@@ -145,11 +145,11 @@ Prefer:
 
 # Sample Lore Texts
 
-The following samples are illustrative and establish tone, not canon.
+The following samples establish tone, not canon.
 
 ---
 
-## Sample: The First Planet’s Voice (Saturn)
+## Sample: A Planet's Voice (Saturn)
 
 > *You ask what I am.*
 >
@@ -163,66 +163,24 @@ The following samples are illustrative and establish tone, not canon.
 >
 > *But tell me: what survives without a shape it cannot escape?*
 
-(Alternate fragment, unlocked after multiple deaths:)
-
-> *You ask what I take from you.*
->
-> *I take nothing you were not already losing.*
->
-> *If you feel delayed, it is because you are early.*
-
 ---
 
-## Sample: A Creation Myth (Contradictory)
+## Sample: Contradictory Creation Myths
 
 **Fragment A (Early Game)**
 
-> *The cosmos was assembled.*
->
-> *The Signs were arranged, the Elements separated, the Planets set into motion.*
->
-> *Only afterward was the Prince introduced, so that something might observe what had been done.*
+> *The cosmos was assembled.
+> The Signs were arranged, the Elements separated, the Planets set into motion.
+> Only afterward was the Prince introduced, so that something might observe what had been done.*
 
 **Fragment B (Later Unlock)**
 
-> *The cosmos was never assembled.*
->
-> *The Prince appeared, and the Signs learned to distinguish themselves.*
->
-> *The Planets began to move only when something could be delayed.*
+> *The cosmos was never assembled.
+> The Prince appeared, and the Signs learned to distinguish themselves.
+> The Planets began to move only when something could be delayed.*
 
 Both fragments coexist.
 Neither is marked as false.
-
----
-
-## Sample: House Fragment (The Seventh House)
-
-> *The Seventh House is not where you meet others.*
->
-> *It is where you discover which parts of yourself refuse to stand alone.*
->
-> *Those who avoid this House often claim independence.*
->
-> *Those who dwell here know better.*
-
----
-
-## Sample: Event Fragment (After a Defensive Death)
-
-> *You survived longer than expected.*
->
-> *This is not the same as understanding why.*
-
----
-
-## Sample: Event Fragment (After Repeated Aggression)
-
-> *Mars does not reward courage.*
->
-> *It rewards commitment.*
->
-> *These are frequently confused.*
 
 ---
 
@@ -255,28 +213,6 @@ The game does not explain these marks.
 Players will.
 
 Lore exists to make those explanations *plausible*, not correct.
-
----
-
-## Non-Goals of Lore
-
-Lore must never:
-- Resolve all ambiguity
-- Provide a definitive timeline
-- Explain the player’s identity fully
-- Reduce the Prince to a character biography
-
-If something feels fully explained, it is wrong.
-
----
-
-## Open Lore Questions
-
-- Are Princes discovered or produced?
-- Do Princes end, or only become unreadable?
-- Can scars unlock beauty rather than damage?
-- Do Planets speak independently, or only when noticed?
-- Is the Fixed Star layer revelation or erasure?
 
 ---
 

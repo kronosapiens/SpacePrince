@@ -168,16 +168,152 @@ Everything that matters:
 
 ---
 
-## What Space Prince Is *Not*
+## FTL: Faster Than Light (Strategic Roguelike)
 
-Space Prince is not:
-- A TCG
-- A hero collector
-- A loot treadmill
-- An esports title
-- A belief-driven astrology simulator
+### What We Take
 
-It is not about mastery over systems, but **coherence within constraint**.
+- Resource scarcity as a forcing function for hard choices
+- Node-based progression through a hostile world
+- Encounter diversity without content bloat
+- The feeling that every decision carries weight because nothing regenerates freely
+
+### What We Reject
+
+- Real-time pressure and pause-spam optimization
+- Crew micromanagement
+- Ship unlocks as the primary metaprogression reward
+- Power fantasy through better loadouts
+
+### How Space Prince Differs
+
+FTL creates tension through **scarcity and pursuit**.
+Space Prince creates tension through **constraint and interpretation**.
+
+In FTL, you are always running out of something — fuel, missiles, hull.
+In Space Prince, you are never "out" of anything; you are simply no longer permitted to act in certain ways.
+
+Where FTL asks:
+> "Can you survive long enough to win?"
+
+Space Prince asks:
+> "Can you understand yourself well enough to continue?"
+
+---
+
+## Loot Survivor (Onchain Roguelike)
+
+### What We Take
+
+- Fully onchain game state with no backend authority
+- Verifiable randomness as a first-class design element
+- Turn-based combat that respects blockchain constraints
+- Proof that meaningful roguelike gameplay can exist onchain
+
+### What We Reject
+
+- Stat-driven power accumulation
+- Gear tiers and item farming
+- Numeric optimization as the core loop
+- Combat as the sole mode of engagement
+
+### How Space Prince Differs
+
+Loot Survivor demonstrates that onchain roguelikes are viable.
+Space Prince asks what an onchain roguelike looks like when **identity replaces inventory**.
+
+Loot Survivor's adventurers are defined by what they find and equip.
+Space Prince's Princes are defined by what they are and how they fail.
+
+Where Loot Survivor asks:
+> "What gear did you acquire?"
+
+Space Prince asks:
+> "What did the world permit you to become?"
+
+Both games treat the chain as canon.
+But Loot Survivor uses the chain to verify *accumulation*.
+Space Prince uses the chain to verify *transformation*.
+
+---
+
+## Additional Inspirations
+
+The following offer relevant design and thematic lessons.
+
+### Siddhartha (Hermann Hesse)
+
+The core narrative influence.
+A Prince's journey is Siddhartha's journey: self-discovery through experience, not instruction.
+
+**Key themes:**
+- Wisdom cannot be taught, only lived into
+- There are no shortcuts — understanding requires experience
+- Failure and suffering are teachers
+- The journey has no destination; the point is becoming
+- Returning to the same things with deeper comprehension
+
+**The Action Space:**
+
+The **Think / Wait / Fast** actions come directly from Siddhartha's answer to the merchant Kamaswami:
+
+> *"I can think. I can wait. I can fast."*
+
+**The River:**
+
+Siddhartha's deepest teacher is the river — not a person, but a presence he listens to over years.
+The cosmos in Space Prince functions the same way: not an opponent to defeat, but a world to harmonize with.
+Alignment isn't conquest; it's listening.
+
+**Partial Teachers:**
+
+Siddhartha learns from many teachers — Samanas, Gotama, Kamala, Kamaswami, Vasudeva — but none gives him the whole truth.
+The planets are partial teachers: Saturn teaches restriction, Mars teaches commitment, Mercury teaches misdirection.
+A Prince who only listens to one planet learns something, but not everything.
+
+**Govinda's Parallel Path:**
+
+Siddhartha's friend Govinda follows Buddha directly; Siddhartha wanders.
+They meet again at the end — two paths, neither wrong.
+Other Princes are Govinda: different coordinates, different journeys, no judgment about which is better.
+
+**The Om:**
+
+At the end, Siddhartha hears the Om — the unity beneath all apparent opposition.
+This is the Fixed Stars layer: where distinctions collapse into facets of one thing.
+
+This is why the game has no tutorial, why death advances understanding, and why there is no win screen.
+
+### Into the Breach
+
+Turn-based tactics with perfect information — you see exactly what enemies will do before you act.
+Tension emerges from puzzle-like constraints, not hidden odds.
+Relevant for legible randomness and weighty single actions.
+
+### Cultist Simulator
+
+Uses a symbolic system (aspects, elements, seasons) as actual mechanics, not flavor.
+Lore is fragmented and discovered through play.
+No tutorial, no clear win state.
+Mythic tone without being self-serious.
+
+### Outer Wilds
+
+Progress is purely knowledge — you can't grind, can't upgrade, can't accumulate.
+Death resets position but not understanding.
+The purest expression of "interpretive progress."
+
+### Wildermyth
+
+Procedural myth-making.
+Characters age, scar, transform, and their history gets written into them permanently.
+Deaths become legends.
+A model for how a Prince's history could become narrative.
+
+### Disco Elysium
+
+Fixed identity as constraint — you are this specific person with this specific past.
+Failure is often more interesting than success.
+The skill system is psychological and philosophical, not tactical.
 
 ---
 
@@ -188,7 +324,9 @@ Space Prince stands at the intersection of:
 - Roguelike progression
 - Tabletop ritual
 - Symbolic systems
+- Strategic scarcity
 - Onchain finality
+- Journey narrative (Siddhartha)
 
 But it diverges from each influence at the exact point where **optimization would overwhelm meaning**.
 

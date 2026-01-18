@@ -33,7 +33,6 @@ No explanation is given.
 
 This framing establishes:
 - Discovery, not creation
-- Seriousness, not playfulness
 - A sense of threshold
 
 ---
@@ -96,9 +95,9 @@ The object is presented as a **thing**, not a character.
 
 A voice appears — not in dialogue form, but as a fragment:
 
-> *You will not be instructed.*
+> *The world is already here.*
 
-> *You will be observed.*
+> *You may begin.*
 
 The player is given a single option:
 
@@ -106,8 +105,8 @@ The player is given a single option:
 
 This establishes the tone:
 - No tutorial voice
-- No guidance masquerading as lore
-- No sense of being “chosen”
+- Discovery rather than instruction
+- The Prince is one of many, not "chosen"
 
 ---
 
@@ -215,31 +214,13 @@ The player understands:
 By the end of ten minutes, the player should feel:
 
 - Curiosity
-- Slight unease
 - A sense of responsibility
-- A desire to see what happens if they continue
+- A desire to see what happens next
 
-They should **not** feel:
-- Confident
-- Skilled
-- In control
-- Explained to
-
-The game has not asked for mastery.
-It has asked for attention.
-
----
-
-## Non-Goals of the First Ten Minutes
-
-The opening does **not** attempt to:
-- Explain all systems
-- Teach optimal play
-- Establish power fantasy
-- Showcase visual maximalism
+The game has asked for attention, not mastery.
 
 If a player says:
-> “I don’t fully understand this yet, but I want to,”
+> "I don't fully understand this yet, but I want to,"
 
 …the opening has succeeded.
 
