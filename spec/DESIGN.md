@@ -459,6 +459,23 @@ As the charts rotate, planetary positions come into and out of alignment:
 - Wait = let the rotation proceed, hope it moves toward favorable positions
 - Fast = force a rotation change (speed up, slow down, or lock), at cost
 
+**Open direction: Orthogonal axes of control**
+
+If the foundation is "two shapes in space," Think/Wait/Fast might map to independent degrees of freedom — like pitch/roll/yaw in spacecraft navigation.
+
+Possible axes for two charts in relation:
+- **Rotation** — angular position (which symbols align)
+- **Distance** — proximity (intensity of alignment effects)
+- **Tilt** — inclination between planes (which alignments are possible)
+
+Possible mapping:
+- Think = tilt (change what's *possible*)
+- Wait = distance (change what's *intense*)
+- Fast = rotation (change what's *imminent*)
+
+This makes the three stances categorically distinct rather than variations on one dial.
+The exact geometry (flat discs, nested spheres, orbital planes) will constrain which axes make sense.
+
 **Precision in rotation terms:**
 - Coarse = "rotate faster" or "rotate slower"
 - Fine = "rotate exactly 15 degrees"

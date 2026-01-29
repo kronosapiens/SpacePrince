@@ -157,10 +157,18 @@ Bad gameplay = more runs = higher total cost.
 
 - A masterful player might mature a Prince in 600 runs ($150)
 - A struggling player might take 1500 runs ($375)
-- A bot plays at some baseline efficiency, probably worse than a skilled human but more consistent
+- A bot, playing optimally within RNG constraints, likely reaches the same efficiency ceiling as a skilled human
 
-Skill doesn't just save time; it saves money.
-This gives skilled human players an edge over bots: they can mature a Prince for less, and thus profit on secondary while bots break even.
+**Conservative assumption:** Bots will solve the game.
+Given enough runs and compute, a bot can map the decision tree and play optimally subject to dice rolls.
+This means skilled humans and optimal bots converge to the same efficiency — call it the "skill ceiling."
+
+**Implication:** Skill provides an advantage over *other humans*, not over bots.
+A skilled player can outcompete a casual player on cost.
+But a skilled player cannot undercut a bot operator who has already solved the game.
+
+This makes the cost floor even more important: it's not just a floor for bots, it's the floor for everyone playing optimally.
+The ~$250 floor applies equally to the best human and the best bot.
 
 ### The Secondary Market Question
 

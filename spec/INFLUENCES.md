@@ -8,6 +8,62 @@ The guiding question throughout is not “what did we like?” but:
 
 ---
 
+## Everything (Philosophical Mood)
+
+### What We Take
+
+- Mood created through curated philosophical fragments
+- Quotes as atmosphere, not instruction
+- The feeling of playing inside a worldview
+
+### What We Reject
+
+- A single philosophical voice (Everything uses only Alan Watts)
+- Quotes as cutscenes or rewards
+- Philosophy as lore to be collected
+
+### How Space Prince Differs
+
+Everything immerses the player in one thinker's perspective.
+Space Prince distributes philosophy across the planets — each celestial body speaks in a different voice.
+
+Saturn quotes the Stoics. Jupiter quotes the expansive. Mercury quotes the tricksters.
+Players encounter fragments constantly, not as interruption but as texture.
+
+Where Everything asks:
+> "What if you heard the universe explaining itself?"
+
+Space Prince asks:
+> "What if each planet had a different answer?"
+
+---
+
+## Braid (Mechanic as Metaphor)
+
+### What We Take
+
+- The conviction that a core mechanic can *embody* theme, not merely serve it
+- Variations on a single mechanic that reveal different facets of a central idea
+- The feeling that understanding the system *is* understanding the meaning
+
+### What We Reject
+
+- Linear narrative that explains the metaphor after the fact
+- A single canonical interpretation the player is meant to "get"
+
+### How Space Prince Differs
+
+Braid's time-rewind is a metaphor for regret and the impossibility of undoing the past.
+Space Prince's astrological system is a metaphor for identity and fate.
+
+Where Braid asks:
+> "What if you could rewind — and discovered it changes nothing?"
+
+Space Prince asks:
+> "What if your nature shaped your odds — and you had to learn what that nature is?"
+
+Both games trust that players will feel the meaning before they can articulate it.
+
 ## Diablo (ARPG Lineage)
 
 ### What We Take
