@@ -1,28 +1,29 @@
 ![Space Prince Banner](./spec/banner.png)
 
-# Space Prince 🪐
+# Space Prince
 
-Space Prince is an onchain, single-character RPG about identity, attention, and irreversible choice.
+Space Prince is an onchain roguelike about identity, attention, and irreversible choice.
 
-Players play as a globally-unique **Prince**, identified by a latitude, longitude, and timestamp.
-This position gives every prince a distinct profile, derived from their astrological chart.
-Signs map to attributes, which shape a prince's relative strengths and weaknesses.
+Players mint a globally unique **Prince**, defined by a latitude, longitude, and timestamp.
+This position determines an astrological natal chart — 7 planets, each placed in a sign, house, and dignity state.
+The chart is the character sheet: immutable, unique, and full of internal structure the player discovers through play.
 
-Players explore the cosmos through a series of increasingly complex procedurally-generated encounters, in which they adopt various _postures_ to earn _permission_ to advance.
-Over many runs of the game, princes gain self-knowledge, which unlocks a greater precision of action.
-The end goal is _self-awareness_ and the ability to act with skill and agency.
+Players navigate encounters by choosing which planet to send against each opponent.
+Sign relationships determine the terrain — harmonious, tense, volatile — and the player's only action is choosing who to send and when.
+Affliction accumulates. Planets combust. Runs end.
+Over many runs, the chart reveals itself: new planets emerge, aspects activate, houses illuminate.
 
-As players play, their Prince NFT evolves visually, reflecting their advancement and history.
-The NFT becomes an "enchanted object" and objective proof of the player's time and investment.
+The Prince NFT evolves with play — from a single bright point to a full wheel of planets, aspects, and history.
+It is the character, the save file, and the artifact forged through attention.
 
 ---
 
 ## What This Is
 
-- A **fully onchain** game (client UI only)
-- A **single-player** game (no decks)
-- A **roguelike structure** where failure advances the world
+- A **fully onchain** game (client is presentation only)
+- A **single-player** roguelike where death advances metaprogression
 - A **generative NFT** that evolves as a permanent record of play
+- An **art game** grounded in Hellenistic astrology
 
 Progress does not increase power.
 It increases specificity.
@@ -31,50 +32,41 @@ It increases specificity.
 
 ## Core Ideas
 
-- **Identity is irreversible**
-  Minting recognizes an identity; it does not create one.
+- **Identity is irreversible.**
+  Minting recognizes a position; it does not create one.
 
-- **Power is cyclical, not hierarchical**
-  No build, chart, or strategy is universally dominant.
+- **Planet selection is the action.**
+  Each turn, the player chooses which planet to send against the opponent.
+  Sign relationships determine the outcome. Everything else emerges from chart structure.
 
-- **Failure is canonical**
-  Death leaves permanent trace and unlocks new understanding.
+- **Affliction is the only resource.**
+  No HP, gold, energy, or inventory. A Prince's run state is 7 integers.
+  Affliction accumulates, testimony relieves, combustion silences.
 
-- **Attention has cost**
-  Each run is a deliberate passage, not a retry.
+- **Aspects propagate with polarity.**
+  Internal aspects carry effects between planets — trines attenuate, squares invert, conjunctions fuse, oppositions flip.
+  A chart full of squares is harder to play and rewards mastery.
 
----
-
-## How You Act
-
-On each turn, the player may choose one stance:
-
-- **Think** — seek clarity
-- **Wait** — yield to time
-- **Fast** — impose constraint
-
-All actions in the game are interpretations of these three.
+- **Failure is canonical.**
+  Death darkens the NFT and unlocks new understanding.
+  The chart was always complete — the player is catching up.
 
 ---
 
 ## The Prince NFT
 
-The Prince NFT is:
+The Prince NFT is the character, the save file, and the artifact.
 
-- The character
-- The save file
-- The artifact forged through play
+It evolves deterministically from onchain state:
+- **Early:** a few bright points on a dark field
+- **Mid:** aspect lines appear, connecting planets into visible geometry
+- **Late:** the full wheel — planets, aspects, and houses — each carrying its history
 
-It evolves deterministically based on:
-- Identity (birth data)
-- World interaction
-- Failure and persistence
+Two Princes are distinguished not by rarity traits but by lived history.
 
 ---
 
 ## What This Is Not
-
-Space Prince is not:
 
 - A TCG
 - A hero collector

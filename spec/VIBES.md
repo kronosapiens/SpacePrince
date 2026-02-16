@@ -19,29 +19,27 @@ When a planet acts, speaks, or is referenced, the language reflects its nature.
 
 ### Voice Register
 
-- **Sun:** sovereign, declarative, present-tense. Quotes the confident and self-possessed. Marcus Aurelius, Whitman, the Bhagavad Gita.
-- **Moon:** reflective, shifting, intimate. Quotes the contemplative and the receptive. Bashō, Rilke, the Psalms.
-- **Mercury:** quick, ambiguous, playful. Quotes tricksters, rhetoricians, and boundary-crossers. Hermes Trismegistus, Borges, Zhuangzi.
-- **Mars:** direct, clipped, committed. Quotes warriors, activists, and those who chose sides. Musashi, Fanon, the Iliad.
-- **Venus:** sensory, relational, attuned to beauty. Quotes lovers, aesthetes, and those who understood attachment. Sappho, Rumi, Sei Shōnagon.
-- **Jupiter:** expansive, generous, oracular. Quotes visionaries, teachers, and the overconfident. Emerson, Tagore, the Upanishads.
-- **Saturn:** austere, patient, measured. Quotes the Stoics, the ascetics, and those who understood limitation. Epictetus, Ecclesiastes, Simone Weil.
+- **Sun:** sovereign, declarative, present-tense. Marcus Aurelius, Whitman, the Bhagavad Gita.
+- **Moon:** reflective, shifting, intimate. Bashō, Rilke, the Psalms.
+- **Mercury:** quick, ambiguous, playful. Hermes Trismegistus, Borges, Zhuangzi.
+- **Mars:** direct, clipped, committed. Musashi, Fanon, the Iliad.
+- **Venus:** sensory, relational, attuned to beauty. Sappho, Rumi, Sei Shōnagon.
+- **Jupiter:** expansive, generous, oracular. Emerson, Tagore, the Upanishads.
+- **Saturn:** austere, patient, measured. Epictetus, Ecclesiastes, Simone Weil.
 
 ### When Planets Speak
 
-Planetary voice surfaces throughout the game:
-
-- **Combat narration.** When a planet is activated in a contest point, a fragment appears — brief, atmospheric, never interrupting.
-  Not: "Mars deals 3 pressure."
-  But: *"Forward."* — and the pressure numbers follow beneath.
-- **Aspect cascades.** When a cascade propagates (Mars activates, Saturn takes pressure via a square), both planets speak — briefly, in tension.
+- **Encounter narration.** When a planet is sent into a turn, a fragment appears — brief, atmospheric, never interrupting.
+  Not: "Mars deals 3 affliction."
+  But: *"Forward."* — and the numbers follow beneath.
+- **Aspect propagation.** When effects propagate through an aspect (Mars activates, Saturn receives inverted testimony via a square), both planets speak — briefly, in tension.
   *"Forward."* / *"Not yet."*
   The player feels the relationship between their planets, not just the arithmetic.
-- **Planet breaks.** When a planet breaks, it speaks one last time — a longer fragment, a closing thought.
+- **Combustion.** When a planet combusts, it speaks one last time — a longer fragment, a closing thought.
   The silence that follows should be noticeable.
   A voice the player has been hearing all game goes quiet.
 - **House encounters.** The ruling planet of the house introduces the encounter.
-  A Jupiter-ruled house speaks expansively about what's on offer.
+  A Jupiter-ruled house speaks expansively.
   A Saturn-ruled house speaks sparely and with warning.
 - **Chart recognition moments.** At progression milestones, a planet offers an observation about the player's chart (see below).
 
@@ -70,6 +68,18 @@ These drive the visual palette dynamically based on what's happening in the game
 - **Jupiter:** deep blue, royal purple
 - **Saturn:** lead grey, dark earth, black
 
+#### Color Swatches
+
+| Planet | Colors | | |
+|--------|--------|---|---|
+| **Sun** | ![](swatches/sun-gold.svg) Gold `#FFD700` | ![](swatches/sun-warmwhite.svg) Warm White `#FFF5CC` | |
+| **Moon** | ![](swatches/moon-silver.svg) Silver `#C0C0C0` | ![](swatches/moon-paleblue.svg) Pale Blue `#B0C4DE` | |
+| **Mercury** | ![](swatches/mercury-greygreen.svg) Grey-Green `#A8B5A2` | ![](swatches/mercury-quicksilver.svg) Quicksilver `#D4D4D4` | |
+| **Venus** | ![](swatches/venus-copper.svg) Copper `#B87333` | ![](swatches/venus-rose.svg) Rose `#E8A0BF` | ![](swatches/venus-softgreen.svg) Soft Green `#8FBC8F` |
+| **Mars** | ![](swatches/mars-red.svg) Red `#CD2626` | ![](swatches/mars-iron.svg) Iron `#5C4033` | |
+| **Jupiter** | ![](swatches/jupiter-deepblue.svg) Deep Blue `#1B3F8B` | ![](swatches/jupiter-royalpurple.svg) Royal Purple `#4B0082` | |
+| **Saturn** | ![](swatches/saturn-leadgrey.svg) Lead Grey `#6B6B6B` | ![](swatches/saturn-darkearth.svg) Dark Earth `#3B2F2F` | ![](swatches/saturn-black.svg) Black `#1A1A1A` |
+
 The screen's ambient color reflects the **active planet**.
 When Mars is in play, the world tilts red.
 When Saturn dominates, things go grey and heavy.
@@ -80,24 +90,24 @@ Transitions between planets should feel like shifts in light — dawn to dusk, s
 The player's natal chart should be **always visible** — not as a HUD element but as the visual ground of the game.
 The chart is not a menu; it is the world.
 
-- Planets glow or dim based on pressure state.
-- Broken planets go dark.
-- Active contest points highlight the connection between two charts.
+- Planets glow or dim based on affliction state.
+- Combust planets go dark.
+- The active encounter highlights the connection between two charts.
 - Aspect lines (trines, squares, oppositions) between planets are visible — the player sees their internal web.
 
-### Combat Visuals
+### Encounter Visuals
 
 Two charts face each other.
-The contest point highlights the active pair of planets — one in each chart.
-When the player chooses an expression, the active planet pulses in its color.
-The opponent's response pulses in theirs.
+The current turn highlights the active pair of planets — one from each chart.
+When the player selects a planet, it pulses in its color.
+The opponent planet pulses in theirs.
 
-**Aspect cascades should be the visual climax of each turn.**
-When Mars activates and pressure propagates to Saturn via a square, the player should *see* the tension travel along the aspect line — a ripple of red hitting Saturn's grey.
-When Jupiter relieves Venus via a trine, soft blue flows along the line.
-The chart is a living system, and the cascades are its heartbeat.
+**Aspect propagation should be the visual climax of each turn.**
+When Mars activates and affliction inverts to testimony on Saturn via a square, the player should *see* the effect travel along the aspect line — a ripple of red becoming Saturn's grey.
+When Jupiter's testimony flows to Venus via a trine, soft blue moves along the line.
+The chart is a living system, and the propagation is its heartbeat.
 
-Cascades that break a planet should feel significant — a dimming, a crack, a sound design moment.
+Propagation that combusts a planet should feel significant — a dimming, a crack, a sound design moment.
 Not dramatic in a blockbuster way.
 More like a candle going out.
 
@@ -112,8 +122,6 @@ Entering a house encounter should feel like entering a *place*, not opening a me
 - **10th house:** a summit, exposed sky, wind
 - **12th house:** deep water, fog, things half-seen
 
-The pressure menu options appear *within* this visual space — not as UI buttons but as objects, paths, or figures that the player interacts with.
-
 ---
 
 ## Chart Recognition (Self-Knowledge Moments)
@@ -124,14 +132,14 @@ They are structurally grounded statements about how the player's chart has been 
 
 ### Examples
 
-After unlocking Mars's off-modality expression:
-> *"Your Mars is in Libra. It initiates through fairness — the blade that cuts both ways equally. You've learned to hold that blade differently. What changed?"*
-
-After a planet breaks for the third time across runs:
-> *"Saturn has broken again. It sits in your 5th house — pleasure constrained, joy deferred. Each time it breaks, the game gets quieter. Have you noticed what you lose when discipline fails?"*
+After a planet combusts for the third time across runs:
+> *"Saturn has combusted again. It sits in your 5th house — pleasure constrained, joy deferred. Each time it goes dark, the game gets quieter. Have you noticed what you lose when discipline fails?"*
 
 After reaching a new depth record:
 > *"Your Moon trines your Jupiter. You've always recovered well — setbacks expand rather than diminish you. This is why you're still here."*
+
+After activating a difficult aspect:
+> *"Your Mars squares your Venus. Every time you send one, the other pays. You've been managing that tension all game. What have you learned about the cost?"*
 
 ### Design Rules for Recognition Moments
 
@@ -147,11 +155,11 @@ After reaching a new depth record:
 Sound should reinforce the planetary color system.
 
 - Each planet has a **tonal signature** — not a melody, but a texture. Saturn is low, sustained, mineral. Mercury is quick, metallic, slightly dissonant. Venus is warm, harmonic, close.
-- Combat turns produce sound from the active planets — the clash or harmony of two tonal signatures.
-- Aspect cascades are *audible*. A trine cascade is a resolution. A square cascade is a dissonance that hangs.
-- A planet breaking is the most significant sound event — its tonal signature cuts off mid-phrase.
+- Encounter turns produce sound from the active planets — the clash or harmony of two tonal signatures.
+- Aspect propagation is *audible*. A trine propagation is a resolution. A square propagation is a dissonance that hangs.
+- A planet combusting is the most significant sound event — its tonal signature cuts off mid-phrase.
 - House encounters have ambient sound shaped by their ruling planet.
-- The overall soundscape gets **sparser as planets break**. Early in a run, the full chart hums. Late in a run, with planets broken, there are gaps — silences where voices used to be.
+- The overall soundscape gets **sparser as planets combust**. Early in a run, the full chart hums. Late in a run, with planets dark, there are gaps — silences where voices used to be.
 
 ---
 
@@ -160,13 +168,21 @@ Sound should reinforce the planetary color system.
 The game's narrative is not a story that unfolds.
 It is a **symbolic vocabulary that the player learns**.
 
-Early runs: the player is learning mechanics. Planetary voices are encountered but not understood. The chart is a diagram.
+Early runs: the player is learning mechanics.
+Planetary voices are encountered but not understood.
+The chart is a diagram.
 
-Mid runs: the player starts to recognize patterns — not just mechanically but symbolically. They know what Mars sounds like, what Saturn feels like when it's pressured. The chart starts to feel like a self-portrait.
+Mid runs: the player starts to recognize patterns — not just mechanically but symbolically.
+They know what Mars sounds like, what Saturn feels like when it's afflicted.
+The chart starts to feel like a self-portrait.
 
-Late runs: the player has internalized the symbolic language. They anticipate not just the mechanical consequences of activating a planet but the *feeling* of it. The game is no longer explaining anything. The player is reading their own chart fluently.
+Late runs: the player has internalized the symbolic language.
+They anticipate not just the mechanical consequences of selecting a planet but the *feeling* of it.
+The game is no longer explaining anything.
+The player is reading their own chart fluently.
 
-This progression requires **no mechanical changes**. It emerges from the accumulation of fragments, visuals, sounds, and recognition moments across many runs.
+This progression requires **no mechanical changes**.
+It emerges from the accumulation of fragments, visuals, sounds, and recognition moments across many runs.
 
 > The game doesn't become meaningful. The player becomes literate.
 
