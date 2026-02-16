@@ -59,6 +59,50 @@ It is the canonical artifact associated with that position.
 
 ---
 
+## Mint Resolution
+
+Mint inputs are quantized to balance specificity (people should be able to mint "themselves") with meaningful scarcity (once your position is claimed, nearby positions shouldn't trivially reproduce it).
+
+### Grid
+
+- **Time: 15-minute buckets.**
+96 slots per day.
+Fine enough that a person knows their slot — most people know their birth time to the nearest 15 minutes or hour.
+Coarse enough that adjacent slots almost always produce the same chart, providing a natural buffer against near-miss minting.
+
+- **Location: 0.1° grid (~11 km at the equator).**
+~6,500 land grid cells worldwide.
+Fine enough to distinguish cities and neighborhoods.
+Coarse enough that minor GPS differences don't matter.
+
+### Why this resolution
+
+The game uses whole-sign houses and sign-based aspects — no degree-level angular geometry.
+A chart is fully determined by 8 sign values: 7 planet signs + the Ascendant sign.
+
+Planet positions depend on date but not location.
+Only the Ascendant depends on time-of-day and location.
+The Ascendant sign changes roughly every 2 hours (varies by latitude and sign).
+
+This means on a typical day, there are **12-24 distinct charts** — one per Ascendant window, with occasional variation when the Moon or an inner planet crosses a sign boundary mid-day.
+
+The 15-minute time bucket is well within the ~2-hour Ascendant window.
+The 0.1° location grid shifts the effective time by ~45 seconds (negligible for sign boundaries).
+Both are far finer than the chart resolution, which is intentional: the coordinate triple is the identity, the chart is the nature.
+
+### Chart twins
+
+Multiple Princes can share the same chart.
+This is astrologically authentic — people born on the same day in the same Ascendant window have the same natal chart.
+Chart twins are siblings in nature, not duplicates.
+Their coordinates (and therefore their identities) remain distinct.
+
+Over a realistic player population, most Princes will have unique charts.
+12-24 charts per day × 365 days × decades of birth dates produces hundreds of thousands of distinct charts.
+Chart twins become more common at scale, but this is a social feature, not a defect.
+
+---
+
 ## Visual Philosophy
 
 The Prince is not depicted as a human figure.

@@ -310,9 +310,13 @@ A Prince's journey is Siddhartha's journey: self-discovery through experience, n
 
 **The Action Space:**
 
-The **Think / Wait / Fast** actions come directly from Siddhartha's answer to the merchant Kamaswami:
+The **Think / Wait / Fast** postures are inspired by Siddhartha's answer to the merchant Kamaswami:
 
 > *"I can think. I can wait. I can fast."*
+
+The posture system stands on its own as a design choice — three modes of engaging with pressure that map naturally to modality (Cardinal→Think, Fixed→Wait, Mutable→Fast).
+The Siddhartha connection is a philosophical resonance, not a design dependency.
+Players do not need to know the reference.
 
 **The River:**
 
