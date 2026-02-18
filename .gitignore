@@ -1,0 +1,21 @@
+# Node
+node_modules/
+.pnpm-store/
+
+# Vite
+client/dist/
+client/.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+
+# Env
+.env
+.env.local
+.env.*.local
