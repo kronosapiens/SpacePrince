@@ -64,11 +64,12 @@ h3,
   gap: 24px;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 28px;
-  border-radius: 32px;
-  background: linear-gradient(135deg, rgba(27, 42, 45, 0.95), rgba(18, 28, 30, 0.95));
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(242, 198, 122, 0.1);
+  padding: 6px 0 20px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid rgba(216, 168, 90, 0.2);
 }
 
 .eyebrow {
@@ -78,8 +79,9 @@ h3,
 }
 
 .hero h1 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: clamp(28px, 4vw, 40px);
+  line-height: 1;
 }
 
 .subtitle {
@@ -191,6 +193,11 @@ h3,
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 10px;
   position: relative;
+}
+
+.chart-stage {
+  position: relative;
+  padding-bottom: 42px;
 }
 
 .chart-shell {
@@ -520,6 +527,15 @@ h3,
   opacity: 0.8;
 }
 
+.aspect-line.impact {
+  animation: linePulse 0.6s ease-out;
+}
+
+.aspect-line.active {
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
 .aspect-trine,
 .aspect-sextile {
   stroke: rgba(143, 188, 143, 0.7);
@@ -571,6 +587,19 @@ h3,
   color: var(--muted);
 }
 
+.tooltip-row.projected {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.delta.up {
+  color: #ffb68a;
+}
+
+.delta.down {
+  color: #8fbc8f;
+}
+
 .chart-visual .inner-ring {
   position: absolute;
   width: 68%;
@@ -613,6 +642,10 @@ h3,
   place-items: center;
   z-index: 3;
   cursor: pointer;
+}
+
+.chart-planet.impact {
+  animation: glowPulse 0.6s ease-out;
 }
 
 .chart-planet.locked {
@@ -659,6 +692,10 @@ h3,
   color: var(--muted);
 }
 
+.chart-affliction.flash {
+  animation: afflictionPulse 0.4s ease-out;
+}
+
 .chart-affliction.affliction-1 {
   color: #d9c08c;
 }
@@ -674,8 +711,8 @@ h3,
 .chart-tooltip {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 8px;
+  transform: translate(-50%, 0);
   background: rgba(18, 28, 30, 0.95);
   border: 1px solid rgba(216, 168, 90, 0.35);
   border-radius: 12px;
@@ -726,6 +763,48 @@ h3,
 .chart-hint {
   font-size: 13px;
   color: var(--muted);
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+    filter: brightness(1.2);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    filter: brightness(1);
+  }
+}
+
+@keyframes linePulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes afflictionPulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+    color: var(--muted);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    color: var(--ink);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    color: var(--muted);
+  }
 }
 
 @media (max-width: 900px) {

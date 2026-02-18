@@ -23,6 +23,7 @@ import type {
   ElementType,
   EncounterState,
   ModalityType,
+  PlanetBaseStats,
   PlanetName,
   PlanetPlacement,
   PlanetState,
