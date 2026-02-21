@@ -10,7 +10,6 @@ export function EncounterLog({ run }: EncounterLogProps) {
       <div className="panel">
         <div className="panel-header">
           <h2>Encounter Log</h2>
-          <div className="tag">Latest 12</div>
         </div>
         <div className="panel-body">
           {run?.log.length ? (
@@ -19,19 +18,21 @@ export function EncounterLog({ run }: EncounterLogProps) {
                 <div key={entry.id} className="log-entry">
                   <div className="log-head">
                     <span>Turn {entry.turnIndex}</span>
+                    <span className="log-sep">|</span>
                     <span>
                       {entry.playerPlanet} vs {entry.opponentPlanet}
                     </span>
+                    <span className="log-sep">|</span>
+                    <span>Fortune +{entry.turnScore}</span>
                   </div>
                   <div className="log-body">
                     <p>
-                      {entry.polarity} | Player {entry.playerCrit ? "CRIT" : ""} {entry.playerDelta}
-                      {entry.polarity === "Testimony" ? " healed" : " affliction"} | Opponent{" "}
-                      {entry.opponentCrit ? "CRIT" : ""} {entry.opponentDelta}
-                      {entry.polarity === "Testimony" ? " healed" : " affliction"}
+                      {entry.polarity} | Self {entry.playerCrit ? "CRIT " : ""}
+                      {entry.playerDelta} · Other {entry.opponentCrit ? "CRIT " : ""}
+                      {entry.opponentDelta}
                     </p>
-                    {entry.playerCombust && <p className="warn">Player combusts</p>}
-                    {entry.opponentCombust && <p className="warn">Opponent combusts</p>}
+                    {entry.playerCombust && <p className="warn">{entry.playerPlanet} combusts</p>}
+                    {entry.opponentCombust && <p className="warn">{entry.opponentPlanet} combusts</p>}
                     {entry.propagation.length > 0 && (
                       <div className="propagation">
                         {entry.propagation.map((prop, index) => (

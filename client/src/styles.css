@@ -171,6 +171,12 @@ h3,
   font-size: 20px;
 }
 
+.encounter-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .tag {
   font-size: 12px;
   text-transform: uppercase;
@@ -181,23 +187,30 @@ h3,
   color: var(--accent);
 }
 
+.log-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .panel-body {
   padding: 20px 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .chart-visuals {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 10px;
+  gap: 6px;
   position: relative;
 }
 
 .chart-stage {
   position: relative;
-  padding-bottom: 42px;
+  padding-bottom: 18px;
 }
 
 .chart-shell {
@@ -434,9 +447,14 @@ h3,
 
 .log-head {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 12px;
   font-size: 13px;
   color: var(--accent-strong);
+}
+
+.log-sep {
+  opacity: 0.7;
 }
 
 .log-body {
@@ -461,11 +479,66 @@ h3,
   color: var(--ink);
 }
 
+.interaction-table-wrap {
+  overflow-x: auto;
+}
+
+.interaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.interaction-table th,
+.interaction-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.interaction-table th {
+  color: var(--accent-strong);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.interaction-table td {
+  color: var(--muted);
+}
+
+.interaction-planet-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.interaction-planet-glyph {
+  font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", "Symbola", serif;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.interaction-table tr.focus td {
+  color: var(--ink);
+}
+
+.interaction-table tr.combusted td {
+  opacity: 0.55;
+}
+
+.interaction-aspects {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
 .chart-visual {
   position: relative;
-  width: min(540px, 100%);
-  height: 540px;
-  margin: 0 auto 6px;
+  width: min(510px, 100%);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 2px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(31, 45, 48, 0.9) 0%, rgba(16, 24, 26, 0.9) 70%);
   border: 1px solid rgba(216, 168, 90, 0.35);
@@ -483,7 +556,7 @@ h3,
   pointer-events: none;
 }
 
-.chart-visual.diurnal::before {
+.chart-visual.day-top::before {
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.035) 0%,
@@ -493,7 +566,7 @@ h3,
   );
 }
 
-.chart-visual.nocturnal::before {
+.chart-visual.day-bottom::before {
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.08) 0%,
@@ -518,7 +591,14 @@ h3,
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+.chart-aspects-lines {
   z-index: 1;
+}
+
+.chart-aspects-labels {
+  z-index: 4;
 }
 
 .aspect-line {
@@ -534,6 +614,19 @@ h3,
 .aspect-line.active {
   stroke-width: 2.2;
   filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+.aspect-label {
+  fill: rgba(245, 241, 230, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke;
+  stroke: rgba(16, 24, 26, 0.95);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 
 .aspect-trine,
@@ -602,8 +695,8 @@ h3,
 
 .chart-visual .inner-ring {
   position: absolute;
-  width: 68%;
-  height: 68%;
+  width: 78%;
+  height: 78%;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.08);
   pointer-events: none;
@@ -624,15 +717,37 @@ h3,
   position: absolute;
   top: 50%;
   left: 50%;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transform-origin: center center;
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  gap: 1px;
+}
+
+.chart-sign-label.ascendant {
+  color: var(--danger);
+  text-shadow: 0 0 6px rgba(255, 140, 107, 0.2);
+}
+
+.sign-abbr {
+  font-size: 11px;
+}
+
+.sign-glyph {
+  font-size: 13px;
+  text-transform: none;
+  font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", "Symbola", serif;
 }
 
 .chart-planet {
+  overflow: visible;
   position: absolute;
+  top: 50%;
+  left: 50%;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -644,6 +759,15 @@ h3,
   cursor: pointer;
 }
 
+.planet-glyph {
+  font-size: 18px;
+  line-height: 1;
+  font-family: "Noto Sans Symbols 2", "Segoe UI Symbol", "Symbola", serif;
+  color: rgba(15, 18, 20, 0.78);
+  pointer-events: none;
+  user-select: none;
+}
+
 .chart-planet.impact {
   animation: glowPulse 0.6s ease-out;
 }
@@ -653,58 +777,71 @@ h3,
   cursor: not-allowed;
 }
 
-.chart-x {
-  position: absolute;
-  color: #ff4d4d;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1;
-  text-shadow: 0 0 8px rgba(255, 77, 77, 0.7);
+.chart-planet.combusted .planet-glyph {
+  opacity: 0.25;
 }
+
+.chart-combust {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 70, 70, 0.95);
+  box-shadow: none;
+  animation: combustRipple 1s ease-out 3;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
 
 .chart-planet.active {
   outline: 2px solid rgba(255, 182, 138, 0.9);
   outline-offset: 2px;
 }
 
-.chart-planet.combusted {
-  filter: grayscale(1) brightness(0.7);
-}
-
-.chart-label {
+.chart-affliction-chip {
   position: absolute;
-  top: 38px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  top: -7px;
+  right: -7px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(18, 28, 30, 0.92);
+  border: 1px solid rgba(216, 168, 90, 0.45);
+  font-size: 10px;
+  font-weight: 700;
   color: var(--ink);
-  white-space: nowrap;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
-.chart-affliction {
-  position: absolute;
-  top: 58px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: var(--muted);
+.chart-affliction-chip.top-half {
+  top: auto;
+  bottom: -7px;
+  right: auto;
+  left: -7px;
 }
 
-.chart-affliction.flash {
-  animation: afflictionPulse 0.4s ease-out;
+.chart-affliction-chip.flash {
+  animation: afflictionChipPulse 0.4s ease-out;
 }
 
-.chart-affliction.affliction-1 {
+.chart-affliction-chip.affliction-1 {
   color: #d9c08c;
 }
 
-.chart-affliction.affliction-2 {
+.chart-affliction-chip.affliction-2 {
   color: #ffb68a;
 }
 
-.chart-affliction.affliction-3 {
+.chart-affliction-chip.affliction-3 {
   color: #ff7a6b;
 }
 
@@ -735,12 +872,25 @@ h3,
   flex-wrap: wrap;
 }
 
+.turn-track-wrap {
+  margin: 14px auto 2px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+
 .turn-track {
-  margin: 10px auto 4px;
   display: flex;
   gap: 8px;
   justify-content: center;
   align-items: center;
+}
+
+.turn-action {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .turn-dot {
@@ -758,11 +908,6 @@ h3,
 
 .turn-dot.active {
   box-shadow: 0 0 8px rgba(216, 168, 90, 0.8);
-}
-
-.chart-hint {
-  font-size: 13px;
-  color: var(--muted);
 }
 
 @keyframes glowPulse {
@@ -792,18 +937,29 @@ h3,
   }
 }
 
-@keyframes afflictionPulse {
+@keyframes afflictionChipPulse {
   0% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
     color: var(--muted);
   }
   50% {
-    transform: translateX(-50%) scale(1.2);
+    transform: scale(1.2);
     color: var(--ink);
   }
   100% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
     color: var(--muted);
+  }
+}
+
+@keyframes combustRipple {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
   }
 }
 

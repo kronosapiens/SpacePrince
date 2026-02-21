@@ -8,12 +8,23 @@ export interface ChartPoint {
   y: number;
 }
 
+// Math-space angle (0° at right, 90° at down) equivalent to ~8:30 on the wheel.
+const ASCENDANT_TARGET_ANGLE_DEGREES = 165;
+
+export const getChartRotationDegrees = (chart: Chart) => {
+  const ascendant = chart.ascendantSign ?? "Aries";
+  const ascIndex = SIGNS.indexOf(ascendant);
+  const ascCenterAngle = -ascIndex * 30 - 75;
+  return ASCENDANT_TARGET_ANGLE_DEGREES - ascCenterAngle;
+};
+
 export const buildChartPoints = (
   chart: Chart,
-  radius = 150,
+  radius = 176,
   spreadStep = 22,
   angleStepDegrees = 12
 ): ChartPoint[] => {
+  const rotation = getChartRotationDegrees(chart) * (Math.PI / 180);
   const bySign = new Map<SignName, PlanetName[]>();
   PLANETS.forEach((planet) => {
     const sign = chart.planets[planet].sign;
@@ -25,13 +36,13 @@ export const buildChartPoints = (
   return PLANETS.map((planet) => {
     const sign = chart.planets[planet].sign;
     const index = SIGNS.indexOf(sign);
-    const baseAngle = (index * 30 - 90 + 15) * (Math.PI / 180);
+    const baseAngle = (-index * 30 - 90 + 15) * (Math.PI / 180);
     const cluster = bySign.get(sign) ?? [];
     const position = cluster.indexOf(planet);
     const angleOffset =
       cluster.length > 1 ? (position - (cluster.length - 1) / 2) * (angleStepDegrees * (Math.PI / 180)) : 0;
     const spread = cluster.length > 1 ? (position - (cluster.length - 1) / 2) * spreadStep : 0;
-    const angle = baseAngle + angleOffset;
+    const angle = baseAngle + angleOffset + rotation;
     const offset = radius + spread;
     const x = Math.cos(angle) * offset;
     const y = Math.sin(angle) * offset;

@@ -26,6 +26,16 @@ export function useCombatAnimation() {
     animationTimeouts.current = [];
   };
 
+  const finishAnimation = () => {
+    clearAnimationTimeouts();
+    setHighlightLines({});
+    setHighlightAffliction({});
+    setActionPlanet(null);
+    setActionOpponent(null);
+    setDisplayAffliction(null);
+    setAnimating(false);
+  };
+
   useEffect(() => clearAnimationTimeouts, []);
 
   const startAnimation = (entry: RunState["log"][number], previousRun: RunState) => {
@@ -52,8 +62,9 @@ export function useCombatAnimation() {
     setHighlightLines({});
 
     const primaryId = window.setTimeout(() => {
-      applyAffliction("self", entry.playerPlanet, entry.playerDelta);
-      applyAffliction("other", entry.opponentPlanet, entry.opponentDelta);
+      const primarySign = entry.polarity === "Testimony" ? -1 : 1;
+      applyAffliction("self", entry.playerPlanet, entry.playerDelta * primarySign);
+      applyAffliction("other", entry.opponentPlanet, entry.opponentDelta * primarySign);
       setHighlightAffliction({
         [`self-${entry.playerPlanet}`]: true,
         [`other-${entry.opponentPlanet}`]: true,
@@ -93,12 +104,7 @@ export function useCombatAnimation() {
     });
 
     const endId = window.setTimeout(() => {
-      setHighlightLines({});
-      setHighlightAffliction({});
-      setActionPlanet(null);
-      setActionOpponent(null);
-      setDisplayAffliction(null);
-      setAnimating(false);
+      finishAnimation();
     }, delay + END_OFFSET);
     animationTimeouts.current.push(endId);
   };
@@ -111,5 +117,6 @@ export function useCombatAnimation() {
     highlightLines,
     displayAffliction,
     startAnimation,
+    finishAnimation,
   };
 }

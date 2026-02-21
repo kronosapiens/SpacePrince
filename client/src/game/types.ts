@@ -65,6 +65,7 @@ export interface Chart {
   id: string;
   name: string;
   isDiurnal: boolean;
+  ascendantSign?: SignName;
   planets: Record<PlanetName, PlanetPlacement>;
 }
 
@@ -93,6 +94,9 @@ export interface TurnLogEntry {
     delta: number;
     note: string;
   }>;
+  turnAffliction: number;
+  turnTestimony: number;
+  turnScore: number;
 }
 
 export interface EncounterState {
@@ -113,6 +117,9 @@ export interface RunState {
   playerState: Record<PlanetName, PlanetState>;
   opponentState: Record<PlanetName, PlanetState>;
   log: TurnLogEntry[];
+  totalAffliction: number;
+  totalTestimony: number;
+  score: number;
   over: boolean;
   victory: boolean;
 }

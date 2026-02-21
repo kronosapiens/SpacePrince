@@ -1,5 +1,4 @@
 import {
-  COMBUST_LIMIT,
   ELEMENT_BUFFS,
   ELEMENT_QUALITIES,
   EXALTATIONS,
@@ -80,11 +79,13 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   });
 
   const isDiurnal = rng() > 0.5;
+  const ascendantSign = SIGNS[Math.floor(rng() * SIGNS.length)];
 
   return {
     id: `chart_${seed}`,
     name,
     isDiurnal,
+    ascendantSign,
     planets,
   };
 }
@@ -133,6 +134,9 @@ export function createRun(
     playerState: createInitialPlanetState(),
     opponentState: createInitialPlanetState(),
     log: [],
+    totalAffliction: 0,
+    totalTestimony: 0,
+    score: 0,
     over: false,
     victory: false,
   };
@@ -168,7 +172,9 @@ export function resolveTurn(
   rng: () => number
 ): RunState {
   const encounter = run.encounters[run.encounterIndex];
+  if (!encounter || encounter.completed) return run;
   const opponentPlanet = encounter.sequence[encounter.turnIndex];
+  if (!opponentPlanet) return run;
   const opponentChart = encounter.opponentChart;
 
   const playerPlacement = playerChart.planets[playerPlanet];
@@ -239,6 +245,19 @@ export function resolveTurn(
     rng
   );
 
+  let turnAffliction = 0;
+  let turnTestimony = 0;
+  if (polarity === "Testimony") {
+    turnTestimony += playerDelta + opponentDelta;
+  } else {
+    turnAffliction += playerDelta + opponentDelta;
+  }
+  propagation.forEach((prop) => {
+    if (prop.delta > 0) turnAffliction += prop.delta;
+    if (prop.delta < 0) turnTestimony += Math.abs(prop.delta);
+  });
+  const turnScore = turnAffliction + turnTestimony;
+
   const logEntry: TurnLogEntry = {
     id: `turn_${run.log.length}_${Date.now()}`,
     turnIndex: encounter.turnIndex + 1,
@@ -252,11 +271,20 @@ export function resolveTurn(
     playerCombust,
     opponentCombust,
     propagation,
+    turnAffliction,
+    turnTestimony,
+    turnScore,
   };
 
+  const priorAffliction = run.totalAffliction ?? 0;
+  const priorTestimony = run.totalTestimony ?? 0;
+  const priorScore = run.score ?? 0;
   const updatedRun = {
     ...run,
     log: [logEntry, ...run.log].slice(0, 12),
+    totalAffliction: priorAffliction + turnAffliction,
+    totalTestimony: priorTestimony + turnTestimony,
+    score: priorScore + turnScore,
   } as RunState;
 
   updatedRun.playerState = playerStateMap;
@@ -409,6 +437,7 @@ function computeEffectAmount(
 
 function applyEffect(state: PlanetState, polarity: Polarity, amount: number): number {
   if (amount === 0) return 0;
+  if (state.combusted) return 0;
   if (polarity === "Testimony") {
     const before = state.affliction;
     state.affliction = Math.max(0, state.affliction - amount);
@@ -470,6 +499,7 @@ function propagateEffects(
   rng: () => number
 ): TurnLogEntry["propagation"] {
   if (amountReceived <= 0) return [];
+  if (playerStateMap[activePlanet]?.combusted) return [];
   const aspects = getAspects(chart).filter((a) => a.from === activePlanet);
   if (aspects.length === 0) return [];
 
@@ -480,6 +510,7 @@ function propagateEffects(
     if (magnitude === 0) return;
 
     const targetState = playerStateMap[aspect.to];
+    if (targetState.combusted) return;
     const targetPlacement = chart.planets[aspect.to];
 
     const inverted = aspect.multiplier < 0;
@@ -522,10 +553,10 @@ function weightedChoice<T>(items: T[], weights: number[], rng: () => number): T 
 }
 
 function evaluateRunState(run: RunState): RunState {
-  const combusted = Object.values(run.playerState).filter((p) => p.combusted).length;
+  const allCombusted = PLANETS.every((planet) => run.playerState[planet].combusted);
   const updated = { ...run } as RunState;
 
-  if (combusted >= COMBUST_LIMIT) {
+  if (allCombusted) {
     updated.over = true;
     updated.victory = false;
     return updated;

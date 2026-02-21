@@ -15,7 +15,8 @@ import { TurnTrack } from "./components/TurnTrack";
 import { EncounterLog } from "./components/EncounterLog";
 import { HeroHeader } from "./components/HeroHeader";
 import { useCombatAnimation } from "./components/useCombatAnimation";
-import { buildChartPoints, buildPointMap } from "./lib/chart";
+import { InteractionChart } from "./components/InteractionChart";
+import { buildChartPoints, buildPointMap, getChartRotationDegrees } from "./lib/chart";
 import { PLANET_COLORS } from "./lib/palette";
 
 interface Profile {
@@ -45,6 +46,7 @@ export default function App() {
     highlightLines,
     displayAffliction,
     startAnimation,
+    finishAnimation,
   } = useCombatAnimation();
 
   const aspects = useMemo(() => getAspects(profile.chart), [profile.chart]);
@@ -56,6 +58,11 @@ export default function App() {
   const chartPoints = useMemo(() => buildChartPoints(profile.chart), [profile.chart]);
   const opponentPoints = useMemo(
     () => (opponentChart ? buildChartPoints(opponentChart) : []),
+    [opponentChart]
+  );
+  const chartRotation = useMemo(() => getChartRotationDegrees(profile.chart), [profile.chart]);
+  const opponentRotation = useMemo(
+    () => (opponentChart ? getChartRotationDegrees(opponentChart) : 0),
     [opponentChart]
   );
   const chartPointMap = useMemo(() => buildPointMap(chartPoints), [chartPoints]);
@@ -76,8 +83,11 @@ export default function App() {
 
   const handleSelectPlanet = (planet: PlanetName) => {
     if (!run || run.over) return;
-    if (animating) return;
+    if (!encounter || encounter.completed) return;
     if (run.playerState[planet].combusted) return;
+    if (animating) {
+      finishAnimation();
+    }
     const currentOpponent = encounter?.sequence[encounter.turnIndex];
     const previousRun = run;
     const updated = resolveTurn(run, profile.chart, planet, () => Math.random());
@@ -197,9 +207,23 @@ export default function App() {
       <section className="stack">
         <div className="panel">
           <div className="panel-header">
-            <h2>Encounter</h2>
+            <div>
+              <h2>Encounter</h2>
+              <p className="encounter-hint">Hover a planet to inspect. Click a planet to act.</p>
+            </div>
+            <div className="log-meta">
+              <div className="tag">Fortune {run?.score ?? 0}</div>
+            </div>
           </div>
           <div className="panel-body">
+            {encounter && (
+              <TurnTrack
+                total={encounter.sequence.length}
+                current={encounter.turnIndex}
+                opponentPlanet={opponentPlanet}
+                disabled={run?.over || encounter.completed}
+              />
+            )}
             <div className="chart-stage">
               <div className="chart-visuals">
                 <ChartVisual
@@ -218,6 +242,8 @@ export default function App() {
                   pointMap={chartPointMap}
                   highlightLines={highlightLines}
                   diurnal={profile.chart.isDiurnal}
+                  rotationDegrees={chartRotation}
+                  ascendantSign={profile.chart.ascendantSign ?? "Aries"}
                   mode="self"
                 />
 
@@ -232,6 +258,8 @@ export default function App() {
                   combusted={opponentCombusted}
                   activePlanet={opponentPlanet}
                   actionPlanet={actionOpponent}
+                  rotationDegrees={opponentRotation}
+                  ascendantSign={opponentChart?.ascendantSign ?? "Aries"}
                   mode="other"
                 />
               </div>
@@ -243,25 +271,18 @@ export default function App() {
                 opponentChart={opponentChart}
                 projected={projected}
               />
-              {encounter && <TurnTrack total={encounter.sequence.length} current={encounter.turnIndex} />}
-            </div>
-            <div className="chart-actions">
-              <div className="chart-hint">Hover a planet to inspect. Click a planet to act.</div>
-              {run?.over && (
-                <div className="run-status">
-                  <strong>{run.victory ? "Run Complete" : "Run Failed"}</strong>
-                  <p>
-                    {run.victory
-                      ? "You survived the sequence. Start another run to continue discovery."
-                      : "Combustion overtook the chart. Mint or start a new run."}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </section>
 
+      <InteractionChart
+        playerChart={profile.chart}
+        opponentChart={opponentChart}
+        opponentPlanet={opponentPlanet}
+        run={run}
+        focusedPlanet={hoveredPlanet}
+      />
       <EncounterLog run={run} />
     </div>
   );

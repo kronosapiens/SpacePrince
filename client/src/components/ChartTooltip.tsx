@@ -23,7 +23,7 @@ export function ChartTooltip({
   opponentChart,
   projected,
 }: ChartTooltipProps) {
-  if (!hoveredPlanet && !(hoveredOpponent && hoveredOpponent === opponentPlanet)) {
+  if (!hoveredPlanet && !hoveredOpponent) {
     return null;
   }
 
@@ -64,14 +64,15 @@ export function ChartTooltip({
     );
   }
 
-  if (!opponentChart || !opponentPlanet) return null;
+  const inspectedOpponent = hoveredOpponent ?? opponentPlanet;
+  if (!opponentChart || !inspectedOpponent) return null;
 
-  const placement = opponentChart.planets[opponentPlanet];
+  const placement = opponentChart.planets[inspectedOpponent];
   return (
     <div className="chart-tooltip">
       <div className="tooltip-row">
         <span className="tooltip-title">
-          {opponentPlanet}
+          {inspectedOpponent}
           {placement.dignity !== "Neutral" && (
             <span className="tooltip-dignity">{placement.dignity.toLowerCase()}</span>
           )}
@@ -81,10 +82,10 @@ export function ChartTooltip({
         {placement.sign} · {placement.element} · {placement.modality}
       </div>
       <div className="tooltip-row">
-        Dmg {PLANET_BASE_STATS[opponentPlanet].damage + placement.buffs.damage} · Heal{" "}
-        {PLANET_BASE_STATS[opponentPlanet].healing + placement.buffs.healing} · Dur{" "}
-        {PLANET_BASE_STATS[opponentPlanet].durability + placement.buffs.durability} · Luck{" "}
-        {PLANET_BASE_STATS[opponentPlanet].luck + placement.buffs.luck}
+        Dmg {PLANET_BASE_STATS[inspectedOpponent].damage + placement.buffs.damage} · Heal{" "}
+        {PLANET_BASE_STATS[inspectedOpponent].healing + placement.buffs.healing} · Dur{" "}
+        {PLANET_BASE_STATS[inspectedOpponent].durability + placement.buffs.durability} · Luck{" "}
+        {PLANET_BASE_STATS[inspectedOpponent].luck + placement.buffs.luck}
       </div>
     </div>
   );
