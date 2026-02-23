@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { resolveTurn, getPolarity, createInitialPlanetState } from "../src/game/logic";
+import { resolveTurn, getPolarity, createInitialPlanetState, generateChart } from "../src/game/logic";
 import {
   PLANETS,
   PLANET_BASE_STATS,
+  SIGNS,
   SIGN_ELEMENT,
   SIGN_MODALITY,
   ELEMENT_BUFFS,
@@ -93,6 +94,18 @@ function setAffliction(
   exaltationSaveUsed = false
 ) {
   state[planet] = { affliction, combusted, exaltationSaveUsed };
+}
+
+function signDistance(a: keyof typeof SIGN_ELEMENT, b: keyof typeof SIGN_ELEMENT) {
+  const ai = SIGNS.indexOf(a);
+  const bi = SIGNS.indexOf(b);
+  const delta = Math.abs(ai - bi);
+  return Math.min(delta, SIGNS.length - delta);
+}
+
+function angularDistanceDegrees(a: number, b: number) {
+  const delta = Math.abs(a - b);
+  return Math.min(delta, 360 - delta);
 }
 
 describe("game logic", () => {
@@ -267,5 +280,24 @@ describe("game logic", () => {
     const propagatedToMoon = updated.log[0].propagation.find((p) => p.target === "Moon");
     expect(propagatedToMoon).toBeUndefined();
     expect(updated.playerState.Moon.affliction).toBe(5);
+  });
+
+  it("generateChart keeps Mercury and Venus plausibly near the Sun", () => {
+    for (let seed = 1; seed <= 300; seed += 1) {
+      const chart = generateChart(seed);
+      const sunSign = chart.planets.Sun.sign;
+      const mercurySign = chart.planets.Mercury.sign;
+      const venusSign = chart.planets.Venus.sign;
+      const sunLongitude = chart.planets.Sun.eclipticLongitude;
+      const mercuryLongitude = chart.planets.Mercury.eclipticLongitude;
+      const venusLongitude = chart.planets.Venus.eclipticLongitude;
+      expect(sunLongitude).toBeDefined();
+      expect(mercuryLongitude).toBeDefined();
+      expect(venusLongitude).toBeDefined();
+      expect(signDistance(sunSign, mercurySign)).toBeLessThanOrEqual(1);
+      expect(signDistance(sunSign, venusSign)).toBeLessThanOrEqual(2);
+      expect(angularDistanceDegrees(sunLongitude ?? 0, mercuryLongitude ?? 0)).toBeLessThanOrEqual(28);
+      expect(angularDistanceDegrees(sunLongitude ?? 0, venusLongitude ?? 0)).toBeLessThanOrEqual(47);
+    }
   });
 });

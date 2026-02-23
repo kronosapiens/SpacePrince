@@ -48,6 +48,7 @@ export interface PlanetStats extends PlanetBaseStats {
 export interface PlanetPlacement {
   planet: PlanetName;
   sign: SignName;
+  eclipticLongitude?: number;
   element: ElementType;
   modality: ModalityType;
   dignity: Dignity;

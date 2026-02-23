@@ -41,13 +41,30 @@ const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
 };
 
 const IN_SECT_DURABILITY_BONUS = 1;
+const MERCURY_MAX_ELONGATION_DEGREES = 28;
+const VENUS_MAX_ELONGATION_DEGREES = 47;
 
 export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   const rng = mulberry32(seed);
   const planets: Record<PlanetName, PlanetPlacement> = {} as Record<PlanetName, PlanetPlacement>;
+  const longitudes: Partial<Record<PlanetName, number>> = {
+    Sun: rng() * 360,
+  };
+  const sunLongitude = longitudes.Sun ?? 0;
+  longitudes.Mercury = normalizeLongitude(
+    sunLongitude + sampleCenteredOffset(rng, MERCURY_MAX_ELONGATION_DEGREES)
+  );
+  longitudes.Venus = normalizeLongitude(
+    sunLongitude + sampleCenteredOffset(rng, VENUS_MAX_ELONGATION_DEGREES)
+  );
+  PLANETS.forEach((planet) => {
+    if (longitudes[planet] !== undefined) return;
+    longitudes[planet] = rng() * 360;
+  });
 
   PLANETS.forEach((planet) => {
-    const sign = SIGNS[Math.floor(rng() * SIGNS.length)];
+    const longitude = longitudes[planet] ?? 0;
+    const sign = SIGNS[Math.floor(longitude / 30)];
     const element = SIGN_ELEMENT[sign];
     const modality = SIGN_MODALITY[sign];
     const base = PLANET_BASE_STATS[planet];
@@ -57,6 +74,7 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
     planets[planet] = {
       planet,
       sign,
+      eclipticLongitude: longitude,
       element,
       modality,
       base,
@@ -75,6 +93,15 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
     ascendantSign,
     planets,
   };
+}
+
+function normalizeLongitude(value: number) {
+  const normalized = value % 360;
+  return normalized < 0 ? normalized + 360 : normalized;
+}
+
+function sampleCenteredOffset(rng: () => number, maxAbs: number) {
+  return (rng() + rng() - 1) * maxAbs;
 }
 
 export function getUnlockedPlanets(totalEncounters: number, unlockAll = false): PlanetName[] {
