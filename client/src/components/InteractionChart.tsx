@@ -1,7 +1,7 @@
-import { PLANET_SECT, PLANETS } from "../game/data";
+import { PLANETS } from "../game/data";
 import { getEffectiveStats, getPolarity } from "../game/combat";
 import type { Chart, PlanetName, RunState } from "../game/types";
-import { formatDisplay, roundDisplay } from "../lib/format";
+import { formatDisplay } from "../lib/format";
 
 interface InteractionChartProps {
   playerChart: Chart;
@@ -20,17 +20,6 @@ const PLANET_GLYPH: Record<PlanetName, string> = {
   Jupiter: "♃",
   Saturn: "♄",
 };
-
-function isInSect(chart: Chart, planet: PlanetName) {
-  const chartSect = chart.isDiurnal ? "Day" : "Night";
-  const planetSect =
-    PLANET_SECT[planet] === "Flexible" ? (chart.isDiurnal ? "Day" : "Night") : PLANET_SECT[planet];
-  return planetSect === chartSect;
-}
-
-function getResolvedSect(chart: Chart, planet: PlanetName) {
-  return PLANET_SECT[planet] === "Flexible" ? (chart.isDiurnal ? "Day" : "Night") : PLANET_SECT[planet];
-}
 
 export function InteractionChart({
   playerChart,
@@ -60,10 +49,9 @@ export function InteractionChart({
                   <tr>
                     <th>Planet</th>
                     <th>Polarity</th>
-                    <th>Sect</th>
                     <th>Base</th>
-                    <th>Luck</th>
                     <th>Output</th>
+                    <th>Luck</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -78,11 +66,7 @@ export function InteractionChart({
                       ? { damage: 0, healing: 0, luck: 0 }
                       : getEffectiveStats(playerChart, planet);
                     const base = polarity === "Testimony" ? pStats.healing : pStats.damage;
-                    const inSect = isInSect(playerChart, planet);
                     const output = base * friction;
-                    const outputCrit = output * 2;
-                    const critBonus = outputCrit - output;
-                    const sectSymbol = getResolvedSect(playerChart, planet) === "Day" ? "☉" : "☽";
                     const rowClass = [
                       focusedPlanet === planet ? "focus" : "",
                       playerState.combusted ? "combusted" : "",
@@ -102,14 +86,9 @@ export function InteractionChart({
                           </span>
                         </td>
                         <td>{polarity}</td>
-                        <td>
-                          {sectSymbol} {inSect ? "In" : "Out"}
-                        </td>
                         <td>{formatDisplay(base, 1)}</td>
+                        <td>{formatDisplay(output, 1)}</td>
                         <td>{formatDisplay(pStats.luck, 1)}</td>
-                        <td>
-                          {roundDisplay(output)} (+{roundDisplay(critBonus)})
-                        </td>
                       </tr>
                     );
                   })}

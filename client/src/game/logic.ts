@@ -39,7 +39,7 @@ const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Opposition: -1,
 };
 
-const IN_SECT_DURABILITY_BONUS = 1;
+const IN_SECT_LUCK_BONUS = 1;
 const MERCURY_MAX_ELONGATION_DEGREES = 28;
 const VENUS_MAX_ELONGATION_DEGREES = 47;
 const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
@@ -77,9 +77,9 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
     const modality = SIGN_MODALITY[sign];
     const base = PLANET_BASE_STATS[planet];
     const buffs = addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]);
-    const planetSect = resolvePlanetSect(planet, isDiurnal);
+    const planetSect = resolvePlanetSect(planet, longitude, sunLongitude);
     if (planetSect === chartSect) {
-      buffs.durability += IN_SECT_DURABILITY_BONUS;
+      buffs.luck += IN_SECT_LUCK_BONUS;
     }
     const dignity = getDignity(planet, sign);
 
@@ -384,10 +384,19 @@ function getAspectType(signA: SignName, signB: SignName): AspectType {
   }
 }
 
-function resolvePlanetSect(planet: PlanetName, isDiurnal: boolean): "Day" | "Night" {
+function resolvePlanetSect(
+  planet: PlanetName,
+  longitude: number,
+  sunLongitude: number
+): "Day" | "Night" {
   const base = PLANET_SECT[planet];
-  if (base === "Flexible") return isDiurnal ? "Day" : "Night";
+  if (base === "Flexible") return resolveMercurySect(longitude, sunLongitude);
   return base;
+}
+
+function resolveMercurySect(mercuryLongitude: number, sunLongitude: number): "Day" | "Night" {
+  const delta = normalizeLongitude(mercuryLongitude - sunLongitude);
+  return delta > 180 ? "Day" : "Night";
 }
 
 function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {

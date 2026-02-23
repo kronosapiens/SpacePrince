@@ -1,5 +1,6 @@
 import type { Chart, PlanetName } from "../game/types";
 import { PLANET_BASE_STATS } from "../game/data";
+import { isInSect } from "../game/combat";
 
 interface ChartTooltipProps {
   hoveredPlanet: PlanetName | null;
@@ -16,22 +17,23 @@ export function ChartTooltip({
   playerChart,
   opponentChart,
 }: ChartTooltipProps) {
+  const formatSect = (inSect: boolean) => (inSect ? "In sect" : "Out of sect");
+
   if (!hoveredPlanet && !hoveredOpponent) {
     return null;
   }
 
   if (hoveredPlanet) {
     const placement = playerChart.planets[hoveredPlanet];
+    const sectLabel = formatSect(isInSect(playerChart, hoveredPlanet));
     return (
       <div className="chart-tooltip">
-        <div className="tooltip-title">
-          {hoveredPlanet}
-          {placement.dignity !== "Neutral" && (
-            <span className="tooltip-dignity">{placement.dignity.toLowerCase()}</span>
-          )}
-        </div>
+        <div className="tooltip-title">{hoveredPlanet}</div>
         <div className="tooltip-row">
           {placement.sign} · {placement.element} · {placement.modality}
+        </div>
+        <div className="tooltip-row">
+          {placement.dignity} · {sectLabel}
         </div>
         <div className="tooltip-row">
           Dmg {PLANET_BASE_STATS[hoveredPlanet].damage + placement.buffs.damage} · Heal{" "}
@@ -47,18 +49,17 @@ export function ChartTooltip({
   if (!opponentChart || !inspectedOpponent) return null;
 
   const placement = opponentChart.planets[inspectedOpponent];
+  const sectLabel = formatSect(isInSect(opponentChart, inspectedOpponent));
   return (
     <div className="chart-tooltip">
       <div className="tooltip-row">
-        <span className="tooltip-title">
-          {inspectedOpponent}
-          {placement.dignity !== "Neutral" && (
-            <span className="tooltip-dignity">{placement.dignity.toLowerCase()}</span>
-          )}
-        </span>
+        <span className="tooltip-title">{inspectedOpponent}</span>
       </div>
       <div className="tooltip-row">
         {placement.sign} · {placement.element} · {placement.modality}
+      </div>
+      <div className="tooltip-row">
+        {placement.dignity} · {sectLabel}
       </div>
       <div className="tooltip-row">
         Dmg {PLANET_BASE_STATS[inspectedOpponent].damage + placement.buffs.damage} · Heal{" "}

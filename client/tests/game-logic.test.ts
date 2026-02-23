@@ -35,7 +35,7 @@ function placement(
   const planetSect =
     PLANET_SECT[planet] === "Flexible" ? (isDiurnal ? "Day" : "Night") : PLANET_SECT[planet];
   if (planetSect === chartSect) {
-    buffs.durability += 1;
+    buffs.luck += 1;
   }
   return {
     planet,
@@ -408,5 +408,33 @@ describe("game logic", () => {
       expect(angularDistanceDegrees(sunLongitude ?? 0, mercuryLongitude ?? 0)).toBeLessThanOrEqual(28);
       expect(angularDistanceDegrees(sunLongitude ?? 0, venusLongitude ?? 0)).toBeLessThanOrEqual(47);
     }
+  });
+
+  it("generateChart applies Mercury sect conditionally from solar phase proxy", () => {
+    let sawInSect = false;
+    let sawOutOfSect = false;
+
+    for (let seed = 1; seed <= 500; seed += 1) {
+      const chart = generateChart(seed);
+      const sunLongitude = chart.planets.Sun.eclipticLongitude ?? 0;
+      const mercuryLongitude = chart.planets.Mercury.eclipticLongitude ?? 0;
+      const delta = ((mercuryLongitude - sunLongitude) % 360 + 360) % 360;
+      const mercurySect = delta > 180 ? "Day" : "Night";
+      const chartSect = chart.isDiurnal ? "Day" : "Night";
+      const inSect = mercurySect === chartSect;
+      if (inSect) sawInSect = true;
+      if (!inSect) sawOutOfSect = true;
+
+      const mercurySign = chart.planets.Mercury.sign;
+      const expectedBaseBuff =
+        ELEMENT_BUFFS[SIGN_ELEMENT[mercurySign]].luck +
+        MODALITY_BUFFS[SIGN_MODALITY[mercurySign]].luck;
+      const expectedLuckBuff = expectedBaseBuff + (inSect ? 1 : 0);
+
+      expect(chart.planets.Mercury.buffs.luck).toBe(expectedLuckBuff);
+    }
+
+    expect(sawInSect).toBe(true);
+    expect(sawOutOfSect).toBe(true);
   });
 });

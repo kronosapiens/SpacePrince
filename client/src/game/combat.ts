@@ -1,4 +1,4 @@
-import { ELEMENT_QUALITIES } from "./data";
+import { ELEMENT_QUALITIES, PLANET_SECT } from "./data";
 import type { Chart, ElementType, PlanetName, PlanetPlacement, PlanetStats, Polarity } from "./types";
 
 export function getPolarity(a: ElementType, b: ElementType): Polarity {
@@ -63,4 +63,31 @@ export function getProjectedPair(
     otherDelta,
     ...exchange,
   };
+}
+
+function normalizeLongitude(value: number): number {
+  const normalized = value % 360;
+  return normalized < 0 ? normalized + 360 : normalized;
+}
+
+function resolveMercurySect(mercuryLongitude: number, sunLongitude: number): "Day" | "Night" {
+  const delta = normalizeLongitude(mercuryLongitude - sunLongitude);
+  return delta > 180 ? "Day" : "Night";
+}
+
+export function getResolvedSect(chart: Chart, planet: PlanetName): "Day" | "Night" {
+  const base = PLANET_SECT[planet];
+  if (base !== "Flexible") return base;
+
+  const mercuryLongitude = chart.planets.Mercury.eclipticLongitude;
+  const sunLongitude = chart.planets.Sun.eclipticLongitude;
+  if (mercuryLongitude === undefined || sunLongitude === undefined) {
+    return chart.isDiurnal ? "Day" : "Night";
+  }
+  return resolveMercurySect(mercuryLongitude, sunLongitude);
+}
+
+export function isInSect(chart: Chart, planet: PlanetName): boolean {
+  const chartSect = chart.isDiurnal ? "Day" : "Night";
+  return getResolvedSect(chart, planet) === chartSect;
 }

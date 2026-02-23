@@ -62,13 +62,13 @@ Planet sect:
 
 - Day: `Sun, Jupiter, Saturn`
 - Night: `Moon, Venus, Mars`
-- Mercury: follows chart sect
+- Mercury: conditional by solar phase proxy (relative ecliptic longitude to Sun)
 
 Current effect:
 
-- In-sect planets get `+1 durability`.
-- This is baked into `buffs.durability` at chart generation time.
-- Sect does not directly modify output, crit, or aspect multipliers.
+- In-sect planets get `+1 luck`.
+- This is baked into `buffs.luck` at chart generation time.
+- Sect does not directly modify base output or aspect multipliers.
 
 ## 6. Effective Combat Stats
 
