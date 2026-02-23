@@ -2,19 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { PLANETS } from "../game/data";
 import type { PlanetName, RunState } from "../game/types";
 
-const PRIMARY_DELAY = 200;
-const STEP_DELAY = 520;
-const STEP_OFFSET = 800;
-const STEP_GLOW_OFFSET = 140;
-const STEP_CLEAR_OFFSET = 320;
-const END_OFFSET = 300;
+const ANIMATION_TIMINGS = {
+  primaryDelay: 200,
+  stepDelay: 520,
+  stepOffset: 800,
+  stepGlowOffset: 140,
+  stepClearOffset: 320,
+  endOffset: 300,
+} as const;
 
 export function useCombatAnimation() {
   const [animating, setAnimating] = useState(false);
   const [actionPlanet, setActionPlanet] = useState<PlanetName | null>(null);
   const [actionOpponent, setActionOpponent] = useState<PlanetName | null>(null);
   const [highlightAffliction, setHighlightAffliction] = useState<Record<string, boolean>>({});
-  const [ripplePlanets, setRipplePlanets] = useState<Record<string, boolean>>({});
   const [critPlanets, setCritPlanets] = useState<Record<string, boolean>>({});
   const [highlightLines, setHighlightLines] = useState<{
     self: Record<string, boolean>;
@@ -39,7 +40,6 @@ export function useCombatAnimation() {
     clearAnimationTimeouts();
     setHighlightLines({ self: {}, other: {} });
     setHighlightAffliction({});
-    setRipplePlanets({});
     setCritPlanets({});
     setActionPlanet(null);
     setActionOpponent(null);
@@ -86,17 +86,10 @@ export function useCombatAnimation() {
     };
 
     setHighlightLines({ self: {}, other: {} });
-    const critTargets = new Set<string>([
-      ...(entry.playerCrit ? [`self-${entry.playerPlanet}`] : []),
-      ...(entry.opponentCrit ? [`other-${entry.opponentPlanet}`] : []),
-    ]);
-
     const primaryId = window.setTimeout(() => {
       const primarySign = entry.polarity === "Testimony" ? -1 : 1;
       applyAffliction("self", entry.playerPlanet, entry.playerDelta * primarySign);
       applyAffliction("other", entry.opponentPlanet, entry.opponentDelta * primarySign);
-      if (entry.playerCombust) applyCombust("self", entry.playerPlanet);
-      if (entry.opponentCombust) applyCombust("other", entry.opponentPlanet);
       setCritPlanets({
         ...(entry.playerCrit ? { [`self-${entry.playerPlanet}`]: true } : {}),
         ...(entry.opponentCrit ? { [`other-${entry.opponentPlanet}`]: true } : {}),
@@ -105,7 +98,7 @@ export function useCombatAnimation() {
         [`self-${entry.playerPlanet}`]: true,
         [`other-${entry.opponentPlanet}`]: true,
       });
-    }, PRIMARY_DELAY);
+    }, ANIMATION_TIMINGS.primaryDelay);
     animationTimeouts.current.push(primaryId);
 
     const steps = entry.propagation
@@ -135,10 +128,7 @@ export function useCombatAnimation() {
         if (step.combust) applyCombust(step.side, step.target);
         const targetKey = `${step.side}-${step.target}`;
         setHighlightAffliction((prev) => ({ ...prev, [targetKey]: true }));
-        if (!critTargets.has(targetKey)) {
-          setRipplePlanets((prev) => ({ ...prev, [targetKey]: true }));
-        }
-      }, delay + STEP_GLOW_OFFSET);
+      }, delay + ANIMATION_TIMINGS.stepGlowOffset);
       animationTimeouts.current.push(afflictId);
 
       const clearId = window.setTimeout(() => {
@@ -152,25 +142,35 @@ export function useCombatAnimation() {
           delete next[`${step.side}-${step.target}`];
           return next;
         });
-        setRipplePlanets((prev) => {
-          const next = { ...prev };
-          delete next[`${step.side}-${step.target}`];
-          return next;
-        });
-      }, delay + STEP_CLEAR_OFFSET);
+      }, delay + ANIMATION_TIMINGS.stepClearOffset);
       animationTimeouts.current.push(clearId);
     };
 
     selfSteps.forEach((step, index) => {
-      scheduleStep(step, STEP_OFFSET + index * STEP_DELAY);
+      scheduleStep(step, ANIMATION_TIMINGS.stepOffset + index * ANIMATION_TIMINGS.stepDelay);
     });
     otherSteps.forEach((step, index) => {
-      scheduleStep(step, STEP_OFFSET + index * STEP_DELAY);
+      scheduleStep(step, ANIMATION_TIMINGS.stepOffset + index * ANIMATION_TIMINGS.stepDelay);
     });
+
+    const finalPropagationDelay =
+      maxSteps > 0
+        ? ANIMATION_TIMINGS.stepOffset +
+          Math.max(0, maxSteps - 1) * ANIMATION_TIMINGS.stepDelay +
+          ANIMATION_TIMINGS.stepGlowOffset
+        : ANIMATION_TIMINGS.primaryDelay;
+    const combustId = window.setTimeout(() => {
+      if (entry.opponentCombust) applyCombust("other", entry.opponentPlanet);
+      if (entry.playerCombust) applyCombust("self", entry.playerPlanet);
+    }, finalPropagationDelay);
+    animationTimeouts.current.push(combustId);
 
     const endId = window.setTimeout(() => {
       finishAnimation();
-    }, STEP_OFFSET + Math.max(0, maxSteps - 1) * STEP_DELAY + STEP_CLEAR_OFFSET + END_OFFSET);
+    }, ANIMATION_TIMINGS.stepOffset +
+      Math.max(0, maxSteps - 1) * ANIMATION_TIMINGS.stepDelay +
+      ANIMATION_TIMINGS.stepClearOffset +
+      ANIMATION_TIMINGS.endOffset);
     animationTimeouts.current.push(endId);
   };
 
@@ -180,7 +180,6 @@ export function useCombatAnimation() {
     actionOpponent,
     highlightAffliction,
     critPlanets,
-    ripplePlanets,
     highlightLines,
     displayAffliction,
     displayCombusted,

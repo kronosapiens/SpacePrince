@@ -1,14 +1,12 @@
 import type { RunState } from "../game/types";
+import { formatDisplay, roundDisplay } from "../lib/format";
 
 interface EncounterLogProps {
   run: RunState | null;
 }
 
 export function EncounterLog({ run }: EncounterLogProps) {
-  const fmt = (value: number | undefined) => {
-    if (value === undefined || Number.isNaN(value)) return "0";
-    return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
-  };
+  const fmt = (value: number | undefined) => formatDisplay(value ?? 0);
   return (
     <section className="grid">
       <div className="panel">
@@ -27,7 +25,7 @@ export function EncounterLog({ run }: EncounterLogProps) {
                       {entry.playerPlanet} vs {entry.opponentPlanet}
                     </span>
                     <span className="log-sep">|</span>
-                    <span>Distance +{entry.turnScore}</span>
+                    <span>Distance +{roundDisplay(entry.turnScore)}</span>
                   </div>
                   <div className="log-body">
                     <p>
@@ -39,16 +37,8 @@ export function EncounterLog({ run }: EncounterLogProps) {
                       {(() => {
                         const playerSectBonus = entry.directBreakdown.playerSectBonus ?? 0;
                         const opponentSectBonus = entry.directBreakdown.opponentSectBonus ?? 0;
-                        const playerLegacySectMultiplier = entry.directBreakdown.playerSectMultiplier ?? 1;
-                        const opponentLegacySectMultiplier = entry.directBreakdown.opponentSectMultiplier ?? 1;
-                        const playerSectPart =
-                          entry.directBreakdown.playerSectBonus !== undefined
-                            ? `${fmt(entry.directBreakdown.playerBase)}+${fmt(playerSectBonus)}`
-                            : `${fmt(entry.directBreakdown.playerBase)}x${fmt(playerLegacySectMultiplier)}`;
-                        const opponentSectPart =
-                          entry.directBreakdown.opponentSectBonus !== undefined
-                            ? `${fmt(entry.directBreakdown.opponentBase)}+${fmt(opponentSectBonus)}`
-                            : `${fmt(entry.directBreakdown.opponentBase)}x${fmt(opponentLegacySectMultiplier)}`;
+                        const playerSectPart = `${fmt(entry.directBreakdown.playerBase)}+${fmt(playerSectBonus)}`;
+                        const opponentSectPart = `${fmt(entry.directBreakdown.opponentBase)}+${fmt(opponentSectBonus)}`;
                         return (
                           <>
                             You: {playerSectPart} x {fmt(entry.directBreakdown.friction)} x{" "}

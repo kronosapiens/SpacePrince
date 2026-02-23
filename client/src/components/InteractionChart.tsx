@@ -1,5 +1,7 @@
-import { ELEMENT_QUALITIES, PLANET_BASE_STATS, PLANET_SECT, PLANETS } from "../game/data";
+import { PLANET_SECT, PLANETS } from "../game/data";
+import { getEffectiveStats, getPolarity } from "../game/combat";
 import type { Chart, PlanetName, RunState } from "../game/types";
+import { formatDisplay, roundDisplay } from "../lib/format";
 
 interface InteractionChartProps {
   playerChart: Chart;
@@ -18,29 +20,6 @@ const PLANET_GLYPH: Record<PlanetName, string> = {
   Jupiter: "♃",
   Saturn: "♄",
 };
-
-function getPolarity(a: string, b: string) {
-  const qualitiesA = ELEMENT_QUALITIES[a as keyof typeof ELEMENT_QUALITIES];
-  const qualitiesB = ELEMENT_QUALITIES[b as keyof typeof ELEMENT_QUALITIES];
-  const shared = qualitiesA.filter((q) => qualitiesB.includes(q)).length;
-  if (shared === 2) return "Testimony";
-  if (shared === 1) return "Friction";
-  return "Affliction";
-}
-
-function getEffectiveStats(chart: Chart, planet: PlanetName) {
-  const placement = chart.planets[planet];
-  return {
-    damage: PLANET_BASE_STATS[planet].damage + placement.buffs.damage,
-    healing: PLANET_BASE_STATS[planet].healing + placement.buffs.healing,
-    durability: PLANET_BASE_STATS[planet].durability + placement.buffs.durability,
-    luck: PLANET_BASE_STATS[planet].luck + placement.buffs.luck,
-  };
-}
-
-function fmt(n: number) {
-  return Number.isInteger(n) ? String(n) : n.toFixed(1);
-}
 
 function isInSect(chart: Chart, planet: PlanetName) {
   const chartSect = chart.isDiurnal ? "Day" : "Night";
@@ -126,10 +105,10 @@ export function InteractionChart({
                         <td>
                           {sectSymbol} {inSect ? "In" : "Out"}
                         </td>
-                        <td>{fmt(base)}</td>
-                        <td>{fmt(pStats.luck)}</td>
+                        <td>{formatDisplay(base, 1)}</td>
+                        <td>{formatDisplay(pStats.luck, 1)}</td>
                         <td>
-                          {Math.round(output)} (+{Math.round(critBonus)})
+                          {roundDisplay(output)} (+{roundDisplay(critBonus)})
                         </td>
                       </tr>
                     );

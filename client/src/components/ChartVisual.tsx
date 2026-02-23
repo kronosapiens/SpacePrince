@@ -1,6 +1,7 @@
 import type { AspectConnection, PlanetName, SignName } from "../game/types";
 import { SIGNS } from "../game/data";
 import type { ChartPoint } from "../lib/chart";
+import { formatSignedRounded, roundDisplay } from "../lib/format";
 
 interface ChartVisualProps {
   title: string;
@@ -10,7 +11,6 @@ interface ChartVisualProps {
   getAfflictionLevel: (value: number) => number;
   highlightAffliction: Record<string, boolean>;
   critPlanets?: Record<string, boolean>;
-  ripplePlanets?: Record<string, boolean>;
   onPlanetHover?: (planet: PlanetName | null) => void;
   onPlanetClick?: (planet: PlanetName) => void;
   combusted: Record<PlanetName, boolean>;
@@ -36,7 +36,6 @@ export function ChartVisual({
   getAfflictionLevel,
   highlightAffliction,
   critPlanets = {},
-  ripplePlanets = {},
   onPlanetHover,
   onPlanetClick,
   combusted,
@@ -140,6 +139,7 @@ export function ChartVisual({
           </div>
         ))}
         {points.map((point) => {
+          const isImpact = actionPlanet === point.planet || highlightAffliction[`${mode}-${point.planet}`];
           const glyph = glyphTone(planetColors[point.planet].fill);
           const affliction = afflictionValues[point.planet] ?? 0;
           const afflictionLevel = getAfflictionLevel(affliction);
@@ -154,7 +154,7 @@ export function ChartVisual({
               : hasProjection && projection < 0
                 ? "testimony"
                 : "neutral";
-          const projectionValue = hasProjection ? `${projection > 0 ? "+" : ""}${projection}` : "0";
+          const projectionValue = hasProjection ? formatSignedRounded(projection) : "0";
           const pairSelfClass =
             hasPairProjection && pairProjection.selfDelta > 0
               ? "affliction"
@@ -167,12 +167,8 @@ export function ChartVisual({
               : hasPairProjection && pairProjection.otherDelta < 0
                 ? "testimony"
                 : "neutral";
-          const pairSelfValue = hasPairProjection
-            ? `${pairProjection.selfDelta > 0 ? "+" : ""}${pairProjection.selfDelta}`
-            : "0";
-          const pairOtherValue = hasPairProjection
-            ? `${pairProjection.otherDelta > 0 ? "+" : ""}${pairProjection.otherDelta}`
-            : "0";
+          const pairSelfValue = hasPairProjection ? formatSignedRounded(pairProjection.selfDelta) : "0";
+          const pairOtherValue = hasPairProjection ? formatSignedRounded(pairProjection.otherDelta) : "0";
           return (
           <div
             key={`${title}-${point.planet}`}
@@ -180,9 +176,7 @@ export function ChartVisual({
               activePlanet === point.planet ? `active active-${mode}` : ""
             } ${
               combusted[point.planet] ? "combusted" : ""
-            } ${actionPlanet === point.planet ? "impact" : ""} ${
-              ripplePlanets[`${mode}-${point.planet}`] ? "ripple" : ""
-            }`}
+            } ${isImpact ? "impact" : ""}`}
             style={{
               transform: `translate(-50%, -50%) translate(${point.x}px, ${point.y}px)`,
               backgroundColor: combusted[point.planet]
@@ -226,7 +220,7 @@ export function ChartVisual({
                   highlightAffliction[`${mode}-${point.planet}`] ? "flash" : ""
                 }`}
               >
-                {affliction}
+                {roundDisplay(affliction)}
               </span>
             )}
           </div>

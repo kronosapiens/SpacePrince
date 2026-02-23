@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   PLANETS,
-  PLANET_BASE_STATS,
-  ELEMENT_QUALITIES,
   SIGN_ELEMENT,
   SIGNS,
 } from "./game/data";
+import { getPolarity, getProjectedPair } from "./game/combat";
 import {
   advanceEncounter,
   createRun,
@@ -24,6 +23,7 @@ import { HeroHeader } from "./components/HeroHeader";
 import { useCombatAnimation } from "./components/useCombatAnimation";
 import { InteractionChart } from "./components/InteractionChart";
 import { buildChartPoints, buildPointMap, getChartRotationDegrees } from "./lib/chart";
+import { roundDisplay } from "./lib/format";
 import { PLANET_COLORS } from "./lib/palette";
 
 interface Profile {
@@ -51,7 +51,6 @@ export default function App() {
     actionOpponent,
     highlightAffliction,
     critPlanets,
-    ripplePlanets,
     highlightLines,
     displayAffliction,
     displayCombusted,
@@ -142,52 +141,22 @@ export default function App() {
     setRun(advanceEncounter(run));
   }, [run, encounter, setProfile, setRun]);
 
-  const getPolarity = (elementA: string, elementB: string) => {
-    const qualitiesA = ELEMENT_QUALITIES[elementA as keyof typeof ELEMENT_QUALITIES];
-    const qualitiesB = ELEMENT_QUALITIES[elementB as keyof typeof ELEMENT_QUALITIES];
-    const shared = qualitiesA.filter((q) => qualitiesB.includes(q)).length;
-    if (shared === 2) return "Testimony";
-    if (shared === 1) return "Friction";
-    return "Affliction";
-  };
-
-  const getEffectiveStats = (planet: PlanetName, chart: Chart) => {
-    const placement = chart.planets[planet];
-    return {
-      damage: PLANET_BASE_STATS[planet].damage + placement.buffs.damage,
-      healing: PLANET_BASE_STATS[planet].healing + placement.buffs.healing,
-      durability: PLANET_BASE_STATS[planet].durability + placement.buffs.durability,
-      luck: PLANET_BASE_STATS[planet].luck + placement.buffs.luck,
-    };
-  };
-
   const getProjectedDelta = (planet: PlanetName) => {
     if (!run || !encounter || !opponentChart || !displayOpponentPlanet) return null;
     if (run.playerState[planet].combusted) return null;
-    const placement = profile.chart.planets[planet];
-    const opponentPlacement = opponentChart.planets[displayOpponentPlanet];
-    const polarity = getPolarity(placement.element, opponentPlacement.element);
-    const playerStats = getEffectiveStats(planet, profile.chart);
-    const opponentStats = getEffectiveStats(
+    const projected = getProjectedPair(
+      profile.chart,
+      opponentChart,
+      planet,
       displayOpponentPlanet,
-      opponentChart
+      run.playerState[planet].combusted,
+      run.opponentState[displayOpponentPlanet].combusted
     );
-
-    const friction = polarity === "Friction" ? 0.5 : 1;
-    const playerToOpponent =
-      (polarity === "Testimony" ? playerStats.healing : playerStats.damage) * friction;
-    const opponentToPlayer =
-      (polarity === "Testimony" ? opponentStats.healing : opponentStats.damage) * friction;
-
-    const playerCarry = run.playerCarry?.[planet] ?? 0;
-    const opponentCarry = run.opponentCarry?.[displayOpponentPlanet] ?? 0;
-    const roundedPlayer = Math.max(0, Math.round(Math.max(0, opponentToPlayer + playerCarry)));
-    const roundedOpponent = Math.max(0, Math.round(Math.max(0, playerToOpponent + opponentCarry)));
-
-    const selfDelta = polarity === "Testimony" ? -roundedPlayer : roundedPlayer;
-    const otherDelta = polarity === "Testimony" ? -roundedOpponent : roundedOpponent;
-
-    return { selfDelta, otherDelta, polarity };
+    return {
+      selfDelta: roundDisplay(projected.selfDelta),
+      otherDelta: roundDisplay(projected.otherDelta),
+      polarity: projected.polarity,
+    };
   };
 
   const selfProjectedPairsByPlanet = useMemo(() => {
@@ -298,7 +267,6 @@ export default function App() {
                     getAfflictionLevel={getAfflictionLevel}
                     highlightAffliction={highlightAffliction}
                     critPlanets={critPlanets}
-                    ripplePlanets={ripplePlanets}
                     onPlanetHover={setHoveredPlanet}
                     onPlanetClick={handleSelectPlanet}
                     combusted={playerCombusted}
@@ -324,7 +292,6 @@ export default function App() {
                     getAfflictionLevel={getAfflictionLevel}
                     highlightAffliction={highlightAffliction}
                     critPlanets={critPlanets}
-                    ripplePlanets={ripplePlanets}
                     onPlanetHover={setHoveredOpponent}
                     combusted={opponentCombusted}
                     activePlanet={displayOpponentPlanet}

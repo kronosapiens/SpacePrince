@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveTurn, getPolarity, createInitialPlanetState, generateChart } from "../src/game/logic";
+import { resolveTurn, createInitialPlanetState, generateChart } from "../src/game/logic";
+import { getPolarity, getProjectedPair } from "../src/game/combat";
 import {
   PLANETS,
   PLANET_BASE_STATS,
@@ -10,6 +11,7 @@ import {
   ELEMENT_BUFFS,
   MODALITY_BUFFS,
 } from "../src/game/data";
+import { roundDisplay } from "../src/lib/format";
 
 function addStats(a: { damage: number; healing: number; durability: number; luck: number }, b: { damage: number; healing: number; durability: number; luck: number }) {
   return {
@@ -91,8 +93,6 @@ function makeRun({
     playerState,
     opponentState,
     log: [],
-    totalAffliction: 0,
-    totalTestimony: 0,
     score: 0,
     over: false,
     victory: false,
@@ -153,14 +153,110 @@ describe("game logic", () => {
     expect(entry.polarity).toBe("Affliction");
     expect(entry.opponentDelta).toBe(6);
     expect(entry.playerDelta).toBe(2);
-    expect(entry.turnAffliction).toBe(26);
-    expect(entry.turnTestimony).toBe(0);
     expect(entry.turnScore).toBe(26);
-    expect(updated.totalAffliction).toBe(26);
-    expect(updated.totalTestimony).toBe(0);
     expect(updated.score).toBe(26);
     expect(updated.playerState.Mars.affliction).toBe(2);
     expect(updated.opponentState.Moon.affliction).toBe(6);
+  });
+
+  it("seeded combat snapshot keeps preview and resolved direct effects aligned", () => {
+    const playerChart = buildChart({
+      Mars: { sign: "Aries", dignity: "Domicile" },
+      Moon: { sign: "Cancer", dignity: "Neutral" },
+    });
+    const opponentChart = buildChart({
+      Moon: { sign: "Cancer", dignity: "Domicile" },
+    });
+    const playerState = createInitialPlanetState();
+    const opponentState = createInitialPlanetState();
+    const run = makeRun({
+      sequence: ["Moon"],
+      opponentChart,
+      playerState,
+      opponentState,
+    });
+
+    const preview = getProjectedPair(playerChart, opponentChart, "Mars", "Moon", false, false);
+    const updated = resolveTurn(run, playerChart, "Mars", () => 0.99);
+    const entry = updated.log[0];
+
+    expect({
+      preview: {
+        polarity: preview.polarity,
+        self: roundDisplay(preview.selfDelta),
+        other: roundDisplay(preview.otherDelta),
+      },
+      direct: {
+        polarity: entry.polarity,
+        self: roundDisplay(entry.playerDelta),
+        other: roundDisplay(entry.opponentDelta),
+      },
+      propagation: entry.propagation.map((prop) => ({
+        side: prop.side,
+        target: prop.target,
+        delta: roundDisplay(prop.delta),
+        note: prop.note,
+      })),
+      score: roundDisplay(entry.turnScore),
+    }).toMatchInlineSnapshot(`
+      {
+        "direct": {
+          "other": 6,
+          "polarity": "Affliction",
+          "self": 2,
+        },
+        "preview": {
+          "other": 6,
+          "polarity": "Affliction",
+          "self": 2,
+        },
+        "propagation": [
+          {
+            "delta": 0,
+            "note": "Square inverts (no effect)",
+            "side": "self",
+            "target": "Moon",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Sun",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Mercury",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Venus",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Mars",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Jupiter",
+          },
+          {
+            "delta": 3,
+            "note": "Sextile flows",
+            "side": "other",
+            "target": "Saturn",
+          },
+        ],
+        "score": 26,
+      }
+    `);
   });
 
   it("testimony healing clamps at zero affliction", () => {

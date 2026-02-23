@@ -116,18 +116,13 @@ Each side rolls independently per action:
 - no hard cap is currently applied
 - crit doubles direct outgoing effect
 
-## 10. Carry-Based Quantization
+## 10. Affliction Value Model
 
-Affliction state is integer; effect math is real-valued.
+Affliction state is real-valued in the game state.
 
-Per target planet, per side:
-
-- store carry (`playerCarry[planet]`, `opponentCarry[planet]`)
-- `effective = max(0, raw + carry)`
-- `applied = round(effective)`
-- `nextCarry = effective - applied`
-
-Healing clamped at zero does not bank overflow carry.
+- direct and propagated effects apply their full real-valued amounts
+- healing still clamps at zero
+- UI rounds values for readability (planet chips, projections, etc.)
 
 ## 11. Aspects and Propagation
 
@@ -144,7 +139,7 @@ Rules:
 - one-hop propagation from active source to connected targets
 - magnitude: `abs(directAmount * aspectMultiplier)`
 - negative multipliers invert polarity (`Affliction <-> Testimony`)
-- propagation uses the same carry-aware integer application
+- propagation applies the same real-valued effect model as direct effects
 - combusted targets are skipped
 - combusted active source does not propagate
 

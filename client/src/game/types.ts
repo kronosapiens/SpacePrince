@@ -96,18 +96,14 @@ export interface TurnLogEntry {
     delta: number;
     note: string;
   }>;
-  turnAffliction: number;
-  turnTestimony: number;
   turnScore: number;
   directBreakdown: {
     playerBase: number;
-    playerSectMultiplier?: number;
     playerSectBonus?: number;
     friction: number;
     playerCritMultiplier: number;
     playerResult: number;
     opponentBase: number;
-    opponentSectMultiplier?: number;
     opponentSectBonus?: number;
     opponentCritMultiplier: number;
     opponentResult: number;
@@ -131,11 +127,7 @@ export interface RunState {
   unlockedPlanets: PlanetName[];
   playerState: Record<PlanetName, PlanetState>;
   opponentState: Record<PlanetName, PlanetState>;
-  playerCarry?: Record<PlanetName, number>;
-  opponentCarry?: Record<PlanetName, number>;
   log: TurnLogEntry[];
-  totalAffliction: number;
-  totalTestimony: number;
   score: number;
   over: boolean;
   victory: boolean;
