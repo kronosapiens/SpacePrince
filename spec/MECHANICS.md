@@ -1,23 +1,24 @@
 # Space Prince — Mechanics (Current Prototype)
 
-This document describes the mechanics currently implemented in the `client/` prototype.
-It is implementation-first: if this conflicts with older design docs, this file reflects actual code behavior.
+This file documents the mechanics implemented in `client/`.
+If this conflicts with older design docs, this file reflects runtime behavior.
 
-## 1. Core Data Model
+## 1. Entities
 
 - Planets: `Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn`
 - Signs: 12 zodiac signs.
 - Each planet placement stores:
-  - sign
-  - element
-  - modality
-  - dignity
-  - base stats
-  - sign-derived buffs
+  - `sign`
+  - `eclipticLongitude` (optional, currently populated by generator)
+  - `element`
+  - `modality`
+  - `dignity`
+  - `base` stats
+  - `buffs` stats
 
 ## 2. Base Stats
 
-Current base stats (`damage, healing, durability, luck`):
+`damage, healing, durability, luck`:
 
 - Sun: `3, 2, 3, 2`
 - Moon: `1, 4, 1, 2`
@@ -27,113 +28,110 @@ Current base stats (`damage, healing, durability, luck`):
 - Jupiter: `2, 3, 3, 3`
 - Saturn: `2, 1, 4, 1`
 
-## 3. Sign Buffs
+## 3. Chart Generation
 
-Buffs are additive at chart generation:
+Charts are generated from a deterministic RNG seed.
 
-- Element buffs:
+- Sun longitude is sampled uniformly in `[0, 360)`.
+- Mercury longitude is sampled around Sun within `±28°`.
+- Venus longitude is sampled around Sun within `±47°`.
+- Other planet longitudes are sampled uniformly in `[0, 360)`.
+- Sign is derived from longitude (`floor(longitude / 30)`).
+
+These are plausibility constraints, not full ephemeris astronomy.
+
+## 4. Stat Buffs
+
+Buffs are additive at generation:
+
+- Element:
   - Fire `+1 damage`
   - Earth `+1 durability`
   - Water `+1 healing`
   - Air `+1 luck`
-- Modality buffs:
+- Modality:
   - Cardinal `+1 damage`
   - Fixed `+1 durability`
   - Mutable `+1 healing`
 
-Effective per-planet pre-combat stats are `base + buffs`.
+## 5. Sect
 
-## 4. Effective Combat Stats
+Sect is chart-level (`Day` if diurnal, else `Night`).
 
-On each action, effective combat stats are currently:
+Planet sect:
+
+- Day: `Sun, Jupiter, Saturn`
+- Night: `Moon, Venus, Mars`
+- Mercury: follows chart sect
+
+Current effect:
+
+- In-sect planets get `+1 durability`.
+- This is baked into `buffs.durability` at chart generation time.
+- Sect does not directly modify output, crit, or aspect multipliers.
+
+## 6. Effective Combat Stats
+
+Effective combat stats are currently:
 
 - `effectiveStat = max(0, base + buffs)`
 
-Combusted planets are treated as zeroed for direct combat output.
+Affliction does not currently scale stats.
+Combusted planets are treated as zero-output for direct resolution.
 
-## 5. Polarity (Element Relationship)
+## 7. Polarity
 
-Polarity between acting self planet and acting opponent planet is quality-overlap based:
+Polarity between acting self planet and acting opponent planet is based on element quality overlap:
 
 - `Testimony`: 2 shared qualities
 - `Friction`: 1 shared quality
 - `Affliction`: 0 shared qualities
 
-## 6. Direct Resolution
+## 8. Direct Resolution
 
-Both sides resolve simultaneously each turn:
+Both sides resolve each action (simultaneous exchange):
 
-- Self planet applies to opponent
-- Opponent active planet applies to self
+- Self acting planet -> opponent active planet
+- Opponent active planet -> self acting planet
 
-Base trait used:
+Base trait:
 
-- `Affliction` / `Friction`: uses `damage`
-- `Testimony`: uses `healing`
+- `Affliction` / `Friction`: `damage`
+- `Testimony`: `healing`
 
-Friction factor:
+Multipliers:
 
-- `Friction` applies `* 0.5`
-- Otherwise `* 1`
-
-Critical multiplier:
-
-- Crit doubles outgoing direct amount (`* 2`)
+- Friction: `0.5` for `Friction`, else `1`
+- Crit: `2` on crit, else `1`
 
 Raw direct amount:
 
 - `raw = baseTrait * friction * critMultiplier`
 
-## 7. Crit
+## 9. Crit
 
-Crit rolls are independent per side, per action.
+Each side rolls independently per action:
 
 - `critChance = effectiveLuck * 0.10`
-- no hard cap is currently applied in code
-- `roll < critChance` => crit
+- no hard cap is currently applied
+- crit doubles direct outgoing effect
 
-Crit affects propagation indirectly because propagation uses direct output magnitude as base impact.
+## 10. Carry-Based Quantization
 
-## 8. Sect (Current Implementation)
+Affliction state is integer; effect math is real-valued.
 
-Sect no longer boosts direct output or aspect multipliers.
+Per target planet, per side:
 
-Current sect effect:
+- store carry (`playerCarry[planet]`, `opponentCarry[planet]`)
+- `effective = max(0, raw + carry)`
+- `applied = round(effective)`
+- `nextCarry = effective - applied`
 
-- **In-sect planets get `+1 durability` for combustion checks only.**
+Healing clamped at zero does not bank overflow carry.
 
-Sect assignment:
+## 11. Aspects and Propagation
 
-- Day planets: `Sun, Jupiter, Saturn`
-- Night planets: `Moon, Venus, Mars`
-- Mercury: follows chart sect (`Day` if diurnal chart, else `Night`)
-
-Chart sect:
-
-- Diurnal chart => `Day`
-- Nocturnal chart => `Night`
-
-## 9. Rounding and Carry
-
-Affliction is integer-state, but raw effect math is real-valued.
-
-The game uses deterministic carry to avoid repeated rounding bias:
-
-- Run stores per-planet carry on both sides:
-  - `playerCarry[planet]`
-  - `opponentCarry[planet]`
-- Quantization uses:
-  - `effective = max(0, raw + carry)`
-  - `applied = round(effective)`
-  - `nextCarry = effective - applied`
-- Carry is consumed/updated per target planet.
-- Healing clamped at zero does not bank overflow carry.
-
-## 10. Aspects and Propagation
-
-Aspects are computed from sign distance.
-
-Propagation multipliers:
+Aspect multipliers:
 
 - Conjunction: `+1`
 - Sextile: `+0.5`
@@ -141,68 +139,57 @@ Propagation multipliers:
 - Square: `-0.5`
 - Opposition: `-1`
 
-No same-sect amplification is currently applied.
+Rules:
 
-Propagation rules:
+- one-hop propagation from active source to connected targets
+- magnitude: `abs(directAmount * aspectMultiplier)`
+- negative multipliers invert polarity (`Affliction <-> Testimony`)
+- propagation uses the same carry-aware integer application
+- combusted targets are skipped
+- combusted active source does not propagate
 
-- One-hop from the active source planet to each connected target.
-- Magnitude uses absolute value:
-  - `|directAmount * aspectMultiplier|`
-- Sign of multiplier determines inversion:
-  - positive: keep polarity
-  - negative: invert polarity (`Affliction <-> Testimony`)
-- Propagation also uses carry-aware integer application.
-- Combusted targets are skipped.
-- Combusted active source does not propagate.
+## 12. Combustion
 
-## 11. Combustion
-
-Combustion is checked when applying non-testimony affliction (direct or propagation).
-
-Probability uses affliction pressure vs durability threshold:
+Combustion is checked when non-testimony affliction is applied (direct or propagation).
 
 - `threshold = durability * 10`
 - `ratio = min(1, affliction / threshold)`
 
-Dignity transforms probability:
+Dignity factor:
 
-- Domicile: `ratio^2`
-- Exaltation: `ratio`
-- Neutral: `ratio`
-- Detriment: `min(0.5, ratio)`
-- Fall: `sqrt(ratio)`
+- Domicile: `0.75`
+- Exaltation: `0.9`
+- Neutral: `1.0`
+- Detriment: `1.15`
+- Fall: `1.3`
 
-Exaltation save:
+Probability:
 
-- First would-combust event is prevented once (`exaltationSaveUsed`), then consumed.
+- `p = clamp(ratio * dignityFactor, 0, 0.95)`
 
-Combusted planets:
+No one-time exaltation save is currently applied.
 
-- stop participating meaningfully in combat output
-- are excluded from aspect rendering and propagation targeting
+## 13. Encounter / Run Flow
 
-## 12. Encounter and Run Flow
-
-- A run contains `MAX_ENCOUNTERS = 3` encounters.
-- In current client flow, encounters are created with all planets unlocked, so sequence length is 7.
-- Turn sequence is pre-built per encounter.
-- Combusted opponent sequence entries are skipped.
+- `MAX_ENCOUNTERS = 3`
+- Current client creates runs with all planets unlocked (`unlockAll=true`), so sequence length is 7.
+- Opponent sequence entries that are already combusted are skipped.
 - Encounter auto-advances when completed.
 - Run ends in defeat when all player planets combust.
 
-## 13. Scoring (Distance)
+## 14. Scoring (Distance)
 
 UI label: `Distance`.
 
 Per turn:
 
-- `turnAffliction`: total positive deltas this turn (direct + propagation)
-- `turnTestimony`: absolute sum of negative deltas this turn
+- `turnAffliction`: sum of all positive deltas (direct + propagation, both sides)
+- `turnTestimony`: sum of absolute negative deltas (direct + propagation, both sides)
 - `turnScore = turnAffliction + turnTestimony`
 
 Run score accumulates `turnScore`.
 
-## 14. Interaction Chart (Current UI Semantics)
+## 15. Interaction Chart Semantics
 
 Columns:
 
@@ -213,18 +200,16 @@ Columns:
 - Luck
 - Output
 
-Output currently displays:
+Output display:
 
-- base direct output after friction (`rounded`)
-- crit bonus in parentheses: `(+x)` where `x` is extra from crit
+- rounded direct output after friction
+- crit bonus as `(+x)` where `x = round((output * 2) - output)`
 
-## 15. Notes on Prototype Scope
+## 16. Prototype Scope
 
-Intentionally out of scope in current prototype:
+Intentionally out of scope for now:
 
-- metaprogression economy
-- final balancing pass
-- broader content systems
-- production-grade persistence migrations
-
-This file should be updated whenever implemented mechanics change.
+- metaprogression/economy
+- production persistence migrations
+- full ephemeris chart calculation
+- final balance pass

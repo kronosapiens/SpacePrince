@@ -43,9 +43,18 @@ const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
 const IN_SECT_DURABILITY_BONUS = 1;
 const MERCURY_MAX_ELONGATION_DEGREES = 28;
 const VENUS_MAX_ELONGATION_DEGREES = 47;
+const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
+  Domicile: 0.75,
+  Exaltation: 0.9,
+  Neutral: 1,
+  Detriment: 1.15,
+  Fall: 1.3,
+};
 
 export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   const rng = mulberry32(seed);
+  const isDiurnal = rng() > 0.5;
+  const chartSect = isDiurnal ? "Day" : "Night";
   const planets: Record<PlanetName, PlanetPlacement> = {} as Record<PlanetName, PlanetPlacement>;
   const longitudes: Partial<Record<PlanetName, number>> = {
     Sun: rng() * 360,
@@ -69,6 +78,10 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
     const modality = SIGN_MODALITY[sign];
     const base = PLANET_BASE_STATS[planet];
     const buffs = addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]);
+    const planetSect = resolvePlanetSect(planet, isDiurnal);
+    if (planetSect === chartSect) {
+      buffs.durability += IN_SECT_DURABILITY_BONUS;
+    }
     const dignity = getDignity(planet, sign);
 
     planets[planet] = {
@@ -83,7 +96,6 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
     };
   });
 
-  const isDiurnal = rng() > 0.5;
   const ascendantSign = SIGNS[Math.floor(rng() * SIGNS.length)];
 
   return {
@@ -259,11 +271,11 @@ export function resolveTurn(
 
   const playerCombust =
     polarity !== "Testimony" && playerDelta > 0
-      ? maybeCombust(playerChart, playerPlacement, playerState, rng)
+      ? maybeCombust(playerPlacement, playerState, rng)
       : false;
   const opponentCombust =
     polarity !== "Testimony" && opponentDelta > 0
-      ? maybeCombust(opponentChart, opponentPlacement, opponentState, rng)
+      ? maybeCombust(opponentPlacement, opponentState, rng)
       : false;
 
   const playerPropagation = propagateEffects(
@@ -467,15 +479,10 @@ function getAspectType(signA: SignName, signB: SignName): AspectType {
   }
 }
 
-function resolveSect(chart: Chart, planet: PlanetName): "Day" | "Night" {
+function resolvePlanetSect(planet: PlanetName, isDiurnal: boolean): "Day" | "Night" {
   const base = PLANET_SECT[planet];
-  if (base === "Flexible") return chart.isDiurnal ? "Day" : "Night";
+  if (base === "Flexible") return isDiurnal ? "Day" : "Night";
   return base;
-}
-
-function isInSect(chart: Chart, planet: PlanetName): boolean {
-  const chartSect = chart.isDiurnal ? "Day" : "Night";
-  return resolveSect(chart, planet) === chartSect;
 }
 
 function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {
@@ -542,7 +549,6 @@ function applyEffectWithCarry(
 }
 
 function maybeCombust(
-  chart: Chart,
   placement: PlanetPlacement,
   state: PlanetState,
   rng: () => number
@@ -550,36 +556,13 @@ function maybeCombust(
   if (state.combusted) return false;
   if (state.affliction <= 0) return false;
 
-  const durabilityBase = placement.base.durability + placement.buffs.durability;
-  const durability = durabilityBase + (isInSect(chart, placement.planet) ? IN_SECT_DURABILITY_BONUS : 0);
+  const durability = placement.base.durability + placement.buffs.durability;
   const threshold = durability * 10;
   const ratio = threshold === 0 ? 1 : Math.min(1, state.affliction / threshold);
-  let probability = ratio;
-
-  switch (placement.dignity) {
-    case "Domicile":
-      probability = ratio ** 2;
-      break;
-    case "Exaltation":
-      probability = ratio;
-      break;
-    case "Neutral":
-      probability = ratio;
-      break;
-    case "Detriment":
-      probability = Math.min(0.5, ratio);
-      break;
-    case "Fall":
-      probability = Math.sqrt(ratio);
-      break;
-  }
+  const probability = Math.max(0, Math.min(0.95, ratio * DIGNITY_COMBUST_FACTOR[placement.dignity]));
 
   const roll = rng();
   if (roll < probability) {
-    if (placement.dignity === "Exaltation" && !state.exaltationSaveUsed) {
-      state.exaltationSaveUsed = true;
-      return false;
-    }
     state.combusted = true;
     return true;
   }
@@ -628,7 +611,7 @@ function propagateEffects(
     if (applied.delta === 0) return;
     const combust =
       effectPolarity !== "Testimony"
-        ? maybeCombust(chart, targetPlacement, targetState, rng)
+        ? maybeCombust(targetPlacement, targetState, rng)
         : false;
 
     propagation.push({

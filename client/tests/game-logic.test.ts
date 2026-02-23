@@ -3,6 +3,7 @@ import { resolveTurn, getPolarity, createInitialPlanetState, generateChart } fro
 import {
   PLANETS,
   PLANET_BASE_STATS,
+  PLANET_SECT,
   SIGNS,
   SIGN_ELEMENT,
   SIGN_MODALITY,
@@ -19,9 +20,21 @@ function addStats(a: { damage: number; healing: number; durability: number; luck
   };
 }
 
-function placement(planet: (typeof PLANETS)[number], sign: keyof typeof SIGN_ELEMENT, dignity = "Neutral") {
+function placement(
+  planet: (typeof PLANETS)[number],
+  sign: keyof typeof SIGN_ELEMENT,
+  dignity = "Neutral",
+  isDiurnal = false
+) {
   const element = SIGN_ELEMENT[sign];
   const modality = SIGN_MODALITY[sign];
+  const buffs = addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]);
+  const chartSect = isDiurnal ? "Day" : "Night";
+  const planetSect =
+    PLANET_SECT[planet] === "Flexible" ? (isDiurnal ? "Day" : "Night") : PLANET_SECT[planet];
+  if (planetSect === chartSect) {
+    buffs.durability += 1;
+  }
   return {
     planet,
     sign,
@@ -29,7 +42,7 @@ function placement(planet: (typeof PLANETS)[number], sign: keyof typeof SIGN_ELE
     modality,
     dignity,
     base: PLANET_BASE_STATS[planet],
-    buffs: addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]),
+    buffs,
   };
 }
 
@@ -39,12 +52,12 @@ function buildChart(
 ) {
   const planets = {} as Record<(typeof PLANETS)[number], ReturnType<typeof placement>>;
   for (const planet of PLANETS) {
-    planets[planet] = placement(planet, "Taurus", "Neutral");
+    planets[planet] = placement(planet, "Taurus", "Neutral", isDiurnal);
   }
   for (const [planet, config] of Object.entries(overrides) as Array<
     [(typeof PLANETS)[number], { sign: keyof typeof SIGN_ELEMENT; dignity?: string }]
   >) {
-    planets[planet] = placement(planet, config.sign, config.dignity ?? "Neutral");
+    planets[planet] = placement(planet, config.sign, config.dignity ?? "Neutral", isDiurnal);
   }
   return { id: "chart", name: "Chart", isDiurnal, planets };
 }
@@ -208,7 +221,7 @@ describe("game logic", () => {
     expect(updated.playerState.Moon.affliction).toBe(5);
   });
 
-  it("exaltation save prevents first fatal combustion", () => {
+  it("exaltation combust chance is reduced but does not have a one-time save", () => {
     const playerChart = buildChart({
       Mars: { sign: "Capricorn", dignity: "Exaltation" },
     });
@@ -228,8 +241,8 @@ describe("game logic", () => {
     });
 
     const afterFirst = resolveTurn(run, playerChart, "Mars", () => 0);
-    expect(afterFirst.playerState.Mars.combusted).toBe(false);
-    expect(afterFirst.playerState.Mars.exaltationSaveUsed).toBe(true);
+    expect(afterFirst.playerState.Mars.combusted).toBe(true);
+    expect(afterFirst.playerState.Mars.exaltationSaveUsed).toBe(false);
   });
 
   it("combusted planets do not receive direct effects", () => {
