@@ -17,7 +17,7 @@ export function ChartTooltip({
   playerChart,
   opponentChart,
 }: ChartTooltipProps) {
-  const formatSect = (inSect: boolean) => (inSect ? "In sect" : "Out of sect");
+  const formatSect = (inSect: boolean) => (inSect ? "In-sect" : "Out-of-sect");
 
   if (!hoveredPlanet && !hoveredOpponent) {
     return null;

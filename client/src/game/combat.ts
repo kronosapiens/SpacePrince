@@ -30,10 +30,16 @@ export function getEffectiveStats(chart: Chart, planet: PlanetName): PlanetStats
 }
 
 export function computeDirectExchange(polarity: Polarity, playerStats: PlanetStats, opponentStats: PlanetStats) {
-  const friction = polarity === "Friction" ? 0.5 : 1;
-  const playerToOpponent = (polarity === "Testimony" ? playerStats.healing : playerStats.damage) * friction;
-  const opponentToPlayer = (polarity === "Testimony" ? opponentStats.healing : opponentStats.damage) * friction;
-  return { friction, playerToOpponent: Math.max(0, playerToOpponent), opponentToPlayer: Math.max(0, opponentToPlayer) };
+  const polarityMultiplier = polarity === "Affliction" ? 2 : 1;
+  const playerToOpponent =
+    (polarity === "Testimony" ? playerStats.healing : playerStats.damage) * polarityMultiplier;
+  const opponentToPlayer =
+    (polarity === "Testimony" ? opponentStats.healing : opponentStats.damage) * polarityMultiplier;
+  return {
+    polarityMultiplier,
+    playerToOpponent: Math.max(0, playerToOpponent),
+    opponentToPlayer: Math.max(0, opponentToPlayer),
+  };
 }
 
 export function getProjectedPair(

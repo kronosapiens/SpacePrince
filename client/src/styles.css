@@ -143,6 +143,12 @@ h3,
   gap: 24px;
 }
 
+.interaction-log-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
 .panel.wide {
   width: 100%;
 }
@@ -169,6 +175,21 @@ h3,
 .panel-header h2 {
   margin: 0;
   font-size: 20px;
+}
+
+.interaction-heading {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.interaction-subtitle {
+  font-family: "Cinzel", "Times New Roman", serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.9;
 }
 
 .encounter-hint {
@@ -436,6 +457,40 @@ h3,
 .log {
   display: grid;
   gap: 12px;
+  max-height: 330px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(216, 168, 90, 0.35) rgba(10, 16, 18, 0.25);
+}
+
+.log::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log::-webkit-scrollbar-track {
+  background: rgba(10, 16, 18, 0.25);
+  border-radius: 999px;
+}
+
+.log::-webkit-scrollbar-thumb {
+  background: rgba(216, 168, 90, 0.35);
+  border-radius: 999px;
+}
+
+.panel-body:has(.log) {
+  position: relative;
+}
+
+.panel-body:has(.log)::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 24px;
+  height: 22px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(20, 30, 33, 0), rgba(20, 30, 33, 0.92));
 }
 
 .log-entry {
@@ -470,6 +525,11 @@ h3,
 .log-body p {
   margin: 0;
   line-height: 1.35;
+}
+
+.log-side {
+  font-weight: 700;
+  color: rgba(245, 241, 230, 0.92);
 }
 
 .log-formula {
@@ -860,11 +920,30 @@ h3,
   z-index: 5;
 }
 
-.chart-affliction-chip.top-half {
+.chart-affliction-chip.toward-center-ul {
+  top: -7px;
+  right: auto;
+  left: -7px;
+}
+
+.chart-affliction-chip.toward-center-ur {
+  top: -7px;
+  right: -7px;
+  left: auto;
+}
+
+.chart-affliction-chip.toward-center-ll {
   top: auto;
   bottom: -7px;
   right: auto;
   left: -7px;
+}
+
+.chart-affliction-chip.toward-center-lr {
+  top: auto;
+  bottom: -7px;
+  right: -7px;
+  left: auto;
 }
 
 .chart-affliction-chip.flash {
@@ -958,10 +1037,11 @@ h3,
 }
 
 .turn-track-wrap {
-  margin: 14px auto 2px;
+  margin: 2px auto 2px;
   display: grid;
   gap: 5px;
   justify-items: center;
+  width: 100%;
 }
 
 .turn-track {
@@ -976,6 +1056,25 @@ h3,
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  justify-self: center;
+}
+
+.turn-action-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.turn-action-slot {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 1px;
+}
+
+.turn-continue-inline {
+  padding: 7px 13px;
+  font-size: 11px;
 }
 
 .turn-dot {
@@ -1065,6 +1164,10 @@ h3,
 
 
 @media (max-width: 900px) {
+  .interaction-log-row {
+    grid-template-columns: 1fr;
+  }
+
   .hero {
     padding: 20px;
   }

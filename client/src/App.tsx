@@ -11,7 +11,6 @@ import {
   generateChart,
   getAspects,
   resolveTurn,
-  skipCombustedOpponentTurns,
 } from "./game/logic";
 import type { Chart, PlanetName, RunState } from "./game/types";
 import { useLocalStorage } from "./components/useLocalStorage";
@@ -45,6 +44,7 @@ export default function App() {
   const [run, setRun] = useLocalStorage<RunState | null>("space-prince-run", null);
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
+  const [frozenDistance, setFrozenDistance] = useState<number | null>(null);
   const {
     animating,
     actionPlanet,
@@ -114,32 +114,26 @@ export default function App() {
     const currentOpponent = encounter?.sequence[encounter.turnIndex];
     const previousRun = run;
     const updated = resolveTurn(run, profile.chart, planet, () => Math.random());
-    let nextRun = updated;
-    const completedEncounter = updated.encounters[updated.encounterIndex];
-    if (completedEncounter?.completed && !updated.over) {
-      setProfile((prev) => ({ ...prev, totalEncounters: prev.totalEncounters + 1 }));
-      nextRun = advanceEncounter(updated);
-    }
-    setRun(nextRun);
+    setRun(updated);
     if (!currentOpponent) return;
     const entry = updated.log[0];
     if (!entry) return;
+    setFrozenDistance(roundDisplay(run.score ?? 0));
     startAnimation(entry, previousRun);
   };
 
-  useEffect(() => {
+  const handleContinueEncounter = () => {
     if (!run || run.over) return;
-    const normalized = skipCombustedOpponentTurns(run);
-    if (normalized !== run) {
-      setRun(normalized);
-    }
-  }, [run, setRun]);
-
-  useEffect(() => {
-    if (!run || !encounter?.completed || run.over) return;
+    if (!encounter || !encounter.completed) return;
     setProfile((prev) => ({ ...prev, totalEncounters: prev.totalEncounters + 1 }));
     setRun(advanceEncounter(run));
-  }, [run, encounter, setProfile, setRun]);
+  };
+
+  useEffect(() => {
+    if (!animating) {
+      setFrozenDistance(null);
+    }
+  }, [animating]);
 
   const getProjectedDelta = (planet: PlanetName) => {
     if (!run || !encounter || !opponentChart || !displayOpponentPlanet) return null;
@@ -244,7 +238,7 @@ export default function App() {
               <p className="encounter-hint">Hover a planet to inspect. Click a planet to act.</p>
             </div>
             <div className="log-meta">
-              <div className="tag">Distance {run?.score ?? 0}</div>
+              <div className="tag">Distance | {frozenDistance ?? roundDisplay(run?.score ?? 0)}</div>
             </div>
           </div>
           <div className="panel-body">
@@ -254,6 +248,13 @@ export default function App() {
                 current={displayTurnIndex}
                 opponentPlanet={displayOpponentPlanet}
                 disabled={run?.over || encounter.completed}
+                actionSlot={
+                  encounter.completed && !run?.over ? (
+                    <button className="btn turn-continue-inline" onClick={handleContinueEncounter} disabled={animating}>
+                      Continue
+                    </button>
+                  ) : undefined
+                }
               />
             )}
             <div className="chart-stage">
@@ -318,14 +319,16 @@ export default function App() {
         </div>
       </section>
 
-      <InteractionChart
-        playerChart={profile.chart}
-        opponentChart={opponentChart}
-        opponentPlanet={displayOpponentPlanet}
-        run={run}
-        focusedPlanet={hoveredPlanet}
-      />
-      <EncounterLog run={run} />
+      <div className="interaction-log-row">
+        <InteractionChart
+          playerChart={profile.chart}
+          opponentChart={opponentChart}
+          opponentPlanet={displayOpponentPlanet}
+          run={run}
+          focusedPlanet={hoveredPlanet}
+        />
+        <EncounterLog run={run} />
+      </div>
     </div>
   );
 }

@@ -140,6 +140,14 @@ export function ChartVisual({
         ))}
         {points.map((point) => {
           const isImpact = actionPlanet === point.planet || highlightAffliction[`${mode}-${point.planet}`];
+          const chipPositionClass =
+            point.x < 0
+              ? point.y < 0
+                ? "toward-center-lr"
+                : "toward-center-ur"
+              : point.y < 0
+                ? "toward-center-ll"
+                : "toward-center-ul";
           const glyph = glyphTone(planetColors[point.planet].fill);
           const affliction = afflictionValues[point.planet] ?? 0;
           const afflictionLevel = getAfflictionLevel(affliction);
@@ -216,7 +224,7 @@ export function ChartVisual({
             )}
             {!combusted[point.planet] && (
               <span
-                className={`chart-affliction-chip ${point.y < 0 ? "top-half" : ""} affliction-${afflictionLevel} ${
+                className={`chart-affliction-chip ${chipPositionClass} affliction-${afflictionLevel} ${
                   highlightAffliction[`${mode}-${point.planet}`] ? "flash" : ""
                 }`}
               >

@@ -151,12 +151,12 @@ describe("game logic", () => {
     const entry = updated.log[0];
 
     expect(entry.polarity).toBe("Affliction");
-    expect(entry.opponentDelta).toBe(6);
-    expect(entry.playerDelta).toBe(2);
-    expect(entry.turnScore).toBe(26);
-    expect(updated.score).toBe(26);
-    expect(updated.playerState.Mars.affliction).toBe(2);
-    expect(updated.opponentState.Moon.affliction).toBe(6);
+    expect(entry.opponentDelta).toBe(12);
+    expect(entry.playerDelta).toBe(4);
+    expect(entry.turnScore).toBe(52);
+    expect(updated.score).toBe(52);
+    expect(updated.playerState.Mars.affliction).toBe(4);
+    expect(updated.opponentState.Moon.affliction).toBe(12);
   });
 
   it("seeded combat snapshot keeps preview and resolved direct effects aligned", () => {
@@ -201,14 +201,14 @@ describe("game logic", () => {
     }).toMatchInlineSnapshot(`
       {
         "direct": {
-          "other": 6,
+          "other": 12,
           "polarity": "Affliction",
-          "self": 2,
+          "self": 4,
         },
         "preview": {
-          "other": 6,
+          "other": 12,
           "polarity": "Affliction",
-          "self": 2,
+          "self": 4,
         },
         "propagation": [
           {
@@ -218,43 +218,43 @@ describe("game logic", () => {
             "target": "Moon",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Sun",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Mercury",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Venus",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Mars",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Jupiter",
           },
           {
-            "delta": 3,
+            "delta": 6,
             "note": "Sextile flows",
             "side": "other",
             "target": "Saturn",
           },
         ],
-        "score": 26,
+        "score": 52,
       }
     `);
   });
@@ -313,8 +313,8 @@ describe("game logic", () => {
     const propagationToMoon = updated.log[0].propagation.find((p) => p.target === "Moon");
 
     expect(propagationToMoon).toBeDefined();
-    expect(propagationToMoon?.delta).toBe(-1);
-    expect(updated.playerState.Moon.affliction).toBe(5);
+    expect(propagationToMoon?.delta).toBe(-2);
+    expect(updated.playerState.Moon.affliction).toBe(4);
   });
 
   it("exaltation combust chance is reduced but does not have a one-time save", () => {

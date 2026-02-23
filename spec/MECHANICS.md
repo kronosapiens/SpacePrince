@@ -101,12 +101,12 @@ Base trait:
 
 Multipliers:
 
-- Friction: `0.5` for `Friction`, else `1`
+- Polarity: `2` for `Affliction`, `1` for `Friction`, `1` for `Testimony`
 - Crit: `2` on crit, else `1`
 
 Raw direct amount:
 
-- `raw = baseTrait * friction * critMultiplier`
+- `raw = baseTrait * polarityMultiplier * critMultiplier`
 
 ## 9. Crit
 
@@ -167,9 +167,10 @@ No one-time exaltation save is currently applied.
 ## 13. Encounter / Run Flow
 
 - `MAX_ENCOUNTERS = 3`
-- Current client creates runs with all planets unlocked (`unlockAll=true`), so sequence length is 7.
-- Opponent sequence entries that are already combusted are skipped.
-- Encounter auto-advances when completed.
+- Current client creates runs with all planets unlocked (`unlockAll=true`), so turn count per encounter is 7.
+- Opponent planet is selected randomly each turn from non-combusted opponent planets.
+- If all opponent planets combust before turn 7, the encounter ends early.
+- Encounter advances manually via `Continue` after completion.
 - Run ends in defeat when all player planets combust.
 
 ## 14. Scoring (Distance)
@@ -190,15 +191,12 @@ Columns:
 
 - Planet
 - Polarity
-- Sect (`☉ In/Out` or `☽ In/Out`)
-- Base
+- Impact
 - Luck
-- Output
 
-Output display:
+Impact display:
 
-- rounded direct output after friction
-- crit bonus as `(+x)` where `x = round((output * 2) - output)`
+- one-decimal direct output after polarity multiplier
 
 ## 16. Prototype Scope
 

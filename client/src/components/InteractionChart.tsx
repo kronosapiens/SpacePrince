@@ -37,7 +37,12 @@ export function InteractionChart({
     <section className="grid">
       <div className="panel">
         <div className="panel-header">
-          <h2>Interaction Chart</h2>
+          <div className="interaction-heading">
+            <h2>Interaction Chart</h2>
+            {context && (
+              <span className="interaction-subtitle">versus {context.opponentPlanet}</span>
+            )}
+          </div>
         </div>
         <div className="panel-body">
           {!context && <p className="muted">Start a run to inspect luck, polarity, and multipliers.</p>}
@@ -49,8 +54,7 @@ export function InteractionChart({
                   <tr>
                     <th>Planet</th>
                     <th>Polarity</th>
-                    <th>Base</th>
-                    <th>Output</th>
+                    <th>Impact</th>
                     <th>Luck</th>
                   </tr>
                 </thead>
@@ -61,12 +65,12 @@ export function InteractionChart({
                     const placement = playerChart.planets[planet];
                     const oppPlacement = context.opponentChart.planets[context.opponentPlanet];
                     const polarity = getPolarity(placement.element, oppPlacement.element);
-                    const friction = polarity === "Friction" ? 0.5 : 1;
+                    const polarityMultiplier = polarity === "Affliction" ? 2 : 1;
                     const pStats = playerState.combusted
                       ? { damage: 0, healing: 0, luck: 0 }
                       : getEffectiveStats(playerChart, planet);
                     const base = polarity === "Testimony" ? pStats.healing : pStats.damage;
-                    const output = base * friction;
+                    const output = base * polarityMultiplier;
                     const rowClass = [
                       focusedPlanet === planet ? "focus" : "",
                       playerState.combusted ? "combusted" : "",
@@ -86,7 +90,6 @@ export function InteractionChart({
                           </span>
                         </td>
                         <td>{polarity}</td>
-                        <td>{formatDisplay(base, 1)}</td>
                         <td>{formatDisplay(output, 1)}</td>
                         <td>{formatDisplay(pStats.luck, 1)}</td>
                       </tr>

@@ -166,26 +166,12 @@ export function createRun(
 }
 
 export function buildEncounterSequence(
-  playerChart: Chart,
-  opponentChart: Chart,
+  _playerChart: Chart,
+  _opponentChart: Chart,
   unlockedPlanets: PlanetName[],
   rng: () => number
 ): PlanetName[] {
-  const weights = PLANETS.map((planet) => {
-    const count = PLANETS.reduce((acc, playerPlanet) => {
-      const aspect = getAspectType(
-        playerChart.planets[playerPlanet].sign,
-        opponentChart.planets[planet].sign
-      );
-      return acc + (aspect !== "None" ? 1 : 0);
-    }, 0);
-    return Math.max(1, count);
-  });
-
-  return Array.from({ length: unlockedPlanets.length }, () => {
-    const choice = weightedChoice(PLANETS, weights, rng);
-    return choice;
-  });
+  return Array.from({ length: unlockedPlanets.length }, () => weightedChoice(PLANETS, rng));
 }
 
 export function resolveTurn(
@@ -242,7 +228,7 @@ export function resolveTurn(
   const turnScore = computeTurnScore(playerDelta, opponentDelta, propagation);
   const logEntry = buildTurnLogEntry({
     runLogLength: run.log.length,
-    turnIndex: encounter.turnIndex + 1,
+    turnIndex: run.log.length + 1,
     playerPlanet,
     opponentPlanet,
     polarity: directPhase.polarity,
@@ -275,8 +261,19 @@ export function resolveTurn(
     enc.id === encounter.id
       ? {
           ...enc,
+          sequence: (() => {
+            const nextTurnIndex = enc.turnIndex + 1;
+            const selectable = PLANETS.filter((planet) => !opponentStateMap[planet].combusted);
+            if (nextTurnIndex >= enc.sequence.length || selectable.length === 0) return enc.sequence;
+            const nextPlanet = weightedChoice(selectable, rng);
+            const nextSequence = [...enc.sequence];
+            nextSequence[nextTurnIndex] = nextPlanet;
+            return nextSequence;
+          })(),
           turnIndex: enc.turnIndex + 1,
-          completed: enc.turnIndex + 1 >= enc.sequence.length,
+          completed:
+            enc.turnIndex + 1 >= enc.sequence.length ||
+            PLANETS.every((planet) => opponentStateMap[planet].combusted),
         }
       : enc
   );
@@ -302,32 +299,7 @@ export function advanceEncounter(run: RunState): RunState {
 }
 
 export function skipCombustedOpponentTurns(run: RunState): RunState {
-  if (run.over) return run;
-  const encounter = run.encounters[run.encounterIndex];
-  if (!encounter || encounter.completed) return run;
-
-  let turnIndex = encounter.turnIndex;
-  while (turnIndex < encounter.sequence.length) {
-    const planet = encounter.sequence[turnIndex];
-    if (!run.opponentState[planet]?.combusted) break;
-    turnIndex += 1;
-  }
-
-  if (turnIndex === encounter.turnIndex) return run;
-  const completed = turnIndex >= encounter.sequence.length;
-
-  return {
-    ...run,
-    encounters: run.encounters.map((enc) =>
-      enc.id === encounter.id
-        ? {
-            ...enc,
-            turnIndex,
-            completed,
-          }
-        : enc
-    ),
-  };
+  return run;
 }
 
 export function getAspects(chart: Chart): AspectConnection[] {
@@ -420,8 +392,8 @@ function computeEffectAmount(
 ) {
   const critMultiplier = crit ? 2 : 1;
   const base = polarity === "Testimony" ? stats.healing : stats.damage;
-  const friction = polarity === "Friction" ? 0.5 : 1;
-  const amount = base * critMultiplier * friction;
+  const polarityMultiplier = polarity === "Affliction" ? 2 : 1;
+  const amount = base * critMultiplier * polarityMultiplier;
   return Math.max(0, amount);
 }
 
@@ -450,7 +422,7 @@ function computeDirectPhase(
   const opponentCrit = rollCrit(opponentEffective.luck, rng);
   const playerToOpponent = computeEffectAmount(polarity, playerEffective, playerCrit);
   const opponentToPlayer = computeEffectAmount(polarity, opponentEffective, opponentCrit);
-  const friction = polarity === "Friction" ? 0.5 : 1;
+  const friction = polarity === "Affliction" ? 2 : 1;
   const playerBase = polarity === "Testimony" ? playerEffective.healing : playerEffective.damage;
   const opponentBase = polarity === "Testimony" ? opponentEffective.healing : opponentEffective.damage;
 
@@ -685,14 +657,12 @@ function propagateEffects(
   return propagation;
 }
 
-function weightedChoice<T>(items: T[], weights: number[], rng: () => number): T {
-  const total = weights.reduce((sum, w) => sum + w, 0);
-  const roll = rng() * total;
-  let cumulative = 0;
-  for (let i = 0; i < items.length; i += 1) {
-    cumulative += weights[i];
-    if (roll <= cumulative) return items[i];
+function weightedChoice<T>(items: T[], rng: () => number): T {
+  if (items.length === 0) {
+    throw new Error("weightedChoice requires at least one item");
   }
+  const index = Math.floor(rng() * items.length);
+  if (index >= 0 && index < items.length) return items[index];
   return items[items.length - 1];
 }
 

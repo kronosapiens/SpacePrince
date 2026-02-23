@@ -47,8 +47,12 @@ export function EncounterLog({ run }: EncounterLogProps) {
                       ];
                       return (
                         <>
-                          <p>Self: {selfEffects.join(", ")}</p>
-                          <p>Other: {otherEffects.join(", ")}</p>
+                          <p>
+                            <span className="log-side">Self:</span> {selfEffects.join(", ")}
+                          </p>
+                          <p>
+                            <span className="log-side">Other:</span> {otherEffects.join(", ")}
+                          </p>
                         </>
                       );
                     })()}
