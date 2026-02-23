@@ -9,6 +9,8 @@ interface ChartVisualProps {
   afflictionValues: Record<PlanetName, number>;
   getAfflictionLevel: (value: number) => number;
   highlightAffliction: Record<string, boolean>;
+  critPlanets?: Record<string, boolean>;
+  ripplePlanets?: Record<string, boolean>;
   onPlanetHover?: (planet: PlanetName | null) => void;
   onPlanetClick?: (planet: PlanetName) => void;
   combusted: Record<PlanetName, boolean>;
@@ -20,7 +22,9 @@ interface ChartVisualProps {
   highlightLines?: Record<string, boolean>;
   diurnal?: boolean;
   rotationDegrees?: number;
-  ascendantSign?: SignName;
+  signPolarities?: Partial<Record<SignName, "Affliction" | "Testimony" | "Friction">>;
+  projectedEffects?: Partial<Record<PlanetName, number>>;
+  projectedPairs?: Partial<Record<PlanetName, { selfDelta: number; otherDelta: number }>>;
   mode: "self" | "other";
 }
 
@@ -31,6 +35,8 @@ export function ChartVisual({
   afflictionValues,
   getAfflictionLevel,
   highlightAffliction,
+  critPlanets = {},
+  ripplePlanets = {},
   onPlanetHover,
   onPlanetClick,
   combusted,
@@ -42,7 +48,9 @@ export function ChartVisual({
   highlightLines = {},
   diurnal,
   rotationDegrees = 0,
-  ascendantSign,
+  signPolarities,
+  projectedEffects = {},
+  projectedPairs = {},
   mode,
 }: ChartVisualProps) {
   const glyphTone = (hex: string) => {
@@ -84,11 +92,6 @@ export function ChartVisual({
     Pisces: "♓︎",
   };
 
-  const formatMultiplier = (value: number) => {
-    const rounded = Number(value.toFixed(3));
-    const text = Number.isInteger(rounded) ? String(rounded) : String(rounded);
-    return `${rounded > 0 ? "+" : ""}${text}x`;
-  };
   const sunPoint = points.find((point) => point.planet === "Sun");
   const sunAboveMidpoint = sunPoint ? sunPoint.y <= 0 : diurnal ?? true;
   const sectClass = sunAboveMidpoint ? "day-top" : "day-bottom";
@@ -98,15 +101,7 @@ export function ChartVisual({
       const from = pointMap[aspect.from];
       const to = pointMap[aspect.to];
       if (!from || !to) return null;
-      const midX = (from.x + to.x) / 2;
-      const midY = (from.y + to.y) / 2;
-      const dx = to.x - from.x;
-      const dy = to.y - from.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const offset = 12;
-      const labelX = midX + (-dy / length) * offset;
-      const labelY = midY + (dx / length) * offset;
-      return { aspect, from, to, labelX, labelY };
+      return { aspect, from, to };
     })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 
@@ -127,9 +122,15 @@ export function ChartVisual({
         {SIGNS.map((sign, index) => (
           <div
             key={`${title}-${sign}-label`}
-            className={`chart-sign-label ${ascendantSign === sign ? "ascendant" : ""}`}
+            className={`chart-sign-label ${
+              signPolarities?.[sign] === "Affliction"
+                ? "sign-affliction"
+                : signPolarities?.[sign] === "Testimony"
+                  ? "sign-testimony"
+                  : ""
+            }`}
             style={{
-              transform: `translate(-50%, -50%) rotate(${rotationDegrees + 15 - index * 30}deg) translateY(-226px) rotate(${
+              transform: `translate(-50%, -50%) rotate(${rotationDegrees + 15 - index * 30}deg) translateY(-227px) rotate(${
                 -(rotationDegrees + 15 - index * 30)
               }deg)`,
             }}
@@ -142,12 +143,46 @@ export function ChartVisual({
           const glyph = glyphTone(planetColors[point.planet].fill);
           const affliction = afflictionValues[point.planet] ?? 0;
           const afflictionLevel = getAfflictionLevel(affliction);
+          const projection = projectedEffects[point.planet];
+          const pairProjection = projectedPairs[point.planet];
+          const projectionPlacement = point.x >= 0 ? "left" : "right";
+          const hasProjection = projection !== undefined;
+          const hasPairProjection = pairProjection !== undefined;
+          const projectionClass =
+            hasProjection && projection > 0
+              ? "affliction"
+              : hasProjection && projection < 0
+                ? "testimony"
+                : "neutral";
+          const projectionValue = hasProjection ? `${projection > 0 ? "+" : ""}${projection}` : "0";
+          const pairSelfClass =
+            hasPairProjection && pairProjection.selfDelta > 0
+              ? "affliction"
+              : hasPairProjection && pairProjection.selfDelta < 0
+                ? "testimony"
+                : "neutral";
+          const pairOtherClass =
+            hasPairProjection && pairProjection.otherDelta > 0
+              ? "affliction"
+              : hasPairProjection && pairProjection.otherDelta < 0
+                ? "testimony"
+                : "neutral";
+          const pairSelfValue = hasPairProjection
+            ? `${pairProjection.selfDelta > 0 ? "+" : ""}${pairProjection.selfDelta}`
+            : "0";
+          const pairOtherValue = hasPairProjection
+            ? `${pairProjection.otherDelta > 0 ? "+" : ""}${pairProjection.otherDelta}`
+            : "0";
           return (
           <div
             key={`${title}-${point.planet}`}
-            className={`chart-planet ${activePlanet === point.planet ? "active" : ""} ${
+            className={`chart-planet ${
+              activePlanet === point.planet ? `active active-${mode}` : ""
+            } ${
               combusted[point.planet] ? "combusted" : ""
-            } ${actionPlanet === point.planet ? "impact" : ""}`}
+            } ${actionPlanet === point.planet ? "impact" : ""} ${
+              ripplePlanets[`${mode}-${point.planet}`] ? "ripple" : ""
+            }`}
             style={{
               transform: `translate(-50%, -50%) translate(${point.x}px, ${point.y}px)`,
               backgroundColor: combusted[point.planet]
@@ -161,12 +196,30 @@ export function ChartVisual({
           >
             <span
               className="planet-glyph"
-              style={{ color: glyph.color, textShadow: `0 1px 2px ${glyph.shadow}` }}
+              style={{
+                color: combusted[point.planet] ? "rgba(12, 12, 12, 0.9)" : glyph.color,
+                textShadow: combusted[point.planet]
+                  ? "0 1px 2px rgba(245, 241, 230, 0.18)"
+                  : `0 1px 2px ${glyph.shadow}`,
+              }}
               aria-hidden="true"
             >
               {planetGlyph[point.planet]}
             </span>
+            {critPlanets[`${mode}-${point.planet}`] && <span className="chart-crit-burst" />}
             {combusted[point.planet] && <span className="chart-combust" />}
+            {!combusted[point.planet] && hasPairProjection && (
+              <span className={`chart-projection pair ${projectionPlacement}`}>
+                <span className={`projection-delta ${pairSelfClass}`}>{pairSelfValue}</span>
+                <span className="projection-divider">/</span>
+                <span className={`projection-delta ${pairOtherClass}`}>{pairOtherValue}</span>
+              </span>
+            )}
+            {!combusted[point.planet] && !hasPairProjection && hasProjection && (
+              <span className={`chart-projection ${projectionPlacement}`}>
+                <span className={`projection-delta ${projectionClass}`}>{projectionValue}</span>
+              </span>
+            )}
             {!combusted[point.planet] && (
               <span
                 className={`chart-affliction-chip ${point.y < 0 ? "top-half" : ""} affliction-${afflictionLevel} ${
@@ -194,18 +247,6 @@ export function ChartVisual({
                   } ${highlightLines[`${aspect.from}-${aspect.to}`] ? "active" : ""}`}
                   style={{ opacity: Math.min(1, Math.abs(aspect.multiplier)) }}
                 />
-              ))}
-            </svg>
-            <svg className="chart-aspects chart-aspects-labels" viewBox="-255 -255 510 510">
-              {visibleAspects.map(({ aspect, labelX, labelY }) => (
-                <text
-                  key={`${aspect.from}-${aspect.to}-${aspect.aspect}-label`}
-                  x={labelX}
-                  y={labelY}
-                  className="aspect-label"
-                >
-                  {formatMultiplier(aspect.multiplier)}
-                </text>
               ))}
             </svg>
           </>

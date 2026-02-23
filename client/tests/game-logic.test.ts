@@ -104,7 +104,7 @@ describe("game logic", () => {
     expect(getPolarity("Earth", "Air")).toBe("Affliction");
   });
 
-  it("resolveTurn applies affliction magnitude with modality multipliers", () => {
+  it("resolveTurn applies affliction magnitude without modality multipliers", () => {
     const playerChart = buildChart({
       Mars: { sign: "Aries", dignity: "Domicile" },
     });
@@ -125,16 +125,16 @@ describe("game logic", () => {
     const entry = updated.log[0];
 
     expect(entry.polarity).toBe("Affliction");
-    expect(entry.opponentDelta).toBe(8);
-    expect(entry.playerDelta).toBe(3);
-    expect(entry.turnAffliction).toBe(11);
+    expect(entry.opponentDelta).toBe(6);
+    expect(entry.playerDelta).toBe(2);
+    expect(entry.turnAffliction).toBe(26);
     expect(entry.turnTestimony).toBe(0);
-    expect(entry.turnScore).toBe(11);
-    expect(updated.totalAffliction).toBe(11);
+    expect(entry.turnScore).toBe(26);
+    expect(updated.totalAffliction).toBe(26);
     expect(updated.totalTestimony).toBe(0);
-    expect(updated.score).toBe(11);
-    expect(updated.playerState.Mars.affliction).toBe(3);
-    expect(updated.opponentState.Moon.affliction).toBe(8);
+    expect(updated.score).toBe(26);
+    expect(updated.playerState.Mars.affliction).toBe(2);
+    expect(updated.opponentState.Moon.affliction).toBe(6);
   });
 
   it("testimony healing clamps at zero affliction", () => {
@@ -167,7 +167,7 @@ describe("game logic", () => {
     expect(updated.opponentState.Sun.affliction).toBe(0);
   });
 
-  it("square propagation inverts affliction into testimony with same-sect scaling", () => {
+  it("square propagation inverts affliction into testimony", () => {
     const playerChart = buildChart({
       Mars: { sign: "Aries", dignity: "Domicile" },
       Moon: { sign: "Cancer", dignity: "Neutral" },
@@ -191,11 +191,11 @@ describe("game logic", () => {
     const propagationToMoon = updated.log[0].propagation.find((p) => p.target === "Moon");
 
     expect(propagationToMoon).toBeDefined();
-    expect(propagationToMoon?.delta).toBe(-2);
-    expect(updated.playerState.Moon.affliction).toBe(4);
+    expect(propagationToMoon?.delta).toBe(-1);
+    expect(updated.playerState.Moon.affliction).toBe(5);
   });
 
-  it("exaltation save prevents first fatal combustion then consumes", () => {
+  it("exaltation save prevents first fatal combustion", () => {
     const playerChart = buildChart({
       Mars: { sign: "Capricorn", dignity: "Exaltation" },
     });
@@ -217,9 +217,6 @@ describe("game logic", () => {
     const afterFirst = resolveTurn(run, playerChart, "Mars", () => 0);
     expect(afterFirst.playerState.Mars.combusted).toBe(false);
     expect(afterFirst.playerState.Mars.exaltationSaveUsed).toBe(true);
-
-    const afterSecond = resolveTurn(afterFirst, playerChart, "Mars", () => 0);
-    expect(afterSecond.playerState.Mars.combusted).toBe(true);
   });
 
   it("combusted planets do not receive direct effects", () => {

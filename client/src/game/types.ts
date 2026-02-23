@@ -74,7 +74,6 @@ export interface AspectConnection {
   to: PlanetName;
   aspect: Exclude<AspectType, "None">;
   multiplier: number;
-  sameSect: boolean;
 }
 
 export interface TurnLogEntry {
@@ -90,6 +89,8 @@ export interface TurnLogEntry {
   playerCombust?: boolean;
   opponentCombust?: boolean;
   propagation: Array<{
+    side: "self" | "other";
+    source: PlanetName;
     target: PlanetName;
     delta: number;
     note: string;
@@ -97,6 +98,19 @@ export interface TurnLogEntry {
   turnAffliction: number;
   turnTestimony: number;
   turnScore: number;
+  directBreakdown: {
+    playerBase: number;
+    playerSectMultiplier?: number;
+    playerSectBonus?: number;
+    friction: number;
+    playerCritMultiplier: number;
+    playerResult: number;
+    opponentBase: number;
+    opponentSectMultiplier?: number;
+    opponentSectBonus?: number;
+    opponentCritMultiplier: number;
+    opponentResult: number;
+  };
 }
 
 export interface EncounterState {
@@ -116,6 +130,8 @@ export interface RunState {
   unlockedPlanets: PlanetName[];
   playerState: Record<PlanetName, PlanetState>;
   opponentState: Record<PlanetName, PlanetState>;
+  playerCarry?: Record<PlanetName, number>;
+  opponentCarry?: Record<PlanetName, number>;
   log: TurnLogEntry[];
   totalAffliction: number;
   totalTestimony: number;

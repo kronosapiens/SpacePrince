@@ -21,7 +21,6 @@ import type {
   Dignity,
   ElementType,
   EncounterState,
-  ModalityType,
   PlanetBaseStats,
   PlanetName,
   PlanetPlacement,
@@ -41,19 +40,7 @@ const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Opposition: -1,
 };
 
-const SAME_SECT_MULTIPLIER = 1.25;
-
-const OUTGOING_MULTIPLIER: Record<ModalityType, number> = {
-  Cardinal: 1.25,
-  Fixed: 1,
-  Mutable: 1,
-};
-
-const INCOMING_MULTIPLIER: Record<ModalityType, number> = {
-  Cardinal: 1,
-  Fixed: 1,
-  Mutable: 1.25,
-};
+const IN_SECT_DURABILITY_BONUS = 1;
 
 export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   const rng = mulberry32(seed);
@@ -102,6 +89,13 @@ export function createInitialPlanetState(): Record<PlanetName, PlanetState> {
   }, {} as Record<PlanetName, PlanetState>);
 }
 
+function createInitialCarryState(): Record<PlanetName, number> {
+  return PLANETS.reduce((acc, planet) => {
+    acc[planet] = 0;
+    return acc;
+  }, {} as Record<PlanetName, number>);
+}
+
 export function createRun(
   playerChart: Chart,
   totalEncounters: number,
@@ -133,6 +127,8 @@ export function createRun(
     unlockedPlanets,
     playerState: createInitialPlanetState(),
     opponentState: createInitialPlanetState(),
+    playerCarry: createInitialCarryState(),
+    opponentCarry: createInitialCarryState(),
     log: [],
     totalAffliction: 0,
     totalTestimony: 0,
@@ -188,6 +184,14 @@ export function resolveTurn(
     acc[planet] = { ...run.opponentState[planet] };
     return acc;
   }, {} as Record<PlanetName, PlanetState>);
+  const playerCarryMap: Record<PlanetName, number> = PLANETS.reduce((acc, planet) => {
+    acc[planet] = run.playerCarry?.[planet] ?? 0;
+    return acc;
+  }, {} as Record<PlanetName, number>);
+  const opponentCarryMap: Record<PlanetName, number> = PLANETS.reduce((acc, planet) => {
+    acc[planet] = run.opponentCarry?.[planet] ?? 0;
+    return acc;
+  }, {} as Record<PlanetName, number>);
 
   const playerState = playerStateMap[playerPlanet];
   const opponentState = opponentStateMap[opponentPlanet];
@@ -196,54 +200,66 @@ export function resolveTurn(
 
   const playerEffective = playerState.combusted
     ? { damage: 0, healing: 0, durability: 0, luck: 0 }
-    : getEffectiveStats(playerPlacement, playerState.affliction);
+    : getEffectiveStats(playerPlacement);
   const opponentEffective = opponentState.combusted
     ? { damage: 0, healing: 0, durability: 0, luck: 0 }
-    : getEffectiveStats(opponentPlacement, opponentState.affliction);
+    : getEffectiveStats(opponentPlacement);
 
   const playerCrit = rollCrit(playerEffective.luck, rng);
   const opponentCrit = rollCrit(opponentEffective.luck, rng);
+  const playerToOpponent = computeEffectAmount(polarity, playerEffective, playerCrit);
+  const opponentToPlayer = computeEffectAmount(polarity, opponentEffective, opponentCrit);
+  const friction = polarity === "Friction" ? 0.5 : 1;
+  const playerBase = polarity === "Testimony" ? playerEffective.healing : playerEffective.damage;
+  const opponentBase = polarity === "Testimony" ? opponentEffective.healing : opponentEffective.damage;
 
-  const playerOutgoing = OUTGOING_MULTIPLIER[playerPlacement.modality];
-  const playerIncoming = INCOMING_MULTIPLIER[playerPlacement.modality];
-  const opponentOutgoing = OUTGOING_MULTIPLIER[opponentPlacement.modality];
-  const opponentIncoming = INCOMING_MULTIPLIER[opponentPlacement.modality];
-
-  const playerToOpponent = computeEffectAmount(
+  const playerDirect = applyEffectWithCarry(
+    playerState,
     polarity,
-    playerEffective,
-    playerOutgoing,
-    opponentIncoming,
-    playerCrit
+    opponentToPlayer,
+    playerCarryMap[playerPlanet]
   );
-  const opponentToPlayer = computeEffectAmount(
+  const opponentDirect = applyEffectWithCarry(
+    opponentState,
     polarity,
-    opponentEffective,
-    opponentOutgoing,
-    playerIncoming,
-    opponentCrit
+    playerToOpponent,
+    opponentCarryMap[opponentPlanet]
   );
-
-  const playerDelta = applyEffect(playerState, polarity, opponentToPlayer);
-  const opponentDelta = applyEffect(opponentState, polarity, playerToOpponent);
+  playerCarryMap[playerPlanet] = playerDirect.carry;
+  opponentCarryMap[opponentPlanet] = opponentDirect.carry;
+  const playerDelta = playerDirect.delta;
+  const opponentDelta = opponentDirect.delta;
 
   const playerCombust =
-    polarity !== "Testimony" && opponentToPlayer > 0
-      ? maybeCombust(playerPlacement, playerState, rng)
+    polarity !== "Testimony" && playerDelta > 0
+      ? maybeCombust(playerChart, playerPlacement, playerState, rng)
       : false;
   const opponentCombust =
-    polarity !== "Testimony" && playerToOpponent > 0
-      ? maybeCombust(opponentPlacement, opponentState, rng)
+    polarity !== "Testimony" && opponentDelta > 0
+      ? maybeCombust(opponentChart, opponentPlacement, opponentState, rng)
       : false;
 
-  const propagation = propagateEffects(
+  const playerPropagation = propagateEffects(
     playerStateMap,
     playerChart,
     playerPlanet,
     polarity,
     opponentToPlayer,
-    rng
+    rng,
+    "self",
+    playerCarryMap
   );
+  const opponentPropagation = propagateEffects(
+    opponentStateMap,
+    opponentChart,
+    opponentPlanet,
+    polarity,
+    playerToOpponent,
+    rng,
+    "other",
+    opponentCarryMap
+  );
+  const propagation = [...playerPropagation, ...opponentPropagation];
 
   let turnAffliction = 0;
   let turnTestimony = 0;
@@ -274,6 +290,15 @@ export function resolveTurn(
     turnAffliction,
     turnTestimony,
     turnScore,
+    directBreakdown: {
+      playerBase,
+      friction,
+      playerCritMultiplier: playerCrit ? 2 : 1,
+      playerResult: playerToOpponent,
+      opponentBase,
+      opponentCritMultiplier: opponentCrit ? 2 : 1,
+      opponentResult: opponentToPlayer,
+    },
   };
 
   const priorAffliction = run.totalAffliction ?? 0;
@@ -289,6 +314,8 @@ export function resolveTurn(
 
   updatedRun.playerState = playerStateMap;
   updatedRun.opponentState = opponentStateMap;
+  updatedRun.playerCarry = playerCarryMap;
+  updatedRun.opponentCarry = opponentCarryMap;
 
   updatedRun.encounters = updatedRun.encounters.map((enc) =>
     enc.id === encounter.id
@@ -317,6 +344,36 @@ export function advanceEncounter(run: RunState): RunState {
     ...run,
     encounterIndex: nextIndex,
     opponentState: createInitialPlanetState(),
+    opponentCarry: createInitialCarryState(),
+  };
+}
+
+export function skipCombustedOpponentTurns(run: RunState): RunState {
+  if (run.over) return run;
+  const encounter = run.encounters[run.encounterIndex];
+  if (!encounter || encounter.completed) return run;
+
+  let turnIndex = encounter.turnIndex;
+  while (turnIndex < encounter.sequence.length) {
+    const planet = encounter.sequence[turnIndex];
+    if (!run.opponentState[planet]?.combusted) break;
+    turnIndex += 1;
+  }
+
+  if (turnIndex === encounter.turnIndex) return run;
+  const completed = turnIndex >= encounter.sequence.length;
+
+  return {
+    ...run,
+    encounters: run.encounters.map((enc) =>
+      enc.id === encounter.id
+        ? {
+            ...enc,
+            turnIndex,
+            completed,
+          }
+        : enc
+    ),
   };
 }
 
@@ -330,10 +387,9 @@ export function getAspects(chart: Chart): AspectConnection[] {
       const b = planets[j];
       const aspect = getAspectType(chart.planets[a].sign, chart.planets[b].sign);
       if (aspect === "None") continue;
-      const sameSect = isSameSect(chart, a, b);
-      const multiplier = ASPECT_BASE[aspect] * (sameSect ? SAME_SECT_MULTIPLIER : 1);
-      connections.push({ from: a, to: b, aspect, multiplier, sameSect });
-      connections.push({ from: b, to: a, aspect, multiplier, sameSect });
+      const multiplier = ASPECT_BASE[aspect];
+      connections.push({ from: a, to: b, aspect, multiplier });
+      connections.push({ from: b, to: a, aspect, multiplier });
     }
   }
   return connections;
@@ -384,16 +440,15 @@ function getAspectType(signA: SignName, signB: SignName): AspectType {
   }
 }
 
-function isSameSect(chart: Chart, a: PlanetName, b: PlanetName): boolean {
-  const sectA = resolveSect(chart, a);
-  const sectB = resolveSect(chart, b);
-  return sectA === sectB;
-}
-
 function resolveSect(chart: Chart, planet: PlanetName): "Day" | "Night" {
   const base = PLANET_SECT[planet];
   if (base === "Flexible") return chart.isDiurnal ? "Day" : "Night";
   return base;
+}
+
+function isInSect(chart: Chart, planet: PlanetName): boolean {
+  const chartSect = chart.isDiurnal ? "Day" : "Night";
+  return resolveSect(chart, planet) === chartSect;
 }
 
 function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {
@@ -405,49 +460,62 @@ function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {
   };
 }
 
-function getEffectiveStats(placement: PlanetPlacement, affliction: number) {
+function getEffectiveStats(placement: PlanetPlacement) {
   const base = addStats(placement.base, placement.buffs);
-  const scale = Math.max(0, 1 - affliction / 10);
   return {
-    damage: Math.max(0, base.damage * scale),
-    healing: Math.max(0, base.healing * scale),
-    durability: Math.max(0, base.durability * scale),
-    luck: Math.max(0, base.luck * scale),
+    damage: Math.max(0, base.damage),
+    healing: Math.max(0, base.healing),
+    durability: Math.max(0, base.durability),
+    luck: Math.max(0, base.luck),
   };
 }
 
 function rollCrit(luck: number, rng: () => number) {
-  const chance = Math.min(0.4, luck * 0.08);
+  const chance = Math.max(0, luck * 0.1);
   return rng() < chance;
 }
 
 function computeEffectAmount(
   polarity: Polarity,
   stats: { damage: number; healing: number },
-  outgoing: number,
-  incoming: number,
   crit: boolean
 ) {
   const critMultiplier = crit ? 2 : 1;
   const base = polarity === "Testimony" ? stats.healing : stats.damage;
   const friction = polarity === "Friction" ? 0.5 : 1;
-  const amount = base * outgoing * incoming * critMultiplier * friction;
-  return Math.max(0, Math.round(amount));
+  const amount = base * critMultiplier * friction;
+  return Math.max(0, amount);
 }
 
-function applyEffect(state: PlanetState, polarity: Polarity, amount: number): number {
-  if (amount === 0) return 0;
-  if (state.combusted) return 0;
+function quantizeWithCarry(rawAmount: number, carry: number) {
+  const effective = Math.max(0, rawAmount + carry);
+  const amount = Math.max(0, Math.round(effective));
+  return { amount, carry: effective - amount };
+}
+
+function applyEffectWithCarry(
+  state: PlanetState,
+  polarity: Polarity,
+  rawAmount: number,
+  carry: number
+): { delta: number; carry: number } {
+  if (rawAmount <= 0) return { delta: 0, carry };
+  if (state.combusted) return { delta: 0, carry };
+  const quantized = quantizeWithCarry(rawAmount, carry);
+  if (quantized.amount <= 0) return { delta: 0, carry: quantized.carry };
   if (polarity === "Testimony") {
     const before = state.affliction;
-    state.affliction = Math.max(0, state.affliction - amount);
-    return before - state.affliction;
+    state.affliction = Math.max(0, state.affliction - quantized.amount);
+    const delta = before - state.affliction;
+    const nextCarry = delta < quantized.amount ? 0 : quantized.carry;
+    return { delta, carry: nextCarry };
   }
-  state.affliction += amount;
-  return amount;
+  state.affliction += quantized.amount;
+  return { delta: quantized.amount, carry: quantized.carry };
 }
 
 function maybeCombust(
+  chart: Chart,
   placement: PlanetPlacement,
   state: PlanetState,
   rng: () => number
@@ -455,7 +523,8 @@ function maybeCombust(
   if (state.combusted) return false;
   if (state.affliction <= 0) return false;
 
-  const durability = placement.base.durability + placement.buffs.durability;
+  const durabilityBase = placement.base.durability + placement.buffs.durability;
+  const durability = durabilityBase + (isInSect(chart, placement.planet) ? IN_SECT_DURABILITY_BONUS : 0);
   const threshold = durability * 10;
   const ratio = threshold === 0 ? 1 : Math.min(1, state.affliction / threshold);
   let probability = ratio;
@@ -491,25 +560,27 @@ function maybeCombust(
 }
 
 function propagateEffects(
-  playerStateMap: Record<PlanetName, PlanetState>,
+  stateMap: Record<PlanetName, PlanetState>,
   chart: Chart,
   activePlanet: PlanetName,
   polarity: Polarity,
   amountReceived: number,
-  rng: () => number
+  rng: () => number,
+  side: "self" | "other",
+  carryMap: Record<PlanetName, number>
 ): TurnLogEntry["propagation"] {
   if (amountReceived <= 0) return [];
-  if (playerStateMap[activePlanet]?.combusted) return [];
+  if (stateMap[activePlanet]?.combusted) return [];
   const aspects = getAspects(chart).filter((a) => a.from === activePlanet);
   if (aspects.length === 0) return [];
 
   const propagation: TurnLogEntry["propagation"] = [];
 
   aspects.forEach((aspect) => {
-    const magnitude = Math.max(0, Math.round(Math.abs(amountReceived * aspect.multiplier)));
-    if (magnitude === 0) return;
+    const magnitude = Math.max(0, Math.abs(amountReceived * aspect.multiplier));
+    if (magnitude <= 0) return;
 
-    const targetState = playerStateMap[aspect.to];
+    const targetState = stateMap[aspect.to];
     if (targetState.combusted) return;
     const targetPlacement = chart.planets[aspect.to];
 
@@ -520,17 +591,31 @@ function propagateEffects(
         : "Testimony"
       : polarity;
 
-    const delta = applyEffect(targetState, effectPolarity, magnitude);
-    const combust = effectPolarity !== "Testimony" ? maybeCombust(targetPlacement, targetState, rng) : false;
+    const applied = applyEffectWithCarry(
+      targetState,
+      effectPolarity,
+      magnitude,
+      carryMap[aspect.to] ?? 0
+    );
+    carryMap[aspect.to] = applied.carry;
+    if (applied.delta === 0) return;
+    const combust =
+      effectPolarity !== "Testimony"
+        ? maybeCombust(chart, targetPlacement, targetState, rng)
+        : false;
 
     propagation.push({
+      side,
+      source: activePlanet,
       target: aspect.to,
-      delta: effectPolarity === "Testimony" ? -delta : delta,
-      note: `${aspect.aspect}${aspect.sameSect ? " (sect)" : ""} ${inverted ? "inverts" : "flows"}`,
+      delta: effectPolarity === "Testimony" ? -applied.delta : applied.delta,
+      note: `${aspect.aspect} ${inverted ? "inverts" : "flows"}`,
     });
 
     if (combust) {
       propagation.push({
+        side,
+        source: activePlanet,
         target: aspect.to,
         delta: 0,
         note: "Combusts",
