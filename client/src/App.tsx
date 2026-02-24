@@ -1,15 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  PLANETS,
-  SIGN_ELEMENT,
-  SIGNS,
-} from "./game/data";
-import { getPolarity, getProjectedPair } from "./game/combat";
+import { useEffect, useState } from "react";
 import {
   advanceEncounter,
   createRun,
   generateChart,
-  getAspects,
   resolveTurn,
 } from "./game/logic";
 import type { Chart, PlanetName, RunState } from "./game/types";
@@ -20,8 +13,8 @@ import { TurnTrack } from "./components/TurnTrack";
 import { EncounterLog } from "./components/EncounterLog";
 import { HeroHeader } from "./components/HeroHeader";
 import { useCombatAnimation } from "./components/useCombatAnimation";
+import { useEncounterViewModel } from "./components/useEncounterViewModel";
 import { InteractionChart } from "./components/InteractionChart";
-import { buildChartPoints, buildPointMap, getChartRotationDegrees } from "./lib/chart";
 import { roundDisplay } from "./lib/format";
 import { PLANET_COLORS } from "./lib/palette";
 
@@ -58,42 +51,37 @@ export default function App() {
     finishAnimation,
   } = useCombatAnimation();
 
-  const aspects = useMemo(() => getAspects(profile.chart), [profile.chart]);
-
-  const encounter = run?.encounters[run.encounterIndex];
-  const opponentChart = encounter?.opponentChart;
-  const opponentPlanet = encounter?.sequence[encounter.turnIndex];
-  const displayOpponentPlanet = animating ? actionOpponent ?? opponentPlanet : opponentPlanet;
-  const displayTurnIndex =
-    animating && encounter ? Math.max(0, encounter.turnIndex - 1) : encounter?.turnIndex ?? 0;
-  const opponentAspects = useMemo(
-    () => (opponentChart ? getAspects(opponentChart) : []),
-    [opponentChart]
-  );
-
-  const chartPoints = useMemo(() => buildChartPoints(profile.chart), [profile.chart]);
-  const opponentPoints = useMemo(
-    () => (opponentChart ? buildChartPoints(opponentChart) : []),
-    [opponentChart]
-  );
-  const chartRotation = useMemo(() => getChartRotationDegrees(profile.chart), [profile.chart]);
-  const opponentRotation = useMemo(
-    () => (opponentChart ? getChartRotationDegrees(opponentChart) : 0),
-    [opponentChart]
-  );
-  const chartPointMap = useMemo(() => buildPointMap(chartPoints), [chartPoints]);
-  const opponentPointMap = useMemo(() => buildPointMap(opponentPoints), [opponentPoints]);
-
-  const activeAspects = useMemo(() => {
-    const source = hoveredPlanet ?? actionPlanet;
-    if (!source) return [];
-    return aspects.filter((aspect) => aspect.from === source);
-  }, [hoveredPlanet, actionPlanet, aspects]);
-  const activeOpponentAspects = useMemo(() => {
-    const source = hoveredOpponent ?? actionOpponent ?? (hoveredPlanet ? displayOpponentPlanet : null);
-    if (!source) return [];
-    return opponentAspects.filter((aspect) => aspect.from === source);
-  }, [hoveredOpponent, actionOpponent, hoveredPlanet, displayOpponentPlanet, opponentAspects]);
+  const {
+    encounter,
+    opponentChart,
+    displayOpponentPlanet,
+    displayTurnIndex,
+    chartPoints,
+    opponentPoints,
+    chartRotation,
+    opponentRotation,
+    chartPointMap,
+    opponentPointMap,
+    activeAspects,
+    activeOpponentAspects,
+    projectedEffectsBySide,
+    selfSignPolarities,
+    otherSignPolarities,
+    playerAffliction,
+    opponentAffliction,
+    playerCombusted,
+    opponentCombusted,
+  } = useEncounterViewModel({
+    profileChart: profile.chart,
+    run,
+    animating,
+    actionPlanet,
+    actionOpponent,
+    hoveredPlanet,
+    hoveredOpponent,
+    displayAffliction,
+    displayCombusted,
+  });
 
   const handleStartRun = () => {
     const chart = generateChart();
@@ -135,88 +123,7 @@ export default function App() {
     }
   }, [animating]);
 
-  const getProjectedDelta = (planet: PlanetName) => {
-    if (!run || !encounter || !opponentChart || !displayOpponentPlanet) return null;
-    if (run.playerState[planet].combusted) return null;
-    const projected = getProjectedPair(
-      profile.chart,
-      opponentChart,
-      planet,
-      displayOpponentPlanet,
-      run.playerState[planet].combusted,
-      run.opponentState[displayOpponentPlanet].combusted
-    );
-    return {
-      selfDelta: roundDisplay(projected.selfDelta),
-      otherDelta: roundDisplay(projected.otherDelta),
-      polarity: projected.polarity,
-    };
-  };
-
-  const selfProjectedPairsByPlanet = useMemo(() => {
-    if (animating) return {} as Partial<Record<PlanetName, { selfDelta: number; otherDelta: number }>>;
-    if (!hoveredPlanet) return {} as Partial<Record<PlanetName, { selfDelta: number; otherDelta: number }>>;
-    const projected = getProjectedDelta(hoveredPlanet);
-    if (!projected) return {} as Partial<Record<PlanetName, { selfDelta: number; otherDelta: number }>>;
-    return { [hoveredPlanet]: { selfDelta: projected.selfDelta, otherDelta: projected.otherDelta } };
-  }, [animating, hoveredPlanet, run, encounter, opponentChart, displayOpponentPlanet, profile.chart]);
   const getAfflictionLevel = (value: number) => Math.min(3, Math.floor(value / 3));
-  const selfSignPolarities = useMemo(() => {
-    if (!opponentChart || !displayOpponentPlanet) return {};
-    const opponentElement = opponentChart.planets[displayOpponentPlanet].element;
-    return SIGNS.reduce<Partial<Record<(typeof SIGNS)[number], "Affliction" | "Testimony" | "Friction">>>(
-      (acc, sign) => {
-        acc[sign] = getPolarity(SIGN_ELEMENT[sign], opponentElement);
-        return acc;
-      },
-      {}
-    );
-  }, [opponentChart, displayOpponentPlanet]);
-
-  const otherSignPolarities = useMemo(() => {
-    const playerRef = hoveredPlanet ?? actionPlanet;
-    if (!playerRef) return {};
-    const playerElement = profile.chart.planets[playerRef].element;
-    return SIGNS.reduce<Partial<Record<(typeof SIGNS)[number], "Affliction" | "Testimony" | "Friction">>>(
-      (acc, sign) => {
-        acc[sign] = getPolarity(SIGN_ELEMENT[sign], playerElement);
-        return acc;
-      },
-      {}
-    );
-  }, [hoveredPlanet, actionPlanet, profile.chart]);
-
-  const playerAffliction = useMemo(() => {
-    if (displayAffliction) return displayAffliction.self as Record<PlanetName, number>;
-    return PLANETS.reduce<Record<PlanetName, number>>((acc, planet) => {
-      acc[planet] = run?.playerState[planet]?.affliction ?? 0;
-      return acc;
-    }, {} as Record<PlanetName, number>);
-  }, [displayAffliction, run]);
-
-  const opponentAffliction = useMemo(() => {
-    if (displayAffliction) return displayAffliction.other as Record<PlanetName, number>;
-    return PLANETS.reduce<Record<PlanetName, number>>((acc, planet) => {
-      acc[planet] = run?.opponentState[planet]?.affliction ?? 0;
-      return acc;
-    }, {} as Record<PlanetName, number>);
-  }, [displayAffliction, run]);
-
-  const playerCombusted = useMemo(() => {
-    if (displayCombusted) return displayCombusted.self as Record<PlanetName, boolean>;
-    return PLANETS.reduce<Record<PlanetName, boolean>>((acc, planet) => {
-      acc[planet] = run?.playerState[planet]?.combusted ?? false;
-      return acc;
-    }, {} as Record<PlanetName, boolean>);
-  }, [displayCombusted, run]);
-
-  const opponentCombusted = useMemo(() => {
-    if (displayCombusted) return displayCombusted.other as Record<PlanetName, boolean>;
-    return PLANETS.reduce<Record<PlanetName, boolean>>((acc, planet) => {
-      acc[planet] = run?.opponentState[planet]?.combusted ?? false;
-      return acc;
-    }, {} as Record<PlanetName, boolean>);
-  }, [displayCombusted, run]);
 
   return (
     <div
@@ -279,7 +186,7 @@ export default function App() {
                     diurnal={profile.chart.isDiurnal}
                     rotationDegrees={chartRotation}
                     signPolarities={selfSignPolarities}
-                    projectedPairs={selfProjectedPairsByPlanet}
+                    projectedEffects={projectedEffectsBySide.self}
                     mode="self"
                   />
                 </div>
@@ -303,6 +210,7 @@ export default function App() {
                     highlightLines={highlightLines.other}
                     rotationDegrees={opponentRotation}
                     signPolarities={otherSignPolarities}
+                    projectedEffects={projectedEffectsBySide.other}
                     mode="other"
                   />
                 </div>

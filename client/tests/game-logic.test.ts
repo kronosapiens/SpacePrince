@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveTurn, createInitialPlanetState, generateChart } from "../src/game/logic";
+import { resolveTurn, createInitialPlanetState, generateChart, generateChartFromBirthData } from "../src/game/logic";
 import { getPolarity, getProjectedPair } from "../src/game/combat";
 import {
   PLANETS,
@@ -436,5 +436,40 @@ describe("game logic", () => {
 
     expect(sawInSect).toBe(true);
     expect(sawOutOfSect).toBe(true);
+  });
+
+  it("generateChartFromBirthData is deterministic for quantized birth inputs", () => {
+    const a = generateChartFromBirthData({
+      timestampMs: Date.UTC(1992, 6, 11, 13, 22, 49),
+      latitude: 37.7749,
+      longitude: -122.4194,
+      name: "Birth A",
+    });
+    const b = generateChartFromBirthData({
+      timestampMs: Date.UTC(1992, 6, 11, 13, 29, 59),
+      latitude: 37.81,
+      longitude: -122.39,
+      name: "Birth B",
+    });
+
+    expect(a.id).toBe(b.id);
+    for (const planet of PLANETS) {
+      expect(a.planets[planet].sign).toBe(b.planets[planet].sign);
+      expect(a.planets[planet].eclipticLongitude).toBeCloseTo(b.planets[planet].eclipticLongitude ?? 0, 10);
+    }
+    expect(a.ascendantSign).toBe(b.ascendantSign);
+  });
+
+  it("generateChartFromBirthData keeps Mercury and Venus within elongation limits", () => {
+    const chart = generateChartFromBirthData({
+      timestampMs: Date.UTC(2025, 9, 17, 4, 10, 0),
+      latitude: 51.5074,
+      longitude: -0.1278,
+    });
+    const sunLongitude = chart.planets.Sun.eclipticLongitude ?? 0;
+    const mercuryLongitude = chart.planets.Mercury.eclipticLongitude ?? 0;
+    const venusLongitude = chart.planets.Venus.eclipticLongitude ?? 0;
+    expect(angularDistanceDegrees(sunLongitude, mercuryLongitude)).toBeLessThanOrEqual(28);
+    expect(angularDistanceDegrees(sunLongitude, venusLongitude)).toBeLessThanOrEqual(47);
   });
 });

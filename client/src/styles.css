@@ -577,6 +577,30 @@ h3,
   text-transform: uppercase;
 }
 
+.interaction-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.interaction-sort-btn:hover {
+  color: var(--ink);
+}
+
+.interaction-sort-indicator {
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0.82;
+}
+
 .interaction-table td {
   color: var(--muted);
 }
@@ -962,6 +986,43 @@ h3,
   color: #ff7a6b;
 }
 
+.chart-affliction-chip.chart-modifier-chip {
+  background: rgba(18, 28, 30, 0.84);
+  border-color: rgba(216, 168, 90, 0.3);
+  font-size: 10px;
+  min-width: 24px;
+  padding: 0 5px;
+  z-index: 6;
+}
+
+.chart-affliction-chip.chart-modifier-chip.toward-center-ul {
+  left: -27px;
+  top: -7px;
+}
+
+.chart-affliction-chip.chart-modifier-chip.toward-center-ur {
+  right: -27px;
+  top: -7px;
+}
+
+.chart-affliction-chip.chart-modifier-chip.toward-center-ll {
+  left: -27px;
+  bottom: -7px;
+}
+
+.chart-affliction-chip.chart-modifier-chip.toward-center-lr {
+  right: -27px;
+  bottom: -7px;
+}
+
+.chart-affliction-chip.chart-modifier-chip.projection-affliction {
+  color: #ff9f90;
+}
+
+.chart-affliction-chip.chart-modifier-chip.projection-testimony {
+  color: #a3d9a3;
+}
+
 .chart-projection {
   position: absolute;
   top: 50%;
@@ -1009,23 +1070,28 @@ h3,
   color: rgba(232, 220, 196, 0.9);
 }
 
-.chart-tooltip {
+.chart-tooltip-stack {
   position: absolute;
   left: 50%;
   bottom: 8px;
   transform: translate(-50%, 0);
+  width: min(210px, calc(100% - 24px));
+  pointer-events: none;
+  z-index: 7;
+}
+
+.chart-tooltip {
+  position: relative;
   background: rgba(18, 28, 30, 0.95);
   border: 1px solid rgba(216, 168, 90, 0.35);
   border-radius: 12px;
   padding: 10px 12px;
   font-size: 12px;
   color: var(--ink);
-  max-width: 240px;
+  width: 100%;
   display: grid;
   gap: 4px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
-  z-index: 5;
-  pointer-events: none;
 }
 
 .chart-actions {

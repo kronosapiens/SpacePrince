@@ -18,17 +18,12 @@ export function ChartTooltip({
   opponentChart,
 }: ChartTooltipProps) {
   const formatSect = (inSect: boolean) => (inSect ? "In-sect" : "Out-of-sect");
-
-  if (!hoveredPlanet && !hoveredOpponent) {
-    return null;
-  }
-
-  if (hoveredPlanet) {
-    const placement = playerChart.planets[hoveredPlanet];
-    const sectLabel = formatSect(isInSect(playerChart, hoveredPlanet));
+  const renderPlanetCard = (planet: PlanetName, chart: Chart) => {
+    const placement = chart.planets[planet];
+    const sectLabel = formatSect(isInSect(chart, planet));
     return (
-      <div className="chart-tooltip">
-        <div className="tooltip-title">{hoveredPlanet}</div>
+      <>
+        <div className="tooltip-title">{planet}</div>
         <div className="tooltip-row">
           {placement.sign} · {placement.element} · {placement.modality}
         </div>
@@ -36,37 +31,20 @@ export function ChartTooltip({
           {placement.dignity} · {sectLabel}
         </div>
         <div className="tooltip-row">
-          Dmg {PLANET_BASE_STATS[hoveredPlanet].damage + placement.buffs.damage} · Heal{" "}
-          {PLANET_BASE_STATS[hoveredPlanet].healing + placement.buffs.healing} · Dur{" "}
-          {PLANET_BASE_STATS[hoveredPlanet].durability + placement.buffs.durability} · Luck{" "}
-          {PLANET_BASE_STATS[hoveredPlanet].luck + placement.buffs.luck}
+          Dmg {PLANET_BASE_STATS[planet].damage + placement.buffs.damage} · Heal{" "}
+          {PLANET_BASE_STATS[planet].healing + placement.buffs.healing} · Dur{" "}
+          {PLANET_BASE_STATS[planet].durability + placement.buffs.durability} · Luck{" "}
+          {PLANET_BASE_STATS[planet].luck + placement.buffs.luck}
         </div>
-      </div>
+      </>
     );
+  };
+
+  if (hoveredPlanet) {
+    return <div className="chart-tooltip-stack"><div className="chart-tooltip">{renderPlanetCard(hoveredPlanet, playerChart)}</div></div>;
   }
 
   const inspectedOpponent = hoveredOpponent ?? opponentPlanet;
-  if (!opponentChart || !inspectedOpponent) return null;
-
-  const placement = opponentChart.planets[inspectedOpponent];
-  const sectLabel = formatSect(isInSect(opponentChart, inspectedOpponent));
-  return (
-    <div className="chart-tooltip">
-      <div className="tooltip-row">
-        <span className="tooltip-title">{inspectedOpponent}</span>
-      </div>
-      <div className="tooltip-row">
-        {placement.sign} · {placement.element} · {placement.modality}
-      </div>
-      <div className="tooltip-row">
-        {placement.dignity} · {sectLabel}
-      </div>
-      <div className="tooltip-row">
-        Dmg {PLANET_BASE_STATS[inspectedOpponent].damage + placement.buffs.damage} · Heal{" "}
-        {PLANET_BASE_STATS[inspectedOpponent].healing + placement.buffs.healing} · Dur{" "}
-        {PLANET_BASE_STATS[inspectedOpponent].durability + placement.buffs.durability} · Luck{" "}
-        {PLANET_BASE_STATS[inspectedOpponent].luck + placement.buffs.luck}
-      </div>
-    </div>
-  );
+  if (!hoveredOpponent || !opponentChart || !inspectedOpponent) return null;
+  return <div className="chart-tooltip-stack"><div className="chart-tooltip">{renderPlanetCard(inspectedOpponent, opponentChart)}</div></div>;
 }

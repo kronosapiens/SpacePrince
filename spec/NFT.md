@@ -103,6 +103,43 @@ Chart twins become more common at scale, but this is a social feature, not a def
 
 ---
 
+## Chart Creation Pipeline (Complexity Reference)
+
+This section documents chart construction as a practical engineering pipeline.
+It is intended as a planning reference for offchain implementation now and onchain migration later.
+
+### Scope for Space Prince
+
+The game currently uses a sign-level model:
+
+- 7 planetary signs
+- Ascendant sign
+- Whole-sign houses
+- Sign-based interactions
+
+No orb calculations or degree-based aspect geometry are required for current gameplay semantics.
+
+### Step-by-step pipeline
+
+| Step | What happens | Output | Compute complexity | Data complexity | Notes |
+|---|---|---|---|---|---|
+| 1 | Collect and quantize mint inputs (timestamp, latitude, longitude) | Quantized `(t, lat, lon)` | Low | Low | 15-minute time buckets, 0.1° location grid |
+| 2 | Convert time scales | UTC-normalized astronomical time base | Low | Low | UTC -> Julian day / related time terms |
+| 3 | Compute planetary longitudes (Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn) | 7 longitudes | High | High | Dominant cost center (ephemeris/model layer) |
+| 4 | Compute local sky frame for Ascendant | Ascendant longitude/sign | Medium | Low | Sidereal time + latitude/longitude + obliquity |
+| 5 | Discretize longitudes to signs | 7 planet signs + Ascendant sign | Low | Low | `floor(longitude / 30)` |
+| 6 | Derive chart metadata | element, modality, dignity, house | Low | Low | table lookups + whole-sign house mapping |
+| 7 | Derive gameplay structural relations | sign-based intra/cross-chart relations | Low | Low | sign-distance mapping only |
+
+### Practical implication
+
+Most complexity is concentrated in planetary astronomy (Step 3), with Ascendant calculation as the secondary cost (Step 4).
+Everything after sign discretization is table lookup and modular arithmetic.
+
+This is why canonical onchain state can remain compact while still being astrologically grounded.
+
+---
+
 ## Visual Philosophy
 
 The Prince is not depicted as a human figure.

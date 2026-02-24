@@ -42,6 +42,7 @@ const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
 const IN_SECT_LUCK_BONUS = 1;
 const MERCURY_MAX_ELONGATION_DEGREES = 28;
 const VENUS_MAX_ELONGATION_DEGREES = 47;
+const TIME_BUCKET_MS = 15 * 60 * 1000;
 const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
   Domicile: 0.75,
   Exaltation: 0.9,
@@ -49,6 +50,24 @@ const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
   Detriment: 1.15,
   Fall: 1.3,
 };
+
+const MEAN_LONGITUDE_COEFF: Record<PlanetName, { base: number; dailyMotion: number }> = {
+  Sun: { base: 280.4665, dailyMotion: 0.98564736 },
+  Moon: { base: 218.3165, dailyMotion: 13.17639648 },
+  Mercury: { base: 252.2509, dailyMotion: 4.09233445 },
+  Venus: { base: 181.9798, dailyMotion: 1.60213034 },
+  Mars: { base: 355.433, dailyMotion: 0.52402068 },
+  Jupiter: { base: 34.3515, dailyMotion: 0.08309103 },
+  Saturn: { base: 50.0774, dailyMotion: 0.0334597 },
+};
+
+export interface BirthChartInput {
+  timestampMs: number;
+  latitude: number;
+  longitude: number;
+  name?: string;
+  quantize?: boolean;
+}
 
 export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   const rng = mulberry32(seed);
@@ -106,13 +125,144 @@ export function generateChart(seed = randomSeed(), name = "Prince"): Chart {
   };
 }
 
+export function generateChartFromBirthData({
+  timestampMs,
+  latitude,
+  longitude,
+  name = "Prince",
+  quantize = true,
+}: BirthChartInput): Chart {
+  const ts = quantize ? Math.floor(timestampMs / TIME_BUCKET_MS) * TIME_BUCKET_MS : timestampMs;
+  const lat = quantize ? Math.round(latitude * 10) / 10 : latitude;
+  const lon = quantize ? Math.round(longitude * 10) / 10 : longitude;
+  const daysSinceJ2000 = toDaysSinceJ2000(ts);
+  const sunLongitude = computeSunLongitude(daysSinceJ2000);
+
+  const longitudes: Record<PlanetName, number> = {
+    Sun: sunLongitude,
+    Moon: meanLongitude("Moon", daysSinceJ2000),
+    Mercury: clampElongation(meanLongitude("Mercury", daysSinceJ2000), sunLongitude, MERCURY_MAX_ELONGATION_DEGREES),
+    Venus: clampElongation(meanLongitude("Venus", daysSinceJ2000), sunLongitude, VENUS_MAX_ELONGATION_DEGREES),
+    Mars: meanLongitude("Mars", daysSinceJ2000),
+    Jupiter: meanLongitude("Jupiter", daysSinceJ2000),
+    Saturn: meanLongitude("Saturn", daysSinceJ2000),
+  };
+
+  const ascendantLongitude = computeAscendantLongitude(ts, lat, lon);
+  const ascendantSign = SIGNS[Math.floor(ascendantLongitude / 30)];
+  const isDiurnal = isSunAboveHorizon(ts, lat, lon, sunLongitude);
+  const chartSect = isDiurnal ? "Day" : "Night";
+
+  const planets: Record<PlanetName, PlanetPlacement> = {} as Record<PlanetName, PlanetPlacement>;
+  PLANETS.forEach((planet) => {
+    const longitudeDegrees = longitudes[planet];
+    const sign = SIGNS[Math.floor(longitudeDegrees / 30)];
+    const element = SIGN_ELEMENT[sign];
+    const modality = SIGN_MODALITY[sign];
+    const base = PLANET_BASE_STATS[planet];
+    const buffs = addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]);
+    const planetSect = resolvePlanetSect(planet, longitudeDegrees, sunLongitude);
+    if (planetSect === chartSect) {
+      buffs.luck += IN_SECT_LUCK_BONUS;
+    }
+    const dignity = getDignity(planet, sign);
+    planets[planet] = {
+      planet,
+      sign,
+      eclipticLongitude: longitudeDegrees,
+      element,
+      modality,
+      base,
+      buffs,
+      dignity,
+    };
+  });
+
+  return {
+    id: `chart_birth_${ts}_${lat.toFixed(1)}_${lon.toFixed(1)}`,
+    name,
+    isDiurnal,
+    ascendantSign,
+    planets,
+  };
+}
+
 function normalizeLongitude(value: number) {
   const normalized = value % 360;
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
+function signedAngularDifference(from: number, to: number) {
+  return ((to - from + 540) % 360) - 180;
+}
+
+function clampElongation(longitude: number, sunLongitude: number, maxAbs: number) {
+  const delta = signedAngularDifference(sunLongitude, longitude);
+  const clamped = Math.max(-maxAbs, Math.min(maxAbs, delta));
+  return normalizeLongitude(sunLongitude + clamped);
+}
+
 function sampleCenteredOffset(rng: () => number, maxAbs: number) {
   return (rng() + rng() - 1) * maxAbs;
+}
+
+function toDaysSinceJ2000(timestampMs: number) {
+  const julianDay = timestampMs / 86400000 + 2440587.5;
+  return julianDay - 2451545.0;
+}
+
+function meanLongitude(planet: PlanetName, daysSinceJ2000: number) {
+  const coeff = MEAN_LONGITUDE_COEFF[planet];
+  return normalizeLongitude(coeff.base + coeff.dailyMotion * daysSinceJ2000);
+}
+
+function computeSunLongitude(daysSinceJ2000: number) {
+  const meanLongitudeDegrees = meanLongitude("Sun", daysSinceJ2000);
+  const meanAnomalyDegrees = normalizeLongitude(357.5291 + 0.98560028 * daysSinceJ2000);
+  const meanAnomalyRadians = (meanAnomalyDegrees * Math.PI) / 180;
+  const equationOfCenter =
+    1.9148 * Math.sin(meanAnomalyRadians) +
+    0.02 * Math.sin(2 * meanAnomalyRadians) +
+    0.0003 * Math.sin(3 * meanAnomalyRadians);
+  return normalizeLongitude(meanLongitudeDegrees + equationOfCenter);
+}
+
+function computeObliquityRadians(daysSinceJ2000: number) {
+  const epsilonDegrees = 23.439291 - 0.00001397 * daysSinceJ2000;
+  return (epsilonDegrees * Math.PI) / 180;
+}
+
+function computeLocalSiderealDegrees(timestampMs: number, longitude: number) {
+  const daysSinceJ2000 = toDaysSinceJ2000(timestampMs);
+  const gmstHours = 18.697374558 + 24.06570982441908 * daysSinceJ2000;
+  const gmstDegrees = normalizeLongitude((gmstHours % 24) * 15);
+  return normalizeLongitude(gmstDegrees + longitude);
+}
+
+function computeAscendantLongitude(timestampMs: number, latitude: number, longitude: number) {
+  const daysSinceJ2000 = toDaysSinceJ2000(timestampMs);
+  const siderealDegrees = computeLocalSiderealDegrees(timestampMs, longitude);
+  const theta = (siderealDegrees * Math.PI) / 180;
+  const phi = (Math.max(-66, Math.min(66, latitude)) * Math.PI) / 180;
+  const epsilon = computeObliquityRadians(daysSinceJ2000);
+  const y = -Math.cos(theta);
+  const x = Math.sin(theta) * Math.cos(epsilon) + Math.tan(phi) * Math.sin(epsilon);
+  return normalizeLongitude((Math.atan2(y, x) * 180) / Math.PI);
+}
+
+function isSunAboveHorizon(timestampMs: number, latitude: number, longitude: number, sunLongitude: number) {
+  const daysSinceJ2000 = toDaysSinceJ2000(timestampMs);
+  const siderealDegrees = computeLocalSiderealDegrees(timestampMs, longitude);
+  const epsilon = computeObliquityRadians(daysSinceJ2000);
+  const lambda = (sunLongitude * Math.PI) / 180;
+  const rightAscension = Math.atan2(Math.sin(lambda) * Math.cos(epsilon), Math.cos(lambda));
+  const declination = Math.asin(Math.sin(epsilon) * Math.sin(lambda));
+  const localHourAngle = ((siderealDegrees * Math.PI) / 180) - rightAscension;
+  const phi = (latitude * Math.PI) / 180;
+  const sinAltitude =
+    Math.sin(phi) * Math.sin(declination) +
+    Math.cos(phi) * Math.cos(declination) * Math.cos(localHourAngle);
+  return sinAltitude > 0;
 }
 
 export function getUnlockedPlanets(totalEncounters: number, unlockAll = false): PlanetName[] {

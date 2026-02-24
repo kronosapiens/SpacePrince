@@ -24,7 +24,6 @@ interface ChartVisualProps {
   rotationDegrees?: number;
   signPolarities?: Partial<Record<SignName, "Affliction" | "Testimony" | "Friction">>;
   projectedEffects?: Partial<Record<PlanetName, number>>;
-  projectedPairs?: Partial<Record<PlanetName, { selfDelta: number; otherDelta: number }>>;
   mode: "self" | "other";
 }
 
@@ -49,7 +48,6 @@ export function ChartVisual({
   rotationDegrees = 0,
   signPolarities,
   projectedEffects = {},
-  projectedPairs = {},
   mode,
 }: ChartVisualProps) {
   const glyphTone = (hex: string) => {
@@ -152,10 +150,7 @@ export function ChartVisual({
           const affliction = afflictionValues[point.planet] ?? 0;
           const afflictionLevel = getAfflictionLevel(affliction);
           const projection = projectedEffects[point.planet];
-          const pairProjection = projectedPairs[point.planet];
-          const projectionPlacement = point.x >= 0 ? "left" : "right";
-          const hasProjection = projection !== undefined;
-          const hasPairProjection = pairProjection !== undefined;
+          const hasProjection = projection !== undefined && projection !== 0;
           const projectionClass =
             hasProjection && projection > 0
               ? "affliction"
@@ -163,20 +158,6 @@ export function ChartVisual({
                 ? "testimony"
                 : "neutral";
           const projectionValue = hasProjection ? formatSignedRounded(projection) : "0";
-          const pairSelfClass =
-            hasPairProjection && pairProjection.selfDelta > 0
-              ? "affliction"
-              : hasPairProjection && pairProjection.selfDelta < 0
-                ? "testimony"
-                : "neutral";
-          const pairOtherClass =
-            hasPairProjection && pairProjection.otherDelta > 0
-              ? "affliction"
-              : hasPairProjection && pairProjection.otherDelta < 0
-                ? "testimony"
-                : "neutral";
-          const pairSelfValue = hasPairProjection ? formatSignedRounded(pairProjection.selfDelta) : "0";
-          const pairOtherValue = hasPairProjection ? formatSignedRounded(pairProjection.otherDelta) : "0";
           return (
           <div
             key={`${title}-${point.planet}`}
@@ -210,26 +191,23 @@ export function ChartVisual({
             </span>
             {critPlanets[`${mode}-${point.planet}`] && <span className="chart-crit-burst" />}
             {combusted[point.planet] && <span className="chart-combust" />}
-            {!combusted[point.planet] && hasPairProjection && (
-              <span className={`chart-projection pair ${projectionPlacement}`}>
-                <span className={`projection-delta ${pairSelfClass}`}>{pairSelfValue}</span>
-                <span className="projection-divider">/</span>
-                <span className={`projection-delta ${pairOtherClass}`}>{pairOtherValue}</span>
-              </span>
-            )}
-            {!combusted[point.planet] && !hasPairProjection && hasProjection && (
-              <span className={`chart-projection ${projectionPlacement}`}>
-                <span className={`projection-delta ${projectionClass}`}>{projectionValue}</span>
-              </span>
-            )}
             {!combusted[point.planet] && (
-              <span
-                className={`chart-affliction-chip ${chipPositionClass} affliction-${afflictionLevel} ${
-                  highlightAffliction[`${mode}-${point.planet}`] ? "flash" : ""
-                }`}
-              >
-                {roundDisplay(affliction)}
-              </span>
+              <>
+                <span
+                  className={`chart-affliction-chip ${chipPositionClass} affliction-${afflictionLevel} ${
+                    highlightAffliction[`${mode}-${point.planet}`] ? "flash" : ""
+                  }`}
+                >
+                  {roundDisplay(affliction)}
+                </span>
+                {hasProjection && (
+                  <span
+                    className={`chart-affliction-chip chart-modifier-chip ${chipPositionClass} projection-${projectionClass}`}
+                  >
+                    {projectionValue}
+                  </span>
+                )}
+              </>
             )}
           </div>
           );
