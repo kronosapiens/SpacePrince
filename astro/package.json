@@ -1,0 +1,19 @@
+{
+  "name": "space-prince-astro",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Scientific chart-compute package for Space Prince",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --test",
+    "build:archive": "node src/cli/build-archive.js",
+    "validate:archive": "node src/cli/validate-archive.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "astronomy-engine": "^2.1.19"
+  }
+}
