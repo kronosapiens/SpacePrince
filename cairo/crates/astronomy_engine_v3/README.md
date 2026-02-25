@@ -150,6 +150,36 @@ scarb test -p astronomy_engine_v3 --manifest-path cairo/Scarb.toml
 scarb build -p astronomy_engine_v3 --manifest-path cairo/Scarb.toml
 ```
 
+## Future Directions
+
+Completing v3 into a fully parametric engine would eliminate the 1900–2100 epoch constraint, since VSOP and ELP models are valid over much wider time ranges than pre-computed tables or Chebyshev fits.
+
+### Sun upgrade (small effort)
+
+Earth VSOP data already exists in `vsop_gen.cairo` and the frame chain is in `frames.cairo`.
+The geocentric Sun is simply the negated heliocentric Earth vector, run through the existing EQJ→precession→nutation→ecliptic-of-date chain.
+No new data or math needed — just a new routing path wiring existing pieces together.
+
+### Moon upgrade (substantial effort)
+
+The Moon orbits Earth, not the Sun, so VSOP does not apply.
+The upstream `astronomy-engine` uses a truncated ELP/MPP02 lunar model — hundreds of trigonometric terms of the form `A * sin(D*d + M*m + M'*m' + F*f)` where `d, m, m', f` are fundamental lunar/solar arguments.
+
+The work involves:
+
+1. Extract term tables from upstream (coefficients + argument multipliers).
+2. Encode as Cairo constants in a generated file (similar to `vsop_gen.cairo`).
+3. Implement the four fundamental argument polynomials in fixed-point.
+4. Implement the series summation loop.
+5. Apply frame conversion (ecliptic J2000 → ecliptic of-date). The Moon is already geocentric, so the heliocentric→geocentric step is skipped.
+
+The series is structurally simpler than VSOP (flat sum of sines, not nested polynomial-in-time orders), but a truncation depth must be chosen that preserves sign-level accuracy while keeping gas reasonable.
+
+### Ascendant upgrade (optional)
+
+The current ascendant path uses simpler polynomial approximations for obliquity, GMST, and nutation.
+It could be upgraded to use the `frames.cairo` infrastructure (IAU2006 precession, IAU2000B nutation), which would both improve accuracy and extend the valid epoch range to match the planetary paths.
+
 ## Scope Boundary
 
 `astronomy_engine_v3` is an experimental higher-fidelity Cairo port path focused on planetary sign accuracy mechanics for Mercury..Saturn. It is not yet a complete full-surface replacement for upstream `astronomy-engine`.

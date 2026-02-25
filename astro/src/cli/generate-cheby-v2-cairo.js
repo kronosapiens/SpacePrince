@@ -117,7 +117,7 @@ function renderPlanet(parts, key, spec, coeffQuantum) {
       `    if idx < ${key}_COEFFS_${i}_OFFSET + ${len} { return ((*${key}_COEFFS_${i}.span().at(idx - ${key}_COEFFS_${i}_OFFSET)).into()) * ${coeffQuantum}; }`,
     );
   }
-  parts.push("    assert(idx < 0, 'coeff idx out of bounds');");
+  parts.push("    assert(false, 'coeff idx out of bounds');");
   parts.push("    0");
   parts.push("}");
 }
