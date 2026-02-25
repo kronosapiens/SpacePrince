@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Cairo / Scarb
+cairo/target/
+
+# Generated astro artifacts
+astro/out/

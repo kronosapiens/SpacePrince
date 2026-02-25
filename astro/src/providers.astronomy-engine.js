@@ -18,6 +18,9 @@ export function createAstronomyEngineProvider({ aberration = true } = {}) {
   return {
     getLongitude(planet, unixMs) {
       const date = new Date(unixMs);
+      if (planet === "Sun") {
+        return Astronomy.SunPosition(date).elon;
+      }
       if (planet === "Moon") {
         return Astronomy.EclipticGeoMoon(date).lon;
       }

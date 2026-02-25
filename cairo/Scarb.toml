@@ -1,0 +1,14 @@
+[workspace]
+members = [
+  "crates/astronomy_engine_v1",
+  "crates/astronomy_engine_v2",
+  "crates/astronomy_engine_v3",
+  "crates/star_chart",
+  "crates/star_chart_v2",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024_07"
+
+[workspace.dependencies]
