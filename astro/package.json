@@ -13,7 +13,8 @@
     "build:sign-corpus": "node src/cli/generate-corpus.js",
     "compare:cairo-model": "node src/cli/compare-cairo-model.js",
     "compare:cairo-runtime": "node src/cli/compare-cairo-runtime.js",
-    "compare:cheby-v2": "node src/cli/compare-cheby-v2-cairo-data.js"
+    "compare:cheby-v2": "node src/cli/compare-cheby-v2-cairo-data.js",
+    "compare:v3-moon": "node src/cli/compare-v3-moon-parity.js"
   },
   "engines": {
     "node": ">=20"

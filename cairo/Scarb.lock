@@ -14,6 +14,10 @@ name = "astronomy_engine_v3"
 version = "0.1.0"
 
 [[package]]
+name = "astronomy_engine_v4"
+version = "0.1.0"
+
+[[package]]
 name = "star_chart"
 version = "0.1.0"
 dependencies = [
