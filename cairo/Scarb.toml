@@ -4,6 +4,7 @@ members = [
   "crates/astronomy_engine_v2",
   "crates/astronomy_engine_v3",
   "crates/astronomy_engine_v4",
+  "crates/astronomy_engine_v5",
   "crates/star_chart",
   "crates/star_chart_v2",
 ]

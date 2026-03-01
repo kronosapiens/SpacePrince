@@ -25,6 +25,9 @@ pnpm-debug.log*
 
 # Cairo / Scarb
 cairo/target/
+cairo/**/target/
+cairo/**/tests/generated_*.cairo
+cairo/**/tests/tmp_*.cairo
 
 # Generated astro artifacts
 astro/out/
