@@ -4,6 +4,8 @@
 
 Space Prince is an onchain roguelike about identity, attention, and irreversible choice.
 
+Astronomical calculation code now lives in the stand-alone [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) repository. This repo is being reduced to the game/client surface that will consume that Cairo package as an external dependency.
+
 Players mint a globally unique **Prince**, defined by a latitude, longitude, and timestamp.
 This position determines an astrological natal chart — 7 planets, each placed in a sign, house, and dignity state.
 The chart is the character sheet: immutable, unique, and full of internal structure the player discovers through play.
