@@ -85,6 +85,32 @@ When Mars is in play, the world tilts red.
 When Saturn dominates, things go grey and heavy.
 Transitions between planets should feel like shifts in light — dawn to dusk, season to season.
 
+### Art Style
+
+The visual language draws from **spiritual abstraction** — art that uses geometry, color, and symbol to point at the numinous.
+
+Primary references:
+- **Hilma af Klint:** bold shapes, layered circles, organic symmetry, color as revelation.
+- **Wassily Kandinsky:** composition through geometric tension, color relationships as emotional grammar.
+- **Alejandro Jodorowsky:** alchemical imagery, tarot-inflected symbolism, sacred geometry that's alive and a little dangerous.
+
+The aesthetic is **shapes, rainbows, alchemy, spirituality**.
+Not pixel art. Not sci-fi chrome. Not medieval parchment.
+Clean geometric forms saturated with color, arranged with the logic of a mandala or a diagram of correspondences.
+
+### The Map as Sephirot
+
+The roguelike map — the structure of nodes and paths the player traverses each run — evokes the **Kabbalistic Tree of Life**.
+
+Ten nodes, connected by paths, arranged vertically.
+The topology is procedurally generated each run with random perturbations — extra paths, shifted nodes, collapsed or split branches.
+Occasionally the generation produces something very close to the actual Sephirot.
+Deniably so.
+
+The map should feel like a diagram of emanation — something flowing downward from unity into multiplicity, or upward from matter toward spirit, depending on which direction the player reads it.
+Nodes glow in planetary colors based on their encounter type.
+Paths between nodes are visible aspect-lines, not just routes.
+
 ### The Chart as Visual Center
 
 The player's natal chart should be **always visible** — not as a HUD element but as the visual ground of the game.
