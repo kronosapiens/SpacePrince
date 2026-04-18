@@ -102,8 +102,8 @@ Clean geometric forms saturated with color, arranged with the logic of a mandala
 
 The roguelike map — the structure of nodes and paths the player traverses each run — evokes the **Kabbalistic Tree of Life**.
 
-Ten nodes, connected by paths, arranged vertically.
-The topology is procedurally generated each run with random perturbations — extra paths, shifted nodes, collapsed or split branches.
+Seven layers arranged vertically, each either a single central node or a left-right pair, connected by pillar spines and asymmetric bookends.
+The topology is procedurally generated each run from a simple grammar (see `spec/MAP.md` for construction rules).
 Occasionally the generation produces something very close to the actual Sephirot.
 Deniably so.
 
