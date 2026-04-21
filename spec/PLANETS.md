@@ -524,6 +524,24 @@ Load-bearing for Space Prince's cosmology — Babylonian astronomy is the root o
 - **Hebrew Bible — poetic books beyond Job and Ecclesiastes (already core Saturn)** — KJV (1611). *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter; *Song of Songs* already core Venus.
 - **Quran** — Palmer (1880) or Rodwell (1861). Jupiter + Sun.
 
+### Jewish: Talmudic, midrashic, kabbalistic, philosophical
+
+The layered rabbinic tradition — Tanakh, Mishnah, Talmud, Midrash, Kabbalah, medieval philosophy. Voice fit tends to cluster in the *aggadic* (narrative / parable) register rather than the *halakhic* (legal), and the aphoristic tractates are the most quotable.
+
+- **Pirkei Avot (*Ethics of the Fathers*)** — Charles Taylor, *Sayings of the Jewish Fathers* (1877 / 1897). The aphoristic tractate of the Mishnah; Hillel's three questions, Akiva's aphorisms, the chain of tradition. Saturn (ethical measure) + Mercury (Hillel's paradoxes) + Jupiter (universal affirmation). Danby's complete *Mishnah* (1933) is not PD.
+- **Babylonian Talmud** — Michael L. Rodkinson, *New Edition of the Babylonian Talmud* (1896–1903, 10 vols). The only full-PD English Talmud; abridged and looser than Soncino but usable. Pull from *aggadic* portions, not halakhic. Saturn + Mercury + Jupiter. **Soncino (1935–1952), Steinsaltz/Koren, ArtScroll are NOT PD.**
+- **Louis Ginzberg — *The Legends of the Jews*** — vols 1–6 (1909–1928), massive midrashic compilation woven into continuous narrative. Multi-planet narrative source. Vol 7 (index only, 1938) not PD.
+- **Pirkei de-Rabbi Eliezer** — Gerald Friedlander (1916). Midrashic cosmogony. Jupiter + Saturn.
+- **Sefer Yetzirah (*Book of Formation*)** — W. Wynn Westcott (1887) or Knut Stenring (1923). Foundational short kabbalistic text. Jupiter + Mercury (alphabet mysticism, creation paradoxes). Aryeh Kaplan 1990 edition NOT PD.
+- **Zohar — partial only** — Nurho de Manhar's Genesis portion (serialized 1900–1914, book 1921) is PD but theosophically inflected and considered unreliable; S. L. MacGregor Mathers's *The Kabbalah Unveiled* (1887) covers Idra Rabba, Idra Zuta, Sifra de-Tzeniuta through a Hermetic lens. Soncino Zohar (1931–1934) and Matt's *Pritzker Zohar* NOT PD. Jupiter + Saturn.
+- **A. E. Waite — *The Holy Kabbalah*** (1929). PD secondary; useful for context, not for primary quotation.
+- **Philo of Alexandria** — C. D. Yonge 4-vol. translation (1854–1855). Jewish Hellenistic allegorical philosophy. Jupiter.
+- **Josephus** — William Whiston (1737). Historical voice, multi-planet.
+- **Yehuda Halevi — *Kuzari*** — Hartwig Hirschfeld (1905). Medieval philosophical dialogue. Saturn + Jupiter.
+- **Bahya ibn Paquda — *Duties of the Heart*** — Edwin Collins partial (1904). Ethical-mystical. Saturn.
+
+**Hasidic gap.** Much of the tradition's most atmospheric material — Buber's *Tales of the Hasidim* (1947), Nachman of Bratslav's stories, the sayings of the Baal Shem Tov and the Kotzker rebbe — lives in 20th-century English translations under active copyright. Scattered pre-1930 partials exist (Paul Levertoff especially) but the Hasidic corpus is largely inaccessible for PD sourcing.
+
 ### Persian, Arabic, and Islamic philosophy
 
 - **Hafiz** — *Divan*, Gertrude Bell (1897) and H. Wilberforce Clarke (1891). Venus (the ghazal of love) + Saturn (the ruin of time) + Mercury.
