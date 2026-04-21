@@ -1,0 +1,82 @@
+# Mars — clipped, imperatival, direct.
+# Batch of 10 verified fragments drawn from primary public-domain sources.
+# See spec/PLANETS.md §7 (Mars) and §11 (Sourcing Notes).
+
+- text: |
+    Attack him where he is unprepared, appear where you are not expected.
+  author: "Sun Tzu"
+  source: "The Art of War, Ch. I (Laying Plans), §24"
+  translation: "Lionel Giles, 1910"
+  source_url: "https://www.gutenberg.org/cache/epub/132/pg132.txt"
+  moods: [cut, command]
+
+- text: |
+    Rapidity is the essence of war.
+  author: "Sun Tzu"
+  source: "The Art of War, Ch. XI (The Nine Situations), §19"
+  translation: "Lionel Giles, 1910"
+  source_url: "https://www.gutenberg.org/cache/epub/132/pg132.txt"
+  moods: [opening, command]
+
+- text: |
+    Make them your examples, and, esteeming courage to be freedom and freedom to be happiness, do not weigh too nicely the perils of war.
+  author: "Thucydides"
+  source: "History of the Peloponnesian War, Book II, §43 (Pericles' Funeral Oration)"
+  translation: "Benjamin Jowett, 1881"
+  source_url: "https://archive.org/details/a609583001thucuoft"
+  moods: [opening, command]
+
+- text: |
+    There is one omen, and one only—that a man should fight for his country.
+  author: "Homer"
+  source: "Iliad, Book XII (Hector to Polydamas)"
+  translation: "Samuel Butler, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/2199/pg2199.txt"
+  moods: [opening, command]
+
+- text: |
+    Be men, my friends, and respect one another's good opinion.
+  author: "Homer"
+  source: "Iliad, Book XV (Nestor rallying the Achaeans)"
+  translation: "Samuel Butler, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/2199/pg2199.txt"
+  moods: [command, warning]
+
+- text: |
+    It is much safer to be feared than loved, when, of the two, either must be dispensed with.
+  author: "Niccolò Machiavelli"
+  source: "The Prince, Ch. XVII (Concerning Cruelty and Clemency)"
+  translation: "W. K. Marriott, 1908"
+  source_url: "https://www.gutenberg.org/cache/epub/1232/pg1232-images.html"
+  moods: [cut, warning]
+
+- text: |
+    War is the father of all and the king of all; and some he has made gods and some men, some bond and some free.
+  author: "Heraclitus"
+  source: "Fragment 44 (Burnet)"
+  translation: "John Burnet, Early Greek Philosophy, 2nd ed. 1908"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [opening, cut]
+
+- text: |
+    Do not act as if thou wert going to live ten thousand years. Death hangs over thee. While thou livest, while it is in thy power, be good.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book IV, §17"
+  translation: "George Long, 1862"
+  source_url: "https://www.gutenberg.org/cache/epub/15877/pg15877.txt"
+  moods: [warning, command]
+
+- text: |
+    Be not ashamed to be helped; for it is thy business to do thy duty like a soldier in the assault on a town.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book VII, §7"
+  translation: "George Long, 1862"
+  source_url: "https://www.gutenberg.org/cache/epub/15877/pg15877.txt"
+  moods: [command, opening]
+
+- text: |
+    The latest Gospel in this world is, Know thy work and do it.
+  author: "Thomas Carlyle"
+  source: "Past and Present, Book III, Ch. XI (Labour)"
+  source_url: "https://www.gutenberg.org/cache/epub/13534/pg13534.txt"
+  moods: [command, opening]
