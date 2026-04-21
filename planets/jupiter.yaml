@@ -120,3 +120,59 @@
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [opening, reverie, affirmation]
+
+- text: |
+    He interprets between gods and men, conveying and taking across to the gods the prayers and sacrifices of men, and to men the commands and replies of the gods; he is the mediator who spans the chasm which divides them, and therefore in him all is bound together.
+  author: "Plato"
+  source: "Symposium (Diotima on the nature of Love)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    All creation or passage of non-being into being is poetry or making, and the processes of all art are creative; and the masters of arts are all poets or makers.
+  author: "Plato"
+  source: "Symposium (Diotima to Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Beauty absolute, separate, simple, and everlasting, which without diminution and without increase, or any change, is imparted to the ever-growing and perishing beauties of all other things.
+  author: "Plato"
+  source: "Symposium (Diotima's ladder)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The true order of going, or being led by another, to the things of love, is to begin from the beauties of earth and mount upwards for the sake of that other beauty, using these as steps only, and from one going on to two, and from two to all fair forms, and from fair forms to fair practices, and from fair practices to fair notions, until from fair notions he arrives at the notion of absolute beauty.
+  author: "Plato"
+  source: "Symposium (Diotima's ladder)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, affirmation, gift]
+
+- text: |
+    This is that life above all others which man should live, in the contemplation of beauty absolute; a beauty which if you once beheld, you would see not to be after the measure of gold, and garments, and fair boys and youths, whose presence now entrances you.
+  author: "Plato"
+  source: "Symposium (Diotima's ladder, conclusion)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, affirmation, venus_secondary]
+
+- text: |
+    To the mortal creature, generation is a sort of eternity and immortality; and if love is of the everlasting possession of the good, all men will necessarily desire immortality together with good: Wherefore love is of immortality.
+  author: "Plato"
+  source: "Symposium (Diotima to Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    The mortal nature is seeking as far as is possible to be everlasting and immortal: and this is only to be attained by generation, because generation always leaves behind a new existence in the place of the old.
+  author: "Plato"
+  source: "Symposium (Diotima to Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, affirmation]

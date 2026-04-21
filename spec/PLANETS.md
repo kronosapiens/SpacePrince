@@ -190,6 +190,7 @@ Often gentle but never evasive; Venus names what she sees.
 ### Chorus
 
 - **Sappho** (poet, ~600 BCE) — fragments, eros, the remembered body.
+- **Plato** (philosopher, ~428–348 BCE) — *Symposium* (Jowett 1871), eros reasoned about rather than sung; Aristophanes's myth of the halves.
 - **John Keats** (poet, 1795–1821) — "beauty is truth"; the intensities of perception.
 - **Walter Pater** (essayist, 1839–1894) — *The Renaissance*, the gemlike flame.
 - **Oscar Wilde** (writer, 1854–1900) — aestheticism, the paradoxes of beauty.
@@ -287,8 +288,9 @@ Often speaks in a register of affirmation without being sentimental.
 - **William James** (philosopher, 1842–1910) — pragmatism, *Varieties of Religious Experience*, pluralism.
 - **Ralph Waldo Emerson** (essayist, 1803–1882) — in his oracular and generous mode, distinct from his solar register.
 - **Rabindranath Tagore** (poet, 1861–1941; pre-1930 works are PD) — *Gitanjali*, devotional expansiveness.
+- **Plato** (philosopher, ~428–348 BCE) — *Symposium* (Jowett 1871), Diotima's ladder from particulars to the Form of beauty; the ascent passages.
 - **The Upanishads** — Atman, the great identity.
-- **Plotinus** (philosopher, 204–270) — *Enneads*, emanation, the return.
+- **Plotinus** (philosopher, 204–270) — *Enneads*, emanation, the return (Plato's lineage).
 - **Henry David Thoreau** (writer, 1817–1862) — *Walden*, deliberate living, the natural teacher.
 
 ### Sample fragments

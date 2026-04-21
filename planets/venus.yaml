@@ -78,3 +78,67 @@
   translation: "Arthur Waley, 1928"
   source_url: "https://archive.org/details/pillowbookofseis0000arth_v1i4"
   moods: [beauty, gift]
+
+- text: |
+    After the division the two parts of man, each desiring his other half, came together, and throwing their arms about one another, entwined in mutual embraces, longing to grow into one.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes, the myth of the halves)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, relation]
+
+- text: |
+    Human nature was originally one and we were a whole, and the desire and pursuit of the whole is called love.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, relation]
+
+- text: |
+    When one of them meets with his other half, the actual half of himself, the pair are lost in an amazement of love and friendship and intimacy, and one will not be out of the other's sight, as I may say, even for a moment.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, relation]
+
+- text: |
+    The intense yearning which each of them has towards the other does not appear to be the desire of lover's intercourse, but of something else which the soul of either evidently desires and cannot tell, and of which she has only a dark and doubtful presentiment.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, question, moon_secondary]
+
+- text: |
+    He walks not upon the earth, nor yet upon the skulls of men, which are not so very soft, but in the hearts and souls of both gods and men, which are of all things the softest: in them he walks and dwells and makes his home.
+  author: "Plato"
+  source: "Symposium (speech of Agathon, on Love)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The fairness of his complexion is revealed by his habitation among the flowers; for he dwells not amid bloomless or fading beauties, whether of body or soul or aught else, but in the place of flowers and scents, there he sits and abides.
+  author: "Plato"
+  source: "Symposium (speech of Agathon, on Love)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, beauty]
+
+- text: |
+    The love of the noble disposition is life-long, for it becomes one with the everlasting.
+  author: "Plato"
+  source: "Symposium (speech of Pausanias)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [affirmation, relation]
+
+- text: |
+    My heart leaps within me more than that of any Corybantian reveller, and my eyes rain tears when I hear them.
+  author: "Plato"
+  source: "Symposium (speech of Alcibiades, on hearing Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, relation]

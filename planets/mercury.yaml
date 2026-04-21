@@ -213,3 +213,35 @@
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [opening, paradox, saturn_secondary]
+
+- text: |
+    How I wish that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
+  author: "Plato"
+  source: "Symposium (Socrates to Agathon, at the couch)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, paradox]
+
+- text: |
+    That which is always flowing in is always flowing out, and so he is never in want and never in wealth; and, further, he is in a mean between ignorance and knowledge.
+  author: "Plato"
+  source: "Symposium (Diotima on the nature of Love)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [paradox, turn]
+
+- text: |
+    Herein is the evil of ignorance, that he who is neither good nor wise is nevertheless satisfied with himself: he has no desire for that of which he feels no want.
+  author: "Plato"
+  source: "Symposium (Diotima to Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [warning, paradox, turn]
+
+- text: |
+    His outer mask is the carved head of the Silenus; but, O my companions in drink, when he is opened, what temperance there is residing within!
+  author: "Plato"
+  source: "Symposium (Alcibiades on Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, turn, paradox]
