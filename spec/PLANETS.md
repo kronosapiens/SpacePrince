@@ -655,6 +655,17 @@ The layered rabbinic tradition — Tanakh, Mishnah, Talmud, Midrash, Kabbalah, m
 - **Emily Dickinson** — poems, **pre-1930 editions only** (Todd / Higginson 1890–1896); Johnson (1955) and Franklin (1998) critical editions are **not** PD. Moon + Saturn.
 - **Yeats** — pre-1930 volumes only: *The Wild Swans at Coole* (1919), *Michael Robartes and the Dancer* (1921), *The Tower* (1928). Later collections (*Last Poems*, 1939) not PD in US. Jupiter + Saturn + Venus.
 
+### Art, aesthetics, and critical theory
+
+Victorian and early-modernist voices on art, perception, form, and consciousness. Register is reflective and sometimes oracular — aesthetic attention raised to a philosophical register.
+
+- **John Ruskin** — *Modern Painters* (1843–1860), *The Stones of Venice* (1851–1853), *The Seven Lamps of Architecture* (1849), *Sesame and Lilies* (1865). English original, all PD. Venus (aesthetic attention) + Saturn (moral weight of craft) + Jupiter (the architectural-as-spiritual).
+- **William Morris** — essays, *News from Nowhere* (1890), lectures on art and socialism. English original, PD. Venus + Saturn.
+- **Matthew Arnold** — *Culture and Anarchy* (1869), *Essays in Criticism* (1865 / 1888). English original, PD. Saturn + Jupiter.
+- **Wassily Kandinsky** — *Concerning the Spiritual in Art*, Michael Sadler translation (1914, London). PD in US (pre-1930 publication). *Point and Line to Plane* (1926 German, 1947 English) — English translation not PD. Voice: Jupiter (the spiritual in art, inner necessity) + Venus (color as emotional grammar) + Mercury (the paradox of abstraction).
+- **Henri Bergson** — *Time and Free Will* (F. L. Pogson 1910), *Matter and Memory* (Paul & Palmer 1911), *Creative Evolution* (Arthur Mitchell 1911), *Laughter* (Brereton & Rothwell 1911). All pre-1930 English translations, PD. Jupiter (duration, élan vital) + Mercury (the paradox of time and memory). Significant early-20c influence on modernist thought.
+- **George Santayana** — *The Sense of Beauty* (1896), *The Life of Reason* (1905–1906), *Three Philosophical Poets* (1910). Pre-1930 works all PD. Venus (aesthetics) + Saturn (skeptical naturalism). Later works (*Realms of Being* 1927–1940, *The Last Puritan* 1935) outside the safe window.
+
 ### Novels and narrative prose
 
 - **Melville** — *Moby-Dick* (1851). Mars (Ahab) + Saturn (Ishmael's reflections) + Jupiter (*The Whiteness of the Whale*).
@@ -701,6 +712,12 @@ Per §11 Scope, Space Prince accepts **PD, CC0, and CC-BY** only. The following 
 - **Full *Shiji*** (Sima Qian) — Burton Watson 1961+ under copyright.
 - **Han Shan / Cold Mountain poems** — Waley 1954, Snyder 1958, Red Pine all under copyright.
 - **Simone Weil** (d. 1943), **Camille Paglia** (active), **Jung**, **Buber**, **W. H. Auden**, **Alan Watts** — modern authors still in copyright despite strong voice-fit.
+- **Walter Benjamin** (d. 1940) — *Illuminations*, *Reflections*, *Arcades Project*, *Selected Writings*. All canonical English translations (Zohn 1968; Belknap 1996–2003; Howard Eiland *Arcades* 1999) under copyright. German originals partially PD in US but atmospheric use requires translation we can't source.
+- **Gershom Scholem** (d. 1982) — *Major Trends in Jewish Mysticism* (1941), *On the Kabbalah and Its Symbolism* (1965), *Sabbatai Sevi* (1973). All rights reserved. A real gap — Scholem is the scholarly voice on Kabbalah, and his absence means our kabbalistic corpus stays thin.
+- **Hilma af Klint's notebooks** (d. 1944) — sealed until the 1980s; English editions of her writings published only recently, all under copyright.
+- **Paul Klee theoretical writings** (d. 1940) — *Pedagogical Sketchbook* (English 1953), *Creative Credo* — most English translations post-1930.
+- **Kazimir Malevich** — *The Non-Objective World* (1927 German, 1959 English). English translation under copyright.
+- **Piet Mondrian theoretical writings** (d. 1944) — English translations mostly under copyright.
 
 **CC-BY-NC (non-commercial only — excluded because Space Prince is commercial):**
 - **William Davidson Talmud** (Sefaria's commissioned Steinsaltz English translation).
