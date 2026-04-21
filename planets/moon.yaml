@@ -127,3 +127,27 @@
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [reverie, opening, saturn_secondary]
+
+- text: |
+    When I lie down, I say, When shall I arise, and the night be gone? and I am full of tossings to and fro unto the dawning of the day.
+  author: "The Book of Job"
+  source: "Job 7:4 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [reverie, opening, saturn_secondary]
+
+- text: |
+    When I say, My bed shall comfort me, my couch shall ease my complaints; then thou scarest me with dreams, and terrifiest me through visions.
+  author: "The Book of Job"
+  source: "Job 7:13–14 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [reverie, opening]
+
+- text: |
+    In thoughts from the visions of the night, when deep sleep falleth on men, fear came upon me, and trembling, which made all my bones to shake. Then a spirit passed before my face; the hair of my flesh stood up.
+  author: "The Book of Job"
+  source: "Job 4:13–15 (Eliphaz)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [reverie, opening]

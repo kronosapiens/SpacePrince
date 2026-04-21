@@ -176,3 +176,27 @@
   translation: "Benjamin Jowett, 1871"
   source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
   moods: [reverie, affirmation]
+
+- text: |
+    He stretcheth out the north over the empty place, and hangeth the earth upon nothing.
+  author: "The Book of Job"
+  source: "Job 26:7 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, reverie]
+
+- text: |
+    Where wast thou when I laid the foundations of the earth? declare, if thou hast understanding. Who hath laid the measures thereof, if thou knowest? or who hath stretched the line upon it? When the morning stars sang together, and all the sons of God shouted for joy?
+  author: "The Book of Job"
+  source: "Job 38:4–7 (the Voice from the whirlwind)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, affirmation, sun_secondary]
+
+- text: |
+    I have heard of thee by the hearing of the ear: but now mine eye seeth thee.
+  author: "The Book of Job"
+  source: "Job 42:5 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [ending, affirmation]

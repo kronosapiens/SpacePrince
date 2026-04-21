@@ -179,3 +179,99 @@
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [ending, reverie]
+
+- text: |
+    Naked came I out of my mother’s womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.
+  author: "The Book of Job"
+  source: "Job 1:21 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, ending, cost]
+
+- text: |
+    Wherefore is light given to him that is in misery, and life unto the bitter in soul; which long for death, but it cometh not; and dig for it more than for hid treasures.
+  author: "The Book of Job"
+  source: "Job 3:20–21 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, cost]
+
+- text: |
+    Yet man is born unto trouble, as the sparks fly upward.
+  author: "The Book of Job"
+  source: "Job 5:7 (Eliphaz)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, cost]
+
+- text: |
+    Is there not an appointed time to man upon earth? are not his days also like the days of an hireling? As a servant earnestly desireth the shadow, and as an hireling looketh for the reward of his work: so am I made to possess months of vanity, and wearisome nights are appointed to me.
+  author: "The Book of Job"
+  source: "Job 7:1–3 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, reverie, cost]
+
+- text: |
+    My days are swifter than a weaver’s shuttle, and are spent without hope.
+  author: "The Book of Job"
+  source: "Job 7:6 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, ending]
+
+- text: |
+    For we are but of yesterday, and know nothing, because our days upon earth are a shadow.
+  author: "The Book of Job"
+  source: "Job 8:9 (Bildad)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, reverie]
+
+- text: |
+    Now my days are swifter than a post: they flee away, they see no good. They are passed away as the swift ships: as the eagle that hasteth to the prey.
+  author: "The Book of Job"
+  source: "Job 9:25–26 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [reverie, ending]
+
+- text: |
+    Man that is born of a woman is of few days and full of trouble. He cometh forth like a flower, and is cut down: he fleeth also as a shadow, and continueth not.
+  author: "The Book of Job"
+  source: "Job 14:1–2 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, ending, cost]
+
+- text: |
+    But man dieth, and wasteth away: yea, man giveth up the ghost, and where is he?
+  author: "The Book of Job"
+  source: "Job 14:10 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [ending, question]
+
+- text: |
+    I have heard many such things: miserable comforters are ye all.
+  author: "The Book of Job"
+  source: "Job 16:2 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [cut, cost]
+
+- text: |
+    If I wait, the grave is mine house: I have made my bed in the darkness. I have said to corruption, Thou art my father: to the worm, Thou art my mother, and my sister.
+  author: "The Book of Job"
+  source: "Job 17:13–14 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [ending, reverie, moon_secondary]
+
+- text: |
+    My bone cleaveth to my skin and to my flesh, and I am escaped with the skin of my teeth.
+  author: "The Book of Job"
+  source: "Job 19:20 (Job)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [cost, ending]

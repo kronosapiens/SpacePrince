@@ -81,3 +81,19 @@
   translation: "Edwin Arnold, The Song Celestial, 1885"
   source_url: "https://www.gutenberg.org/cache/epub/2388/pg2388-images.html"
   moods: [declaration, cost]
+
+- text: |
+    Gird up now thy loins like a man; for I will demand of thee, and answer thou me.
+  author: "The Book of Job"
+  source: "Job 38:3 (the Voice from the whirlwind)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [opening, cut, declaration]
+
+- text: |
+    Whatsoever is under the whole heaven is mine.
+  author: "The Book of Job"
+  source: "Job 41:11 (the Voice from the whirlwind)"
+  translation: "King James Version, 1611"
+  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  moods: [declaration, opening, jupiter_secondary]
