@@ -80,3 +80,43 @@
   translation: "Stephen MacKenna, 1917"
   source_url: "https://en.wikisource.org/wiki/Plotinus_(MacKenna)/Volume_1/Ennead_1.6"
   moods: [opening, affirmation]
+
+- text: |
+    There was something undefined and complete, coming into existence before Heaven and Earth. How still it was and formless, standing alone, and undergoing no change, reaching everywhere and in no danger (of being exhausted)! It may be regarded as the Mother of all things.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 25"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, reverie]
+
+- text: |
+    All-pervading is the Great Tao! It may be found on the left hand and on the right. All things depend on it for their production, which it gives to them, not one refusing obedience to it. When its work is accomplished, it does not claim the name of having done it.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 34"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    The Tao in its regular course does nothing (for the sake of doing it), and so there is nothing which it does not do.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 37"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, affirmation, mercury_secondary]
+
+- text: |
+    The tree which fills the arms grew from the tiniest sprout; the tower of nine storeys rose from a (small) heap of earth; the journey of a thousand li commenced with a single step.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 64"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    All things are produced by the Tao, and nourished by its outflowing operation. They receive their forms according to the nature of each, and are completed according to the circumstances of their condition. Therefore all things without exception honour the Tao, and exalt its outflowing operation.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 51"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, reverie, affirmation]

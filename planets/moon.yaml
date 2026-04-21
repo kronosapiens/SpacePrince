@@ -119,3 +119,11 @@
   translation: "Clara A. Walsh, 1910"
   source_url: "https://archive.org/details/mastersingersofj00wals/page/107"
   moods: [opening, reverie]
+
+- text: |
+    The multitude of men look satisfied and pleased; as if enjoying a full banquet, as if mounted on a tower in spring. I alone seem listless and still, my desires having as yet given no indication of their presence. I am like an infant which has not yet smiled. I look dejected and forlorn, as if I had no home to go to.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 20"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [reverie, opening, saturn_secondary]

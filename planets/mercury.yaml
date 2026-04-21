@@ -118,3 +118,98 @@
   translation: "Herbert A. Giles, 1889"
   source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
   moods: [opening, paradox, warning]
+
+- text: |
+    The Tao that can be trodden is not the enduring and unchanging Tao. The name that can be named is not the enduring and unchanging name.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 1"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox, jupiter_secondary]
+
+- text: |
+    The partial becomes complete; the crooked, straight; the empty, full; the worn out, new. He whose (desires) are few gets them; he whose (desires) are many goes astray.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 22"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox, turn]
+
+- text: |
+    When one is about to take an inspiration, he is sure to make a (previous) expiration; when he is going to weaken another, he will first strengthen him; when he is going to overthrow another, he will first have raised him up; when he is going to despoil another, he will first have made gifts to him.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 36"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn, warning]
+
+- text: |
+    The movement of the Tao
+      By contraries proceeds;
+    And weakness marks the course
+      Of Tao's mighty deeds.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 40"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox]
+
+- text: |
+    The Tao, when brightest seen, seems light to lack;
+    Who progress in it makes, seems drawing back;
+    Its even way is like a rugged track.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 41"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn]
+
+- text: |
+    The softest thing in the world dashes against and overcomes the hardest; that which has no (substantial) existence enters where there is no crevice.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 43"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn]
+
+- text: |
+    Do thou what's straight still crooked deem;
+    Thy greatest art still stupid seem,
+    And eloquence a stammering scream.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 45"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn]
+
+- text: |
+    He who knows (the Tao) does not (care to) speak (about it); he who is (ever ready to) speak about it does not know it.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 56"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn, saturn_secondary]
+
+- text: |
+    To know and yet (think) we do not know is the highest (attainment); not to know (and yet think) we do know is a disease.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 71"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, question]
+
+- text: |
+    Words that are strictly true seem to be paradoxical.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 78"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, opening]
+
+- text: |
+    Sincere words are not fine; fine words are not sincere. Those who are skilled (in the Tao) do not dispute (about it); the disputatious are not skilled in it. Those who know (the Tao) are not extensively learned; the extensively learned do not know it.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 81"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox, saturn_secondary]

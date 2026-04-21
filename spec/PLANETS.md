@@ -147,6 +147,7 @@ Uses the trick of saying the opposite of what the listener expects.
 ### Chorus
 
 - **Friedrich Nietzsche** (philosopher, 1844–1900) — the aphoristic mode of *Twilight of the Idols*, *Human, All Too Human*.
+- **Lao Tzu** — *Tao Te Ching*, James Legge (1891). The paradox of the Way, the inversion of striving.
 - **Zhuangzi** (philosopher, ~4th c. BCE) — butterfly dreams, useless trees, the wandering mind.
 - **Heraclitus** (fragments, ~500 BCE) — the unity of opposites, the river that cannot be stepped in twice.
 - **William Blake** (poet, 1757–1827) — *Proverbs of Hell*, the inversion as revelation.

@@ -126,3 +126,56 @@
   translation: "Charles Cotton, 1685–1686"
   source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_LVII"
   moods: [ending, reverie]
+
+- text: |
+    It is better to leave a vessel unfilled, than to attempt to carry it when it is full. If you keep feeling a point that has been sharpened, the point cannot long preserve its sharpness.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 9"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [warning, cost]
+
+- text: |
+    When the work is done, and one's name is becoming distinguished, to withdraw into obscurity is the way of Heaven.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 9"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [ending, opening]
+
+- text: |
+    He who knows other men is discerning; he who knows himself is intelligent. He who overcomes others is strong; he who overcomes himself is mighty. He who is satisfied with his lot is rich.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 33"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, cost]
+
+- text: |
+    Who is content
+    Needs fear no shame.
+    Who knows to stop
+    Incurs no blame.
+    From danger free
+    Long live shall he.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 44"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, warning]
+
+- text: |
+    There is no guilt greater than to sanction ambition; no calamity greater than to be discontented with one's lot; no fault greater than the wish to be getting. Therefore the sufficiency of contentment is an enduring and unchanging sufficiency.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 46"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [warning, cost]
+
+- text: |
+    Man at his birth is supple and weak; at his death, firm and strong. (So it is with) all things. Trees and plants, in their early growth, are soft and brittle; at their death, dry and withered. Thus it is that firmness and strength are the concomitants of death; softness and weakness, the concomitants of life.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 76"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [ending, reverie]
