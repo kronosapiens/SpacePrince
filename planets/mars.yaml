@@ -80,3 +80,43 @@
   source: "Past and Present, Book III, Ch. XI (Labour)"
   source_url: "https://www.gutenberg.org/cache/epub/13534/pg13534.txt"
   moods: [command, opening]
+
+- text: |
+    A prince ought to have no other aim or thought, nor select anything else for his study, than war and its rules and discipline.
+  author: "Niccolò Machiavelli"
+  source: "The Prince, Ch. XIV (That Which Concerns A Prince On The Subject Of The Art Of War)"
+  translation: "W. K. Marriott, 1908"
+  source_url: "https://www.gutenberg.org/cache/epub/1232/pg1232.txt"
+  moods: [opening, command]
+
+- text: |
+    All warfare is based on deception.
+  author: "Sun Tzu"
+  source: "The Art of War, Ch. I (Laying Plans), §18"
+  translation: "Lionel Giles, 1910"
+  source_url: "https://www.gutenberg.org/cache/epub/132/pg132.txt"
+  moods: [cut, warning]
+
+- text: |
+    The powerful exact what they can, and the weak grant what they must.
+  author: "Thucydides"
+  source: "History of the Peloponnesian War, Book V, §89 (Melian Dialogue)"
+  translation: "Benjamin Jowett, 1881"
+  source_url: "https://archive.org/details/a609583001thucuoft"
+  moods: [cut, cost]
+
+- text: |
+    The art of life is more like the wrestler's art than the dancer's, in respect of this, that it should stand ready and firm to meet onsets which are sudden and unexpected.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book VII, §61"
+  translation: "George Long, 1862"
+  source_url: "https://www.gutenberg.org/cache/epub/15877/pg15877.txt"
+  moods: [command, warning]
+
+- text: |
+    Shame on you, to stay talking here like children, when you should fight like men.
+  author: "Homer"
+  source: "Iliad, Book II (Nestor to the Achaeans)"
+  translation: "Samuel Butler, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/2199/pg2199.txt"
+  moods: [command, cut]
