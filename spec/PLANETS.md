@@ -363,6 +363,7 @@ This is expected and a feature, not a bug — a mature voice can speak from more
 - **Marcus Aurelius** — Sun (declarative, present-tense) and Mars (soldier-emperor discipline).
 - **Heraclitus** — Mercury (paradox, the riddle) and Mars (agonistic, "war is the father").
 - **Keats** — Venus (beauty as truth, sensory intensity) and Mercury (paradox, Negative Capability).
+- **Wilde** — Venus (aestheticism, the paradoxes of beauty) and Saturn (the prison-voice of *De Profundis* and *The Ballad of Reading Gaol*).
 
 When sourcing, fragments from these authors should be tagged by which register they serve.
 A fragment that could serve both is tagged for both; the encounter system picks by context.

@@ -81,3 +81,48 @@
   translation: "H. R. James, 1897"
   source_url: "https://www.gutenberg.org/files/14328/14328-h/14328-h.htm"
   moods: [cost, reverie]
+
+- text: |
+    Suffering is one very long moment. We cannot divide it by seasons.
+  author: "Oscar Wilde"
+  source: "De Profundis"
+  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
+  moods: [opening, cost]
+
+- text: |
+    Behind sorrow there is always sorrow.
+  author: "Oscar Wilde"
+  source: "De Profundis"
+  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
+  moods: [reverie, cost]
+
+- text: |
+    And thus we rust Life's iron chain, degraded and alone.
+  author: "Oscar Wilde"
+  source: "The Ballad of Reading Gaol, Part V"
+  source_url: "https://www.gutenberg.org/cache/epub/301/pg301-images.html"
+  moods: [ending, cost]
+
+- text: |
+    Our disease lies in the mind, which cannot escape from itself.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
+  moods: [opening, warning]
+
+- text: |
+    Retire yourself into yourself, but first prepare yourself there to receive yourself.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
+  moods: [opening, reverie]
+
+- text: |
+    To die of old age is a death rare, extraordinary, and singular.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. LVII ('Of Age')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_LVII"
+  moods: [ending, reverie]
