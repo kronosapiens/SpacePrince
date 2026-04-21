@@ -362,3 +362,112 @@
   source: "Essays: First Series, 'Self-Reliance' (quoting Zoroaster)"
   source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
   moods: [opening, affirmation, gift]
+
+# Batch 4: Persian / Sufi tradition — Rumi (Whinfield 1887), Attar (FitzGerald 1889).
+
+- text: |
+    To each person have I allotted peculiar forms,
+    To each have I given particular usages.
+    What is praiseworthy in thee is blamable in him,
+    What is poison for thee is honey for him.
+  author: "Rumi"
+  source: "Masnavi, Book II, Story VII ('Moses and the Shepherd'), 'Religious forms indifferent'"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, affirmation, reverie]
+
+- text: |
+    I regard not the outside and the words,
+    I regard the inside and the state of heart.
+    I look at the heart if it be humble,
+    Though the words may be the reverse of humble.
+  author: "Rumi"
+  source: "Masnavi, Book II, Story VII ('Moses and the Shepherd')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, affirmation]
+
+- text: |
+    I died as a mineral and arose a plant,
+    I died as a plant and rose again an animal.
+    I died as an animal and arose a man.
+    Why then should I fear to become less by dying?
+  author: "Rumi"
+  source: "Masnavi, Book III, Story XVII ('The Vakil of Bokhara')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, affirmation, saturn_secondary]
+
+- text: |
+    I shall die once again as a man
+    To rise an angel perfect from head to foot!
+    Again when I suffer dissolution as an angel,
+    I shall become what passes the conception of man!
+  author: "Rumi"
+  source: "Masnavi, Book III, Story XVII ('The Vakil of Bokhara')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [affirmation, reverie]
+
+- text: |
+    Pain is a treasure, for it contains mercies;
+    The kernel is soft when the rind is scraped off.
+    O brother, the place of darkness and cold
+    Is the fountain of life and the cup of ecstasy.
+  author: "Rumi"
+  source: "Masnavi, Book II, Story X ('Bayazid and the Saint')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [affirmation, reverie, saturn_secondary]
+
+- text: |
+    Under the water you see there is another Water moving it,
+    Within the spirit is a Spirit that calls it.
+  author: "Rumi"
+  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, reverie]
+
+- text: |
+    Behold the Grace of Allah comes and goes
+    As to Itself is good: and no one knows
+    Which way it turns: in that mysterious Court
+    Not he most finds who furthest travels for't.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Pheasant answered by Tajidar"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [opening, reverie, mercury_secondary]
+
+- text: |
+    Come you lost Atoms to your Centre draw,
+    And be the Eternal Mirror that you saw:
+    Rays that have wander'd into Darkness wide
+    Return, and back into your Sun subside.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [opening, affirmation, ending]
+
+- text: |
+    The Sun of my Perfection is a Glass
+    Wherein from Seeing into Being pass
+    All who, reflecting as reflected see
+    Themselves in Me, and Me in Them.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne (climax)"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [opening, affirmation, mercury_secondary]
+
+- text: |
+    As Water lifted from the Deep, again
+    Falls back in individual Drops of Rain
+    Then melts into the Universal Main.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [reverie, affirmation, ending]

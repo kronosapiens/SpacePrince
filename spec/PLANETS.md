@@ -155,6 +155,7 @@ Uses the trick of saying the opposite of what the listener expects.
 - **Heraclitus** (fragments, ~500 BCE) — the unity of opposites, the river that cannot be stepped in twice.
 - **William Blake** (poet, 1757–1827) — *Proverbs of Hell*, the inversion as revelation.
 - **Pirkei Avot (*Ethics of the Fathers*)** — Charles Taylor (1897), Joshua Kulp Mishnah Yomit (CC-BY). Hillel's three questions, Akiva's paradoxes, Ben Bag Bag's "turn it over, and again turn it over."
+- **Attar** — *Bird Parliament* (FitzGerald 1889). The Simurgh recognition — thirty birds discovering the sought Bird is themselves; the self-inverting turn as mystical vocation.
 - **The Hermetica** — "as above, so below."
 
 ### Sample fragments
@@ -337,6 +338,7 @@ Speaks as if having waited a long time to speak.
 - **Ecclesiastes** — "vanity of vanities"; the cycle of what has been and will be again.
 - **The Book of Job** — KJV (1611); lamentation, the endured weight, the sufferer's voice.
 - **Luo Guanzhong** — *Romance of the Three Kingdoms*, C. H. Brewitt-Taylor (1925). The Zhuge Liang death arc, the failed restoration, the closing dissolution; measured austere narrative register.
+- **Ferdowsi** — *Shahnameh*, A. G. and Edmond Warner (1905–1925). The dynastic falls, Rustam's lament for his son Suhrab, Iraj's pre-death plea, Jamshid's loss of Grace.
 - **Epictetus** (philosopher, 55–135) — *Enchiridion*, the dichotomy of control.
 - **Seneca** (philosopher, 4 BCE–65) — *Letters from a Stoic*, the moral measured life.
 - **Michel de Montaigne** (essayist, 1533–1592) — *Essays*, the patient examination of mortality, solitude, and age.

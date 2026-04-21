@@ -324,3 +324,100 @@
   source: "Poems, First Series (1890), Book I. Life, XI"
   source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
   moods: [opening, paradox, saturn_secondary]
+
+# Batch 4: Persian / Sufi — Rumi (Whinfield 1887), Attar (FitzGerald 1889).
+# The paradoxical, self-inverting seeker-voice of Sufi mysticism.
+
+- text: |
+    The eye of outward sense is as the palm of a hand,
+    The whole of the object is not grasped in the palm.
+    The sea itself is one thing, the foam another;
+    Neglect the foam, and regard the sea with your eyes.
+  author: "Rumi"
+  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, paradox, turn]
+
+- text: |
+    When a garment is made by a good tailor,
+    'Tis an evidence of the tailor's art.
+    Defects are the mirrors of the attributes of Beauty,
+    The base is the mirror of the High and Glorious One.
+  author: "Rumi"
+  source: "Masnavi, Book I, Story XII ('Joseph and the Mirror')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [paradox, turn]
+
+- text: |
+    Since Not-being is the mirror of Being,
+    If you are wise, choose Not-being (self-abnegation).
+  author: "Rumi"
+  source: "Masnavi, Book I, Story XII ('Joseph and the Mirror')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [paradox, turn]
+
+- text: |
+    Keep silence, that you may hear Him speaking
+    Words unutterable by tongue in speech.
+  author: "Rumi"
+  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, paradox]
+
+- text: |
+    Not Me,
+    But all of Me that a contracted Eye
+    Is comprehensive of Infinity:
+    Nor yet Themselves: no Selves, but of The All
+    Fractions, from which they split and whither fall.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [paradox, turn, jupiter_secondary]
+
+- text: |
+    I was the Sin that from Myself rebell'd:
+    I the Remorse that tow'rd Myself compell'd:
+    I was the Tajidar who led the Track:
+    I was the little Briar that pull'd you back.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [turn, paradox, ending]
+
+- text: |
+    Sin and Contrition — Retribution owed,
+    And cancell'd — Pilgrim, Pilgrimage, and Road,
+    Was but Myself toward Myself: and Your
+    Arrival but Myself at my own Door.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [paradox, turn, ending, jupiter_secondary]
+
+- text: |
+    They That, That They: Another, yet the Same:
+    Dividual, yet One.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the climax (thirty birds seeing the Simurgh)"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [paradox, ending]
+
+- text: |
+    The Blaze that from my Harim window breaks
+    With fright the Rabble of the Roadside takes;
+    And ev'n of those that at my Portal din,
+    Thousands may knock for one that enters in.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice to Bajazyd"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [opening, warning, paradox]

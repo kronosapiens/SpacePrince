@@ -345,3 +345,89 @@
   source: "Poems, Second Series (1891), Book II. Love, VII"
   source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
   moods: [opening, relation, reverie, moon_secondary]
+
+# Batch 4: Persian / Sufi — Rumi (Whinfield 1887), the lover-and-beloved register.
+
+- text: |
+    Hearken to the reed-flute, how it discourses
+    When complaining of the pains of separation —
+    "Ever since they tore me from my osier bed,
+    My plaintive notes have moved men and women to tears."
+  author: "Rumi"
+  source: "Masnavi, Book I, Prologue ('The Song of the Reed')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, reverie, mercury_secondary]
+
+- text: |
+    The Beloved is all in all, the lover only veils Him;
+    The Beloved is all that lives, the lover a dead thing.
+  author: "Rumi"
+  source: "Masnavi, Book I, Prologue"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation, jupiter_secondary]
+
+- text: |
+    A true lover is proved such by his pain of heart;
+    No sickness is there like sickness of heart.
+    The lover's ailment is different from all ailments;
+    Love is the astrolabe of God's mysteries.
+  author: "Rumi"
+  source: "Masnavi, Book I, Story I ('The Prince and the Handmaid'), Description of Love"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation]
+
+- text: |
+    However much we describe and explain love,
+    When we fall in love we are ashamed of our words.
+    Explanation by the tongue makes most things clear,
+    But love unexplained is clearer.
+  author: "Rumi"
+  source: "Masnavi, Book I, Description of Love"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation, mercury_secondary]
+
+- text: |
+    None but the sun can display the sun,
+    If you would see it displayed, turn not away from it.
+  author: "Rumi"
+  source: "Masnavi, Book I, Description of Love"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, beauty, sun_secondary]
+
+- text: |
+    Once a man came and knocked at the door of his friend.
+    His friend said, "Who art thou, O faithful one?"
+    He said, "'Tis I." He answered, "There is no admittance.
+    There is no room for the 'raw' at my well-cooked feast."
+  author: "Rumi"
+  source: "Masnavi, Book I, Story XI ('The Lover and his Mistress')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation, paradox]
+
+- text: |
+    He knocked at the door in fear and trepidation
+    Lest some careless word might fall from his lips.
+    His friend shouted, "Who is that at the door?"
+    He answered, "'Tis Thou who art at the door, O Beloved!"
+    The friend said, "Since 'tis I, let me come in,
+    There is not room for two 'I's' in one house."
+  author: "Rumi"
+  source: "Masnavi, Book I, Story XI ('The Lover and his Mistress')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [relation, ending, mercury_secondary]
+
+- text: |
+    Did my Beloved only touch me with his lips,
+    I too, like the flute, would burst out in melody.
+  author: "Rumi"
+  source: "Masnavi, Book I, Prologue"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [reverie, relation]

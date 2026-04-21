@@ -224,3 +224,64 @@
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
   source_url: "https://www.sefaria.org/Pirkei_Avot.2.5"
   moods: [command, opening]
+
+# Batch 4: Persian / Sufi — Ferdowsi's Shahnameh (Warner 1905–1910).
+# Heroic speeches, the martial register of the Persian national epic.
+
+- text: |
+    Ye men of name! Ye worshippers of God!
+    Whoe'er would 'scape the fetters of Zahhak
+    Let him resort with me to Faridun
+    And shadow in his Grace.
+  author: "Ferdowsi"
+  source: "Shahnameh, Zahhak section §5 (Kawa the Smith raising the apron-standard)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [opening, command]
+
+- text: |
+    I came not from Iran to bring him pardon.
+  author: "Ferdowsi"
+  source: "Shahnameh, Zahhak §7 (Faridun to the sisters of Jamshid)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [cut, command]
+
+- text: |
+    Though he slay me, yet will I trust in him.
+    A bow is useless if it be not bent.
+  author: "Ferdowsi"
+  source: "Shahnameh, Faridun §13 (after the murder of Iraj)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [command, cut, saturn_secondary]
+
+- text: |
+    Whenever thou dost thirst for blood and stain
+    Therewith thy glittering dagger, destiny
+    Will be athirst for thy blood, and ordain
+    Each hair of thine to be a sword for thee.
+  author: "Ferdowsi"
+  source: "Shahnameh, Kai Kaus §21 ('How Suhrab was slain by Rustam')"
+  translation: "Arthur George Warner & Edmond Warner, 1906"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
+  moods: [warning, cut, saturn_secondary]
+
+- text: |
+    I came like lightning and like wind I go.
+  author: "Ferdowsi"
+  source: "Shahnameh, Kai Kaus §21 (Suhrab, dying, to Rustam)"
+  translation: "Arthur George Warner & Edmond Warner, 1906"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
+  moods: [cut, ending, saturn_secondary]
+
+- text: |
+    Who then this Travel to Result would bring
+    Needs both a Lion's Heart beneath the Wing,
+    And even more, a Spirit purified
+    Of Worldly Passion, Malice, Lust, and Pride.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), Tajidar to the birds"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [opening, command, jupiter_secondary]

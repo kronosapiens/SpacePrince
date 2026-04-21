@@ -590,3 +590,119 @@
   source: "Poems, First Series (1890), Book IV. Time and Eternity, XXII"
   source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
   moods: [ending, cost]
+
+# Batch 4: Persian / Sufi — Ferdowsi (Warner 1905–1906), Attar (FitzGerald 1889), Rumi (Whinfield 1887).
+# The tragic register of the Shahnameh (the failed sons, the fallen kings);
+# the desert-crossings and cost-of-journey of the Conference of the Birds.
+
+- text: |
+    Although thou ridest on the heaven above,
+    A brick will be thy pillow in the end.
+  author: "Ferdowsi"
+  source: "Shahnameh, Faridun §12 (Iraj to Tur, before his murder)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [cost, warning, ending]
+
+- text: |
+    Be on thy guard as touching this world's love;
+    A bow is useless if it be not bent.
+    The process of the turning sky above
+    Is, favouring first, to plunder in the event.
+  author: "Ferdowsi"
+  source: "Shahnameh, Faridun §13 (the poet's counsel after Iraj's murder)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [opening, cost, warning]
+
+- text: |
+    I have lost to-day
+    All strength and courage. Fight not with Turan:
+    I have done harm enough.
+  author: "Ferdowsi"
+  source: "Shahnameh, Kai Kaus §21 (Rustam, having slain Suhrab, to the nobles)"
+  translation: "Arthur George Warner & Edmond Warner, 1906"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
+  moods: [cost, ending, mars_secondary]
+
+- text: |
+    I have slain my son now when my head is grey.
+    He is cut off both root and stem, his loins
+    Are pierced, and heaven will weep for him for ever.
+  author: "Ferdowsi"
+  source: "Shahnameh, Kai Kaus §21 (Rustam to Zawara)"
+  translation: "Arthur George Warner & Edmond Warner, 1906"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
+  moods: [cost, ending]
+
+- text: |
+    We are the quarry, and death hunteth us
+    No matter whether we wear casque or crown,
+    But all are borne out when their end hath come,
+    And afterward we wot not how they do.
+  author: "Ferdowsi"
+  source: "Shahnameh, Kai Kaus §21 (Gudarz comforting Rustam)"
+  translation: "Arthur George Warner & Edmond Warner, 1906"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
+  moods: [opening, cost, reverie]
+
+- text: |
+    Day darkened to Jamshid, he lost the Grace
+    That lighteneth the world, and though with tears
+    Of blood he sought for pardon Grace was not,
+    And dread of coming evil was his lot.
+  author: "Ferdowsi"
+  source: "Shahnameh, §1 ('The Greatness and Fall of Jamshid')"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [cost, ending]
+
+- text: |
+    A Road still waxing in Self-sacrifice
+    As it went on: still ringing with the Cries
+    And Groans of Those who had not yet prevail'd,
+    And bleaching with the Bones of those who fail'd.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Tajidar describes the Road"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [warning, cost, opening]
+
+- text: |
+    Till of the mighty Host that fledged the Dome
+    Of Heav'n and Floor of Earth on leaving Home,
+    A Handful reach'd and scrambled up the Knees
+    Of Kaf whose Feet dip in the Seven Seas.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), after the great attrition"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [cost, ending]
+
+- text: |
+    But Thirty — thirty desperate draggled Things,
+    Half-dead, with scarce a Feather on their Wings,
+    Stunn'd, blinded, deafen'd with the Crash and Craze
+    Of Rock and Sea collapsing in a Blaze.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the thirty survivors arrive"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [cost, ending, jupiter_secondary]
+
+- text: |
+    Consort with grief and put up with sadness,
+    Seek long life in your own death!
+  author: "Rumi"
+  source: "Masnavi, Book II, Story X ('Bayazid and the Saint')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, cost]
+
+- text: |
+    Where earth shall take the measure of my height.
+  author: "Ferdowsi"
+  source: "Shahnameh, Faridun §13 (Faridun praying for a respite before death)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [cost, ending]
