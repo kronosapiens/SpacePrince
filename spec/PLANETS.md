@@ -419,7 +419,7 @@ The editions below are reasonable-confidence recommendations; subagents must ver
 - **Zhuangzi** — James Legge (1891, SBE series); Herbert Giles (1889).
 - **Heraclitus** — John Burnet, *Early Greek Philosophy* (1892).
 - **Hermetica** — G. R. S. Mead, *Thrice-Greatest Hermes* (1906).
-- **Upanishads** — Max Müller (1879–1884, SBE series); Paul Deussen (1906).
+- **Upanishads** — Max Müller (1879–1884, SBE series); Paul Deussen (1906); Swami Paramananda, *The Upanishads* (1919) — cleaner idiom for short-fragment use than Müller's scholarly Victorian.
 - **Plotinus** — Stephen MacKenna, *Enneads* vols 1–4 (1917–1926). Vol 5 (1930) is on the boundary and needs verification.
 - **Epictetus** — W. A. Oldfather Loeb *Discourses* (1925); Elizabeth Carter *Enchiridion* (1758).
 - **Seneca** — R. M. Gummere Loeb *Letters* vols 1–3 (1917–1925); Aubrey Stewart (1880s–90s).
