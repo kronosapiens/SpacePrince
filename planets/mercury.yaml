@@ -1,0 +1,81 @@
+# Mercury — aphoristic, paradoxical, self-inverting.
+# The riddle, the turn. Never earnest, never conclusive, never threatens.
+# See spec/PLANETS.md §5 (Mercury) and §11 (Sourcing Notes).
+
+- text: |
+    He who fights with monsters should be careful lest he thereby become a monster. And if thou gaze long into an abyss, the abyss will also gaze into thee.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §146 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [warning, turn, paradox]
+
+- text: |
+    That which does not kill me, makes me stronger.
+  author: "Friedrich Nietzsche"
+  source: "Twilight of the Idols, 'Maxims and Missiles' §8"
+  translation: "Anthony M. Ludovici, 1911"
+  source_url: "https://www.gutenberg.org/cache/epub/52263/pg52263.txt"
+  moods: [opening, turn]
+
+- text: |
+    "I did that," says my memory. "I could not have done that," says my pride, and remains inexorable. Eventually--the memory yields.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §68 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [turn, paradox]
+
+- text: |
+    You cannot step twice into the same rivers; for fresh waters are ever flowing in upon you.
+  author: "Heraclitus"
+  source: "Fragments 41, 42 (Bywater numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [opening, paradox]
+
+- text: |
+    The way up and the way down is one and the same.
+  author: "Heraclitus"
+  source: "Fragment 69 (Bywater numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [paradox, question]
+
+- text: |
+    The road of excess leads to the palace of wisdom.
+  author: "William Blake"
+  source: "The Marriage of Heaven and Hell, 'Proverbs of Hell'"
+  source_url: "https://en.wikisource.org/wiki/The_Marriage_of_Heaven_and_Hell"
+  moods: [opening, turn]
+
+- text: |
+    If the fool would persist in his folly he would become wise.
+  author: "William Blake"
+  source: "The Marriage of Heaven and Hell, 'Proverbs of Hell'"
+  source_url: "https://en.wikisource.org/wiki/The_Marriage_of_Heaven_and_Hell"
+  moods: [paradox, turn]
+
+- text: |
+    Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.
+  author: "Zhuangzi"
+  source: "Chuang Tzŭ, Ch. II ('The Identity of Contraries')"
+  translation: "Herbert A. Giles, 1889"
+  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
+  moods: [question, paradox, reverie]
+
+- text: |
+    The raison d'être of a fish-trap is the fish. When the fish is caught, the trap may be ignored.
+  author: "Zhuangzi"
+  source: "Chuang Tzŭ, Ch. XXVI ('Contingencies')"
+  translation: "Herbert A. Giles, 1889"
+  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
+  moods: [opening, turn]
+
+- text: |
+    Man, a life that cannot die, and yet a life that dies.
+  author: "Hermes Trismegistus"
+  source: "Corpus Hermeticum IV ('The Cup or Monad'), §2"
+  translation: "G. R. S. Mead, 1906"
+  source_url: "https://archive.org/details/GRSMeadThriceGreatestHermesVolII"
+  moods: [opening, paradox]

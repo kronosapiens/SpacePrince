@@ -1,0 +1,82 @@
+# Jupiter — expansive, affirmative, oracular.
+# Batch of 10 verified fragments drawn from primary public-domain sources.
+# See spec/PLANETS.md §8 (Jupiter) and §11 (Sourcing Notes).
+
+- text: |
+    Thy infinite gifts come to me only on these very small hands of mine. Ages pass, and still thou pourest, and still there is room to fill.
+  author: "Rabindranath Tagore"
+  source: "Gitanjali, Song 1"
+  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
+  moods: [gift, opening]
+
+- text: |
+    But I find that thy will knows no end in me. And when old words die out on the tongue, new melodies break forth from the heart; and where the old tracks are lost, new country is revealed with its wonders.
+  author: "Rabindranath Tagore"
+  source: "Gitanjali, Song 37"
+  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Time is endless in thy hands, my lord. There is none to count thy minutes.
+  author: "Rabindranath Tagore"
+  source: "Gitanjali, Song 82"
+  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
+  moods: [reverie, opening]
+
+- text: |
+    Were one asked to characterize the life of religion in the broadest and most general terms possible, one might say that it consists of the belief that there is an unseen order, and that our supreme good lies in harmoniously adjusting ourselves thereto.
+  author: "William James"
+  source: "The Varieties of Religious Experience, Lecture III (The Reality of the Unseen)"
+  source_url: "https://www.gutenberg.org/cache/epub/621/pg621.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Philosophy is at once the most sublime and the most trivial of human pursuits. It works in the minutest crannies and it opens out the widest vistas.
+  author: "William James"
+  source: "Pragmatism, Lecture I (The Present Dilemma in Philosophy)"
+  source_url: "https://www.gutenberg.org/cache/epub/5116/pg5116.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Man is a stream whose source is hidden. Our being is descending into us from we know not whence.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [reverie, opening]
+
+- text: |
+    Every spirit builds itself a house; and beyond its house a world; and beyond its world, a heaven.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. VIII (Prospects)"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    The light which puts out our eyes is darkness to us. Only that day dawns to which we are awake. There is more day to dawn. The sun is but a morning star.
+  author: "Henry David Thoreau"
+  source: "Walden, Conclusion"
+  source_url: "https://www.gutenberg.org/cache/epub/205/pg205.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Heaven is under our feet as well as over our heads.
+  author: "Henry David Thoreau"
+  source: "Walden, 'The Pond in Winter'"
+  source_url: "https://www.gutenberg.org/cache/epub/205/pg205.txt"
+  moods: [reverie, affirmation]
+
+- text: |
+    The Self is subtler than the subtle, greater than the great; It dwells in the heart of each living being.
+  author: "Katha-Upanishad"
+  source: "Katha-Upanishad, Part Second, verse XX"
+  translation: "Swami Paramananda, 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/3283/pg3283.txt"
+  moods: [opening, reverie]
+
+- text: |
+    This is the spirit that Beauty must ever induce, wonderment and a delicious trouble, longing and love and a trembling that is all delight.
+  author: "Plotinus"
+  source: "Enneads I.6 (On Beauty), §4"
+  translation: "Stephen MacKenna, 1917"
+  source_url: "https://en.wikisource.org/wiki/Plotinus_(MacKenna)/Volume_1/Ennead_1.6"
+  moods: [opening, affirmation]
