@@ -97,3 +97,192 @@
   translation: "King James Version, 1611"
   source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   moods: [declaration, opening, jupiter_secondary]
+
+# Batch 2: Plato's Apology (Jowett), Emerson deep read, Plutarch's Moralia.
+
+- text: |
+    The unexamined life is not worth living.
+  author: "Plato"
+  source: "Apology (Socrates, on refusing to abandon philosophy)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, declaration, cut]
+
+- text: |
+    The hour of departure has arrived, and we go our ways—I to die, and you to live. Which is better God only knows.
+  author: "Plato"
+  source: "Apology (Socrates, closing address to the jury)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [ending, declaration, saturn_secondary]
+
+- text: |
+    Men of Athens, I honour and love you; but I shall obey God rather than you, and while I have life and strength I shall never cease from the practice and teaching of philosophy.
+  author: "Plato"
+  source: "Apology (Socrates's refusal)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, declaration]
+
+- text: |
+    He knows nothing, and thinks that he knows; I neither know nor think that I know. In this latter particular, then, I seem to have slightly the advantage of him.
+  author: "Plato"
+  source: "Apology (Socrates, on testing the oracle)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, declaration, mercury_secondary]
+
+- text: |
+    The fear of death is indeed the pretence of wisdom, and not real wisdom, being a pretence of knowing the unknown.
+  author: "Plato"
+  source: "Apology (Socrates, on why he will not desert his post)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, cut, saturn_secondary]
+
+- text: |
+    The difficulty, my friends, is not to avoid death, but to avoid unrighteousness; for that runs faster than death.
+  author: "Plato"
+  source: "Apology (Socrates, after the verdict)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, cut, declaration]
+
+- text: |
+    No evil can happen to a good man, either in life or after death.
+  author: "Plato"
+  source: "Apology (Socrates, closing)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [declaration, affirmation]
+
+- text: |
+    I am a sort of gadfly, given to the state by God; and the state is a great and noble steed who is tardy in his motions owing to his very size, and requires to be stirred into life.
+  author: "Plato"
+  source: "Apology (Socrates, on his mission)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [opening, declaration]
+
+- text: |
+    To believe your own thought, to believe that what is true for you in your private heart is true for all men,—that is genius.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, declaration]
+
+- text: |
+    Envy is ignorance; imitation is suicide; he must take himself for better for worse as his portion.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, cut, declaration]
+
+- text: |
+    Nothing is at last sacred but the integrity of your own mind.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, cut, declaration]
+
+- text: |
+    Whoso would be a man, must be a nonconformist.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, cut]
+
+- text: |
+    To be great is to be misunderstood.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [declaration, cut]
+
+- text: |
+    What I must do is all that concerns me, not what the people think.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, cut, declaration]
+
+- text: |
+    It is easy in the world to live after the world's opinion; it is easy in solitude to live after our own; but the great man is he who in the midst of the crowd keeps with perfect sweetness the independence of solitude.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, declaration]
+
+- text: |
+    Insist on yourself; never imitate.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [cut, command]
+
+- text: |
+    Nothing can bring you peace but yourself. Nothing can bring you peace but the triumph of principles.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [ending, declaration]
+
+- text: |
+    Always do what you are afraid to do.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Heroism'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [cut, command]
+
+- text: |
+    Heroism feels and never reasons, and therefore is always right.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Heroism'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [declaration, cut]
+
+- text: |
+    Build, therefore, your own world. As fast as you conform your life to the pure idea in your mind, that will unfold its great proportions.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. VIII (Prospects)"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, command, declaration, jupiter_secondary]
+
+- text: |
+    Know then, that the world exists for you. For you is the phenomenon perfect. What we are, that only can we see.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. VIII (Prospects)"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, declaration]
+
+- text: |
+    A happy and cheerful life is not from without; on the contrary, a man adds the pleasure and gratification to the things that surround him, his temperament being as it were the source of his feelings.
+  author: "Plutarch"
+  source: "Moralia, 'On Virtue and Vice' §I"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, declaration]
+
+- text: |
+    Every kind of life with virtue is painless and pleasurable.
+  author: "Plutarch"
+  source: "Moralia, 'On Virtue and Vice'"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, declaration]
+
+- text: |
+    The shoe is shaped by the foot, and not the foot by the shoe, so does the disposition make the life similar to itself.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, declaration]
+
+- text: |
+    Let us cleanse therefore the fountain of contentedness, which is within us, that so external things may turn out for our good, through our putting the best face on them.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, affirmation, jupiter_secondary]

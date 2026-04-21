@@ -395,3 +395,117 @@
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
   source_url: "https://www.sefaria.org/Pirkei_Avot.4.22"
   moods: [opening, ending, reverie]
+
+# Batch 2: Plato's Apology (Jowett), Plutarch's Moralia.
+
+- text: |
+    For the penalty of unrighteousness is swifter than death; that penalty has already overtaken his accusers as death will soon overtake him.
+  author: "Plato"
+  source: "Apology (Socrates, after the verdict)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [ending, cost, warning]
+
+- text: |
+    I am old and move slowly, and the slower runner has overtaken me, and my accusers are keen and quick, and the faster runner, who is unrighteousness, has overtaken them.
+  author: "Plato"
+  source: "Apology (Socrates, after the verdict)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [ending, reverie, cost]
+
+- text: |
+    When my sons are grown up, I would ask you, O my friends, to punish them; and I would have you trouble them, as I have troubled you, if they seem to care about riches, or anything, more than about virtue.
+  author: "Plato"
+  source: "Apology (Socrates's final request to the jurors)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [ending, reverie]
+
+- text: |
+    God only is wise; and by his answer he intends to show that the wisdom of men is worth little or nothing.
+  author: "Plato"
+  source: "Apology (Socrates, on the oracle at Delphi)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [reverie, cost, sun_secondary]
+
+- text: |
+    For the sensible make their life pleasanter and more endurable by mitigating their sorrows with the consideration of their blessings, while most people, like sieves, let the worst things stick to them while the best pass through.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost, warning]
+
+- text: |
+    For the body is weighed down by the burden of what presses on it, but the soul often adds to the real load a burden of its own.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §II"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost, reverie]
+
+- text: |
+    A patrician's slipper is no cure for the gout, nor a costly ring for a whitlow, nor a diadem for the headache.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §I"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, cut]
+
+- text: |
+    Trouble and life are truly near akin. With the luxurious or the glorious life trouble consorts, and in the life of poverty lasts with it to the end.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §III (quoting Menander)"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost]
+
+- text: |
+    Events will take their course, it is no good our being angry at them, he is happiest who wisely turns them to the best account.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost, sun_secondary]
+
+- text: |
+    It is the act of a madman to distress oneself over what is lost, and not to rejoice at what is left.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §VIII"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, cut]
+
+- text: |
+    Every one of you has some trouble, and he who has mine only is not so bad off.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §XI (Pittacus)"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [reverie, cost]
+
+- text: |
+    Whenever then you admire anyone carried by in his litter as a greater man than yourself, lower your eyes and look at those that bear the litter.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §X"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, reverie]
+
+- text: |
+    Vice fabricates for itself each of its own torments, being the terrible author of its own misery in life.
+  author: "Plutarch"
+  source: "Moralia, 'On Those Who Are Punished by the Deity Late' §IX"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, cost]
+
+- text: |
+    Man is shut up in life as in a prison from which there is no egress or escape, and though doubtless during his life he has much feasting and business and gifts and favours and amusement, yet, just like people playing at dice or draughts in a prison, the rope is all the time hanging over his head.
+  author: "Plutarch"
+  source: "Moralia, 'On Those Who Are Punished by the Deity Late' §IX"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [reverie, cost, ending]

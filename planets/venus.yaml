@@ -142,3 +142,69 @@
   translation: "Benjamin Jowett, 1871"
   source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
   moods: [reverie, relation]
+
+# Batch 2: Plutarch's Moralia, Advice to Married Couples.
+
+- text: |
+    As that plant yields the sweetest eating from among the roughest prickles, so a bride, if the groom does not run away in disgust because he finds her difficult and vexatious at first, will afford him a sweet and gentle companionship.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §2"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [opening, relation, reverie]
+
+- text: |
+    Fire is readily kindled in chaff, dry rushes, or hare's fur, but quickly goes out unless it gets a further hold upon something capable both of keeping it in and feeding it. So with that fierce blaze of passion which is produced in the newly-married by physical enjoyment.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §4"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [warning, reverie, relation]
+
+- text: |
+    It is these little, continual, daily frictions between man and wife, which the world knows nothing of, that do most to create the rifts which ruin married life.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §22"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [warning, relation, saturn_secondary]
+
+- text: |
+    Your witchcraft lies in yourself.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §23 (Olympias)"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [relation, gift, cut]
+
+- text: |
+    Marriage should not be made with the eyes; neither should it with the fingers, as it is in the case of some, who reckon up the amount of the dower, instead of calculating the companionable quality, of the wife they are marrying.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §24"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [warning, relation]
+
+- text: |
+    As Crates used to say, 'Adornment is that which adorns,' and that which adorns is that which adds to a woman's seemliness.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §26"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [beauty, reverie]
+
+- text: |
+    If you are thought to trust, you are trusted; if you are thought to love, you are loved.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §36"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [relation, gift, affirmation]
+
+- text: |
+    When a husband has his fits of anger, if he raises his voice, a sensible wife keeps quiet; if he is silent, she soothes him by talking to him in a coaxing way.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §37"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [relation, reverie]

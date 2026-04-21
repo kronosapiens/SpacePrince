@@ -272,3 +272,93 @@
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
   source_url: "https://www.sefaria.org/Pirkei_Avot.4.16"
   moods: [reverie, ending, saturn_secondary]
+
+# Batch 2: Plato's Apology (Jowett), Emerson deep read, Plutarch's Moralia.
+
+- text: |
+    Either death is a state of nothingness and utter unconsciousness, or, as men say, there is a change and migration of the soul from this world to another.
+  author: "Plato"
+  source: "Apology (Socrates, reflecting on death)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [reverie, opening, saturn_secondary]
+
+- text: |
+    The Supreme Critic on the errors of the past and the present, and the only prophet of that which must be, is that great nature in which we rest as the earth lies in the soft arms of the atmosphere; that Unity, that Over-soul, within which every man's particular being is contained and made one with all other.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    We live in succession, in division, in parts, in particles. Meantime within man is the soul of the whole; the wise silence; the universal beauty, to which every part and particle is equally related; the eternal ONE.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    From within or from behind, a light shines through us upon things and makes us aware that we are nothing, but the light is all.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The soul looketh steadily forwards, creating a world before her, leaving worlds behind her. She has no dates, nor rites, nor persons, nor specialties nor men. The soul knows only the soul; the web of events is the flowing robe in which she is clothed.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    We lie in the lap of immense intelligence, which makes us receivers of its truth and organs of its activity.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, affirmation, reverie]
+
+- text: |
+    I became a transparent eye-ball; I am nothing; I see all; the currents of the Universal Being circulate through me; I am part or particle of God.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. I"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    Beauty is the mark God sets upon virtue. Every natural action is graceful. Every heroic act is also decent, and causes the place and the bystanders to shine.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. III (Beauty)"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, affirmation, venus_secondary]
+
+- text: |
+    For man, as Plato says, is not an earthly and immovable but heavenly plant, the head making the body erect as from a root, and turned up to heaven.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §V"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    See you the boundless reach of sky above, and how it holds the earth in its soft arms? These are the boundaries of our country, nor is there either exile or stranger or foreigner in these, where there is the same fire, water and air, the same rulers controllers and presidents, the sun the moon and the morning star.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §V"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, reverie, affirmation]
+
+- text: |
+    Socrates said, that he was not an Athenian or Greek, but a citizen of the world.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §V"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, declaration, sun_secondary]
+
+- text: |
+    To the persevering mortal, said Zoroaster, the blessed Immortals are swift.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance' (quoting Zoroaster)"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, affirmation, gift]
