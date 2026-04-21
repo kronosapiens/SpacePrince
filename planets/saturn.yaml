@@ -509,3 +509,84 @@
   translation: "A. R. Shilleto, 1898"
   source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
   moods: [reverie, cost, ending]
+
+# Batch 3: Baudelaire (Flowers of Evil, Paris Spleen), Dickinson (pre-1930).
+# Secondary yield from a Moon- and Venus-weighted pass.
+
+- text: |
+    If you would not feel the horrible burden of Time weighing on your shoulders and crushing you to the earth, be drunken continually. Drunken with what? With wine, with poetry, or with virtue, as you will. But be drunken.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'Be Drunken'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [opening, cost, moon_secondary]
+
+- text: |
+    Yes, Time has reappeared; Time reigns a monarch now; and with the hideous Ancient has returned all his demoniacal following of Memories, Regrets, Tremors, Fears, Dolours, Nightmares, and twittering nerves.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
+  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [cost, ending]
+
+- text: |
+    I assure you that the seconds are strongly and solemnly accentuated now; and each, as it drips from the pendulum, says: "I am Life: intolerable, implacable Life!"
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
+  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [cost, warning]
+
+- text: |
+    Because I could not stop for Death,
+    He kindly stopped for me;
+    The carriage held but just ourselves
+    And Immortality.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXVII — 'The Chariot'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, ending, reverie]
+
+- text: |
+    Since then 't is centuries; but each
+    Feels shorter than the day
+    I first surmised the horses' heads
+    Were toward eternity.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXVII — 'The Chariot'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [ending, reverie]
+
+- text: |
+    I heard a fly buzz when I died;
+    The stillness round my form
+    Was like the stillness in the air
+    Between the heaves of storm.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book IV. Time and Eternity, XLVI — 'Dying'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, ending]
+
+- text: |
+    Safe in their alabaster chambers,
+    Untouched by morning and untouched by noon,
+    Sleep the meek members of the resurrection,
+    Rafter of satin, and roof of stone.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, IV"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [ending, reverie, moon_secondary]
+
+- text: |
+    The bustle in a house
+    The morning after death
+    Is solemnest of industries
+    Enacted upon earth, —
+    The sweeping up the heart,
+    And putting love away
+    We shall not want to use again
+    Until eternity.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXII"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [ending, cost]

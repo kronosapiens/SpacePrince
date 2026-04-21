@@ -105,6 +105,9 @@ Uses sensory and spatial language — rooms, water, twilight, half-open doors.
 - **Henri-Frédéric Amiel** (diarist, 1821–1881) — the long private examination of the inner weather.
 - **Novalis** (poet, 1772–1801) — *Hymns to the Night*, the ecstatic dark.
 - **Thomas Browne** (physician-philosopher, 1605–1682) — the melancholy of antiquities, the dream of the self.
+- **Charles Baudelaire** (poet, 1821–1867) — *Paris Spleen* and *Les Fleurs du Mal* (Symons / Sturm / Huneker translations); the interior at twilight, the city as nocturne.
+- **Emily Dickinson** (poet, 1830–1886) — pre-1930 Todd / Higginson editions. Interior, the slant of light, the selection of one's own society.
+- **Kalidasa** — *Meghaduta* (H. H. Wilson 1814 / 1843). The beloved evoked through distance and landscape; the classical Sanskrit anchor of Moon reverie.
 - **Bashō** (poet, 1644–1694) — the haiku instant, the moment as window.
 
 ### Sample fragments

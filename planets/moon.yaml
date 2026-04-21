@@ -175,3 +175,243 @@
   translation: "R. Campbell Thompson, 1928"
   source_url: "https://archive.org/details/thompson-1928-gilgamesh"
   moods: [reverie, ending]
+
+# Batch 3: Baudelaire (Paris Spleen, Flowers of Evil), Dickinson (pre-1930 Todd/Higginson),
+# Kalidasa (Meghaduta, Wilson 1843). Moon- and Venus-weighted pass.
+
+- text: |
+    He who looks in through an open window never sees so many things as he who looks at a shut window. There is nothing more profound, more mysterious, more fertile, more gloomy, or more dazzling, than a window lighted by a candle. What we can see in the sunlight is always less interesting than what goes on behind the panes of a window. In that dark or luminous hollow, life lives, life dreams, life suffers.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'Windows'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [opening, reverie]
+
+- text: |
+    A chamber that is like a reverie; a chamber truly spiritual, where the stagnant atmosphere is lightly touched with rose and blue. There the soul bathes itself in indolence made odorous with regret and desire.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
+  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie, venus_secondary]
+
+- text: |
+    Alone at last! Nothing is to be heard but the rattle of a few tardy and tired-out cabs. There will be silence now, if not repose, for several hours at least. At last it is permitted me to refresh myself in a bath of shadows.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'At One o'Clock in the Morning'"
+  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The day is over. A great restfulness descends into poor minds that the day's work has wearied; and thoughts take on the tender and dim colours of twilight.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'Evening Twilight'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [opening, reverie]
+
+- text: |
+    O night! O refreshing dark! for me you are the summons to an inner feast, you are the deliverer from anguish!
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'Evening Twilight'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [reverie, gift]
+
+- text: |
+    "I love the clouds — the clouds that pass — yonder — the marvellous clouds."
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'The Stranger' (closing line)"
+  translation: "Joseph T. Shipley, in The Poems and Prose Poems of Charles Baudelaire (James Huneker, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/36287/pg36287.txt"
+  moods: [ending, reverie]
+
+- text: |
+    Autumns and winters, springs of mire and rain,
+    Seasons of sleep, I sing your praises loud,
+    For thus I love to wrap my heart and brain
+    In some dim tomb beneath a vapoury shroud.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Mist and Rain' (Brumes et Pluies)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie, saturn_secondary]
+
+- text: |
+    The Moon more indolently dreams to-night
+    Than a fair woman on her couch at rest,
+    Caressing, with a hand distraught and light,
+    Before she sleeps, the contour of her breast.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'The Sadness of the Moon' (Tristesses de la Lune)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie, venus_secondary]
+
+- text: |
+    Thou, O my Grief, be wise and tranquil still,
+    The eve is thine which even now drops down,
+    To carry peace or care to human will,
+    And in a misty veil enfolds the town.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Contemplation' (Recueillement)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie, saturn_secondary]
+
+- text: |
+    Under the overhanging yews,
+    The dark owls sit in solemn state,
+    Like stranger gods; by twos and twos
+    Their red eyes gleam. They meditate.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'The Owls' (Les Hiboux)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The soul selects her own society,
+    Then shuts the door;
+    On her divine majority
+    Obtrude no more.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book II. Love, XIII — 'Exclusion'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, reverie]
+
+- text: |
+    There's a certain slant of light,
+    On winter afternoons,
+    That oppresses, like the weight
+    Of cathedral tunes.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book III. Nature, XXXI"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, reverie, saturn_secondary]
+
+- text: |
+    One need not be a chamber to be haunted,
+    One need not be a house;
+    The brain has corridors surpassing
+    Material place.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book I. Life, XXIX — 'Ghosts'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The soul unto itself
+    Is an imperial friend, —
+    Or the most agonizing spy
+    An enemy could send.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book I. Life, XV"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, reverie]
+
+- text: |
+    Sleep is supposed to be,
+    By souls of sanity,
+    The shutting of the eye.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXXVIII"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [reverie, ending]
+
+- text: |
+    The way I read a letter 's this:
+    'T is first I lock the door,
+    And push it with my fingers next,
+    For transport it be sure.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book II. Love, VI"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [reverie, opening, venus_secondary]
+
+- text: |
+    The moon was but a chin of gold
+    A night or two ago,
+    And now she turns her perfect face
+    Upon the world below.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book III. Nature, XXI — 'The Moon'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, reverie]
+
+- text: |
+    The last night that she lived,
+    It was a common night,
+    Except the dying; this to us
+    Made nature different.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XX"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [reverie, ending, saturn_secondary]
+
+- text: |
+    When with Ashárha's glooms the air was hung,
+    And one dark Cloud around the mountain clung;
+    In form, some elephant, whose sportive rage,
+    Ramparts, scarce equal to his might, engage.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 11–13"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [opening, reverie]
+
+- text: |
+    Ere yet thy coming yields opposing gloom,
+    The moon's white rays the smiling night illume,
+    And on the moon-gem concentrated fall,
+    That hangs in woven nets in every hall.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 487–490"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [reverie, opening, venus_secondary]
+
+- text: |
+    And sad, and silent, shalt thou find my wife,
+    Half of my soul, and partner of my life,
+    Nipped by chill sorrow, as the flowers enfold
+    Their shrinking petals from the withering cold.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 555–558"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [reverie, ending, venus_secondary]
+
+- text: |
+    Sad on her hand her pallid cheek declines,
+    And half unseen through veiling tresses shines;
+    As when a darkling night the moon enshrouds,
+    A few faint rays break straggling through the Clouds.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 561–564"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [reverie, venus_secondary]
+
+- text: |
+    Now seeking sleep, a husband to restore;
+    And waking now, his absence to deplore;
+    Deprived of slumber by returning woes,
+    Or mocked by idle phantoms of repose.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 597–600"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [reverie, ending, venus_secondary]
+
+- text: |
+    Her heavy eyelids languidly unclose
+    To where the moon its silvery radiance throws
+    Mild through the chamber: once a welcome light;
+    Avoided now, and hateful to her sight.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 615–618"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [reverie, cost, venus_secondary]

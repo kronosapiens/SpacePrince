@@ -301,3 +301,26 @@
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
   source_url: "https://www.sefaria.org/Pirkei_Avot.5.22"
   moods: [opening, paradox, jupiter_secondary]
+
+# Batch 3 (Dickinson): riddle-poems from the pre-1930 Todd/Higginson editions.
+
+- text: |
+    I'm nobody! Who are you?
+    Are you nobody, too?
+    Then there 's a pair of us — don't tell!
+    They 'd banish us, you know.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book I. Life, I"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, paradox]
+
+- text: |
+    Much madness is divinest sense
+    To a discerning eye;
+    Much sense the starkest madness.
+    'T is the majority
+    In this, as all, prevails.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book I. Life, XI"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, paradox, saturn_secondary]

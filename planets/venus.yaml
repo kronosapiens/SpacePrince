@@ -208,3 +208,140 @@
   translation: "T. G. Tucker, 1913"
   source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
   moods: [relation, reverie]
+
+# Batch 3: Baudelaire (Flowers of Evil, Paris Spleen), Kalidasa (Meghaduta, Wilson 1843).
+# Aesthetic attention and erotic reverie — Venus-weighted pass.
+
+- text: |
+    In Nature's temple living pillars rise,
+    And words are murmured none have understood,
+    And man must wander through a tangled wood
+    Of symbols watching him with friendly eyes.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Correspondences' (Correspondances)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, beauty]
+
+- text: |
+    As long-drawn echoes heard far-off and dim
+    Mingle to one deep sound and fade away;
+    Vast as the night and brilliant as the day,
+    Colour and sound and perfume speak to him.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Correspondences' (Correspondances)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [beauty, reverie, moon_secondary]
+
+- text: |
+    When, with closed eyes in the warm autumn night,
+    I breathe the fragrance of thy bosom bare,
+    My dream unfurls a clime of loveliest air,
+    Drenched in the fiery sun's unclouded light.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Exotic Fragrance' (Parfum Exotique)"
+  translation: "W. J. Robertson, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, beauty, reverie]
+
+- text: |
+    Thine eye with dawn is filled, with twilight dwindles,
+    Like winds of night thou sprinklest perfumes mild;
+    Thy kiss, that is a spell, the child's heart kindles,
+    Thy mouth, a chalice, makes the man a child.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Hymn to Beauty' (Hymne à la Beauté)"
+  translation: "W. J. Robertson, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [beauty, reverie]
+
+- text: |
+    Mother of memories, mistress of mistresses,
+    O thou, my pleasure, thou, all my desire,
+    Thou shalt recall the beauty of caresses,
+    The charm of evenings by the gentle fire.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'The Balcony' (Le Balcon)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, relation, reverie, moon_secondary]
+
+- text: |
+    A real country of Cockaigne, where everything is beautiful, rich, quiet, honest; where order is the likeness and the mirror of luxury; where life is fat, and sweet to breathe.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'L'Invitation au Voyage'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [reverie, beauty, moon_secondary]
+
+- text: |
+    There is a country made in your image, where all is beautiful, rich, quiet and honest; where fancy has built and decorated a western China, where life is sweet to breathe, where happiness is wedded to silence.
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'L'Invitation au Voyage'"
+  translation: "Arthur Symons, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
+  moods: [reverie, beauty, relation]
+
+- text: |
+    They pass before me, these Eyes full of light,
+    Eyes made magnetic by some angel wise;
+    The holy brothers pass before my sight,
+    And cast their diamond fires in my dim eyes.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'The Living Flame' (Le Flambeau Vivant)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [beauty, relation, reverie]
+
+- text: |
+    There lovely triflers wanton through the day,
+    Dress all their care, and all their labour play;
+    One while, the fluttering Lotus fans the fair,
+    Or Kunda top-knots crown the jetty hair.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 449–452 (Alaka, the city of Kuvera)"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [beauty, reverie, moon_secondary]
+
+- text: |
+    Whose slender limbs inadequately bear
+    A full-orbed bosom, and a weight of care;
+    Whose teeth like pearls, whose lips like Bimbas show,
+    And fawn-like eyes still tremble as they glow.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 549–552 (the Yaksha's wife)"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [beauty, reverie, moon_secondary]
+
+- text: |
+    Here, when the evening twilight shades the skies,
+    The blue-necked Peacock to the summit flies,
+    And moves in graceful circles to the tone
+    My fair awakens from her tinkling zone.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 527–530"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [opening, beauty, reverie, moon_secondary]
+
+- text: |
+    The rainbow flickering gleams along the walls,
+    And glittering rain in sparkling diamonds falls.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 447–448 (Alaka)"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [beauty, reverie]
+
+- text: |
+    Wild nights! Wild nights!
+    Were I with thee,
+    Wild nights should be
+    Our luxury!
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book II. Love, VII"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, relation, reverie, moon_secondary]
