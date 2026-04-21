@@ -232,10 +232,12 @@ Comfortable with silence.
 
 ### Chorus
 
-- **Miyamoto Musashi** (swordsman, 1584–1645) — *Book of Five Rings*, the strategist's directness.
+- **Thucydides** (historian, ~460–400 BCE) — *History of the Peloponnesian War*, the speeches of men under pressure.
 - **Sun Tzu** (strategist, ~500 BCE) — *Art of War*, the economy of force.
+- **Homer** (poet, ~8th c. BCE) — the *Iliad*, warrior culture and the agon.
 - **Niccolò Machiavelli** (statesman, 1469–1527) — *The Prince*, the politics of commitment.
 - **Heraclitus** (fragments, ~500 BCE) — "war is the father of all"; the agonistic mode.
+- **Thomas Carlyle** (essayist, 1795–1881) — *On Heroes and Hero-Worship*, the heroic will.
 - **Marcus Aurelius** (emperor-philosopher, 121–180) — the soldier-emperor's discipline, distinct from his solar register.
 
 ### Sample fragments
@@ -257,8 +259,9 @@ Percussive, sharp, brief — a strike, not a tone.
 
 ### Note on chorus depth
 
-Mars has the thinnest public-domain philosophical corpus of the seven planets — most good martial writing lives in epic and strategy rather than philosophy proper.
-The chorus above is acceptable but may need broadening during sourcing (Thucydides's speeches, the *Iliad*, Carlyle's heroic essays, Hagakure).
+Mars has a narrower philosophical corpus than the other planets — most good martial writing lives in epic and strategy rather than philosophy proper.
+The chorus above is deliberately broader than the others' to compensate, and includes historical and epic sources alongside philosophical ones.
+Miyamoto Musashi was considered and dropped; see §11.
 
 ---
 
@@ -327,7 +330,7 @@ Speaks as if having waited a long time to speak.
 - **Ecclesiastes** — "vanity of vanities"; the cycle of what has been and will be again.
 - **Epictetus** (philosopher, 55–135) — *Enchiridion*, the dichotomy of control.
 - **Seneca** (philosopher, 4 BCE–65) — *Letters from a Stoic*, the moral measured life.
-- **Søren Kierkegaard** (philosopher, 1813–1855) — the knight of faith, the inwardness of despair.
+- **Michel de Montaigne** (essayist, 1533–1592) — *Essays*, the patient examination of mortality, solitude, and age.
 - **Arthur Schopenhauer** (philosopher, 1788–1860) — *Essays on Pessimism*, the will's suffering.
 - **Blaise Pascal** (philosopher, 1623–1662) — *Pensées*, the eternal silence of infinite spaces.
 - **Boethius** (philosopher, 477–524) — *Consolation of Philosophy*, written in prison.
@@ -373,41 +376,95 @@ All fragments must be in the public domain.
 PD status depends on jurisdiction and on whether attribution is to an original or a translation.
 Default rule of thumb: target works where **both** the author died before 1930 **and** (for translated works) the translator died before 1930 or the translation was published before 1930 in the US.
 
-### Public-domain translations to prefer
+### Storage
+
+Sourced fragments live in `planets/<planet>.yaml`, one file per planet:
+
+```
+planets/
+├── sun.yaml
+├── moon.yaml
+├── mercury.yaml
+├── venus.yaml
+├── mars.yaml
+├── jupiter.yaml
+└── saturn.yaml
+```
+
+Schema per entry:
+
+```yaml
+- text: |
+    Quote text. Multi-line is supported.
+  author: "Author Name"
+  source: "Work, section reference"
+  translation: "Translator, year"     # optional; only for non-English originals
+  source_url: "https://..."           # optional; PD verification link
+  moods: [opening, cost]              # optional; free-form tags
+```
+
+Required fields: `text`, `author`, `source`.
+Optional: `translation`, `source_url`, `moods`.
+A fragment that fits more than one planet (see §10) lives in the file of whichever planet is its primary assignment and carries a `moods` tag identifying its secondary register; the runtime will handle cross-planet selection.
+
+### Public-domain editions to prefer
 
 Most of the non-English chorus requires a translation layer.
-Acceptable PD translations exist for each:
+The editions below are reasonable-confidence recommendations; subagents must verify the PD chain (author death date, translator death date or pre-1930 US publication) for each quote against the specific edition they source from.
 
-- **Marcus Aurelius** — George Long (1862), C. R. Haines (1916).
-- **Bhagavad Gita** — Edwin Arnold's *The Song Celestial* (1885), K. T. Telang (1882, SBE series).
-- **Zhuangzi** — James Legge (1891, SBE series).
-- **Heraclitus** — John Burnet's *Early Greek Philosophy* (1892).
-- **Hermetica** — G. R. S. Mead (1906).
-- **Upanishads** — Max Müller (1879–1884, SBE series).
-- **Plotinus** — Stephen MacKenna (1917–1930, early editions PD in US).
-- **Epictetus / Seneca / Boethius** — old Loeb editions, old W. A. Oldfather (Epictetus, 1925), Richard Mott Gummere (Seneca Letters, 1917–1925), "I.T." (Boethius, 1609).
-- **Schopenhauer** — T. Bailey Saunders (pre-1910).
+- **Marcus Aurelius** — George Long (1862); C. R. Haines Loeb (1916).
+- **Bhagavad Gita** — Edwin Arnold, *The Song Celestial* (1885); K. T. Telang (1882, SBE series).
+- **Homer's *Iliad*** — Samuel Butler (1898); Lang, Leaf & Myers (1883); Alexander Pope (1715–1720) for archaic register.
+- **Thucydides** — Benjamin Jowett (1881).
+- **Zhuangzi** — James Legge (1891, SBE series); Herbert Giles (1889).
+- **Heraclitus** — John Burnet, *Early Greek Philosophy* (1892).
+- **Hermetica** — G. R. S. Mead, *Thrice-Greatest Hermes* (1906).
+- **Upanishads** — Max Müller (1879–1884, SBE series); Paul Deussen (1906).
+- **Plotinus** — Stephen MacKenna, *Enneads* vols 1–4 (1917–1926). Vol 5 (1930) is on the boundary and needs verification.
+- **Epictetus** — W. A. Oldfather Loeb *Discourses* (1925); Elizabeth Carter *Enchiridion* (1758).
+- **Seneca** — R. M. Gummere Loeb *Letters* vols 1–3 (1917–1925); Aubrey Stewart (1880s–90s).
+- **Boethius** — H. R. James (1897), preferred over "I.T." (1609) for readability.
+- **Schopenhauer** — T. Bailey Saunders *Essays* (1890s); Haldane & Kemp *World as Will and Representation* (1883–1886).
 - **Pascal** — W. F. Trotter (1910).
+- **Montaigne** — Charles Cotton (1685–1686); John Florio (1603).
+- **Machiavelli** — W. K. Marriott, *The Prince* (1908).
+- **Sun Tzu** — Lionel Giles, *Art of War* (1910).
+- **Nietzsche** — Oscar Levy, ed., *Complete Works* series (1909–1913); translators include Helen Zimmern, Anthony Ludovici, Thomas Common.
 - **Sappho** — Henry Thornton Wharton (1885).
-- **Song of Songs** — King James Version (1611).
-- **Sei Shōnagon** — to be checked; Arthur Waley's translation (1928) needs US-publication-date verification.
-- **Bashō** — early translations by Miyamori, Aston, or Noguchi (pre-1930).
-- **Novalis** — George MacDonald (1897).
-- **Amiel** — Mrs. Humphry Ward (1885, *Journal Intime*).
-- **Proust** — Scott Moncrieff (early volumes, 1922–1930); later volumes need verification.
-- **Musashi / Sun Tzu / Machiavelli** — Lionel Giles (Sun Tzu, 1910); Victor Harris (Musashi, 1974) **not** PD — need older translation or original text work; W. K. Marriott (Machiavelli, 1908).
+- **Song of Songs / Ecclesiastes** — King James Version (1611); Jewish Publication Society (1917).
+- **Sei Shōnagon** — Arthur Waley (1928, pre-1930 US publication).
+- **Bashō** — Basil Hall Chamberlain (1880); Clara A. Walsh (1910). *PD Bashō is sparse — the major translations (Blyth, Yuasa) are post-1930 and under copyright. Expect a smaller sourced pool from Bashō than from other chorus members.*
+- **Novalis** — George MacDonald, *Rampolli* (1897).
+- **Amiel** — Mrs. Humphry Ward, *Journal Intime* (1885).
+- **Proust** — Scott Moncrieff, vols 1–6 (1922–1929). Volume 7 (Stephen Hudson, 1931) is outside the safe window and should be excluded.
+- **Tagore** — self-translated English works: *Gitanjali* (1912), *Sadhana* (1913), and other pre-1930 publications.
 
-This list is scaffolding for the sourcing task, not a final bibliography.
-Verification is part of the sourcing work.
+English-original authors (Emerson, Whitman, Keats, Blake, Pater, Wilde, Thoreau, James, Browne, Carlyle) do not require a translation layer — source directly from PD editions of the originals.
+
+### Excluded from the chorus
+
+Two authors were considered and dropped during scoping:
+
+- **Miyamoto Musashi** — no PD English translation of *Book of Five Rings* exists. Victor Harris (1974) and Thomas Cleary (1993) are both under active copyright. Mars chorus is compensated with Thucydides, Homer, and Carlyle.
+- **Søren Kierkegaard** — PD English translations are thin. Hong & Hong (Princeton, 1978+) and Walter Lowrie (1930s–40s) are under copyright; earlier translations (Hollander 1923, Dru 1938) are incomplete. Saturn chorus is compensated with Montaigne.
+
+### Anti-hallucination guardrails
+
+The single biggest sourcing risk is fabricated quotes — LLMs will confidently produce attributed material that does not exist in the cited source.
+Subagents must:
+
+- Return a specific textual locator for each quote: book/chapter/section/page/fragment number as appropriate to the work.
+- Return a `source_url` pointing at a PD host (Project Gutenberg, Wikisource, archive.org, Perseus) where the quote appears in situ.
+- Never source from quote-aggregator sites (BrainyQuote, Goodreads) — only from the primary text.
+- Flag any quote that is widely attributed but not locatable in a primary source (common for Emerson, Aurelius, Nietzsche).
+
+A spot-check of ~20% of each batch against the linked primary source should be part of the acceptance workflow before merging.
 
 ### Tagging
 
-Each sourced fragment should carry:
-- `planet` — one of Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn. (A fragment may belong to more than one planet; see §10.)
-- `author` — original author.
-- `source` — work, section/page.
-- `translation` — translator and date, where applicable.
-- `mood` — draft tags like *opening, warning, cost, gift, ending, question*. These tags will emerge from real sourced content; don't fix the vocabulary before the fragments exist.
+Each sourced fragment carries the fields defined in Storage above.
+The `moods` tag vocabulary should emerge from the real sourced content — do not fix it before the fragments exist.
+Initial candidates: *opening, warning, cost, gift, ending, question, cut, reverie, paradox.*
 
 ### Scale
 
@@ -415,8 +472,13 @@ Initial target: ~10 fragments per planet, ~70 total.
 This comfortably covers 60 narrative encounter openings (12 houses × 5 encounters) without within-run repetition.
 Sourcing can grow the library over time.
 
+Within each planet's ten, aim for coverage across the chorus rather than a single-author shotgun: no more than 3–4 fragments from any one author.
+
 ### Workflow
 
-Sourcing is best done planet-by-planet with dedicated subagents.
-Each subagent takes one planet, works through its chorus, and returns a tagged fragment list.
+Pilot one planet first — recommended: **Saturn**, which has the deepest PD corpus and the lowest hallucination risk (its authors are widely anthologized on Gutenberg).
+Use the pilot to iterate on the brief, the schema, and the verification cadence before running the remaining six in parallel.
+
+Sourcing is then done planet-by-planet with dedicated subagents.
+Each subagent takes one planet, works through its chorus, and returns a `planets/<planet>.yaml` file conforming to the schema above.
 This document is the brief.
