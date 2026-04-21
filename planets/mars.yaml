@@ -144,3 +144,83 @@
   translation: "King James Version, 1611"
   source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   moods: [opening, command]
+
+- text: |
+    We will rescue each other in difficulty, we will aid each other in danger. We swear to serve the state and save the people. We ask not the same day of birth but we seek to die together.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 1 (the Oath of the Peach Garden)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_1"
+  moods: [opening, command]
+
+- text: |
+    I would rather betray the world than let the world betray me.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 4 (Cao Cao)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_4"
+  moods: [cut, warning]
+
+- text: |
+    The only heroes in the world are you and I.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 21 (Cao Cao to Liu Bei, over green plums and warmed wine)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_21"
+  moods: [cut, command]
+
+- text: |
+    Now we have but one course; we must fight to the death.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 50 (Cao Cao at Huarong Pass)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_50"
+  moods: [cut, command]
+
+- text: |
+    The number of your days is fixed. Any one who howls shall be put to death.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 50 (Cao Cao on the flight from Red Cliffs)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_50"
+  moods: [cut, warning, saturn_secondary]
+
+- text: |
+    Success depends upon the leader rather than on the number of men.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 85 (Zhu Huan to his garrison at Ruxu)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_85"
+  moods: [opening, command]
+
+- text: |
+    Wherever terror is to be faced, thou, forsooth, art in fear of death. Thy prowess lacks strength. I will go before thee. If I fall, I will establish my name.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Pennsylvania Tablet IV (Gilgamesh to Enkidu, on the road to Humbaba)"
+  translation: "Morris Jastrow & Albert T. Clay, 1920"
+  source_url: "https://www.gutenberg.org/files/11000/11000-0.txt"
+  moods: [command, opening]
+
+- text: |
+    I am determined to enter the cedar forest. I will, indeed, establish my name.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Pennsylvania Tablet IV (Gilgamesh)"
+  translation: "Morris Jastrow & Albert T. Clay, 1920"
+  source_url: "https://www.gutenberg.org/files/11000/11000-0.txt"
+  moods: [cut, command]
+
+- text: |
+    Be strong as a leopard, and swift as an eagle, and fleet as a gazelle, and brave as a lion, to do the will of your Father who is in heaven.
+  author: "Judah ben Tema"
+  source: "Pirkei Avot 5:20"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.5.20"
+  moods: [opening, command, jupiter_secondary]
+
+- text: |
+    In a place where there are no men, strive to be a man.
+  author: "Hillel"
+  source: "Pirkei Avot 2:5"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.2.5"
+  moods: [command, opening]

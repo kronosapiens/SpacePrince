@@ -151,6 +151,7 @@ Uses the trick of saying the opposite of what the listener expects.
 - **Zhuangzi** (philosopher, ~4th c. BCE) — butterfly dreams, useless trees, the wandering mind.
 - **Heraclitus** (fragments, ~500 BCE) — the unity of opposites, the river that cannot be stepped in twice.
 - **William Blake** (poet, 1757–1827) — *Proverbs of Hell*, the inversion as revelation.
+- **Pirkei Avot (*Ethics of the Fathers*)** — Charles Taylor (1897), Joshua Kulp Mishnah Yomit (CC-BY). Hillel's three questions, Akiva's paradoxes, Ben Bag Bag's "turn it over, and again turn it over."
 - **The Hermetica** — "as above, so below."
 
 ### Sample fragments
@@ -332,6 +333,7 @@ Speaks as if having waited a long time to speak.
 
 - **Ecclesiastes** — "vanity of vanities"; the cycle of what has been and will be again.
 - **The Book of Job** — KJV (1611); lamentation, the endured weight, the sufferer's voice.
+- **Luo Guanzhong** — *Romance of the Three Kingdoms*, C. H. Brewitt-Taylor (1925). The Zhuge Liang death arc, the failed restoration, the closing dissolution; measured austere narrative register.
 - **Epictetus** (philosopher, 55–135) — *Enchiridion*, the dichotomy of control.
 - **Seneca** (philosopher, 4 BCE–65) — *Letters from a Stoic*, the moral measured life.
 - **Michel de Montaigne** (essayist, 1533–1592) — *Essays*, the patient examination of mortality, solitude, and age.

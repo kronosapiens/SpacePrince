@@ -275,3 +275,123 @@
   translation: "King James Version, 1611"
   source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   moods: [cost, ending]
+
+- text: |
+    Man proposes; God disposes. We cannot wrest events to our will.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 103 (Zhuge Liang, when rain quenches the fire at Shangfang Valley)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_103"
+  moods: [opening, cost]
+
+- text: |
+    My death is very near. My chief desire has been to spend myself to the utmost to restore the Hans and lead a glorious return of the Hans to their capital, but Heaven decrees it otherwise.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang to Jiang Wei, on his deathbed)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [ending, cost]
+
+- text: |
+    I shall never again lead the army against the rebels. O distant and azure Heaven, when will this end?
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang, after his final inspection of the camps)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [ending, question]
+
+- text: |
+    Life and death are the common lot, and fate cannot be evaded. Death is at hand, and I desire to prove my loyalty to the end.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang's testament)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [opening, ending]
+
+- text: |
+    Heaven grieved and earth mourned on the night of K'ung-ming's death. Even the moon was dimmed. And K'ung-ming returned to Heaven.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [ending, reverie, moon_secondary]
+
+- text: |
+    Alas, ye blue heavens! What manner of man is this Sun Hao to yield thus the heritage of his family, won by the sword of his forbears in the brave days that are past?
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 120 (Sun Xiu, wailing for the fall of Wu)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_120"
+  moods: [ending, cost]
+
+- text: |
+    All down the ages rings the note of change, for fate so rules it; none escapes its sway. The kingdoms three have vanished as a dream, the useless misery is ours to grieve.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 120 (closing poem)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_120"
+  moods: [ending, reverie]
+
+- text: |
+    Why, O Gish, dost thou run about? The life that thou seekest, thou wilt not find. When the gods created mankind, death they imposed on mankind; life they kept in their power.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Old Babylonian Tablet (Sabitum to Gilgamesh)"
+  translation: "Morris Jastrow & Albert T. Clay, 1920"
+  source_url: "https://www.gutenberg.org/files/11000/11000-0.txt"
+  moods: [warning, cost]
+
+- text: |
+    He whom I loved hath become like the dust. I, shall I not, also, lay me down like him, throughout all eternity never returning?
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet X (Gilgamesh to Siduri the Wine-maker)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [opening, ending, cost]
+
+- text: |
+    Sleeping and dead are alike, from death they mark no distinction. Servant and master, when once they have reached their full span allotted, then do the Anunnaki, the great gods, with Mammetum, Maker of Destiny, settle destiny. Death and life they determine; of death is the day not revealed.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet X (the Wine-maker's wisdom)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [reverie, cost]
+
+- text: |
+    All that was bright was turned into darkness.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet XI (Utnapishtim, on the coming of the Flood)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [opening, jupiter_secondary]
+
+- text: |
+    The day is short, and the task is great, and the workmen are sluggish, and the reward is much, and the Master of the house is urgent.
+  author: "Rabbi Tarphon"
+  source: "Pirkei Avot 2:20"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [opening, warning]
+
+- text: |
+    It is not for thee to finish the work, nor art thou free to desist therefrom.
+  author: "Rabbi Tarphon"
+  source: "Pirkei Avot 2:21"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [opening, command]
+
+- text: |
+    Be exceeding humble spirit, for the end of man is the worm.
+  author: "Rabbi Levitas of Yavneh"
+  source: "Pirkei Avot 4:4"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.4"
+  moods: [warning, ending]
+
+- text: |
+    The ones who were born are to die, and the ones who have died are to be brought to life, and the ones brought to life are to be judged.
+  author: "Rabbi Elazar Ha-kappar"
+  source: "Pirkei Avot 4:22"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.22"
+  moods: [opening, ending, reverie]

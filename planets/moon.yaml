@@ -151,3 +151,27 @@
   translation: "King James Version, 1611"
   source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   moods: [reverie, opening]
+
+- text: |
+    Didst thou not call me, O friend? O, why am I wakened from slumber? Didst thou not touch me — for, why am I fearful, or hath not some spirit passed me? Or, why is my flesh all a-quiver?
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet V (Gilgamesh waking on the road to the Cedar Forest)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [reverie, opening]
+
+- text: |
+    He led me to the Dwelling of Darkness, the home of Irkalla, unto the Dwelling from which he who entereth cometh forth never; by the road on the passage whereof there can be no returning, unto the Dwelling whose tenants are ever bereft of the daylight, where for their food is the dust, and the mud is their sustenance.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet VII (Enkidu's dream of the Underworld)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [reverie, ending, saturn_secondary]
+
+- text: |
+    While he sat on his haunches a sleep like a breeze breathed upon him.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet XI (Gilgamesh, after the Flood story)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [reverie, ending]

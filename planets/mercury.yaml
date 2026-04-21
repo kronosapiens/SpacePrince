@@ -245,3 +245,59 @@
   translation: "Benjamin Jowett, 1871"
   source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
   moods: [opening, turn, paradox]
+
+- text: |
+    K'ung-ming is a master of mysteries, and it may be that this is but a ruse to get us to take the field. We may fall victims to his guile.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Sima Yi, halting the pursuit after Zhuge Liang's death)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [warning, turn]
+
+- text: |
+    If I am not for myself, who is for me? And being for my own self, what am I? And if not now, when?
+  author: "Hillel"
+  source: "Pirkei Avot 1:14"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [question, paradox, opening]
+
+- text: |
+    Everything is foreseen yet freedom of choice is granted, and the world is judged with goodness; and everything is in accordance with the preponderance of works.
+  author: "Rabbi Akiva"
+  source: "Pirkei Avot 3:15"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.3.15"
+  moods: [paradox, opening, saturn_secondary]
+
+- text: |
+    Everything is given against a pledge, and a net is spread out over all the living; the store is open and the storekeeper allows credit, but the ledger is open and the hand writes, and whoever wishes to borrow may come and borrow.
+  author: "Rabbi Akiva"
+  source: "Pirkei Avot 3:16"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.3.16"
+  moods: [paradox, warning, saturn_secondary]
+
+- text: |
+    Who is wise? He who learns from every man. Who is mighty? He who subdues his inclination. Who is rich? He who rejoices in his portion. Who is honored? He who honors others.
+  author: "Ben Zoma"
+  source: "Pirkei Avot 4:1"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.1"
+  moods: [opening, paradox]
+
+- text: |
+    Do not despise any man, and do not discriminate against anything, for there is no man that has not his hour, and there is no thing that has not its place.
+  author: "Ben Azzai"
+  source: "Pirkei Avot 4:3"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.3"
+  moods: [opening, turn]
+
+- text: |
+    Turn it over, and again turn it over, for all is therein. And look into it; and become gray and old therein; and do not move away from it, for you have no better portion than it.
+  author: "Ben Bag Bag"
+  source: "Pirkei Avot 5:22"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.5.22"
+  moods: [opening, paradox, jupiter_secondary]

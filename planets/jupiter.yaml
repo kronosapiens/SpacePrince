@@ -200,3 +200,75 @@
   translation: "King James Version, 1611"
   source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
   moods: [ending, affirmation]
+
+- text: |
+    Empires wax and wane; states cleave asunder and coalesce.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 1 (opening line)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_1"
+  moods: [opening, saturn_secondary]
+
+- text: |
+    A dragon can assume any size, can rise in glory or hide from sight. Bulky, it generates clouds and evolves mist; attenuated, it can scarcely hide a mustard stalk or conceal a shadow. Mounting, it can soar to the empyrean; subsiding, it lurks in the uttermost depths of the ocean.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 21 (Cao Cao on the nature of dragons)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_21"
+  moods: [opening, reverie]
+
+- text: |
+    Heroes are men who cherish lofty designs in their bosoms and have plans to achieve them; they have all-embracing schemes and the whole world is at their mercy.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 21 (Cao Cao, Discusses Heroes)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_21"
+  moods: [opening, affirmation]
+
+- text: |
+    Living you were valorous, dead you left behind a name.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 91 (Zhuge Liang, sacrificial prayer at the Lu waters)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_91"
+  moods: [affirmation, saturn_secondary]
+
+- text: |
+    Fill thy belly: each day and night be thou merry, and daily keep holiday revel; each day and night do thou dance and rejoice; and fresh be thy raiment, let thy head be clean washen, and bathe thyself in the water; cherish the little one holding thy hand; be thy spouse in thy bosom happy — for this is the dower of man.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet X (Siduri the Wine-maker to Gilgamesh)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [affirmation, opening, saturn_secondary]
+
+- text: |
+    Six days, a sennight the hurricane, deluge, and tempest continued sweeping the land: when the seventh day came, were quelled the warfare, tempest and deluge which like to an army embattled were fighting. Lulled was the sea, all spent was the gale, assuaged was the deluge.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet XI (Utnapishtim's Flood narrative)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [reverie, ending]
+
+- text: |
+    Beloved is man that he was created in the image; greater love was it that it was made known to him that he was created in the image of God.
+  author: "Rabbi Akiva"
+  source: "Pirkei Avot 3:14"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [affirmation, opening]
+
+- text: |
+    With ten utterances the world was created.
+  author: "Mishnah"
+  source: "Pirkei Avot 5:1"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.5.1"
+  moods: [opening, reverie]
+
+- text: |
+    This world is like a vestibule before the world to come; prepare yourself in the vestibule, so that you may enter the banqueting-hall.
+  author: "Rabbi Jacob"
+  source: "Pirkei Avot 4:16"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.16"
+  moods: [reverie, ending, saturn_secondary]
