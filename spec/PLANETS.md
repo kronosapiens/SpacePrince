@@ -378,9 +378,21 @@ A fragment that could serve both is tagged for both; the encounter system picks 
 
 ### Scope
 
-All fragments must be in the public domain.
+Space Prince is a **commercial project** — it monetizes via per-prince mints and per-run fees. License choices must preserve commercial distribution and must not commit the content library to share-alike terms.
+
+**Acceptable license tiers:**
+- **Public domain** — pre-1930 translations; unrestricted use.
+- **CC0** — creator has waived all rights; equivalent to PD in practice.
+- **CC-BY** — commercial use permitted with attribution. Attribution is recorded in the YAML `author` / `source` / `translation` fields already; no additional workflow change needed.
+
+**Unacceptable license tiers:**
+- **CC-BY-NC** — non-commercial only. Excludes the William Davidson Talmud, JPS 1985 / 2006 / 2023, Koren Jerusalem Bible, and any other NC-licensed source regardless of voice fit. If a specific NC source becomes load-bearing, negotiate a separate commercial license with the rights holder rather than relying on the NC license.
+- **CC-BY-SA** — the share-alike clause requires derivative works to carry the same license, which could propagate to the game's content library or further. Avoid entirely for now; we are not committing to share-alike distribution.
+- **Proprietary / all-rights-reserved / "copyright: [publisher]"** — not usable without a separate license grant.
+- **"Unknown" license** — treat as restricted. Do not source.
+
 PD status depends on jurisdiction and on whether attribution is to an original or a translation.
-Default rule of thumb: target works where **both** the author died before 1930 **and** (for translated works) the translator died before 1930 or the translation was published before 1930 in the US.
+Default rule of thumb for PD: target works where **both** the author died before 1930 **and** (for translated works) the translator died before 1930 or the translation was published before 1930 in the US.
 
 ### Storage
 
@@ -540,7 +552,9 @@ The layered rabbinic tradition — Tanakh, Mishnah, Talmud, Midrash, Kabbalah, m
 - **Yehuda Halevi — *Kuzari*** — Hartwig Hirschfeld (1905). Medieval philosophical dialogue. Saturn + Jupiter.
 - **Bahya ibn Paquda — *Duties of the Heart*** — Edwin Collins partial (1904). Ethical-mystical. Saturn.
 
-**Hasidic gap.** Much of the tradition's most atmospheric material — Buber's *Tales of the Hasidim* (1947), Nachman of Bratslav's stories, the sayings of the Baal Shem Tov and the Kotzker rebbe — lives in 20th-century English translations under active copyright. Scattered pre-1930 partials exist (Paul Levertoff especially) but the Hasidic corpus is largely inaccessible for PD sourcing.
+**Hasidic gap.** Much of the tradition's most atmospheric material — Buber's *Tales of the Hasidim* (1947), Nachman of Bratslav's stories, the sayings of the Baal Shem Tov and the Kotzker rebbe — lives in 20th-century English translations under active copyright. Scattered pre-1930 partials exist (Paul Levertoff especially) but the canonical Hasidic corpus is largely inaccessible for us.
+
+**Sefaria as a per-text license clearinghouse.** [sefaria.org](https://www.sefaria.org) hosts a large library of Jewish texts with per-translation license metadata exposed via their public API (e.g. `https://www.sefaria.org/api/texts/Pirkei_Avot.1.14`). License strings fall into PD, CC0, CC-BY, CC-BY-SA, CC-BY-NC, proprietary, and "unknown." Per §11 Scope we accept PD, CC0, and CC-BY only. Sefaria Community Translations (CC0) exist for many texts without pre-1930 English translations and are the main route to expanding beyond the PD list above. Named CC-BY translations worth knowing: **Joshua Kulp's Mishnah Yomit** (Mishnah), **Rabbi Shraga Silverstein's Rashi Chumash** (Rashi on Torah), **Metsudah Chumash** (Torah). Explicitly **unavailable** under our license discipline: William Davidson Talmud (CC-BY-NC), JPS 1985 / 2006 / 2023 (CC-BY-NC), Koren Jerusalem Bible (CC-BY-NC), Everett Fox (proprietary), Chabad Kehot (proprietary). A sourcing agent working Jewish texts should query the Sefaria API per passage and filter to the acceptable tier before quoting.
 
 ### Persian, Arabic, and Islamic philosophy
 
@@ -673,17 +687,30 @@ Genuinely underrepresented regions where good PD material is scarce:
 
 Calling this out explicitly so we don't pretend the content library is representing the full range of human wisdom traditions — it's representing what's accessible, which skews heavily toward what was colonized, translated, and printed in English before 1930.
 
-### Non-PD and explicitly excluded
+### Excluded under our license discipline
 
-- **Hermann Hesse** — *Siddhartha* German original (1922) PD in US; canonical Rosner 1951 English translation **not** PD.
+Per §11 Scope, Space Prince accepts **PD, CC0, and CC-BY** only. The following are excluded because they fail that test — whether through outright copyright, CC-BY-NC licensing, or share-alike terms we are not committing to. Not exhaustive.
+
+**Still under active copyright (all rights reserved):**
+- **Hermann Hesse** — *Siddhartha* German original (1922) PD in US; canonical Rosner 1951 English translation not PD.
 - **Rilke** — most English translations post-1930.
 - **Umberto Eco** (d. 2016), **Jorge Luis Borges** (d. 1986) — voice fits (Mercury especially), but full works still under active copyright.
 - **Journey to the West** (*Xi You Ji*) — only the Timothy Richard 1913 paraphrase is PD, and it recasts Buddhist concepts in Christian terms; misrepresents Wu Cheng'en. Waley (1942), Anthony Yu (1977–83), Jenner (1982–86) all under copyright.
-- ***Water Margin*** (*Shuihu Zhuan*) — Pearl Buck *All Men Are Brothers* (1933) and Sidney Shapiro (1980) both under copyright. No PD English.
+- ***Water Margin*** (*Shuihu Zhuan*) — Pearl Buck *All Men Are Brothers* (1933) and Sidney Shapiro (1980) both under copyright.
 - ***Golden Lotus*** (*Jin Ping Mei*) — Egerton 1939 under copyright.
 - **Full *Shiji*** (Sima Qian) — Burton Watson 1961+ under copyright.
 - **Han Shan / Cold Mountain poems** — Waley 1954, Snyder 1958, Red Pine all under copyright.
-- **Simone Weil** (d. 1943), **Camille Paglia** (active), **Jung**, **Buber**, **W. H. Auden**, **Alan Watts** — all modern authors still in copyright despite strong voice-fit.
+- **Simone Weil** (d. 1943), **Camille Paglia** (active), **Jung**, **Buber**, **W. H. Auden**, **Alan Watts** — modern authors still in copyright despite strong voice-fit.
+
+**CC-BY-NC (non-commercial only — excluded because Space Prince is commercial):**
+- **William Davidson Talmud** (Sefaria's commissioned Steinsaltz English translation).
+- **JPS Tanakh 1985, JPS Contemporary Torah 2006, JPS Gender-Sensitive Edition 2023.**
+- **Koren Jerusalem Bible.**
+
+**CC-BY-SA (excluded for now — share-alike could propagate to the game's content distribution):**
+- **Wikisource Talmud Bavli** translation (CC-BY-SA).
+- **Open Mishnah** (CC-BY-SA).
+- Other CC-BY-SA material on Sefaria and elsewhere. Reconsider case-by-case if a particular work becomes load-bearing and no CC-BY / PD alternative exists.
 
 Sources are added to this list as they surface during design conversations.
 After sourcing, a source that contributes meaningfully to a particular planet's voice may be promoted into that planet's core chorus in §§3–9.
