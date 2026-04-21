@@ -1,0 +1,83 @@
+# Saturn — measured, austere, patient.
+# Pilot batch of 10 verified fragments drawn from primary public-domain sources.
+# See spec/PLANETS.md §9 (Saturn) and §11 (Sourcing Notes).
+
+- text: |
+    Then shall the dust return to the earth as it was: and the spirit shall return unto God who gave it.
+  author: "Ecclesiastes"
+  source: "Ecclesiastes 12:7 (KJV)"
+  translation: "King James Version, 1611"
+  source_url: "https://en.wikisource.org/wiki/Bible_(King_James)/Ecclesiastes"
+  moods: [ending, cost]
+
+- text: |
+    Let Death and Exile, and all other Things which appear terrible, be daily before your Eyes; but chiefly Death: and you will never entertain any abject Thought, nor too eagerly covet any thing.
+  author: "Epictetus"
+  source: "Encheiridion §XXI"
+  translation: "Elizabeth Carter, 1758"
+  source_url: "https://en.wikisource.org/wiki/All_the_Works_of_Epictetus,_Which_Are_Now_Extant/The_Encheiridion"
+  moods: [warning, opening]
+
+- text: |
+    While we are postponing, life speeds by.
+  author: "Seneca"
+  source: "Epistulae Morales ad Lucilium, Letter 1.2"
+  translation: "Richard M. Gummere (Loeb), 1917"
+  source_url: "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_1"
+  moods: [cost, warning]
+
+- text: |
+    Infinitely swift is the flight of time, as those see more clearly who are looking backwards.
+  author: "Seneca"
+  source: "Epistulae Morales ad Lucilium, Letter 49.2"
+  translation: "Richard M. Gummere (Loeb), 1917"
+  source_url: "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_49"
+  moods: [ending, reverie]
+
+- text: |
+    It is not the last step that causeth weariness: it only declares it.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XIX ('That to philosophise is to learne how to die')"
+  translation: "John Florio, 1603"
+  source_url: "https://en.wikisource.org/wiki/Montaigne%27s_Essays/Book_I/Chapter_XIX"
+  moods: [ending, cost]
+
+- text: |
+    All daies march towards death, only the last comes to it.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XIX ('That to philosophise is to learne how to die')"
+  translation: "John Florio, 1603"
+  source_url: "https://en.wikisource.org/wiki/Montaigne%27s_Essays/Book_I/Chapter_XIX"
+  moods: [opening, ending]
+
+- text: |
+    Life is a task to be done.
+  author: "Arthur Schopenhauer"
+  source: "Studies in Pessimism, 'On the Sufferings of the World'"
+  translation: "T. Bailey Saunders, 1890"
+  source_url: "https://www.gutenberg.org/files/10732/10732-h/10732-h.htm"
+  moods: [opening, cost]
+
+- text: |
+    Unrest is the mark of existence.
+  author: "Arthur Schopenhauer"
+  source: "Studies in Pessimism, 'The Vanity of Existence'"
+  translation: "T. Bailey Saunders, 1890"
+  source_url: "https://www.gutenberg.org/files/10732/10732-h/10732-h.htm"
+  moods: [opening, warning]
+
+- text: |
+    The eternal silence of these infinite spaces frightens me.
+  author: "Blaise Pascal"
+  source: "Pensées §206 (Brunschvicg)"
+  translation: "W. F. Trotter, 1910"
+  source_url: "https://www.gutenberg.org/files/18269/18269-h/18269-h.htm#p_206"
+  moods: [reverie, ending]
+
+- text: |
+    For truly in adverse fortune the worst sting of misery is to have been happy.
+  author: "Boethius"
+  source: "The Consolation of Philosophy, Book II, Prose IV"
+  translation: "H. R. James, 1897"
+  source_url: "https://www.gutenberg.org/files/14328/14328-h/14328-h.htm"
+  moods: [cost, reverie]
