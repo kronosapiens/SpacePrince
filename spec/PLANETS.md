@@ -510,16 +510,60 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 - **Ovid** — *Metamorphoses*, Dryden / Pope collaborative (1717) or Garth (1717). Jupiter + Venus + Mars.
 - **Virgil** — *Aeneid*, Dryden (1697) → Mars; *Georgics*, Rhoades (1881) → Jupiter.
 
-### Hebrew Bible and wisdom literature
+### Hebrew Bible and Abrahamic scripture
 
 - **Hebrew Bible — poetic books beyond Job and Ecclesiastes (already core Saturn)** — KJV (1611). *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter; *Song of Songs* already core Venus.
 - **Quran** — Palmer (1880) or Rodwell (1861). Jupiter + Sun.
+
+### Persian and Arabic
+
+- **Hafiz** — *Divan*, Gertrude Bell (1897) and H. Wilberforce Clarke (1891). Venus (the ghazal of love) + Saturn (the ruin of time) + Mercury.
+- **Rumi** — *Mathnawi*, Reynold A. Nicholson vols 1–2 (1925–1926, pre-1930 PD; later vols excluded); E. H. Whinfield selections (1887). Jupiter (devotional expansiveness) + Venus (lover-and-beloved) + Mercury (paradox of the reed-flute). **Note:** Coleman Barks, Arberry, and most 20th-century Rumi translations are NOT PD.
+- **Omar Khayyam** — *Rubáiyát*, Edward FitzGerald (first ed. 1859, later editions also PD). Saturn (the vessel, the clay, the moving finger) + Mercury + Venus (wine and the rose).
+- **Sa'di** — *Gulistan*, James Ross (1823) or Edward Rehatsek (1888); *Bustan*. Saturn (measured reflection) + Mercury (aphorism).
+
+### South Asian (beyond core Gita and Upanishads)
+
+- **Kabir** — *One Hundred Poems of Kabir*, Tagore's self-translation with Evelyn Underhill (1915, PD). Jupiter (devotional) + Mercury (paradox of the seeker) + Saturn.
+- **Swami Vivekananda** — *Raja Yoga*, *Jnana Yoga*, *Karma Yoga*, lectures (all pre-1902 publications, PD). Jupiter + Sun.
+- **Patanjali — Yoga Sutras** — Vivekananda (1896) or James Haughton Woods (1914). Jupiter + Saturn.
+- **Rig Veda hymns** — Ralph T. H. Griffith translation (1889). Jupiter + Sun.
+
+### East Asian (beyond core Lao Tzu, Zhuangzi, Sun Tzu)
+
 - **Confucian Analects / Mencius** — Legge (pre-1900). Saturn + Jupiter + Sun.
+- **I Ching / Book of Changes** — Legge (1882, SBE). Jupiter + Mercury.
+- **Liezi** — Lionel Giles (1912). Mercury + Jupiter.
+- **Tang Dynasty poets** — Li Bai, Du Fu, Wang Wei, Bai Juyi, Tao Yuanming. Arthur Waley's *A Hundred and Seventy Chinese Poems* (1918) and *More Translations from the Chinese* (1919); Herbert Giles's *Chinese Poetry in English Verse* (1898). Moon + Saturn + Venus.
+
+### Japanese classical (beyond core Bashō and Sei Shōnagon)
+
+- **Murasaki Shikibu** — *The Tale of Genji*, Arthur Waley vols 1–3 (1925–1927, pre-1930 PD); vols 4–6 (1928–1933) partially PD; vols 5–6 (post-1930) excluded. Moon + Venus.
+- **Kamo no Chōmei** — *Hōjōki (An Account of My Hut)*, c. 1212; James Rice (1886) and other pre-1930 translations. Saturn (impermanence) + Moon (solitude).
+- **Yoshida Kenkō** — *Tsurezuregusa (Essays in Idleness)*, c. 1330; William N. Porter (1914). Saturn + Moon + Mercury.
+- **Tale of the Heike** — A. L. Sadler (1918–1921). Mars (battle) + Saturn (the fall of great houses).
+
+### Buddhist
+
 - **Dhammapada** — Max Müller (1881). Jupiter + Saturn.
+
+### African and Mediterranean (pre-Greek / Hellenistic)
+
+- **Instructions of Ptahhotep / Maxims of Ani** — Egyptian wisdom literature, ~2400 BCE onward; Breasted and other pre-1930 translations. Saturn (measure) + Jupiter.
+- **Egyptian Book of the Dead** — E. A. Wallis Budge (1895). Jupiter + Moon + Saturn.
+- **Kebra Nagast** — Ethiopian national epic; E. A. Wallis Budge (1922). Jupiter.
+- **Lucretius** — *De Rerum Natura*, H. A. J. Munro (1864) or Cyril Bailey (1910). Saturn (mortality, the nature of things) + Jupiter (cosmic scope) + Mercury (atomic paradoxes).
+- **Epicurus fragments** — Cyril Bailey, *Epicurus: The Extant Remains* (1926, pre-1930 PD). Saturn + Venus (pleasure rightly understood).
+
+### Mesoamerican and Indigenous Americas
+
+- **Popol Vuh** — Mayan creation text, Daniel G. Brinton (1885) and other PD translations. Jupiter (cosmogony) + Moon (emergence from the dark).
 
 ### Mystical, contemplative, and medieval
 
 - **Augustine** — *Confessions*, Pusey (1838). Saturn (time, memory) + Moon (interior life).
+- **Julian of Norwich** — *Revelations of Divine Love* (c. 1395); Grace Warrack (1901). Venus + Jupiter + Saturn.
+- **Thomas à Kempis** — *Imitation of Christ*; multiple PD translations. Saturn + Jupiter.
 - **Dante** — *Divine Comedy*, Longfellow (1867) or Cary (1814). Saturn (*Inferno*) + Mars (*Inferno* martial) + Jupiter (*Paradiso*).
 - **Meister Eckhart** — sermons, pre-1930 English translations (where they exist). Jupiter.
 - **Teresa of Avila** — *Interior Castle*, David Lewis (1852–1853). Venus + Moon.
@@ -568,6 +612,18 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 - **Nietzsche** (Levy series) — *The Gay Science* / *Joyful Wisdom*, *Human All Too Human*, *Daybreak*.
 - **Proust** (Moncrieff vols 1–6) — deeper Overture, *Within a Budding Grove*, *The Guermantes Way*.
 - **Emerson** — *Self-Reliance*, *Nature*, *Heroism*, *The Over-Soul* in full (earlier passes sampled).
+
+### Coverage gaps worth naming
+
+PD sourcing pulls unavoidably toward the North Atlantic, the ancient Mediterranean, and the classical Asian canon — the traditions with the deepest pre-1930 English-language translation corpora.
+Genuinely underrepresented regions where good PD material is scarce:
+
+- **Sub-Saharan Africa** — most atmospheric philosophical and poetic material is either oral-traditional (and recorded only in colonial-era ethnographic contexts that are PD but problematic), or modern (Soyinka, Achebe, Senghor) and under copyright. Egyptian and Ethiopian texts above are Northern African / Afro-Asiatic.
+- **Latin America** — pre-Columbian material is mostly in *Popol Vuh* above; colonial-era sources are dominated by Spanish imperial voices; the great modern Latin American poets (Darío, Mistral, Neruda, Paz, Borges) are all under copyright.
+- **Indigenous peoples of the Americas, Australia, Oceania** — recorded song and myth traditions exist in pre-1930 ethnographic collections, but the voice-fit for an atmospheric game and the ethics of using ethnographically-recorded material warrant case-by-case judgment.
+- **Modern Islamic thought** (Iqbal, Shariati) and **modern Indian thought** (Aurobindo, Krishnamurti, Ramana Maharshi) — mostly 20th century and under copyright.
+
+Calling this out explicitly so we don't pretend the content library is representing the full range of human wisdom traditions — it's representing what's accessible, which skews heavily toward what was colonized, translated, and printed in English before 1930.
 
 ### Non-PD and explicitly excluded
 
