@@ -678,6 +678,20 @@ Victorian and early-modernist voices on art, perception, form, and consciousness
 - **Adam Smith** — *Theory of Moral Sentiments* (1759). Saturn (the impartial spectator). *Wealth of Nations* is too analytical for atmospheric use.
 - **G. K. Chesterton** — *Orthodoxy* (1908), *Heretics* (1905), *The Man Who Was Thursday* (1908). Mercury (paradox; Wilde-adjacent but more pious).
 
+### Utopian, anarchist, and radical-social
+
+Utopian and radical social thinkers from Renaissance to early 20th century. Note: the 19c utopian-socialists (Fourier, Owen, Noyes) are historically important but their prose registers skew reformist-systematic rather than atmospheric — low expected yield. The more atmospheric figures in this lineage are Kropotkin, Carpenter, and the Renaissance utopian dialogues (More, Bacon, Campanella).
+
+- **Thomas More — *Utopia*** (Latin 1516; Ralph Robinson English 1551; Gilbert Burnet 1684). PD. Jupiter (the vision) + Saturn (the moral critique).
+- **Francis Bacon — *The New Atlantis*** (1627). English original, PD. Jupiter (cosmic scientific-utopian vision).
+- **Tommaso Campanella — *The City of the Sun*** (Latin 1602; Thomas W. Halliday English 1885). Jupiter + Mercury.
+- **Peter Kropotkin** — *Mutual Aid: A Factor of Evolution* (1902), *The Conquest of Bread* (1906 English), *Memoirs of a Revolutionist* (1899), *Fields, Factories, and Workshops* (1898). All PD. Jupiter (mutual aid as cosmic principle) + Saturn + Mars. The most atmospheric voice in this lineage.
+- **Edward Carpenter** — *Towards Democracy* (1883 and later editions), *Civilisation: Its Cause and Cure* (1889), *The Drama of Love and Death* (1912). PD. Whitman-inspired English socialist-mystic. Venus + Jupiter + Saturn.
+- **Mikhail Bakunin** — *God and the State* (1882 English). PD. Mars (polemical) + Jupiter. Modest yield — more polemical than atmospheric.
+- **Charles Fourier** — Albert Brisbane's interpretive *Social Destiny of Man* (1840); John Reynell Morell's *The Passions of the Human Soul* (1851); other 19c English partials. All PD. Jupiter (cosmic-social scope) + Mercury (his eccentric taxonomies — phalansteries, passionate series). **Low atmospheric yield expected** — Fourier's 19c English prose is dry and taxonomic. Worth exploring but don't expect much.
+- **Robert Owen** — *A New View of Society* (1813), *The Book of the New Moral World* (1836–1844), lectures. English original, PD. Saturn (moral weight) + Jupiter (formative affirmation). **Low yield expected** — reformist-essay register rather than aphoristic.
+- **John Humphrey Noyes** — *Bible Communism* (1849), *History of American Socialisms* (1870), *The Berean* (1847). PD. Jupiter + Saturn. **Low yield expected** — sermonic and community-rule-oriented. Context-sensitive: parts of the Oneida doctrine ("complex marriage") are awkward for game use regardless of voice fit.
+
 ### Core-chorus deepening
 
 - **Marcus Aurelius** (Long 1862) — Books V–XI especially under-mined.
