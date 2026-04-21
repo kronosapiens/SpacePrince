@@ -1,0 +1,80 @@
+# Venus — sensory, relational, attuned to beauty.
+# Ten verified fragments drawn from primary public-domain sources.
+# See spec/PLANETS.md §6 (Venus) and §11 (Sourcing Notes).
+
+- text: |
+    Now Love masters my limbs and shakes me, fatal creature, bitter-sweet.
+  author: "Sappho"
+  source: "Fragment 40 (Wharton)"
+  translation: "Henry Thornton Wharton, 1885 (literal prose)"
+  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
+  moods: [opening, relation]
+
+- text: |
+    The moon has set, and the Pleiades; it is midnight, the time is going by, and I sleep alone.
+  author: "Sappho"
+  source: "Fragment 52 (Wharton)"
+  translation: "Henry Thornton Wharton, 1885 (literal prose)"
+  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
+  moods: [reverie, opening]
+
+- text: |
+    As the sweet-apple blushes on the end of the bough, the very end of the bough, which the gatherers overlooked, nay overlooked not but could not reach.
+  author: "Sappho"
+  source: "Fragment 93 (Wharton)"
+  translation: "Henry Thornton Wharton, 1885 (literal prose)"
+  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
+  moods: [beauty, reverie]
+
+- text: |
+    A thing of beauty is a joy for ever:
+    Its loveliness increases; it will never
+    Pass into nothingness.
+  author: "John Keats"
+  source: "Endymion, Book I, lines 1–3"
+  source_url: "https://www.gutenberg.org/files/24280/24280-h/24280-h.htm"
+  moods: [opening, beauty, gift]
+
+- text: |
+    O for a life of Sensations rather than of Thoughts!
+  author: "John Keats"
+  source: "Letter to Benjamin Bailey, 22 November 1817"
+  source_url: "https://www.gutenberg.org/files/35698/35698-h/35698-h.htm"
+  moods: [opening, reverie]
+
+- text: |
+    To burn always with this hard, gemlike flame, to maintain this ecstasy, is success in life.
+  author: "Walter Pater"
+  source: "Studies in the History of the Renaissance, Conclusion"
+  source_url: "https://www.gutenberg.org/files/2398/2398-h/2398-h.htm"
+  moods: [opening, beauty]
+
+- text: |
+    To look at a thing is very different from seeing a thing. One does not see anything until one sees its beauty.
+  author: "Oscar Wilde"
+  source: "The Decay of Lying (Intentions, 1891)"
+  source_url: "https://www.gutenberg.org/files/887/887-h/887-h.htm"
+  moods: [opening, beauty]
+
+- text: |
+    With freedom, flowers, books, and the moon, who could not be perfectly happy?
+  author: "Oscar Wilde"
+  source: "De Profundis"
+  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
+  moods: [gift, reverie]
+
+- text: |
+    For, lo, the winter is past, the rain is over and gone; the flowers appear on the earth; the time of the singing of birds is come, and the voice of the turtle is heard in our land.
+  author: "Song of Solomon"
+  source: "Song of Solomon 2:11-12 (KJV)"
+  translation: "King James Version, 1611"
+  source_url: "https://en.wikisource.org/wiki/Bible_(King_James)/Song_of_Solomon"
+  moods: [opening, gift]
+
+- text: |
+    The face of a child that has its teeth dug into a melon.
+  author: "Sei Shōnagon"
+  source: "The Pillow-Book, 'Pretty Things'"
+  translation: "Arthur Waley, 1928"
+  source_url: "https://archive.org/details/pillowbookofseis0000arth_v1i4"
+  moods: [beauty, gift]

@@ -1,0 +1,83 @@
+# Sun — sovereign, declarative, present-tense, unqualified.
+# Batch of 10 verified fragments drawn from primary public-domain sources.
+# See spec/PLANETS.md §3 (Sun) and §11 (Sourcing Notes).
+
+- text: |
+    Trust thyself: every heart vibrates to that iron string.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://en.wikisource.org/wiki/Essays:_First_Series/Self-Reliance"
+  moods: [opening, declaration]
+
+- text: |
+    A foolish consistency is the hobgoblin of little minds, adored by little statesmen and philosophers and divines.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://en.wikisource.org/wiki/Essays:_First_Series/Self-Reliance"
+  moods: [opening, cut]
+
+- text: |
+    Self-trust is the essence of heroism.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Heroism'"
+  source_url: "https://en.wikisource.org/wiki/Essays:_First_Series/Heroism"
+  moods: [opening, declaration]
+
+- text: |
+    I exist as I am, that is enough.
+  author: "Walt Whitman"
+  source: "Leaves of Grass, 'Song of Myself' §20"
+  source_url: "https://en.wikisource.org/wiki/Leaves_of_Grass/Book_III"
+  moods: [opening, declaration]
+
+- text: |
+    Do I contradict myself?
+    Very well then I contradict myself,
+    (I am large, I contain multitudes.)
+  author: "Walt Whitman"
+  source: "Leaves of Grass, 'Song of Myself' §51"
+  source_url: "https://en.wikisource.org/wiki/Leaves_of_Grass/Book_III"
+  moods: [declaration, paradox]
+
+- text: |
+    Not I, not any one else can travel that road for you,
+    You must travel it for yourself.
+  author: "Walt Whitman"
+  source: "Leaves of Grass, 'Song of Myself' §46"
+  source_url: "https://en.wikisource.org/wiki/Leaves_of_Grass/Book_III"
+  moods: [opening, cut]
+
+- text: |
+    The universe is transformation: life is opinion.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book IV.3"
+  translation: "George Long, 1862"
+  source_url: "https://en.wikisource.org/wiki/The_Thoughts_of_the_Emperor_Marcus_Aurelius_Antoninus/Book_IV"
+  moods: [opening, declaration]
+
+- text: |
+    If thou art pained by any external thing, it is not this thing that disturbs thee, but thy own judgment about it. And it is in thy power to wipe out this judgment now.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book VIII.47"
+  translation: "George Long, 1862"
+  source_url: "https://en.wikisource.org/wiki/The_Thoughts_of_the_Emperor_Marcus_Aurelius_Antoninus/Book_VIII"
+  moods: [cut, declaration]
+
+- text: |
+    Let right deeds be
+    Thy motive, not the fruit which comes from them.
+  author: "The Bhagavad Gita"
+  source: "Chapter II"
+  translation: "Edwin Arnold, The Song Celestial, 1885"
+  source_url: "https://www.gutenberg.org/cache/epub/2388/pg2388-images.html"
+  moods: [opening, cut]
+
+- text: |
+    Finally, this is better, that one do
+    His own task as he may, even though he fail,
+    Than take tasks not his own, though they seem good.
+  author: "The Bhagavad Gita"
+  source: "Chapter III"
+  translation: "Edwin Arnold, The Song Celestial, 1885"
+  source_url: "https://www.gutenberg.org/cache/epub/2388/pg2388-images.html"
+  moods: [declaration, cost]

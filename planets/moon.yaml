@@ -1,0 +1,121 @@
+# Moon — intimate, nocturnal, drifting between present and memory.
+# Imagery over argument. Rooms, water, twilight, half-open doors.
+# See spec/PLANETS.md §4 (Moon) and §11 (Sourcing Notes).
+
+- text: |
+    For a long time I used to go to bed early.
+  author: "Marcel Proust"
+  source: "Swann's Way, Overture (opening line)"
+  translation: "C. K. Scott Moncrieff, 1922"
+  source_url: "https://www.gutenberg.org/files/7178/7178-h/7178-h.htm"
+  moods: [opening, reverie]
+
+- text: |
+    When a man is asleep, he has in a circle round him the chain of the hours, the sequence of the years, the order of the heavenly host.
+  author: "Marcel Proust"
+  source: "Swann's Way, Overture"
+  translation: "C. K. Scott Moncrieff, 1922"
+  source_url: "https://www.gutenberg.org/files/7178/7178-h/7178-h.htm"
+  moods: [reverie, opening]
+
+- text: |
+    The memory would come like a rope let down from heaven to draw me up out of the abyss of not-being.
+  author: "Marcel Proust"
+  source: "Swann's Way, Overture"
+  translation: "C. K. Scott Moncrieff, 1922"
+  source_url: "https://www.gutenberg.org/files/7178/7178-h/7178-h.htm"
+  moods: [reverie, ending]
+
+- text: |
+    From the starry vault descends an invisible snow-shower of dreams, calling us to a pure sleep.
+  author: "Henri-Frédéric Amiel"
+  source: "Journal Intime, August 8, 1865 (Gryon sur Bex)"
+  translation: "Mrs. Humphry Ward, 1885"
+  source_url: "https://archive.org/details/amielsjournalint00amieuoft/page/139"
+  moods: [opening, reverie]
+
+- text: |
+    Let mystery have its place in you; do not be always turning up your whole soil with the plowshare of self-examination, but leave a little fallow corner in your heart ready for any seed the winds may bring, and reserve a nook of shadow for the passing bird.
+  author: "Henri-Frédéric Amiel"
+  source: "Journal Intime, December 2, 1851"
+  translation: "Mrs. Humphry Ward, 1885"
+  source_url: "https://www.gutenberg.org/ebooks/8545"
+  moods: [reverie, opening]
+
+- text: |
+    All conception should be enwrapped by the triple veil of modesty, silence and night.
+  author: "Henri-Frédéric Amiel"
+  source: "Journal Intime, December 2, 1851"
+  translation: "Mrs. Humphry Ward, 1885"
+  source_url: "https://www.gutenberg.org/ebooks/8545"
+  moods: [reverie]
+
+- text: |
+    Reverie, like the rain of night, restores color and force to thoughts which have been blanched and wearied by the heat of the day.
+  author: "Henri-Frédéric Amiel"
+  source: "Journal Intime, April 28, 1852 (Lancy)"
+  translation: "Mrs. Humphry Ward, 1885"
+  source_url: "https://www.gutenberg.org/ebooks/8545"
+  moods: [reverie, opening]
+
+- text: |
+    Aside I turn to the holy, unspeakable, mysterious Night.
+  author: "Novalis"
+  source: "Hymns to the Night, I"
+  translation: "George MacDonald, Rampolli, 1897"
+  source_url: "https://www.gutenberg.org/files/8949/8949-h/8949-h.htm"
+  moods: [opening]
+
+- text: |
+    The distances of memory, the wishes of youth, the dreams of childhood, the brief joys and vain hopes of a whole long life, arise in gray garments, like an evening vapour after the sunset.
+  author: "Novalis"
+  source: "Hymns to the Night, I"
+  translation: "George MacDonald, Rampolli, 1897"
+  source_url: "https://www.gutenberg.org/files/8949/8949-h/8949-h.htm"
+  moods: [reverie, ending]
+
+- text: |
+    Out of the blue distances, from the hills of my ancient bliss, came a shiver of twilight.
+  author: "Novalis"
+  source: "Hymns to the Night, III"
+  translation: "George MacDonald, Rampolli, 1897"
+  source_url: "https://www.gutenberg.org/files/8949/8949-h/8949-h.htm"
+  moods: [reverie, opening]
+
+- text: |
+    There is no antidote against the Opium of time.
+  author: "Thomas Browne"
+  source: "Hydriotaphia, Urn Burial, Chapter V"
+  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
+  moods: [ending, reverie]
+
+- text: |
+    Our Fathers finde their graves in our short memories.
+  author: "Thomas Browne"
+  source: "Hydriotaphia, Urn Burial, Chapter V"
+  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
+  moods: [ending, cost]
+
+- text: |
+    The night of time far surpasseth the day.
+  author: "Thomas Browne"
+  source: "Hydriotaphia, Urn Burial, Chapter V"
+  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
+  moods: [opening, ending]
+
+- text: |
+    Diuturnity is a dream and folly of expectation.
+  author: "Thomas Browne"
+  source: "Hydriotaphia, Urn Burial, Chapter V"
+  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
+  moods: [reverie, ending]
+
+- text: |
+    The Autumn gloaming deepens into night;
+    Black 'gainst the slowly-fading orange light,
+    On withered bough a lonely crow is sitting!
+  author: "Matsuo Bashō"
+  source: "The Master-Singers of Japan, 'Contrasts' (p. 107)"
+  translation: "Clara A. Walsh, 1910"
+  source_url: "https://archive.org/details/mastersingersofj00wals/page/107"
+  moods: [opening, reverie]
