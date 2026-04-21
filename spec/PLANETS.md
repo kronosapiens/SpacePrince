@@ -32,7 +32,7 @@ These are not specced here — PLANETS.md is the content library, not the integr
 
 Rules that apply to every planet's chorus.
 
-- **Short.** One sentence, maybe two, rarely three. Jupiter is the only planet whose fragments can run a little longer.
+- **Length is tag-driven, not planet-driven.** Cut / command / warning fragments should be tight — one sentence, maybe two. Opening / reverie / gift / affirmation fragments can breathe — several sentences if the rhythm asks for it. Brevity is in service of tone-setting, not a rule for its own sake. Never a paragraph.
 - **Curated, not generated.** All fragments are drawn from the real writings of the chorus authors. No AI generation. No paraphrase.
 - **Public domain only.** See §11 for scope and translation notes.
 - **Never explanatory.** The fragment never explains the mechanic beneath it. It accompanies, it does not instruct.
@@ -481,6 +481,32 @@ Within each planet's ten, aim for coverage across the chorus rather than a singl
 Pilot one planet first — recommended: **Saturn**, which has the deepest PD corpus and the lowest hallucination risk (its authors are widely anthologized on Gutenberg).
 Use the pilot to iterate on the brief, the schema, and the verification cadence before running the remaining six in parallel.
 
-Sourcing is then done planet-by-planet with dedicated subagents.
-Each subagent takes one planet, works through its chorus, and returns a `planets/<planet>.yaml` file conforming to the schema above.
-This document is the brief.
+Sourcing can be run in two modes:
+
+- **Planet-driven.** A subagent takes one planet and works through its chorus (§§3–9). Good for initial population. Used in the first sourcing sweep.
+- **Source-driven.** A subagent takes one text (e.g. *Tao Te Ching*) and distributes fragments across whichever planet YAMLs the source's register serves. Good for expansion — a single source can yield material for several planets, and deep reading of one text tends to surface more resonant fragments than shallow sampling across many. See §12 for candidate sources.
+
+This document is the brief for both modes.
+
+---
+
+## 12. Extended Chorus Candidates
+
+The seven per-planet choruses (§§3–9) are the core, but the content library is open-ended and grows through source-driven sourcing passes (§11 Workflow).
+The list below is a roster of candidate sources worth exploring, with approximate planetary register.
+Not all candidates must be sourced; this is a backlog to draw from.
+
+- **Plato** — dialogues, Jowett translation (1871). *Phaedo* → Saturn; *Symposium* → Venus + Jupiter; *Phaedrus* → Jupiter + Mercury; *Apology* → Sun + Saturn; *Republic* → Jupiter.
+- **Hebrew Bible — poetic and wisdom books** — KJV (1611). *Job* → Saturn + Jupiter (the whirlwind speech); *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter.
+- **Lao Tzu** — *Tao Te Ching*, James Legge (1891). Mercury (paradox) + Saturn (restraint) + Jupiter (the Way).
+- **Dhammapada** — Max Müller (1881) or F. L. Woodward pre-1930. Jupiter + Saturn.
+- **Virgil** — *Aeneid*, Dryden (1697) → Mars; *Georgics*, Rhoades (1881) → Jupiter.
+- **Augustine** — *Confessions*, Pusey (1838). Saturn (time, memory) + Moon (interior life).
+- **Meister Eckhart** — sermons, pre-1930 English translations (where they exist). Jupiter.
+- **Teresa of Avila** — *Interior Castle*, David Lewis (1853). Venus (the inner rose) + Moon.
+- **Hermann Hesse** — *Siddhartha*, German original 1922 (PD in US); canonical Rosner 1951 English translation is **not** PD. Would require fresh translation or use of the German; flagged as a trap.
+- **Rilke** — most English translations post-1930 and under copyright; original German PD but limits what we can source without fresh translation.
+- **Core-chorus deepening** — additional Marcus Aurelius (Long 1862), Sei Shōnagon (Waley 1928), Nietzsche (Levy series), Proust (vols 1–6).
+
+Sources are added to this list as they surface during design conversations.
+After sourcing, a source that contributes meaningfully to a particular planet's voice may be promoted into that planet's core chorus in §§3–9.
