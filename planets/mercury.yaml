@@ -79,3 +79,42 @@
   translation: "G. R. S. Mead, 1906"
   source_url: "https://archive.org/details/GRSMeadThriceGreatestHermesVolII"
   moods: [opening, paradox]
+
+- text: |
+    Negative Capability, that is when man is capable of being in uncertainties, Mysteries, doubts, without any irritable reaching after fact & reason.
+  author: "John Keats"
+  source: "Letter to George and Thomas Keats, 21/27 December 1817"
+  source_url: "https://en.wikisource.org/wiki/Letter_to_George_and_Thomas_Keats,_December_28,_1817"
+  moods: [opening, paradox, question, venus_secondary]
+
+- text: |
+    Nature loves to hide.
+  author: "Heraclitus"
+  source: "Fragment 10 (Burnet numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [opening, paradox, question]
+
+- text: |
+    The hidden attunement is better than the open.
+  author: "Heraclitus"
+  source: "Fragment 47 (Burnet numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [paradox, turn]
+
+- text: |
+    One loves ultimately one's desires, not the thing desired.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §175 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [turn, paradox]
+
+- text: |
+    My life has a limit, but my knowledge is without limit. To drive the limited in search of the limitless, is fatal.
+  author: "Zhuangzi"
+  source: "Chuang Tzŭ, Ch. III ('Nourishment of the Soul')"
+  translation: "Herbert A. Giles, 1889"
+  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
+  moods: [opening, paradox, warning]

@@ -362,6 +362,7 @@ This is expected and a feature, not a bug — a mature voice can speak from more
 - **Emerson** — Sun (sovereign, self-reliant) and Jupiter (oracular, expansive).
 - **Marcus Aurelius** — Sun (declarative, present-tense) and Mars (soldier-emperor discipline).
 - **Heraclitus** — Mercury (paradox, the riddle) and Mars (agonistic, "war is the father").
+- **Keats** — Venus (beauty as truth, sensory intensity) and Mercury (paradox, Negative Capability).
 
 When sourcing, fragments from these authors should be tagged by which register they serve.
 A fragment that could serve both is tagged for both; the encounter system picks by context.
