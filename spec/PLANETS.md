@@ -510,20 +510,44 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 - **Ovid** — *Metamorphoses*, Dryden / Pope collaborative (1717) or Garth (1717). Jupiter + Venus + Mars.
 - **Virgil** — *Aeneid*, Dryden (1697) → Mars; *Georgics*, Rhoades (1881) → Jupiter.
 
+### Mesopotamian and ancient Near East
+
+Load-bearing for Space Prince's cosmology — Babylonian astronomy is the root of Hellenistic astrology, and the Mesopotamian planetary pantheon (Shamash → Sun, Sin → Moon, Nabu → Mercury, Ishtar → Venus, Nergal → Mars, Marduk → Jupiter, Ninurta → Saturn) is the system the game inherits.
+
+- **Epic of Gilgamesh** — R. Campbell Thompson verse (1928), Morris Jastrow & A. T. Clay prose (1920), Stephen Langdon (1917). All PD. Saturn (Enkidu's death, mortality, the failed return from Utnapishtim) + Jupiter (cosmic scope, the flood) + Mars (Humbaba, the Bull of Heaven) + Moon (the dreams, the twelve leagues of darkness). Modern Sandars / George / Kovacs / Mitchell all under copyright.
+- **Enuma Elish** (Babylonian creation) — L. W. King, *The Seven Tablets of Creation* (1902). Jupiter + Mars.
+- **Descent of Ishtar to the Underworld** — multiple PD translations (King, Jastrow). Saturn + Venus (Ishtar herself — the Mesopotamian Venus).
+- **Code of Hammurabi** — L. W. King (1902). Mars + Sun (sovereign pronouncements).
+
 ### Hebrew Bible and Abrahamic scripture
 
 - **Hebrew Bible — poetic books beyond Job and Ecclesiastes (already core Saturn)** — KJV (1611). *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter; *Song of Songs* already core Venus.
 - **Quran** — Palmer (1880) or Rodwell (1861). Jupiter + Sun.
 
-### Persian and Arabic
+### Persian, Arabic, and Islamic philosophy
 
 - **Hafiz** — *Divan*, Gertrude Bell (1897) and H. Wilberforce Clarke (1891). Venus (the ghazal of love) + Saturn (the ruin of time) + Mercury.
 - **Rumi** — *Mathnawi*, Reynold A. Nicholson vols 1–2 (1925–1926, pre-1930 PD; later vols excluded); E. H. Whinfield selections (1887). Jupiter (devotional expansiveness) + Venus (lover-and-beloved) + Mercury (paradox of the reed-flute). **Note:** Coleman Barks, Arberry, and most 20th-century Rumi translations are NOT PD.
 - **Omar Khayyam** — *Rubáiyát*, Edward FitzGerald (first ed. 1859, later editions also PD). Saturn (the vessel, the clay, the moving finger) + Mercury + Venus (wine and the rose).
 - **Sa'di** — *Gulistan*, James Ross (1823) or Edward Rehatsek (1888); *Bustan*. Saturn (measured reflection) + Mercury (aphorism).
+- **Al-Ghazali** — *The Alchemy of Happiness* (*Kimiya-yi-sa'ādat*), Claud Field (1910). Saturn + Jupiter.
+- **Attar** — *Conference of the Birds* (*Manṭiq-uṭ-Ṭayr*), Edward FitzGerald's abridgment *Bird Parliament* (1889); R. P. Masani (1924). Jupiter (the mystical journey) + Mercury (paradoxes of the seeker) + Saturn.
+- **Ferdowsi — *Shahnameh*** — the Persian national epic. Arthur & Edmond Warner 9-volume translation (1905–1925); Helen Zimmern abridgment (1883). Mars + Saturn + Sun — the Persian *Iliad*.
+- **Nizami Ganjavi** — *Laila and Majnun*, James Atkinson (1836); *Haft Paikar*, C. E. Wilson (1924). Venus (love stories) + Jupiter.
+- **Jami** — *Yusuf and Zulaikha*, Ralph T. H. Griffith (1882) or Alexander Rogers (1892). Venus.
+- **Ibn Tufayl** — *Hayy ibn Yaqdhan*, Simon Ockley translation (1708). The 12th-c. autodidact philosophical novella. Jupiter + Saturn.
+- **Arabian Nights / *One Thousand and One Nights*** — Richard Burton (1885), Edward Lane (1840s), John Payne (1882–1884). More narrative than atmospheric — use sparingly. Multi-planet.
 
 ### South Asian (beyond core Gita and Upanishads)
 
+- **Mahabharata** — Kisari Mohan Ganguli's complete prose translation (1883–1896), PD. The massive Indian epic in which the Gita sits as Book VI. Multi-planet: Yudhishthira / Dharma dialogues → Saturn; Bhishma on his bed of arrows → Saturn; Draupadi's ordeal → Saturn + Mars; the final ascent → Jupiter. Modern van Buitenen translation is incomplete and under copyright.
+- **Ramayana** — Ralph T. H. Griffith verse (1870–1874); Manmatha Nath Dutt prose (1892); Romesh C. Dutt abridgment (1900). Mars (Rama the warrior) + Venus (Sita-Rama) + Saturn (exile, loss) + Jupiter (Vishnu's cosmic scope).
+- **Kalidasa** — the great classical Sanskrit poet. *Shakuntala* (Monier Williams 1855); *Meghaduta* (H. H. Wilson 1814 — the cloud-messenger, pure Moon reverie); *Kumarasambhava*.
+- **Bhartrihari** — Sanskrit aphorist (5th c. CE). *Niti-Shataka* (worldly wisdom), *Vairagya-Shataka* (renunciation), *Shringara-Shataka* (love). B. Hale Wortham (1886). Saturn + Venus + Mercury.
+- **Jataka tales** — Buddhist birth-stories. E. B. Cowell et al. (1895–1913). Multi-planet narrative source.
+- **Tulsidas — *Ramcharitmanas*** — the Hindi devotional Ramayana. Frederic Salmon Growse (1876–1881). Jupiter (devotion) + Venus + Mars.
+- **Manusmriti / Laws of Manu** — G. Buhler, SBE vol. 25 (1886). Saturn + Sun.
+- **Arthashastra** (Kautilya) — R. Shamasastry (1915). Mars (statecraft, warfare, strategic austerity).
 - **Kabir** — *One Hundred Poems of Kabir*, Tagore's self-translation with Evelyn Underhill (1915, PD). Jupiter (devotional) + Mercury (paradox of the seeker) + Saturn.
 - **Swami Vivekananda** — *Raja Yoga*, *Jnana Yoga*, *Karma Yoga*, lectures (all pre-1902 publications, PD). Jupiter + Sun.
 - **Patanjali — Yoga Sutras** — Vivekananda (1896) or James Haughton Woods (1914). Jupiter + Saturn.
@@ -567,6 +591,7 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 ### Mystical, contemplative, and medieval
 
 - **Augustine** — *Confessions*, Pusey (1838). Saturn (time, memory) + Moon (interior life).
+- **Maimonides** — *Guide for the Perplexed*, Michael Friedländer (1881 / revised 1904). Jupiter + Saturn. Written in Judeo-Arabic; culturally part of the medieval Arabic philosophical conversation, placed here for its mystical-philosophical register.
 - **Julian of Norwich** — *Revelations of Divine Love* (c. 1395); Grace Warrack (1901). Venus + Jupiter + Saturn.
 - **Thomas à Kempis** — *Imitation of Christ*; multiple PD translations. Saturn + Jupiter.
 - **Dante** — *Divine Comedy*, Longfellow (1867) or Cary (1814). Saturn (*Inferno*) + Mars (*Inferno* martial) + Jupiter (*Paradiso*).
