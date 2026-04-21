@@ -499,18 +499,82 @@ This document is the brief for both modes.
 The seven per-planet choruses (§§3–9) are the core, but the content library is open-ended and grows through source-driven sourcing passes (§11 Workflow).
 The list below is a roster of candidate sources worth exploring, with approximate planetary register.
 Not all candidates must be sourced; this is a backlog to draw from.
+Authors already in a core chorus (§§3–9) appear here when their wider corpus reaches planets beyond the one they anchor.
 
-- **Plato** — dialogues, Jowett translation (1871). *Phaedo* → Saturn; *Symposium* → Venus + Jupiter; *Phaedrus* → Jupiter + Mercury; *Apology* → Sun + Saturn; *Republic* → Jupiter.
-- **Hebrew Bible — poetic and wisdom books** — KJV (1611). *Job* → Saturn + Jupiter (the whirlwind speech); *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter.
-- **Lao Tzu** — *Tao Te Ching*, James Legge (1891). Mercury (paradox) + Saturn (restraint) + Jupiter (the Way).
-- **Dhammapada** — Max Müller (1881) or F. L. Woodward pre-1930. Jupiter + Saturn.
+### Classical and ancient
+
+- **Plato** (beyond core Venus + Jupiter) — Jowett (1871). *Phaedo* → Saturn; *Phaedrus* → Jupiter + Mercury; *Apology* → Sun + Saturn; *Republic* → Jupiter.
+- **Cicero** — *On Old Age*, *On Friendship*, *On Duties*, pre-1930 PD translations. Saturn + Venus + Sun.
+- **Plutarch** — *Moralia* essays, Goodwin / Shilleto PD translations. Jupiter + Sun.
+- **Horace** — *Odes*, Conington (1863). Saturn + Jupiter.
+- **Ovid** — *Metamorphoses*, Dryden / Pope collaborative (1717) or Garth (1717). Jupiter + Venus + Mars.
 - **Virgil** — *Aeneid*, Dryden (1697) → Mars; *Georgics*, Rhoades (1881) → Jupiter.
+
+### Hebrew Bible and wisdom literature
+
+- **Hebrew Bible — poetic books beyond Job and Ecclesiastes (already core Saturn)** — KJV (1611). *Psalms* → Moon + Sun + Saturn; *Proverbs* → Mercury + Saturn; *Isaiah* → Jupiter; *Song of Songs* already core Venus.
+- **Quran** — Palmer (1880) or Rodwell (1861). Jupiter + Sun.
+- **Confucian Analects / Mencius** — Legge (pre-1900). Saturn + Jupiter + Sun.
+- **Dhammapada** — Max Müller (1881). Jupiter + Saturn.
+
+### Mystical, contemplative, and medieval
+
 - **Augustine** — *Confessions*, Pusey (1838). Saturn (time, memory) + Moon (interior life).
+- **Dante** — *Divine Comedy*, Longfellow (1867) or Cary (1814). Saturn (*Inferno*) + Mars (*Inferno* martial) + Jupiter (*Paradiso*).
 - **Meister Eckhart** — sermons, pre-1930 English translations (where they exist). Jupiter.
-- **Teresa of Avila** — *Interior Castle*, David Lewis (1853). Venus (the inner rose) + Moon.
-- **Hermann Hesse** — *Siddhartha*, German original 1922 (PD in US); canonical Rosner 1951 English translation is **not** PD. Would require fresh translation or use of the German; flagged as a trap.
-- **Rilke** — most English translations post-1930 and under copyright; original German PD but limits what we can source without fresh translation.
-- **Core-chorus deepening** — additional Marcus Aurelius (Long 1862), Sei Shōnagon (Waley 1928), Nietzsche (Levy series), Proust (vols 1–6).
+- **Teresa of Avila** — *Interior Castle*, David Lewis (1852–1853). Venus + Moon.
+- **Milton** — *Paradise Lost* (1667). Jupiter + Mars + Saturn.
+- **Spenser** — *The Faerie Queene* (1590–1596). Jupiter (allegorical scope) + Venus (courtly love).
+- **Shakespeare** — sonnets and plays. Multi-planet — *Antony and Cleopatra* for Venus, *Macbeth* for Mars, *Lear* for Saturn, *Hamlet* for Mercury.
+
+### Early modern philosophy
+
+- **Spinoza** — *Ethics*, Elwes (1883). Mercury (geometric paradox) + Saturn (measured limit).
+- **Hume** — *Enquiry concerning Human Understanding*, English original. Mercury (skeptical paradox).
+- **Kant** — *Critique of Practical Reason*, Abbott (1873). Sun (the "starry heavens / moral law within" passage); otherwise dense and limited yield.
+
+### Romantic and 19th-century canon
+
+- **William Blake** (beyond core Mercury) — *Songs of Innocence and of Experience*, *Marriage of Heaven and Hell* (full, not just proverbs), *Milton*, *Jerusalem*, the prophetic books. Venus + Jupiter + Mars + Saturn.
+- **Rousseau** — *Reveries of a Solitary Walker*, pre-1930 PD translations. Moon.
+- **Goethe** — *Faust* (Bayard Taylor 1870–1871; Anna Swanwick pre-1900), *Sorrows of Young Werther*. Multi-planet — Saturn (Werther), Jupiter (Faust's cosmic drama).
+- **Wordsworth** — *The Prelude*, *Lyrical Ballads*, sonnets. Moon + Jupiter.
+- **Coleridge** — "Kubla Khan," "Rime of the Ancient Mariner," *Biographia Literaria*. Moon + Mercury.
+- **Byron** — *Don Juan*, *Childe Harold*, *Cain*. Mars + Venus.
+- **Shelley** — *Prometheus Unbound*, *Adonais*, "Ode to the West Wind," *Defence of Poetry*. Jupiter + Venus + Mars.
+- **John Keats** (beyond core Venus + Mercury) — *Hyperion*, remaining letters.
+- **Emily Brontë** — *Wuthering Heights*, collected poems. Moon + Saturn.
+- **Poe** — tales, poems, "The Philosophy of Composition." Moon + Saturn.
+- **Baudelaire** — *Fleurs du Mal*, *Paris Spleen*, Arthur Symons (1905) or F. P. Sturm (1906) or Huneker (1919). Moon + Venus + Saturn.
+- **Emily Dickinson** — poems, **pre-1930 editions only** (Todd / Higginson 1890–1896); Johnson (1955) and Franklin (1998) critical editions are **not** PD. Moon + Saturn.
+- **Yeats** — pre-1930 volumes only: *The Wild Swans at Coole* (1919), *Michael Robartes and the Dancer* (1921), *The Tower* (1928). Later collections (*Last Poems*, 1939) not PD in US. Jupiter + Saturn + Venus.
+
+### Novels and narrative prose
+
+- **Melville** — *Moby-Dick* (1851). Mars (Ahab) + Saturn (Ishmael's reflections) + Jupiter (*The Whiteness of the Whale*).
+- **Dostoevsky** — Constance Garnett translations (pre-1930). *Notes from Underground* → Mercury; *Brothers Karamazov* (Grand Inquisitor) → Saturn + Jupiter; *Demons* → Mars.
+- **Tolstoy** — Garnett (pre-1930). *Death of Ivan Ilych* → Saturn; *War and Peace* philosophical asides → Jupiter; *Anna Karenina* → Venus + Saturn.
+
+### Social and political
+
+- **Karl Marx** — *Communist Manifesto* (Moore 1888), *Capital* (Moore-Aveling 1887), *Economic and Philosophical Manuscripts of 1844*. Atmospheric yield is concentrated in the Manifesto's rhetorical peaks and the 1844 *Manuscripts* on alienation. Mars + Jupiter + Saturn.
+- **Adam Smith** — *Theory of Moral Sentiments* (1759). Saturn (the impartial spectator). *Wealth of Nations* is too analytical for atmospheric use.
+- **G. K. Chesterton** — *Orthodoxy* (1908), *Heretics* (1905), *The Man Who Was Thursday* (1908). Mercury (paradox; Wilde-adjacent but more pious).
+
+### Core-chorus deepening
+
+- **Marcus Aurelius** (Long 1862) — Books V–XI especially under-mined.
+- **Sei Shōnagon** (Waley 1928) — additional *Pillow-Book* entries beyond "Pretty Things."
+- **Nietzsche** (Levy series) — *The Gay Science* / *Joyful Wisdom*, *Human All Too Human*, *Daybreak*.
+- **Proust** (Moncrieff vols 1–6) — deeper Overture, *Within a Budding Grove*, *The Guermantes Way*.
+- **Emerson** — *Self-Reliance*, *Nature*, *Heroism*, *The Over-Soul* in full (earlier passes sampled).
+
+### Non-PD and explicitly excluded
+
+- **Hermann Hesse** — *Siddhartha* German original (1922) PD in US; canonical Rosner 1951 English translation **not** PD.
+- **Rilke** — most English translations post-1930.
+- **Umberto Eco** (d. 2016), **Jorge Luis Borges** (d. 1986) — voice fits (Mercury especially), but full works still under active copyright.
+- **Simone Weil** (d. 1943), **Camille Paglia** (active), **Jung**, **Buber**, **W. H. Auden**, **Alan Watts** — all modern authors still in copyright despite strong voice-fit.
 
 Sources are added to this list as they surface during design conversations.
 After sourcing, a source that contributes meaningfully to a particular planet's voice may be promoted into that planet's core chorus in §§3–9.
