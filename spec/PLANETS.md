@@ -534,7 +534,10 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 - **Confucian Analects / Mencius** — Legge (pre-1900). Saturn + Jupiter + Sun.
 - **I Ching / Book of Changes** — Legge (1882, SBE). Jupiter + Mercury.
 - **Liezi** — Lionel Giles (1912). Mercury + Jupiter.
+- **Book of Songs (*Shijing*)** — James Legge, *The Chinese Classics* vol. 4 (1871). The oldest Chinese poetry anthology. Venus (Guofeng love poems) + Jupiter (dynastic hymns) + Saturn (lamentations).
 - **Tang Dynasty poets** — Li Bai, Du Fu, Wang Wei, Bai Juyi, Tao Yuanming. Arthur Waley's *A Hundred and Seventy Chinese Poems* (1918) and *More Translations from the Chinese* (1919); Herbert Giles's *Chinese Poetry in English Verse* (1898). Moon + Saturn + Venus.
+- **Romance of the Three Kingdoms** (*Sanguo Yanyi*, attr. Luo Guanzhong, 14th c.) — C. H. Brewitt-Taylor (1925, Shanghai). Mars (battles, strategic speeches) + Saturn (the tragic falls; Zhuge Liang's last campaign) + Jupiter (Zhuge Liang's cosmic register). Modern Moss Roberts 1991 translation NOT PD.
+- **Dream of the Red Chamber** (*Hongloumeng*, Cao Xueqin, 18th c.) — H. Bencraft Joly (1892–1893), **first 56 chapters only**. Venus (Dai-yu / Bao-yu) + Saturn (the family's decline) + Moon (interior reflection). The Hawkes/Minford and Yang complete translations are NOT PD.
 
 ### Japanese classical (beyond core Bashō and Sei Shōnagon)
 
@@ -546,6 +549,8 @@ Authors already in a core chorus (§§3–9) appear here when their wider corpus
 ### Buddhist
 
 - **Dhammapada** — Max Müller (1881). Jupiter + Saturn.
+- **Diamond Sutra and Heart Sutra** — Max Müller, SBE vol. 49 (1894). Jupiter (emptiness, non-attachment) + Mercury.
+- **Platform Sutra of the Sixth Patriarch** (Huineng, compiled ~9th c.) — Wong Mou-Lam (1930, Shanghai). Mercury (Chan paradox — "no mind, no tree, no mirror"). Boundary case for US pre-1930 pub — verify exact publication date before sourcing.
 
 ### African and Mediterranean (pre-Greek / Hellenistic)
 
@@ -630,6 +635,11 @@ Calling this out explicitly so we don't pretend the content library is represent
 - **Hermann Hesse** — *Siddhartha* German original (1922) PD in US; canonical Rosner 1951 English translation **not** PD.
 - **Rilke** — most English translations post-1930.
 - **Umberto Eco** (d. 2016), **Jorge Luis Borges** (d. 1986) — voice fits (Mercury especially), but full works still under active copyright.
+- **Journey to the West** (*Xi You Ji*) — only the Timothy Richard 1913 paraphrase is PD, and it recasts Buddhist concepts in Christian terms; misrepresents Wu Cheng'en. Waley (1942), Anthony Yu (1977–83), Jenner (1982–86) all under copyright.
+- ***Water Margin*** (*Shuihu Zhuan*) — Pearl Buck *All Men Are Brothers* (1933) and Sidney Shapiro (1980) both under copyright. No PD English.
+- ***Golden Lotus*** (*Jin Ping Mei*) — Egerton 1939 under copyright.
+- **Full *Shiji*** (Sima Qian) — Burton Watson 1961+ under copyright.
+- **Han Shan / Cold Mountain poems** — Waley 1954, Snyder 1958, Red Pine all under copyright.
 - **Simone Weil** (d. 1943), **Camille Paglia** (active), **Jung**, **Buber**, **W. H. Auden**, **Alan Watts** — all modern authors still in copyright despite strong voice-fit.
 
 Sources are added to this list as they surface during design conversations.
