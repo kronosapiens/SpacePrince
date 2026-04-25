@@ -4,7 +4,7 @@ This document defines the construction rules for the roguelike map traversed eac
 
 It covers topology only. Visual/aesthetic treatment lives in `spec/VIBES.md` ("The Map as Sephirot"). Encounter semantics (what lives at each node) and traversal mechanics are out of scope for v1.
 
-Reference implementation: `sephirot-playground.html` at project root — interactive prototype with live layer sliders, pattern overrides, and reseed.
+Reference implementation: `spec/tree.html` — interactive prototype with live layer sliders, pattern overrides, and reseed.
 
 ---
 
