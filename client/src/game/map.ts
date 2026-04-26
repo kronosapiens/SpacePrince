@@ -34,7 +34,7 @@ export interface MapGraph {
 }
 
 export const NUM_LAYERS = 7;
-export const ROOT_NODE_ID = "1C";
+export const ROOT_NODE_ID = "7C";
 
 export interface PatternOptions {
   probabilities?: number[];

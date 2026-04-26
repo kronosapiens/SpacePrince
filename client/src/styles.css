@@ -1444,21 +1444,33 @@ h3,
 .map-page-header {
   background: var(--map-panel);
   border-bottom: 1px solid var(--map-border);
-}
-
-.map-layout {
-  flex: 1;
   display: flex;
-  min-height: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.map-sidebar {
-  width: 340px;
-  padding: 28px 24px;
-  border-right: 1px solid var(--map-border);
-  background: var(--map-panel);
-  overflow-y: auto;
-  flex-shrink: 0;
+.map-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.map-header-btn {
+  font-family: "Cinzel", serif;
+  background: transparent;
+  border: 1px solid var(--map-border);
+  color: var(--map-muted);
+  padding: 7px 14px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.map-header-btn:hover {
+  border-color: var(--map-accent);
+  color: var(--map-accent);
 }
 
 .map-canvas {
@@ -1474,190 +1486,6 @@ h3,
   max-width: 560px;
   max-height: 760px;
 }
-
-.map-title {
-  font-family: "Cinzel", serif;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  margin: 0 0 4px;
-  color: var(--map-accent);
-}
-
-.map-subtitle {
-  font-size: 11px;
-  color: var(--map-muted);
-  margin-bottom: 28px;
-  font-style: italic;
-}
-
-.map-section {
-  margin-bottom: 24px;
-}
-
-.map-h3 {
-  font-family: "Cinzel", serif;
-  font-weight: 500;
-  margin: 0 0 12px;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--map-muted);
-}
-
-.map-hr {
-  border: none;
-  border-top: 1px solid var(--map-border);
-  margin: 20px 0;
-}
-
-.map-primary,
-.map-secondary {
-  font-family: "Cinzel", serif;
-  border: none;
-  cursor: pointer;
-  padding: 11px 16px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-size: 11px;
-  font-weight: 600;
-  width: 100%;
-  transition: opacity 0.15s, background 0.15s;
-}
-
-.map-primary {
-  background: var(--map-accent);
-  color: var(--map-bg);
-  margin-bottom: 8px;
-}
-
-.map-primary:hover {
-  opacity: 0.85;
-}
-
-.map-secondary {
-  background: transparent;
-  color: var(--map-muted);
-  border: 1px solid var(--map-border);
-}
-
-.map-secondary:hover {
-  color: var(--map-text);
-  border-color: var(--map-dim);
-}
-
-.map-slider-row,
-.map-force-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.map-slider-row label,
-.map-force-row label {
-  width: 30px;
-  font-size: 11px;
-  color: var(--map-muted);
-  font-family: ui-monospace, monospace;
-}
-
-.map-slider-row input[type="range"] {
-  flex: 1;
-  accent-color: var(--map-accent);
-}
-
-.map-slider-value {
-  width: 36px;
-  font-size: 11px;
-  text-align: right;
-  color: var(--map-muted);
-  font-family: ui-monospace, monospace;
-}
-
-.map-toggle {
-  padding: 5px 10px;
-  font-size: 11px;
-  background: transparent;
-  border: 1px solid var(--map-border);
-  color: var(--map-muted);
-  cursor: pointer;
-  font-family: ui-monospace, monospace;
-  flex: 1;
-  transition: all 0.15s;
-}
-
-.map-toggle:hover {
-  border-color: var(--map-dim);
-  color: var(--map-text);
-}
-
-.map-toggle.active {
-  background: var(--map-accent);
-  color: var(--map-bg);
-  border-color: var(--map-accent);
-  font-weight: 600;
-}
-
-.map-readout {
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  color: var(--map-muted);
-  padding: 14px;
-  background: var(--map-bg);
-  border: 1px solid var(--map-border);
-  line-height: 1.8;
-}
-
-.map-readout > div {
-  display: flex;
-  gap: 14px;
-}
-
-.map-readout .map-k {
-  color: var(--map-dim);
-  width: 56px;
-  flex-shrink: 0;
-}
-
-.map-readout .map-v {
-  color: var(--map-text);
-}
-
-.map-warning {
-  display: block;
-  margin-top: 6px;
-  font-size: 10px;
-  color: #c47474;
-  font-style: italic;
-}
-
-.map-legend {
-  font-size: 10px;
-  color: var(--map-muted);
-  line-height: 1.8;
-  font-family: ui-monospace, monospace;
-}
-
-.map-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 2px;
-}
-
-.map-legend-swatch {
-  width: 18px;
-  height: 2px;
-  flex-shrink: 0;
-}
-
-.swatch-pillar { background: var(--map-edge-pillar); height: 2px; }
-.swatch-horizontal { background: var(--map-edge-horizontal); }
-.swatch-bookend-upper { background: var(--map-edge-bookend-upper); }
-.swatch-bookend-lower { background: var(--map-edge-bookend-lower); }
-.swatch-cross { background: var(--map-edge-cross); }
 
 /* SVG */
 
