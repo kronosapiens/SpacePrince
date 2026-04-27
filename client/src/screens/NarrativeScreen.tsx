@@ -12,7 +12,7 @@ export default function NarrativeScreen() {
         <div className="stub-eyebrow">Narrative · House Encounters</div>
         <h1 className="stub-title">Not yet inhabited</h1>
         <p className="stub-prose">
-          The twelve houses are specified in <code>spec/HOUSES.md</code>. This
+          The twelve houses are specified in <code>spec/mechanics/HOUSES.md</code>. This
           surface will host the push-your-luck decision trees, chart-conditioned
           options, and house-archetype encounters described there.
         </p>

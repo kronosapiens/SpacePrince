@@ -8,7 +8,7 @@ Purpose:
 - Define a concrete execution order for implementation.
 - Separate locked decisions from open questions.
 
-This plan complements `spec/CHART.md` and should be updated when decisions change.
+This plan complements `spec/mechanics/CHART.md` and should be updated when decisions change.
 
 ---
 
@@ -145,7 +145,7 @@ These were not fully locked in planning and should be finalized during implement
 When restarting work, confirm:
 
 - This document still matches current decisions.
-- `spec/CHART.md` scope has not changed.
+- `spec/mechanics/CHART.md` scope has not changed.
 - Oracle generator output hashes are stable.
 - Numeric rounding behavior still matches golden vectors.
 

@@ -3,10 +3,10 @@
 *The philosophical chorus that gives each planet its personality.*
 
 Each of the seven classical planets has a **chorus** — a small set of thinkers whose writings share a tonal register that matches the planet's archetype.
-At various points in the game (principally the opening of narrative encounters; see `spec/HOUSES.md`), the player receives a short fragment drawn from the relevant planet's chorus.
+At various points in the game (principally the opening of narrative encounters; see `spec/mechanics/HOUSES.md`), the player receives a short fragment drawn from the relevant planet's chorus.
 Fragments frame a decision, set a mood, and over many runs build up a symbolic association between each planet and its felt voice.
 
-This document supersedes the *Voice Register*, *When Planets Speak*, and *Chart Recognition* sections of `spec/VIBES.md`.
+This document supersedes the *Voice Register*, *When Planets Speak*, and *Chart Recognition* sections of `spec/design/VIBES.md`.
 
 Influences include *Everything* (David OReilly), in which Alan Watts fragments surface as the player moves through the world.
 The effect we're aiming for is similar: evocative, philosophical, ambient — language that points at meaning without explaining it.
@@ -21,7 +21,7 @@ Fragments appear in the game at moments where mood matters more than mechanics.
 Each node in a house encounter opens with a short fragment in the voice of the house's ruling planet.
 The fragment frames the decision beneath it — sets tonal expectations before the player reads their options.
 A Saturn-framed 12th-house encounter opens with Saturn-weight; a Venus-framed 5th-house encounter opens with Venus-ease.
-See `spec/HOUSES.md` for encounter structure.
+See `spec/mechanics/HOUSES.md` for encounter structure.
 
 **Likely secondary usages:** planetary-combat moments of significance (opening of a run, combustion, possibly others), progression milestones.
 These are not specced here — PLANETS.md is the content library, not the integration schedule.

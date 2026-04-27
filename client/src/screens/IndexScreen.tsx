@@ -27,7 +27,7 @@ const SURFACES: SurfaceLink[] = [
     eyebrow: "Houses",
     title: "Narrative",
     blurb:
-      "Twelve-house decision-tree encounters. Stubbed; design lives in spec/HOUSES.md.",
+      "Twelve-house decision-tree encounters. Stubbed; design lives in spec/mechanics/HOUSES.md.",
   },
 ];
 

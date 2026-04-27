@@ -194,7 +194,7 @@ Policy:
 
 This document only covers chart construction.
 
-Combat/encounter resolution remains defined in `spec/MECHANICS.md`.
+Combat/encounter resolution remains defined in `spec/mechanics/MECHANICS.md`.
 
 Key interface contract between systems:
 

@@ -3,9 +3,9 @@
 This document defines the **narrative encounter** system, organized around the twelve astrological houses.
 Narrative encounters are an alternative node type to combat, offering short decision trees and push-your-luck choices rather than turn-by-turn planetary resolution.
 
-Combat mechanics are specified in `spec/MECHANICS.md`.
-Chart construction (whole-sign houses, ASC, rulerships) is specified in `spec/CHART.md`.
-Map topology is specified in `spec/MAP.md`.
+Combat mechanics are specified in `spec/mechanics/MECHANICS.md`.
+Chart construction (whole-sign houses, ASC, rulerships) is specified in `spec/mechanics/CHART.md`.
+Map topology is specified in `spec/mechanics/MAP.md`.
 
 ---
 

@@ -17,7 +17,7 @@ The guiding principle:
 Every planet has a **voice** — a tonal register drawn from real philosophical, literary, and spiritual traditions.
 Fragments in that voice appear at moments where mood matters more than mechanics, principally the opening of narrative encounters.
 
-See `spec/PLANETS.md` for the full specification — chorus authors per planet, usage, voice rules, and sourcing notes.
+See `spec/concept/PLANETS.md` for the full specification — chorus authors per planet, usage, voice rules, and sourcing notes.
 
 ---
 
@@ -71,7 +71,7 @@ Clean geometric forms saturated with color, arranged with the logic of a mandala
 The roguelike map — the structure of nodes and paths the player traverses each run — evokes the **Kabbalistic Tree of Life**.
 
 Seven layers arranged vertically, each either a single central node or a left-right pair, connected by pillar spines and asymmetric bookends.
-The topology is procedurally generated each run from a simple grammar (see `spec/MAP.md` for construction rules).
+The topology is procedurally generated each run from a simple grammar (see `spec/mechanics/MAP.md` for construction rules).
 Occasionally the generation produces something very close to the actual Sephirot.
 Deniably so.
 
