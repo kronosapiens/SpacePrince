@@ -1355,6 +1355,9 @@ h3,
 }
 
 .screen-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 12px;
 }
 
@@ -1371,6 +1374,33 @@ h3,
 .screen-nav-link:hover,
 .map-back:hover {
   color: var(--accent-strong);
+}
+
+.screen-nav-toggle {
+  font-family: "Cinzel", serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.screen-nav-toggle:hover {
+  color: var(--accent-strong);
+}
+
+.screen-nav-toggle:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.screen-nav-toggle.is-active {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .stub-body {

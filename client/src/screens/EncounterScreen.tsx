@@ -42,6 +42,10 @@ export default function EncounterScreen() {
     "space-prince-run",
     null
   );
+  const [devMode, setDevMode] = useLocalStorage<boolean>(
+    "space-prince-dev-mode",
+    false
+  );
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(
     null
@@ -152,6 +156,14 @@ export default function EncounterScreen() {
         <Link to="/" className="screen-nav-link">
           ← Index
         </Link>
+        <button
+          type="button"
+          className={`screen-nav-toggle${devMode ? " is-active" : ""}`}
+          aria-pressed={devMode}
+          onClick={() => setDevMode((v) => !v)}
+        >
+          Dev
+        </button>
       </div>
       <HeroHeader onNewVoyage={handleStartRun} />
 
@@ -255,16 +267,18 @@ export default function EncounterScreen() {
         </div>
       </section>
 
-      <div className="interaction-log-row">
-        <InteractionChart
-          playerChart={profile.chart}
-          opponentChart={opponentChart}
-          opponentPlanet={displayOpponentPlanet}
-          run={run}
-          focusedPlanet={hoveredPlanet}
-        />
-        <EncounterLog run={run} />
-      </div>
+      {devMode && (
+        <div className="interaction-log-row">
+          <InteractionChart
+            playerChart={profile.chart}
+            opponentChart={opponentChart}
+            opponentPlanet={displayOpponentPlanet}
+            run={run}
+            focusedPlanet={hoveredPlanet}
+          />
+          <EncounterLog run={run} />
+        </div>
+      )}
     </div>
   );
 }
