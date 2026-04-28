@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { seededChart, blankSideState } from "@/game/chart";
 import { newMapState } from "@/game/run";
+import { eligibleNext } from "@/game/map-gen";
 import { beginCombatEncounter } from "@/game/encounter";
 import { rollNodeContent } from "@/game/map-content";
 import { mulberry32, hashString } from "@/game/rng";
@@ -101,10 +102,16 @@ export function makeDevRun(seed: number, profile: Profile): RunState {
   };
 }
 
-/** Build an ephemeral map with all frontier nodes pre-rolled so the diagram
- *  reads as varied (combat + narrative mixed). */
+/** Build an ephemeral map with deterministic walk progress. From the seed:
+ *  - all nodes are pre-rolled (combat / narrative content)
+ *  - a partial walk is simulated (forward-only via eligibleNext) so the
+ *    diagram has a current position, a visited path, and eligible-next nodes
+ *  Re-visiting the same seed always produces the same walk + content.
+ */
 export function makeDevMap(seed: number): MapState {
   const base = newMapState(seed);
+
+  // Roll content for every node deterministically.
   const rolled: Record<string, NodeContent> = {};
   let lastNarrative: number | null = null;
   for (const node of base.graph.nodes) {
@@ -113,7 +120,28 @@ export function makeDevMap(seed: number): MapState {
     rolled[node.id] = content;
     if (content.kind === "narrative") lastNarrative = content.house;
   }
-  return { ...base, rolledNodes: rolled };
+
+  // Simulate a partial walk. Walk 1..5 layers forward from L1 — never starting
+  // at the start node and never reaching the terminal so there's always a
+  // visible past, current, and eligible-next.
+  const walkRng = mulberry32(hashString(`${seed}_walk`));
+  const targetSteps = 1 + Math.floor(walkRng() * 5); // 1..5 forward steps
+  const path: string[] = [base.currentNodeId];
+  let currentNodeId = base.currentNodeId;
+  for (let step = 0; step < targetSteps; step++) {
+    const next = eligibleNext(base.graph, currentNodeId);
+    if (next.length === 0) break;
+    const idx = Math.floor(walkRng() * next.length);
+    currentNodeId = next[idx]!;
+    path.push(currentNodeId);
+  }
+
+  return {
+    ...base,
+    rolledNodes: rolled,
+    visitedNodeIds: path,
+    currentNodeId,
+  };
 }
 
 /** Build an ephemeral combat encounter. */

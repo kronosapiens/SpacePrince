@@ -157,19 +157,29 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 
 ### 4.2 Nodes
 
-Two types, distinguished by shape and fill:
+Two content types, distinguished by shape and fill:
 
 - **Combat node:** ringed circle, Bone outline, no fill. Reads as *"another chart waits here."*
-- **Narrative node:** filled circle in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."*
+- **Narrative node:** filled circle in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."* The house's ruling-planet glyph appears at the node center.
 
-States, with rendering progressively gaining and then losing saturation as the player passes through:
+Each node also has one of four **temporal states** relative to the player's current position. Together with content type, the state determines what's rendered:
 
-- **Distant undiscovered nodes** — small unstyled circles. No color, no shape distinction (combat vs. narrative is undecided here — content has not yet been rolled). Placeholders.
-- **Eligible-next nodes (future)** — full visual at full saturation, with the "Map node arrival" pulse from `STYLE.md §7`. Content has been rolled.
-- **Current node** — full visual + active-planet halo per `STYLE.md §11`.
-- **Traversed nodes (past)** — full shape preserved, but **desaturated**; the node remembers what was there, faded. The progression from full saturation (future) to full saturation + halo (current) to desaturation (past) reads as a wave passing across the map.
+- **Current** — the player's standing position. Emphasized: larger node radius, active-planet halo (planet-color radial gradient), and a colored ring around the disc. There is exactly one current node per map. Even a current *combat* node — which is a ringed shape with no fill — gets the halo and emphasis ring so the player's location is unmistakable.
+- **Eligible-next** — nodes exactly **one layer forward** from current along the topology (per `MAP.md` edge rules). Rendered with full content at full saturation. Same-layer siblings are *not* eligible — the player can't step sideways. The eligible set surfaces a soft pulse on entry per the "Map node arrival" motion in `STYLE.md §7`.
+- **Traversed (past)** — nodes on the player's walk-path so far, excluding current. Full content visible but **at reduced opacity (~0.35)**. The shape and ruler color are preserved so the player can read the path they came from; the desaturation says "this is memory, not action."
+- **Distant** — every other node. Always rendered as **unfilled outline circles only**, regardless of whether the topology is exposed. No content visible, no glyph, no ruler color. The road ahead is geometry; what waits on it is unknowable until the player approaches.
+
+Distant nodes therefore render the same whether or not their content has been rolled. **Knowing what's there is a function of where the player stands**, not a function of internal state. This preserves the "diagram of emanation" feel from `VIBES.md`: meaning concentrates near the player and dissolves into potential at distance.
+
+The progression from outline (distant) to full saturation (eligible) to full saturation + halo (current) to desaturation (past) reads as a wave passing across the map.
 
 Click/tap on a traversed node will eventually reveal an outcome detail popup (especially relevant in the end-of-run map browser, per `§6.1`). Treatment TBD.
+
+### 4.2.1 Determinism
+
+A map's full visual state — topology, content per node, walk-path so far, and current position — is **deterministically derived from a single seed**. Re-rendering the same seed always produces the same map and the same point along the walk. This matters for two reasons: it lets the player share a specific run state via URL, and it lets dev tooling reproduce exact map states for screen-iteration work.
+
+Walk derivation in dev mode: from the seed, walk 1–5 forward steps from L1 along eligibleNext (deterministic seeded RNG), with the final node becoming current and intermediate nodes becoming traversed. In real gameplay the walk is the player's actual history, but the same deterministic principle applies to topology + content rolls.
 
 ### 4.3 Lazy node generation
 

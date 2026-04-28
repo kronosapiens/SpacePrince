@@ -233,15 +233,8 @@ function DevMapScreen() {
           unlockedPlanets={unlockedPlanets(999)}
         />
       </div>
-      <div className="map-distance">
-        <span className="eyebrow">DISTANCE</span>
-        <span className="map-distance-v">—</span>
-      </div>
       <div className="map-diagram-wrap">
         <MapDiagram map={map} onSelectNode={handleNodeSelect} />
-      </div>
-      <div className="map-caption">
-        <span className="eyebrow">DEV · {seedHash}</span>
       </div>
     </div>
   );

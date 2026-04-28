@@ -151,9 +151,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  padding: 36px 24px;
+  /* Chart pinned to a fixed top offset so it doesn't recenter when the
+     content below changes between input / reveal / settled stages. */
+  justify-content: flex-start;
+  gap: 24px;
+  padding: 6vh 24px 24px;
   text-align: center;
 }
 
@@ -294,7 +296,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 4px;
   height: 100%;
   justify-content: center;
 }
@@ -670,66 +672,83 @@
   text-transform: uppercase;
 }
 
-/* ── Dev Bar (visible when devModeActive) ─────────────────────────────── */
+/* ── Page dropdown (top-right) ────────────────────────────────────────── */
 
-.dev-bar {
+.page-dropdown {
   position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 8px 16px;
-  background: rgba(11, 10, 15, 0.85);
-  border: 1px solid var(--smoke);
-  border-radius: 999px;
+  top: 20px;
+  right: 24px;
   z-index: 100;
   font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--mist);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
-.dev-bar-label {
-  color: var(--gold-hi);
-  font-weight: 500;
-  letter-spacing: 0.32em;
-}
-.dev-bar-nav {
+.page-dropdown-button {
   display: flex;
-  gap: 14px;
   align-items: center;
-}
-.dev-bar-link {
-  color: var(--mist);
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 200ms ease;
-}
-.dev-bar-link:hover { color: var(--bone); }
-.dev-bar-link.is-active { color: var(--bone); }
-.dev-bar-actions {
-  display: flex;
-  gap: 8px;
-  border-left: 1px solid var(--smoke);
-  padding-left: 14px;
-}
-.dev-bar-btn {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--bone);
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(11, 10, 15, 0.75);
   border: 1px solid var(--smoke);
   border-radius: 999px;
-  padding: 4px 12px;
+  color: var(--bone);
   cursor: pointer;
-  transition: border-color 200ms ease, color 200ms ease;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 200ms ease;
 }
-.dev-bar-btn:hover { border-color: var(--bone); }
-.dev-bar-btn-quiet { color: var(--mist); }
+.page-dropdown-button:hover { border-color: var(--mist); }
+.page-dropdown-eyebrow {
+  color: var(--mist);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+}
+.page-dropdown-current {
+  color: var(--bone);
+  font-weight: 500;
+}
+.page-dropdown-caret {
+  color: var(--mist);
+  font-size: 10px;
+  transform: translateY(-1px);
+}
+.page-dropdown-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  margin: 0;
+  padding: 6px 0;
+  background: rgba(11, 10, 15, 0.95);
+  border: 1px solid var(--smoke);
+  border-radius: 12px;
+  list-style: none;
+  min-width: 180px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.page-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 18px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mist);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color 180ms ease, background 180ms ease;
+}
+.page-dropdown-item:hover {
+  color: var(--bone);
+  background: rgba(232, 226, 212, 0.04);
+}
+.page-dropdown-item.is-current { color: var(--bone); }
 
 /* ── Index (dev) ──────────────────────────────────────────────────────── */
 

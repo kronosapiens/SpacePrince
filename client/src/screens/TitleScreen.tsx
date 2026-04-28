@@ -32,7 +32,7 @@ export function TitleScreen() {
         <div className="title-foot">
           <button
             className="begin-btn"
-            onClick={() => navigate(ROUTES.mint)}
+            onClick={() => navigate(ROUTES.start)}
             type="button"
           >
             Recognize a Position
@@ -43,7 +43,7 @@ export function TitleScreen() {
   }
 
   const settings = loadDevSettings();
-  const beginLabel = run && !run.over ? "Continue" : "Begin";
+  const beginLabel = run && !run.over ? "Start" : "Begin";
   const unlocked = unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll);
 
   return (

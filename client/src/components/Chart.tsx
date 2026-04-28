@@ -4,7 +4,7 @@ import { getAspects } from "@/game/aspects";
 import {
   CHART_CENTER, CHART_SIZE,
   INNER_RING_R, OUTER_RING_R,
-  PLANET_R_REST, PLANET_R_ACTIVE, PLANET_HALO_R,
+  PLANET_R_REST, PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
   STROKE_LIGHT,
 } from "@/svg/viewbox";
@@ -293,7 +293,9 @@ function PlanetGlyph({
 }) {
   const c = PLANET_PRIMARY[point.planet];
   const sec = PLANET_SECONDARY[point.planet];
-  const r = active ? point.glyphRActive : point.glyphR;
+  // Active no longer enlarges the glyph — the ring carries the state,
+  // matches the on-hover treatment.
+  const r = point.glyphR;
   const interactive = !passive && (!!onClick || !!onHover) && !combusted && !ghost;
 
   const handleClick = onClick && interactive
@@ -345,7 +347,8 @@ function PlanetGlyph({
       className={combusted ? "anim-combust" : undefined}
     >
       {active && (
-        <circle r={PLANET_HALO_R} fill={`url(#v2-halo-${point.planet})`} />
+        <circle r={point.glyphR + 6} fill="none"
+          stroke={c} strokeOpacity="0.9" strokeWidth={STROKE_LIGHT} />
       )}
       {(inspect || selected) && !active && (
         <circle r={point.glyphR + 10} fill="none"

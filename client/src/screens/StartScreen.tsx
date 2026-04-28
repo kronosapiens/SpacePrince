@@ -12,7 +12,7 @@ import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Profile, PlanetName, SignName } from "@/game/types";
 
-type Stage = "input" | "confirming" | "revealing" | "settled";
+type Stage = "input" | "revealing" | "settled";
 
 interface FormState {
   name: string;
@@ -26,7 +26,7 @@ const REVEAL_INTERVAL_MS = 2500;
 const HELD_MOMENT_MS = 1500;
 const GHOST_FADE_MS = 1500;
 
-export function MintScreen() {
+export function StartScreen() {
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
   const [stage, setStage] = useState<Stage>("input");
@@ -91,6 +91,12 @@ export function MintScreen() {
     setActive(last);
   }, [stage, revealedCount, setActive]);
 
+  // Keep the canvas neutral on the input + settled stages — no carry-over tint
+  // from the previous screen.
+  useEffect(() => {
+    if (stage === "input" || stage === "settled") setActive(null);
+  }, [stage, setActive]);
+
   const revealedPlanets: PlanetName[] = useMemo(
     () => (ghosted ? ["Moon"] : MACROBIAN_ORDER.slice(0, revealedCount)),
     [revealedCount, ghosted],
@@ -129,7 +135,7 @@ export function MintScreen() {
     navigate(ROUTES.title);
   };
 
-  const showCeremony = stage === "revealing" || stage === "settled" || stage === "confirming";
+  const showCeremony = stage === "revealing" || stage === "settled";
 
   return (
     <div className="mint-screen">
@@ -149,8 +155,6 @@ export function MintScreen() {
       </div>
 
       <div className="mint-center">
-        <span className="eyebrow">RECOGNITION</span>
-
         {stage === "input" && computed && (
           <div className="mint-stage">
             <Chart
@@ -179,14 +183,6 @@ export function MintScreen() {
         {stage === "input" && (
           <>
             <div className="mint-form">
-              <Field label="Name (optional)">
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Prince"
-                />
-              </Field>
               <Field label="Date">
                 <input
                   type="date"
@@ -219,26 +215,16 @@ export function MintScreen() {
                 />
               </Field>
             </div>
-            <button className="begin-btn" onClick={() => setStage("confirming")} disabled={!computed}>
-              Continue
+            <button className="begin-btn" onClick={handleConfirm} disabled={!computed}>
+              Begin
             </button>
-          </>
-        )}
-
-        {stage === "confirming" && (
-          <>
-            <div className="mint-caption-italic">This position may only be recognized once.</div>
-            <div style={{ display: "flex", gap: 24 }}>
-              <button className="begin-btn begin-btn-ghost" onClick={() => setStage("input")}>Reconsider</button>
-              <button className="begin-btn" onClick={handleConfirm}>Recognize this position</button>
-            </div>
           </>
         )}
 
         {stage === "revealing" && (
           <div className="mint-caption-italic">
             {currentRevealing && currentSign ? (
-              <>The {currentRevealing} rises in {currentSign}.</>
+              <>{currentRevealing} rises in {currentSign}.</>
             ) : (
               <>—</>
             )}
@@ -247,8 +233,8 @@ export function MintScreen() {
 
         {stage === "settled" && (
           <>
-            <div className="mint-caption-italic">Only the Moon stands today. The rest will be revealed.</div>
-            <button className="begin-btn" onClick={handleEnter}>Enter</button>
+            <div className="mint-caption-italic">The Moon rises in the east. The rest will be revealed in time.</div>
+            <button className="begin-btn" onClick={handleEnter}>Continue</button>
           </>
         )}
 

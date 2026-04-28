@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
 import { loadProfile, saveProfile } from "@/state/profile";
@@ -62,7 +62,6 @@ export function EndOfRunScreen() {
   return (
     <div className="eor">
       <div className="eor-top">
-        <div className="eor-caption">The world remembers.</div>
         <div className="eor-counts">
           <div>
             <span className="eor-big">{Math.round(run.runDistance).toLocaleString()}</span>
@@ -115,8 +114,7 @@ export function EndOfRunScreen() {
       </div>
 
       <div className="eor-actions">
-        <Link to={ROUTES.title} className="begin-btn begin-btn-ghost">Return to Title</Link>
-        <button className="begin-btn" onClick={beginNew}>Begin a New Run</button>
+        <button className="begin-btn" onClick={beginNew}>Begin again</button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties } from "react";
-import { layoutNodes, eligibleNext, neighborsOf, NUM_LAYERS } from "@/game/map-gen";
+import { layoutNodes, eligibleNext } from "@/game/map-gen";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
@@ -13,6 +13,8 @@ interface MapDiagramProps {
 }
 
 const NODE_R = 22;
+const NODE_R_CURRENT = 28;
+const TRAVERSED_OPACITY = 0.35;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
   const positioned = useMemo(() => {
@@ -23,15 +25,14 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     return raw.map((n) => ({ ...n, y: maxY - n.y }));
   }, [map.graph.nodes, bottomUp]);
 
+  // "Eligible" = nodes exactly 1 layer ahead of the current position
+  // (forward-only). Sibling nodes at the same layer aren't eligible — the
+  // player can't backtrack or step sideways.
   const eligible = useMemo(
     () => new Set(eligibleNext(map.graph, map.currentNodeId)),
     [map.graph, map.currentNodeId],
   );
   const visited = useMemo(() => new Set(map.visitedNodeIds), [map.visitedNodeIds]);
-  const eligibleNeighbors = useMemo(
-    () => new Set(neighborsOf(map.graph.edges, map.currentNodeId)),
-    [map.graph.edges, map.currentNodeId],
-  );
 
   const xs = positioned.map((n) => n.x);
   const ys = positioned.map((n) => n.y);
@@ -62,6 +63,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const eligibleEdge =
       (e.from === map.currentNodeId && eligible.has(e.to)) ||
       (e.to === map.currentNodeId && eligible.has(e.from));
+    void eligibleEdge;
     const inReach = both || eligibleEdge;
     const rA = ruler(e.from);
     const rB = ruler(e.to);
@@ -89,9 +91,9 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   const nodeEls = positioned.map((n) => {
     const content = map.rolledNodes[n.id];
     const isCurrent = n.id === map.currentNodeId;
-    const isEligible = eligibleNeighbors.has(n.id) && !visited.has(n.id);
+    const isEligible = eligible.has(n.id);
     const isTraversed = visited.has(n.id) && !isCurrent;
-    const distant = !isCurrent && !isEligible && !isTraversed;
+    const isDistant = !isCurrent && !isEligible && !isTraversed;
     const r = ruler(n.id);
     const color = r ? PLANET_PRIMARY[r] : NEUTRAL.bone;
     const isNarrative = content?.kind === "narrative";
@@ -100,24 +102,30 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     if (isCurrent) {
       haloDefs.push(
         <radialGradient key={`mh-${n.id}`} id={`m2-halo-${n.id}`}>
-          <stop offset="0%" stopColor={color} stopOpacity="0.6" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.7" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </radialGradient>,
       );
     }
 
-    const handleClick = onSelectNode && eligibleNeighbors.has(n.id) && !isCurrent
+    const handleClick = onSelectNode && isEligible
       ? () => onSelectNode(n.id)
       : undefined;
     const isClickable = !!handleClick;
 
-    if (distant && !content) {
-      // Placeholder — small unstyled dot.
+    // Distant nodes (>1 layer ahead, or off-path) render as light outline
+    // circles only — no fill, no glyph, regardless of whether content has
+    // been pre-rolled. The player can't see what's on the road yet.
+    if (isDistant) {
       return (
-        <circle key={n.id} cx={n.x} cy={n.y} r={4}
-          fill={NEUTRAL.bone} fillOpacity="0.25" />
+        <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
+          <circle r={NODE_R} fill="none"
+            stroke={NEUTRAL.bone} strokeOpacity="0.18" strokeWidth={1} />
+        </g>
       );
     }
+
+    const nodeRadius = isCurrent ? NODE_R_CURRENT : NODE_R;
 
     return (
       <g
@@ -127,22 +135,27 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         style={{ cursor: isClickable ? "pointer" : "default" }}
       >
         {isCurrent && (
-          <circle r={64} fill={`url(#m2-halo-${n.id})`} />
+          <>
+            <circle r={80} fill={`url(#m2-halo-${n.id})`} />
+            <circle r={NODE_R_CURRENT + 6} fill="none"
+              stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
+          </>
         )}
         {isEligible && (
           <circle r={32} fill="none"
-            stroke={color} strokeOpacity="0.45" strokeWidth={1} />
+            stroke={color} strokeOpacity="0.55" strokeWidth={1} />
         )}
-        <circle r={NODE_R}
+        <circle r={nodeRadius}
           fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isTraversed ? 0.2 : 0.85) : 0}
+          fillOpacity={isNarrative ? (isTraversed ? TRAVERSED_OPACITY : 0.9) : 0}
           stroke={color}
-          strokeOpacity={isTraversed ? 0.4 : 1}
-          strokeWidth={1.8} />
+          strokeOpacity={isTraversed ? TRAVERSED_OPACITY : 1}
+          strokeWidth={isCurrent ? 2.4 : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
-            fontSize={18} fill={isTraversed ? color : NEUTRAL.void}
-            fillOpacity={isTraversed ? 0.6 : 1}
+            fontSize={isCurrent ? 22 : 18}
+            fill={isTraversed ? color : NEUTRAL.void}
+            fillOpacity={isTraversed ? 0.55 : 1}
             fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
             fontWeight={600}
             style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -150,14 +163,12 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           </text>
         )}
         {isCombat && (
-          <circle r={8} fill="none" stroke={color}
-            strokeOpacity={isTraversed ? 0.4 : 0.85} strokeWidth={1} />
+          <circle r={isCurrent ? 11 : 8} fill="none" stroke={color}
+            strokeOpacity={isTraversed ? TRAVERSED_OPACITY : 0.9} strokeWidth={1} />
         )}
       </g>
     );
   });
-
-  void NUM_LAYERS;
 
   return (
     <svg
