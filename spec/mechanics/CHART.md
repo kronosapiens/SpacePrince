@@ -190,7 +190,45 @@ Policy:
 
 ---
 
-## 9. Relationship to Game Mechanics
+## 9. Empirical Distribution
+
+Charts mint from real ephemeris, not a uniform 12-sign distribution.
+Clustering — multiple planets sharing a sign — is the rarity surface for both gameplay and the NFT artifact, and real charts cluster much harder than a naive model would suggest.
+The structural reason is that Mercury is locked within ~28° of the Sun and Venus within ~48°, so Sun–Mercury–Venus huddles are a constant feature of real charts.
+
+Largest cluster (most planets sharing any one sign), measured across 250k charts sampled uniformly over 1850–2050:
+
+| Largest cluster | Real charts |
+|---|---|
+| 1 (all signs different) | 2.47% |
+| 2 | 55.18% |
+| 3 | 34.15% |
+| 4 | 7.21% |
+| 5 | 0.925% |
+| 6 | 0.049% |
+| 7 (all in one sign) | 0.0016% |
+
+Cumulative ("at least k planets sharing a sign"):
+
+| Threshold | Real |
+|---|---|
+| ≥ 3 | 42.34% |
+| ≥ 4 | 8.19% |
+| ≥ 5 | 0.98% |
+| ≥ 6 | 0.051% |
+| ≥ 7 | 0.0016% |
+
+Implications for rarity tiering:
+
+- Triple-stelliums are common (~42%), not rare — most Princes will have one.
+- Quadruple-stelliums (~8%, ~1 in 12) are the natural "rare" tier.
+- Quintuple+ (≤1%) is genuine scarcity.
+- "All seven different signs" is itself rare (~2.5%) — a "scattered" Prince is its own distinction, not the baseline.
+- Clusters that don't include Sun/Mercury/Venus are much rarer than the headline numbers suggest, and may deserve their own recognition.
+
+---
+
+## 10. Relationship to Game Mechanics
 
 This document only covers chart construction.
 
