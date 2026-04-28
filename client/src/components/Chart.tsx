@@ -180,10 +180,6 @@ export function Chart(props: ChartProps) {
   // Substrate (hexagram + vesica) — only when explicitly requested.
   const substrate = showSubstrate ? renderSubstrate() : null;
 
-  // ASC line — full horizontal cut across the inner ring.
-  const ascLeft = polar(CHART_CENTER, CHART_CENTER, INNER_RING_R, 180);
-  const ascRight = polar(CHART_CENTER, CHART_CENTER, INNER_RING_R, 0);
-
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
@@ -220,14 +216,12 @@ export function Chart(props: ChartProps) {
       {fieldBlooms}
       {substrate}
 
-      {/* Diagram layer: rings + ticks + sign labels + ASC line + aspect web */}
+      {/* Diagram layer: rings + ticks + sign labels + aspect web */}
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={OUTER_RING_R}
         fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1.5} />
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
         fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.45" strokeWidth={1} />
       <SignTicks />
-      <line x1={ascLeft.x} y1={ascLeft.y} x2={ascRight.x} y2={ascRight.y}
-        stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
       <SignLabels ascSignIdx={ascSignIdx} />
       {aspectLines}
 
