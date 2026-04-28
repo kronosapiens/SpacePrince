@@ -670,6 +670,67 @@
   text-transform: uppercase;
 }
 
+/* ── Dev Bar (visible when devModeActive) ─────────────────────────────── */
+
+.dev-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 16px;
+  background: rgba(11, 10, 15, 0.85);
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  z-index: 100;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--mist);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.dev-bar-label {
+  color: var(--gold-hi);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+}
+.dev-bar-nav {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.dev-bar-link {
+  color: var(--mist);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+.dev-bar-link:hover { color: var(--bone); }
+.dev-bar-link.is-active { color: var(--bone); }
+.dev-bar-actions {
+  display: flex;
+  gap: 8px;
+  border-left: 1px solid var(--smoke);
+  padding-left: 14px;
+}
+.dev-bar-btn {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone);
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.dev-bar-btn:hover { border-color: var(--bone); }
+.dev-bar-btn-quiet { color: var(--mist); }
+
 /* ── Index (dev) ──────────────────────────────────────────────────────── */
 
 .index-screen {

@@ -16,6 +16,8 @@ import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter"
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
 import { getTree } from "@/data/narrative-trees";
+import { getOrCreateDevProfile, makeDevMap, useDevSeed } from "@/state/dev-state";
+import { blankSideState } from "@/game/chart";
 import type {
   EncounterState,
   Profile,
@@ -23,7 +25,15 @@ import type {
   NodeContent,
 } from "@/game/types";
 
+const blankSideStateConst = blankSideState();
+
 export function MapScreen() {
+  const settings = loadDevSettings();
+  if (settings.devModeActive) return <DevMapScreen />;
+  return <NormalMapScreen />;
+}
+
+function NormalMapScreen() {
   const navigate = useNavigate();
   const [profile] = useState<Profile | null>(() => loadProfile());
   const [run, setRun] = useState<RunState | null>(() => {
@@ -41,7 +51,7 @@ export function MapScreen() {
     setActive(null); // map fades to neutral
   }, [setActive]);
 
-  const settings = useMemo(() => loadDevSettings(), []);
+  const settings = loadDevSettings();
   const playerUnlocked = useMemo(
     () => (profile ? unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll) : []),
     [profile, settings.unlockAll],
@@ -172,4 +182,51 @@ function roman(n: number): string {
     while (v >= k) { out += s; v -= k; }
   }
   return out;
+}
+
+// ── Dev mode map ───────────────────────────────────────────────────────────
+
+function DevMapScreen() {
+  const navigate = useNavigate();
+  const seed = useDevSeed();
+  const profile = useMemo(() => getOrCreateDevProfile(), []);
+  const map = useMemo(() => makeDevMap(seed), [seed]);
+  const { setActive } = useActivePlanet();
+  useEffect(() => { setActive(null); }, [setActive]);
+
+  const handleNodeSelect = useCallback(
+    (nodeId: string) => {
+      const content = map.rolledNodes[nodeId];
+      if (!content) return;
+      const nextSeed = randomSeed();
+      if (content.kind === "combat") {
+        navigate(`${ROUTES.encounter}?r=${nextSeed}`);
+      } else {
+        navigate(`${ROUTES.narrative}?r=${nextSeed}&house=${content.house}`);
+      }
+    },
+    [map, navigate],
+  );
+
+  return (
+    <div className="map-screen">
+      <div className="map-anchor">
+        <ChartAnchor
+          chart={profile.chart}
+          state={blankSideStateConst}
+          unlockedPlanets={unlockedPlanets(999)}
+        />
+      </div>
+      <div className="map-distance">
+        <span className="eyebrow">DISTANCE</span>
+        <span className="map-distance-v">—</span>
+      </div>
+      <div className="map-diagram-wrap">
+        <MapDiagram map={map} onSelectNode={handleNodeSelect} />
+      </div>
+      <div className="map-caption">
+        <span className="eyebrow">DEV · seed {seed}</span>
+      </div>
+    </div>
+  );
 }

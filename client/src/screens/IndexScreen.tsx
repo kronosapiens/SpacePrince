@@ -36,7 +36,8 @@ export function IndexScreen() {
             ["Title", ROUTES.title],
             ["Mint", ROUTES.mint],
             ["Map", ROUTES.map],
-            ["Encounter", ROUTES.encounter],
+            ["Encounter (Combat)", ROUTES.encounter],
+            ["Narrative", ROUTES.narrative],
             ["End of Run", ROUTES.end],
             ["Chart Study", ROUTES.study],
           ] as Array<[string, string]>
@@ -146,6 +147,16 @@ export function IndexScreen() {
 
       <section>
         <div className="t-chrome-em" style={{ marginBottom: 8 }}>Cheats</div>
+        <div className="index-cheat" style={{ borderBottom: "1px solid var(--smoke)", paddingBottom: 12, marginBottom: 8 }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={settings.devModeActive}
+              onChange={(e) => update({ ...settings, devModeActive: e.target.checked })}
+            />
+            <strong>Dev mode</strong> — suspend game state; /map, /encounter, /narrative show ephemeral random state
+          </label>
+        </div>
         <div className="index-cheat">
           <label>
             <input

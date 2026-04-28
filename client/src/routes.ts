@@ -3,6 +3,7 @@ export const ROUTES = {
   mint: "/mint",
   map: "/map",
   encounter: "/encounter",
+  narrative: "/narrative",
   end: "/end",
   study: "/study",
   index: "/__index",
