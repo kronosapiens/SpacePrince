@@ -41,3 +41,9 @@ export const SIGN_ELEMENT_COLOR = {
   Air: "#E8E2D4",
   Water: "#9EC9A8",
 } as const;
+
+/** Aspect-line colors per v1: green for harmonious, red for tense. */
+export const ASPECT_COLOR = {
+  harmony: "#8FBC8F", // trine, sextile, conjunction
+  tension: "#CD2626", // square, opposition
+} as const;

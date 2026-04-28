@@ -33,31 +33,40 @@
   border-radius: 999px;
   cursor: pointer;
   transition: background 220ms ease, color 220ms ease, border-color 220ms ease;
+  animation: begin-breath 3s ease-in-out infinite;
 }
-.begin-btn:hover { background: var(--bone); color: var(--void); }
-.begin-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.begin-btn:hover {
+  background: var(--bone);
+  color: var(--void);
+  animation: none;
+  opacity: 1;
+}
+.begin-btn:disabled { opacity: 0.45; cursor: not-allowed; animation: none; }
 .begin-btn-ghost {
   border-color: var(--mist);
   color: var(--mist);
   font-size: 18px;
   padding: 10px 32px;
   font-style: italic;
+  animation: none; /* secondary action — no breath */
 }
 .begin-btn-ghost:hover { background: transparent; color: var(--bone); border-color: var(--bone); }
 
 /* ── Title ─────────────────────────────────────────────────────────────── */
 
+/* Equal 1fr rows above and below the chart so the wordmark and the
+   Begin/Continue button each sit centered in their own space. */
 .title {
   position: relative;
   z-index: 1;
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  row-gap: 24px;
-  padding: 32px 0 48px;
+  grid-template-rows: 1fr auto 1fr;
 }
 
 .title-wordmark {
+  align-self: center;
+  justify-self: center;
   text-align: center;
   font-family: var(--serif);
   font-size: 28px;
@@ -73,20 +82,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
   padding: 0 24px;
+  min-height: 0;
 }
 .title-chart {
   position: relative;
   z-index: 1;
   width: 100%;
   max-width: 680px;
+  /* Cap height by viewport so chart never crowds wordmark/button on short screens. */
+  max-height: 80vh;
   aspect-ratio: 1 / 1;
-  max-height: 100%;
 }
-.title-chart > svg { display: block; max-width: 100%; max-height: 100%; }
+.title-chart > svg { display: block; width: 100%; height: 100%; }
 
 .title-foot {
+  align-self: center;
+  justify-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;

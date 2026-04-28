@@ -9,7 +9,7 @@ import {
   STROKE_LIGHT,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
+import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
 import type {
   AspectConnection,
   Chart as ChartType,
@@ -161,14 +161,14 @@ export function Chart(props: ChartProps) {
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
-        const fromC = PLANET_PRIMARY[a.from];
-        const fromS = PLANET_SECONDARY[a.from];
+        // v1 convention: harmonious (trine/sextile/conjunction) = green,
+        // tense (square/opposition) = red. Source-planet color is too noisy.
         const stroke =
-          a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction" ? fromC :
-          a.aspect === "Square" ? fromS :
-          NEUTRAL.mist;
-        const opacity = isActive ? 0.95 : isInspect ? 0.75 : 0.18;
-        const sw = isActive ? 2 : isInspect ? 1.4 : 0.6;
+          a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction"
+            ? ASPECT_COLOR.harmony
+            : ASPECT_COLOR.tension;
+        const opacity = isActive ? 0.8 : isInspect ? 0.5 : 0.2;
+        const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
         const len = Math.hypot(dx, dy) || 1;
@@ -322,7 +322,8 @@ function PlanetGlyph({
 
   const fill = combusted ? "#3B2F2F" : c;
   const fillOpacity = combusted ? 0.4 : 0.92;
-  const glyphFill = combusted ? NEUTRAL.mist : NEUTRAL.void;
+  // Planet glyph in Smoke (rather than pure Void) — softer on saturated fills.
+  const glyphFill = combusted ? NEUTRAL.mist : NEUTRAL.smoke;
 
   // Affliction badge — center-facing side of planet, half in / half out.
   const dx = CHART_CENTER - point.cx;

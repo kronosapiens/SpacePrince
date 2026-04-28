@@ -53,7 +53,6 @@ export function TitleScreen() {
         <div className="title-chart">
           <Chart
             chart={profile.chart}
-            state={run?.perPlanetState}
             unlockedPlanets={unlocked}
             allActive
             hoveredPlanet={hovered}

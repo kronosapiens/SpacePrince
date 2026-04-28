@@ -36,6 +36,13 @@
   to   { opacity: 1; }
 }
 
+/* Gentle breath on the primary action button — Begin / Continue.
+   Opacity-only, slow, low amplitude. Draws the eye without fidgeting. */
+@keyframes begin-breath {
+  0%, 100% { opacity: 0.78; }
+  50%      { opacity: 1; }
+}
+
 .anim-combust {
   animation: combust var(--m-combust) var(--ease-combust) forwards;
 }
