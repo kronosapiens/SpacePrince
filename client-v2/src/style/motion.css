@@ -1,0 +1,69 @@
+/* Named motions per STYLE.md §7 / VIBES.md */
+
+@keyframes pulse-active {
+  0%   { transform: scale(1);   opacity: 0.95; }
+  50%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1);   opacity: 0.95; }
+}
+
+@keyframes combust {
+  0%   { filter: saturate(1) brightness(1); opacity: 1; }
+  60%  { filter: saturate(0.4) brightness(0.7); opacity: 0.8; }
+  100% { filter: saturate(0) brightness(0.55); opacity: 0.55; }
+}
+
+@keyframes fragment-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes encounter-open-left {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes encounter-open-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes encounter-open-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes map-node-arrival {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ghost-emerge {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+.anim-pulse-active {
+  animation: pulse-active var(--m-planet-active) var(--ease-inout) infinite;
+  transform-origin: center;
+}
+
+.anim-combust {
+  animation: combust var(--m-combust) var(--ease-combust) forwards;
+}
+
+.anim-fragment-in {
+  animation: fragment-in var(--m-fragment) var(--ease-out) both;
+}
+
+.anim-fragment-in-1 { animation-delay: 0ms; }
+.anim-fragment-in-2 { animation-delay: 200ms; }
+.anim-fragment-in-3 { animation-delay: 400ms; }
+.anim-fragment-in-4 { animation-delay: 600ms; }
+
+.anim-encounter-open-left  { animation: encounter-open-left  var(--m-encounter-open) var(--ease-out) both; }
+.anim-encounter-open-right { animation: encounter-open-right var(--m-encounter-open) var(--ease-out) both; }
+.anim-encounter-open-fade  { animation: encounter-open-fade  var(--m-encounter-open) var(--ease-out) both; }
+
+.anim-map-arrival { animation: map-node-arrival var(--m-map-arrival) var(--ease-out) both; }
+
+.anim-ghost-emerge { animation: ghost-emerge var(--m-encounter-open) var(--ease-out) both; }
