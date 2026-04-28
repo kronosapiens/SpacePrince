@@ -54,6 +54,7 @@ export function TitleScreen() {
             chart={profile.chart}
             state={run?.perPlanetState}
             unlockedPlanets={unlocked}
+            allActive
             showColorField
             passive
           />

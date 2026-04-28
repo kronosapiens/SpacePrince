@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
-import { PLANETS, SIGN_ELEMENT, SIGNS } from "@/game/data";
+import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import {
   CHART_CENTER, CHART_SIZE,
@@ -9,7 +9,7 @@ import {
   STROKE_LIGHT,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, SIGN_ELEMENT_COLOR } from "@/svg/palette";
+import { NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
 import type {
   AspectConnection,
   Chart as ChartType,
@@ -65,6 +65,9 @@ export interface ChartProps {
   selectedPlanet?: PlanetName | null;
   /** Always-active planet (e.g. opponent-of-the-turn). Pulses with full halo. */
   activePlanet?: PlanetName | null;
+  /** When true, every visible planet renders in active state (full halo + larger glyph).
+   *  Used for ceremonial / hero stages like the Title screen. */
+  allActive?: boolean;
   /** Hover preview state. */
   hoveredPlanet?: PlanetName | null;
   /** Sustained inspection (Chart Study). Brighter aspects, gold ring. */
@@ -94,6 +97,7 @@ export function Chart(props: ChartProps) {
     unlockedPlanets,
     selectedPlanet,
     activePlanet,
+    allActive = false,
     hoveredPlanet,
     inspectPlanet,
     showColorField = true,
@@ -146,7 +150,8 @@ export function Chart(props: ChartProps) {
         const from = pointMap[a.from];
         const to = pointMap[a.to];
         if (!from || !to) return null;
-        const isActive = activePlanet === a.from || activePlanet === a.to ||
+        const isActive = allActive ||
+                         activePlanet === a.from || activePlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
@@ -231,7 +236,7 @@ export function Chart(props: ChartProps) {
         const combusted = status?.combusted ?? false;
         const unlocked = isUnlocked(p.planet);
         const isSelected = selectedPlanet === p.planet;
-        const isActive = activePlanet === p.planet;
+        const isActive = (allActive && unlocked && !combusted) || activePlanet === p.planet;
         const isHovered = hoveredPlanet === p.planet;
         const isInspect = inspectPlanet === p.planet;
         const projectedDelta = projection?.deltas[p.planet];
@@ -400,18 +405,17 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
     const offset = (i - ascSignIdx + 12) % 12;
     const ang = 180 + offset * 30 + 15;
     const p = polar(CHART_CENTER, CHART_CENTER, SIGN_LABEL_R, ang);
-    const color = SIGN_ELEMENT_COLOR[SIGN_ELEMENT[sign]];
     out.push(
       <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={color} fillOpacity="0.85"
+          fontSize={20} fill={NEUTRAL.bone} fillOpacity="0.7"
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={color} fillOpacity="0.85"
+          fontSize={22} fill={NEUTRAL.bone} fillOpacity="0.7"
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}
