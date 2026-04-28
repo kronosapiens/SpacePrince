@@ -160,11 +160,22 @@ export function makeDevMap(seed: number): MapState {
 /** Build an ephemeral combat encounter. */
 export function makeDevCombat(seed: number, profile: Profile): CombatEncounter {
   const run = makeDevRun(seed, profile);
-  return beginCombatEncounter({
+  const encounter = beginCombatEncounter({
     run,
     opponentSeed: seed,
     lifetimeEncounterCount: profile.lifetimeEncounterCount,
   });
+  return {
+    ...encounter,
+    turnIndex: syntheticDevTurnIndex(seed, encounter),
+  };
+}
+
+/** Stable turn progress for generated combat pages. */
+export function syntheticDevTurnIndex(seed: number, encounter: CombatEncounter): number {
+  if (encounter.sequence.length <= 1) return 0;
+  const rng = mulberry32(hashString(`${seed}_turn`));
+  return Math.floor(rng() * encounter.sequence.length);
 }
 
 /** Build an ephemeral narrative encounter. House defaults to seed-picked
