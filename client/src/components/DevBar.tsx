@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { loadDevSettings, saveDevSettings } from "@/state/settings";
-import { randomSeed } from "@/game/rng";
 
 /**
  * Floating dev-mode panel — visible on every screen when devModeActive is on.
@@ -29,10 +28,17 @@ export function DevBar() {
 
   if (!settings.devModeActive) return null;
 
+  // Reroll = navigate to the bare route, which then auto-redirects to a fresh
+  // seeded URL. Pull the route prefix off the current path.
   const reroll = () => {
-    const params = new URLSearchParams(location.search);
-    params.set("r", String(randomSeed()));
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    const seg = location.pathname.split("/").filter(Boolean)[0] ?? "";
+    const target =
+      seg === "map" ? ROUTES.map :
+      seg === "encounter" ? ROUTES.encounter :
+      seg === "narrative" ? ROUTES.narrative :
+      location.pathname;
+    // Preserve query params (e.g. ?house= for narrative).
+    navigate(`${target}${location.search}`);
   };
 
   const skip = () => navigate(ROUTES.map);

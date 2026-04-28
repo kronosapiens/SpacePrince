@@ -19,8 +19,11 @@ export function App() {
         <Route path={ROUTES.title} element={<TitleScreen />} />
         <Route path={ROUTES.mint} element={<MintScreen />} />
         <Route path={ROUTES.map} element={<MapScreen />} />
+        <Route path={`${ROUTES.map}/:seed`} element={<MapScreen />} />
         <Route path={ROUTES.encounter} element={<EncounterScreen />} />
+        <Route path={`${ROUTES.encounter}/:seed`} element={<EncounterScreen />} />
         <Route path={ROUTES.narrative} element={<NarrativeRoute />} />
+        <Route path={`${ROUTES.narrative}/:seed`} element={<NarrativeRoute />} />
         <Route path={ROUTES.end} element={<EndOfRunScreen />} />
         <Route path={ROUTES.study} element={<ChartStudyScreen />} />
         <Route path={ROUTES.index} element={<IndexScreen />} />

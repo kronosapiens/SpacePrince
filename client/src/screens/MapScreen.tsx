@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { MapDiagram } from "@/components/MapDiagram";
 import { ROUTES } from "@/routes";
@@ -16,7 +16,12 @@ import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter"
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
 import { getTree } from "@/data/narrative-trees";
-import { getOrCreateDevProfile, makeDevMap, useDevSeed } from "@/state/dev-state";
+import {
+  generateSeedHash,
+  getOrCreateDevProfile,
+  makeDevMap,
+  seedFromHash,
+} from "@/state/dev-state";
 import { blankSideState } from "@/game/chart";
 import type {
   EncounterState,
@@ -188,7 +193,16 @@ function roman(n: number): string {
 
 function DevMapScreen() {
   const navigate = useNavigate();
-  const seed = useDevSeed();
+  const { seed: seedHash } = useParams<{ seed?: string }>();
+
+  // Bare /map → generate a hash and replace into the URL.
+  useEffect(() => {
+    if (!seedHash) {
+      navigate(`${ROUTES.map}/${generateSeedHash()}`, { replace: true });
+    }
+  }, [seedHash, navigate]);
+
+  const seed = seedHash ? seedFromHash(seedHash) : 0;
   const profile = useMemo(() => getOrCreateDevProfile(), []);
   const map = useMemo(() => makeDevMap(seed), [seed]);
   const { setActive } = useActivePlanet();
@@ -198,15 +212,17 @@ function DevMapScreen() {
     (nodeId: string) => {
       const content = map.rolledNodes[nodeId];
       if (!content) return;
-      const nextSeed = randomSeed();
+      const nextHash = generateSeedHash();
       if (content.kind === "combat") {
-        navigate(`${ROUTES.encounter}?r=${nextSeed}`);
+        navigate(`${ROUTES.encounter}/${nextHash}`);
       } else {
-        navigate(`${ROUTES.narrative}?r=${nextSeed}&house=${content.house}`);
+        navigate(`${ROUTES.narrative}/${nextHash}?house=${content.house}`);
       }
     },
     [map, navigate],
   );
+
+  if (!seedHash) return null; // wait for redirect
 
   return (
     <div className="map-screen">
@@ -225,7 +241,7 @@ function DevMapScreen() {
         <MapDiagram map={map} onSelectNode={handleNodeSelect} />
       </div>
       <div className="map-caption">
-        <span className="eyebrow">DEV · seed {seed}</span>
+        <span className="eyebrow">DEV · {seedHash}</span>
       </div>
     </div>
   );

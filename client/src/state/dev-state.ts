@@ -19,21 +19,29 @@ import type {
 } from "@/game/types";
 
 /**
- * Hooks that synthesize ephemeral state for dev mode. State is keyed on the
- * `r` URL param + an optional `house` param so the DevBar's Reroll button
- * regenerates by changing the URL.
+ * Hooks + helpers that synthesize ephemeral state for dev mode. State is
+ * keyed on the URL :seed segment (8-char base36 hash). The DevBar's Reroll
+ * navigates to the bare path; the route component generates a fresh hash
+ * and replace-navigates to /<route>/<hash>.
  */
 
-export function useDevSeed(): number {
-  const location = useLocation();
-  return useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    const r = params.get("r");
-    if (r) return Number(r) || hashString(r);
-    return hashString(location.pathname);
-  }, [location.search, location.pathname]);
+const SEED_HASH_LEN = 8;
+
+/** Generate a fresh 8-character base36 hash for use as a seed. */
+export function generateSeedHash(): string {
+  let s = "";
+  for (let i = 0; i < SEED_HASH_LEN; i++) {
+    s += Math.floor(Math.random() * 36).toString(36);
+  }
+  return s;
 }
 
+/** Convert an 8-char hash back into a numeric seed for the RNG. */
+export function seedFromHash(hash: string): number {
+  return hashString(hash);
+}
+
+/** Pull the `?house=N` query param if present (1..12). */
 export function useDevHouseParam(): number | null {
   const location = useLocation();
   return useMemo(() => {

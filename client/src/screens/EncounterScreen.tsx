@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { loadProfile, saveProfile } from "@/state/profile";
 import { loadRun, saveRun } from "@/state/run-store";
@@ -7,10 +7,11 @@ import { loadDevSettings } from "@/state/settings";
 import { EncounterCombatScreen } from "./EncounterCombat";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
 import {
+  generateSeedHash,
   getOrCreateDevProfile,
   makeDevCombat,
   makeDevRun,
-  useDevSeed,
+  seedFromHash,
 } from "@/state/dev-state";
 import type { Profile, RunState } from "@/game/types";
 
@@ -62,13 +63,30 @@ function NormalEncounterScreen() {
   );
 }
 
-/** /encounter in dev mode — fresh combat encounter per seed. */
+/** /encounter in dev mode — fresh combat encounter per seed.
+ *  Bare /encounter redirects to /encounter/<hash>; the hash drives the seed. */
 function DevCombatScreen() {
-  const seed = useDevSeed();
+  const navigate = useNavigate();
+  const { seed: seedHash } = useParams<{ seed?: string }>();
+
+  useEffect(() => {
+    if (!seedHash) {
+      navigate(`${ROUTES.encounter}/${generateSeedHash()}`, { replace: true });
+    }
+  }, [seedHash, navigate]);
+
+  const seed = seedHash ? seedFromHash(seedHash) : 0;
   const profile = useMemo(() => getOrCreateDevProfile(), []);
   const baseRun = useMemo(() => makeDevRun(seed, profile), [seed, profile]);
   const encounter = useMemo(() => makeDevCombat(seed, profile), [seed, profile]);
   const [run, setRun] = useState<RunState>({ ...baseRun, currentEncounter: encounter });
+
+  // Reset the in-memory run when seed changes (Reroll → new hash → remount via key).
+  useEffect(() => {
+    setRun({ ...baseRun, currentEncounter: encounter });
+  }, [baseRun, encounter]);
+
+  if (!seedHash) return null;
 
   return (
     <EncounterCombatScreen
