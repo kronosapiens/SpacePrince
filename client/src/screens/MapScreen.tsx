@@ -21,6 +21,7 @@ import {
   getOrCreateDevProfile,
   makeDevMap,
   seedFromHash,
+  syntheticDevDistance,
 } from "@/state/dev-state";
 import { blankSideState } from "@/game/chart";
 import type {
@@ -205,6 +206,7 @@ function DevMapScreen() {
   const seed = seedHash ? seedFromHash(seedHash) : 0;
   const profile = useMemo(() => getOrCreateDevProfile(), []);
   const map = useMemo(() => makeDevMap(seed), [seed]);
+  const distance = useMemo(() => syntheticDevDistance(seed, map), [seed, map]);
   const { setActive } = useActivePlanet();
   useEffect(() => { setActive(null); }, [setActive]);
 
@@ -232,6 +234,10 @@ function DevMapScreen() {
           state={blankSideStateConst}
           unlockedPlanets={unlockedPlanets(999)}
         />
+      </div>
+      <div className="map-distance">
+        <span className="eyebrow">DISTANCE</span>
+        <span className="map-distance-v">{Math.round(distance)}</span>
       </div>
       <div className="map-diagram-wrap">
         <MapDiagram map={map} onSelectNode={handleNodeSelect} />

@@ -85,14 +85,15 @@ export function clearDevProfile(): void {
 
 /** Build an ephemeral run state from a seed. */
 export function makeDevRun(seed: number, profile: Profile): RunState {
+  const currentMap = makeDevMap(seed);
   return {
     id: `dev_run_${seed}`,
     seed,
     startedAt: Date.now(),
     perPlanetState: blankSideState(),
-    runDistance: 0,
+    runDistance: syntheticDevDistance(seed, currentMap),
     runOmens: [],
-    currentMap: makeDevMap(seed),
+    currentMap,
     mapHistory: [],
     currentEncounter: null,
     seenFragmentIds: [],
@@ -100,6 +101,18 @@ export function makeDevRun(seed: number, profile: Profile): RunState {
     lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
     over: false,
   };
+}
+
+/** Stable screenshot/prototype distance for URL-generated dev pages.
+ *  It scales with simulated walk depth so hashed map/encounter pages don't
+ *  all read as a brand-new run. */
+export function syntheticDevDistance(seed: number, map: MapState): number {
+  const rng = mulberry32(hashString(`${seed}_distance`));
+  const completedSteps = Math.max(0, map.visitedNodeIds.length - 1);
+  const base = completedSteps * (9 + Math.floor(rng() * 7)); // 9..15 per step
+  const priorMaps = Math.floor(rng() * 3) * (42 + Math.floor(rng() * 24));
+  const drift = Math.floor(rng() * 9);
+  return base + priorMaps + drift;
 }
 
 /** Build an ephemeral map with deterministic walk progress. From the seed:

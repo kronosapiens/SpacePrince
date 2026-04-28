@@ -43,6 +43,17 @@
   50%      { opacity: 1; }
 }
 
+@keyframes tint-breath {
+  0%, 100% {
+    opacity: calc(var(--tint-opacity) * 0.72);
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: calc(var(--tint-opacity) * 1.08);
+    transform: scale(1.03);
+  }
+}
+
 .anim-combust {
   animation: combust var(--m-combust) var(--ease-combust) forwards;
 }

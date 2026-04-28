@@ -48,7 +48,7 @@ export function KandinskyComposition({ planet, size = 540 }: KandinskyCompositio
       }).join(" ")} fill="none" stroke={c} strokeOpacity="0.18" strokeWidth={0.5} />
       {/* Centerpiece glyph */}
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-        fontSize={120} fill={c}
+        fontSize={96} fill={c}
         fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif" fontWeight={500}>
         {glyph}
       </text>

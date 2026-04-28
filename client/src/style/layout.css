@@ -7,6 +7,7 @@
   pointer-events: none;
   z-index: 0;
   opacity: var(--tint-opacity);
+  transform-origin: 50% 45%;
   background: radial-gradient(
     70% 60% at 50% 45%,
     var(--tint-color, transparent) 0%,
@@ -14,6 +15,15 @@
     transparent 75%
   );
   transition: background var(--m-tint-shift) linear, opacity var(--m-tint-shift) linear;
+  animation: tint-breath 7s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tint-overlay {
+    animation: none;
+    transform: none;
+  }
 }
 
 .screen { position: relative; z-index: 1; min-height: 100vh; padding: var(--pad); display: flex; flex-direction: column; }
@@ -437,7 +447,6 @@
   max-width: 720px;
 }
 .narrative-composition {
-  grid-row: 1 / 3;
   align-self: center;
   margin-left: -40px;
   width: 280px;
@@ -700,6 +709,30 @@
   transition: border-color 200ms ease;
 }
 .page-dropdown-button:hover { border-color: var(--mist); }
+.page-refresh-button {
+  display: block;
+  width: calc(100% - 18px);
+  margin: 8px 9px 0 auto;
+  padding: 7px 12px;
+  background: rgba(11, 10, 15, 0.68);
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  color: var(--mist);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.page-refresh-button:hover {
+  border-color: var(--mist);
+  color: var(--bone);
+}
 .page-dropdown-eyebrow {
   color: var(--mist);
   font-weight: 500;

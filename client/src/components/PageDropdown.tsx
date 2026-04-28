@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
+import { generateSeedHash } from "@/state/dev-state";
 
 interface Page {
   label: string;
@@ -43,6 +44,12 @@ export function PageDropdown() {
   }, [location.pathname]);
 
   const current = detectCurrentPage(location.pathname);
+  const canRefresh = isRefreshablePage(current.path);
+
+  const handleRefresh = () => {
+    if (!canRefresh) return;
+    navigate(`${current.path}/${generateSeedHash()}`);
+  };
 
   return (
     <div className="page-dropdown" ref={ref}>
@@ -74,6 +81,15 @@ export function PageDropdown() {
           ))}
         </ul>
       )}
+      {canRefresh && (
+        <button
+          type="button"
+          className="page-refresh-button"
+          onClick={handleRefresh}
+        >
+          Refresh
+        </button>
+      )}
     </div>
   );
 }
@@ -82,4 +98,8 @@ function detectCurrentPage(pathname: string): Page {
   if (pathname === "/") return PAGES[0]!;
   const first = "/" + (pathname.split("/").filter(Boolean)[0] ?? "");
   return PAGES.find((p) => p.path === first) ?? PAGES[0]!;
+}
+
+function isRefreshablePage(path: string): boolean {
+  return path === ROUTES.map || path === ROUTES.encounter || path === ROUTES.narrative;
 }
