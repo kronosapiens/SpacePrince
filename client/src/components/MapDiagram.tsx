@@ -127,14 +127,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         style={{ cursor: isClickable ? "pointer" : "default" }}
       >
         {isCurrent && (
-          <circle r={64} fill={`url(#m2-halo-${n.id})`} className="anim-pulse-active" />
+          <circle r={64} fill={`url(#m2-halo-${n.id})`} />
         )}
         {isEligible && (
           <circle r={32} fill="none"
-            stroke={color} strokeOpacity="0.45" strokeWidth={1}>
-            <animate attributeName="r" values="26;34;26" dur="2.4s" repeatCount="indefinite" />
-            <animate attributeName="stroke-opacity" values="0.2;0.55;0.2" dur="2.4s" repeatCount="indefinite" />
-          </circle>
+            stroke={color} strokeOpacity="0.45" strokeWidth={1} />
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}

@@ -123,7 +123,9 @@ export function Chart(props: ChartProps) {
   }, [points]);
   const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
 
-  const isUnlocked = (p: PlanetName) => (unlockedPlanets ? unlockedPlanets.includes(p) : true);
+  // allActive overrides unlock-gating: every planet renders in full state.
+  const isUnlocked = (p: PlanetName) =>
+    allActive || (unlockedPlanets ? unlockedPlanets.includes(p) : true);
 
   const entranceClass =
     entrance === "left" ? "anim-encounter-open-left" :
@@ -236,7 +238,7 @@ export function Chart(props: ChartProps) {
         const combusted = status?.combusted ?? false;
         const unlocked = isUnlocked(p.planet);
         const isSelected = selectedPlanet === p.planet;
-        const isActive = (allActive && unlocked && !combusted) || activePlanet === p.planet;
+        const isActive = (allActive && !combusted) || activePlanet === p.planet;
         const isHovered = hoveredPlanet === p.planet;
         const isInspect = inspectPlanet === p.planet;
         const projectedDelta = projection?.deltas[p.planet];
@@ -336,7 +338,7 @@ function PlanetGlyph({
       className={combusted ? "anim-combust" : undefined}
     >
       {active && (
-        <circle r={PLANET_HALO_R} fill={`url(#v2-halo-${point.planet})`} className="anim-pulse-active" />
+        <circle r={PLANET_HALO_R} fill={`url(#v2-halo-${point.planet})`} />
       )}
       {(inspect || selected) && !active && (
         <circle r={point.glyphR + 10} fill="none"
