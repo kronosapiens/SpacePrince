@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { loadProfile } from "@/state/profile";
@@ -7,7 +7,13 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { unlockedPlanets } from "@/game/unlocks";
 import { loadDevSettings } from "@/state/settings";
-import type { PlanetName, Profile, RunState } from "@/game/types";
+import { seededChart } from "@/game/chart";
+import { hashString } from "@/game/rng";
+import type { Chart as ChartType, PlanetName, Profile, RunState } from "@/game/types";
+
+// Stable sample chart for visitors who haven't minted yet — same chart every
+// time so the lobby presents a consistent sample of what a Prince looks like.
+const SAMPLE_CHART_SEED = hashString("space-prince-sample-v1");
 
 export function TitleScreen() {
   const navigate = useNavigate();
@@ -20,31 +26,18 @@ export function TitleScreen() {
     setActive("Sun"); // ceremonial gold tint on Title
   }, [setActive]);
 
-  if (!profile) {
-    return (
-      <div className="title">
-        <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
-        <div className="title-stage">
-          <div style={{ textAlign: "center", maxWidth: 420 }}>
-            <p className="title-empty-line">A position has not yet been recognized.</p>
-          </div>
-        </div>
-        <div className="title-foot">
-          <button
-            className="begin-btn"
-            onClick={() => navigate(ROUTES.start)}
-            type="button"
-          >
-            Recognize a Position
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const sampleChart: ChartType = useMemo(
+    () => seededChart(SAMPLE_CHART_SEED, "Sample"),
+    [],
+  );
 
   const settings = loadDevSettings();
+  const chart = profile?.chart ?? sampleChart;
+  const unlocked = profile
+    ? unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll)
+    : []; // unused when allActive is on
   const beginLabel = run && !run.over ? "Start" : "Begin";
-  const unlocked = unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll);
+  const handleBegin = () => navigate(profile ? ROUTES.map : ROUTES.start);
 
   return (
     <div className="title">
@@ -52,7 +45,7 @@ export function TitleScreen() {
       <div className="title-stage">
         <div className="title-chart">
           <Chart
-            chart={profile.chart}
+            chart={chart}
             unlockedPlanets={unlocked}
             allActive
             hoveredPlanet={hovered}
@@ -63,7 +56,7 @@ export function TitleScreen() {
         </div>
       </div>
       <div className="title-foot">
-        <button className="begin-btn" onClick={() => navigate(ROUTES.map)} type="button">
+        <button className="begin-btn" onClick={handleBegin} type="button">
           {beginLabel}
         </button>
       </div>
