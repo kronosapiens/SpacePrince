@@ -24,7 +24,8 @@ export function ChartAnchor({ chart, state, unlockedPlanets, ceremonyPlanet, siz
         state={memoState}
         unlockedPlanets={unlockedPlanets}
         activePlanet={ceremonyPlanet ?? null}
-        showHouseWedges={false}
+        showColorField={false}
+        showAspects={false}
         passive
       />
     </div>

@@ -6,16 +6,18 @@ import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements } from "@/game/chart";
 import { saveProfile } from "@/state/profile";
 import { hashString } from "@/game/rng";
-import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
+import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import type { Chart as ChartType, Profile, PlanetName } from "@/game/types";
+import { PLANET_PRIMARY } from "@/svg/palette";
+import { PLANET_GLYPH } from "@/svg/glyphs";
+import type { Chart as ChartType, Profile, PlanetName, SignName } from "@/game/types";
 
 type Stage = "input" | "confirming" | "revealing" | "settled";
 
 interface FormState {
   name: string;
-  date: string; // YYYY-MM-DD
-  time: string; // HH:MM
+  date: string;
+  time: string;
   lat: string;
   lon: string;
 }
@@ -67,11 +69,9 @@ export function MintScreen() {
     }
   }, [form]);
 
-  // Reveal progression
   useEffect(() => {
     if (stage !== "revealing") return;
     if (revealedCount >= MACROBIAN_ORDER.length) {
-      // Active tint = Saturn briefly while held
       const t = window.setTimeout(() => {
         setGhosted(true);
         setActive(null);
@@ -80,13 +80,10 @@ export function MintScreen() {
       }, HELD_MOMENT_MS);
       return () => window.clearTimeout(t);
     }
-    const t = window.setTimeout(() => {
-      setRevealedCount((n) => n + 1);
-    }, REVEAL_INTERVAL_MS);
+    const t = window.setTimeout(() => setRevealedCount((n) => n + 1), REVEAL_INTERVAL_MS);
     return () => window.clearTimeout(t);
   }, [stage, revealedCount, setActive]);
 
-  // Tint active planet while it's painting in
   useEffect(() => {
     if (stage !== "revealing") return;
     if (revealedCount === 0) return;
@@ -98,6 +95,11 @@ export function MintScreen() {
     () => (ghosted ? ["Moon"] : MACROBIAN_ORDER.slice(0, revealedCount)),
     [revealedCount, ghosted],
   );
+
+  const currentRevealing = revealedCount > 0 ? MACROBIAN_ORDER[revealedCount - 1] : null;
+  const currentSign: SignName | null = currentRevealing && computed
+    ? computed.planets[currentRevealing].sign
+    : null;
 
   const handleConfirm = () => {
     if (!computed) return;
@@ -127,120 +129,147 @@ export function MintScreen() {
     navigate(ROUTES.title);
   };
 
+  const showCeremony = stage === "revealing" || stage === "settled" || stage === "confirming";
+
   return (
-    <div className="mint">
-      <div className="mint-stage">
+    <div className="mint-screen">
+      {/* Macrobian rainbow bands on the left edge */}
+      <div className="mint-bands">
+        {MACROBIAN_ORDER.map((p, i) => {
+          const isOn = stage === "revealing" || stage === "settled" ? i < revealedCount : false;
+          const isCurrent = stage === "revealing" && i === revealedCount - 1;
+          return (
+            <div
+              key={p}
+              className={`mint-band ${isOn ? "is-on" : ""} ${isCurrent ? "is-current" : ""}`}
+              style={{ background: PLANET_PRIMARY[p] }}
+            />
+          );
+        })}
+      </div>
+
+      <div className="mint-center">
+        <span className="eyebrow">RECOGNITION</span>
+
         {stage === "input" && computed && (
-          <div style={{ width: "min(420px, 70vw)", aspectRatio: "1 / 1" }}>
+          <div className="mint-stage">
             <Chart
               chart={computed}
               unlockedPlanets={[]}
-              showHouseWedges={false}
-              showAspects={false}
+              showColorField={false}
+              showSubstrate
               passive
             />
           </div>
         )}
-        {(stage === "confirming" || stage === "revealing" || stage === "settled") && computed && (
-          <div style={{ width: "min(540px, 80vw)", aspectRatio: "1 / 1" }}>
+
+        {showCeremony && computed && (
+          <div className="mint-stage">
             <Chart
               chart={computed}
               unlockedPlanets={revealedPlanets}
-              showHouseWedges
+              activePlanet={ghosted ? null : currentRevealing}
+              showColorField
+              showSubstrate
               passive
             />
           </div>
         )}
-      </div>
 
-      {stage === "input" && (
-        <>
-          <div className="mint-form">
-            <Field label="Name (optional)">
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Prince"
-              />
-            </Field>
-            <Field label="Date">
-              <input
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-              />
-            </Field>
-            <Field label="Time (UTC)">
-              <input
-                type="time"
-                step={900}
-                value={form.time}
-                onChange={(e) => setForm({ ...form, time: e.target.value })}
-              />
-            </Field>
-            <Field label="Latitude">
-              <input
-                type="number"
-                step="0.1"
-                value={form.lat}
-                onChange={(e) => setForm({ ...form, lat: e.target.value })}
-              />
-            </Field>
-            <Field label="Longitude">
-              <input
-                type="number"
-                step="0.1"
-                value={form.lon}
-                onChange={(e) => setForm({ ...form, lon: e.target.value })}
-              />
-            </Field>
-          </div>
-
-          <div className="mint-confirm">
-            <button
-              className="mint-confirm-btn"
-              onClick={() => setStage("confirming")}
-              disabled={!computed}
-            >
+        {stage === "input" && (
+          <>
+            <div className="mint-form">
+              <Field label="Name (optional)">
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Prince"
+                />
+              </Field>
+              <Field label="Date">
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                />
+              </Field>
+              <Field label="Time (UTC)">
+                <input
+                  type="time"
+                  step={900}
+                  value={form.time}
+                  onChange={(e) => setForm({ ...form, time: e.target.value })}
+                />
+              </Field>
+              <Field label="Latitude">
+                <input
+                  type="number"
+                  step="0.1"
+                  value={form.lat}
+                  onChange={(e) => setForm({ ...form, lat: e.target.value })}
+                />
+              </Field>
+              <Field label="Longitude">
+                <input
+                  type="number"
+                  step="0.1"
+                  value={form.lon}
+                  onChange={(e) => setForm({ ...form, lon: e.target.value })}
+                />
+              </Field>
+            </div>
+            <button className="begin-btn" onClick={() => setStage("confirming")} disabled={!computed}>
               Continue
             </button>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {stage === "confirming" && (
-        <div className="mint-confirm">
-          <div className="mint-confirm-text anim-fragment-in">
-            This position may only be recognized once.
-          </div>
-          <div style={{ display: "flex", gap: 24, marginTop: 8 }}>
-            <button className="title-second" onClick={() => setStage("input")}>Reconsider</button>
-            <button className="mint-confirm-btn" onClick={handleConfirm}>
-              Recognize this position
-            </button>
-          </div>
-        </div>
-      )}
+        {stage === "confirming" && (
+          <>
+            <div className="mint-caption-italic">This position may only be recognized once.</div>
+            <div style={{ display: "flex", gap: 24 }}>
+              <button className="begin-btn begin-btn-ghost" onClick={() => setStage("input")}>Reconsider</button>
+              <button className="begin-btn" onClick={handleConfirm}>Recognize this position</button>
+            </div>
+          </>
+        )}
 
-      {stage === "revealing" && (
-        <div className="mint-confirm">
-          <div className="mint-confirm-text anim-fragment-in">
-            {revealedCount === 0 ? "—" : revealedPlanets[revealedPlanets.length - 1]}
+        {stage === "revealing" && (
+          <div className="mint-caption-italic">
+            {currentRevealing && currentSign ? (
+              <>The {currentRevealing} rises in {currentSign}.</>
+            ) : (
+              <>—</>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {stage === "settled" && (
-        <div className="mint-confirm">
-          <div className="mint-confirm-text anim-fragment-in">
-            Only the Moon stands today. The rest will be revealed.
+        {stage === "settled" && (
+          <>
+            <div className="mint-caption-italic">Only the Moon stands today. The rest will be revealed.</div>
+            <button className="begin-btn" onClick={handleEnter}>Enter</button>
+          </>
+        )}
+
+        {/* Progress pips — Macrobian sequence as planet glyphs */}
+        {showCeremony && (
+          <div className="mint-progress">
+            {MACROBIAN_ORDER.map((p, i) => {
+              const isOn = i < revealedCount;
+              return (
+                <span
+                  key={p}
+                  className={`mint-pip ${isOn ? "is-on" : ""}`}
+                  style={{ ["--c" as any]: PLANET_PRIMARY[p] }}
+                >
+                  {PLANET_GLYPH[p]}
+                </span>
+              );
+            })}
           </div>
-          <button className="mint-confirm-btn anim-fragment-in" onClick={handleEnter}>
-            Enter
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -258,11 +287,7 @@ function quantizeMs(iso: string): number {
   const ms = new Date(iso).getTime();
   return Math.floor(ms / TIME_BUCKET_MS) * TIME_BUCKET_MS;
 }
+function roundLat(v: number): number { return Math.round(v * 10) / 10; }
+function roundLon(v: number): number { return Math.round(v * 10) / 10; }
 
-function roundLat(v: number): number {
-  return Math.round(v * 10) / 10;
-}
-
-function roundLon(v: number): number {
-  return Math.round(v * 10) / 10;
-}
+void SIGNS;

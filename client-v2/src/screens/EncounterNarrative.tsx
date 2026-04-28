@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
-import { ChorusFragment } from "@/components/ChorusFragment";
+import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { ROUTES } from "@/routes";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
@@ -21,6 +21,14 @@ import type {
   RunState,
 } from "@/game/types";
 
+const ROMAN = ["i", "ii", "iii", "iv", "v"];
+
+const HOUSE_NAMES = [
+  "First House", "Second House", "Third House", "Fourth House",
+  "Fifth House", "Sixth House", "Seventh House", "Eighth House",
+  "Ninth House", "Tenth House", "Eleventh House", "Twelfth House",
+];
+
 interface NarrativeScreenProps {
   run: RunState;
   profile: Profile;
@@ -39,12 +47,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const ariaPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
 
-  // Tint the canvas the house's natural ruler.
   useEffect(() => {
     setActive(ariaPlanet);
   }, [ariaPlanet, setActive]);
 
-  // Resolve fragment by id (already chosen at encounter open). If id not found, fall back to a fresh pick.
   const fragment = useMemo(() => {
     const fixed = getFragmentById(encounter.fragmentId);
     if (fixed) return fixed;
@@ -71,18 +77,14 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const [resolved, setResolved] = useState(encounter.resolved);
   const [resolutionLine, setResolutionLine] = useState<string | null>(encounter.resolutionText ?? null);
   const playerUnlocked = unlockedPlanets(profile.lifetimeEncounterCount);
-
   const node = useMemo(() => getTreeNode(tree, encounter.currentNodeId), [tree, encounter.currentNodeId]);
   const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
 
   const handleOption = (option: Option) => {
     if (resolved) return;
-
-    // Resolve outcomes (including push-your-luck rolls)
     let outcomes = option.outcomes ?? [];
     let resolutionText = "";
     if (option.outcomesOnSuccess || option.outcomesOnFail) {
-      // Luck roll vs joy planet (or ruler if no joy)
       const luckPlanet = joyPlanet ?? house.ruler;
       const placement = profile.chart.planets[luckPlanet];
       const luck = placement.base.luck + placement.buffs.luck;
@@ -93,14 +95,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     }
 
     let nextRun = applyOutcomes(run, profile, outcomes);
-
-    // Mark fragment as seen
     if (fragment && !nextRun.seenFragmentIds.includes(fragment.id)) {
       nextRun = { ...nextRun, seenFragmentIds: [...nextRun.seenFragmentIds, fragment.id] };
     }
 
     if (option.next) {
-      // Advance to child node within this encounter
       const updatedEnc: NarrativeEncounter = {
         ...encounter,
         currentNodeId: option.next,
@@ -112,7 +111,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       return;
     }
 
-    // Terminal — encounter resolves.
     const finalEnc: NarrativeEncounter = {
       ...encounter,
       resolved: true,
@@ -120,7 +118,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     };
     nextRun = { ...nextRun, currentEncounter: finalEnc };
 
-    // Increment lifetime encounter count (narrative also counts)
     const nextProfile: Profile = {
       ...profile,
       lifetimeEncounterCount: profile.lifetimeEncounterCount + 1,
@@ -128,7 +125,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     saveProfile(nextProfile);
     setProfile(nextProfile);
 
-    // Capture outcome on the map node for End-of-Run inspection.
     const combusts = PLANETS.filter(
       (p) => nextRun.perPlanetState[p].combusted && !run.perPlanetState[p].combusted,
     );
@@ -164,49 +160,75 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     navigate(ROUTES.map);
   };
 
+  const fragmentLines = (fragment?.text ?? "").split(/\n+/);
+
   return (
-    <div className="encounter narrative">
-      <div className="encounter-side">
+    <div className="narrative">
+      <div className="narrative-chart">
         <Chart
           chart={profile.chart}
           state={run.perPlanetState}
           unlockedPlanets={playerUnlocked}
           activePlanet={joyPlanet ?? null}
+          inspectPlanet={joyPlanet ?? null}
           entrance="left"
+          showColorField
           passive
         />
-      </div>
-      <div className="narrative-column anim-encounter-open-fade">
-        {fragment && (
-          <ChorusFragment
-            planet={ariaPlanet}
-            text={fragment.text}
-            attribution={fragment.author ? `— ${fragment.author}${fragment.source ? `, ${fragment.source}` : ""}` : undefined}
-          />
-        )}
-        <div className="narrative-text anim-fragment-in anim-fragment-in-3">
-          {resolved ? (resolutionLine ?? "It is finished.") : node.text}
+        <div className="narrative-distance">
+          <span className="eyebrow">DISTANCE</span>
+          <span className="narrative-distance-v">{Math.round(run.runDistance)}</span>
         </div>
-        <div className="narrative-options anim-fragment-in anim-fragment-in-4">
-          {!resolved && options.map((o) => (
+      </div>
+
+      <div className="narrative-column">
+        <div className="narrative-composition">
+          <KandinskyComposition planet={ariaPlanet} size={280} />
+        </div>
+
+        <div className="narrative-text anim-fragment-in">
+          {fragment && (
+            <>
+              <div className="narrative-fragment">
+                {fragmentLines.map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < fragmentLines.length - 1 ? <br /> : null}
+                  </span>
+                ))}
+              </div>
+              <div className="narrative-attrib">
+                {fragment.author?.toUpperCase() ?? ""}
+                {fragment.source ? ` · ${fragment.source.toUpperCase()}` : ""}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="narrative-body">
+          <div className="narrative-house">{HOUSE_NAMES[house.num - 1]}</div>
+          <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
+        </div>
+
+        <div className="narrative-options">
+          {!resolved && options.map((o, i) => (
             <button
               key={o.id}
-              className="narrative-option"
+              className={`option ${i === 1 ? "is-emph" : ""}`}
               onClick={() => handleOption(o)}
               type="button"
             >
-              <span>{o.text}</span>
-              {resolveAside(o, ctx) && (
-                <span className="narrative-option-aside">{resolveAside(o, ctx)}</span>
-              )}
+              <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
+              <span className="option-text">
+                {o.text}
+                {resolveAside(o, ctx) && (
+                  <span className="option-aside">{resolveAside(o, ctx)}</span>
+                )}
+              </span>
             </button>
           ))}
           {resolved && (
-            <button
-              className="continue-prompt-btn"
-              onClick={handleContinue}
-              type="button"
-            >
+            <button className="begin-btn" onClick={handleContinue}>
               {run.over ? "Walk back" : "Continue"}
             </button>
           )}

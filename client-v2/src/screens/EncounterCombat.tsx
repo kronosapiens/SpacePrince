@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
-import { TurnDots } from "@/components/TurnDots";
-import { OpponentIndicator } from "@/components/OpponentIndicator";
-import { DistanceReadout } from "@/components/DistanceReadout";
+import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { resolveTurn } from "@/game/turn";
 import { mulberry32 } from "@/game/rng";
@@ -14,6 +12,8 @@ import { saveProfile } from "@/state/profile";
 import { PLANETS } from "@/game/data";
 import { computeProjectedEffects } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
+import { PLANET_PRIMARY } from "@/svg/palette";
+import { PLANET_GLYPH } from "@/svg/glyphs";
 import type {
   CombatEncounter,
   NodeOutcome,
@@ -43,7 +43,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
 
-  // Tint to the opponent-of-the-turn (constant of the turn) per STYLE.md §5.
   useEffect(() => {
     setActive(opponentTurn);
   }, [opponentTurn, setActive]);
@@ -53,8 +52,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [profile.lifetimeEncounterCount, devUnlockAll],
   );
 
-  // Projection — when the player has tap-previewed a planet, compute the
-  // affliction deltas that would land on each side if they commit.
   const projection = useMemo(() => {
     if (!selected || !opponentTurn) return null;
     if (run.perPlanetState[selected].combusted) return null;
@@ -77,27 +74,23 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       if (encounter.resolved || settling) return;
       if (!playerUnlocked.includes(planet)) return;
       if (run.perPlanetState[planet].combusted) return;
-      // First tap = preview; second tap on same planet = commit.
       if (selected !== planet) {
         setSelected(planet);
         return;
       }
-      // Commit
       const rng = mulberry32((run.seed ^ encounter.turnIndex ^ Date.now()) >>> 0);
       const result = resolveTurn(run, profile.chart, planet, rng);
       if (!result) return;
       let nextRun = result.run;
       if (result.encounterEnded) {
-        // Award lifetime encounter increment when the encounter completes.
         const nextProfile: Profile = {
           ...profile,
           lifetimeEncounterCount: profile.lifetimeEncounterCount + 1,
         };
         saveProfile(nextProfile);
         setProfile(nextProfile);
-        // Capture outcome on the map node for End-of-Run inspection.
-        const combusts = PLANETS.filter((p) =>
-          nextRun.perPlanetState[p].combusted && !run.perPlanetState[p].combusted,
+        const combusts = PLANETS.filter(
+          (p) => nextRun.perPlanetState[p].combusted && !run.perPlanetState[p].combusted,
         );
         const outcome: NodeOutcome = {
           nodeId: nextRun.currentMap.currentNodeId,
@@ -117,8 +110,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       saveRun(nextRun);
       setRun(nextRun);
       setSelected(null);
-      // Settle phase — gives the eye a beat to register the change before
-      // the next opponent planet shows up. Roughly the trine duration.
       setSettling(true);
       window.setTimeout(() => setSettling(false), 1000);
     },
@@ -130,7 +121,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       navigate(ROUTES.end);
       return;
     }
-    // Clear encounter, return to map.
     const cleared: RunState = { ...run, currentEncounter: null };
     saveRun(cleared);
     setRun(cleared);
@@ -138,29 +128,62 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   };
 
   return (
-    <div className="encounter">
-      <div className="encounter-side">
+    <div className="combat">
+      <div className="combat-side">
         <Chart
           chart={profile.chart}
           state={run.perPlanetState}
           unlockedPlanets={playerUnlocked}
           selectedPlanet={selected}
           hoveredPlanet={hovered}
+          inspectPlanet={selected}
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
           onPlanetHover={setHovered}
           projection={projection ? { deltas: projection.self } : undefined}
         />
+        <div className="combat-side-label">SELF</div>
       </div>
 
-      <div className="encounter-seam">
-        <TurnDots total={encounter.sequence.length} current={encounter.turnIndex} />
-        <OpponentIndicator planet={opponentTurn} dim={encounter.resolved} />
-        <DistanceReadout value={run.runDistance} />
+      <div className="combat-seam">
+        {!encounter.resolved && opponentTurn && (
+          <div className="combat-opp-of-turn">
+            <span className="eyebrow">ANSWER</span>
+            <span
+              className="combat-opp-glyph"
+              style={{ color: PLANET_PRIMARY[opponentTurn] }}
+            >
+              {PLANET_GLYPH[opponentTurn]}
+            </span>
+            <span className="combat-opp-name">{opponentTurn.toUpperCase()}</span>
+          </div>
+        )}
+        {encounter.resolved && (
+          <div className="combat-opp-of-turn is-dim">
+            <span className="combat-opp-name">{run.over ? "COMBUST" : "SETTLED"}</span>
+          </div>
+        )}
+
+        <div className="combat-vesica">
+          <VesicaSeam planet={opponentTurn ?? "Mars"} />
+        </div>
+
+        <div className="combat-turn-dots">
+          {Array.from({ length: encounter.sequence.length }).map((_, i) => {
+            const cls = i < encounter.turnIndex ? "is-on" :
+                        i === encounter.turnIndex ? "is-current" : "";
+            return <span key={i} className={`combat-dot ${cls}`} />;
+          })}
+        </div>
+
+        <div className="combat-distance">
+          <span className="eyebrow">DISTANCE</span>
+          <span className="combat-distance-v">{Math.round(run.runDistance)}</span>
+        </div>
       </div>
 
-      <div className="encounter-side">
+      <div className="combat-side">
         <Chart
           chart={encounter.opponentChart}
           state={encounter.opponentState}
@@ -172,14 +195,12 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           projection={projection ? { deltas: projection.other } : undefined}
           passive
         />
+        <div className="combat-side-label">OTHER</div>
       </div>
 
       {encounter.resolved && (
-        <div
-          className="continue-prompt anim-fragment-in"
-          style={{ position: "fixed", bottom: 28, left: 0, right: 0, zIndex: 5 }}
-        >
-          <button className="continue-prompt-btn" onClick={handleContinue}>
+        <div className="continue-prompt">
+          <button className="begin-btn" onClick={handleContinue}>
             {run.over ? "Walk back" : "Continue"}
           </button>
         </div>

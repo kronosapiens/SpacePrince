@@ -5,6 +5,7 @@ import { loadProfile } from "@/state/profile";
 import { loadRun } from "@/state/run-store";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
+import { Spiral } from "@/components/Spiral";
 import { unlockedPlanets } from "@/game/unlocks";
 import { loadDevSettings } from "@/state/settings";
 import type { Profile, RunState } from "@/game/types";
@@ -16,21 +17,21 @@ export function TitleScreen() {
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
-    setActive(null);
+    setActive("Sun"); // ceremonial gold tint on Title
   }, [setActive]);
 
   if (!profile) {
     return (
       <div className="title">
-        <div className="title-wordmark t-display-em">SPACE PRINCE</div>
+        <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
         <div className="title-stage">
-          <div style={{ textAlign: "center", maxWidth: 400 }}>
-            <p className="title-line">A position has not yet been recognized.</p>
+          <div style={{ textAlign: "center", maxWidth: 420 }}>
+            <p className="title-empty-line">A position has not yet been recognized.</p>
           </div>
         </div>
         <div className="title-foot">
           <button
-            className="title-begin"
+            className="begin-btn"
             onClick={() => navigate(ROUTES.mint)}
             type="button"
           >
@@ -47,26 +48,30 @@ export function TitleScreen() {
 
   return (
     <div className="title">
-      <div className="title-wordmark t-display-em">SPACE PRINCE</div>
+      <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
       <div className="title-stage">
-        <div style={{ width: "min(560px, 80vw)", aspectRatio: "1 / 1" }}>
-          <Chart
-            chart={profile.chart}
-            state={run?.perPlanetState}
-            unlockedPlanets={unlocked}
-            passive
-          />
+        <div className="title-stage-inner">
+          <Spiral size={820} opacity={0.16} />
+          <div className="title-chart">
+            <Chart
+              chart={profile.chart}
+              state={run?.perPlanetState}
+              unlockedPlanets={unlocked}
+              showColorField
+              passive
+            />
+          </div>
         </div>
       </div>
       <div className="title-foot">
-        <button
-          className="title-begin"
-          onClick={() => navigate(ROUTES.map)}
-          type="button"
-        >
+        <button className="begin-btn" onClick={() => navigate(ROUTES.map)} type="button">
           {beginLabel}
         </button>
-        <Link className="title-second" to={ROUTES.study}>Chart Study</Link>
+        <Link className="title-second" to={ROUTES.study}>Sit with the chart</Link>
+      </div>
+      <div className="title-prince">
+        <span className="eyebrow">PRINCE</span>
+        <span className="title-prince-name">{profile.name} ▾</span>
       </div>
     </div>
   );

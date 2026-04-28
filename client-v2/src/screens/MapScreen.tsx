@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { MapDiagram } from "@/components/MapDiagram";
-import { DistanceReadout } from "@/components/DistanceReadout";
 import { ROUTES } from "@/routes";
 import { loadProfile } from "@/state/profile";
 import { loadRun, saveRun } from "@/state/run-store";
@@ -11,7 +10,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, randomSeed, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
-import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
+import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { beginRun, rolloverMap } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
@@ -26,7 +25,7 @@ import type {
 
 export function MapScreen() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(() => loadProfile());
+  const [profile] = useState<Profile | null>(() => loadProfile());
   const [run, setRun] = useState<RunState | null>(() => {
     const p = loadProfile();
     if (!p) return null;
@@ -38,10 +37,8 @@ export function MapScreen() {
   });
   const { setActive } = useActivePlanet();
 
-  void setProfile;
-  // Map ambient tint fades to neutral on mount.
   useEffect(() => {
-    setActive(null);
+    setActive(null); // map fades to neutral
   }, [setActive]);
 
   const settings = useMemo(() => loadDevSettings(), []);
@@ -53,7 +50,6 @@ export function MapScreen() {
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
       if (!run || !profile) return;
-      // Roll content for the target node if not yet rolled.
       let nextRun: RunState = { ...run };
       const existing = nextRun.currentMap.rolledNodes[nodeId];
       let content: NodeContent;
@@ -77,7 +73,6 @@ export function MapScreen() {
         };
       }
 
-      // Move player to the node.
       nextRun = {
         ...nextRun,
         currentMap: {
@@ -89,7 +84,6 @@ export function MapScreen() {
         },
       };
 
-      // Begin the encounter at this node.
       let encounter: EncounterState;
       if (content.kind === "combat") {
         encounter = beginCombatEncounter({
@@ -124,7 +118,6 @@ export function MapScreen() {
     [run, profile, settings, navigate],
   );
 
-  // Auto-rollover when reaching the terminal node with no encounter.
   useEffect(() => {
     if (!run) return;
     if (run.currentEncounter) return;
@@ -137,13 +130,11 @@ export function MapScreen() {
 
   if (!profile) return <Navigate to={ROUTES.title} replace />;
   if (!run) return null;
-
-  // If an encounter is mid-flight (e.g. browser refresh), bounce to it.
   if (run.currentEncounter) return <Navigate to={ROUTES.encounter} replace />;
   if (run.over) return <Navigate to={ROUTES.end} replace />;
 
-  const eligible = eligibleNext(run.currentMap.graph, run.currentMap.currentNodeId);
-  void eligible;
+  const mapNumber = run.mapHistory.length + 1;
+  const runNumber = profile.scarsLevel + 1;
 
   return (
     <div className="map-screen">
@@ -155,11 +146,30 @@ export function MapScreen() {
         />
       </div>
       <div className="map-distance">
-        <DistanceReadout value={run.runDistance} />
+        <span className="eyebrow">DISTANCE</span>
+        <span className="map-distance-v">{Math.round(run.runDistance)}</span>
       </div>
       <div className="map-diagram-wrap">
         <MapDiagram map={run.currentMap} onSelectNode={handleNodeSelect} />
       </div>
+      <div className="map-caption">
+        <span className="eyebrow">RUN {roman(runNumber)} · MAP {roman(mapNumber)}</span>
+      </div>
     </div>
   );
+}
+
+function roman(n: number): string {
+  if (n <= 0) return "I";
+  const numerals: Array<[number, string]> = [
+    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  ];
+  let v = n;
+  let out = "";
+  for (const [k, s] of numerals) {
+    while (v >= k) { out += s; v -= k; }
+  }
+  return out;
 }
