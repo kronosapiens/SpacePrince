@@ -33,6 +33,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     [map.graph, map.currentNodeId],
   );
   const visited = useMemo(() => new Set(map.visitedNodeIds), [map.visitedNodeIds]);
+  const traversedEdges = useMemo(() => {
+    const edges = new Set<string>();
+    for (let i = 0; i < map.visitedNodeIds.length - 1; i++) {
+      edges.add(edgeKey(map.visitedNodeIds[i]!, map.visitedNodeIds[i + 1]!));
+    }
+    return edges;
+  }, [map.visitedNodeIds]);
 
   const xs = positioned.map((n) => n.x);
   const ys = positioned.map((n) => n.y);
@@ -57,14 +64,12 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const from = positioned.find((n) => n.id === e.from);
     const to = positioned.find((n) => n.id === e.to);
     if (!from || !to) return null;
-    const traversedFrom = visited.has(e.from);
-    const traversedTo = visited.has(e.to);
-    const both = traversedFrom && traversedTo;
+    const traversedEdge = traversedEdges.has(edgeKey(e.from, e.to));
     const eligibleEdge =
       (e.from === map.currentNodeId && eligible.has(e.to)) ||
       (e.to === map.currentNodeId && eligible.has(e.from));
     void eligibleEdge;
-    const inReach = both || eligibleEdge;
+    const inReach = traversedEdge || eligibleEdge;
     const rA = ruler(e.from);
     const rB = ruler(e.to);
     const cA = rA ? PLANET_PRIMARY[rA] : NEUTRAL.bone;
@@ -77,8 +82,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         <stop offset="100%" stopColor={cB} />
       </linearGradient>,
     );
-    const opacity = both ? 0.7 : eligibleEdge ? 0.55 : 0.12;
-    const sw = both ? 1.6 : eligibleEdge ? 1.2 : 0.5;
+    const opacity = traversedEdge ? 0.7 : eligibleEdge ? 0.55 : 0.12;
+    const sw = traversedEdge ? 1.6 : eligibleEdge ? 1.2 : 0.5;
     return (
       <line key={`edge-${i}`}
         x1={from.x} y1={from.y} x2={to.x} y2={to.y}
@@ -153,13 +158,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           strokeWidth={isCurrent ? 2.4 : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
-            fontSize={isCurrent ? 22 : 18}
+            fontSize={isCurrent ? 17 : 14}
             fill={isTraversed ? color : NEUTRAL.void}
             fillOpacity={isTraversed ? 0.55 : 1}
-            fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
-            fontWeight={600}
+            fontFamily="'Cormorant Garamond', Garamond, serif"
+            fontWeight={700}
             style={{ pointerEvents: "none", userSelect: "none" }}>
-            {planetGlyph(r)}
+            {romanHouse(content.house)}
           </text>
         )}
         {isCombat && (
@@ -185,11 +190,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   );
 }
 
-function planetGlyph(p: PlanetName): string {
-  const VS = "︎";
-  const map: Record<PlanetName, string> = {
-    Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀",
-    Mars: "♂", Jupiter: "♃", Saturn: "♄",
-  };
-  return map[p] + VS;
+function edgeKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function romanHouse(house: number): string {
+  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+  return numerals[house - 1] ?? String(house);
 }
