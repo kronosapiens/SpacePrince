@@ -12,10 +12,7 @@ export function ChorusFragment({ planet, text, attribution }: ChorusFragmentProp
   return (
     <div className="narrative-aria">
       <div className="narrative-aria-glyph" style={{ color: PLANET_PRIMARY[planet] }}>
-        <span style={{ fontSize: 32 }}>{PLANET_GLYPH[planet]}</span>
-        <span style={{ color: "var(--mist)", fontFamily: "var(--display)", fontStyle: "italic", fontSize: 14 }}>
-          in {planet}'s voice
-        </span>
+        <span style={{ fontSize: 36, lineHeight: 1 }}>{PLANET_GLYPH[planet]}</span>
       </div>
       <div className="narrative-fragment anim-fragment-in anim-fragment-in-1">{text}</div>
       {attribution && (

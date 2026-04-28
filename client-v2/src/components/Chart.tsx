@@ -113,7 +113,7 @@ export function Chart(props: ChartProps) {
         const isActive = selectedPlanet === a.from || selectedPlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to;
         const stroke = isActive ? NEUTRAL.bone : NEUTRAL.mist;
-        const opacity = isActive ? 0.85 : 0.18;
+        const opacity = isActive ? 0.95 : 0.32;
         const weight = isActive ? STROKE_LIGHT : STROKE_HAIRLINE;
         // glyph-edge to glyph-edge:
         const dx = to.cx - from.cx;
@@ -358,9 +358,10 @@ function HouseWedges({ chart }: { chart: ChartType }) {
       x: CHART_CENTER + Math.cos(end) * INNER_RING_R,
       y: CHART_CENTER + Math.sin(end) * INNER_RING_R,
     };
-    // Wedge ribbon between rings — only the Field layer flourish.
+    // Wedge ribbon between rings — only the Field layer flourish. Even across all
+    // 12 houses; the ASC marker line already calls out the 1st specifically.
     const houseNum = i + 1;
-    const opacity = houseNum === 1 ? 0.16 : 0.06;
+    const opacity = 0.08;
     const path =
       `M ${inner1.x} ${inner1.y} ` +
       `L ${x1} ${y1} ` +
@@ -409,9 +410,9 @@ function SignGlyphs({ ascRotationRad }: { ascRotationRad: number }) {
         textAnchor="middle"
         dominantBaseline="central"
         fontFamily="'Cormorant Garamond', Garamond, serif"
-        fontSize={20}
-        fill={NEUTRAL.mist}
-        opacity={0.7}
+        fontSize={24}
+        fill={NEUTRAL.bone}
+        opacity={0.6}
         style={{ pointerEvents: "none", userSelect: "none" }}
       >
         {SIGN_GLYPH[sign]}

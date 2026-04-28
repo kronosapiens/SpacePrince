@@ -36,7 +36,8 @@ export function MapDiagram({ map, onSelectNode, style }: MapDiagramProps) {
   return (
     <svg
       viewBox={`${minX} ${minY} ${w} ${h}`}
-      style={{ width: "100%", height: "100%", maxHeight: "85vh", ...style }}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ width: "100%", height: "100%", ...style }}
       role="img"
       aria-label="Map"
     >

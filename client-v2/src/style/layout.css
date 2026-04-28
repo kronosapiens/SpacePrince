@@ -6,7 +6,12 @@
   pointer-events: none;
   z-index: 0;
   opacity: var(--tint-opacity);
-  background: radial-gradient(circle at center, var(--tint-color, transparent) 0%, transparent 65%);
+  background: radial-gradient(
+    circle at center,
+    var(--tint-color, transparent) 0%,
+    var(--tint-color, transparent) 35%,
+    transparent 95%
+  );
   transition: background var(--m-tint-shift) linear, opacity var(--m-tint-shift) linear;
 }
 
@@ -167,34 +172,43 @@
 .mint-confirm-btn:hover { color: var(--sun-2); }
 .mint-confirm-btn[disabled] { color: var(--smoke); cursor: not-allowed; }
 
-/* Map screen */
+/* Map screen — full-viewport diagram with chrome floating on top.
+   The Sephirot dominates; the chart anchor sits in its corner. */
 .map-screen {
-  display: grid;
-  grid-template-areas:
-    "anchor distance"
-    "diagram diagram";
-  grid-template-columns: 18% 1fr;
-  grid-template-rows: auto 1fr;
+  position: relative;
   min-height: 100vh;
-  padding: 16px;
-  gap: 12px;
+  width: 100%;
 }
 
-.map-anchor { grid-area: anchor; }
-.map-distance { grid-area: distance; justify-self: end; }
+.map-anchor {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: clamp(170px, 16vw, 240px);
+  z-index: 2;
+}
+
+.map-distance {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2;
+}
+
 .map-diagram-wrap {
-  grid-area: diagram;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 6vh 4vw;
 }
 
 @media (max-width: 720px) {
-  .map-screen {
-    grid-template-areas:
-      "anchor distance"
-      "diagram diagram";
-    grid-template-columns: 38% 1fr;
+  .map-anchor {
+    width: 32vw;
+    top: 12px;
+    left: 12px;
   }
 }
 
@@ -223,6 +237,28 @@
   justify-content: space-between;
   padding: 24px 0 16px;
   gap: 18px;
+  position: relative;
+}
+.encounter-seam::before {
+  content: "";
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: 50%;
+  width: 1px;
+  background: var(--bone);
+  opacity: 0.12;
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .encounter-seam::before {
+    top: 50%;
+    bottom: auto;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    width: auto;
+  }
 }
 
 @media (max-width: 720px) {
@@ -362,20 +398,25 @@
 }
 
 .opponent-indicator {
-  font-family: var(--chrome);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  color: var(--bone);
-  text-transform: uppercase;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  transition: opacity var(--m-tint-shift) ease;
 }
+.opponent-indicator.is-dim { opacity: 0.45; }
 .opponent-indicator-glyph {
-  font-size: 26px;
-  color: var(--bone);
+  font-size: 32px;
+  line-height: 1;
+}
+.opponent-indicator-label {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: var(--mist);
 }
 
 .continue-prompt {

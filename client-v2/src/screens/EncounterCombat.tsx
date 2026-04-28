@@ -156,12 +156,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
       <div className="encounter-seam">
         <TurnDots total={encounter.sequence.length} current={encounter.turnIndex} />
-        {!encounter.resolved && <OpponentIndicator planet={opponentTurn} />}
-        {encounter.resolved && (
-          <div className="opponent-indicator" style={{ opacity: 0.7 }}>
-            <div>{run.over ? "Combust" : "Settled"}</div>
-          </div>
-        )}
+        <OpponentIndicator planet={opponentTurn} dim={encounter.resolved} />
         <DistanceReadout value={run.runDistance} />
       </div>
 
