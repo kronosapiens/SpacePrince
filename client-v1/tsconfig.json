@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -14,13 +14,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@planets/*": ["../planets/*"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "tests"]
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

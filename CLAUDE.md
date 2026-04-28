@@ -33,7 +33,8 @@ Space Prince is a **fully onchain game** with a thin presentation client.
 
 ```
 cairo/        Cairo crates — onchain backend
-client/       React/Vite/TS — browser client (prototype)
+client/       React/Vite/TS — browser client (current prototype, v2)
+client-v1/    React/Vite/TS — earlier prototype, archived for reference
 spec/         Design spec (see outline below)
 planets/      Per-planet YAML reference notes
 img/          Chart and prototype screenshots

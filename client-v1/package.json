@@ -1,28 +1,23 @@
 {
-  "name": "space-prince-client-v2",
+  "name": "space-prince-client",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test:logic": "vitest run tests/game-logic.test.ts"
   },
   "dependencies": {
-    "astronomy-engine": "^2.1.19",
-    "js-yaml": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.14.2"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
-    "jsdom": "^25.0.1",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
     "vitest": "^3.2.4"

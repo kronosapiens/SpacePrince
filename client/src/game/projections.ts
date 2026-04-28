@@ -1,11 +1,14 @@
 import { PLANETS } from "./data";
 import { getProjectedPair } from "./combat";
-import type { AspectConnection, Chart, PlanetName, Polarity } from "./types";
-import { roundDisplay } from "../lib/format";
+import type {
+  AspectConnection,
+  Chart,
+  PlanetName,
+  Polarity,
+  SideState,
+} from "./types";
 
-type SideState = Record<PlanetName, { affliction: number; combusted: boolean }>;
-
-interface ComputeProjectedEffectsInput {
+export interface ComputeProjectedEffectsInput {
   playerChart: Chart;
   opponentChart: Chart;
   playerPlanet: PlanetName;
@@ -21,95 +24,82 @@ export interface ProjectedEffectsBySide {
   other: Partial<Record<PlanetName, number>>;
 }
 
-const EMPTY_PROJECTED_EFFECTS: ProjectedEffectsBySide = {
-  self: {},
-  other: {},
-};
+const EMPTY: ProjectedEffectsBySide = { self: {}, other: {} };
 
-function flipPolarity(polarity: Polarity): Polarity {
-  return polarity === "Testimony" ? "Affliction" : "Testimony";
+function flipPolarity(p: Polarity): Polarity {
+  return p === "Testimony" ? "Affliction" : "Testimony";
 }
 
-function applyProjectedMagnitude(
-  sideState: SideState,
-  projectedMap: Partial<Record<PlanetName, number>>,
+function applyMag(
+  side: SideState,
+  out: Partial<Record<PlanetName, number>>,
   target: PlanetName,
   polarity: Polarity,
-  magnitude: number
+  magnitude: number,
 ) {
-  const state = sideState[target];
+  const state = side[target];
   if (!state || state.combusted || magnitude <= 0) return;
-  const currentAffliction = projectedMap[target] ?? state.affliction;
-  projectedMap[target] = polarity === "Testimony" ? Math.max(0, currentAffliction - magnitude) : currentAffliction + magnitude;
+  const current = out[target] ?? state.affliction;
+  out[target] = polarity === "Testimony" ? Math.max(0, current - magnitude) : current + magnitude;
 }
 
-function toDeltaMap(
+function round2(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
+function toDeltas(
   finalMap: Partial<Record<PlanetName, number>>,
-  sideState: SideState
+  side: SideState,
 ): Partial<Record<PlanetName, number>> {
-  return PLANETS.reduce<Partial<Record<PlanetName, number>>>((acc, planet) => {
-    if (finalMap[planet] === undefined) return acc;
-    const delta = roundDisplay(finalMap[planet]! - sideState[planet].affliction);
-    if (delta !== 0) acc[planet] = delta;
-    return acc;
-  }, {});
+  const out: Partial<Record<PlanetName, number>> = {};
+  for (const planet of PLANETS) {
+    const final = finalMap[planet];
+    if (final === undefined) continue;
+    const delta = round2(final - side[planet].affliction);
+    if (delta !== 0) out[planet] = delta;
+  }
+  return out;
 }
 
-export function computeProjectedEffects(input: ComputeProjectedEffectsInput): ProjectedEffectsBySide {
+export function computeProjectedEffects(
+  input: ComputeProjectedEffectsInput,
+): ProjectedEffectsBySide {
   const {
-    playerChart,
-    opponentChart,
-    playerPlanet,
-    opponentPlanet,
-    playerState,
-    opponentState,
-    playerAspects,
-    opponentAspects,
+    playerChart, opponentChart, playerPlanet, opponentPlanet,
+    playerState, opponentState, playerAspects, opponentAspects,
   } = input;
-
-  if (playerState[playerPlanet].combusted || opponentState[opponentPlanet].combusted) {
-    return EMPTY_PROJECTED_EFFECTS;
-  }
+  if (playerState[playerPlanet].combusted || opponentState[opponentPlanet].combusted) return EMPTY;
 
   const projected = getProjectedPair(
-    playerChart,
-    opponentChart,
-    playerPlanet,
-    opponentPlanet,
-    playerState[playerPlanet].combusted,
-    opponentState[opponentPlanet].combusted
+    playerChart, opponentChart, playerPlanet, opponentPlanet,
+    playerState[playerPlanet].combusted, opponentState[opponentPlanet].combusted,
   );
 
   const selfFinal: Partial<Record<PlanetName, number>> = {};
   const otherFinal: Partial<Record<PlanetName, number>> = {};
 
-  applyProjectedMagnitude(playerState, selfFinal, playerPlanet, projected.polarity, projected.opponentToPlayer);
-  applyProjectedMagnitude(opponentState, otherFinal, opponentPlanet, projected.polarity, projected.playerToOpponent);
+  applyMag(playerState, selfFinal, playerPlanet, projected.polarity, projected.opponentToPlayer);
+  applyMag(opponentState, otherFinal, opponentPlanet, projected.polarity, projected.playerToOpponent);
 
   if (!playerState[playerPlanet].combusted && projected.opponentToPlayer > 0) {
-    playerAspects
-      .filter((aspect) => aspect.from === playerPlanet)
-      .forEach((aspect) => {
-        if (playerState[aspect.to].combusted) return;
-        const magnitude = Math.abs(projected.opponentToPlayer * aspect.multiplier);
-        const effectPolarity = aspect.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
-        applyProjectedMagnitude(playerState, selfFinal, aspect.to, effectPolarity, magnitude);
-      });
+    for (const a of playerAspects) {
+      if (a.from !== playerPlanet) continue;
+      if (playerState[a.to].combusted) continue;
+      const mag = Math.abs(projected.opponentToPlayer * a.multiplier);
+      const polarity = a.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
+      applyMag(playerState, selfFinal, a.to, polarity, mag);
+    }
   }
 
   if (!opponentState[opponentPlanet].combusted && projected.playerToOpponent > 0) {
-    opponentAspects
-      .filter((aspect) => aspect.from === opponentPlanet)
-      .forEach((aspect) => {
-        if (opponentState[aspect.to].combusted) return;
-        const magnitude = Math.abs(projected.playerToOpponent * aspect.multiplier);
-        const effectPolarity = aspect.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
-        applyProjectedMagnitude(opponentState, otherFinal, aspect.to, effectPolarity, magnitude);
-      });
+    for (const a of opponentAspects) {
+      if (a.from !== opponentPlanet) continue;
+      if (opponentState[a.to].combusted) continue;
+      const mag = Math.abs(projected.playerToOpponent * a.multiplier);
+      const polarity = a.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
+      applyMag(opponentState, otherFinal, a.to, polarity, mag);
+    }
   }
 
-  return {
-    self: toDeltaMap(selfFinal, playerState),
-    other: toDeltaMap(otherFinal, opponentState),
-  };
+  return { self: toDeltas(selfFinal, playerState), other: toDeltas(otherFinal, opponentState) };
 }

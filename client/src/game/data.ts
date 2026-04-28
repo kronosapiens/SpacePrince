@@ -3,83 +3,49 @@ import type {
   ModalityType,
   PlanetBaseStats,
   PlanetName,
-  SignName,
   Quality,
+  SignName,
+  Dignity,
+  AspectType,
 } from "./types";
 
 export const SIGNS: SignName[] = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces",
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
 ];
 
 export const PLANETS: PlanetName[] = [
-  "Sun",
-  "Moon",
-  "Mercury",
-  "Venus",
-  "Mars",
-  "Jupiter",
-  "Saturn",
+  "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn",
 ];
 
-export const PLANET_ORDER_UNLOCK: PlanetName[] = [
-  "Moon",
-  "Mercury",
-  "Venus",
-  "Sun",
-  "Mars",
-  "Jupiter",
-  "Saturn",
+// Macrobian descent — order in which planets unlock.
+export const MACROBIAN_ORDER: PlanetName[] = [
+  "Moon", "Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn",
 ];
+
+// Cumulative lifetime encounter thresholds at which each Macrobian planet unlocks.
+export const MACROBIAN_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
 
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun: { damage: 3, healing: 2, durability: 3, luck: 2 },
-  Moon: { damage: 1, healing: 4, durability: 1, luck: 2 },
+  Sun:     { damage: 3, healing: 2, durability: 3, luck: 2 },
+  Moon:    { damage: 1, healing: 4, durability: 1, luck: 2 },
   Mercury: { damage: 2, healing: 2, durability: 2, luck: 4 },
-  Venus: { damage: 1, healing: 4, durability: 2, luck: 3 },
-  Mars: { damage: 4, healing: 1, durability: 2, luck: 1 },
+  Venus:   { damage: 1, healing: 4, durability: 2, luck: 3 },
+  Mars:    { damage: 4, healing: 1, durability: 2, luck: 1 },
   Jupiter: { damage: 2, healing: 3, durability: 3, luck: 3 },
-  Saturn: { damage: 2, healing: 1, durability: 4, luck: 1 },
+  Saturn:  { damage: 2, healing: 1, durability: 4, luck: 1 },
 };
 
 export const SIGN_ELEMENT: Record<SignName, ElementType> = {
-  Aries: "Fire",
-  Taurus: "Earth",
-  Gemini: "Air",
-  Cancer: "Water",
-  Leo: "Fire",
-  Virgo: "Earth",
-  Libra: "Air",
-  Scorpio: "Water",
-  Sagittarius: "Fire",
-  Capricorn: "Earth",
-  Aquarius: "Air",
-  Pisces: "Water",
+  Aries: "Fire", Taurus: "Earth", Gemini: "Air", Cancer: "Water",
+  Leo: "Fire", Virgo: "Earth", Libra: "Air", Scorpio: "Water",
+  Sagittarius: "Fire", Capricorn: "Earth", Aquarius: "Air", Pisces: "Water",
 };
 
 export const SIGN_MODALITY: Record<SignName, ModalityType> = {
-  Aries: "Cardinal",
-  Taurus: "Fixed",
-  Gemini: "Mutable",
-  Cancer: "Cardinal",
-  Leo: "Fixed",
-  Virgo: "Mutable",
-  Libra: "Cardinal",
-  Scorpio: "Fixed",
-  Sagittarius: "Mutable",
-  Capricorn: "Cardinal",
-  Aquarius: "Fixed",
-  Pisces: "Mutable",
+  Aries: "Cardinal", Taurus: "Fixed", Gemini: "Mutable", Cancer: "Cardinal",
+  Leo: "Fixed", Virgo: "Mutable", Libra: "Cardinal", Scorpio: "Fixed",
+  Sagittarius: "Mutable", Capricorn: "Cardinal", Aquarius: "Fixed", Pisces: "Mutable",
 };
 
 export const ELEMENT_QUALITIES: Record<ElementType, [Quality, Quality]> = {
@@ -91,61 +57,53 @@ export const ELEMENT_QUALITIES: Record<ElementType, [Quality, Quality]> = {
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {
   Cardinal: { damage: 1, healing: 0, durability: 0, luck: 0 },
-  Fixed: { damage: 0, healing: 0, durability: 1, luck: 0 },
-  Mutable: { damage: 0, healing: 1, durability: 0, luck: 0 },
+  Fixed:    { damage: 0, healing: 0, durability: 1, luck: 0 },
+  Mutable:  { damage: 0, healing: 1, durability: 0, luck: 0 },
 };
 
 export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
-  Fire: { damage: 1, healing: 0, durability: 0, luck: 0 },
+  Fire:  { damage: 1, healing: 0, durability: 0, luck: 0 },
   Earth: { damage: 0, healing: 0, durability: 1, luck: 0 },
   Water: { damage: 0, healing: 1, durability: 0, luck: 0 },
-  Air: { damage: 0, healing: 0, durability: 0, luck: 1 },
+  Air:   { damage: 0, healing: 0, durability: 0, luck: 1 },
 };
 
 export const RULERSHIP: Record<SignName, PlanetName> = {
-  Aries: "Mars",
-  Taurus: "Venus",
-  Gemini: "Mercury",
-  Cancer: "Moon",
-  Leo: "Sun",
-  Virgo: "Mercury",
-  Libra: "Venus",
-  Scorpio: "Mars",
-  Sagittarius: "Jupiter",
-  Capricorn: "Saturn",
-  Aquarius: "Saturn",
-  Pisces: "Jupiter",
+  Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon",
+  Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars",
+  Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter",
 };
 
 export const EXALTATIONS: Partial<Record<PlanetName, SignName>> = {
-  Sun: "Aries",
-  Moon: "Taurus",
-  Mercury: "Virgo",
-  Venus: "Pisces",
-  Mars: "Capricorn",
-  Jupiter: "Cancer",
-  Saturn: "Libra",
+  Sun: "Aries", Moon: "Taurus", Mercury: "Virgo", Venus: "Pisces",
+  Mars: "Capricorn", Jupiter: "Cancer", Saturn: "Libra",
 };
 
 export const PLANET_SECT: Record<PlanetName, "Day" | "Night" | "Flexible"> = {
-  Sun: "Day",
-  Jupiter: "Day",
-  Saturn: "Day",
-  Moon: "Night",
-  Venus: "Night",
-  Mars: "Night",
+  Sun: "Day", Jupiter: "Day", Saturn: "Day",
+  Moon: "Night", Venus: "Night", Mars: "Night",
   Mercury: "Flexible",
 };
 
-export const PLANET_UNLOCK_COSTS: Record<PlanetName, number> = {
-  Moon: 0,
-  Mercury: 1,
-  Venus: 2,
-  Sun: 4,
-  Mars: 8,
-  Jupiter: 16,
-  Saturn: 32,
+export const IN_SECT_LUCK_BONUS = 1;
+
+export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
+  Conjunction: 1,
+  Sextile: 0.5,
+  Trine: 0.5,
+  Square: -0.5,
+  Opposition: -1,
 };
 
-export const MAX_ENCOUNTERS = 3;
-export const COMBUST_LIMIT = 4;
+export const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
+  Domicile: 0.75,
+  Exaltation: 0.9,
+  Neutral: 1,
+  Detriment: 1.15,
+  Fall: 1.3,
+};
+
+export const TIME_BUCKET_MS = 15 * 60 * 1000;
+
+// Combat-vs-narrative split: φ:1 → narrative ≈ 1 / (1+φ) ≈ 0.382
+export const NARRATIVE_NODE_PROB = 1 / (1 + 1.618033988749895);
