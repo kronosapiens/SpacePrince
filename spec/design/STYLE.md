@@ -32,11 +32,11 @@ Anything not on this list requires a deliberate exception.
 ### Allowed primitives
 
 - **Circle.** The dominant form. Planets, nodes, orbits, halos, the outer chart ring. Hilma af Klint's vocabulary almost entirely.
-- **Line segment.** Aspect lines, spine connections, pillar paths. Always straight.
+- **Line segment.** Aspect lines, pillar paths. Always straight.
 - **Arc.** Sign boundaries on the chart wheel, partial halos around active planets, sweep transitions.
 - **Polygon — regular only.** Triangles (trines), squares (squares), hexagons (sextiles), dodecagons (the zodiac itself). Irregular polygons are forbidden.
 - **Spiral.** Reserved. One spiral per screen, maximum. Used for emanation cues and rare cosmic moments.
-- **Glyph.** Authored SVG paths for the seven planets and twelve signs. Drawn once, reused everywhere. No alternates.
+- **Glyph.** Astrological characters for the seven planets and twelve signs. Standard Unicode in v1 (♉ ♓ ☉ ♀ etc.); authored SVG paths reserved as a later option if Unicode proves insufficient. Drawn once, reused everywhere. No alternates.
 
 ### Forbidden primitives
 
@@ -61,8 +61,8 @@ Let `u` = 1 unit on the active viewBox, where the canonical chart wheel uses a 1
 | Hairline  | `0.5u`   | Sign boundaries, faint background grid, distant aspects.       |
 | Light     | `1u`     | Aspect lines at rest, chart inner ring.                        |
 | Regular   | `1.5u`   | Map paths, planet glyph strokes, chart outer ring.             |
-| Medium    | `2.5u`   | Active aspect line, active planet halo, encounter spine.       |
-| Heavy     | `4u`     | Combust crack, the rare emphatic mark. Used sparingly.         |
+| Medium    | `2.5u`   | Active aspect line, active planet halo.                        |
+| Heavy     | `4u`     | The rare emphatic mark. Used sparingly.                        |
 
 Weights scale the same way across viewBoxes — a 500-unit map uses the same five weights, just with `u = 0.5px` at default zoom.
 
@@ -116,7 +116,13 @@ Neutrals are warm-cool balanced toward the cool side so they sit cleanly against
 
 ### Active-planet tinting
 
-When a planet is active, the entire screen receives an ambient tint in that planet's primary color at 8% opacity, applied as a full-canvas radial gradient centered behind the active element. The tint composites over `Void`, not under it.
+The screen receives an ambient tint in the active planet's primary color at 8% opacity, applied as a full-canvas radial gradient centered behind the active element. The tint composites over `Void`, not under it.
+
+**What counts as "the active planet" depends on the configuration:**
+
+- **Combat:** the **opponent's** acting planet — the one selected by the system at turn start. The opponent's planet is the constant of the turn (it doesn't change as the player explores their own options); the player's planet is in flux during exploration. Tinting by the constant gives the turn a stable mood. This also matches the "ANSWER MERCURY" framing in `SCREENS.md §3.7` — the world is in Mercury's mood; the player's task is to reply.
+- **Narrative:** the house's **ruling planet** (per `SCREENS.md §3.2`). The aria's planet tints the world.
+- **Map / between encounters:** fades to neutral — no active planet, the map is a contemplative between-surface. See `SCREENS.md §4.6`.
 
 Transitions between tints take 2000ms, linear easing — slow enough to feel like the light changing in a room, fast enough that a player who looks away and back perceives the new state.
 
@@ -156,7 +162,7 @@ For chrome that must read as legible at small sizes — turn indicators, subtle 
 - No all-caps display type. The chorus speaks in sentences.
 - No drop caps. Affectation that doesn't earn its weight.
 - No text on a planetary color. Text rests on neutral.
-- No game-UI text registers — no "+3 PERMISSION" or "TURN 4". The world doesn't talk like that. (This is `VIBES.md §What the Client Must Never Do` restated for type.)
+- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn dots, an opponent indicator) is permitted where it does necessary work; see `SCREENS.md §3.7`.
 
 ---
 
@@ -172,10 +178,16 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 | Planet activate           | 600ms    | ease-in-out, looping        | The active planet pulses — a slow heartbeat at the planet's tone.  |
 | Aspect propagation (trine)| 1000ms   | ease-out                    | Color travels along the line. Resolves cleanly into the target.    |
 | Aspect propagation (square)| 1400ms  | ease-in, hold, ease-out     | Color travels, pauses just before terminus, completes. Dissonant.  |
-| Combust                   | 1800ms   | cubic-bezier(.7,.0,.85,.0)  | The planet glyph dims. Slow, then sudden — a candle going out.     |
+| Combust                   | 1800ms   | cubic-bezier(.7,.0,.85,.0)  | The planet glyph desaturates to gray. Slow, then sudden.           |
 | Tint shift                | 2000ms   | linear                      | Ambient color changes between planetary registers. Light shifting. |
 | Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |
 | Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
+
+### Combat turn composition
+
+In a combat turn, both charts' propagations run **simultaneously** — when the player commits a planet, the player-chart and opponent-chart light up their internal aspect webs at the same time, in parallel. The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+
+Narrative encounters do not use propagation animations. Resolution applies plain state-change flashes on affected planets — see `SCREENS.md §3.5`.
 
 ### What does not animate
 
@@ -256,8 +268,7 @@ The visual analogue to `VIBES.md §What the Client Must Never Do`.
 
 - **Never use raster art.** Including for backgrounds, including for "atmospheric textures." If it's not vector, it doesn't ship.
 - **Never simulate paper, parchment, or canvas.** No grain, no fiber, no paper-edge effects. The world is a clean drawing, not a faux artifact.
-- **Never simulate lighting.** No drop shadows, no glows beyond the specified halos, no rim lighting, no specular highlights.
-- **Never use stock symbols or icons.** All glyphs are authored for this game. No Material Icons, no Font Awesome, no zodiac glyphs pulled from a font.
+- **Never use stock symbols or icons** beyond the astrological glyphs. Standard Unicode astrological characters (planets, signs) are acceptable. No Material Icons, no Font Awesome, no decorative icon sets.
 - **Never break the layer hierarchy.** Word never sits behind Diagram. Active never sits behind Field. The order is the order.
 - **Never animate at rest.** Stillness is a state, not an absence of state.
 - **Never introduce a color outside the palette plus neutrals.** Including for "just this one error state."
@@ -303,11 +314,14 @@ The mobile layout doesn't have to be polished yet. It has to be possible.
 
 Things this document deliberately does not yet answer, listed so they don't get lost:
 
-- **Sign glyphs.** Authored or selected from a PD source (e.g. classical astrological woodcuts)? Authored is more coherent but more expensive.
-- **The aspect graph at rest.** Always visible, faintly? Or only visible during encounters? VIBES.md says "the player sees their internal web" — probably always visible at Hairline weight, brightening to Light when an aspect is touched.
-- **Touch interaction model.** Hover-to-inspect / click-to-act is the desktop model in the current prototype. On touch there's no hover. Tap-to-inspect-then-tap-to-commit, long-press-to-commit, and inspect-mode toggles are all candidates — none chosen. This affects mobile but also desktop interaction grammar, since whatever pattern wins should feel natural on both.
-- **Loading and transition states between scenes.** Currently undefined. Probably a slow tint shift on a Void canvas, but worth specifying.
 - **Accessibility.** Color is doing a lot of work in this style. A planet's identity is communicated by color before glyph. We need a parallel channel — probably texture-on-glyph or ARIA labels — so the game is playable without color discrimination.
+
+Recently resolved (see referenced sections):
+
+- *Aspect graph at rest* — always visible at Hairline weight, brightening to Light when active. Confirmed by prototype (`img/chart-v3.png`).
+- *Touch interaction model* — see `SCREENS.md §3.6`. Double-tap to commit, universal tap-to-inspect across both charts.
+- *Sign and planet glyphs* — standard Unicode in v1 (replace prototype's text labels like "LIB" with `♎` etc.). Authored SVG alternatives reserved for later.
+- *Loading and transition states between scenes* — fade through Void with active-planet tint shift, ~1000ms each direction. Map → Encounter inherits the "Encounter open" 1200ms ease-out from `§7`; Encounter → Map is a faster ~600ms fade.
 
 ---
 

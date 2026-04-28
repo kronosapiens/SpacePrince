@@ -169,9 +169,9 @@ The visual system mirrors the mechanical structure of the game.
 1. **Immutable Core** — Derived from mint inputs (lat, long, timestamp). Determines base geometry, symmetry, and color. Never changes.
 
 2. **Evolutionary Layers** — Evolve with progression:
-   - Houses add structure
-   - Planets add motion
-   - Death adds scars
+   - **Planet revelation.** Planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn) at cumulative-encounter counts of `2^i` for `i = 0..6`. See `spec/mechanics/MECHANICS.md §13.1`. Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
+   - **Houses add structure.**
+   - **Death adds scars.**
 
 3. **Temporary States** — Run-specific effects (glow, distortion) that recede when the run ends.
 

@@ -76,18 +76,20 @@ Occasionally the generation produces something very close to the actual Sephirot
 Deniably so.
 
 The map should feel like a diagram of emanation — something flowing downward from unity into multiplicity, or upward from matter toward spirit, depending on which direction the player reads it.
-Nodes glow in planetary colors based on their encounter type.
+Narrative nodes glow in their house's ruling-planet color; combat nodes are rendered in neutral outline.
+Distant nodes are ghosts at hairline weight — the map manifests as the player approaches it.
 Paths between nodes are visible aspect-lines, not just routes.
+See `SCREENS.md §4` for full node and layout treatment.
 
 ### The Chart as Visual Center
 
 The player's natal chart should be **always visible** — not as a HUD element but as the visual ground of the game.
 The chart is not a menu; it is the world.
 
-- Planets glow or dim based on affliction state.
-- Combust planets go dark.
-- The active encounter highlights the connection between two charts.
-- Aspect lines (trines, squares, oppositions) between planets are visible — the player sees their internal web.
+- Each planet's affliction state is shown numerically beside its glyph (per current prototype — see `img/chart-v3.png`).
+- Combust planets gray out.
+- During an active encounter, each chart's internal aspect web lights up — the connection between two charts is conceptual, not drawn.
+- Aspect lines (trines, squares, oppositions) between planets are visible at rest at Hairline weight — the player sees their internal web.
 
 ### Encounter Visuals
 
@@ -101,7 +103,7 @@ When Mars activates and affliction inverts to testimony on Saturn via a square, 
 When Jupiter's testimony flows to Venus via a trine, soft blue moves along the line.
 The chart is a living system, and the propagation is its heartbeat.
 
-Propagation that combusts a planet should feel significant — a dimming, a crack, a sound design moment.
+Propagation that combusts a planet should feel significant — a desaturation moment, a sound design moment.
 Not dramatic in a blockbuster way.
 More like a candle going out.
 
@@ -149,6 +151,6 @@ It emerges from the accumulation of fragments, visuals, and sounds across many r
 
 - **Never explain astrology didactically.** No tutorials on what a trine is. The player learns through encounter, not instruction.
 - **Never generate text.** All fragments are authored and curated. Quality over quantity.
-- **Never break the symbolic register with game-UI language.** No "Level Up!" or "+3 Attack." The world speaks in its own voice.
+- **Avoid blockbuster game-UI registers.** No "Level Up!", "+3 Attack", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn cadence, opponent indicator) is permitted where it does necessary work — see `SCREENS.md §3.7`. The aesthetic remains sparse and ethereal; treat it as provocation, not a strict ban on UI text.
 - **Never rush.** Animations, transitions, and text should have pacing. Silence is a design tool. The game respects the player's time by not filling every moment.
 - **Never flatten the mystery.** The player should always feel there is more to understand. Even at maximum progression, the chart should feel partially opaque — not because information is hidden, but because symbolic meaning is inexhaustible.

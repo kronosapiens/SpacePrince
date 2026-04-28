@@ -164,14 +164,48 @@ Probability:
 
 No one-time exaltation save is currently applied.
 
-## 13. Encounter / Run Flow
+## 13. Encounter / Map / Run Flow
 
-- `MAX_ENCOUNTERS = 3`
-- Current client creates runs with all planets unlocked (`unlockAll=true`), so turn count per encounter is 7.
+The game's progression is layered:
+
+- **Encounter** — one node traversal (combat or narrative). Resolves in turns; turn count per encounter equals the number of unlocked planets (see §13.1).
+- **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
+- **Run** — a sequence of maps. After completing a map, a new map is generated and begun. The structure is similar to FTL's sectors.
+- **Run end** — the run ends only when **all seven of the player's planets combust**, regardless of how many maps were completed.
+
+Per encounter:
+
 - Opponent planet is selected randomly each turn from non-combusted opponent planets.
-- If all opponent planets combust before turn 7, the encounter ends early.
+- If all opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
-- Run ends in defeat when all player planets combust.
+
+Affliction and combust state **persist across encounters and across maps within a run**. They reset only on run end.
+
+### 13.1 Planet Unlock Schedule
+
+A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run. The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward), with unlocks at encounter counts of `2^i` for `i = 0..6`:
+
+| Encounter # | Unlock | Total planets |
+|-----|--------|---------------|
+| 1 | Moon | 1 |
+| 2 | Mercury | 2 |
+| 4 | Venus | 3 |
+| 8 | Sun | 4 |
+| 16 | Mars | 5 |
+| 32 | Jupiter | 6 |
+| 64 | Saturn | 7 |
+
+The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart. Saturn arrives last as the final teacher.
+
+Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.
+
+The Prince NFT artifact reveals planets on the same cumulative-encounter schedule: an unrevealed planet renders as a **ghost** at hairline weight (per `STYLE.md`), present as potential but not yet awakened. See `spec/concept/NFT.md`.
+
+**Dev mode** overrides this schedule and unlocks all seven planets immediately. Dev mode is for development and is never active in production.
+
+### 13.2 Achievements (deferred)
+
+The run-end-only structure suggests room for an achievements layer — recognitions for completing multiple maps in a single run, encountering rare topologies (e.g. the canonical Sephirot pattern from `MAP.md §2`), or other lifetime markers. Achievements are out of scope for v1; they're noted here so the surrounding mechanics leave room for them.
 
 ## 14. Scoring (Distance)
 

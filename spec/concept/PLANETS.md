@@ -17,9 +17,10 @@ The effect we're aiming for is similar: evocative, philosophical, ambient — la
 
 Fragments appear in the game at moments where mood matters more than mechanics.
 
-**Primary usage (v1):** narrative encounter openings.
-Each node in a house encounter opens with a short fragment in the voice of the house's ruling planet.
-The fragment frames the decision beneath it — sets tonal expectations before the player reads their options.
+**Primary usage (v1):** narrative encounter arias.
+Each house encounter opens with a single short fragment in the voice of the house's ruling planet.
+The fragment is **persistent across the entire encounter** — it sits in the right-hand column's top band as the encounter's *aria* (per `spec/design/SCREENS.md §3.2`), not refreshing per decision node.
+Per-node framing is carried by narrative text in the middle band; the aria stays.
 A Saturn-framed 12th-house encounter opens with Saturn-weight; a Venus-framed 5th-house encounter opens with Venus-ease.
 See `spec/mechanics/HOUSES.md` for encounter structure.
 

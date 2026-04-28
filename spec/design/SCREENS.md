@@ -30,13 +30,12 @@ Listed roughly in the order a player encounters them.
 
 | Screen          | Primary purpose                                          | State            |
 |-----------------|----------------------------------------------------------|------------------|
-| Mint            | Birth-data input → chart computation → first chart view  | Not designed     |
-| Title           | Entry point for returning players                        | Open question    |
-| Prince select   | Pick which Prince to play (if player has multiple)       | Not designed     |
-| Map             | Navigate the run's Sephirot-pattern node graph           | Prototyped (§4)  |
-| Encounter       | Combat or narrative encounter — same screen, two modes   | Prototyped (§3)  |
-| End-of-run      | "The world remembers" — the run's residue                | Not designed     |
-| Chart study     | Inspect own chart between runs, with earned annotations  | Not designed     |
+| Mint            | Birth-data input → chart computation → reveal ceremony   | Designed (§5)    |
+| Title (lobby)   | Entry point; Prince selection (dropdown); Begin          | Designed (§9)    |
+| Map             | Walk the Sephirot tree; one map per L1→L7 traversal      | Designed (§4)    |
+| Encounter       | Combat (symmetric) or narrative (asymmetric column)      | Designed (§3)    |
+| End-of-run      | Browsable history of the run's maps                      | Designed (§6)    |
+| Chart Study     | Inspect own chart between runs (earned annotations)      | Stub (§7)        |
 
 Dev-only:
 
@@ -48,26 +47,40 @@ The current `client/` is a prototype. Nothing in it is canonical against this do
 
 ## 3. Encounter Screen
 
-The primary surface. Designed to morph between two modes — **combat** and **house narrative** — without semantic discontinuity. The same screen, with one slot rendering different content.
+The primary surface. Two distinct configurations — **combat** and **house narrative** — sharing one constant: the player's chart on the left.
 
-### 3.1 Layout (canonical / desktop)
+The two configurations are different layouts, not modes of one layout. An earlier draft of this document framed them as a single morphing screen; that framing has been retired. The screens are related by what they share (the player chart) and by their place in the run flow, not by being the same layout with different content.
+
+### 3.1 Combat layout (symmetric)
 
 - **Left half:** the player's chart, drawn per `STYLE.md §11`.
-- **Right half:** the *what you're facing* slot.
-  - In **combat**, this is another chart. NPC opponent — see §3.4.
-  - In **house narrative**, this is a large glyph of the house's ruling planet, sized at multiple times the player's planet glyphs, with the planet's color halo per `STYLE.md §5`.
+- **Right half:** the opposing NPC chart, drawn with the same chart visual language. See §3.4.
+- **Center seam:** narrow chrome region carrying turn cadence and opponent-of-the-turn indicator. Chrome rules per §3.7.
 
-### 3.2 Layout (mobile portrait)
+The two charts face each other as equals. There is no visual differentiation between "yours" and "theirs" beyond their position.
 
-The two halves stack vertically — player's chart on top, the right-hand slot below. The "two charts face each other" framing translates from horizontal to vertical without semantic change. See `STYLE.md §13`.
+### 3.2 Narrative layout (asymmetric)
 
-### 3.3 Mode signals
+- **Left half:** the player's chart, drawn per `STYLE.md §11`.
+- **Right half:** a three-band column carrying the narrative encounter:
+  - **Top band — Aria:** the ruling planet's glyph paired horizontally with a single chorus fragment in that planet's voice. The persistent presence of the encounter — fades in once at encounter open and remains throughout. The planet glyph is rendered with its color treatment per `STYLE.md §5`; the fragment in Cormorant Garamond per `STYLE.md §6`.
+  - **Middle band — Narrative:** the current decision node's narrative text. Updates per node.
+  - **Bottom band — Options:** the 2–3 decision options for the current node. Updates per node.
 
-Mode is signaled by the right-hand slot's content, not by chrome differences. The chart on the left looks the same in both modes; what's different is what it's facing. There is no "narrative mode banner" or "combat HUD." The world tells you what mode you're in by what's across from you.
+The aria does not re-pulse on node transitions; only the middle and bottom bands change. Per `PLANETS.md §1`, **one fragment per encounter, not per node** — the aria carries the whole encounter, while the narrative text in the middle band does the per-node framing.
 
-### 3.4 NPC opponents
+### 3.3 Mobile portrait
 
-In combat encounters, the opponent's chart is a real player's chart (another minted Prince) pulled in as an NPC. Combat is single-player; the multiplayer dimension is purely as content source.
+Both layouts stack vertically.
+
+- **Combat:** player's chart on top, opponent's chart below. Center-seam chrome relocates to a horizontal band between them.
+- **Narrative:** player's chart on top, then aria, narrative text, options.
+
+In both cases the vertical stacking preserves the semantic relationship between the chart and what it faces. See `STYLE.md §13`.
+
+### 3.4 NPC opponents (combat)
+
+The opponent's chart is a real player's chart (another minted Prince) pulled in as an NPC. Combat is single-player; the multiplayer dimension is purely as content source.
 
 This means:
 
@@ -75,116 +88,262 @@ This means:
 - No visual cue that a chart is "yours" vs "someone else's" — they are both charts.
 - The narrative framing of *whose* chart it is and *why* you're facing them lives in encounter setup, not in visual differentiation.
 
+**Asymmetric matchups are expected.** The opponent renders with whatever planets that source Prince has actually unlocked at the time of matching, regardless of the player's own unlock tier. A Run-1 player with only the Moon may face a fully-charted opponent — turn count is bounded by the *player's* unlocked planet count, so encounters remain short. The asymmetry is part of the tutorial: the player learns to read chart complexity from the outside before they have it themselves. Subject to balance review during playtesting.
+
 ### 3.5 Visual climax
 
-Activation propagates **within each chart** along that chart's own aspect lines, per the current prototype's `useCombatAnimation`. The chart is the living system; its internal web is what lights up.
+**Combat.** Both charts' propagations animate **simultaneously** — when a turn resolves, the player-chart and opponent-chart both light up their internal aspect webs at the same time. Activation propagates within each chart along that chart's own aspect lines; there is no line drawn between the two charts. The connection between them is conceptual (your planet faces theirs this turn), not visual.
 
-There is no spine drawn between the two charts. The connection between them is conceptual (your planet faces theirs this turn), not visual. This is consistent with `VIBES.md` "the chart is a living system, and the propagation is its heartbeat" — the heartbeat is *internal* to the chart.
+The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy. See `STYLE.md §7` for the per-motion durations.
 
-This applies to both modes. In a house narrative encounter, the propagation runs through the player's chart in response to whatever the encounter activates. The right-hand glyph (the ruling planet's archetype) is the framing, not the locus of action.
+**Narrative.** During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per `HOUSES.md §4.3` chart-conditioning) carry a soft Field-layer halo so the player can see *why* the option exists. On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied). No propagation through aspect lines — propagation is a combat-only language. The aria does not animate during resolution; it remains the steady framing presence.
 
-### 3.6 Chrome
+### 3.6 Interaction grammar
 
-Allowed:
+The player's only per-turn action in combat is choosing which of their planets acts (the opponent's planet is system-selected). The grammar is the same on touch and desktop.
 
-- Turn indicator (where in the encounter sequence the player is).
-- Decision/action affordances tied to the player's chart (selecting which planet to act with).
-- Chorus fragment region for narrative encounters, sitting on negative ground per `STYLE.md §6` and §8.
+- **First tap on a planet:** preview. The chart highlights the aspects this planet would fire and the consequences the choice would carry. The inspected planet receives a thin gold selection ring.
+- **Second tap on the same planet:** commit. The turn resolves.
+- **Tap a different planet:** preview switches to that planet (not a commit).
+- **Tap an opponent planet:** preview-only. Surfaces the same information as own planets. No commit; opponent planets are not actable.
+- **Hover (desktop only):** ambient preview. Same information as tap-preview, but free. Hover is additive — never a commit gesture and never a substitute for tap.
 
-Forbidden:
+In narrative encounters, the same grammar governs *inspecting* the chart. Decision options are committed by single-tap on the option — each option's text label is itself the commit affordance, no separate confirm step.
 
-- HP bars, score readouts, or other game-UI register elements.
-- Targeting reticles, attack/defend buttons, or any "battle" framing.
-- Always-visible logs of past turns. Such logs are dev-only; see §8.
-- Any chrome element that lives strictly to the left or right of one chart in a way that wouldn't survive vertical stacking on mobile (per `STYLE.md §13`).
+### 3.7 Chrome
 
-### 3.7 Open questions
+The encounter screen is allowed restrained, functional chrome where it does necessary work — telling the player whose turn it is, what the run state is, and how to leave. The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.
 
-- Where the chorus fragment sits in the layout — above the right-hand glyph, below it, or in a dedicated region.
-- How decisions are presented during a house narrative encounter — text below the spine, overlay, side panel, or other.
-- Whether the player's chart visibly responds during a fragment (idle vs. animated). VIBES.md's "silence is a design tool" suggests the chart should quiet during fragments, not animate.
-- Touch interaction model — see `STYLE.md §14`.
+**Allowed:**
+
+- **Distance readout.** The run's accumulating score (per `MECHANICS.md §14`). Visible during encounters. Functional type at small size.
+- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position.
+- **Opponent-of-the-turn indicator.** Text + glyph identifying which opponent planet is acting this turn (e.g. "ANSWER MERCURY ☿"). Lives in the center seam between charts in combat.
+
+**Out:**
+
+- Section titles ("ENCOUNTER", "MAP") on the screens themselves — the player knows where they are.
+- The wordmark "SPACE PRINCE" inside the encounter — it lives on the title screen.
+- Instructional hints ("Hover a planet to inspect. Click a planet to act.") — the grammar should be discoverable; if it isn't, that's a structural failure to fix, not to paper over with copy.
+- HP bars, "+N attack" registers, blockbuster game-UI flourishes.
+- Always-visible logs of past turns (those are dev-only).
+- Run-management affordances inside an active run. There is no in-game "abandon" or "new voyage" while a run is in progress; runs continue until full combust regardless of session breaks. The prototype's "New Voyage" button is a development artifact.
+
+### 3.8 Mode and scene transitions
+
+Transitions between major surfaces fade through the Void canvas with an active-planet tint shift, ~1000ms in each direction:
+
+- **Map → Encounter** inherits the "Encounter open" 1200ms ease-out from `STYLE.md §7`.
+- **Encounter → Map** is a faster ~600ms fade (the player is leaving, not arriving).
+- **Encounter → End-of-run** (on full combust): a slower fade, ~1800ms, matching the combust motion's weight.
+
+### 3.9 Open questions
+
+- Whether the player's chart should pulse, idle, or stay completely still during the *fragment fade-in* moment specifically (distinct from the broader decision phase, which is settled — gating planets pulse).
+- Map traversal interaction model (separate from encounter interaction — see §4).
+- Accessibility (color-channel parallel signal).
 
 ---
 
 ## 4. Map Screen
 
-The second main surface. Renders the Sephirot-pattern node graph from `MAP.md`.
+The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` against a Void canvas.
 
 ### 4.1 Layout
 
-Centered diagram with breathing room, per `STYLE.md §10`. Nodes are interactive; edges are visible aspect-lines. The player's current position is highlighted; eligible next nodes pulse.
+- **Centered diagram** with breathing room — at least 15% margin on each side, per `STYLE.md §10`.
+- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32, 64 — per `MECHANICS.md §13.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
+- **Distance readout** in the same position and treatment as the encounter screen (per §3.7).
 
-Chrome at the top of the screen, minimal — at least a way back to a higher-level surface, possibly run-meta information. Final shape TBD.
+### 4.2 Nodes
 
-### 4.2 Mobile
+Two types, distinguished by shape and fill:
 
-Map scales down to width. Vertical scrolling is acceptable here (unlike encounter screens), since map navigation is inherently slow and exploratory.
+- **Combat node:** ringed circle, Bone outline, no fill. Reads as *"another chart waits here."*
+- **Narrative node:** filled circle in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."*
 
-### 4.3 Open questions
+States, with rendering progressively gaining and then losing saturation as the player passes through:
 
-- Whether the player's chart is anchored somewhere on the map (e.g. a small inset top-left) or absent. Anchoring keeps the chart "always present"; absence keeps the map's diagrammatic logic clean. Worth prototyping both.
-- How much information eligible nodes reveal pre-traversal — encounter type? ruling planet? nothing?
-- Whether traversed nodes show a visible trace of what happened there, or just "visited."
+- **Distant undiscovered nodes** — small unstyled circles. No color, no shape distinction (combat vs. narrative is undecided here — content has not yet been rolled). Placeholders.
+- **Eligible-next nodes (future)** — full visual at full saturation, with the "Map node arrival" pulse from `STYLE.md §7`. Content has been rolled.
+- **Current node** — full visual + active-planet halo per `STYLE.md §11`.
+- **Traversed nodes (past)** — full shape preserved, but **desaturated**; the node remembers what was there, faded. The progression from full saturation (future) to full saturation + halo (current) to desaturation (past) reads as a wave passing across the map.
+
+Click/tap on a traversed node will eventually reveal an outcome detail popup (especially relevant in the end-of-run map browser, per `§6.1`). Treatment TBD.
+
+### 4.3 Lazy node generation
+
+Nodes are not all rolled at map-generation time:
+
+- The **topology** is fixed at map generation (per `MAP.md`).
+- **Encounter content** (combat opponent, or narrative house) is rolled only for the *current* node and the *eligible-next* nodes.
+- As the player traverses, newly-eligible nodes get rolled. Once rolled, content is stable.
+- Distant nodes render as small unstyled placeholders (per §4.2) until they enter the eligible frontier.
+
+The map manifests as the player approaches it — distant nodes are placeholders; near nodes are charged with content. This honors the "diagram of emanation" feel from `VIBES.md`: meaning concentrates near the player and dissolves into potential at distance.
+
+**Roll parameters:**
+
+- **Combat-to-narrative ratio:** **φ:1** (golden ratio) — roughly **62/38** combat-heavy. This rhymes with the stroke-scale ratio in `STYLE.md §3` (also golden-ratio-adjacent, after af Klint) and with the proportional logic that runs through the visual system. Refine in playtesting.
+- **House assignment** (for narrative nodes): **uniform random over the 12 houses, with a "no immediate repeat" rule** (a freshly-rolled narrative node cannot be the same house as the player's most-recent narrative node). Position-derived house assignment (upper layers = elevated houses, lower = grounded) is reserved for v2 if it earns its weight in playtesting.
+- **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4` (asymmetric matchups expected).
+
+### 4.4 Mobile
+
+Map scales down to width. Vertical scrolling is acceptable here (unlike encounter screens), since map navigation is inherently slow and exploratory. The chart anchor relocates to the top of the screen, above the map.
+
+### 4.5 House → ruler mapping (color rule)
+
+Narrative nodes are colored by their house's **natural-zodiac ruler** (the classical seven-planet rulership of the sign that naturally corresponds to the house number — Aries=1, Taurus=2, etc.):
+
+| House | Natural sign | Ruler |
+|-------|--------------|-------|
+| 1 | Aries | Mars |
+| 2 | Taurus | Venus |
+| 3 | Gemini | Mercury |
+| 4 | Cancer | Moon |
+| 5 | Leo | Sun |
+| 6 | Virgo | Mercury |
+| 7 | Libra | Venus |
+| 8 | Scorpio | Mars |
+| 9 | Sagittarius | Jupiter |
+| 10 | Capricorn | Saturn |
+| 11 | Aquarius | Saturn |
+| 12 | Pisces | Jupiter |
+
+This is the **rulership** axis, distinct from the **joys** axis used mechanically in `HOUSES.md §3.3`. Rulership is the visual color anchor on the map; joys remain the mechanical character of each house.
+
+### 4.6 Map ambient tint
+
+Between encounters, the map's ambient tint **fades to neutral** — no active planet to color the world. The map is a contemplative between-surface; let it breathe.
+
+### 4.7 Open questions
+
+- Outcome-detail popup treatment for traversed nodes (when clicked in the end-of-run map browser).
 
 ---
 
 ## 5. Mint Screen
 
-(Stub — to be designed.)
+The player's first touch. Three beats: input, confirmation, reveal. Each is irreversible at its end.
 
-The first time a player touches the game. Receives birth data (latitude, longitude, timestamp), triggers on-chain chart computation per `CHART.md`, reveals the resulting chart with appropriate ceremony.
+### 5.1 Beats
 
-### 5.1 Constraints
+**Input.** The player enters birth date, time (quantized to 15-min buckets per `NFT.md`), and location. As inputs progress, a faint scaffold of the chart wheel begins to take shape — sign divisions appearing at hairline weight, the wheel becoming legible. Geometry stabilizing, not generating.
 
-- The reveal moment matches the weight of the act per `DESIGN.md`: *"Minting does not create identity; it recognizes it."* Not a "spinning loot box" reveal. Closer to "the chart was always going to be this one — you're just seeing it now."
-- Birth-data input must be careful. Wrong input means wrong identity, and identity is permanent. UX needs to accommodate ambiguity (uncertain birth times, contested locations) without making the act trivial.
+**Confirmation.** A single explicit confirmation step. *"This position may only be recognized once."* The friction is intentional — wrong input is permanent identity.
 
-### 5.2 Open questions
+**Reveal.** The staged Macrobian ceremony (§5.2).
 
-- Date/time picker treatment. Ascendant calculation is sensitive to the minute; the input should reflect that without becoming a data-entry chore.
-- Location input — coordinate picker, city search, or both?
-- Whether the reveal is paced (chart components appear over time) or instant.
-- Whether chorus fragments accompany the reveal, and from which planet(s).
+### 5.2 The Reveal — staged Macrobian unfolding
+
+After confirmation, the chart wheel is computed on-chain (per `CHART.md`). During the on-chain transaction's confirmation window, the seven planets paint in **one at a time, in Macrobian order**:
+
+> Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn
+
+Each planet appears at its computed sign placement, in its glyph and color, separated by ~2–3 seconds. The total ceremony runs roughly 15–20 seconds — intentionally long enough to mask the on-chain compute and to give the act its weight. After all seven planets have appeared, the chart sits whole for a brief held moment.
+
+This is the **only time** the player sees their full chart until cumulative encounter 64.
+
+The chart then **gates back** to its starting state: the Moon remains in full visual treatment, the other six planets recede to **ghost** (hairline outline, no color), per `NFT.md` and `MECHANICS.md §13.1`. The player is left with what they currently have access to.
+
+Future unlocks (per `MECHANICS.md §13.1`) reveal one planet at a time *between encounters*, not in a single ceremony. The mint is the only staged unfolding in the game.
+
+### 5.3 NFT artifact
+
+The NFT renders the player's chart at its current unlock state — Moon visible, the other six as ghosts from minute one. The artifact evolves alongside in-game unlocks per `NFT.md`. There is no standing "preview" of the full chart in the artifact; a verification preview surface (e.g. for wallets) can be added later if needed.
+
+### 5.4 Constraints
+
+- *"Minting does not create identity; it recognizes it."* The reveal is recognition, not generation. Not a spinning loot box; closer to *"the chart was always going to be this one — you're just seeing it now."*
+- Birth-data input must accommodate ambiguity (uncertain birth times, contested locations) without trivializing the act.
+
+### 5.5 Open questions
+
+- **Date/time picker treatment.** The 15-min quantization should be reflected in the picker — not "type any time" but "select your slot."
+- **Location input.** City search, coordinate picker, or both? Likely both, with city search as the primary affordance.
+- **Chorus fragments at mint.** None, the Moon at the end, or one per planet during the unfolding? Per `VIBES.md` "silence is a design tool," lean is **no chorus at mint** — the chart's appearance is itself the moment. The Moon's voice can arrive at the first encounter instead.
+- **Failed mints.** Handled by the Cartridge Controller wallet's transaction UI; the game does not invent a custom error surface. If the mint transaction fails or is rejected, the player remains on the Mint screen and can retry through the Controller flow. The 15–20s reveal ceremony begins only after the on-chain confirmation lands.
 
 ---
 
 ## 6. End-of-Run Screen
 
-(Stub — to be designed.)
+What the player sees when a run ends — that is, when **all seven of the player's planets have combust** (per `MECHANICS.md §13`). *"Failure is not punishment; it is acknowledgment. When a run ends, the world remembers."*
 
-What the player sees when a run ends. Per `DESIGN.md`: *"Failure is not punishment; it is acknowledgment. When a run ends, the world remembers."*
+A run typically spans multiple maps. End-of-run is the wrap of the entire arc, not the end of any single map.
 
-### 6.1 Constraints
+### 6.1 The map browser
+
+End-of-run is **the run's map history, browsable**. The player can page through every map they walked, in order, with the path-trace and outcomes preserved on each.
+
+The current chart in end state is *not* shown here — it's always all-combust, and showing it adds nothing the player doesn't already know.
+
+- Maps appear as a horizontal carousel or sequence — first map leftmost, last (where final combust occurred) rightmost.
+- Each map renders at full fidelity when selected. The player can revisit each, click through, and see what happened at each node (traces per `§4.2`).
+- The interaction is paginating between maps and inspecting nodes.
+
+Reads as: *here is what you walked. Walk it again, in your mind.*
+
+### 6.2 Constraints
 
 - Quiet, not theatrical. No "GAME OVER" register.
-- The chart is visible in its end state — combust planets dark, residual afflictions visible.
-- A trace of the run (which nodes traversed, where it ended) is readable at a glance.
+- The map browser is the dominant register. Small chrome can carry Distance final and achievements (per `§3.7`), but they don't earn their own zone.
 
-### 6.2 Open questions
+### 6.3 Affordances
 
-- What persists between runs and how that's communicated here.
-- Whether there is a chorus fragment specific to the ending mode (combust by Saturn vs. by Mars vs. exhausted at the lowest layer).
-- Continue/restart affordances — and whether "restart" is even the right word for a game that treats runs as cumulative.
+- **Begin new run.** Generates a new starting map and resets chart state (afflictions and combusts cleared). The player's accumulated encounter count and unlocks persist — that's the lifetime layer.
+- **Return to Title.** Step out, decide later.
+
+There is no "restart this run" or "abandon run" affordance — at end-of-run, the run is already over.
+
+### 6.4 Open questions
+
+- **Run journal.** A visible record of past runs (one line each: # maps completed, Distance final, etc.)? Candidate lifetime-progression surface. Out of scope for v1; flagged.
+- **Chorus on end-of-run.** Currently deferred — possible later detail (e.g. the planet that delivered the final combust speaks one fragment).
 
 ---
 
 ## 7. Chart Study Screen
 
-(Stub — to be designed.)
+A "quiet mode" of the Title screen for sitting with one's chart.
 
-Between runs, a place to look at one's chart at full size, possibly with annotations earned through play. This is the "interpretive depth replaces gear" payoff per `INFLUENCES.md` (Diablo lineage section).
+### 7.1 Entry and exit
 
-### 7.1 Constraints
+- Entered by tapping the chart on the Title (per `§9`).
+- On entry: the wordmark fades, the Begin affordance recedes, the chart sits alone on a clean Void canvas.
+- Exited by tapping outside the chart, or by tapping the chart again.
 
-- The chart should feel like an artifact, not a stat sheet.
-- Annotations earned through play (which planets you've activated, which aspects have propagated, which houses you've encountered) should be present but not loud.
+### 7.2 Inspection grammar
 
-### 7.2 Open questions
+Chart Study supports the same **tap-to-inspect / hover-to-preview** grammar as combat (per `§3.6`), minus the commit step:
 
-- Whether this is a separate screen or a "zoom in" mode of another screen.
-- What annotations are earned and how they're presented.
-- Whether this surface is the same as the on-chain NFT chart artifact, a richer view of it, or something distinct that draws from the same data.
+- Tap a planet → its aspect lines highlight, the planet receives its inspection ring.
+- Hover (desktop) → ambient preview, same surface.
+- Tap elsewhere → preview clears.
+
+There is no commit. The point of Chart Study is to look at the web, not to act on it.
+
+### 7.3 What's shown in v1
+
+The chart at full size, in its current state — combust grayed, afflictions visible per the chart-rendering rules in `STYLE.md §11`.
+
+No earned-annotation layers in v1. The chart-at-rest is the artifact.
+
+### 7.4 v2 evolution path
+
+Future additions can layer on top of v1 without restructuring:
+
+- Aspects that have propagated in play stay subtly brighter at rest.
+- Houses encountered in narrative encounters get a small Field-layer flourish in their wedge.
+- Lifetime activation count per planet (revealed on hover, not always visible).
+- Fragment archive — chorus quotes the player has heard, browsable.
+
+These are deferred. The interpretive-depth payoff (per `INFLUENCES.md`) is delivered in v1 by the chart's visible state changes during play; richer annotation comes later.
+
+### 7.5 Relationship to NFT
+
+Chart Study renders the **same chart** as the NFT artifact (per `NFT.md`). No client-only enrichments in v1. Future annotations would be in-app overlays, not modifications to the canonical on-chain artifact.
 
 ---
 
@@ -200,19 +359,51 @@ Dev surfaces are not the subject of this document beyond:
 
 ---
 
-## 9. Title and Prince Select
+## 9. Title (Lobby)
 
-(Stubs — to be designed.)
+A combined lobby surface — the player's entry point, also serving as Prince selection for the rare player with multiple Princes.
 
-For returning players, an entry surface and (if they have multiple Princes) a selector. These are likely thin — the title screen may be a single chart-glyph splash; the prince select may be a horizontal carousel or grid of mini-charts.
+### 9.1 Layout
 
-Open question: whether title and prince select are separate screens or one combined "lobby" surface.
+- **The player's chart fills the canvas** at full size, in its current unlock state (Moon visible early, ghosts for the rest). The chart is who they are; standing on the title is standing in front of yourself.
+- **Wordmark "SPACE PRINCE"** appears small at the top. This is the only screen where the wordmark exists.
+- **One primary affordance:** **Begin** (see §9.2).
+- **Chart Study** as a quiet secondary affordance (per `§7`).
+
+### 9.2 Begin — state-dependent
+
+The Begin affordance's meaning depends on game state:
+
+- **If a run is in progress** (no end-of-run has fired), Begin = *continue* — drops the player back at the Map (their last surface in that run).
+- **If no run is in progress** (post-end-of-run, or never run), Begin = *new run* — generates a fresh starting map and begins.
+
+The button does not label its branches. The world tells the player which they did, by where they land.
+
+Active runs must be completed (full combust). There is no abandon-run affordance — see `§3.7`.
+
+### 9.3 Prince selection
+
+For players with multiple Princes, a small **dropdown** lets them switch the lobby's chart between their Princes. Visually quiet. The dropdown is hidden if the player has only one Prince. Most players will.
+
+### 9.4 First arrival (no Prince yet)
+
+A new player landing here without a minted Prince sees a shorter version of this surface:
+
+- A blank canvas (no chart).
+- The line *"A position has not yet been recognized."*
+- A single affordance: **Recognize a Position**, which leads to Mint (`§5`).
+
+This preserves the *recognition* tone from the archived `v1/ONBOARD.md` minute 0–1 without that doc's ten-minute arc.
+
+### 9.5 Settings, account, wallet
+
+Account, wallet, and configuration management are **not** in-game surfaces. They live in the **Cartridge Controller** web wallet's config modal, accessed once the user is logged in. The game does not duplicate that surface.
 
 ---
 
 ## 10. Navigation
 
-The screen graph is small enough to draw in a sentence: *Mint → Title → Prince select → Map ↔ Encounter → End-of-run → Title*, with Chart study reachable from Title and from End-of-run.
+The screen graph is small enough to draw in a sentence: *Mint → Title (lobby) → (Map ↔ Encounter, looping; new maps generate after each L7 completion) → End-of-run (only on full combust) → Title*. Chart Study is reachable from Title and from End-of-run.
 
 In the current dev prototype, navigation is via the Index screen and direct routes (`/map`, `/encounter`, `/narrative`). Final-game navigation is mostly implicit — the world advances you through screens — with a small persistent way back to higher-level surfaces from any point.
 
