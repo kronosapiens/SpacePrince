@@ -105,22 +105,6 @@
 }
 .title-second:hover { color: var(--bone); }
 
-.title-prince {
-  position: absolute;
-  bottom: 36px;
-  left: 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 3;
-}
-.title-prince-name {
-  font-family: var(--serif);
-  font-size: 22px;
-  font-style: italic;
-  color: var(--bone);
-}
-
 .title-empty-line {
   font-family: var(--serif);
   font-style: italic;

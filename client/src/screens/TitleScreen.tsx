@@ -64,10 +64,6 @@ export function TitleScreen() {
           {beginLabel}
         </button>
       </div>
-      <div className="title-prince">
-        <span className="eyebrow">PRINCE</span>
-        <span className="title-prince-name">{profile.name} ▾</span>
-      </div>
     </div>
   );
 }
