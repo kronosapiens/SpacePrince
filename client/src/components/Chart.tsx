@@ -78,6 +78,8 @@ export interface ChartProps {
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
+  /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
+  hideAfflictionBadges?: boolean;
   scale?: number;
   entrance?: "left" | "right" | "none";
   side?: "self" | "other";
@@ -103,6 +105,7 @@ export function Chart(props: ChartProps) {
     showColorField = true,
     showSubstrate = false,
     showAspects = true,
+    hideAfflictionBadges = false,
     entrance = "none",
     side,
     onPlanetClick,
@@ -152,8 +155,9 @@ export function Chart(props: ChartProps) {
         const from = pointMap[a.from];
         const to = pointMap[a.to];
         if (!from || !to) return null;
-        const isActive = allActive ||
-                         activePlanet === a.from || activePlanet === a.to ||
+        // Aspect highlights only follow hover/select/active. Dimmed by default
+        // even when allActive is true — keeps the resting Title chart calm.
+        const isActive = activePlanet === a.from || activePlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
@@ -163,8 +167,8 @@ export function Chart(props: ChartProps) {
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction" ? fromC :
           a.aspect === "Square" ? fromS :
           NEUTRAL.mist;
-        const opacity = isActive ? 0.95 : isInspect ? 0.75 : 0.35;
-        const sw = isActive ? 2 : isInspect ? 1.4 : 0.8;
+        const opacity = isActive ? 0.95 : isInspect ? 0.75 : 0.18;
+        const sw = isActive ? 2 : isInspect ? 1.4 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
         const len = Math.hypot(dx, dy) || 1;
@@ -248,6 +252,7 @@ export function Chart(props: ChartProps) {
             point={p}
             combusted={combusted}
             affliction={status?.affliction ?? 0}
+            hideAfflictionBadge={hideAfflictionBadges}
             ghost={!unlocked}
             selected={isSelected}
             active={isActive}
@@ -267,7 +272,7 @@ export function Chart(props: ChartProps) {
 // ─── Internal pieces ────────────────────────────────────────────────────
 
 function PlanetGlyph({
-  point, combusted, affliction, ghost,
+  point, combusted, affliction, hideAfflictionBadge, ghost,
   selected, active, hovered, inspect,
   onClick, onHover, passive,
   projectedDelta,
@@ -275,6 +280,7 @@ function PlanetGlyph({
   point: PlanetPoint;
   combusted: boolean;
   affliction: number;
+  hideAfflictionBadge: boolean;
   ghost: boolean;
   selected: boolean;
   active: boolean;
@@ -359,7 +365,7 @@ function PlanetGlyph({
         style={{ pointerEvents: "none", userSelect: "none" }}>
         {PLANET_GLYPH[point.planet]}
       </text>
-      {!combusted && affliction > 0 && (
+      {!hideAfflictionBadge && !combusted && affliction > 0 && (
         <g transform={`translate(${ux * badgeOffset}, ${uy * badgeOffset})`}>
           <circle r={badgeR} fill={NEUTRAL.void} stroke={c} strokeOpacity="0.85" strokeWidth={1.2} />
           <text textAnchor="middle" dominantBaseline="central"

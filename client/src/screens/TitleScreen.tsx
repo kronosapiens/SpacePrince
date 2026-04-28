@@ -7,12 +7,13 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { unlockedPlanets } from "@/game/unlocks";
 import { loadDevSettings } from "@/state/settings";
-import type { Profile, RunState } from "@/game/types";
+import type { PlanetName, Profile, RunState } from "@/game/types";
 
 export function TitleScreen() {
   const navigate = useNavigate();
   const [profile] = useState<Profile | null>(() => loadProfile());
   const [run] = useState<RunState | null>(() => loadRun());
+  const [hovered, setHovered] = useState<PlanetName | null>(null);
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
@@ -55,8 +56,10 @@ export function TitleScreen() {
             state={run?.perPlanetState}
             unlockedPlanets={unlocked}
             allActive
+            hoveredPlanet={hovered}
+            onPlanetHover={setHovered}
+            hideAfflictionBadges
             showColorField
-            passive
           />
         </div>
       </div>
