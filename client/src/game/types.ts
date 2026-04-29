@@ -212,6 +212,10 @@ export interface Profile {
   chart: Chart;
   lifetimeEncounterCount: number;
   scarsLevel: number;
+  /** ID of the most recent run that bumped scarsLevel — used for idempotency
+   *  so revisiting End-of-Run doesn't double-count. Optional for back-compat
+   *  with previously-saved profiles that predate this field. */
+  lastScarsBumpRunId?: string | null;
   createdAt: number;
   schemaVersion: 1;
 }

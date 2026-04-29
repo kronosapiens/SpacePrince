@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
 import { STROKE_MEDIUM } from "@/svg/viewbox";
 import type { PlanetName } from "@/game/types";
@@ -26,13 +26,13 @@ export interface PropagationLineProps {
  */
 export function PropagationLine(props: PropagationLineProps) {
   const { fromX, fromY, toX, toY, fromPlanet, toPlanet, aspect, active, onComplete } = props;
-  const lineRef = useRef<SVGLineElement | null>(null);
+  const gradientRef = useRef<SVGLinearGradientElement | null>(null);
+  // useId guarantees uniqueness across instances even when coords collide.
+  const gradientId = useId();
 
   const harmony = aspect === "Trine" || aspect === "Sextile" || aspect === "Conjunction";
   const fromColor = harmony ? PLANET_PRIMARY[fromPlanet] : PLANET_SECONDARY[fromPlanet];
   const toColor = harmony ? PLANET_PRIMARY[toPlanet] : PLANET_SECONDARY[toPlanet];
-
-  const gradientId = `prop_${fromPlanet}_${toPlanet}_${fromX}_${fromY}`;
 
   useEffect(() => {
     if (!active) return;
@@ -56,7 +56,7 @@ export function PropagationLine(props: PropagationLineProps) {
       } else {
         t = easeOut(t);
       }
-      const grad = document.getElementById(gradientId);
+      const grad = gradientRef.current;
       if (grad) {
         const stops = grad.querySelectorAll("stop");
         const offset0 = Math.max(0, t - 0.18);
@@ -72,7 +72,7 @@ export function PropagationLine(props: PropagationLineProps) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [active, aspect, gradientId, onComplete]);
+  }, [active, aspect, onComplete]);
 
   if (!active) return null;
 
@@ -80,6 +80,7 @@ export function PropagationLine(props: PropagationLineProps) {
     <g style={{ pointerEvents: "none" }}>
       <defs>
         <linearGradient
+          ref={gradientRef}
           id={gradientId}
           x1={fromX} y1={fromY} x2={toX} y2={toY}
           gradientUnits="userSpaceOnUse"
@@ -89,7 +90,6 @@ export function PropagationLine(props: PropagationLineProps) {
         </linearGradient>
       </defs>
       <line
-        ref={lineRef}
         x1={fromX} y1={fromY} x2={toX} y2={toY}
         stroke={`url(#${gradientId})`}
         strokeWidth={STROKE_MEDIUM}

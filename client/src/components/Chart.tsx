@@ -95,6 +95,16 @@ export interface ChartProps {
   projection?: ProjectionChips;
   /** Directed aspect keys (`Source->Target`) currently propagating. */
   activePropagationKeys?: ReadonlySet<string>;
+  /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
+  actionPulsePlanet?: PlanetName | null;
+  /** Planets whose affliction badge should pulse (took a hit this beat). */
+  impactPlanets?: ReadonlySet<PlanetName>;
+  /** Planets whose direct hit was a crit — fires a radial burst. */
+  critPlanets?: ReadonlySet<PlanetName>;
+  /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
+  combustingPlanets?: ReadonlySet<PlanetName>;
+  /** Per-turn key — bumped each turn so animation classes replay reliably. */
+  animationEpoch?: number;
 }
 
 export function Chart(props: ChartProps) {
@@ -122,6 +132,11 @@ export function Chart(props: ChartProps) {
     aspects: aspectsProp,
     projection,
     activePropagationKeys,
+    actionPulsePlanet,
+    impactPlanets,
+    critPlanets,
+    combustingPlanets,
+    animationEpoch,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
@@ -282,6 +297,10 @@ export function Chart(props: ChartProps) {
         const isHovered = hoveredPlanet === p.planet;
         const isInspect = inspectPlanet === p.planet;
         const projectedDelta = projection?.deltas[p.planet];
+        const isActionPulse = actionPulsePlanet === p.planet;
+        const isImpacting = impactPlanets?.has(p.planet) ?? false;
+        const isCritting = critPlanets?.has(p.planet) ?? false;
+        const isCombusting = combustingPlanets?.has(p.planet) ?? false;
         return (
           <PlanetGlyph
             key={p.planet}
@@ -299,6 +318,11 @@ export function Chart(props: ChartProps) {
             onHover={handleHover}
             passive={passive}
             projectedDelta={projectedDelta}
+            actionPulse={isActionPulse}
+            impact={isImpacting}
+            crit={isCritting}
+            combusting={isCombusting}
+            animationEpoch={animationEpoch}
           />
         );
       })}
@@ -318,6 +342,8 @@ function PlanetGlyph({
   selected, active, hovered, inspect,
   onClick, onHover, passive,
   projectedDelta,
+  actionPulse, impact, crit, combusting,
+  animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
@@ -333,6 +359,11 @@ function PlanetGlyph({
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
   projectedDelta?: number;
+  actionPulse: boolean;
+  impact: boolean;
+  crit: boolean;
+  combusting: boolean;
+  animationEpoch?: number;
 }) {
   const c = PLANET_PRIMARY[point.planet];
   const sec = PLANET_SECONDARY[point.planet];
@@ -381,14 +412,22 @@ function PlanetGlyph({
   const badgeR = Math.max(9, r * 0.4);
   const badgeFontSize = Math.max(11, Math.round(r * 0.46));
 
+  // Outer wrapper carries the optional action-glow pulse. The desaturation
+  // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
+  // ripple overlays don't desaturate with it.
+  const epoch = animationEpoch ?? 0;
+  const outerClass = actionPulse ? "anim-action-glow" : undefined;
+  const glyphClass = combusted || combusting ? "anim-combust" : undefined;
+  const badgeClass = impact ? "anim-impact" : undefined;
+
   return (
     <g
       transform={`translate(${point.cx}, ${point.cy})`}
       onClick={handleClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      style={{ cursor: interactive ? "pointer" : "default" }}
-      className={combusted ? "anim-combust" : undefined}
+      style={{ cursor: interactive ? "pointer" : "default", color: c }}
+      className={outerClass}
     >
       {active && (
         <circle r={point.glyphR + 6} fill="none"
@@ -402,19 +441,49 @@ function PlanetGlyph({
         <circle r={point.glyphR + 6} fill="none"
           stroke={NEUTRAL.bone} strokeOpacity="0.6" strokeWidth={STROKE_LIGHT} />
       )}
-      <circle r={r}
-        fill={fill} fillOpacity={fillOpacity}
-        stroke={sec} strokeOpacity="0.9" strokeWidth={Math.max(1, r * 0.05)} />
-      <text textAnchor="middle" dominantBaseline="central"
-        fontSize={Math.round(r * 0.85)}
-        fill={glyphFill}
-        fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
-        fontWeight={600}
-        style={{ pointerEvents: "none", userSelect: "none" }}>
-        {PLANET_GLYPH[point.planet]}
-      </text>
+      <g className={glyphClass}>
+        <circle r={r}
+          fill={fill} fillOpacity={fillOpacity}
+          stroke={sec} strokeOpacity="0.9" strokeWidth={Math.max(1, r * 0.05)} />
+        <text textAnchor="middle" dominantBaseline="central"
+          fontSize={Math.round(r * 0.85)}
+          fill={glyphFill}
+          fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
+          fontWeight={600}
+          style={{ pointerEvents: "none", userSelect: "none" }}>
+          {PLANET_GLYPH[point.planet]}
+        </text>
+      </g>
+      {crit && (
+        <circle
+          key={`crit-${epoch}`}
+          r={r + 4}
+          fill="none"
+          stroke={c}
+          strokeOpacity={0.8}
+          strokeWidth={2}
+          className="anim-crit-burst"
+          style={{ pointerEvents: "none" }}
+        />
+      )}
+      {combusting && (
+        <circle
+          key={`ripple-${epoch}`}
+          r={r + 2}
+          fill="none"
+          stroke={c}
+          strokeOpacity={0.85}
+          strokeWidth={1.5}
+          className="anim-combust-ripple"
+          style={{ pointerEvents: "none" }}
+        />
+      )}
       {!hideAfflictionBadge && !combusted && (alwaysShowAfflictionBadge || affliction > 0) && (
-        <g transform={`translate(${ux * badgeOffset}, ${uy * badgeOffset})`}>
+        <g
+          transform={`translate(${ux * badgeOffset}, ${uy * badgeOffset})`}
+          className={badgeClass}
+          key={`badge-${epoch}-${impact ? 1 : 0}`}
+        >
           <circle r={badgeR} fill={NEUTRAL.void} stroke={c} strokeOpacity="0.85" strokeWidth={1.2} />
           <text textAnchor="middle" dominantBaseline="central"
             fontSize={badgeFontSize} fill={NEUTRAL.bone}

@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { MapDiagram } from "@/components/MapDiagram";
 import { ROUTES } from "@/routes";
-import { loadProfile } from "@/state/profile";
-import { loadRun, saveRun } from "@/state/run-store";
+import { useProfile } from "@/state/ProfileStore";
+import { useRun, useRunDispatch } from "@/state/RunStore";
+import { useStartRun, useRolloverMap } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { mulberry32, randomSeed, hashString } from "@/game/rng";
+import { mulberry32, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
-import { beginRun, rolloverMap } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
@@ -26,7 +26,6 @@ import {
 import { blankSideState } from "@/game/chart";
 import type {
   EncounterState,
-  Profile,
   RunState,
   NodeContent,
 } from "@/game/types";
@@ -41,17 +40,21 @@ export function MapScreen() {
 
 function NormalMapScreen() {
   const navigate = useNavigate();
-  const [profile] = useState<Profile | null>(() => loadProfile());
-  const [run, setRun] = useState<RunState | null>(() => {
-    const p = loadProfile();
-    if (!p) return null;
-    const existing = loadRun();
-    if (existing && !existing.over) return existing;
-    const fresh = beginRun(p);
-    saveRun(fresh);
-    return fresh;
-  });
+  const profile = useProfile();
+  const run = useRun();
+  const dispatchRun = useRunDispatch();
+  const startRun = useStartRun();
+  const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
+
+  // Bootstrap: if we have a profile but no live run, start one. Persistence
+  // is handled by the RunStore effect. If the run is `over`, leave it alone —
+  // EndOfRunScreen handles the "Begin again" path via run/clear.
+  useEffect(() => {
+    if (!profile) return;
+    if (run) return;
+    startRun(profile);
+  }, [profile, run, startRun]);
 
   useEffect(() => {
     setActive(null); // map fades to neutral
@@ -127,22 +130,20 @@ function NormalMapScreen() {
         });
       }
       nextRun = { ...nextRun, currentEncounter: encounter };
-      saveRun(nextRun);
-      setRun(nextRun);
+      // commitNarrative covers any pre-encounter run mutations (rolledNodes,
+      // visitedNodeIds, currentNodeId). The reducer just adopts the new state.
+      dispatchRun({ type: "run/commitNarrative", nextRun });
       navigate(ROUTES.encounter);
     },
-    [run, profile, settings, navigate],
+    [run, profile, settings, navigate, dispatchRun],
   );
 
   useEffect(() => {
     if (!run) return;
     if (run.currentEncounter) return;
     if (run.currentMap.currentNodeId !== TERMINAL_NODE_ID) return;
-    const nextSeed = randomSeed();
-    const next = rolloverMap(run, nextSeed);
-    saveRun(next);
-    setRun(next);
-  }, [run]);
+    rolloverMap(run);
+  }, [run, rolloverMap]);
 
   if (!profile) return <Navigate to={ROUTES.title} replace />;
   if (!run) return null;

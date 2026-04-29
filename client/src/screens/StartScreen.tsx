@@ -4,7 +4,7 @@ import { Chart } from "@/components/Chart";
 import { ROUTES } from "@/routes";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements } from "@/game/chart";
-import { saveProfile } from "@/state/profile";
+import { useProfileDispatch } from "@/state/ProfileStore";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -29,6 +29,7 @@ const GHOST_FADE_MS = 1500;
 export function StartScreen() {
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
+  const dispatchProfile = useProfileDispatch();
   const [stage, setStage] = useState<Stage>("input");
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -131,7 +132,7 @@ export function StartScreen() {
       createdAt: Date.now(),
       schemaVersion: 1,
     };
-    saveProfile(profile);
+    dispatchProfile({ type: "profile/set", profile });
     navigate(ROUTES.title);
   };
 

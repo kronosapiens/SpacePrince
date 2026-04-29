@@ -47,8 +47,12 @@ export function NarrativeRoute() {
       run={runWithEnc}
       profile={profile}
       encounter={encounter}
-      setRun={() => {}}
-      setProfile={() => {}}
+      onCommit={() => {
+        /* dev-only: no persistence */
+      }}
+      onClearEncounter={() => {
+        /* dev-only: no persistence */
+      }}
     />
   );
 }

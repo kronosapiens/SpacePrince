@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { loadProfile, saveProfile } from "@/state/profile";
-import { loadRun, saveRun } from "@/state/run-store";
+import { useProfile } from "@/state/ProfileStore";
+import { useRun, useRunDispatch } from "@/state/RunStore";
+import { useCommitNarrative, useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
-import { EncounterCombatScreen } from "./EncounterCombat";
+import { EncounterCombatScreen, type CommitTurnResult } from "./EncounterCombat";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
+import { resolveTurn } from "@/game/turn";
 import {
   generateSeedHash,
   getOrCreateDevProfile,
@@ -13,7 +15,7 @@ import {
   makeDevRun,
   seedFromHash,
 } from "@/state/dev-state";
-import type { Profile, RunState } from "@/game/types";
+import type { CombatEncounter, PlanetName, RunState } from "@/game/types";
 
 export function EncounterScreen() {
   const settings = loadDevSettings();
@@ -22,18 +24,12 @@ export function EncounterScreen() {
 }
 
 function NormalEncounterScreen() {
-  const [profile, setProfile] = useState<Profile | null>(() => loadProfile());
-  const [run, setRun] = useState<RunState | null>(() => loadRun());
+  const profile = useProfile();
+  const run = useRun();
+  const dispatchRun = useRunDispatch();
+  const commitTurn = useCommitTurn();
+  const commitNarrative = useCommitNarrative();
   const settings = loadDevSettings();
-
-  const updateProfile = useCallback((p: Profile) => {
-    saveProfile(p);
-    setProfile(p);
-  }, []);
-  const updateRun = useCallback((r: RunState) => {
-    saveRun(r);
-    setRun(r);
-  }, []);
 
   if (!profile) return <Navigate to={ROUTES.title} replace />;
   if (!run) return <Navigate to={ROUTES.title} replace />;
@@ -46,8 +42,8 @@ function NormalEncounterScreen() {
         run={run}
         profile={profile}
         encounter={enc}
-        setRun={updateRun}
-        setProfile={updateProfile}
+        onCommitTurn={(planet, rng) => commitTurn(run, profile.chart, planet, rng)}
+        onClearEncounter={() => dispatchRun({ type: "run/clearEncounter" })}
         devUnlockAll={settings.unlockAll}
       />
     );
@@ -57,14 +53,17 @@ function NormalEncounterScreen() {
       run={run}
       profile={profile}
       encounter={enc}
-      setRun={updateRun}
-      setProfile={updateProfile}
+      onCommit={(args) =>
+        commitNarrative({ run, nextRun: args.nextRun, summary: args.summary, resolved: args.resolved })
+      }
+      onClearEncounter={() => dispatchRun({ type: "run/clearEncounter" })}
     />
   );
 }
 
 /** /encounter in dev mode — fresh combat encounter per seed.
- *  Bare /encounter redirects to /encounter/<hash>; the hash drives the seed. */
+ *  Bare /encounter redirects to /encounter/<hash>; the hash drives the seed.
+ *  Dev mode uses local state only — no dispatch to the global stores. */
 function DevCombatScreen() {
   const navigate = useNavigate();
   const { seed: seedHash } = useParams<{ seed?: string }>();
@@ -76,7 +75,10 @@ function DevCombatScreen() {
   }, [seedHash, navigate]);
 
   const seed = seedHash ? seedFromHash(seedHash) : 0;
-  const profile = useMemo(() => getOrCreateDevProfile(), []);
+  // useState initializers — pure given seed/profile but `getOrCreateDevProfile`
+  // touches sessionStorage, which would double-fire under StrictMode if used in
+  // useMemo.
+  const [profile] = useState(() => getOrCreateDevProfile());
   const baseRun = useMemo(() => makeDevRun(seed, profile), [seed, profile]);
   const encounter = useMemo(() => makeDevCombat(seed, profile), [seed, profile]);
   const [run, setRun] = useState<RunState>({ ...baseRun, currentEncounter: encounter });
@@ -86,15 +88,45 @@ function DevCombatScreen() {
     setRun({ ...baseRun, currentEncounter: encounter });
   }, [baseRun, encounter]);
 
+  const onCommitTurn = useCallback(
+    (planet: PlanetName, rng: () => number): CommitTurnResult | null => {
+      const result = resolveTurn(run, profile.chart, planet, rng);
+      if (!result || result.encounter.kind !== "combat") return null;
+      const nextRun = result.run;
+      setRun(nextRun);
+      return {
+        log: result.log,
+        nextRun,
+        encounter: result.encounter,
+        encounterEnded: result.encounterEnded,
+        runEnded: result.runEnded,
+      };
+    },
+    [run, profile.chart],
+  );
+
+  const onClearEncounter = useCallback(() => {
+    setRun((prev) => ({ ...prev, currentEncounter: null }));
+  }, []);
+
   if (!seedHash) return null;
+
+  // Use the encounter on the current run so post-turn updates (turnIndex,
+  // opponentState, log, resolved) actually flow into the screen. Falling back
+  // to the seed-memoized encounter only on the very first render before the
+  // run-reset effect has fired.
+  const liveEncounter: CombatEncounter =
+    run.currentEncounter && run.currentEncounter.kind === "combat"
+      ? run.currentEncounter
+      : encounter;
 
   return (
     <EncounterCombatScreen
       run={run}
       profile={profile}
-      encounter={encounter}
-      setRun={setRun}
-      setProfile={() => {}}
+      encounter={liveEncounter}
+      onCommitTurn={onCommitTurn}
+      onClearEncounter={onClearEncounter}
       devUnlockAll
     />
   );

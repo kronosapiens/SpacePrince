@@ -3,7 +3,6 @@ import { blankSideState, seededChart } from "./chart";
 import { pickWeighted, mulberry32 } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
-  Chart,
   CombatEncounter,
   NarrativeEncounter,
   PlanetName,
@@ -62,13 +61,3 @@ export function beginNarrativeEncounter(input: BeginNarrativeInput): NarrativeEn
   };
 }
 
-/** Get the player chart's projection of unlocked planets, used everywhere encounter UI gates on availability. */
-export function selectablePlayerPlanets(
-  chart: Chart,
-  unlocked: PlanetName[],
-  perPlanetState: Record<PlanetName, { combusted: boolean }>,
-): PlanetName[] {
-  // Order unlocked by chart position would be nice; for now keep Macrobian order.
-  void chart;
-  return unlocked.filter((p) => !perPlanetState[p].combusted);
-}

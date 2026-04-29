@@ -1,5 +1,9 @@
 import { PLANETS } from "./data";
-import { getEffectiveStatsFromPlacement, getPolarity } from "./combat";
+import {
+  computeDirectExchange,
+  getEffectiveStatsFromPlacement,
+  getPolarity,
+} from "./combat";
 import { getAspects } from "./aspects";
 import { maybeCombust } from "./combust";
 import { cloneSideState } from "./chart";
@@ -18,7 +22,7 @@ import type {
   TurnLogEntry,
 } from "./types";
 
-const ZERO = { damage: 0, healing: 0, durability: 0, luck: 0 };
+const ZERO_STATS = { damage: 0, healing: 0, durability: 0, luck: 0 };
 
 interface TurnResult {
   run: RunState;
@@ -144,13 +148,6 @@ function rollCrit(luck: number, rng: () => number): boolean {
   return rng() < chance;
 }
 
-function effectAmount(polarity: Polarity, stats: { damage: number; healing: number }, crit: boolean) {
-  const critMul = crit ? 2 : 1;
-  const base = polarity === "Testimony" ? stats.healing : stats.damage;
-  const polarityMul = polarity === "Affliction" ? 2 : 1;
-  return Math.max(0, base * critMul * polarityMul);
-}
-
 function computeDirectPhase(
   playerPlacement: PlanetPlacement,
   opponentPlacement: PlanetPlacement,
@@ -159,17 +156,21 @@ function computeDirectPhase(
   rng: () => number,
 ) {
   const polarity = getPolarity(playerPlacement.element, opponentPlacement.element);
-  const playerEff = playerState.combusted ? ZERO : getEffectiveStatsFromPlacement(playerPlacement);
-  const opponentEff = opponentState.combusted ? ZERO : getEffectiveStatsFromPlacement(opponentPlacement);
+  const playerEff = playerState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(playerPlacement);
+  const opponentEff = opponentState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(opponentPlacement);
   const playerCrit = rollCrit(playerEff.luck, rng);
   const opponentCrit = rollCrit(opponentEff.luck, rng);
+  // Reuse the polarity/element exchange formula from combat.ts; multiply by
+  // crit factor here. Projection (computeProjectedEffects) uses the same
+  // function without crit, so projection and resolution can never drift.
+  const exchange = computeDirectExchange(polarity, playerEff, opponentEff);
   return {
     polarity,
     playerCrit,
     opponentCrit,
-    playerToOpponent: effectAmount(polarity, playerEff, playerCrit),
-    opponentToPlayer: effectAmount(polarity, opponentEff, opponentCrit),
-    friction: polarity === "Affliction" ? 2 : 1,
+    playerToOpponent: exchange.playerToOpponent * (playerCrit ? 2 : 1),
+    opponentToPlayer: exchange.opponentToPlayer * (opponentCrit ? 2 : 1),
+    friction: exchange.polarityMultiplier,
     playerBase: polarity === "Testimony" ? playerEff.healing : playerEff.damage,
     opponentBase: polarity === "Testimony" ? opponentEff.healing : opponentEff.damage,
   };

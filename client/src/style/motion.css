@@ -59,8 +59,42 @@
   to   { transform: rotate(360deg); }
 }
 
+/* Combat per-planet feedback — ported from client_v1. */
+@keyframes action-glow-pulse {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+  50%      { filter: brightness(1.18) drop-shadow(0 0 6px currentColor); }
+}
+
+@keyframes affliction-impact {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.18); }
+}
+
+@keyframes crit-burst {
+  0%   { transform: scale(1);   opacity: 1; }
+  65%  { transform: scale(2.2); opacity: 0.22; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes combust-ripple {
+  0%   { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
 .anim-combust {
   animation: combust var(--m-combust) var(--ease-combust) forwards;
+}
+
+.anim-action-glow    { animation: action-glow-pulse var(--m-planet-active) var(--ease-out) both; }
+.anim-impact         { animation: affliction-impact 360ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-crit-burst     { animation: crit-burst 720ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-action-glow,
+  .anim-impact,
+  .anim-crit-burst,
+  .anim-combust-ripple { animation-duration: 1ms; }
 }
 
 .anim-fragment-in {

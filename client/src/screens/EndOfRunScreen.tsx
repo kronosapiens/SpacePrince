@@ -2,17 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
-import { loadProfile, saveProfile } from "@/state/profile";
-import { loadRun, clearRun } from "@/state/run-store";
+import { useProfile } from "@/state/ProfileStore";
+import { useRun, useRunDispatch } from "@/state/RunStore";
+import { useBumpScars } from "@/state/store-actions";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { MACROBIAN_ORDER, PLANETS } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
-import type { Profile, RunState, MapState } from "@/game/types";
+import type { MapState } from "@/game/types";
 
 export function EndOfRunScreen() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(() => loadProfile());
-  const [run] = useState<RunState | null>(() => loadRun());
+  const profile = useProfile();
+  const run = useRun();
+  const dispatchRun = useRunDispatch();
+  const bumpScars = useBumpScars();
   const [selectedIdx, setSelectedIdx] = useState(0);
   const { setActive } = useActivePlanet();
 
@@ -23,13 +26,8 @@ export function EndOfRunScreen() {
   useEffect(() => {
     if (!profile || !run) return;
     if (!run.over) return;
-    const key = `sp:end_bump:${run.id}`;
-    if (localStorage.getItem(key)) return;
-    localStorage.setItem(key, "1");
-    const next: Profile = { ...profile, scarsLevel: profile.scarsLevel + 1 };
-    saveProfile(next);
-    setProfile(next);
-  }, [profile, run]);
+    bumpScars(run.id); // idempotent — reducer guards on lastScarsBumpRunId
+  }, [profile, run, bumpScars]);
 
   const allMaps: MapState[] = useMemo(() => {
     if (!run) return [];
@@ -50,7 +48,7 @@ export function EndOfRunScreen() {
   if (!run) return <Navigate to={ROUTES.title} replace />;
 
   const beginNew = () => {
-    clearRun();
+    dispatchRun({ type: "run/clear" });
     navigate(ROUTES.map);
   };
 

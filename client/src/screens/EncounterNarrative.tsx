@@ -5,17 +5,13 @@ import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { ROUTES } from "@/routes";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
-import { saveProfile } from "@/state/profile";
-import { saveRun } from "@/state/run-store";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getTree, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment } from "@/data/chorus";
 import { mulberry32 } from "@/game/rng";
-import { PLANETS } from "@/game/data";
 import type {
   NarrativeEncounter,
-  NodeOutcome,
   PlanetName,
   Profile,
   RunState,
@@ -29,16 +25,27 @@ const HOUSE_NAMES = [
   "Ninth House", "Tenth House", "Eleventh House", "Twelfth House",
 ];
 
+export interface CommitNarrativeArgs {
+  nextRun: RunState;
+  /** Free-form summary of the choice made (used in NodeOutcome). */
+  summary: string;
+  /** True when the choice resolved the encounter. */
+  resolved: boolean;
+}
+
 interface NarrativeScreenProps {
   run: RunState;
   profile: Profile;
   encounter: NarrativeEncounter;
-  setRun: (r: RunState) => void;
-  setProfile: (p: Profile) => void;
+  /** Persistence + (when resolved) lifetime bump + outcome construction
+   *  happens inside the implementation (real or dev). */
+  onCommit: (args: CommitNarrativeArgs) => void;
+  /** Clear `run.currentEncounter` and return to the map. */
+  onClearEncounter: () => void;
 }
 
 export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
-  const { run, profile, encounter, setRun, setProfile } = props;
+  const { run, profile, encounter, onCommit, onClearEncounter } = props;
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
@@ -106,8 +113,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         visitedNodeIds: [...encounter.visitedNodeIds, option.next],
       };
       nextRun = { ...nextRun, currentEncounter: updatedEnc };
-      saveRun(nextRun);
-      setRun(nextRun);
+      onCommit({ nextRun, summary: option.text, resolved: false });
       return;
     }
 
@@ -118,33 +124,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     };
     nextRun = { ...nextRun, currentEncounter: finalEnc };
 
-    const nextProfile: Profile = {
-      ...profile,
-      lifetimeEncounterCount: profile.lifetimeEncounterCount + 1,
-    };
-    saveProfile(nextProfile);
-    setProfile(nextProfile);
-
-    const combusts = PLANETS.filter(
-      (p) => nextRun.perPlanetState[p].combusted && !run.perPlanetState[p].combusted,
-    );
-    const outcome: NodeOutcome = {
-      nodeId: nextRun.currentMap.currentNodeId,
-      kind: "narrative",
+    onCommit({
+      nextRun,
       summary: `${house.name} · ${option.text}`,
-      distanceDelta: nextRun.runDistance - run.runDistance,
-      combusts,
-    };
-    nextRun = {
-      ...nextRun,
-      currentMap: {
-        ...nextRun.currentMap,
-        outcomes: { ...nextRun.currentMap.outcomes, [outcome.nodeId]: outcome },
-      },
-    };
-
-    saveRun(nextRun);
-    setRun(nextRun);
+      resolved: true,
+    });
     setResolved(true);
     setResolutionLine(resolutionText || option.text);
   };
@@ -154,9 +138,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       navigate(ROUTES.end);
       return;
     }
-    const cleared: RunState = { ...run, currentEncounter: null };
-    saveRun(cleared);
-    setRun(cleared);
+    onClearEncounter();
     navigate(ROUTES.map);
   };
 

@@ -370,6 +370,10 @@
   border-radius: 50%;
   border: 1px solid var(--mist);
   background: transparent;
+  transition:
+    box-shadow 220ms var(--ease-out),
+    background-color 220ms var(--ease-out),
+    border-color 220ms var(--ease-out);
 }
 .combat-dot.is-on { background: var(--bone); border-color: var(--bone); }
 .combat-dot.is-current { box-shadow: 0 0 0 3px rgba(224, 74, 63, 0.25); }

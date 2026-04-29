@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { loadProfile, saveProfile, clearProfile } from "@/state/profile";
-import { loadRun, clearRun } from "@/state/run-store";
+import { useProfile, useProfileDispatch } from "@/state/ProfileStore";
+import { useRun, useRunDispatch } from "@/state/RunStore";
+import { useResetAll } from "@/state/store-actions";
 import { loadDevSettings, saveDevSettings, type DevSettings } from "@/state/settings";
 import { unlockedPlanets } from "@/game/unlocks";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
-import type { Profile, RunState } from "@/game/types";
+import type { Profile } from "@/game/types";
 
 export function IndexScreen() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [run, setRun] = useState<RunState | null>(null);
+  const profile = useProfile();
+  const run = useRun();
+  const dispatchProfile = useProfileDispatch();
+  const dispatchRun = useRunDispatch();
+  const resetAll = useResetAll();
   const [settings, setSettings] = useState<DevSettings>(() => loadDevSettings());
-
-  useEffect(() => {
-    setProfile(loadProfile());
-    setRun(loadRun());
-  }, []);
 
   const update = (next: DevSettings) => {
     setSettings(next);
@@ -70,9 +69,7 @@ export function IndexScreen() {
                   if (v == null) return;
                   const n = Math.max(0, Math.floor(Number(v)));
                   if (Number.isFinite(n)) {
-                    const next = { ...profile, lifetimeEncounterCount: n };
-                    saveProfile(next);
-                    setProfile(next);
+                    dispatchProfile({ type: "profile/setEncounterCount", count: n });
                   }
                 }}
               >
@@ -80,14 +77,9 @@ export function IndexScreen() {
               </button>
               <button
                 className="title-second"
-                onClick={() => {
-                  clearProfile();
-                  clearRun();
-                  setProfile(null);
-                  setRun(null);
-                }}
+                onClick={resetAll}
               >
-                Clear profile + run
+                Reset all (profile + run)
               </button>
             </div>
           </>
@@ -111,8 +103,7 @@ export function IndexScreen() {
                   createdAt: Date.now(),
                   schemaVersion: 1,
                 };
-                saveProfile(next);
-                setProfile(next);
+                dispatchProfile({ type: "profile/set", profile: next });
               }}
             >
               Create stub profile (seeded chart)
@@ -130,10 +121,7 @@ export function IndexScreen() {
             <div className="index-row">
               <button
                 className="title-second"
-                onClick={() => {
-                  clearRun();
-                  setRun(null);
-                }}
+                onClick={() => dispatchRun({ type: "run/clear" })}
               >
                 Clear run
               </button>

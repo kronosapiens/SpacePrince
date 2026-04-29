@@ -1,57 +1,59 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type Dispatch,
-  type MutableRefObject,
-  type SetStateAction,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { aspectKey, Chart } from "@/components/Chart";
+import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
-import { resolveTurn } from "@/game/turn";
-import { mulberry32 } from "@/game/rng";
+import { hashString, mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { saveRun } from "@/state/run-store";
-import { saveProfile } from "@/state/profile";
-import { PLANETS } from "@/game/data";
 import { computeProjectedEffects } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
+import {
+  EMPTY_PLANET_SET,
+  EMPTY_PROPAGATION_KEYS,
+  useCombatAnimation,
+} from "@/components/useCombatAnimation";
 import type {
   CombatEncounter,
-  NodeOutcome,
   PlanetName,
   Profile,
   RunState,
-  SideState,
   TurnLogEntry,
 } from "@/game/types";
+
+/** Outcome of a committed combat turn — feeds the animation playback. */
+export interface CommitTurnResult {
+  log: TurnLogEntry;
+  nextRun: RunState;
+  encounter: CombatEncounter;
+  encounterEnded: boolean;
+  runEnded: boolean;
+}
 
 interface CombatScreenProps {
   run: RunState;
   profile: Profile;
   encounter: CombatEncounter;
-  setRun: (r: RunState) => void;
-  setProfile: (p: Profile) => void;
+  /** Resolves a turn; returns null if the click was rejected (e.g. encounter
+   *  resolved). Persistence + lifetime-bump + outcome construction happen
+   *  inside the implementation (real or dev). */
+  onCommitTurn: (planet: PlanetName, rng: () => number) => CommitTurnResult | null;
+  /** Clear `run.currentEncounter` and return to the map. */
+  onClearEncounter: () => void;
   devUnlockAll: boolean;
 }
 
 export function EncounterCombatScreen(props: CombatScreenProps) {
-  const { run, profile, encounter, setRun, setProfile, devUnlockAll } = props;
+  const { run, profile, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
-  const [animation, setAnimation] = useState<CombatAnimationState | null>(null);
-  const timeoutIds = useRef<number[]>([]);
+  const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -60,17 +62,19 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const displayPlayerState = animation?.selfState ?? run.perPlanetState;
   const displayOpponentState = animation?.otherState ?? encounter.opponentState;
   const activePropagationKeys = animation?.activePropagationKeys ?? EMPTY_PROPAGATION_KEYS;
+  const actionPulsePlayer = animation?.actionPulse.player ?? null;
+  const actionPulseOpponent = animation?.actionPulse.opponent ?? null;
+  const impactPlayer = animation?.impactPlanets.self ?? EMPTY_PLANET_SET;
+  const impactOpponent = animation?.impactPlanets.other ?? EMPTY_PLANET_SET;
+  const critPlayer = animation?.critPlanets.self ?? EMPTY_PLANET_SET;
+  const critOpponent = animation?.critPlanets.other ?? EMPTY_PLANET_SET;
+  const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;
+  const combustingOpponent = animation?.combustingPlanets.other ?? EMPTY_PLANET_SET;
+  const animationEpoch = animation?.epoch ?? encounter.turnIndex;
 
   useEffect(() => {
     setActive(displayOpponentTurn);
   }, [displayOpponentTurn, setActive]);
-
-  useEffect(() => {
-    return () => {
-      timeoutIds.current.forEach((id) => window.clearTimeout(id));
-      timeoutIds.current = [];
-    };
-  }, []);
 
   const playerUnlocked = useMemo(
     () => unlockedPlanets(profile.lifetimeEncounterCount, devUnlockAll),
@@ -97,7 +101,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
-      if (animation) return;
+      if (animation) {
+        skipAnimation();
+        setSelected(null);
+        return;
+      }
       if (encounter.resolved) return;
       if (!playerUnlocked.includes(planet)) return;
       if (run.perPlanetState[planet].combusted) return;
@@ -105,62 +113,34 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         setSelected(planet);
         return;
       }
-      const rng = mulberry32((run.seed ^ encounter.turnIndex ^ Date.now()) >>> 0);
-      const result = resolveTurn(run, profile.chart, planet, rng);
-      if (!result) return;
+      // Deterministic per (run, encounter, turn) — same seed produces the
+      // same fight every time, which is the point of `/encounter/<seed>`.
+      const rng = mulberry32(
+        (run.seed ^ encounter.turnIndex ^ hashString(encounter.id)) >>> 0,
+      );
       const previousRun = run;
       const previousEncounter = encounter;
-      let nextRun = result.run;
-      if (result.encounterEnded) {
-        const nextProfile: Profile = {
-          ...profile,
-          lifetimeEncounterCount: profile.lifetimeEncounterCount + 1,
-        };
-        saveProfile(nextProfile);
-        setProfile(nextProfile);
-        const combusts = PLANETS.filter(
-          (p) => nextRun.perPlanetState[p].combusted && !run.perPlanetState[p].combusted,
-        );
-        const outcome: NodeOutcome = {
-          nodeId: nextRun.currentMap.currentNodeId,
-          kind: "combat",
-          summary: `Combat · ${result.encounter.opponentChart.name}`,
-          distanceDelta: nextRun.runDistance - run.runDistance,
-          combusts,
-        };
-        nextRun = {
-          ...nextRun,
-          currentMap: {
-            ...nextRun.currentMap,
-            outcomes: { ...nextRun.currentMap.outcomes, [outcome.nodeId]: outcome },
-          },
-        };
-      }
-      saveRun(nextRun);
-      setRun(nextRun);
-      startCombatAnimation({
-        entry: result.log,
+      const committed = onCommitTurn(planet, rng);
+      if (!committed) return;
+      startAnimation({
+        entry: committed.log,
         previousRun,
         previousEncounter,
-        setAnimation,
-        timeoutIds,
       });
       setSelected(null);
     },
-    [animation, encounter, profile, run, selected, playerUnlocked, setProfile, setRun],
+    [animation, encounter, run, selected, playerUnlocked, onCommitTurn, skipAnimation, startAnimation],
   );
 
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     if (animation) return;
     if (run.over) {
       navigate(ROUTES.end);
       return;
     }
-    const cleared: RunState = { ...run, currentEncounter: null };
-    saveRun(cleared);
-    setRun(cleared);
+    onClearEncounter();
     navigate(ROUTES.map);
-  };
+  }, [animation, run.over, onClearEncounter, navigate]);
 
   return (
     <div className="combat">
@@ -179,6 +159,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           projection={projection ? { deltas: projection.self } : undefined}
           activePlanet={animation?.playerPlanet ?? null}
           activePropagationKeys={activePropagationKeys.self}
+          actionPulsePlanet={actionPulsePlayer}
+          impactPlanets={impactPlayer}
+          critPlanets={critPlayer}
+          combustingPlanets={combustingPlayer}
+          animationEpoch={animationEpoch}
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>
@@ -233,6 +218,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           projection={projection ? { deltas: projection.other } : undefined}
           passive
           activePropagationKeys={activePropagationKeys.other}
+          actionPulsePlanet={actionPulseOpponent}
+          impactPlanets={impactOpponent}
+          critPlanets={critOpponent}
+          combustingPlanets={combustingOpponent}
+          animationEpoch={animationEpoch}
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">OTHER</div>
@@ -247,164 +237,4 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       )}
     </div>
   );
-}
-
-const EMPTY_PROPAGATION_KEYS: {
-  self: ReadonlySet<string>;
-  other: ReadonlySet<string>;
-} = { self: new Set(), other: new Set() };
-
-const ANIMATION_TIMINGS = {
-  primaryDelay: 200,
-  propagationStart: 800,
-  propagationStep: 520,
-  propagationApplyOffset: 160,
-  propagationClearOffset: 360,
-  endOffset: 360,
-} as const;
-
-interface CombatAnimationState {
-  selfState: SideState;
-  otherState: SideState;
-  playerPlanet: PlanetName;
-  opponentPlanet: PlanetName;
-  turnIndex: number;
-  distanceBefore: number;
-  activePropagationKeys: {
-    self: ReadonlySet<string>;
-    other: ReadonlySet<string>;
-  };
-}
-
-function startCombatAnimation(args: {
-  entry: TurnLogEntry;
-  previousRun: RunState;
-  previousEncounter: CombatEncounter;
-  setAnimation: Dispatch<SetStateAction<CombatAnimationState | null>>;
-  timeoutIds: MutableRefObject<number[]>;
-}) {
-  const { entry, previousRun, previousEncounter, setAnimation, timeoutIds } = args;
-  timeoutIds.current.forEach((id) => window.clearTimeout(id));
-  timeoutIds.current = [];
-
-  const updateAnimation = (fn: (state: CombatAnimationState) => CombatAnimationState) => {
-    setAnimation((prev) => (prev ? fn(prev) : prev));
-  };
-  const schedule = (fn: () => void, delay: number) => {
-    const id = window.setTimeout(fn, delay);
-    timeoutIds.current.push(id);
-  };
-
-  setAnimation({
-    selfState: cloneDisplayState(previousRun.perPlanetState),
-    otherState: cloneDisplayState(previousEncounter.opponentState),
-    playerPlanet: entry.playerPlanet,
-    opponentPlanet: entry.opponentPlanet,
-    turnIndex: previousEncounter.turnIndex,
-    distanceBefore: previousRun.runDistance,
-    activePropagationKeys: EMPTY_PROPAGATION_KEYS,
-  });
-
-  schedule(() => {
-    updateAnimation((state) => {
-      const next = cloneAnimationState(state);
-      const sign = entry.polarity === "Testimony" ? -1 : 1;
-      applyDisplayDelta(next.selfState, entry.playerPlanet, entry.playerDelta * sign);
-      applyDisplayDelta(next.otherState, entry.opponentPlanet, entry.opponentDelta * sign);
-      return next;
-    });
-  }, ANIMATION_TIMINGS.primaryDelay);
-
-  const propagationSteps = entry.propagation.filter((p) => p.target);
-  const maxSideSteps = Math.max(
-    propagationSteps.filter((p) => p.side === "self").length,
-    propagationSteps.filter((p) => p.side === "other").length,
-  );
-  const sideIndexes = { self: 0, other: 0 };
-
-  for (const step of propagationSteps) {
-    const stepIndex = sideIndexes[step.side]++;
-    const key = aspectKey(step.source, step.target);
-    const delay = ANIMATION_TIMINGS.propagationStart + stepIndex * ANIMATION_TIMINGS.propagationStep;
-
-    schedule(() => {
-      updateAnimation((state) => ({
-        ...state,
-        activePropagationKeys: {
-          ...state.activePropagationKeys,
-          [step.side]: new Set([...state.activePropagationKeys[step.side], key]),
-        },
-      }));
-    }, delay);
-
-    schedule(() => {
-      updateAnimation((state) => {
-        const next = cloneAnimationState(state);
-        const targetState = step.side === "self" ? next.selfState : next.otherState;
-        if (step.note === "Combusts") {
-          targetState[step.target].combusted = true;
-        } else {
-          applyDisplayDelta(targetState, step.target, step.delta);
-        }
-        return next;
-      });
-    }, delay + ANIMATION_TIMINGS.propagationApplyOffset);
-
-    schedule(() => {
-      updateAnimation((state) => {
-        const nextKeys = new Set(state.activePropagationKeys[step.side]);
-        nextKeys.delete(key);
-        return {
-          ...state,
-          activePropagationKeys: {
-            ...state.activePropagationKeys,
-            [step.side]: nextKeys,
-          },
-        };
-      });
-    }, delay + ANIMATION_TIMINGS.propagationClearOffset);
-  }
-
-  const finalPropagationDelay =
-    maxSideSteps > 0
-      ? ANIMATION_TIMINGS.propagationStart +
-        Math.max(0, maxSideSteps - 1) * ANIMATION_TIMINGS.propagationStep +
-        ANIMATION_TIMINGS.propagationApplyOffset
-      : ANIMATION_TIMINGS.primaryDelay;
-
-  schedule(() => {
-    updateAnimation((state) => {
-      const next = cloneAnimationState(state);
-      if (entry.playerCombust) next.selfState[entry.playerPlanet].combusted = true;
-      if (entry.opponentCombust) next.otherState[entry.opponentPlanet].combusted = true;
-      return next;
-    });
-  }, finalPropagationDelay);
-
-  const endDelay =
-    ANIMATION_TIMINGS.propagationStart +
-    Math.max(0, maxSideSteps - 1) * ANIMATION_TIMINGS.propagationStep +
-    ANIMATION_TIMINGS.propagationClearOffset +
-    ANIMATION_TIMINGS.endOffset;
-  schedule(() => setAnimation(null), endDelay);
-}
-
-function cloneDisplayState(state: SideState): SideState {
-  const out = {} as SideState;
-  for (const [planet, value] of Object.entries(state) as Array<[PlanetName, SideState[PlanetName]]>) {
-    out[planet] = { ...value };
-  }
-  return out;
-}
-
-function cloneAnimationState(state: CombatAnimationState): CombatAnimationState {
-  return {
-    ...state,
-    selfState: cloneDisplayState(state.selfState),
-    otherState: cloneDisplayState(state.otherState),
-  };
-}
-
-function applyDisplayDelta(state: SideState, planet: PlanetName, delta: number) {
-  state[planet].affliction = Math.max(0, state[planet].affliction + delta);
 }
