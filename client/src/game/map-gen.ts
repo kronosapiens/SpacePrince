@@ -120,15 +120,26 @@ export function neighborsOf(edges: MapEdge[], nodeId: string): Set<string> {
   return set;
 }
 
-/** Eligible-next nodes: neighbors strictly downward (next layer only) of current. */
-export function eligibleNext(graph: MapGraph, currentNodeId: string): string[] {
+/** Eligible-next nodes: every node 1 edge away from `currentNodeId` that the
+ *  player hasn't already visited and that isn't behind them in the topology.
+ *  Includes same-layer (horizontal) neighbors and forward-layer neighbors;
+ *  excludes backward-layer neighbors. Pass `visitedNodeIds` to prevent
+ *  sideways oscillation back through previously-visited nodes. */
+export function eligibleNext(
+  graph: MapGraph,
+  currentNodeId: string,
+  visitedNodeIds: ReadonlyArray<string> = [],
+): string[] {
   const cur = graph.nodes.find((n) => n.id === currentNodeId);
   if (!cur) return [];
+  const visited = new Set(visitedNodeIds);
   const neighbors = neighborsOf(graph.edges, currentNodeId);
   const out: string[] = [];
   for (const n of graph.nodes) {
     if (!neighbors.has(n.id)) continue;
-    if (n.layer === cur.layer + 1) out.push(n.id);
+    if (visited.has(n.id)) continue;
+    if (n.layer < cur.layer) continue; // never look back
+    out.push(n.id);
   }
   return out;
 }

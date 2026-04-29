@@ -142,7 +142,7 @@ export function makeDevMap(seed: number): MapState {
   const path: string[] = [base.currentNodeId];
   let currentNodeId = base.currentNodeId;
   for (let step = 0; step < targetSteps; step++) {
-    const next = eligibleNext(base.graph, currentNodeId);
+    const next = eligibleNext(base.graph, currentNodeId, path);
     if (next.length === 0) break;
     const idx = Math.floor(walkRng() * next.length);
     currentNodeId = next[idx]!;

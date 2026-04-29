@@ -62,15 +62,29 @@ describe("Run loop integration", () => {
     expect(ratio).toBeLessThan(0.45);
   });
 
-  it("eligibleNext returns next-layer neighbors only", () => {
+  it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {
     const profile = makeStubProfile(7);
     const run = beginRun(profile, 17);
-    const next = eligibleNext(run.currentMap.graph, run.currentMap.currentNodeId);
+    const startId = run.currentMap.currentNodeId;
+    const startLayer = run.currentMap.graph.nodes.find((n) => n.id === startId)!.layer;
+    const next = eligibleNext(run.currentMap.graph, startId, run.currentMap.visitedNodeIds);
     expect(next.length).toBeGreaterThan(0);
     for (const id of next) {
       const node = run.currentMap.graph.nodes.find((n) => n.id === id)!;
-      expect(node.layer).toBe(1); // L1 is layer 0; eligible-next is layer 1
+      expect(node.layer).toBeGreaterThanOrEqual(startLayer);
     }
+  });
+
+  it("eligibleNext excludes already-visited neighbors", () => {
+    const profile = makeStubProfile(7);
+    const run = beginRun(profile, 17);
+    const startId = run.currentMap.currentNodeId;
+    const firstNeighbor = eligibleNext(run.currentMap.graph, startId, [])[0]!;
+    // After "visiting" firstNeighbor, calling eligibleNext from it with a
+    // visited list containing the start should not propose stepping back.
+    const next = eligibleNext(run.currentMap.graph, firstNeighbor, [startId, firstNeighbor]);
+    expect(next).not.toContain(startId);
+    expect(next).not.toContain(firstNeighbor);
   });
 
   it("narrative outcomes can heal / harm / spend distance and uncombust", () => {

@@ -164,15 +164,17 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 
 ### 4.2 Nodes
 
-Two content types, distinguished by shape and fill:
+Two content types, distinguished by shape and fill. Both share the same outer disc footprint so the diagram reads as one network of nodes; the *content inside* the disc tells you what kind of beat it is.
 
-- **Combat node:** ringed circle, Bone outline, no fill. Reads as *"another chart waits here."*
-- **Narrative node:** filled circle in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."* The house's ruling-planet glyph appears at the node center.
+- **Combat node:** thin disc-ring outline plus an eight-pointed star inside, filled with the opponent's **chart ruler** color — the planet ruling the opponent's Ascendant sign. The star extends slightly past the disc rim. Reads as *"another chart waits here, anchored by [planet]."*
+- **Narrative node:** filled disc in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."* The house Roman numeral appears at the node center.
+
+The color rule is the same on both axes: a single principled astrological lookup picks the identifying planet. For narrative, it's the house's natural ruler; for combat, it's the opponent's chart ruler. See §4.5 for the sign→ruler table both lookups consume.
 
 Each node also has one of four **temporal states** relative to the player's current position. Together with content type, the state determines what's rendered:
 
-- **Current** — the player's standing position. Emphasized: larger node radius, active-planet halo (planet-color radial gradient), and a colored ring around the disc. There is exactly one current node per map. Even a current *combat* node — which is a ringed shape with no fill — gets the halo and emphasis ring so the player's location is unmistakable.
-- **Eligible-next** — nodes exactly **one layer forward** from current along the topology (per `MAP.md` edge rules). Rendered with full content at full saturation. Same-layer siblings are *not* eligible — the player can't step sideways. The eligible set surfaces a soft pulse on entry per the "Map node arrival" motion in `STYLE.md §7`.
+- **Current** — the player's standing position. Node radius stays the same as every other state — emphasis comes from the active-planet halo (planet-color radial gradient), a colored ring around the disc, and a slightly heavier disc stroke. There is exactly one current node per map.
+- **Eligible-next** — every node **one edge away** from current that the player hasn't already visited and isn't behind them in the topology. Includes forward-layer neighbors *and* same-layer (horizontal) siblings, so a "sidestep" along the current layer is allowed. Rendered with full content at full saturation. The eligible set surfaces a soft pulse on entry per the "Map node arrival" motion in `STYLE.md §7`. Backtracking is still impossible — once visited, a node is locked out, so a sidestep is a one-way street.
 - **Traversed (past)** — nodes on the player's walk-path so far, excluding current. Full content visible but **at reduced opacity (~0.35)**. The shape and ruler color are preserved so the player can read the path they came from; the desaturation says "this is memory, not action."
 - **Distant** — every other node. Always rendered as **unfilled outline circles only**, regardless of whether the topology is exposed. No content visible, no glyph, no ruler color. The road ahead is geometry; what waits on it is unknowable until the player approaches.
 

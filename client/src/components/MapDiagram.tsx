@@ -1,5 +1,7 @@
 import { useMemo, type CSSProperties } from "react";
 import { layoutNodes, eligibleNext } from "@/game/map-gen";
+import { seededChart } from "@/game/chart";
+import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
@@ -13,7 +15,7 @@ interface MapDiagramProps {
 }
 
 const NODE_R = 22;
-const NODE_R_CURRENT = 28;
+const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE_R
 const TRAVERSED_OPACITY = 0.35;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
@@ -29,8 +31,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   // (forward-only). Sibling nodes at the same layer aren't eligible — the
   // player can't backtrack or step sideways.
   const eligible = useMemo(
-    () => new Set(eligibleNext(map.graph, map.currentNodeId)),
-    [map.graph, map.currentNodeId],
+    () => new Set(eligibleNext(map.graph, map.currentNodeId, map.visitedNodeIds)),
+    [map.graph, map.currentNodeId, map.visitedNodeIds],
   );
   const visited = useMemo(() => new Set(map.visitedNodeIds), [map.visitedNodeIds]);
   const traversedEdges = useMemo(() => {
@@ -50,33 +52,62 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   const w = maxX - minX;
   const h = maxY - minY;
 
+  // Combat nodes derive their color from the opponent's chart ruler — the
+  // planet that rules the opponent's Ascendant sign. Cached per node so we
+  // only build each opponent chart once per render pass.
+  const combatRulerByNode = useMemo(() => {
+    const out: Record<string, PlanetName> = {};
+    for (const [id, content] of Object.entries(map.rolledNodes)) {
+      if (content.kind !== "combat") continue;
+      const chart = seededChart(content.opponentSeed, "");
+      out[id] = RULERSHIP[chart.ascendantSign];
+    }
+    return out;
+  }, [map.rolledNodes]);
+
   // Resolve ruler color for a node.
   const ruler = (id: string): PlanetName | null => {
     const c = map.rolledNodes[id];
     if (!c) return null;
     if (c.kind === "narrative") return HOUSES[c.house - 1]!.ruler;
+    if (c.kind === "combat") return combatRulerByNode[id] ?? null;
     return null;
   };
 
-  // Edge gradients between rulers.
+  // Edge gradients between rulers. Lines are shortened to start/end at the
+  // disc rim rather than the node center, so traversed-node visuals (which
+  // are dimmed via opacity) don't show the edge bleeding through the disc.
   const edgeDefs: JSX.Element[] = [];
   const edgeEls = map.graph.edges.map((e, i) => {
     const from = positioned.find((n) => n.id === e.from);
     const to = positioned.find((n) => n.id === e.to);
     if (!from || !to) return null;
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len = Math.hypot(dx, dy);
+    // Discs touch or overlap → nothing visible to draw.
+    if (len <= NODE_R * 2) return null;
+    const ux = dx / len;
+    const uy = dy / len;
+    const x1 = from.x + ux * NODE_R;
+    const y1 = from.y + uy * NODE_R;
+    const x2 = to.x - ux * NODE_R;
+    const y2 = to.y - uy * NODE_R;
+
     const traversedEdge = traversedEdges.has(edgeKey(e.from, e.to));
     const eligibleEdge =
       (e.from === map.currentNodeId && eligible.has(e.to)) ||
       (e.to === map.currentNodeId && eligible.has(e.from));
-    void eligibleEdge;
     const inReach = traversedEdge || eligibleEdge;
     const rA = ruler(e.from);
     const rB = ruler(e.to);
     const cA = rA ? PLANET_PRIMARY[rA] : NEUTRAL.bone;
     const cB = rB ? PLANET_PRIMARY[rB] : NEUTRAL.bone;
     const gid = `m2-edge-${i}`;
+    // Gradient endpoints match the shortened line so the color travel reads
+    // cleanly across the visible segment.
     edgeDefs.push(
-      <linearGradient key={gid} id={gid} x1={from.x} y1={from.y} x2={to.x} y2={to.y}
+      <linearGradient key={gid} id={gid} x1={x1} y1={y1} x2={x2} y2={y2}
         gradientUnits="userSpaceOnUse">
         <stop offset="0%" stopColor={cA} />
         <stop offset="100%" stopColor={cB} />
@@ -86,7 +117,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const sw = traversedEdge ? 1.6 : eligibleEdge ? 1.2 : 0.5;
     return (
       <line key={`edge-${i}`}
-        x1={from.x} y1={from.y} x2={to.x} y2={to.y}
+        x1={x1} y1={y1} x2={x2} y2={y2}
         stroke={inReach ? `url(#${gid})` : NEUTRAL.bone}
         strokeOpacity={opacity} strokeWidth={sw} strokeLinecap="round" />
     );
@@ -130,8 +161,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       );
     }
 
-    const nodeRadius = isCurrent ? NODE_R_CURRENT : NODE_R;
-
     return (
       <g
         key={n.id}
@@ -142,15 +171,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         {isCurrent && (
           <>
             <circle r={80} fill={`url(#m2-halo-${n.id})`} />
-            <circle r={NODE_R_CURRENT + 6} fill="none"
+            <circle r={NODE_R + 6} fill="none"
               stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
           </>
         )}
         {isEligible && (
-          <circle r={32} fill="none"
+          <circle r={NODE_R + 10} fill="none"
             stroke={color} strokeOpacity="0.55" strokeWidth={1} />
         )}
-        <circle r={nodeRadius}
+        <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
           fillOpacity={isNarrative ? (isTraversed ? TRAVERSED_OPACITY : 0.9) : 0}
           stroke={color}
@@ -158,7 +187,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           strokeWidth={isCurrent ? 2.4 : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
-            fontSize={isCurrent ? 17 : 14}
+            fontSize={14}
             fill={isTraversed ? color : NEUTRAL.void}
             fillOpacity={isTraversed ? 0.55 : 1}
             fontFamily="'Cormorant Garamond', Garamond, serif"
@@ -167,10 +196,24 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             {romanHouse(content.house)}
           </text>
         )}
-        {isCombat && (
-          <circle r={isCurrent ? 11 : 8} fill="none" stroke={color}
-            strokeOpacity={isTraversed ? TRAVERSED_OPACITY : 0.9} strokeWidth={1} />
-        )}
+        {isCombat && (() => {
+          const fillOp = isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.7;
+          const strokeOp = isTraversed ? TRAVERSED_OPACITY : 1;
+          return (
+            <>
+              <polygon
+                points={trianglePoints(0, 0, COMBAT_TRI_R, 90)}
+                fill={color} fillOpacity={fillOp}
+                stroke={color} strokeOpacity={strokeOp}
+                strokeWidth={1} strokeLinejoin="round" />
+              <polygon
+                points={trianglePoints(0, 0, COMBAT_TRI_R, 270)}
+                fill={color} fillOpacity={fillOp}
+                stroke={color} strokeOpacity={strokeOp}
+                strokeWidth={1} strokeLinejoin="round" />
+            </>
+          );
+        })()}
       </g>
     );
   });
@@ -197,4 +240,18 @@ function edgeKey(a: string, b: string): string {
 function romanHouse(house: number): string {
   const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
   return numerals[house - 1] ?? String(house);
+}
+
+/** Three vertices of an equilateral triangle, circumradius `r`, with the
+ *  first vertex at angle `baseDeg` (math convention: 90° = top, 270° = bottom).
+ *  Two of these at 90° + 270° form a hexagram. */
+function trianglePoints(cx: number, cy: number, r: number, baseDeg: number): string {
+  const pts: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    const rad = ((baseDeg + i * 120) * Math.PI) / 180;
+    const x = cx + r * Math.cos(rad);
+    const y = cy - r * Math.sin(rad); // SVG y-axis flipped vs. math convention
+    pts.push(`${x.toFixed(2)},${y.toFixed(2)}`);
+  }
+  return pts.join(" ");
 }
