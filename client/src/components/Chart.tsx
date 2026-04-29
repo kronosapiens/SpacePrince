@@ -435,7 +435,7 @@ function PlanetGlyph({
       )}
       {(inspect || selected) && !active && (
         <circle r={point.glyphR + 10} fill="none"
-          stroke={NEUTRAL.goldHi} strokeOpacity="0.85" strokeWidth={1.2} />
+          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
       )}
       {hovered && !selected && !inspect && (
         <circle r={point.glyphR + 6} fill="none"

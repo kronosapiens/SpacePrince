@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { layoutNodes, eligibleNext } from "@/game/map-gen";
 import { seededChart } from "@/game/chart";
 import { RULERSHIP } from "@/game/data";
@@ -19,6 +19,17 @@ const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE
 const TRAVERSED_OPACITY = 0.35;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
+  // Tap-to-preview / tap-again-to-commit, mirroring the encounter screen's
+  // grammar. First click on an eligible node highlights it; a second click
+  // on the same node fires onSelectNode. Clicking a different eligible node
+  // switches the highlight without committing.
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
+  // Reset preview when the player actually moves (current node changes).
+  useEffect(() => {
+    setSelectedNodeId(null);
+  }, [map.currentNodeId]);
+
   const positioned = useMemo(() => {
     const raw = layoutNodes(map.graph.nodes);
     if (!bottomUp) return raw;
@@ -113,8 +124,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         <stop offset="100%" stopColor={cB} />
       </linearGradient>,
     );
-    const opacity = traversedEdge ? 0.7 : eligibleEdge ? 0.55 : 0.12;
-    const sw = traversedEdge ? 1.6 : eligibleEdge ? 1.2 : 0.5;
+    // Visual hierarchy:
+    //   - Eligible (forward path, the immediate decision) — brightest gradient
+    //   - Traversed (your colored trail, faded) — gradient at 0.45 (slightly
+    //     more present than the 0.35 node dim so the path stays readable)
+    //   - Background (the Sephirot structure) — faint bone
+    const opacity = eligibleEdge ? 0.75 : traversedEdge ? 0.45 : 0.2;
+    const sw = eligibleEdge ? 1.6 : traversedEdge ? 1.2 : 0.9;
     return (
       <line key={`edge-${i}`}
         x1={x1} y1={y1} x2={x2} y2={y2}
@@ -144,8 +160,16 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       );
     }
 
+    const isSelected = isEligible && n.id === selectedNodeId;
     const handleClick = onSelectNode && isEligible
-      ? () => onSelectNode(n.id)
+      ? () => {
+          if (selectedNodeId === n.id) {
+            onSelectNode(n.id);
+            setSelectedNodeId(null);
+          } else {
+            setSelectedNodeId(n.id);
+          }
+        }
       : undefined;
     const isClickable = !!handleClick;
 
@@ -170,12 +194,16 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       >
         {isCurrent && (
           <>
-            <circle r={80} fill={`url(#m2-halo-${n.id})`} />
+            <circle r={55} fill={`url(#m2-halo-${n.id})`} className="anim-map-current-halo" />
             <circle r={NODE_R + 6} fill="none"
               stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
           </>
         )}
-        {isEligible && (
+        {isSelected && (
+          <circle r={NODE_R + 10} fill="none"
+            stroke={color} strokeOpacity="0.95" strokeWidth={1.8} />
+        )}
+        {isEligible && !isSelected && (
           <circle r={NODE_R + 10} fill="none"
             stroke={color} strokeOpacity="0.55" strokeWidth={1} />
         )}

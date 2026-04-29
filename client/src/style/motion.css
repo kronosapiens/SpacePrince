@@ -54,6 +54,13 @@
   }
 }
 
+/* Slow, gentle breath on the map's current-node halo — same family as
+   the tint-overlay breath but applied to an SVG circle. */
+@keyframes map-current-halo-breath {
+  0%, 100% { opacity: 0.7;  transform: scale(0.96); }
+  50%      { opacity: 1.0;  transform: scale(1.04); }
+}
+
 @keyframes kandinsky-orbit {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
@@ -89,12 +96,18 @@
 .anim-impact         { animation: affliction-impact 360ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-crit-burst     { animation: crit-burst 720ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-map-current-halo {
+  animation: map-current-halo-breath 4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
   .anim-impact,
   .anim-crit-burst,
-  .anim-combust-ripple { animation-duration: 1ms; }
+  .anim-combust-ripple,
+  .anim-map-current-halo { animation: none; }
 }
 
 .anim-fragment-in {
