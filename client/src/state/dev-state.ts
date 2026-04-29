@@ -1,11 +1,12 @@
 import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
-import { seededChart, blankSideState } from "@/game/chart";
+import { seededChart } from "@/game/chart";
 import { newMapState } from "@/game/run";
 import { eligibleNext } from "@/game/map-gen";
 import { beginCombatEncounter } from "@/game/encounter";
 import { rollNodeContent } from "@/game/map-content";
 import { mulberry32, hashString } from "@/game/rng";
+import { PLANETS } from "@/game/data";
 import { HOUSES } from "@/data/houses";
 import { getTree } from "@/data/narrative-trees";
 import { pickFragment } from "@/data/chorus";
@@ -17,6 +18,7 @@ import type {
   NodeContent,
   Profile,
   RunState,
+  SideState,
 } from "@/game/types";
 
 /**
@@ -90,7 +92,7 @@ export function makeDevRun(seed: number, profile: Profile): RunState {
     id: `dev_run_${seed}`,
     seed,
     startedAt: Date.now(),
-    perPlanetState: blankSideState(),
+    perPlanetState: syntheticDevSideState(seed, "player"),
     runDistance: syntheticDevDistance(seed, currentMap),
     runOmens: [],
     currentMap,
@@ -101,6 +103,41 @@ export function makeDevRun(seed: number, profile: Profile): RunState {
     lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
     over: false,
   };
+}
+
+/** Deterministic synthetic SideState — varies affliction values + occasional
+ *  combust flags so dev screens show realistic per-planet state. Pass
+ *  distinct `tag` values for player vs opponent so the two sides don't mirror.
+ *
+ *  Distribution per planet (rolled independently):
+ *    55% clean        affliction 0
+ *    23% light        affliction 1..3
+ *    13% medium       affliction 4..8
+ *     6% heavy        affliction 9..15
+ *     3% combusted    affliction 12..21, combusted=true
+ */
+export function syntheticDevSideState(seed: number, tag: string): SideState {
+  const rng = mulberry32(hashString(`${seed}_${tag}_state`));
+  const out = {} as SideState;
+  for (const planet of PLANETS) {
+    const r = rng();
+    let affliction = 0;
+    let combusted = false;
+    if (r < 0.55) {
+      // clean
+    } else if (r < 0.78) {
+      affliction = 1 + Math.floor(rng() * 3);
+    } else if (r < 0.91) {
+      affliction = 4 + Math.floor(rng() * 5);
+    } else if (r < 0.97) {
+      affliction = 9 + Math.floor(rng() * 7);
+    } else {
+      combusted = true;
+      affliction = 12 + Math.floor(rng() * 10);
+    }
+    out[planet] = { affliction, combusted };
+  }
+  return out;
 }
 
 /** Stable screenshot/prototype distance for URL-generated dev pages.
@@ -167,6 +204,7 @@ export function makeDevCombat(seed: number, profile: Profile): CombatEncounter {
   });
   return {
     ...encounter,
+    opponentState: syntheticDevSideState(seed, "opponent"),
     turnIndex: syntheticDevTurnIndex(seed, encounter),
   };
 }

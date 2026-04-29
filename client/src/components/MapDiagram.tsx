@@ -205,11 +205,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         )}
         {isEligible && !isSelected && (
           <circle r={NODE_R + 10} fill="none"
-            stroke={color} strokeOpacity="0.55" strokeWidth={1} />
+            stroke={color} strokeOpacity="0.7" strokeWidth={1} />
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isTraversed ? TRAVERSED_OPACITY : 0.9) : 0}
+          fillOpacity={isNarrative ? (isTraversed ? TRAVERSED_OPACITY : 0.98) : 0}
           stroke={color}
           strokeOpacity={isTraversed ? TRAVERSED_OPACITY : 1}
           strokeWidth={isCurrent ? 2.4 : 1.8} />
@@ -225,7 +225,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           </text>
         )}
         {isCombat && (() => {
-          const fillOp = isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.7;
+          const fillOp = isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.85;
           const strokeOp = isTraversed ? TRAVERSED_OPACITY : 1;
           return (
             <>

@@ -402,15 +402,23 @@ function PlanetGlyph({
   // lighter on dark discs, avoiding hard black/white contrast.
   const glyphFill = combusted ? NEUTRAL.mist : contrastGrayForFill(fill);
 
-  // Affliction badge — center-facing side of planet, half in / half out.
+  // Affliction + projection badges — pill-shaped, gold border, drop shadow,
+  // matching the v1 treatment. Pills sit on the chart-facing side of the
+  // planet; projection sits beside the affliction along the perpendicular.
   const dx = CHART_CENTER - point.cx;
   const dy = CHART_CENTER - point.cy;
   const d = Math.hypot(dx, dy) || 1;
   const ux = dx / d;
   const uy = dy / d;
   const badgeOffset = r;
-  const badgeR = Math.max(9, r * 0.4);
-  const badgeFontSize = Math.max(11, Math.round(r * 0.46));
+  const badgeR = Math.max(12, r * 0.5);
+  const badgeFontSize = Math.max(12, Math.round(r * 0.48));
+  // Pill width grows with text length. Floor at 2*badgeR (square-ish).
+  const widthFor = (text: string) =>
+    Math.max(2 * badgeR, text.length * badgeFontSize * 0.55 + badgeR * 0.7);
+  // Perpendicular to toward-center, counter-clockwise rotation.
+  const perpX = -uy;
+  const perpY = ux;
 
   // Outer wrapper carries the optional action-glow pulse. The desaturation
   // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
@@ -478,32 +486,128 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {!hideAfflictionBadge && !combusted && (alwaysShowAfflictionBadge || affliction > 0) && (
-        <g
-          transform={`translate(${ux * badgeOffset}, ${uy * badgeOffset})`}
-          className={badgeClass}
-          key={`badge-${epoch}-${impact ? 1 : 0}`}
-        >
-          <circle r={badgeR} fill={NEUTRAL.void} stroke={c} strokeOpacity="0.85" strokeWidth={1.2} />
-          <text textAnchor="middle" dominantBaseline="central"
-            fontSize={badgeFontSize} fill={NEUTRAL.bone}
-            fontFamily="'Inter', sans-serif" fontWeight={500}
-            style={{ pointerEvents: "none", userSelect: "none" }}>
-            {Math.round(affliction)}
-          </text>
-        </g>
-      )}
-      {!combusted && projectedDelta !== undefined && projectedDelta !== 0 && (
-        <g transform={`translate(${r * 1.4}, 0)`}>
-          <text textAnchor="start" dominantBaseline="central"
-            fontFamily="'Inter', system-ui, sans-serif"
-            fontSize={13} fontWeight={500}
-            fill={projectedDelta > 0 ? PLANET_PRIMARY.Mars : NEUTRAL.bone}
-            style={{ userSelect: "none", pointerEvents: "none" }}>
-            {projectedDelta > 0 ? "+" : "−"}{Math.abs(projectedDelta).toFixed(1).replace(/\.0$/, "")}
-          </text>
-        </g>
-      )}
+      {(() => {
+        const showAffliction =
+          !hideAfflictionBadge && !combusted &&
+          (alwaysShowAfflictionBadge || affliction > 0);
+        const showProjection =
+          !combusted && projectedDelta !== undefined && projectedDelta !== 0;
+        if (!showAffliction && !showProjection) return null;
+
+        const afflictionText = String(Math.round(affliction));
+        const wA = widthFor(afflictionText);
+        const aX = ux * badgeOffset;
+        const aY = uy * badgeOffset;
+
+        let projection: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
+        if (showProjection) {
+          const positive = projectedDelta > 0;
+          // Sign carried by color alone (red = damage, green = heal); drop
+          // the "+" / "−" prefix so the digits read more cleanly at small sizes.
+          const text = Math.abs(projectedDelta).toFixed(1).replace(/\.0$/, "");
+          const wP = widthFor(text);
+          // Sit beside affliction along perpendicular axis. Center-to-center
+          // distance = half each pill's width + a small gap.
+          const off = wA / 2 + wP / 2 + 4;
+          projection = {
+            wP,
+            pX: aX + perpX * off,
+            pY: aY + perpY * off,
+            text,
+            col: positive ? ASPECT_COLOR.tension : ASPECT_COLOR.harmony,
+          };
+        }
+
+        const shadow: CSSProperties = {
+          filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))",
+          pointerEvents: "none",
+          userSelect: "none",
+        };
+
+        return (
+          <>
+            {showAffliction && (
+              // Outer g positions; inner g animates. Splitting prevents the
+              // CSS keyframe `transform` from clobbering the SVG translate
+              // attribute mid-animation (which would snap the badge to (0,0)
+              // = planet center for one frame).
+              <g
+                transform={`translate(${aX}, ${aY})`}
+                style={shadow}
+              >
+                <g
+                  className={badgeClass}
+                  key={`badge-${epoch}-${impact ? 1 : 0}`}
+                >
+                  <rect
+                    x={-wA / 2} y={-badgeR}
+                    width={wA} height={2 * badgeR}
+                    rx={badgeR} ry={badgeR}
+                    fill={NEUTRAL.void} fillOpacity="0.92"
+                    stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
+                  <foreignObject
+                    x={-wA / 2} y={-badgeR}
+                    width={wA} height={2 * badgeR}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: NEUTRAL.bone,
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 700,
+                        fontSize: `${badgeFontSize}px`,
+                        lineHeight: 1,
+                        userSelect: "none",
+                      }}
+                    >
+                      {afflictionText}
+                    </div>
+                  </foreignObject>
+                </g>
+              </g>
+            )}
+            {projection && (
+              <g
+                transform={`translate(${projection.pX}, ${projection.pY})`}
+                style={shadow}
+              >
+                <rect
+                  x={-projection.wP / 2} y={-badgeR}
+                  width={projection.wP} height={2 * badgeR}
+                  rx={badgeR} ry={badgeR}
+                  fill={NEUTRAL.void} fillOpacity="0.84"
+                  stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
+                <foreignObject
+                  x={-projection.wP / 2} y={-badgeR}
+                  width={projection.wP} height={2 * badgeR}
+                >
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: projection.col,
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 700,
+                      fontSize: `${badgeFontSize}px`,
+                      lineHeight: 1,
+                      userSelect: "none",
+                    }}
+                  >
+                    {projection.text}
+                  </div>
+                </foreignObject>
+              </g>
+            )}
+          </>
+        );
+      })()}
     </g>
   );
 }
