@@ -173,6 +173,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           inspectPlanet={joyPlanet ?? null}
           entrance="left"
           showColorField
+          alwaysShowAfflictionBadges
           passive
         />
       </div>

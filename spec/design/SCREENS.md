@@ -98,6 +98,13 @@ The total turn animation budget is roughly **3–4 seconds**, intentionally long
 
 **Narrative.** During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per `HOUSES.md §4.3` chart-conditioning) carry a soft Field-layer halo so the player can see *why* the option exists. On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied). No propagation through aspect lines — propagation is a combat-only language. The aria does not animate during resolution; it remains the steady framing presence.
 
+### 3.5.1 Affliction badges
+
+Affliction badges are visible on gameplay chart surfaces even when the value is zero.
+This applies to the Map chart anchor, the Combat encounter charts, and the Narrative encounter chart.
+Affliction badges are hidden on entry and exit surfaces: Title, Mint / Start, and End-of-run.
+Chart Study follows the gameplay rule because its purpose is to inspect current chart state.
+
 ### 3.6 Interaction grammar
 
 The player's only per-turn action in combat is choosing which of their planets acts (the opponent's planet is system-selected). The grammar is the same on touch and desktop.

@@ -1,6 +1,7 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
+import { PropagationLine } from "@/components/PropagationLine";
 import {
   CHART_CENTER, CHART_SIZE,
   INNER_RING_R, OUTER_RING_R,
@@ -80,6 +81,8 @@ export interface ChartProps {
   showAspects?: boolean;
   /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
   hideAfflictionBadges?: boolean;
+  /** Show affliction badges even when value is zero. Used on gameplay surfaces. */
+  alwaysShowAfflictionBadges?: boolean;
   scale?: number;
   entrance?: "left" | "right" | "none";
   side?: "self" | "other";
@@ -90,6 +93,8 @@ export interface ChartProps {
   passive?: boolean;
   aspects?: AspectConnection[];
   projection?: ProjectionChips;
+  /** Directed aspect keys (`Source->Target`) currently propagating. */
+  activePropagationKeys?: ReadonlySet<string>;
 }
 
 export function Chart(props: ChartProps) {
@@ -106,6 +111,7 @@ export function Chart(props: ChartProps) {
     showSubstrate = false,
     showAspects = true,
     hideAfflictionBadges = false,
+    alwaysShowAfflictionBadges = false,
     entrance = "none",
     side,
     onPlanetClick,
@@ -115,6 +121,7 @@ export function Chart(props: ChartProps) {
     passive = false,
     aspects: aspectsProp,
     projection,
+    activePropagationKeys,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
@@ -157,7 +164,11 @@ export function Chart(props: ChartProps) {
         if (!from || !to) return null;
         // Aspect highlights only follow hover/select/active. Dimmed by default
         // even when allActive is true — keeps the resting Title chart calm.
-        const isActive = activePlanet === a.from || activePlanet === a.to ||
+        const isPropagating =
+          activePropagationKeys?.has(aspectKey(a.from, a.to)) ||
+          activePropagationKeys?.has(aspectKey(a.to, a.from));
+        const isActive = isPropagating ||
+                         activePlanet === a.from || activePlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
@@ -181,6 +192,30 @@ export function Chart(props: ChartProps) {
             x1={from.cx + ux * ra} y1={from.cy + uy * ra}
             x2={to.cx - ux * rb} y2={to.cy - uy * rb}
             stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} strokeLinecap="round" />
+        );
+      })
+    : null;
+
+  const propagationLines = activePropagationKeys
+    ? aspects.map((a) => {
+        const key = aspectKey(a.from, a.to);
+        if (!activePropagationKeys.has(key)) return null;
+        if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
+        const from = pointMap[a.from];
+        const to = pointMap[a.to];
+        if (!from || !to) return null;
+        return (
+          <PropagationLine
+            key={`prop-${key}`}
+            fromX={from.cx}
+            fromY={from.cy}
+            toX={to.cx}
+            toY={to.cy}
+            fromPlanet={a.from}
+            toPlanet={a.to}
+            aspect={a.aspect}
+            active
+          />
         );
       })
     : null;
@@ -235,6 +270,7 @@ export function Chart(props: ChartProps) {
       <SignTicks />
       <SignLabels ascSignIdx={ascSignIdx} />
       {aspectLines}
+      {propagationLines}
 
       {/* Active + Word layer: planets + halos + glyphs + badges */}
       {points.map((p) => {
@@ -253,6 +289,7 @@ export function Chart(props: ChartProps) {
             combusted={combusted}
             affliction={status?.affliction ?? 0}
             hideAfflictionBadge={hideAfflictionBadges}
+            alwaysShowAfflictionBadge={alwaysShowAfflictionBadges}
             ghost={!unlocked}
             selected={isSelected}
             active={isActive}
@@ -269,10 +306,15 @@ export function Chart(props: ChartProps) {
   );
 }
 
+export function aspectKey(from: PlanetName, to: PlanetName): string {
+  return `${from}->${to}`;
+}
+
 // ─── Internal pieces ────────────────────────────────────────────────────
 
 function PlanetGlyph({
   point, combusted, affliction, hideAfflictionBadge, ghost,
+  alwaysShowAfflictionBadge,
   selected, active, hovered, inspect,
   onClick, onHover, passive,
   projectedDelta,
@@ -281,6 +323,7 @@ function PlanetGlyph({
   combusted: boolean;
   affliction: number;
   hideAfflictionBadge: boolean;
+  alwaysShowAfflictionBadge: boolean;
   ghost: boolean;
   selected: boolean;
   active: boolean;
@@ -370,7 +413,7 @@ function PlanetGlyph({
         style={{ pointerEvents: "none", userSelect: "none" }}>
         {PLANET_GLYPH[point.planet]}
       </text>
-      {!hideAfflictionBadge && !combusted && affliction > 0 && (
+      {!hideAfflictionBadge && !combusted && (alwaysShowAfflictionBadge || affliction > 0) && (
         <g transform={`translate(${ux * badgeOffset}, ${uy * badgeOffset})`}>
           <circle r={badgeR} fill={NEUTRAL.void} stroke={c} strokeOpacity="0.85" strokeWidth={1.2} />
           <text textAnchor="middle" dominantBaseline="central"
