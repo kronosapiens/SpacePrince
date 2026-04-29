@@ -195,7 +195,7 @@ export function Chart(props: ChartProps) {
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
       className={[entranceClass, className ?? ""].filter(Boolean).join(" ")}
-      style={{ width: "100%", height: "100%", ...style }}
+      style={{ display: "block", width: "100%", ...style }}
       role="img"
       aria-label={`${chart.name} natal chart${side === "other" ? " (opponent)" : ""}`}
       xmlns="http://www.w3.org/2000/svg"
@@ -324,8 +324,9 @@ function PlanetGlyph({
 
   const fill = combusted ? "#3B2F2F" : c;
   const fillOpacity = combusted ? 0.4 : 0.92;
-  // Planet glyph in Smoke (rather than pure Void) — softer on saturated fills.
-  const glyphFill = combusted ? NEUTRAL.mist : NEUTRAL.smoke;
+  // Derive a neutral glyph tone from the planet fill: darker on light discs,
+  // lighter on dark discs, avoiding hard black/white contrast.
+  const glyphFill = combusted ? NEUTRAL.mist : contrastGrayForFill(fill);
 
   // Affliction badge — center-facing side of planet, half in / half out.
   const dx = CHART_CENTER - point.cx;
@@ -470,6 +471,34 @@ function renderSubstrate() {
 function polar(cx: number, cy: number, r: number, deg: number): { x: number; y: number } {
   const rad = (deg * Math.PI) / 180;
   return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+}
+
+function contrastGrayForFill(hex: string): string {
+  const rgb = parseHexColor(hex);
+  if (!rgb) return "#808080";
+  const [r, g, b] = rgb.map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const luminance = 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  const gray = Math.round(clamp(210 - luminance * 190, 54, 190));
+  const h = gray.toString(16).padStart(2, "0");
+  return `#${h}${h}${h}`;
+}
+
+function parseHexColor(hex: string): [number, number, number] | null {
+  const match = /^#?([0-9a-f]{6})$/i.exec(hex);
+  if (!match) return null;
+  const value = match[1]!;
+  return [
+    Number.parseInt(value.slice(0, 2), 16),
+    Number.parseInt(value.slice(2, 4), 16),
+    Number.parseInt(value.slice(4, 6), 16),
+  ];
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }
 
 function signMidDeg(signIdx: number, ascSignIdx: number): number {

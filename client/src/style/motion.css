@@ -54,6 +54,11 @@
   }
 }
 
+@keyframes kandinsky-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 .anim-combust {
   animation: combust var(--m-combust) var(--ease-combust) forwards;
 }

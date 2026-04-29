@@ -53,15 +53,17 @@ export function KandinskyComposition({ planet, size = 540 }: KandinskyCompositio
         {glyph}
       </text>
       {/* Orbiting dots */}
-      {[0, 72, 144, 216, 288].map((deg, i) => {
-        const r = 200;
-        const a = (deg * Math.PI) / 180;
-        return (
-          <circle key={i}
-            cx={cx + r * Math.cos(a)} cy={cy + r * Math.sin(a)}
-            r={i === 0 ? 6 : 3} fill={c} fillOpacity={i === 0 ? 1 : 0.55} />
-        );
-      })}
+      <g className="kandinsky-orbit" style={{ transformOrigin: `${cx}px ${cy}px` }}>
+        {[0, 72, 144, 216, 288].map((deg, i) => {
+          const r = 200;
+          const a = (deg * Math.PI) / 180;
+          return (
+            <circle key={i}
+              cx={cx + r * Math.cos(a)} cy={cy + r * Math.sin(a)}
+              r={i === 0 ? 6 : 3} fill={c} fillOpacity={i === 0 ? 1 : 0.55} />
+          );
+        })}
+      </g>
     </svg>
   );
 }

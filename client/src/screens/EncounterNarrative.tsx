@@ -175,10 +175,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           showColorField
           passive
         />
-        <div className="narrative-distance">
-          <span className="eyebrow">DISTANCE</span>
-          <span className="narrative-distance-v">{Math.round(run.runDistance)}</span>
-        </div>
       </div>
 
       <div className="narrative-column">
@@ -232,6 +228,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
               {run.over ? "Walk back" : "Continue"}
             </button>
           )}
+        </div>
+
+        <div className="narrative-distance">
+          <span className="eyebrow">DISTANCE</span>
+          <span className="narrative-distance-v">{Math.round(run.runDistance)}</span>
         </div>
       </div>
     </div>
