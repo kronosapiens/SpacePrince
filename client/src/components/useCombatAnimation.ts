@@ -34,6 +34,8 @@ interface FlagPair<T> {
   other: ReadonlySet<T>;
 }
 
+export type ProjectionDeltas = Partial<Record<PlanetName, number>>;
+
 export interface CombatAnimationState {
   selfState: SideState;
   otherState: SideState;
@@ -46,6 +48,14 @@ export interface CombatAnimationState {
   impactPlanets: FlagPair<PlanetName>;
   critPlanets: FlagPair<PlanetName>;
   combustingPlanets: FlagPair<PlanetName>;
+  /** Snapshot of the per-planet projection deltas captured at commit, so
+   *  the projection badges can persist through the animation rather than
+   *  vanishing all at once. */
+  projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
+  /** Planets whose projection has been "consumed" — once their impact
+   *  pulse fires, the projection badge for that planet stops rendering.
+   *  Accumulates only; never cleared until the animation ends. */
+  consumedProjections: FlagPair<PlanetName>;
   epoch: number;
 }
 
@@ -66,6 +76,7 @@ export interface CombatAnimationApi {
     entry: TurnLogEntry;
     previousRun: RunState;
     previousEncounter: CombatEncounter;
+    projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   }): void;
   /** Snap to final state and clear all scheduled timeouts. */
   skip(): void;
@@ -94,11 +105,13 @@ export function useCombatAnimation(): CombatAnimationApi {
       entry: TurnLogEntry;
       previousRun: RunState;
       previousEncounter: CombatEncounter;
+      projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
     }) => {
       runScheduler({
         entry: args.entry,
         previousRun: args.previousRun,
         previousEncounter: args.previousEncounter,
+        projectedDeltas: args.projectedDeltas ?? null,
         setAnimation,
         timeoutIds,
       });
@@ -151,6 +164,7 @@ function runScheduler(args: {
   entry: TurnLogEntry;
   previousRun: RunState;
   previousEncounter: CombatEncounter;
+  projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   setAnimation: (
     update:
       | CombatAnimationState
@@ -159,7 +173,7 @@ function runScheduler(args: {
   ) => void;
   timeoutIds: { current: number[] };
 }) {
-  const { entry, previousRun, previousEncounter, setAnimation, timeoutIds } = args;
+  const { entry, previousRun, previousEncounter, projectedDeltas, setAnimation, timeoutIds } = args;
   timeoutIds.current.forEach((id) => window.clearTimeout(id));
   timeoutIds.current = [];
 
@@ -185,6 +199,8 @@ function runScheduler(args: {
     impactPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     critPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
+    projectedDeltas,
+    consumedProjections: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     epoch: previousEncounter.turnIndex,
   });
 
@@ -202,6 +218,10 @@ function runScheduler(args: {
       next.impactPlanets = {
         self: addToFlag(next.impactPlanets.self, entry.playerPlanet),
         other: addToFlag(next.impactPlanets.other, entry.opponentPlanet),
+      };
+      next.consumedProjections = {
+        self: addToFlag(next.consumedProjections.self, entry.playerPlanet),
+        other: addToFlag(next.consumedProjections.other, entry.opponentPlanet),
       };
       next.critPlanets = {
         self: entry.playerCrit
@@ -291,6 +311,10 @@ function runScheduler(args: {
         next.impactPlanets = {
           ...next.impactPlanets,
           [step.side]: addToFlag(next.impactPlanets[step.side], step.target),
+        };
+        next.consumedProjections = {
+          ...next.consumedProjections,
+          [step.side]: addToFlag(next.consumedProjections[step.side], step.target),
         };
         return next;
       });

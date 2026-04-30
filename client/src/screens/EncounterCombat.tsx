@@ -4,6 +4,7 @@ import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
+import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects } from "@/game/projections";
@@ -99,6 +100,37 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     });
   }, [animation, selected, opponentTurn, run.perPlanetState, encounter.opponentState, encounter.opponentChart, profile.chart]);
 
+  // Projection-deltas to actually display, per side. Pre-commit: the live
+  // projection. Mid-animation: the snapshot captured at commit, with each
+  // planet filtered out as its impact pulse fires (see useCombatAnimation).
+  const displayProjection = useMemo(() => {
+    const filterConsumed = (
+      deltas: Partial<Record<PlanetName, number>>,
+      consumed: ReadonlySet<PlanetName>,
+    ): Partial<Record<PlanetName, number>> | undefined => {
+      const out: Partial<Record<PlanetName, number>> = {};
+      let any = false;
+      for (const planet of PLANETS) {
+        const v = deltas[planet];
+        if (v === undefined) continue;
+        if (consumed.has(planet)) continue;
+        out[planet] = v;
+        any = true;
+      }
+      return any ? out : undefined;
+    };
+    if (animation?.projectedDeltas) {
+      return {
+        self: filterConsumed(animation.projectedDeltas.self, animation.consumedProjections.self),
+        other: filterConsumed(animation.projectedDeltas.other, animation.consumedProjections.other),
+      };
+    }
+    return {
+      self: projection?.self,
+      other: projection?.other,
+    };
+  }, [animation, projection]);
+
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
       if (animation) {
@@ -120,16 +152,23 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       );
       const previousRun = run;
       const previousEncounter = encounter;
+      // Snapshot the projection so the badges can persist through the
+      // animation rather than vanishing all at once. The hook clears each
+      // planet's projection as that planet's impact pulse fires.
+      const projectionSnapshot = projection
+        ? { self: { ...projection.self }, other: { ...projection.other } }
+        : null;
       const committed = onCommitTurn(planet, rng);
       if (!committed) return;
       startAnimation({
         entry: committed.log,
         previousRun,
         previousEncounter,
+        projectedDeltas: projectionSnapshot,
       });
       setSelected(null);
     },
-    [animation, encounter, run, selected, playerUnlocked, onCommitTurn, skipAnimation, startAnimation],
+    [animation, encounter, run, selected, playerUnlocked, onCommitTurn, skipAnimation, startAnimation, projection],
   );
 
   const handleContinue = useCallback(() => {
@@ -156,7 +195,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           side="self"
           onPlanetClick={handlePlayerClick}
           onPlanetHover={setHovered}
-          projection={projection ? { deltas: projection.self } : undefined}
+          projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
           activePlanet={animation?.playerPlanet ?? null}
           activePropagationKeys={activePropagationKeys.self}
           actionPulsePlanet={actionPulsePlayer}
@@ -215,7 +254,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           entrance="right"
           side="other"
           onPlanetHover={setHoveredOpponent}
-          projection={projection ? { deltas: projection.other } : undefined}
+          projection={displayProjection.other ? { deltas: displayProjection.other } : undefined}
           passive
           activePropagationKeys={activePropagationKeys.other}
           actionPulsePlanet={actionPulseOpponent}

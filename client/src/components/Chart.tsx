@@ -413,12 +413,13 @@ function PlanetGlyph({
   const badgeOffset = r;
   const badgeR = Math.max(12, r * 0.5);
   const badgeFontSize = Math.max(12, Math.round(r * 0.48));
-  // Pill width grows with text length. Floor at 2*badgeR (square-ish).
-  const widthFor = (text: string) =>
-    Math.max(2 * badgeR, text.length * badgeFontSize * 0.55 + badgeR * 0.7);
-  // Perpendicular to toward-center, counter-clockwise rotation.
-  const perpX = -uy;
-  const perpY = ux;
+  // Projection badge is ~20% smaller — only ever a single digit, doesn't
+  // need to fit two-digit values like the persistent affliction badge.
+  const projBadgeR = Math.max(10, r * 0.4);
+  const projFontSize = Math.max(10, Math.round(r * 0.38));
+  // Pill width grows with text length. Floor at 2*r (square-ish).
+  const widthFor = (text: string, fontSize: number, pillR: number) =>
+    Math.max(2 * pillR, text.length * fontSize * 0.55 + pillR * 0.7);
 
   // Outer wrapper carries the optional action-glow pulse. The desaturation
   // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
@@ -495,26 +496,37 @@ function PlanetGlyph({
         if (!showAffliction && !showProjection) return null;
 
         const afflictionText = String(Math.round(affliction));
-        const wA = widthFor(afflictionText);
+        const wA = widthFor(afflictionText, badgeFontSize, badgeR);
         const aX = ux * badgeOffset;
         const aY = uy * badgeOffset;
 
         let projection: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
         if (showProjection) {
           const positive = projectedDelta > 0;
-          // Sign carried by color alone (red = damage, green = heal); drop
-          // the "+" / "−" prefix so the digits read more cleanly at small sizes.
+          // Sign carried by color alone (soft pink-red = damage, sage green
+          // = heal); drop the "+" / "−" prefix so the digits read cleanly.
           const text = Math.abs(projectedDelta).toFixed(1).replace(/\.0$/, "");
-          const wP = widthFor(text);
-          // Sit beside affliction along perpendicular axis. Center-to-center
-          // distance = half each pill's width + a small gap.
-          const off = wA / 2 + wP / 2 + 4;
+          const wP = widthFor(text, projFontSize, projBadgeR);
+          // Both centers sit on the planet rim. Projection is rotated around
+          // the rim from the affliction by the angle at which the two badges
+          // just clear each other — chord = sum of their (approximated
+          // circular) radii plus a small visual gap so the strokes don't
+          // fuse at the tangent point.
+          const chord = wA / 2 + wP / 2 + 2;
+          const projAngle = 2 * Math.asin(Math.min(1, chord / (2 * badgeOffset)));
+          const cos = Math.cos(projAngle);
+          const sin = Math.sin(projAngle);
+          const projDirX = ux * cos - uy * sin;
+          const projDirY = uy * cos + ux * sin;
           projection = {
             wP,
-            pX: aX + perpX * off,
-            pY: aY + perpY * off,
+            pX: projDirX * badgeOffset,
+            pY: projDirY * badgeOffset,
             text,
-            col: positive ? ASPECT_COLOR.tension : ASPECT_COLOR.harmony,
+            // Softer than ASPECT_COLOR.tension (#CD2626) — the saturated red
+            // felt aggressive on the small preview badge. Salmon-coral reads
+            // as "incoming damage" without screaming.
+            col: positive ? "#FF9F90" : ASPECT_COLOR.harmony,
           };
         }
 
@@ -576,14 +588,14 @@ function PlanetGlyph({
                 style={shadow}
               >
                 <rect
-                  x={-projection.wP / 2} y={-badgeR}
-                  width={projection.wP} height={2 * badgeR}
-                  rx={badgeR} ry={badgeR}
+                  x={-projection.wP / 2} y={-projBadgeR}
+                  width={projection.wP} height={2 * projBadgeR}
+                  rx={projBadgeR} ry={projBadgeR}
                   fill={NEUTRAL.void} fillOpacity="0.84"
                   stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
                 <foreignObject
-                  x={-projection.wP / 2} y={-badgeR}
-                  width={projection.wP} height={2 * badgeR}
+                  x={-projection.wP / 2} y={-projBadgeR}
+                  width={projection.wP} height={2 * projBadgeR}
                 >
                   <div
                     style={{
@@ -595,7 +607,7 @@ function PlanetGlyph({
                       color: projection.col,
                       fontFamily: "'Inter', sans-serif",
                       fontWeight: 700,
-                      fontSize: `${badgeFontSize}px`,
+                      fontSize: `${projFontSize}px`,
                       lineHeight: 1,
                       userSelect: "none",
                     }}
