@@ -562,31 +562,23 @@
 
 /* ── End of Run ────────────────────────────────────────────────────────── */
 
+/* Flex column: counts → rainbow (flex-grow) → actions. No absolute positioning,
+   no magic offsets — each section claims its natural height and the rainbow
+   absorbs the remainder. */
 .eor {
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  width: 100%;
-}
-.eor-top {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-.eor-caption {
-  font-family: var(--serif);
-  font-size: 24px;
-  font-style: italic;
-  color: var(--mist);
+  padding: 48px 0 40px;
+  gap: 40px;
 }
 .eor-counts {
   display: flex;
+  justify-content: center;
   gap: 56px;
+  flex-shrink: 0;
 }
 .eor-counts > div {
   display: flex;
@@ -601,32 +593,45 @@
   font-feature-settings: "tnum";
 }
 .eor-rainbow {
-  position: absolute;
-  top: 230px;
-  left: 0;
-  right: 0;
-  height: 480px;
+  flex: 1;
+  min-height: 0; /* allow shrink in flex column */
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Cards stretch to the row's full height so .is-current can `flex: 1`
+     vertically; smaller cards center their fixed-size map within. */
+  align-items: stretch;
+  /* `safe center` falls back to flex-start when the row overflows so the
+     first cards stay scrollable; degrades to plain `center` on older browsers. */
+  justify-content: safe center;
   gap: 12px;
-  padding: 0 40px;
+  padding: 4vh 40px;
+  /* Browsers compute `overflow-y: auto` when only `overflow-x` is set, which
+     re-introduces the vertical scrollbar. Pin both axes explicitly. */
   overflow-x: auto;
+  overflow-y: hidden;
 }
 .eor-card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   opacity: 0.55;
-  transition: opacity 400ms ease;
+  /* 200ms matches CROSSFADE_MS in EndOfRunScreen.tsx — see selectCard(). */
+  transition: opacity 200ms ease;
   background: transparent;
   border: 0;
   cursor: pointer;
   flex-shrink: 0;
 }
 .eor-card.is-current { opacity: 1; }
+/* Crossfade: only the cards changing focus state dim through near-zero so
+   their size-class swap (small ↔ large) happens under cover of darkness.
+   Neighbors stay put. The compound selector beats `.is-current`. */
+.eor-card.is-fading,
+.eor-card.is-current.is-fading {
+  opacity: 0.04;
+}
 .eor-card-tint {
   position: absolute;
   inset: -20px;
@@ -636,10 +641,15 @@
 .eor-card-map {
   width: 170px;
   height: 220px;
+  flex-shrink: 0;
 }
 .eor-card-map.is-current {
-  width: 280px;
-  height: 360px;
+  /* Fill the card vertically; width tracks the card's existing aspect (~4:5). */
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  width: auto;
+  aspect-ratio: 4 / 5;
 }
 .eor-card-label {
   font-family: var(--sans);
@@ -649,13 +659,9 @@
   text-transform: uppercase;
 }
 .eor-actions {
-  position: absolute;
-  bottom: 40px;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: center;
-  gap: 24px;
+  flex-shrink: 0;
 }
 
 /* ── Chart Study ───────────────────────────────────────────────────────── */

@@ -24,6 +24,7 @@ export function App() {
         <Route path={ROUTES.narrative} element={<NarrativeRoute />} />
         <Route path={`${ROUTES.narrative}/:seed`} element={<NarrativeRoute />} />
         <Route path={ROUTES.end} element={<EndOfRunScreen />} />
+        <Route path={`${ROUTES.end}/:seed`} element={<EndOfRunScreen />} />
         <Route path={ROUTES.index} element={<IndexScreen />} />
         <Route path="*" element={<Navigate to={ROUTES.title} replace />} />
       </Routes>

@@ -101,5 +101,10 @@ function detectCurrentPage(pathname: string): Page {
 }
 
 function isRefreshablePage(path: string): boolean {
-  return path === ROUTES.map || path === ROUTES.encounter || path === ROUTES.narrative;
+  return (
+    path === ROUTES.map ||
+    path === ROUTES.encounter ||
+    path === ROUTES.narrative ||
+    path === ROUTES.end
+  );
 }

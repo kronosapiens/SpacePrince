@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { seededChart } from "@/game/chart";
 import { newMapState } from "@/game/run";
-import { eligibleNext } from "@/game/map-gen";
+import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { beginCombatEncounter } from "@/game/encounter";
 import { rollNodeContent } from "@/game/map-content";
 import { mulberry32, hashString } from "@/game/rng";
@@ -210,6 +210,74 @@ export function makeDevMap(seed: number): MapState {
     visitedNodeIds: path,
     currentNodeId,
   };
+}
+
+// ── End-of-run dev state ────────────────────────────────────────────────────
+
+const DEV_END_MIN_MAPS = 1;
+const DEV_END_MAX_MAPS = 20;
+const DEV_END_MIN_ENC_PER_MAP = 3;
+const DEV_END_MAX_ENC_PER_MAP = 10;
+
+export interface DevEndState {
+  runDistance: number;
+  totalEncounters: number;
+  perPlanetState: SideState;
+  allMaps: MapState[];
+  numMaps: number;
+}
+
+/** Synthesize a complete-run snapshot from a seed: a randomized number of
+ *  maps (1..20), each with a full ROOT→TERMINAL walk, plus aggregate distance
+ *  / encounter / combust counts derived from the same seed so each hash is
+ *  reproducible. */
+export function makeDevEndState(seed: number): DevEndState {
+  const rng = mulberry32(hashString(`${seed}_end`));
+  const numMaps =
+    DEV_END_MIN_MAPS +
+    Math.floor(rng() * (DEV_END_MAX_MAPS - DEV_END_MIN_MAPS + 1));
+
+  let totalEncounters = 0;
+  let runDistance = 0;
+  const allMaps: MapState[] = [];
+  for (let i = 0; i < numMaps; i++) {
+    const mapSeed = hashString(`${seed}_end_map_${i}`);
+    allMaps.push(makeDevWalkedMap(mapSeed));
+    const stepRng = mulberry32(hashString(`${seed}_end_steps_${i}`));
+    const encs =
+      DEV_END_MIN_ENC_PER_MAP +
+      Math.floor(stepRng() * (DEV_END_MAX_ENC_PER_MAP - DEV_END_MIN_ENC_PER_MAP + 1));
+    totalEncounters += encs;
+    runDistance += encs * (9 + Math.floor(stepRng() * 7));
+  }
+
+  const perPlanetState = syntheticDevSideState(seed, "end");
+  return { runDistance, totalEncounters, perPlanetState, allMaps, numMaps };
+}
+
+/** Map with a full walk from ROOT to TERMINAL (one specific path picked
+ *  deterministically from `seed`). Used for the End-of-Run rainbow where
+ *  every card is a completed traversal. */
+function makeDevWalkedMap(seed: number): MapState {
+  const base = newMapState(seed);
+  const rolled: Record<string, NodeContent> = {};
+  let lastNarrative: number | null = null;
+  for (const node of base.graph.nodes) {
+    const r = mulberry32(hashString(`${seed}_${node.id}_end`));
+    const content = rollNodeContent({ rng: r, lastNarrativeHouse: lastNarrative });
+    rolled[node.id] = content;
+    if (content.kind === "narrative") lastNarrative = content.house;
+  }
+  const walkRng = mulberry32(hashString(`${seed}_walk_end`));
+  const path: string[] = [base.currentNodeId];
+  let cur = base.currentNodeId;
+  while (cur !== TERMINAL_NODE_ID) {
+    const next = eligibleNext(base.graph, cur, path);
+    if (next.length === 0) break;
+    cur = next[Math.floor(walkRng() * next.length)]!;
+    path.push(cur);
+  }
+  return { ...base, rolledNodes: rolled, visitedNodeIds: path, currentNodeId: cur };
 }
 
 /** Build an ephemeral combat encounter. */
