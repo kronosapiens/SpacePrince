@@ -5,6 +5,8 @@ node_modules/
 # Vite
 client/dist/
 client/.vite/
+landing/dist/
+landing/.vite/
 
 # Logs
 npm-debug.log*

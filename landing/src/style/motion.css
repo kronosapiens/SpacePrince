@@ -1,0 +1,33 @@
+/* Motion vocabulary used by the landing page (subset of client/style/motion.css).
+   Keep: tint-breath (page background), begin-breath (button), propagation-pulse
+   + .anim-propagation-pulse (Chart aspect lines), reduced-motion guard. */
+
+@keyframes begin-breath {
+  0%, 100% { opacity: 0.78; }
+  50%      { opacity: 1; }
+}
+
+@keyframes tint-breath {
+  0%, 100% {
+    opacity: calc(var(--tint-opacity) * 0.72);
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: calc(var(--tint-opacity) * 1.08);
+    transform: scale(1.03);
+  }
+}
+
+@keyframes propagation-pulse {
+  0%   { opacity: 0; }
+  35%  { opacity: 1; }
+  65%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.anim-propagation-pulse {
+  animation: propagation-pulse 360ms var(--ease-out) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-propagation-pulse { animation: none; }
+}
