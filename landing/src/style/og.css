@@ -1,0 +1,64 @@
+/* OG card (1200×630 social preview).
+   Fixed-size canvas — never clamp(), never vh/vw. Designed once for the
+   Open Graph spec aspect ratio. Reachable only via /#og hash in dev for
+   screenshot capture; excluded from production bundle by App.tsx's
+   import.meta.env.DEV gate (see App.tsx). */
+
+.og-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1200px;
+  height: 630px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 80px;
+  /* Asymmetric: more breathing room on the right so the chart pulls in
+     from the canvas edge. */
+  padding: 60px 110px 60px 80px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.og-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.og-card-wordmark {
+  font-family: var(--serif);
+  font-size: 52px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--bone);
+  line-height: 1;
+}
+
+.og-card-tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: var(--mist);
+}
+
+.og-card-chart {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.og-card-chart > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 510px;
+  max-height: 510px;
+}
