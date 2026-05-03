@@ -48,7 +48,7 @@ describe("Run loop integration", () => {
     expect((r.currentEncounter as any).resolved).toBe(true);
   });
 
-  it("frontier rolls produce ~38% narrative content over many seeds", () => {
+  it("frontier rolls produce ~50% narrative content over many seeds", () => {
     let narrative = 0;
     let total = 0;
     for (let seed = 0; seed < 1000; seed++) {
@@ -58,8 +58,8 @@ describe("Run loop integration", () => {
       if (c.kind === "narrative") narrative++;
     }
     const ratio = narrative / total;
-    expect(ratio).toBeGreaterThan(0.32);
-    expect(ratio).toBeLessThan(0.45);
+    expect(ratio).toBeGreaterThan(0.45);
+    expect(ratio).toBeLessThan(0.55);
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {

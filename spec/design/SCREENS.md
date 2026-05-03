@@ -203,7 +203,7 @@ The map manifests as the player approaches it — distant nodes are placeholders
 
 **Roll parameters:**
 
-- **Combat-to-narrative ratio:** **φ:1** (golden ratio) — roughly **62/38** combat-heavy. This rhymes with the stroke-scale ratio in `STYLE.md §3` (also golden-ratio-adjacent, after af Klint) and with the proportional logic that runs through the visual system. Refine in playtesting.
+- **Combat-to-narrative ratio:** **50/50**. Refine in playtesting — earlier drafts ran a φ:1 (62/38) combat-heavy split, but rebalanced to give narrative beats equal footing in a run.
 - **House assignment** (for narrative nodes): **uniform random over the 12 houses, with a "no immediate repeat" rule** (a freshly-rolled narrative node cannot be the same house as the player's most-recent narrative node). Position-derived house assignment (upper layers = elevated houses, lower = grounded) is reserved for v2 if it earns its weight in playtesting.
 - **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4` (asymmetric matchups expected).
 

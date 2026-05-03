@@ -4,11 +4,12 @@ import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
-import { PLANETS } from "@/game/data";
+import { PLANETS, SIGNS, SIGN_ELEMENT } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { computeProjectedEffects } from "@/game/projections";
+import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
+import { getPolarity } from "@/game/combat";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import {
@@ -19,8 +20,10 @@ import {
 import type {
   CombatEncounter,
   PlanetName,
+  Polarity,
   Profile,
   RunState,
+  SignName,
   TurnLogEntry,
 } from "@/game/types";
 
@@ -100,15 +103,27 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     });
   }, [animation, selected, opponentTurn, run.perPlanetState, encounter.opponentState, encounter.opponentChart, profile.chart]);
 
+  // Per-sign polarity tints on the player's rim — at a glance, which of my
+  // signs would resolve as Testimony / Affliction against the opponent's
+  // current turn. The mirror on the opponent chart is the same matchup
+  // commuted, so it adds no new info; we don't render it there.
+  const selfSignPolarities = useMemo<Partial<Record<SignName, Polarity>>>(() => {
+    if (!displayOpponentTurn) return {};
+    const oppElement = encounter.opponentChart.planets[displayOpponentTurn].element;
+    const out: Partial<Record<SignName, Polarity>> = {};
+    for (const sign of SIGNS) out[sign] = getPolarity(SIGN_ELEMENT[sign], oppElement);
+    return out;
+  }, [displayOpponentTurn, encounter.opponentChart]);
+
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection. Mid-animation: the snapshot captured at commit, with each
   // planet filtered out as its impact pulse fires (see useCombatAnimation).
   const displayProjection = useMemo(() => {
     const filterConsumed = (
-      deltas: Partial<Record<PlanetName, number>>,
+      deltas: Partial<Record<PlanetName, ProjectedEffect>>,
       consumed: ReadonlySet<PlanetName>,
-    ): Partial<Record<PlanetName, number>> | undefined => {
-      const out: Partial<Record<PlanetName, number>> = {};
+    ): Partial<Record<PlanetName, ProjectedEffect>> | undefined => {
+      const out: Partial<Record<PlanetName, ProjectedEffect>> = {};
       let any = false;
       for (const planet of PLANETS) {
         const v = deltas[planet];
@@ -203,6 +218,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           critPlanets={critPlayer}
           combustingPlanets={combustingPlayer}
           animationEpoch={animationEpoch}
+          signPolarities={selfSignPolarities}
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>

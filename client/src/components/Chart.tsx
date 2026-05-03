@@ -15,8 +15,14 @@ import type {
   AspectConnection,
   Chart as ChartType,
   PlanetName,
+  Polarity,
   SignName,
 } from "@/game/types";
+
+// Sign-label tints used to surface combat polarity around the chart rim.
+// Match v1's values so the affordance reads the same.
+const SIGN_AFFLICTION_COLOR = "#FF8C6B";
+const SIGN_TESTIMONY_COLOR = "#8FBC8F";
 
 const SIGN_LABELS: Record<SignName, string> = {
   Aries: "ARI", Taurus: "TAU", Gemini: "GEM", Cancer: "CAN",
@@ -53,8 +59,13 @@ interface PlanetStatus {
   affliction?: number;
 }
 
+export interface ProjectionChip {
+  delta: number;
+  polarity: Polarity;
+}
+
 export interface ProjectionChips {
-  deltas: Partial<Record<PlanetName, number>>;
+  deltas: Partial<Record<PlanetName, ProjectionChip>>;
 }
 
 export interface ChartProps {
@@ -93,7 +104,9 @@ export interface ChartProps {
   passive?: boolean;
   aspects?: AspectConnection[];
   projection?: ProjectionChips;
-  /** Directed aspect keys (`Source->Target`) currently propagating. */
+  /** Directed aspect keys (`Source->Target`) currently propagating. The
+   *  pulse just brightens the existing aspect-line color; heal/harm signal
+   *  lives on the projection badge and the planet's impact pulse. */
   activePropagationKeys?: ReadonlySet<string>;
   /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
   actionPulsePlanet?: PlanetName | null;
@@ -105,6 +118,12 @@ export interface ChartProps {
   combustingPlanets?: ReadonlySet<PlanetName>;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
+  /** Per-sign polarity coloring — used during combat to indicate, for each
+   *  zodiac sign on the rim, what the polarity outcome would be against the
+   *  reference planet (opponent-of-turn for the player chart, player's
+   *  hovered/selected for the opponent chart). Affliction = red, Testimony
+   *  = green, Friction or absent = neutral. */
+  signPolarities?: Partial<Record<SignName, Polarity>>;
 }
 
 export function Chart(props: ChartProps) {
@@ -137,6 +156,7 @@ export function Chart(props: ChartProps) {
     critPlanets,
     combustingPlanets,
     animationEpoch,
+    signPolarities,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
@@ -187,12 +207,15 @@ export function Chart(props: ChartProps) {
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
-        // v1 convention: harmonious (trine/sextile/conjunction) = green,
-        // tense (square/opposition) = red. Source-planet color is too noisy.
-        const stroke =
-          a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction"
-            ? ASPECT_COLOR.harmony
-            : ASPECT_COLOR.tension;
+        // The chart has two orthogonal signals to communicate: aspect mood
+        // (harmony/tension) and effect polarity (heal/harm). Aspects own
+        // red/green per astrological convention; polarity lives on the
+        // projection badge so the two channels don't fight. Fallback if
+        // red/green ever feels too noisy: bone (harmony) / mist (tension)
+        // — achromatic, doesn't compete, but loses the mood affordance.
+        const isHarmony =
+          a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
+        const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
         const opacity = isActive ? 0.8 : isInspect ? 0.5 : 0.2;
         const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
         const dx = to.cx - from.cx;
@@ -206,7 +229,8 @@ export function Chart(props: ChartProps) {
           <line key={`aspect_${i}`}
             x1={from.cx + ux * ra} y1={from.cy + uy * ra}
             x2={to.cx - ux * rb} y2={to.cy - uy * rb}
-            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} strokeLinecap="round" />
+            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+            strokeLinecap="round" />
         );
       })
     : null;
@@ -283,7 +307,7 @@ export function Chart(props: ChartProps) {
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
         fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.45" strokeWidth={1} />
       <SignTicks />
-      <SignLabels ascSignIdx={ascSignIdx} />
+      <SignLabels ascSignIdx={ascSignIdx} signPolarities={signPolarities} />
       {aspectLines}
       {propagationLines}
 
@@ -296,7 +320,7 @@ export function Chart(props: ChartProps) {
         const isActive = (allActive && !combusted) || activePlanet === p.planet;
         const isHovered = hoveredPlanet === p.planet;
         const isInspect = inspectPlanet === p.planet;
-        const projectedDelta = projection?.deltas[p.planet];
+        const projectionChip = projection?.deltas[p.planet];
         const isActionPulse = actionPulsePlanet === p.planet;
         const isImpacting = impactPlanets?.has(p.planet) ?? false;
         const isCritting = critPlanets?.has(p.planet) ?? false;
@@ -317,7 +341,7 @@ export function Chart(props: ChartProps) {
             onClick={handleClick}
             onHover={handleHover}
             passive={passive}
-            projectedDelta={projectedDelta}
+            projection={projectionChip}
             actionPulse={isActionPulse}
             impact={isImpacting}
             crit={isCritting}
@@ -341,7 +365,7 @@ function PlanetGlyph({
   alwaysShowAfflictionBadge,
   selected, active, hovered, inspect,
   onClick, onHover, passive,
-  projectedDelta,
+  projection,
   actionPulse, impact, crit, combusting,
   animationEpoch,
 }: {
@@ -358,7 +382,7 @@ function PlanetGlyph({
   onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
-  projectedDelta?: number;
+  projection?: ProjectionChip;
   actionPulse: boolean;
   impact: boolean;
   crit: boolean;
@@ -418,8 +442,11 @@ function PlanetGlyph({
   const projBadgeR = Math.max(10, r * 0.4);
   const projFontSize = Math.max(10, Math.round(r * 0.38));
   // Pill width grows with text length. Floor at 2*r (square-ish).
+  // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
+  // visual padding so multi-char content like "2.5" doesn't get crowded
+  // against the rounded ends.
   const widthFor = (text: string, fontSize: number, pillR: number) =>
-    Math.max(2 * pillR, text.length * fontSize * 0.55 + pillR * 0.7);
+    Math.max(2 * pillR, text.length * fontSize * 0.7 + pillR * 0.7);
 
   // Outer wrapper carries the optional action-glow pulse. The desaturation
   // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
@@ -439,8 +466,8 @@ function PlanetGlyph({
       className={outerClass}
     >
       {active && (
-        <circle r={point.glyphR + 6} fill="none"
-          stroke={c} strokeOpacity="0.9" strokeWidth={STROKE_LIGHT} />
+        <circle r={point.glyphR + 10} fill="none"
+          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
       )}
       {(inspect || selected) && !active && (
         <circle r={point.glyphR + 10} fill="none"
@@ -491,8 +518,11 @@ function PlanetGlyph({
         const showAffliction =
           !hideAfflictionBadge && !combusted &&
           (alwaysShowAfflictionBadge || affliction > 0);
-        const showProjection =
-          !combusted && projectedDelta !== undefined && projectedDelta !== 0;
+        // Show the projection badge whenever there's any projected effect —
+        // including testimony at zero delta (planet already at 0 affliction).
+        // The polarity tells the player "this would heal", even if the
+        // numeric outcome is the same as standing still.
+        const showProjection = !combusted && projection !== undefined;
         if (!showAffliction && !showProjection) return null;
 
         const afflictionText = String(Math.round(affliction));
@@ -500,12 +530,12 @@ function PlanetGlyph({
         const aX = ux * badgeOffset;
         const aY = uy * badgeOffset;
 
-        let projection: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
-        if (showProjection) {
-          const positive = projectedDelta > 0;
+        let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
+        if (showProjection && projection) {
+          const isHarm = projection.polarity !== "Testimony";
           // Sign carried by color alone (soft pink-red = damage, sage green
           // = heal); drop the "+" / "−" prefix so the digits read cleanly.
-          const text = Math.abs(projectedDelta).toFixed(1).replace(/\.0$/, "");
+          const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
           const wP = widthFor(text, projFontSize, projBadgeR);
           // Both centers sit on the planet rim. Projection is rotated around
           // the rim from the affliction by the angle at which the two badges
@@ -518,7 +548,7 @@ function PlanetGlyph({
           const sin = Math.sin(projAngle);
           const projDirX = ux * cos - uy * sin;
           const projDirY = uy * cos + ux * sin;
-          projection = {
+          projBadge = {
             wP,
             pX: projDirX * badgeOffset,
             pY: projDirY * badgeOffset,
@@ -526,7 +556,7 @@ function PlanetGlyph({
             // Softer than ASPECT_COLOR.tension (#CD2626) — the saturated red
             // felt aggressive on the small preview badge. Salmon-coral reads
             // as "incoming damage" without screaming.
-            col: positive ? "#FF9F90" : ASPECT_COLOR.harmony,
+            col: isHarm ? "#FF9F90" : ASPECT_COLOR.harmony,
           };
         }
 
@@ -582,20 +612,20 @@ function PlanetGlyph({
                 </g>
               </g>
             )}
-            {projection && (
+            {projBadge && (
               <g
-                transform={`translate(${projection.pX}, ${projection.pY})`}
+                transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
                 style={shadow}
               >
                 <rect
-                  x={-projection.wP / 2} y={-projBadgeR}
-                  width={projection.wP} height={2 * projBadgeR}
+                  x={-projBadge.wP / 2} y={-projBadgeR}
+                  width={projBadge.wP} height={2 * projBadgeR}
                   rx={projBadgeR} ry={projBadgeR}
                   fill={NEUTRAL.void} fillOpacity="0.84"
                   stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
                 <foreignObject
-                  x={-projection.wP / 2} y={-projBadgeR}
-                  width={projection.wP} height={2 * projBadgeR}
+                  x={-projBadge.wP / 2} y={-projBadgeR}
+                  width={projBadge.wP} height={2 * projBadgeR}
                 >
                   <div
                     style={{
@@ -604,7 +634,7 @@ function PlanetGlyph({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: projection.col,
+                      color: projBadge.col,
                       fontFamily: "'Inter', sans-serif",
                       fontWeight: 700,
                       fontSize: `${projFontSize}px`,
@@ -612,7 +642,7 @@ function PlanetGlyph({
                       userSelect: "none",
                     }}
                   >
-                    {projection.text}
+                    {projBadge.text}
                   </div>
                 </foreignObject>
               </g>
@@ -639,24 +669,36 @@ function SignTicks() {
   return <g>{lines}</g>;
 }
 
-function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
+function SignLabels({
+  ascSignIdx,
+  signPolarities,
+}: {
+  ascSignIdx: number;
+  signPolarities?: Partial<Record<SignName, Polarity>>;
+}) {
   const out = [];
   for (let i = 0; i < 12; i++) {
     const sign = SIGNS[i]!;
     const offset = (i - ascSignIdx + 12) % 12;
     const ang = 180 + offset * 30 + 15;
     const p = polar(CHART_CENTER, CHART_CENTER, SIGN_LABEL_R, ang);
+    const polarity = signPolarities?.[sign];
+    const tint =
+      polarity === "Affliction" ? SIGN_AFFLICTION_COLOR :
+      polarity === "Testimony" ? SIGN_TESTIMONY_COLOR :
+      NEUTRAL.bone;
+    const opacity = polarity === "Affliction" || polarity === "Testimony" ? 0.95 : 0.7;
     out.push(
       <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={NEUTRAL.bone} fillOpacity="0.7"
+          fontSize={20} fill={tint} fillOpacity={opacity}
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={NEUTRAL.bone} fillOpacity="0.7"
+          fontSize={22} fill={tint} fillOpacity={opacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}

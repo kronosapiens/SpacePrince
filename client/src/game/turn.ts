@@ -220,6 +220,7 @@ function propagate(
       source: active,
       target: a.to,
       delta: effPolarity === "Testimony" ? -delta : delta,
+      polarity: effPolarity,
       note: `${a.aspect} ${inverted ? "inverts" : "flows"}${delta === 0 ? " (no effect)" : ""}`,
     });
     if (combust) {
@@ -228,6 +229,7 @@ function propagate(
         source: active,
         target: a.to,
         delta: 0,
+        polarity: "Affliction",
         note: "Combusts",
       });
     }

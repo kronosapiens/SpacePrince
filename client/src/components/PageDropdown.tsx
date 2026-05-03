@@ -87,7 +87,7 @@ export function PageDropdown() {
           className="page-refresh-button"
           onClick={handleRefresh}
         >
-          Refresh
+          Regenerate
         </button>
       )}
     </div>

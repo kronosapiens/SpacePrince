@@ -81,6 +81,24 @@ export function getOrCreateDevProfile(): Profile {
   return profile;
 }
 
+/** Seed-driven dev profile. Pure, no storage. Each URL hash maps
+ *  deterministically to a (player chart, opponent chart) pair so reroll
+ *  refreshes both. */
+export function makeDevProfile(seed: number): Profile {
+  const chartSeed = hashString(`${seed}_player`);
+  const chart: Chart = seededChart(chartSeed, "Dev Prince");
+  return {
+    id: `dev_${seed}`,
+    name: "Dev Prince",
+    birthData: { iso: new Date(0).toISOString(), lat: 0, lon: 0 },
+    chart,
+    lifetimeEncounterCount: 999,
+    scarsLevel: 0,
+    createdAt: 0,
+    schemaVersion: 1,
+  };
+}
+
 export function clearDevProfile(): void {
   sessionStorage.removeItem(SESSION_PROFILE_KEY);
 }

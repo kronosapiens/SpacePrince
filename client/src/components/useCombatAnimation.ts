@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
+import type { ProjectedEffect } from "@/game/projections";
 import type {
   CombatEncounter,
   PlanetName,
@@ -25,6 +26,9 @@ export const ANIMATION_TIMINGS = {
   propagationClearOffset: 360,
   combustRippleDuration: 1000,
   endOffset: 360,
+  /** Pause between the player's resolution phase and the opponent's, so the
+   *  two charts read sequentially rather than simultaneously. */
+  interPhasePause: 240,
 } as const;
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -34,7 +38,7 @@ interface FlagPair<T> {
   other: ReadonlySet<T>;
 }
 
-export type ProjectionDeltas = Partial<Record<PlanetName, number>>;
+export type ProjectionDeltas = Partial<Record<PlanetName, ProjectedEffect>>;
 
 export interface CombatAnimationState {
   selfState: SideState;
@@ -204,233 +208,214 @@ function runScheduler(args: {
     epoch: previousEncounter.turnIndex,
   });
 
-  // Direct phase: apply deltas + light up action-glow, impact pulses, crit bursts.
-  schedule(() => {
-    updateAnimation((state) => {
-      const next = cloneAnimation(state);
-      const sign = entry.polarity === "Testimony" ? -1 : 1;
-      applyDelta(next.selfState, entry.playerPlanet, entry.playerDelta * sign);
-      applyDelta(next.otherState, entry.opponentPlanet, entry.opponentDelta * sign);
-      next.actionPulse = {
-        player: entry.playerPlanet,
-        opponent: entry.opponentPlanet,
-      };
-      next.impactPlanets = {
-        self: addToFlag(next.impactPlanets.self, entry.playerPlanet),
-        other: addToFlag(next.impactPlanets.other, entry.opponentPlanet),
-      };
-      next.consumedProjections = {
-        self: addToFlag(next.consumedProjections.self, entry.playerPlanet),
-        other: addToFlag(next.consumedProjections.other, entry.opponentPlanet),
-      };
-      next.critPlanets = {
-        self: entry.playerCrit
-          ? addToFlag(next.critPlanets.self, entry.playerPlanet)
-          : next.critPlanets.self,
-        other: entry.opponentCrit
-          ? addToFlag(next.critPlanets.other, entry.opponentPlanet)
-          : next.critPlanets.other,
-      };
-      return next;
-    });
-  }, ANIMATION_TIMINGS.primaryDelay);
-
-  // Clear primary impact pulse before propagation begins so propagation
-  // pulses on the same planet replay cleanly.
-  schedule(() => {
-    updateAnimation((state) => ({
-      ...state,
-      impactPlanets: {
-        self: removeFromFlag(state.impactPlanets.self, entry.playerPlanet),
-        other: removeFromFlag(state.impactPlanets.other, entry.opponentPlanet),
-      },
-    }));
-  }, ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryImpactClear);
-
-  // Clear action glow.
-  schedule(() => {
-    updateAnimation((state) => ({
-      ...state,
-      actionPulse: { player: null, opponent: null },
-    }));
-  }, ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear);
-
-  // Clear crit burst.
-  schedule(() => {
-    updateAnimation((state) => ({
-      ...state,
-      critPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
-    }));
-  }, ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryCritClear);
-
+  const sign = entry.polarity === "Testimony" ? -1 : 1;
   const propagationSteps = entry.propagation.filter((p) => p.target);
-  const maxSideSteps = Math.max(
-    propagationSteps.filter((p) => p.side === "self").length,
-    propagationSteps.filter((p) => p.side === "other").length,
-  );
-  const sideIndexes = { self: 0, other: 0 };
-  let lastCombustClear = 0;
+  const playerSteps = propagationSteps.filter((s) => s.side === "self");
+  const opponentSteps = propagationSteps.filter((s) => s.side === "other");
 
-  for (const step of propagationSteps) {
-    const stepIndex = sideIndexes[step.side]++;
-    const key = aspectKey(step.source, step.target);
-    const delay =
-      ANIMATION_TIMINGS.propagationStart +
-      stepIndex * ANIMATION_TIMINGS.propagationStep;
+  // Schedule one side's full resolution beat (primary hit + propagation +
+  // any action-planet combust ripple) at the given base time. Returns the
+  // moment the side's last visual finishes — caller uses that to chain
+  // the opponent phase after the player phase.
+  const schedulePhase = (args: {
+    base: number;
+    side: "self" | "other";
+    actionPlanet: PlanetName;
+    actionDelta: number;
+    actionCrit: boolean;
+    actionCombust: boolean;
+    steps: typeof propagationSteps;
+  }): number => {
+    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, steps } = args;
+    const isSelf = side === "self";
 
-    schedule(() => {
-      updateAnimation((state) => ({
-        ...state,
-        activePropagationKeys: {
-          ...state.activePropagationKeys,
-          [step.side]: new Set([
-            ...state.activePropagationKeys[step.side],
-            key,
-          ]),
-        },
-      }));
-    }, delay);
-
+    // Primary direct phase — apply delta, light action-glow, impact, crit.
     schedule(() => {
       updateAnimation((state) => {
         const next = cloneAnimation(state);
-        const targetState =
-          step.side === "self" ? next.selfState : next.otherState;
-        if (step.note === "Combusts") {
-          targetState[step.target].combusted = true;
-          next.combustingPlanets = {
-            ...next.combustingPlanets,
-            [step.side]: addToFlag(
-              next.combustingPlanets[step.side],
-              step.target,
-            ),
-          };
-        } else {
-          applyDelta(targetState, step.target, step.delta);
-        }
+        if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
+        else applyDelta(next.otherState, actionPlanet, actionDelta * sign);
+        next.actionPulse = isSelf
+          ? { ...next.actionPulse, player: actionPlanet }
+          : { ...next.actionPulse, opponent: actionPlanet };
         next.impactPlanets = {
           ...next.impactPlanets,
-          [step.side]: addToFlag(next.impactPlanets[step.side], step.target),
+          [side]: addToFlag(next.impactPlanets[side], actionPlanet),
         };
         next.consumedProjections = {
           ...next.consumedProjections,
-          [step.side]: addToFlag(next.consumedProjections[step.side], step.target),
+          [side]: addToFlag(next.consumedProjections[side], actionPlanet),
         };
+        if (actionCrit) {
+          next.critPlanets = {
+            ...next.critPlanets,
+            [side]: addToFlag(next.critPlanets[side], actionPlanet),
+          };
+        }
         return next;
       });
-    }, delay + ANIMATION_TIMINGS.propagationApplyOffset);
+    }, base + ANIMATION_TIMINGS.primaryDelay);
 
+    // Clear primary impact pulse before propagation begins.
     schedule(() => {
       updateAnimation((state) => ({
         ...state,
-        activePropagationKeys: {
-          ...state.activePropagationKeys,
-          [step.side]: removeFromFlag(
-            state.activePropagationKeys[step.side],
-            key,
-          ),
-        },
         impactPlanets: {
           ...state.impactPlanets,
-          [step.side]: removeFromFlag(
-            state.impactPlanets[step.side],
-            step.target,
-          ),
+          [side]: removeFromFlag(state.impactPlanets[side], actionPlanet),
         },
       }));
-    }, delay + ANIMATION_TIMINGS.propagationClearOffset);
+    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryImpactClear);
 
-    if (step.note === "Combusts") {
-      const rippleClearAt =
-        delay +
-        ANIMATION_TIMINGS.propagationApplyOffset +
-        ANIMATION_TIMINGS.combustRippleDuration;
-      lastCombustClear = Math.max(lastCombustClear, rippleClearAt);
+    // Clear action glow.
+    schedule(() => {
+      updateAnimation((state) => ({
+        ...state,
+        actionPulse: isSelf
+          ? { ...state.actionPulse, player: null }
+          : { ...state.actionPulse, opponent: null },
+      }));
+    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear);
+
+    // Clear crit burst.
+    schedule(() => {
+      updateAnimation((state) => ({
+        ...state,
+        critPlanets: { ...state.critPlanets, [side]: EMPTY_PLANET_SET },
+      }));
+    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryCritClear);
+
+    // Propagation steps for this side.
+    let lastCombustClearLocal = 0;
+    steps.forEach((step, stepIndex) => {
+      const key = aspectKey(step.source, step.target);
+      const delay = base + ANIMATION_TIMINGS.propagationStart + stepIndex * ANIMATION_TIMINGS.propagationStep;
+
+      schedule(() => {
+        updateAnimation((state) => ({
+          ...state,
+          activePropagationKeys: {
+            ...state.activePropagationKeys,
+            [side]: addToFlag(state.activePropagationKeys[side], key),
+          },
+        }));
+      }, delay);
+
+      schedule(() => {
+        updateAnimation((state) => {
+          const next = cloneAnimation(state);
+          const targetState = isSelf ? next.selfState : next.otherState;
+          if (step.note === "Combusts") {
+            targetState[step.target].combusted = true;
+            next.combustingPlanets = {
+              ...next.combustingPlanets,
+              [side]: addToFlag(next.combustingPlanets[side], step.target),
+            };
+          } else {
+            applyDelta(targetState, step.target, step.delta);
+          }
+          next.impactPlanets = {
+            ...next.impactPlanets,
+            [side]: addToFlag(next.impactPlanets[side], step.target),
+          };
+          next.consumedProjections = {
+            ...next.consumedProjections,
+            [side]: addToFlag(next.consumedProjections[side], step.target),
+          };
+          return next;
+        });
+      }, delay + ANIMATION_TIMINGS.propagationApplyOffset);
+
+      schedule(() => {
+        updateAnimation((state) => ({
+          ...state,
+          activePropagationKeys: {
+            ...state.activePropagationKeys,
+            [side]: removeFromFlag(state.activePropagationKeys[side], key),
+          },
+          impactPlanets: {
+            ...state.impactPlanets,
+            [side]: removeFromFlag(state.impactPlanets[side], step.target),
+          },
+        }));
+      }, delay + ANIMATION_TIMINGS.propagationClearOffset);
+
+      if (step.note === "Combusts") {
+        const rippleClearAt = delay + ANIMATION_TIMINGS.propagationApplyOffset + ANIMATION_TIMINGS.combustRippleDuration;
+        lastCombustClearLocal = Math.max(lastCombustClearLocal, rippleClearAt);
+        schedule(() => {
+          updateAnimation((state) => ({
+            ...state,
+            combustingPlanets: {
+              ...state.combustingPlanets,
+              [side]: removeFromFlag(state.combustingPlanets[side], step.target),
+            },
+          }));
+        }, rippleClearAt);
+      }
+    });
+
+    // Final-phase action-planet combust (if any).
+    const finalPropagationDelay = steps.length > 0
+      ? base + ANIMATION_TIMINGS.propagationStart + (steps.length - 1) * ANIMATION_TIMINGS.propagationStep + ANIMATION_TIMINGS.propagationApplyOffset
+      : base + ANIMATION_TIMINGS.primaryDelay;
+
+    if (actionCombust) {
+      schedule(() => {
+        updateAnimation((state) => {
+          const next = cloneAnimation(state);
+          if (isSelf) {
+            next.selfState[actionPlanet].combusted = true;
+          } else {
+            next.otherState[actionPlanet].combusted = true;
+          }
+          next.combustingPlanets = {
+            ...next.combustingPlanets,
+            [side]: addToFlag(next.combustingPlanets[side], actionPlanet),
+          };
+          return next;
+        });
+      }, finalPropagationDelay);
+
+      const actionRippleClearAt = finalPropagationDelay + ANIMATION_TIMINGS.combustRippleDuration;
+      lastCombustClearLocal = Math.max(lastCombustClearLocal, actionRippleClearAt);
       schedule(() => {
         updateAnimation((state) => ({
           ...state,
           combustingPlanets: {
             ...state.combustingPlanets,
-            [step.side]: removeFromFlag(
-              state.combustingPlanets[step.side],
-              step.target,
-            ),
+            [side]: removeFromFlag(state.combustingPlanets[side], actionPlanet),
           },
         }));
-      }, rippleClearAt);
+      }, actionRippleClearAt);
     }
-  }
 
-  const finalPropagationDelay =
-    maxSideSteps > 0
-      ? ANIMATION_TIMINGS.propagationStart +
-        Math.max(0, maxSideSteps - 1) * ANIMATION_TIMINGS.propagationStep +
-        ANIMATION_TIMINGS.propagationApplyOffset
-      : ANIMATION_TIMINGS.primaryDelay;
+    const propagationEnd = steps.length > 0
+      ? base + ANIMATION_TIMINGS.propagationStart + (steps.length - 1) * ANIMATION_TIMINGS.propagationStep + ANIMATION_TIMINGS.propagationClearOffset
+      : base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryCritClear;
+    return Math.max(propagationEnd, lastCombustClearLocal);
+  };
 
-  // Final-phase combust on action planets.
-  schedule(() => {
-    updateAnimation((state) => {
-      const next = cloneAnimation(state);
-      if (entry.playerCombust) {
-        next.selfState[entry.playerPlanet].combusted = true;
-        next.combustingPlanets = {
-          ...next.combustingPlanets,
-          self: addToFlag(next.combustingPlanets.self, entry.playerPlanet),
-        };
-      }
-      if (entry.opponentCombust) {
-        next.otherState[entry.opponentPlanet].combusted = true;
-        next.combustingPlanets = {
-          ...next.combustingPlanets,
-          other: addToFlag(
-            next.combustingPlanets.other,
-            entry.opponentPlanet,
-          ),
-        };
-      }
-      return next;
-    });
-  }, finalPropagationDelay);
+  // Sequential phases: player chart resolves first, then opponent.
+  const playerPhaseEnd = schedulePhase({
+    base: 0,
+    side: "self",
+    actionPlanet: entry.playerPlanet,
+    actionDelta: entry.playerDelta,
+    actionCrit: entry.playerCrit,
+    actionCombust: entry.playerCombust ?? false,
+    steps: playerSteps,
+  });
+  const opponentBase = playerPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
+  const opponentPhaseEnd = schedulePhase({
+    base: opponentBase,
+    side: "other",
+    actionPlanet: entry.opponentPlanet,
+    actionDelta: entry.opponentDelta,
+    actionCrit: entry.opponentCrit,
+    actionCombust: entry.opponentCombust ?? false,
+    steps: opponentSteps,
+  });
 
-  if (entry.playerCombust || entry.opponentCombust) {
-    const finalRippleClearAt =
-      finalPropagationDelay + ANIMATION_TIMINGS.combustRippleDuration;
-    lastCombustClear = Math.max(lastCombustClear, finalRippleClearAt);
-    schedule(() => {
-      updateAnimation((state) => {
-        const next = cloneAnimation(state);
-        if (entry.playerCombust) {
-          next.combustingPlanets = {
-            ...next.combustingPlanets,
-            self: removeFromFlag(
-              next.combustingPlanets.self,
-              entry.playerPlanet,
-            ),
-          };
-        }
-        if (entry.opponentCombust) {
-          next.combustingPlanets = {
-            ...next.combustingPlanets,
-            other: removeFromFlag(
-              next.combustingPlanets.other,
-              entry.opponentPlanet,
-            ),
-          };
-        }
-        return next;
-      });
-    }, finalRippleClearAt);
-  }
-
-  const propagationEnd =
-    ANIMATION_TIMINGS.propagationStart +
-    Math.max(0, maxSideSteps - 1) * ANIMATION_TIMINGS.propagationStep +
-    ANIMATION_TIMINGS.propagationClearOffset +
-    ANIMATION_TIMINGS.endOffset;
-  const endDelay = Math.max(
-    propagationEnd,
-    lastCombustClear + ANIMATION_TIMINGS.endOffset,
-  );
-  schedule(() => setAnimation(null), endDelay);
+  schedule(() => setAnimation(null), opponentPhaseEnd + ANIMATION_TIMINGS.endOffset);
 }

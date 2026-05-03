@@ -66,6 +66,18 @@
   to   { transform: rotate(360deg); }
 }
 
+/* Propagation line — solid polarity-colored stroke that fades in, holds,
+   and fades out over the line's active window (~360ms). */
+@keyframes propagation-pulse {
+  0%   { opacity: 0; }
+  35%  { opacity: 1; }
+  65%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.anim-propagation-pulse {
+  animation: propagation-pulse 360ms var(--ease-out) forwards;
+}
+
 /* Combat per-planet feedback — ported from client_v1. */
 @keyframes action-glow-pulse {
   0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }

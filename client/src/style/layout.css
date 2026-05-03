@@ -376,7 +376,7 @@
     border-color 220ms var(--ease-out);
 }
 .combat-dot.is-on { background: var(--bone); border-color: var(--bone); }
-.combat-dot.is-current { box-shadow: 0 0 0 3px rgba(224, 74, 63, 0.25); }
+.combat-dot.is-current { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); }
 .combat-distance {
   display: flex;
   flex-direction: column;

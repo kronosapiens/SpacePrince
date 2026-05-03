@@ -36,8 +36,15 @@ describe("propagation projections", () => {
       playerAspects: getAspects(chart),
       opponentAspects: getAspects(opp),
     });
-    // No combust, so direct deltas should appear for the active pair (or nothing if Testimony with 0 affliction).
-    Object.values(projected.self).forEach((d) => expect(typeof d).toBe("number"));
-    Object.values(projected.other).forEach((d) => expect(typeof d).toBe("number"));
+    // No combust, so direct deltas should appear for the active pair.
+    // Each entry is { delta: number; polarity: Polarity }.
+    Object.values(projected.self).forEach((d) => {
+      expect(typeof d!.delta).toBe("number");
+      expect(["Testimony", "Affliction", "Friction"]).toContain(d!.polarity);
+    });
+    Object.values(projected.other).forEach((d) => {
+      expect(typeof d!.delta).toBe("number");
+      expect(["Testimony", "Affliction", "Friction"]).toContain(d!.polarity);
+    });
   });
 });

@@ -62,6 +62,10 @@ export interface PropagationEntry {
   source: PlanetName;
   target: PlanetName;
   delta: number;
+  /** The polarity that landed on the target. Carries the heal/harm signal
+   *  even when `delta` clamps to 0 (e.g. testimony to a planet already at
+   *  0 affliction); inferring from `delta` sign alone is unsafe. */
+  polarity: Polarity;
   note: string;
 }
 

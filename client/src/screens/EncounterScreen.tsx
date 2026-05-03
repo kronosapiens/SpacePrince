@@ -10,7 +10,7 @@ import { EncounterNarrativeScreen } from "./EncounterNarrative";
 import { resolveTurn } from "@/game/turn";
 import {
   generateSeedHash,
-  getOrCreateDevProfile,
+  makeDevProfile,
   makeDevCombat,
   makeDevRun,
   seedFromHash,
@@ -75,10 +75,10 @@ function DevCombatScreen() {
   }, [seedHash, navigate]);
 
   const seed = seedHash ? seedFromHash(seedHash) : 0;
-  // useState initializers — pure given seed/profile but `getOrCreateDevProfile`
-  // touches sessionStorage, which would double-fire under StrictMode if used in
-  // useMemo.
-  const [profile] = useState(() => getOrCreateDevProfile());
+  // Profile (player chart) is also seed-driven so Regenerate refreshes both
+  // charts, not just the opponent's. `makeDevProfile` is pure (no storage),
+  // so useMemo is StrictMode-safe.
+  const profile = useMemo(() => makeDevProfile(seed), [seed]);
   const baseRun = useMemo(() => makeDevRun(seed, profile), [seed, profile]);
   const encounter = useMemo(() => makeDevCombat(seed, profile), [seed, profile]);
   const [run, setRun] = useState<RunState>({ ...baseRun, currentEncounter: encounter });

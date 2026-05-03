@@ -225,7 +225,7 @@ export function StartScreen() {
         {stage === "revealing" && (
           <div className="mint-caption-italic">
             {currentRevealing && currentSign ? (
-              <>{currentRevealing} rises in {currentSign}.</>
+              <>{currentRevealing} in {currentSign}.</>
             ) : (
               <>—</>
             )}
@@ -234,7 +234,7 @@ export function StartScreen() {
 
         {stage === "settled" && (
           <>
-            <div className="mint-caption-italic">The Moon rises in the east. The rest will be revealed in time.</div>
+            <div className="mint-caption-italic">The Moon rises in the east. The rest, in time.</div>
             <button className="begin-btn" onClick={handleEnter}>Continue</button>
           </>
         )}
