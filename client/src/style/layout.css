@@ -7,9 +7,9 @@
   pointer-events: none;
   z-index: 0;
   opacity: var(--tint-opacity);
-  transform-origin: 50% 45%;
+  transform-origin: 50% 50%;
   background: radial-gradient(
-    70% 60% at 50% 45%,
+    70% 60% at 50% 50%,
     var(--tint-color, transparent) 0%,
     var(--tint-color, transparent) 25%,
     transparent 75%
@@ -644,7 +644,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  opacity: 0.55;
+  opacity: 0.75;
   /* 200ms matches CROSSFADE_MS in EndOfRunScreen.tsx — see selectCard(). */
   transition: opacity 200ms ease;
   background: transparent;

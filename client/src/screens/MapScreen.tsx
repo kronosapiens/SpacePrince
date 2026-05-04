@@ -12,6 +12,7 @@ import { mulberry32, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
+import { RULERSHIP } from "@/game/data";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
@@ -23,9 +24,11 @@ import {
   seedFromHash,
   syntheticDevDistance,
 } from "@/state/dev-state";
-import { blankSideState } from "@/game/chart";
+import { blankSideState, seededChart } from "@/game/chart";
 import type {
   EncounterState,
+  MapState,
+  PlanetName,
   RunState,
   NodeContent,
 } from "@/game/types";
@@ -56,9 +59,18 @@ function NormalMapScreen() {
     startRun(profile);
   }, [profile, run, startRun]);
 
+  // Tint follows the player's current node when it has content; otherwise
+  // falls back to the terminal node's ruler (the map's destination), so a
+  // freshly-entered map already carries the through-line color rather than
+  // sitting on neutral bone until the first encounter resolves.
+  const tintPlanet = useMemo<PlanetName | null>(() => {
+    if (!run) return null;
+    return mapTintPlanet(run.currentMap);
+  }, [run]);
+
   useEffect(() => {
-    setActive(null); // map fades to neutral
-  }, [setActive]);
+    setActive(tintPlanet);
+  }, [tintPlanet, setActive]);
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(
@@ -191,6 +203,23 @@ function roman(n: number): string {
   return out;
 }
 
+/** Pick a planet for the active-planet tint of a map screen. Prefer the
+ *  current node's ruler (where the player is standing); fall back to the
+ *  terminal node's ruler (the destination) so freshly-entered maps still
+ *  carry a color. Returns null if neither has been rolled yet. */
+function mapTintPlanet(map: MapState): PlanetName | null {
+  return rulerOf(map, map.currentNodeId) ?? rulerOf(map, TERMINAL_NODE_ID);
+}
+
+function rulerOf(map: MapState, nodeId: string | undefined): PlanetName | null {
+  if (!nodeId) return null;
+  const content = map.rolledNodes[nodeId];
+  if (!content) return null;
+  if (content.kind === "narrative") return HOUSES[content.house - 1]!.ruler;
+  const chart = seededChart(content.opponentSeed, "");
+  return RULERSHIP[chart.ascendantSign];
+}
+
 // ── Dev mode map ───────────────────────────────────────────────────────────
 
 function DevMapScreen() {
@@ -209,7 +238,8 @@ function DevMapScreen() {
   const map = useMemo(() => makeDevMap(seed), [seed]);
   const distance = useMemo(() => syntheticDevDistance(seed, map), [seed, map]);
   const { setActive } = useActivePlanet();
-  useEffect(() => { setActive(null); }, [setActive]);
+  const tintPlanet = useMemo(() => mapTintPlanet(map), [map]);
+  useEffect(() => { setActive(tintPlanet); }, [tintPlanet, setActive]);
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
