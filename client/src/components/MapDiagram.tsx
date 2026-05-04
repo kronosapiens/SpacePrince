@@ -16,13 +16,15 @@ interface MapDiagramProps {
 
 const NODE_R = 22;
 const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE_R
-// Semantic opacity: solid past, translucent future. Traversed (the path
-// you actually walked) renders close to fully solid; eligible (the
-// hypothetical next steps) renders translucent so the eye reads them as
-// "possibility, not yet real." The current node and distant background
-// keep their existing treatments.
-const TRAVERSED_OPACITY = 0.95;
-const ELIGIBLE_OPACITY = 0.55;
+// Tiered visual scale used by both the edge web and the nodes themselves.
+// Semantic: solid past, translucent future, faint untouched skeleton.
+// Each tier bundles the values that move together (opacity + stroke
+// width) so retuning one stays internally consistent.
+const TIER = {
+  traversed:  { opacity: 1,    stroke: 1.6 }, // the path you walked — fully realized
+  eligible:   { opacity: 0.7,  stroke: 1.3 }, // immediate next steps — possibility, not yet real
+  background: { opacity: 0.25, stroke: 1   }, // distant / untouched — the Sephirot skeleton
+} as const;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
   // Tap-to-preview / tap-again-to-commit, mirroring the encounter screen's
@@ -115,7 +117,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const eligibleEdge =
       (e.from === map.currentNodeId && eligible.has(e.to)) ||
       (e.to === map.currentNodeId && eligible.has(e.from));
-    const inReach = traversedEdge || eligibleEdge;
+    // The eligible-edge highlight is reserved for the *engaged* state: when
+    // the player has tap-previewed a specific eligible node, the edge to it
+    // brightens. At rest the eligible nodes themselves carry the "options"
+    // signal; edges stay quiet so the chart doesn't chatter.
+    const isSelectedEdge = eligibleEdge && selectedNodeId !== null &&
+      (e.from === selectedNodeId || e.to === selectedNodeId);
+    const inReach = traversedEdge || isSelectedEdge;
     const rA = ruler(e.from);
     const rB = ruler(e.to);
     const cA = rA ? PLANET_PRIMARY[rA] : NEUTRAL.bone;
@@ -130,13 +138,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         <stop offset="100%" stopColor={cB} />
       </linearGradient>,
     );
-    // Visual hierarchy:
-    //   - Eligible (forward path, the immediate decision) — brightest gradient
-    //   - Traversed (your colored trail, faded) — gradient at 0.45 (slightly
-    //     more present than the 0.35 node dim so the path stays readable)
-    //   - Background (the Sephirot structure) — faint bone
-    const opacity = traversedEdge ? 0.85 : eligibleEdge ? 0.4 : 0.2;
-    const sw = traversedEdge ? 1.6 : eligibleEdge ? 1.2 : 0.9;
+    // Tier:
+    //   - Traversed: your committed past — gradient + TIER.traversed
+    //   - Selected: the eligible edge you've tap-previewed — gradient + TIER.eligible
+    //   - Everything else (background or unselected eligible): faint bone + TIER.background
+    const tier = traversedEdge ? TIER.traversed : isSelectedEdge ? TIER.eligible : TIER.background;
+    const opacity = tier.opacity;
+    const sw = tier.stroke;
     return (
       <line key={`edge-${i}`}
         x1={x1} y1={y1} x2={x2} y2={y2}
@@ -186,7 +194,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       return (
         <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
           <circle r={NODE_R} fill="none"
-            stroke={NEUTRAL.bone} strokeOpacity="0.18" strokeWidth={1} />
+            stroke={NEUTRAL.bone} strokeOpacity={TIER.background.opacity} strokeWidth={TIER.background.stroke} />
         </g>
       );
     }
@@ -215,15 +223,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 0.98) : 0}
+          fillOpacity={isNarrative ? (isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 0.98) : 0}
           stroke={color}
-          strokeOpacity={isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 1}
+          strokeOpacity={isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 1}
           strokeWidth={isCurrent ? 2.4 : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
             fontSize={14}
             fill={NEUTRAL.void}
-            fillOpacity={isEligible ? ELIGIBLE_OPACITY : 1}
+            fillOpacity={isEligible ? TIER.eligible.opacity : 1}
             fontFamily="'Cormorant Garamond', Garamond, serif"
             fontWeight={700}
             style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -231,8 +239,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           </text>
         )}
         {isCombat && (() => {
-          const fillOp = isEligible ? ELIGIBLE_OPACITY * 0.78 : isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.85;
-          const strokeOp = isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 1;
+          const fillOp = isEligible ? TIER.eligible.opacity * 0.78 : isTraversed ? TIER.traversed.opacity * 0.78 : 0.85;
+          const strokeOp = isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 1;
           return (
             <>
               <polygon
