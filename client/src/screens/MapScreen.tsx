@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
+import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
 import { ROUTES } from "@/routes";
 import { useProfile } from "@/state/ProfileStore";
@@ -49,6 +50,7 @@ function NormalMapScreen() {
   const startRun = useStartRun();
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
+  const [studyOpen, setStudyOpen] = useState(false);
 
   // Bootstrap: if we have a profile but no live run, start one. Persistence
   // is handled by the RunStore effect. If the run is `over`, leave it alone —
@@ -172,6 +174,7 @@ function NormalMapScreen() {
           chart={profile.chart}
           state={run.perPlanetState}
           unlockedPlanets={playerUnlocked}
+          onExpand={() => setStudyOpen(true)}
         />
       </div>
       <div className="map-distance">
@@ -184,6 +187,14 @@ function NormalMapScreen() {
       <div className="map-caption">
         <span className="eyebrow">RUN {roman(runNumber)} · MAP {roman(mapNumber)}</span>
       </div>
+      {studyOpen && (
+        <ChartStudyOverlay
+          chart={profile.chart}
+          state={run.perPlanetState}
+          unlockedPlanets={playerUnlocked}
+          onClose={() => setStudyOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -240,6 +251,7 @@ function DevMapScreen() {
   const { setActive } = useActivePlanet();
   const tintPlanet = useMemo(() => mapTintPlanet(map), [map]);
   useEffect(() => { setActive(tintPlanet); }, [tintPlanet, setActive]);
+  const [studyOpen, setStudyOpen] = useState(false);
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
@@ -264,6 +276,7 @@ function DevMapScreen() {
           chart={profile.chart}
           state={blankSideStateConst}
           unlockedPlanets={unlockedPlanets(999)}
+          onExpand={() => setStudyOpen(true)}
         />
       </div>
       <div className="map-distance">
@@ -273,6 +286,14 @@ function DevMapScreen() {
       <div className="map-diagram-wrap">
         <MapDiagram map={map} onSelectNode={handleNodeSelect} />
       </div>
+      {studyOpen && (
+        <ChartStudyOverlay
+          chart={profile.chart}
+          state={blankSideStateConst}
+          unlockedPlanets={unlockedPlanets(999)}
+          onClose={() => setStudyOpen(false)}
+        />
+      )}
     </div>
   );
 }

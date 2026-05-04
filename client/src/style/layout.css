@@ -729,6 +729,91 @@
   text-transform: uppercase;
 }
 
+/* Chart anchor button (clickable inset) — keeps the existing chart visual
+   but adds cursor + a focus ring for accessibility. */
+.chart-anchor-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+}
+.chart-anchor-btn:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* Chart study overlay — full-viewport modal opened from the chart anchor.
+   Backdrop dismisses on click; the chart stage stops propagation so its
+   own clicks don't close the overlay. */
+.chart-study-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(11, 10, 15, 0.78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.chart-study-stage {
+  position: relative;
+  width: min(720px, 88vmin);
+  aspect-ratio: 1 / 1;
+  background: rgba(11, 10, 15, 0.85);
+  border: 1px solid var(--smoke);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chart-study-chart {
+  width: 100%;
+  height: 100%;
+}
+.chart-study-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--smoke);
+  color: var(--mist);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+.chart-study-close:hover {
+  background: var(--bone);
+  color: var(--void);
+  border-color: var(--bone);
+}
+.chart-study-close:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@keyframes chart-study-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.anim-chart-study-fade {
+  animation: chart-study-fade 280ms var(--ease-out) both;
+}
+
 /* ── Page dropdown (top-right) ────────────────────────────────────────── */
 
 .page-dropdown {
