@@ -186,6 +186,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, encounter, run, selected, playerUnlocked, onCommitTurn, skipAnimation, startAnimation, projection],
   );
 
+  // Selection wins over hover — locks the panel to the selected planet so
+  // mousing around the chart doesn't blow the read away.
+  const inspected = selected ?? hovered;
+
   const handleContinue = useCallback(() => {
     if (animation) return;
     if (run.over) {
@@ -219,6 +223,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           combustingPlanets={combustingPlayer}
           animationEpoch={animationEpoch}
           signPolarities={selfSignPolarities}
+          statsPanelPlanet={inspected}
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>

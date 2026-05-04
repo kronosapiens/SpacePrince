@@ -403,6 +403,34 @@
   z-index: 5;
 }
 
+/* Stats panel rendered inside the chart SVG, in the largest empty angular
+   wedge between planets. Sized in viewBox units (1000-unit chart) so it
+   scales with the chart on resize. v1 style: gold uppercase eyebrow title,
+   serif body in bone, gold-tinted border. */
+.planet-stats-bg {
+  fill: rgba(11, 10, 15, 0.92);
+  stroke: rgba(201, 169, 106, 0.35);
+  stroke-width: 1;
+}
+.planet-stats-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 500;
+  fill: var(--gold);
+  letter-spacing: 0.10em;
+  dominant-baseline: middle;
+}
+.planet-stats-epithet {
+  font-size: 20px;
+}
+.planet-stats-row {
+  font-family: var(--sans);
+  font-size: 20px;
+  fill: var(--bone);
+  letter-spacing: 0.02em;
+  dominant-baseline: middle;
+}
+
 @media (max-width: 720px) {
   .combat {
     grid-template-columns: 1fr;

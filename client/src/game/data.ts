@@ -36,6 +36,18 @@ export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
   Saturn:  { damage: 2, healing: 1, durability: 4, luck: 1 },
 };
 
+// Per-planet gameplay role — the one-word epithet that gives a player a quick
+// read on what the planet is for. See `spec/mechanics/MECHANICS.md §2`.
+export const PLANET_ROLE: Record<PlanetName, string> = {
+  Sun:     "the sovereign",
+  Moon:    "the healer",
+  Mercury: "the trickster",
+  Venus:   "the muse",
+  Mars:    "the warrior",
+  Jupiter: "the patron",
+  Saturn:  "the weight",
+};
+
 export const SIGN_ELEMENT: Record<SignName, ElementType> = {
   Aries: "Fire", Taurus: "Earth", Gemini: "Air", Cancer: "Water",
   Leo: "Fire", Virgo: "Earth", Libra: "Air", Scorpio: "Water",

@@ -93,11 +93,17 @@ button {
 
 ::selection { background: var(--bone); color: var(--void); }
 
-/* Force monochrome symbol rendering for astrology glyphs (no emoji) */
+/* Force monochrome symbol rendering for astrology glyphs (no emoji).
+   No `!important`: class-based rules can override per-element. The four
+   glyph-bearing svg text elements (Chart planet/sign glyphs, Kandinsky
+   composition glyph) all set their fontFamily inline; if a future
+   class-based rule swaps the family on a glyph site, the symbol falls
+   back to a non-symbol font and renders as emoji on some platforms —
+   visible immediately, easy to fix. */
 svg text,
 .combat-opp-glyph,
 .option-gate {
-  font-family: 'Cormorant Garamond', 'Noto Sans Symbols 2', 'Segoe UI Symbol', 'Apple Symbols', serif !important;
+  font-family: 'Cormorant Garamond', 'Noto Sans Symbols 2', 'Segoe UI Symbol', 'Apple Symbols', serif;
   font-variant-emoji: text;
 }
 

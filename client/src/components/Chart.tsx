@@ -1,6 +1,11 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
+import {
+  PlanetStatsPanel,
+  PLANET_STATS_PANEL_W,
+  PLANET_STATS_PANEL_H,
+} from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import {
   CHART_CENTER, CHART_SIZE,
@@ -124,6 +129,11 @@ export interface ChartProps {
    *  hovered/selected for the opponent chart). Affliction = red, Testimony
    *  = green, Friction or absent = neutral. */
   signPolarities?: Partial<Record<SignName, Polarity>>;
+  /** When set, render the planet stats panel inside the chart at the
+   *  anti-centroid placement. The position is fixed per-chart (depends only
+   *  on planet positions), so swapping which planet is inspected doesn't
+   *  jump the panel around. */
+  statsPanelPlanet?: PlanetName | null;
 }
 
 export function Chart(props: ChartProps) {
@@ -157,9 +167,11 @@ export function Chart(props: ChartProps) {
     combustingPlanets,
     animationEpoch,
     signPolarities,
+    statsPanelPlanet,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
+  const panelPlacement = useMemo(() => computePanelPlacement(points), [points]);
   const aspects = useMemo(() => aspectsProp ?? getAspects(chart), [chart, aspectsProp]);
   const pointMap = useMemo(() => {
     const m: Record<PlanetName, PlanetPoint> = {} as Record<PlanetName, PlanetPoint>;
@@ -310,6 +322,15 @@ export function Chart(props: ChartProps) {
       <SignLabels ascSignIdx={ascSignIdx} signPolarities={signPolarities} />
       {aspectLines}
       {propagationLines}
+
+      {statsPanelPlanet && (
+        <PlanetStatsPanel
+          chart={chart}
+          planet={statsPanelPlanet}
+          cx={panelPlacement.cx}
+          cy={panelPlacement.cy}
+        />
+      )}
 
       {/* Active + Word layer: planets + halos + glyphs + badges */}
       {points.map((p) => {
@@ -774,6 +795,70 @@ function clamp(value: number, min: number, max: number): number {
 function signMidDeg(signIdx: number, ascSignIdx: number): number {
   const offset = (signIdx - ascSignIdx + 12) % 12;
   return 180 + offset * 30 + 15;
+}
+
+/** Find the panel position with maximum clearance to the nearest planet
+ *  glyph, by sweeping a 2D grid of candidate centers across the chart
+ *  interior. The chart never changes once mounted (memoized via useMemo
+ *  on `points`), so this runs once per chart load — ~1100 candidates ×
+ *  7 planets is trivial in absolute terms. */
+function computePanelPlacement(points: PlanetPoint[]): { cx: number; cy: number } {
+  if (points.length === 0) return { cx: CHART_CENTER, cy: CHART_CENTER };
+  const halfW = PLANET_STATS_PANEL_W / 2;
+  const halfH = PLANET_STATS_PANEL_H / 2;
+  // Allowed region for the panel center: the panel rect must stay inside
+  // the inner ring with a visual margin so it doesn't crowd the rim.
+  const RING_MARGIN = 50;
+  const RING_LIMIT = INNER_RING_R - RING_MARGIN;
+  // Grid sweep ±180 viewBox units from chart center (covers everywhere
+  // a 400×102 panel could plausibly land), step 10. 37×37 = 1369 cells.
+  const GRID_HALF = 180;
+  const STEP = 10;
+
+  let bestCx = CHART_CENTER;
+  let bestCy = CHART_CENTER;
+  let bestOverlap = Infinity; // smaller is better; negative = clearance
+  for (let dx = -GRID_HALF; dx <= GRID_HALF; dx += STEP) {
+    for (let dy = -GRID_HALF; dy <= GRID_HALF; dy += STEP) {
+      // Check that all four panel corners stay inside the inner ring.
+      // Worst-case corner is the one whose components share signs with
+      // (dx, dy), so we only need that one check.
+      const fx = Math.abs(dx) + halfW;
+      const fy = Math.abs(dy) + halfH;
+      if (Math.hypot(fx, fy) > RING_LIMIT) continue;
+      const cx = CHART_CENTER + dx;
+      const cy = CHART_CENTER + dy;
+      const overlap = maxPlanetOverlap(cx, cy, points);
+      if (overlap < bestOverlap) {
+        bestOverlap = overlap;
+        bestCx = cx;
+        bestCy = cy;
+      }
+    }
+  }
+  return { cx: bestCx, cy: bestCy };
+}
+
+/** Worst overlap between any planet glyph (treated as a circle of radius
+ *  PLANET_R_REST + PANEL_PLANET_BUFFER) and the panel rect centered at
+ *  (panelCx, panelCy). Positive = overlap depth; ≤0 = clear. */
+function maxPlanetOverlap(panelCx: number, panelCy: number, points: PlanetPoint[]): number {
+  const PANEL_PLANET_BUFFER = 14; // visual breathing room beyond the glyph circle
+  const left = panelCx - PLANET_STATS_PANEL_W / 2;
+  const right = panelCx + PLANET_STATS_PANEL_W / 2;
+  const top = panelCy - PLANET_STATS_PANEL_H / 2;
+  const bottom = panelCy + PLANET_STATS_PANEL_H / 2;
+  let worst = -Infinity;
+  for (const p of points) {
+    // Distance from planet center to nearest point on panel rect.
+    const dx = Math.max(left - p.cx, 0, p.cx - right);
+    const dy = Math.max(top - p.cy, 0, p.cy - bottom);
+    const dist = Math.hypot(dx, dy);
+    const planetR = p.glyphR + PANEL_PLANET_BUFFER;
+    const overlap = planetR - dist;
+    if (overlap > worst) worst = overlap;
+  }
+  return worst;
 }
 
 function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
