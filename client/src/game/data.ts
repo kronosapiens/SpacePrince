@@ -115,7 +115,7 @@ export const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
   Fall: 1.3,
 };
 
-export const TIME_BUCKET_MS = 15 * 60 * 1000;
+export const TIME_BUCKET_MS = 5 * 60 * 1000;
 
 // Combat-vs-narrative split: 50/50.
 export const NARRATIVE_NODE_PROB = 0.5;

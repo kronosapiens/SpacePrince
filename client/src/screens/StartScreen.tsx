@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
+import { CityPicker } from "@/components/CityPicker";
 import { ROUTES } from "@/routes";
 import { computeBirthChart } from "@/astronomy/compute";
-import { derivePlacements } from "@/game/chart";
+import { derivePlacements, seededChart } from "@/game/chart";
 import { useProfileDispatch } from "@/state/ProfileStore";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
@@ -20,11 +21,17 @@ interface FormState {
   time: string;
   lat: string;
   lon: string;
+  tz: string;
 }
 
 const REVEAL_INTERVAL_MS = 2500;
 const HELD_MOMENT_MS = 1500;
 const GHOST_FADE_MS = 1500;
+
+// Stable scaffold chart shown before the player has supplied inputs. Real
+// planet positions are hidden via unlockedPlanets={[]}; only the substrate
+// (rings + sign divisions) renders.
+const SCAFFOLD_CHART = seededChart(0, "");
 
 export function StartScreen() {
   const navigate = useNavigate();
@@ -35,19 +42,21 @@ export function StartScreen() {
     name: "",
     date: "1990-01-01",
     time: "12:00",
-    lat: "40.0",
-    lon: "-74.0",
+    lat: "",
+    lon: "",
+    tz: "",
   });
   const [revealedCount, setRevealedCount] = useState(0);
   const [ghosted, setGhosted] = useState(false);
 
   const computed: ChartType | null = useMemo(() => {
+    if (!form.lat || !form.lon) return null;
+    if (!form.date || !form.time) return null;
     const lat = Number(form.lat);
     const lon = Number(form.lon);
     if (Number.isNaN(lat) || Number.isNaN(lon)) return null;
-    if (!form.date || !form.time) return null;
     try {
-      const ms = quantizeMs(`${form.date}T${form.time}:00Z`);
+      const ms = quantizeMs(localToUtcMs(form.date, form.time, form.tz));
       const iso = new Date(ms).toISOString();
       const data = computeBirthChart(iso, roundLat(lat), roundLon(lon));
       const { planets, ascendantSign } = derivePlacements({
@@ -116,7 +125,7 @@ export function StartScreen() {
 
   const handleEnter = () => {
     if (!computed) return;
-    const ms = quantizeMs(`${form.date}T${form.time}:00Z`);
+    const ms = quantizeMs(localToUtcMs(form.date, form.time, form.tz));
     const iso = new Date(ms).toISOString();
     const profile: Profile = {
       id: computed.id,
@@ -156,10 +165,10 @@ export function StartScreen() {
       </div>
 
       <div className="mint-center">
-        {stage === "input" && computed && (
+        {stage === "input" && (
           <div className="mint-stage">
             <Chart
-              chart={computed}
+              chart={computed ?? SCAFFOLD_CHART}
               unlockedPlanets={[]}
               showColorField={false}
               showSubstrate
@@ -191,28 +200,22 @@ export function StartScreen() {
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />
               </Field>
-              <Field label="Time (UTC)">
+              <Field label="Time">
                 <input
                   type="time"
-                  step={900}
+                  step={300}
                   value={form.time}
                   onChange={(e) => setForm({ ...form, time: e.target.value })}
                 />
               </Field>
-              <Field label="Latitude">
-                <input
-                  type="number"
-                  step="0.1"
-                  value={form.lat}
-                  onChange={(e) => setForm({ ...form, lat: e.target.value })}
-                />
-              </Field>
-              <Field label="Longitude">
-                <input
-                  type="number"
-                  step="0.1"
-                  value={form.lon}
-                  onChange={(e) => setForm({ ...form, lon: e.target.value })}
+              <Field label="Place">
+                <CityPicker
+                  lat={Number(form.lat)}
+                  lon={Number(form.lon)}
+                  tz={form.tz}
+                  onChange={(lat, lon, tz) =>
+                    setForm({ ...form, lat: String(lat), lon: String(lon), tz })
+                  }
                 />
               </Field>
             </div>
@@ -270,11 +273,41 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function quantizeMs(iso: string): number {
-  const ms = new Date(iso).getTime();
+function quantizeMs(ms: number): number {
   return Math.floor(ms / TIME_BUCKET_MS) * TIME_BUCKET_MS;
 }
 function roundLat(v: number): number { return Math.round(v * 10) / 10; }
 function roundLon(v: number): number { return Math.round(v * 10) / 10; }
+
+// Convert a wall-clock (date, time) in IANA `tz` to a UTC ms timestamp.
+// Empty tz: input is treated as UTC (used before a city has been picked).
+// Two-pass to handle DST boundaries; ambiguous fall-back hours resolve to the
+// first occurrence (DST → standard), which is acceptable at sign-level chart
+// resolution.
+function localToUtcMs(date: string, time: string, tz: string): number {
+  const naive = Date.parse(`${date}T${time}:00Z`);
+  if (!tz) return naive;
+  const off1 = tzOffsetMs(naive, tz);
+  return naive - tzOffsetMs(naive - off1, tz);
+}
+
+function tzOffsetMs(ms: number, tz: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(ms));
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const wall = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour") % 24,
+    get("minute"),
+    get("second"),
+  );
+  return wall - ms;
+}
 
 void SIGNS;

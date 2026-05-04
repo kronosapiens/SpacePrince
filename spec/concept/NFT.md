@@ -65,9 +65,9 @@ Mint inputs are quantized to balance specificity (people should be able to mint 
 
 ### Grid
 
-- **Time: 15-minute buckets.**
-96 slots per day.
-Fine enough that a person knows their slot — most people know their birth time to the nearest 15 minutes or hour.
+- **Time: 5-minute buckets.**
+288 slots per day.
+Fine enough to honor the minute-level birth time recorded on most birth certificates.
 Coarse enough that adjacent slots almost always produce the same chart, providing a natural buffer against near-miss minting.
 
 - **Location: 0.1° grid (~11 km at the equator).**
@@ -86,9 +86,16 @@ The Ascendant sign changes roughly every 2 hours (varies by latitude and sign).
 
 This means on a typical day, there are **12-24 distinct charts** — one per Ascendant window, with occasional variation when the Moon or an inner planet crosses a sign boundary mid-day.
 
-The 15-minute time bucket is well within the ~2-hour Ascendant window.
+The 5-minute time bucket is well within the ~2-hour Ascendant window.
 The 0.1° location grid shifts the effective time by ~45 seconds (negligible for sign boundaries).
 Both are far finer than the chart resolution, which is intentional: the coordinate triple is the identity, the chart is the nature.
+
+### Identity space under this resolution
+
+At 5-minute time buckets and 0.1° location, the mintable identity space is 288 × ~6,500 ≈ 1.87 million slots per day, or ~683 million per year of birth dates.
+This is far larger than any realistic player population, by design — the coordinate triple is the identity, and identities should not collide except on shared birth moments.
+The number of distinct *chart artifacts* per year is unchanged by this parameterization: 12–24 charts per day × 365 ≈ 4,400–8,800 per year.
+The gap between identity space (~683 M/year) and chart space (~6,500/year) is the chart-twin landscape — most Princes will share their chart with someone, and that is intentional.
 
 ### Chart twins
 
@@ -123,7 +130,7 @@ No orb calculations or degree-based aspect geometry are required for current gam
 
 | Step | What happens | Output | Compute complexity | Data complexity | Notes |
 |---|---|---|---|---|---|
-| 1 | Collect and quantize mint inputs (timestamp, latitude, longitude) | Quantized `(t, lat, lon)` | Low | Low | 15-minute time buckets, 0.1° location grid |
+| 1 | Collect and quantize mint inputs (timestamp, latitude, longitude) | Quantized `(t, lat, lon)` | Low | Low | 5-minute time buckets, 0.1° location grid |
 | 2 | Convert time scales | UTC-normalized astronomical time base | Low | Low | UTC -> Julian day / related time terms |
 | 3 | Compute planetary longitudes (Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn) | 7 longitudes | High | High | Dominant cost center (ephemeris/model layer) |
 | 4 | Compute local sky frame for Ascendant | Ascendant longitude/sign | Medium | Low | Sidereal time + latitude/longitude + obliquity |

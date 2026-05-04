@@ -248,7 +248,7 @@ The player's first touch. Three beats: input, confirmation, reveal. Each is irre
 
 ### 5.1 Beats
 
-**Input.** The player enters birth date, time (quantized to 15-min buckets per `NFT.md`), and location. As inputs progress, a faint scaffold of the chart wheel begins to take shape — sign divisions appearing at hairline weight, the wheel becoming legible. Geometry stabilizing, not generating.
+**Input.** The player enters birth date, time (quantized to 5-min buckets per `NFT.md`), and location. As inputs progress, a faint scaffold of the chart wheel begins to take shape — sign divisions appearing at hairline weight, the wheel becoming legible. Geometry stabilizing, not generating.
 
 **Confirmation.** A single explicit confirmation step. *"This position may only be recognized once."* The friction is intentional — wrong input is permanent identity.
 
@@ -279,7 +279,7 @@ The NFT renders the player's chart at its current unlock state — Moon visible,
 
 ### 5.5 Open questions
 
-- **Date/time picker treatment.** The 15-min quantization should be reflected in the picker — not "type any time" but "select your slot."
+- **Date/time picker treatment.** The 5-min quantization should be reflected in the picker — not "type any time" but "select your slot."
 - **Location input.** City search, coordinate picker, or both? Likely both, with city search as the primary affordance.
 - **Chorus fragments at mint.** None, the Moon at the end, or one per planet during the unfolding? Per `VIBES.md` "silence is a design tool," lean is **no chorus at mint** — the chart's appearance is itself the moment. The Moon's voice can arrive at the first encounter instead.
 - **Failed mints.** Handled by the Cartridge Controller wallet's transaction UI; the game does not invent a custom error surface. If the mint transaction fails or is rejected, the player remains on the Mint screen and can retry through the Controller flow. The 15–20s reveal ceremony begins only after the on-chain confirmation lands.
