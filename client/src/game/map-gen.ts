@@ -71,19 +71,28 @@ export function generateEdges(nodes: MapNode[], pattern: LayerPattern): MapEdge[
   }
 
   // 3.3 Asymmetric bookend
+  //
+  // The Bahir Tree of Life gives Tiferet (the middle central sephirah) long
+  // diagonals reaching across the doubles toward Binah/Hochmah at the top,
+  // while Keter (the topmost central sephirah) connects only to its
+  // immediate-below doubles. We render bottom-up, so the lower-index
+  // central node here is the Tiferet-equivalent (gets the long reach) and
+  // the higher-index central node is the Keter-equivalent (short reach).
   const centralLayers: number[] = [];
   for (let layer = 0; layer < NUM_LAYERS; layer++) if (pattern[layer] === 1) centralLayers.push(layer);
   for (let ci = 0; ci < centralLayers.length - 1; ci++) {
-    const upper = centralLayers[ci]!;
-    const lower = centralLayers[ci + 1]!;
+    const upper = centralLayers[ci]!;       // lower index → Tiferet-equiv (long reach)
+    const lower = centralLayers[ci + 1]!;   // higher index → Keter-equiv (short reach)
     const doubles: number[] = [];
     for (let l = upper + 1; l < lower; l++) doubles.push(l);
     if (doubles.length === 0) continue;
     const upperC = atLayer(nodes, upper)[0]!;
     const lowerC = atLayer(nodes, lower)[0]!;
-    const immediate = atLayer(nodes, doubles[0]!);
-    for (const n of immediate) edges.push({ from: upperC.id, to: n.id, type: "bookend-upper" });
-    for (const dl of doubles) for (const n of atLayer(nodes, dl)) edges.push({ from: lowerC.id, to: n.id, type: "bookend-lower" });
+    // Tiferet-equiv reaches every double layer in the gap (the long crossing diagonals).
+    for (const dl of doubles) for (const n of atLayer(nodes, dl)) edges.push({ from: upperC.id, to: n.id, type: "bookend-upper" });
+    // Keter-equiv only touches the double layer immediately adjacent to it.
+    const nearest = atLayer(nodes, doubles[doubles.length - 1]!);
+    for (const n of nearest) edges.push({ from: lowerC.id, to: n.id, type: "bookend-lower" });
   }
 
   // 3.4 Adjacent-double cross

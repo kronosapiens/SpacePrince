@@ -16,7 +16,13 @@ interface MapDiagramProps {
 
 const NODE_R = 22;
 const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE_R
-const TRAVERSED_OPACITY = 0.35;
+// Semantic opacity: solid past, translucent future. Traversed (the path
+// you actually walked) renders close to fully solid; eligible (the
+// hypothetical next steps) renders translucent so the eye reads them as
+// "possibility, not yet real." The current node and distant background
+// keep their existing treatments.
+const TRAVERSED_OPACITY = 0.95;
+const ELIGIBLE_OPACITY = 0.55;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
   // Tap-to-preview / tap-again-to-commit, mirroring the encounter screen's
@@ -129,8 +135,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     //   - Traversed (your colored trail, faded) — gradient at 0.45 (slightly
     //     more present than the 0.35 node dim so the path stays readable)
     //   - Background (the Sephirot structure) — faint bone
-    const opacity = eligibleEdge ? 0.75 : traversedEdge ? 0.45 : 0.2;
-    const sw = eligibleEdge ? 1.6 : traversedEdge ? 1.2 : 0.9;
+    const opacity = traversedEdge ? 0.85 : eligibleEdge ? 0.4 : 0.2;
+    const sw = traversedEdge ? 1.6 : eligibleEdge ? 1.2 : 0.9;
     return (
       <line key={`edge-${i}`}
         x1={x1} y1={y1} x2={x2} y2={y2}
@@ -209,15 +215,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isTraversed ? TRAVERSED_OPACITY : 0.98) : 0}
+          fillOpacity={isNarrative ? (isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 0.98) : 0}
           stroke={color}
-          strokeOpacity={isTraversed ? TRAVERSED_OPACITY : 1}
+          strokeOpacity={isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 1}
           strokeWidth={isCurrent ? 2.4 : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
             fontSize={14}
-            fill={isTraversed ? color : NEUTRAL.void}
-            fillOpacity={isTraversed ? 0.55 : 1}
+            fill={NEUTRAL.void}
+            fillOpacity={isEligible ? ELIGIBLE_OPACITY : 1}
             fontFamily="'Cormorant Garamond', Garamond, serif"
             fontWeight={700}
             style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -225,8 +231,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           </text>
         )}
         {isCombat && (() => {
-          const fillOp = isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.85;
-          const strokeOp = isTraversed ? TRAVERSED_OPACITY : 1;
+          const fillOp = isEligible ? ELIGIBLE_OPACITY * 0.78 : isTraversed ? TRAVERSED_OPACITY * 0.78 : 0.85;
+          const strokeOp = isEligible ? ELIGIBLE_OPACITY : isTraversed ? TRAVERSED_OPACITY : 1;
           return (
             <>
               <polygon
