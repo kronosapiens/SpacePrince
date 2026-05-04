@@ -21,7 +21,7 @@ export function LandingScreen() {
     <div className="title">
       <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
       <div className="title-tagline">
-        A fully-onchain astrological roguelike. December 2026.
+        A fully-onchain astrological roguelike. Winter 2026.
       </div>
       <div className="title-stage">
         <div className="title-chart">

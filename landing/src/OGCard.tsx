@@ -23,7 +23,7 @@ export function OGCard() {
         <div className="og-card-tagline">
           A fully-onchain astrological roguelike.
           <br />
-          December 2026.
+          Winter 2026.
         </div>
       </div>
       <div className="og-card-chart">
