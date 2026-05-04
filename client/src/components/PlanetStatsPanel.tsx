@@ -12,7 +12,7 @@ interface PlanetStatsPanelProps {
 
 // Exported so Chart.tsx's placement algorithm can do rect-vs-circle
 // collision tests against planet glyphs in the same viewBox units.
-export const PLANET_STATS_PANEL_W = 400;
+export const PLANET_STATS_PANEL_W = 370;
 export const PLANET_STATS_PANEL_H = 102;
 const W = PLANET_STATS_PANEL_W;
 const H = PLANET_STATS_PANEL_H;

@@ -20,14 +20,15 @@ If this conflicts with older design docs, this file reflects runtime behavior.
 
 Each planet has a gameplay role — a stat profile that matches its astrological archetype (see `spec/concept/PLANETS.md`).
 The role is the player's first read on the planet; the stats are the role's mechanical expression.
+The short display label per planet (e.g., "the warrior") lives in `client/src/game/data.ts` as `PLANET_ROLE`.
 
-- **Sun, the sovereign** — balanced presence in every stat; the centered self.
-- **Moon, the healer** — top healing, fragile elsewhere; the reflective interior.
-- **Mercury, the trickster** — top luck, average elsewhere; paradox, the turn.
-- **Venus, the muse** — strong healing and luck; beauty, relation, the sensed world.
-- **Mars, the warrior** — top damage, brittle elsewhere; the decisive cut.
-- **Jupiter, the patron** — balanced and generous across all stats; expansion, gift.
-- **Saturn, the weight** — top durability, slow elsewhere; limit, time, endurance.
+- **Sun** — balanced presence in every stat; the centered self.
+- **Moon** — top healing, fragile elsewhere; the reflective interior.
+- **Mercury** — top luck, average elsewhere; paradox, the turn.
+- **Venus** — strong healing and luck; beauty, relation, the sensed world.
+- **Mars** — top damage, brittle elsewhere; the decisive cut.
+- **Jupiter** — balanced and generous across all stats; expansion, gift.
+- **Saturn** — top durability, slow elsewhere; limit, time, endurance.
 
 Base stats per planet (`damage, healing, durability, luck`):
 

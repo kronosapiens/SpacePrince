@@ -41,11 +41,11 @@ export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
 export const PLANET_ROLE: Record<PlanetName, string> = {
   Sun:     "the sovereign",
   Moon:    "the healer",
-  Mercury: "the trickster",
-  Venus:   "the muse",
+  Mercury: "the fool",
+  Venus:   "the lover",
   Mars:    "the warrior",
   Jupiter: "the patron",
-  Saturn:  "the weight",
+  Saturn:  "the boundary",
 };
 
 export const SIGN_ELEMENT: Record<SignName, ElementType> = {

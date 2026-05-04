@@ -190,6 +190,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // mousing around the chart doesn't blow the read away.
   const inspected = selected ?? hovered;
 
+  // Clicking anywhere outside a planet glyph clears the selection. Planet
+  // and continue-button clicks stopPropagation, so they don't reach this
+  // handler. Skipped during animation so an in-flight resolution doesn't
+  // get its selection state mid-flight.
+  const handleClearSelection = useCallback(() => {
+    if (animation) return;
+    if (selected !== null) setSelected(null);
+  }, [animation, selected]);
+
   const handleContinue = useCallback(() => {
     if (animation) return;
     if (run.over) {
@@ -201,7 +210,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [animation, run.over, onClearEncounter, navigate]);
 
   return (
-    <div className="combat">
+    <div className="combat" onClick={handleClearSelection}>
       <div className="combat-side">
         <Chart
           chart={profile.chart}

@@ -408,7 +408,7 @@
    scales with the chart on resize. v1 style: gold uppercase eyebrow title,
    serif body in bone, gold-tinted border. */
 .planet-stats-bg {
-  fill: rgba(11, 10, 15, 0.92);
+  fill: rgba(11, 10, 15, 0.72);
   stroke: rgba(201, 169, 106, 0.35);
   stroke-width: 1;
 }
