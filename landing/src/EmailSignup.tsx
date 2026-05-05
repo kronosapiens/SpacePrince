@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const FORM_ID = import.meta.env.VITE_CONVERTKIT_FORM_ID as string | undefined;
+const FORM_ID = "7b7d375ba5";
 
 export function EmailSignup() {
   const [email, setEmail] = useState("");
@@ -10,10 +10,6 @@ export function EmailSignup() {
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!FORM_ID) {
-      setStatus("error");
-      return;
-    }
     setStatus("submitting");
     try {
       const res = await fetch(
