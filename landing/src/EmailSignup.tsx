@@ -2,7 +2,10 @@ import { useState, type FormEvent } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const FORM_ID = "7b7d375ba5";
+// Kit's internal numeric form id (from the embed's <form action>). The
+// public data-uid "7b7d375ba5" only routes the embed JS; the subscription
+// endpoint wants this id.
+const FORM_ID = "9399950";
 
 export function EmailSignup() {
   const [email, setEmail] = useState("");
@@ -16,11 +19,7 @@ export function EmailSignup() {
         `https://app.kit.com/forms/${FORM_ID}/subscriptions`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ email_address: email }),
+          body: new URLSearchParams({ email_address: email }),
         },
       );
       if (!res.ok) throw new Error(`status ${res.status}`);
