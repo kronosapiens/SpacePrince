@@ -33,6 +33,10 @@
 .screen { position: relative; z-index: 1; min-height: 100vh; padding: var(--pad); display: flex; flex-direction: column; }
 .screen.center { justify-content: center; align-items: center; }
 
+/* Default chart sizing. Chart.tsx renders <svg class="chart-svg">; consumers
+   override via more-specific selectors (e.g. `.combat-side > svg { width: ... }`). */
+.chart-svg { display: block; width: 100%; height: auto; }
+
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 .begin-btn {
@@ -83,8 +87,8 @@
   justify-self: center;
   text-align: center;
   font-family: var(--serif);
-  font-size: 42px;
-  letter-spacing: 0.34em;
+  font-size: clamp(22px, 6vw, 42px);
+  letter-spacing: clamp(0.16em, 1vw, 0.34em);
   color: var(--bone);
   font-weight: 500;
   text-transform: uppercase;
@@ -360,7 +364,7 @@
 }
 
 @media (max-width: 720px) {
-  .map-anchor { width: 32vw; top: 12px; left: 12px; }
+  .map-anchor { width: clamp(80px, 25vw, 130px); top: 8px; left: 8px; }
 }
 
 /* ── Combat ────────────────────────────────────────────────────────────── */
@@ -500,14 +504,22 @@
   dominant-baseline: middle;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 899px) {
   .combat {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto 1fr;
-    padding: 24px 16px;
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    padding: 12px 12px;
+    gap: 8px;
   }
-  .combat-side > svg { width: min(360px, 80vw); }
+  .combat-side { height: auto; gap: 4px; }
+  .combat-side > svg { width: min(380px, 64vw); }
   .combat-vesica { display: none; }
+  .combat-seam { gap: 8px; min-width: 0; }
+  .combat-opp-glyph { font-size: clamp(28px, 8vw, 44px); }
+  .combat-opp-name { font-size: clamp(14px, 4vw, 22px); letter-spacing: 0.18em; }
+  .combat-distance-v { font-size: clamp(18px, 5vw, 22px); }
+  .combat-distance { margin-top: 4px; gap: 2px; }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */
@@ -648,7 +660,7 @@
   font-style: italic;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 899px) {
   .narrative {
     grid-template-columns: 1fr;
     padding: 24px 16px;
@@ -761,6 +773,15 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 720px) {
+  /* Clear the fixed PageDropdown (top:20 + button + REGENERATE) which would
+     otherwise sit on top of the counts row at narrow widths. */
+  .eor { padding: 100px 0 32px; gap: 28px; }
+  .eor-counts { gap: 28px; padding: 0 16px; }
+  .eor-big { font-size: clamp(22px, 7vw, 32px); }
+  .eor-rainbow { padding: 4vh 16px; }
+}
+
 /* ── Chart Study ───────────────────────────────────────────────────────── */
 
 .study {
@@ -798,14 +819,16 @@
   text-transform: uppercase;
 }
 
-/* Chart anchor button (clickable inset) — keeps the existing chart visual
-   but adds cursor + a focus ring for accessibility. */
+/* Chart anchor button (clickable inset) — fills its parent container by
+   default. Square aspect-ratio so .map-anchor's width drives the chart size. */
 .chart-anchor-btn {
   background: transparent;
   border: 0;
   padding: 0;
   cursor: pointer;
   display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 .chart-anchor-btn:focus-visible {
   outline: 1px solid var(--gold);

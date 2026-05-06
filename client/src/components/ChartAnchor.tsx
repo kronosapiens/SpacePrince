@@ -8,7 +8,10 @@ interface ChartAnchorProps {
   unlockedPlanets: PlanetName[];
   /** Briefly highlight a newly-unlocked planet — Phase 7 motion polish wires this. */
   ceremonyPlanet?: PlanetName | null;
-  size?: number; // CSS px
+  /** Optional explicit pixel size. When omitted, the anchor fills its parent
+   *  container via CSS (`.chart-anchor-btn`). The Map screen relies on CSS
+   *  sizing so the chart shrinks to the `.map-anchor` width on mobile. */
+  size?: number;
   /** When provided, the anchor becomes a button that opens a full-chart
    *  inspection overlay (Chart Study). Without it, the anchor is purely
    *  decorative. */
@@ -19,8 +22,9 @@ interface ChartAnchorProps {
  * Compact form of Chart for the Map screen's top-left inset.
  * The literal expression of "the chart is always present" (SCREENS.md §1).
  */
-export function ChartAnchor({ chart, state, unlockedPlanets, ceremonyPlanet, size = 220, onExpand }: ChartAnchorProps) {
+export function ChartAnchor({ chart, state, unlockedPlanets, ceremonyPlanet, size, onExpand }: ChartAnchorProps) {
   const memoState = useMemo(() => state, [state]);
+  const sizeStyle = size !== undefined ? { width: size, height: size } : undefined;
   const inner = (
     <Chart
       chart={chart}
@@ -34,13 +38,13 @@ export function ChartAnchor({ chart, state, unlockedPlanets, ceremonyPlanet, siz
     />
   );
   if (!onExpand) {
-    return <div style={{ width: size, height: size }}>{inner}</div>;
+    return <div className="chart-anchor-btn" style={sizeStyle}>{inner}</div>;
   }
   return (
     <button
       type="button"
       className="chart-anchor-btn"
-      style={{ width: size, height: size }}
+      style={sizeStyle}
       onClick={onExpand}
       aria-label="Inspect chart"
     >
