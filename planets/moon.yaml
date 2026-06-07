@@ -1,5 +1,6 @@
 # Moon — intimate, nocturnal, drifting between present and memory.
 # Imagery over argument. Rooms, water, twilight, half-open doors.
+# Curated keepers from the source review.
 # See spec/PLANETS.md §4 (Moon) and §11 (Sourcing Notes).
 
 - text: |
@@ -11,44 +12,12 @@
   moods: [opening, reverie]
 
 - text: |
-    When a man is asleep, he has in a circle round him the chain of the hours, the sequence of the years, the order of the heavenly host.
-  author: "Marcel Proust"
-  source: "Swann's Way, Overture"
-  translation: "C. K. Scott Moncrieff, 1922"
-  source_url: "https://www.gutenberg.org/files/7178/7178-h/7178-h.htm"
-  moods: [reverie, opening]
-
-- text: |
-    The memory would come like a rope let down from heaven to draw me up out of the abyss of not-being.
-  author: "Marcel Proust"
-  source: "Swann's Way, Overture"
-  translation: "C. K. Scott Moncrieff, 1922"
-  source_url: "https://www.gutenberg.org/files/7178/7178-h/7178-h.htm"
-  moods: [reverie, ending]
-
-- text: |
-    From the starry vault descends an invisible snow-shower of dreams, calling us to a pure sleep.
-  author: "Henri-Frédéric Amiel"
-  source: "Journal Intime, August 8, 1865 (Gryon sur Bex)"
-  translation: "Mrs. Humphry Ward, 1885"
-  source_url: "https://archive.org/details/amielsjournalint00amieuoft/page/139"
-  moods: [opening, reverie]
-
-- text: |
     Let mystery have its place in you; do not be always turning up your whole soil with the plowshare of self-examination, but leave a little fallow corner in your heart ready for any seed the winds may bring, and reserve a nook of shadow for the passing bird.
   author: "Henri-Frédéric Amiel"
   source: "Journal Intime, December 2, 1851"
   translation: "Mrs. Humphry Ward, 1885"
   source_url: "https://www.gutenberg.org/ebooks/8545"
   moods: [reverie, opening]
-
-- text: |
-    All conception should be enwrapped by the triple veil of modesty, silence and night.
-  author: "Henri-Frédéric Amiel"
-  source: "Journal Intime, December 2, 1851"
-  translation: "Mrs. Humphry Ward, 1885"
-  source_url: "https://www.gutenberg.org/ebooks/8545"
-  moods: [reverie]
 
 - text: |
     Reverie, like the rain of night, restores color and force to thoughts which have been blanched and wearied by the heat of the day.
@@ -67,117 +36,15 @@
   moods: [opening]
 
 - text: |
-    The distances of memory, the wishes of youth, the dreams of childhood, the brief joys and vain hopes of a whole long life, arise in gray garments, like an evening vapour after the sunset.
-  author: "Novalis"
-  source: "Hymns to the Night, I"
-  translation: "George MacDonald, Rampolli, 1897"
-  source_url: "https://www.gutenberg.org/files/8949/8949-h/8949-h.htm"
-  moods: [reverie, ending]
-
-- text: |
-    Out of the blue distances, from the hills of my ancient bliss, came a shiver of twilight.
-  author: "Novalis"
-  source: "Hymns to the Night, III"
-  translation: "George MacDonald, Rampolli, 1897"
-  source_url: "https://www.gutenberg.org/files/8949/8949-h/8949-h.htm"
-  moods: [reverie, opening]
-
-- text: |
-    There is no antidote against the Opium of time.
-  author: "Thomas Browne"
-  source: "Hydriotaphia, Urn Burial, Chapter V"
-  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
-  moods: [ending, reverie]
-
-- text: |
-    Our Fathers finde their graves in our short memories.
-  author: "Thomas Browne"
-  source: "Hydriotaphia, Urn Burial, Chapter V"
-  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
-  moods: [ending, cost]
-
-- text: |
-    The night of time far surpasseth the day.
-  author: "Thomas Browne"
-  source: "Hydriotaphia, Urn Burial, Chapter V"
-  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
-  moods: [opening, ending]
-
-- text: |
-    Diuturnity is a dream and folly of expectation.
-  author: "Thomas Browne"
-  source: "Hydriotaphia, Urn Burial, Chapter V"
-  source_url: "http://penelope.uchicago.edu/hydrionoframes/hydrio5.html"
-  moods: [reverie, ending]
-
-- text: |
-    The Autumn gloaming deepens into night;
-    Black 'gainst the slowly-fading orange light,
-    On withered bough a lonely crow is sitting!
-  author: "Matsuo Bashō"
-  source: "The Master-Singers of Japan, 'Contrasts' (p. 107)"
-  translation: "Clara A. Walsh, 1910"
-  source_url: "https://archive.org/details/mastersingersofj00wals/page/107"
-  moods: [opening, reverie]
-
-- text: |
-    The multitude of men look satisfied and pleased; as if enjoying a full banquet, as if mounted on a tower in spring. I alone seem listless and still, my desires having as yet given no indication of their presence. I am like an infant which has not yet smiled. I look dejected and forlorn, as if I had no home to go to.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 20"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [reverie, opening, saturn_secondary]
-
-- text: |
-    When I lie down, I say, When shall I arise, and the night be gone? and I am full of tossings to and fro unto the dawning of the day.
-  author: "The Book of Job"
-  source: "Job 7:4 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [reverie, opening, saturn_secondary]
-
-- text: |
-    When I say, My bed shall comfort me, my couch shall ease my complaints; then thou scarest me with dreams, and terrifiest me through visions.
+    When I say: 'My bed shall comfort me,
+    My couch shall ease my complaint';
+    Then Thou scarest me with dreams,
+    And terrifiest me through visions.
   author: "The Book of Job"
   source: "Job 7:13–14 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Job.7.13-14"
   moods: [reverie, opening]
-
-- text: |
-    In thoughts from the visions of the night, when deep sleep falleth on men, fear came upon me, and trembling, which made all my bones to shake. Then a spirit passed before my face; the hair of my flesh stood up.
-  author: "The Book of Job"
-  source: "Job 4:13–15 (Eliphaz)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [reverie, opening]
-
-- text: |
-    Didst thou not call me, O friend? O, why am I wakened from slumber? Didst thou not touch me — for, why am I fearful, or hath not some spirit passed me? Or, why is my flesh all a-quiver?
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet V (Gilgamesh waking on the road to the Cedar Forest)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [reverie, opening]
-
-- text: |
-    He led me to the Dwelling of Darkness, the home of Irkalla, unto the Dwelling from which he who entereth cometh forth never; by the road on the passage whereof there can be no returning, unto the Dwelling whose tenants are ever bereft of the daylight, where for their food is the dust, and the mud is their sustenance.
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet VII (Enkidu's dream of the Underworld)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [reverie, ending, saturn_secondary]
-
-- text: |
-    While he sat on his haunches a sleep like a breeze breathed upon him.
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet XI (Gilgamesh, after the Flood story)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [reverie, ending]
-
-# Batch 3: Baudelaire (Paris Spleen, Flowers of Evil), Dickinson (pre-1930 Todd/Higginson),
-# Kalidasa (Meghaduta, Wilson 1843). Moon- and Venus-weighted pass.
 
 - text: |
     He who looks in through an open window never sees so many things as he who looks at a shut window. There is nothing more profound, more mysterious, more fertile, more gloomy, or more dazzling, than a window lighted by a candle. What we can see in the sunlight is always less interesting than what goes on behind the panes of a window. In that dark or luminous hollow, life lives, life dreams, life suffers.
@@ -188,27 +55,11 @@
   moods: [opening, reverie]
 
 - text: |
-    A chamber that is like a reverie; a chamber truly spiritual, where the stagnant atmosphere is lightly touched with rose and blue. There the soul bathes itself in indolence made odorous with regret and desire.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
-  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, reverie, venus_secondary]
-
-- text: |
     Alone at last! Nothing is to be heard but the rattle of a few tardy and tired-out cabs. There will be silence now, if not repose, for several hours at least. At last it is permitted me to refresh myself in a bath of shadows.
   author: "Charles Baudelaire"
   source: "Paris Spleen (Petits Poèmes en Prose), 'At One o'Clock in the Morning'"
   translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
   source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, reverie]
-
-- text: |
-    The day is over. A great restfulness descends into poor minds that the day's work has wearied; and thoughts take on the tender and dim colours of twilight.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'Evening Twilight'"
-  translation: "Arthur Symons, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
   moods: [opening, reverie]
 
 - text: |
@@ -218,47 +69,6 @@
   translation: "Arthur Symons, 1913"
   source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
   moods: [reverie, gift]
-
-- text: |
-    "I love the clouds — the clouds that pass — yonder — the marvellous clouds."
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'The Stranger' (closing line)"
-  translation: "Joseph T. Shipley, in The Poems and Prose Poems of Charles Baudelaire (James Huneker, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/36287/pg36287.txt"
-  moods: [ending, reverie]
-
-- text: |
-    Autumns and winters, springs of mire and rain,
-    Seasons of sleep, I sing your praises loud,
-    For thus I love to wrap my heart and brain
-    In some dim tomb beneath a vapoury shroud.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'Mist and Rain' (Brumes et Pluies)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, reverie, saturn_secondary]
-
-- text: |
-    The Moon more indolently dreams to-night
-    Than a fair woman on her couch at rest,
-    Caressing, with a hand distraught and light,
-    Before she sleeps, the contour of her breast.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'The Sadness of the Moon' (Tristesses de la Lune)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, reverie, venus_secondary]
-
-- text: |
-    Thou, O my Grief, be wise and tranquil still,
-    The eve is thine which even now drops down,
-    To carry peace or care to human will,
-    And in a misty veil enfolds the town.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'Contemplation' (Recueillement)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, reverie, saturn_secondary]
 
 - text: |
     Under the overhanging yews,
@@ -282,55 +92,6 @@
   moods: [opening, reverie]
 
 - text: |
-    There's a certain slant of light,
-    On winter afternoons,
-    That oppresses, like the weight
-    Of cathedral tunes.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book III. Nature, XXXI"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [opening, reverie, saturn_secondary]
-
-- text: |
-    One need not be a chamber to be haunted,
-    One need not be a house;
-    The brain has corridors surpassing
-    Material place.
-  author: "Emily Dickinson"
-  source: "Poems, Second Series (1891), Book I. Life, XXIX — 'Ghosts'"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [opening, reverie]
-
-- text: |
-    The soul unto itself
-    Is an imperial friend, —
-    Or the most agonizing spy
-    An enemy could send.
-  author: "Emily Dickinson"
-  source: "Poems, Second Series (1891), Book I. Life, XV"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [opening, reverie]
-
-- text: |
-    Sleep is supposed to be,
-    By souls of sanity,
-    The shutting of the eye.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXXVIII"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [reverie, ending]
-
-- text: |
-    The way I read a letter 's this:
-    'T is first I lock the door,
-    And push it with my fingers next,
-    For transport it be sure.
-  author: "Emily Dickinson"
-  source: "Poems, Second Series (1891), Book II. Love, VI"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [reverie, opening, venus_secondary]
-
-- text: |
     The moon was but a chin of gold
     A night or two ago,
     And now she turns her perfect face
@@ -341,77 +102,9 @@
   moods: [opening, reverie]
 
 - text: |
-    The last night that she lived,
-    It was a common night,
-    Except the dying; this to us
-    Made nature different.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book IV. Time and Eternity, XX"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [reverie, ending, saturn_secondary]
-
-- text: |
-    When with Ashárha's glooms the air was hung,
-    And one dark Cloud around the mountain clung;
-    In form, some elephant, whose sportive rage,
-    Ramparts, scarce equal to his might, engage.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 11–13"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [opening, reverie]
-
-- text: |
-    Ere yet thy coming yields opposing gloom,
-    The moon's white rays the smiling night illume,
-    And on the moon-gem concentrated fall,
-    That hangs in woven nets in every hall.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 487–490"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [reverie, opening, venus_secondary]
-
-- text: |
-    And sad, and silent, shalt thou find my wife,
-    Half of my soul, and partner of my life,
-    Nipped by chill sorrow, as the flowers enfold
-    Their shrinking petals from the withering cold.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 555–558"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [reverie, ending, venus_secondary]
-
-- text: |
-    Sad on her hand her pallid cheek declines,
-    And half unseen through veiling tresses shines;
-    As when a darkling night the moon enshrouds,
-    A few faint rays break straggling through the Clouds.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 561–564"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [reverie, venus_secondary]
-
-- text: |
-    Now seeking sleep, a husband to restore;
-    And waking now, his absence to deplore;
-    Deprived of slumber by returning woes,
-    Or mocked by idle phantoms of repose.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 597–600"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [reverie, ending, venus_secondary]
-
-- text: |
-    Her heavy eyelids languidly unclose
-    To where the moon its silvery radiance throws
-    Mild through the chamber: once a welcome light;
-    Avoided now, and hateful to her sight.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 615–618"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [reverie, cost, venus_secondary]
+    The hidden attunement is better than the open.
+  author: "Heraclitus"
+  source: "Fragment 47 (Burnet numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [paradox, turn]

@@ -1,22 +1,6 @@
 # Venus — sensory, relational, attuned to beauty.
-# Ten verified fragments drawn from primary public-domain sources.
+# Curated keepers from the source review.
 # See spec/PLANETS.md §6 (Venus) and §11 (Sourcing Notes).
-
-- text: |
-    Now Love masters my limbs and shakes me, fatal creature, bitter-sweet.
-  author: "Sappho"
-  source: "Fragment 40 (Wharton)"
-  translation: "Henry Thornton Wharton, 1885 (literal prose)"
-  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
-  moods: [opening, relation]
-
-- text: |
-    The moon has set, and the Pleiades; it is midnight, the time is going by, and I sleep alone.
-  author: "Sappho"
-  source: "Fragment 52 (Wharton)"
-  translation: "Henry Thornton Wharton, 1885 (literal prose)"
-  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
-  moods: [reverie, opening]
 
 - text: |
     As the sweet-apple blushes on the end of the bough, the very end of the bough, which the gatherers overlooked, nay overlooked not but could not reach.
@@ -64,11 +48,15 @@
   moods: [gift, reverie]
 
 - text: |
-    For, lo, the winter is past, the rain is over and gone; the flowers appear on the earth; the time of the singing of birds is come, and the voice of the turtle is heard in our land.
-  author: "Song of Solomon"
-  source: "Song of Solomon 2:11-12 (KJV)"
-  translation: "King James Version, 1611"
-  source_url: "https://en.wikisource.org/wiki/Bible_(King_James)/Song_of_Solomon"
+    For, lo, the winter is past,
+    The rain is over and gone;
+    The flowers appear on the earth;
+    The time of singing is come,
+    And the voice of the turtle is heard in our land.
+  author: "Song of Songs"
+  source: "Song of Songs 2:11–12"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Song_of_Songs.2.11-12"
   moods: [opening, gift]
 
 - text: |
@@ -78,14 +66,6 @@
   translation: "Arthur Waley, 1928"
   source_url: "https://archive.org/details/pillowbookofseis0000arth_v1i4"
   moods: [beauty, gift]
-
-- text: |
-    After the division the two parts of man, each desiring his other half, came together, and throwing their arms about one another, entwined in mutual embraces, longing to grow into one.
-  author: "Plato"
-  source: "Symposium (speech of Aristophanes, the myth of the halves)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, relation]
 
 - text: |
     Human nature was originally one and we were a whole, and the desire and pursuit of the whole is called love.
@@ -104,54 +84,12 @@
   moods: [reverie, relation]
 
 - text: |
-    The intense yearning which each of them has towards the other does not appear to be the desire of lover's intercourse, but of something else which the soul of either evidently desires and cannot tell, and of which she has only a dark and doubtful presentiment.
-  author: "Plato"
-  source: "Symposium (speech of Aristophanes)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [reverie, question, moon_secondary]
-
-- text: |
-    He walks not upon the earth, nor yet upon the skulls of men, which are not so very soft, but in the hearts and souls of both gods and men, which are of all things the softest: in them he walks and dwells and makes his home.
-  author: "Plato"
-  source: "Symposium (speech of Agathon, on Love)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, reverie]
-
-- text: |
-    The fairness of his complexion is revealed by his habitation among the flowers; for he dwells not amid bloomless or fading beauties, whether of body or soul or aught else, but in the place of flowers and scents, there he sits and abides.
-  author: "Plato"
-  source: "Symposium (speech of Agathon, on Love)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, beauty]
-
-- text: |
     The love of the noble disposition is life-long, for it becomes one with the everlasting.
   author: "Plato"
   source: "Symposium (speech of Pausanias)"
   translation: "Benjamin Jowett, 1871"
   source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
   moods: [affirmation, relation]
-
-- text: |
-    My heart leaps within me more than that of any Corybantian reveller, and my eyes rain tears when I hear them.
-  author: "Plato"
-  source: "Symposium (speech of Alcibiades, on hearing Socrates)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [reverie, relation]
-
-# Batch 2: Plutarch's Moralia, Advice to Married Couples.
-
-- text: |
-    As that plant yields the sweetest eating from among the roughest prickles, so a bride, if the groom does not run away in disgust because he finds her difficult and vexatious at first, will afford him a sweet and gentle companionship.
-  author: "Plutarch"
-  source: "Moralia, 'Advice to Married Couples' §2"
-  translation: "T. G. Tucker, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
-  moods: [opening, relation, reverie]
 
 - text: |
     Fire is readily kindled in chaff, dry rushes, or hare's fur, but quickly goes out unless it gets a further hold upon something capable both of keeping it in and feeding it. So with that fierce blaze of passion which is produced in the newly-married by physical enjoyment.
@@ -170,69 +108,12 @@
   moods: [warning, relation, saturn_secondary]
 
 - text: |
-    Your witchcraft lies in yourself.
-  author: "Plutarch"
-  source: "Moralia, 'Advice to Married Couples' §23 (Olympias)"
-  translation: "T. G. Tucker, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
-  moods: [relation, gift, cut]
-
-- text: |
-    Marriage should not be made with the eyes; neither should it with the fingers, as it is in the case of some, who reckon up the amount of the dower, instead of calculating the companionable quality, of the wife they are marrying.
-  author: "Plutarch"
-  source: "Moralia, 'Advice to Married Couples' §24"
-  translation: "T. G. Tucker, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
-  moods: [warning, relation]
-
-- text: |
-    As Crates used to say, 'Adornment is that which adorns,' and that which adorns is that which adds to a woman's seemliness.
-  author: "Plutarch"
-  source: "Moralia, 'Advice to Married Couples' §26"
-  translation: "T. G. Tucker, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
-  moods: [beauty, reverie]
-
-- text: |
     If you are thought to trust, you are trusted; if you are thought to love, you are loved.
   author: "Plutarch"
   source: "Moralia, 'Advice to Married Couples' §36"
   translation: "T. G. Tucker, 1913"
   source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
   moods: [relation, gift, affirmation]
-
-- text: |
-    When a husband has his fits of anger, if he raises his voice, a sensible wife keeps quiet; if he is silent, she soothes him by talking to him in a coaxing way.
-  author: "Plutarch"
-  source: "Moralia, 'Advice to Married Couples' §37"
-  translation: "T. G. Tucker, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
-  moods: [relation, reverie]
-
-# Batch 3: Baudelaire (Flowers of Evil, Paris Spleen), Kalidasa (Meghaduta, Wilson 1843).
-# Aesthetic attention and erotic reverie — Venus-weighted pass.
-
-- text: |
-    In Nature's temple living pillars rise,
-    And words are murmured none have understood,
-    And man must wander through a tangled wood
-    Of symbols watching him with friendly eyes.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'Correspondences' (Correspondances)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, beauty]
-
-- text: |
-    As long-drawn echoes heard far-off and dim
-    Mingle to one deep sound and fade away;
-    Vast as the night and brilliant as the day,
-    Colour and sound and perfume speak to him.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'Correspondences' (Correspondances)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [beauty, reverie, moon_secondary]
 
 - text: |
     When, with closed eyes in the warm autumn night,
@@ -246,44 +127,6 @@
   moods: [opening, beauty, reverie]
 
 - text: |
-    Thine eye with dawn is filled, with twilight dwindles,
-    Like winds of night thou sprinklest perfumes mild;
-    Thy kiss, that is a spell, the child's heart kindles,
-    Thy mouth, a chalice, makes the man a child.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'Hymn to Beauty' (Hymne à la Beauté)"
-  translation: "W. J. Robertson, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [beauty, reverie]
-
-- text: |
-    Mother of memories, mistress of mistresses,
-    O thou, my pleasure, thou, all my desire,
-    Thou shalt recall the beauty of caresses,
-    The charm of evenings by the gentle fire.
-  author: "Charles Baudelaire"
-  source: "The Flowers of Evil, 'The Balcony' (Le Balcon)"
-  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [opening, relation, reverie, moon_secondary]
-
-- text: |
-    A real country of Cockaigne, where everything is beautiful, rich, quiet, honest; where order is the likeness and the mirror of luxury; where life is fat, and sweet to breathe.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'L'Invitation au Voyage'"
-  translation: "Arthur Symons, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
-  moods: [reverie, beauty, moon_secondary]
-
-- text: |
-    There is a country made in your image, where all is beautiful, rich, quiet and honest; where fancy has built and decorated a western China, where life is sweet to breathe, where happiness is wedded to silence.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'L'Invitation au Voyage'"
-  translation: "Arthur Symons, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
-  moods: [reverie, beauty, relation]
-
-- text: |
     They pass before me, these Eyes full of light,
     Eyes made magnetic by some angel wise;
     The holy brothers pass before my sight,
@@ -293,39 +136,6 @@
   translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
   source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
   moods: [beauty, relation, reverie]
-
-- text: |
-    There lovely triflers wanton through the day,
-    Dress all their care, and all their labour play;
-    One while, the fluttering Lotus fans the fair,
-    Or Kunda top-knots crown the jetty hair.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 449–452 (Alaka, the city of Kuvera)"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [beauty, reverie, moon_secondary]
-
-- text: |
-    Whose slender limbs inadequately bear
-    A full-orbed bosom, and a weight of care;
-    Whose teeth like pearls, whose lips like Bimbas show,
-    And fawn-like eyes still tremble as they glow.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 549–552 (the Yaksha's wife)"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [beauty, reverie, moon_secondary]
-
-- text: |
-    Here, when the evening twilight shades the skies,
-    The blue-necked Peacock to the summit flies,
-    And moves in graceful circles to the tone
-    My fair awakens from her tinkling zone.
-  author: "Kalidasa"
-  source: "Meghaduta (Cloud Messenger), verses 527–530"
-  translation: "H. H. Wilson, 1843"
-  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
-  moods: [opening, beauty, reverie, moon_secondary]
 
 - text: |
     The rainbow flickering gleams along the walls,
@@ -345,28 +155,6 @@
   source: "Poems, Second Series (1891), Book II. Love, VII"
   source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
   moods: [opening, relation, reverie, moon_secondary]
-
-# Batch 4: Persian / Sufi — Rumi (Whinfield 1887), the lover-and-beloved register.
-
-- text: |
-    Hearken to the reed-flute, how it discourses
-    When complaining of the pains of separation —
-    "Ever since they tore me from my osier bed,
-    My plaintive notes have moved men and women to tears."
-  author: "Rumi"
-  source: "Masnavi, Book I, Prologue ('The Song of the Reed')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, reverie, mercury_secondary]
-
-- text: |
-    The Beloved is all in all, the lover only veils Him;
-    The Beloved is all that lives, the lover a dead thing.
-  author: "Rumi"
-  source: "Masnavi, Book I, Prologue"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, relation, jupiter_secondary]
 
 - text: |
     A true lover is proved such by his pain of heart;
@@ -391,39 +179,6 @@
   moods: [opening, relation, mercury_secondary]
 
 - text: |
-    None but the sun can display the sun,
-    If you would see it displayed, turn not away from it.
-  author: "Rumi"
-  source: "Masnavi, Book I, Description of Love"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, beauty, sun_secondary]
-
-- text: |
-    Once a man came and knocked at the door of his friend.
-    His friend said, "Who art thou, O faithful one?"
-    He said, "'Tis I." He answered, "There is no admittance.
-    There is no room for the 'raw' at my well-cooked feast."
-  author: "Rumi"
-  source: "Masnavi, Book I, Story XI ('The Lover and his Mistress')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, relation, paradox]
-
-- text: |
-    He knocked at the door in fear and trepidation
-    Lest some careless word might fall from his lips.
-    His friend shouted, "Who is that at the door?"
-    He answered, "'Tis Thou who art at the door, O Beloved!"
-    The friend said, "Since 'tis I, let me come in,
-    There is not room for two 'I's' in one house."
-  author: "Rumi"
-  source: "Masnavi, Book I, Story XI ('The Lover and his Mistress')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [relation, ending, mercury_secondary]
-
-- text: |
     Did my Beloved only touch me with his lips,
     I too, like the flute, would burst out in melody.
   author: "Rumi"
@@ -431,3 +186,11 @@
   translation: "E. H. Whinfield, 1887"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [reverie, relation]
+
+- text: |
+    One loves ultimately one's desires, not the thing desired.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §175 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [turn, paradox]

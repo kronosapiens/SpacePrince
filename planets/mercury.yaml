@@ -1,14 +1,7 @@
 # Mercury — aphoristic, paradoxical, self-inverting.
 # The riddle, the turn. Never earnest, never conclusive, never threatens.
+# Curated keepers from the source review.
 # See spec/PLANETS.md §5 (Mercury) and §11 (Sourcing Notes).
-
-- text: |
-    He who fights with monsters should be careful lest he thereby become a monster. And if thou gaze long into an abyss, the abyss will also gaze into thee.
-  author: "Friedrich Nietzsche"
-  source: "Beyond Good and Evil, §146 (Apophthegms and Interludes)"
-  translation: "Helen Zimmern, 1907"
-  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
-  moods: [warning, turn, paradox]
 
 - text: |
     That which does not kill me, makes me stronger.
@@ -43,13 +36,6 @@
   moods: [paradox, question]
 
 - text: |
-    The road of excess leads to the palace of wisdom.
-  author: "William Blake"
-  source: "The Marriage of Heaven and Hell, 'Proverbs of Hell'"
-  source_url: "https://en.wikisource.org/wiki/The_Marriage_of_Heaven_and_Hell"
-  moods: [opening, turn]
-
-- text: |
     If the fool would persist in his folly he would become wise.
   author: "William Blake"
   source: "The Marriage of Heaven and Hell, 'Proverbs of Hell'"
@@ -65,20 +51,12 @@
   moods: [question, paradox, reverie]
 
 - text: |
-    The raison d'être of a fish-trap is the fish. When the fish is caught, the trap may be ignored.
+    My life has a limit, but my knowledge is without limit. To drive the limited in search of the limitless, is fatal.
   author: "Zhuangzi"
-  source: "Chuang Tzŭ, Ch. XXVI ('Contingencies')"
+  source: "Chuang Tzŭ, Ch. III ('Nourishment of the Soul')"
   translation: "Herbert A. Giles, 1889"
   source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
-  moods: [opening, turn]
-
-- text: |
-    Man, a life that cannot die, and yet a life that dies.
-  author: "Hermes Trismegistus"
-  source: "Corpus Hermeticum IV ('The Cup or Monad'), §2"
-  translation: "G. R. S. Mead, 1906"
-  source_url: "https://archive.org/details/GRSMeadThriceGreatestHermesVolII"
-  moods: [opening, paradox]
+  moods: [opening, paradox, warning]
 
 - text: |
     Negative Capability, that is when man is capable of being in uncertainties, Mysteries, doubts, without any irritable reaching after fact & reason.
@@ -88,60 +66,12 @@
   moods: [opening, paradox, question, venus_secondary]
 
 - text: |
-    Nature loves to hide.
-  author: "Heraclitus"
-  source: "Fragment 10 (Burnet numbering), in Burnet, Early Greek Philosophy"
-  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
-  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
-  moods: [opening, paradox, question]
-
-- text: |
-    The hidden attunement is better than the open.
-  author: "Heraclitus"
-  source: "Fragment 47 (Burnet numbering), in Burnet, Early Greek Philosophy"
-  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
-  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
-  moods: [paradox, turn]
-
-- text: |
-    One loves ultimately one's desires, not the thing desired.
-  author: "Friedrich Nietzsche"
-  source: "Beyond Good and Evil, §175 (Apophthegms and Interludes)"
-  translation: "Helen Zimmern, 1907"
-  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
-  moods: [turn, paradox]
-
-- text: |
-    My life has a limit, but my knowledge is without limit. To drive the limited in search of the limitless, is fatal.
-  author: "Zhuangzi"
-  source: "Chuang Tzŭ, Ch. III ('Nourishment of the Soul')"
-  translation: "Herbert A. Giles, 1889"
-  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
-  moods: [opening, paradox, warning]
-
-- text: |
     The Tao that can be trodden is not the enduring and unchanging Tao. The name that can be named is not the enduring and unchanging name.
   author: "Lao Tzu"
   source: "Tao Te Ching, Ch. 1"
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [opening, paradox, jupiter_secondary]
-
-- text: |
-    The partial becomes complete; the crooked, straight; the empty, full; the worn out, new. He whose (desires) are few gets them; he whose (desires) are many goes astray.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 22"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, paradox, turn]
-
-- text: |
-    When one is about to take an inspiration, he is sure to make a (previous) expiration; when he is going to weaken another, he will first strengthen him; when he is going to overthrow another, he will first have raised him up; when he is going to despoil another, he will first have made gifts to him.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 36"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [paradox, turn, warning]
 
 - text: |
     The movement of the Tao
@@ -153,34 +83,6 @@
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
   moods: [opening, paradox]
-
-- text: |
-    The Tao, when brightest seen, seems light to lack;
-    Who progress in it makes, seems drawing back;
-    Its even way is like a rugged track.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 41"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [paradox, turn]
-
-- text: |
-    The softest thing in the world dashes against and overcomes the hardest; that which has no (substantial) existence enters where there is no crevice.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 43"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [paradox, turn]
-
-- text: |
-    Do thou what's straight still crooked deem;
-    Thy greatest art still stupid seem,
-    And eloquence a stammering scream.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 45"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [paradox, turn]
 
 - text: |
     He who knows (the Tao) does not (care to) speak (about it); he who is (ever ready to) speak about it does not know it.
@@ -207,54 +109,6 @@
   moods: [paradox, opening]
 
 - text: |
-    Sincere words are not fine; fine words are not sincere. Those who are skilled (in the Tao) do not dispute (about it); the disputatious are not skilled in it. Those who know (the Tao) are not extensively learned; the extensively learned do not know it.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 81"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, paradox, saturn_secondary]
-
-- text: |
-    How I wish that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
-  author: "Plato"
-  source: "Symposium (Socrates to Agathon, at the couch)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, paradox]
-
-- text: |
-    That which is always flowing in is always flowing out, and so he is never in want and never in wealth; and, further, he is in a mean between ignorance and knowledge.
-  author: "Plato"
-  source: "Symposium (Diotima on the nature of Love)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [paradox, turn]
-
-- text: |
-    Herein is the evil of ignorance, that he who is neither good nor wise is nevertheless satisfied with himself: he has no desire for that of which he feels no want.
-  author: "Plato"
-  source: "Symposium (Diotima to Socrates)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [warning, paradox, turn]
-
-- text: |
-    His outer mask is the carved head of the Silenus; but, O my companions in drink, when he is opened, what temperance there is residing within!
-  author: "Plato"
-  source: "Symposium (Alcibiades on Socrates)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, turn, paradox]
-
-- text: |
-    K'ung-ming is a master of mysteries, and it may be that this is but a ruse to get us to take the field. We may fall victims to his guile.
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 104 (Sima Yi, halting the pursuit after Zhuge Liang's death)"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
-  moods: [warning, turn]
-
-- text: |
     If I am not for myself, who is for me? And being for my own self, what am I? And if not now, when?
   author: "Hillel"
   source: "Pirkei Avot 1:14"
@@ -269,14 +123,6 @@
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
   source_url: "https://www.sefaria.org/Pirkei_Avot.3.15"
   moods: [paradox, opening, saturn_secondary]
-
-- text: |
-    Everything is given against a pledge, and a net is spread out over all the living; the store is open and the storekeeper allows credit, but the ledger is open and the hand writes, and whoever wishes to borrow may come and borrow.
-  author: "Rabbi Akiva"
-  source: "Pirkei Avot 3:16"
-  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.3.16"
-  moods: [paradox, warning, saturn_secondary]
 
 - text: |
     Who is wise? He who learns from every man. Who is mighty? He who subdues his inclination. Who is rich? He who rejoices in his portion. Who is honored? He who honors others.
@@ -295,16 +141,6 @@
   moods: [opening, turn]
 
 - text: |
-    Turn it over, and again turn it over, for all is therein. And look into it; and become gray and old therein; and do not move away from it, for you have no better portion than it.
-  author: "Ben Bag Bag"
-  source: "Pirkei Avot 5:22"
-  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.5.22"
-  moods: [opening, paradox, jupiter_secondary]
-
-# Batch 3 (Dickinson): riddle-poems from the pre-1930 Todd/Higginson editions.
-
-- text: |
     I'm nobody! Who are you?
     Are you nobody, too?
     Then there 's a pair of us — don't tell!
@@ -315,51 +151,6 @@
   moods: [opening, paradox]
 
 - text: |
-    Much madness is divinest sense
-    To a discerning eye;
-    Much sense the starkest madness.
-    'T is the majority
-    In this, as all, prevails.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book I. Life, XI"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [opening, paradox, saturn_secondary]
-
-# Batch 4: Persian / Sufi — Rumi (Whinfield 1887), Attar (FitzGerald 1889).
-# The paradoxical, self-inverting seeker-voice of Sufi mysticism.
-
-- text: |
-    The eye of outward sense is as the palm of a hand,
-    The whole of the object is not grasped in the palm.
-    The sea itself is one thing, the foam another;
-    Neglect the foam, and regard the sea with your eyes.
-  author: "Rumi"
-  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, paradox, turn]
-
-- text: |
-    When a garment is made by a good tailor,
-    'Tis an evidence of the tailor's art.
-    Defects are the mirrors of the attributes of Beauty,
-    The base is the mirror of the High and Glorious One.
-  author: "Rumi"
-  source: "Masnavi, Book I, Story XII ('Joseph and the Mirror')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [paradox, turn]
-
-- text: |
-    Since Not-being is the mirror of Being,
-    If you are wise, choose Not-being (self-abnegation).
-  author: "Rumi"
-  source: "Masnavi, Book I, Story XII ('Joseph and the Mirror')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [paradox, turn]
-
-- text: |
     Keep silence, that you may hear Him speaking
     Words unutterable by tongue in speech.
   author: "Rumi"
@@ -367,57 +158,3 @@
   translation: "E. H. Whinfield, 1887"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, paradox]
-
-- text: |
-    Not Me,
-    But all of Me that a contracted Eye
-    Is comprehensive of Infinity:
-    Nor yet Themselves: no Selves, but of The All
-    Fractions, from which they split and whither fall.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [paradox, turn, jupiter_secondary]
-
-- text: |
-    I was the Sin that from Myself rebell'd:
-    I the Remorse that tow'rd Myself compell'd:
-    I was the Tajidar who led the Track:
-    I was the little Briar that pull'd you back.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [turn, paradox, ending]
-
-- text: |
-    Sin and Contrition — Retribution owed,
-    And cancell'd — Pilgrim, Pilgrimage, and Road,
-    Was but Myself toward Myself: and Your
-    Arrival but Myself at my own Door.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [paradox, turn, ending, jupiter_secondary]
-
-- text: |
-    They That, That They: Another, yet the Same:
-    Dividual, yet One.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the climax (thirty birds seeing the Simurgh)"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [paradox, ending]
-
-- text: |
-    The Blaze that from my Harim window breaks
-    With fright the Rabble of the Roadside takes;
-    And ev'n of those that at my Portal din,
-    Thousands may knock for one that enters in.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice to Bajazyd"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [opening, warning, paradox]

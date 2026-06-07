@@ -1,22 +1,14 @@
 # Saturn — measured, austere, patient.
-# Pilot batch of 10 verified fragments drawn from primary public-domain sources.
+# Curated keepers from the source review.
 # See spec/PLANETS.md §9 (Saturn) and §11 (Sourcing Notes).
 
 - text: |
-    Then shall the dust return to the earth as it was: and the spirit shall return unto God who gave it.
+    And the dust returneth to the earth as it was, and the spirit returneth unto God who gave it.
   author: "Ecclesiastes"
-  source: "Ecclesiastes 12:7 (KJV)"
-  translation: "King James Version, 1611"
-  source_url: "https://en.wikisource.org/wiki/Bible_(King_James)/Ecclesiastes"
+  source: "Ecclesiastes 12:7"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Ecclesiastes.12.7"
   moods: [ending, cost]
-
-- text: |
-    Let Death and Exile, and all other Things which appear terrible, be daily before your Eyes; but chiefly Death: and you will never entertain any abject Thought, nor too eagerly covet any thing.
-  author: "Epictetus"
-  source: "Encheiridion §XXI"
-  translation: "Elizabeth Carter, 1758"
-  source_url: "https://en.wikisource.org/wiki/All_the_Works_of_Epictetus,_Which_Are_Now_Extant/The_Encheiridion"
-  moods: [warning, opening]
 
 - text: |
     While we are postponing, life speeds by.
@@ -27,28 +19,20 @@
   moods: [cost, warning]
 
 - text: |
-    Infinitely swift is the flight of time, as those see more clearly who are looking backwards.
-  author: "Seneca"
-  source: "Epistulae Morales ad Lucilium, Letter 49.2"
-  translation: "Richard M. Gummere (Loeb), 1917"
-  source_url: "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_49"
+    Retire yourself into yourself, but first prepare yourself there to receive yourself.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
+  moods: [opening, reverie]
+
+- text: |
+    To die of old age is a death rare, extraordinary, and singular.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. LVII ('Of Age')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_LVII"
   moods: [ending, reverie]
-
-- text: |
-    It is not the last step that causeth weariness: it only declares it.
-  author: "Michel de Montaigne"
-  source: "Essays, Book I, Ch. XIX ('That to philosophise is to learne how to die')"
-  translation: "John Florio, 1603"
-  source_url: "https://en.wikisource.org/wiki/Montaigne%27s_Essays/Book_I/Chapter_XIX"
-  moods: [ending, cost]
-
-- text: |
-    All daies march towards death, only the last comes to it.
-  author: "Michel de Montaigne"
-  source: "Essays, Book I, Ch. XIX ('That to philosophise is to learne how to die')"
-  translation: "John Florio, 1603"
-  source_url: "https://en.wikisource.org/wiki/Montaigne%27s_Essays/Book_I/Chapter_XIX"
-  moods: [opening, ending]
 
 - text: |
     Life is a task to be done.
@@ -67,65 +51,12 @@
   moods: [opening, warning]
 
 - text: |
-    The eternal silence of these infinite spaces frightens me.
-  author: "Blaise Pascal"
-  source: "Pensées §206 (Brunschvicg)"
-  translation: "W. F. Trotter, 1910"
-  source_url: "https://www.gutenberg.org/files/18269/18269-h/18269-h.htm#p_206"
-  moods: [reverie, ending]
-
-- text: |
     For truly in adverse fortune the worst sting of misery is to have been happy.
   author: "Boethius"
   source: "The Consolation of Philosophy, Book II, Prose IV"
   translation: "H. R. James, 1897"
   source_url: "https://www.gutenberg.org/files/14328/14328-h/14328-h.htm"
   moods: [cost, reverie]
-
-- text: |
-    Suffering is one very long moment. We cannot divide it by seasons.
-  author: "Oscar Wilde"
-  source: "De Profundis"
-  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
-  moods: [opening, cost]
-
-- text: |
-    Behind sorrow there is always sorrow.
-  author: "Oscar Wilde"
-  source: "De Profundis"
-  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
-  moods: [reverie, cost]
-
-- text: |
-    And thus we rust Life's iron chain, degraded and alone.
-  author: "Oscar Wilde"
-  source: "The Ballad of Reading Gaol, Part V"
-  source_url: "https://www.gutenberg.org/cache/epub/301/pg301-images.html"
-  moods: [ending, cost]
-
-- text: |
-    Our disease lies in the mind, which cannot escape from itself.
-  author: "Michel de Montaigne"
-  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
-  translation: "Charles Cotton, 1685–1686"
-  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
-  moods: [opening, warning]
-
-- text: |
-    Retire yourself into yourself, but first prepare yourself there to receive yourself.
-  author: "Michel de Montaigne"
-  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
-  translation: "Charles Cotton, 1685–1686"
-  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
-  moods: [opening, reverie]
-
-- text: |
-    To die of old age is a death rare, extraordinary, and singular.
-  author: "Michel de Montaigne"
-  source: "Essays, Book I, Ch. LVII ('Of Age')"
-  translation: "Charles Cotton, 1685–1686"
-  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_LVII"
-  moods: [ending, reverie]
 
 - text: |
     It is better to leave a vessel unfilled, than to attempt to carry it when it is full. If you keep feeling a point that has been sharpened, the point cannot long preserve its sharpness.
@@ -152,145 +83,13 @@
   moods: [opening, cost]
 
 - text: |
-    Who is content
-    Needs fear no shame.
-    Who knows to stop
-    Incurs no blame.
-    From danger free
-    Long live shall he.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 44"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, warning]
-
-- text: |
-    There is no guilt greater than to sanction ambition; no calamity greater than to be discontented with one's lot; no fault greater than the wish to be getting. Therefore the sufficiency of contentment is an enduring and unchanging sufficiency.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 46"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [warning, cost]
-
-- text: |
-    Man at his birth is supple and weak; at his death, firm and strong. (So it is with) all things. Trees and plants, in their early growth, are soft and brittle; at their death, dry and withered. Thus it is that firmness and strength are the concomitants of death; softness and weakness, the concomitants of life.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 76"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [ending, reverie]
-
-- text: |
-    Naked came I out of my mother’s womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.
-  author: "The Book of Job"
-  source: "Job 1:21 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, ending, cost]
-
-- text: |
-    Wherefore is light given to him that is in misery, and life unto the bitter in soul; which long for death, but it cometh not; and dig for it more than for hid treasures.
-  author: "The Book of Job"
-  source: "Job 3:20–21 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, cost]
-
-- text: |
-    Yet man is born unto trouble, as the sparks fly upward.
-  author: "The Book of Job"
-  source: "Job 5:7 (Eliphaz)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, cost]
-
-- text: |
-    Is there not an appointed time to man upon earth? are not his days also like the days of an hireling? As a servant earnestly desireth the shadow, and as an hireling looketh for the reward of his work: so am I made to possess months of vanity, and wearisome nights are appointed to me.
-  author: "The Book of Job"
-  source: "Job 7:1–3 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, reverie, cost]
-
-- text: |
-    My days are swifter than a weaver’s shuttle, and are spent without hope.
-  author: "The Book of Job"
-  source: "Job 7:6 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, ending]
-
-- text: |
-    For we are but of yesterday, and know nothing, because our days upon earth are a shadow.
+    For we are but of yesterday, and know nothing,
+    Because our days upon earth are a shadow.
   author: "The Book of Job"
   source: "Job 8:9 (Bildad)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Job.8.9"
   moods: [opening, reverie]
-
-- text: |
-    Now my days are swifter than a post: they flee away, they see no good. They are passed away as the swift ships: as the eagle that hasteth to the prey.
-  author: "The Book of Job"
-  source: "Job 9:25–26 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [reverie, ending]
-
-- text: |
-    Man that is born of a woman is of few days and full of trouble. He cometh forth like a flower, and is cut down: he fleeth also as a shadow, and continueth not.
-  author: "The Book of Job"
-  source: "Job 14:1–2 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, ending, cost]
-
-- text: |
-    But man dieth, and wasteth away: yea, man giveth up the ghost, and where is he?
-  author: "The Book of Job"
-  source: "Job 14:10 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [ending, question]
-
-- text: |
-    I have heard many such things: miserable comforters are ye all.
-  author: "The Book of Job"
-  source: "Job 16:2 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [cut, cost]
-
-- text: |
-    If I wait, the grave is mine house: I have made my bed in the darkness. I have said to corruption, Thou art my father: to the worm, Thou art my mother, and my sister.
-  author: "The Book of Job"
-  source: "Job 17:13–14 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [ending, reverie, moon_secondary]
-
-- text: |
-    My bone cleaveth to my skin and to my flesh, and I am escaped with the skin of my teeth.
-  author: "The Book of Job"
-  source: "Job 19:20 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [cost, ending]
-
-- text: |
-    Man proposes; God disposes. We cannot wrest events to our will.
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 103 (Zhuge Liang, when rain quenches the fire at Shangfang Valley)"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_103"
-  moods: [opening, cost]
-
-- text: |
-    My death is very near. My chief desire has been to spend myself to the utmost to restore the Hans and lead a glorious return of the Hans to their capital, but Heaven decrees it otherwise.
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang to Jiang Wei, on his deathbed)"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
-  moods: [ending, cost]
 
 - text: |
     I shall never again lead the army against the rebels. O distant and azure Heaven, when will this end?
@@ -309,22 +108,6 @@
   moods: [opening, ending]
 
 - text: |
-    Heaven grieved and earth mourned on the night of K'ung-ming's death. Even the moon was dimmed. And K'ung-ming returned to Heaven.
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 104"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
-  moods: [ending, reverie, moon_secondary]
-
-- text: |
-    Alas, ye blue heavens! What manner of man is this Sun Hao to yield thus the heritage of his family, won by the sword of his forbears in the brave days that are past?
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 120 (Sun Xiu, wailing for the fall of Wu)"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_120"
-  moods: [ending, cost]
-
-- text: |
     All down the ages rings the note of change, for fate so rules it; none escapes its sway. The kingdoms three have vanished as a dream, the useless misery is ours to grieve.
   author: "Luo Guanzhong"
   source: "Romance of the Three Kingdoms, Ch. 120 (closing poem)"
@@ -341,36 +124,12 @@
   moods: [warning, cost]
 
 - text: |
-    He whom I loved hath become like the dust. I, shall I not, also, lay me down like him, throughout all eternity never returning?
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet X (Gilgamesh to Siduri the Wine-maker)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [opening, ending, cost]
-
-- text: |
-    Sleeping and dead are alike, from death they mark no distinction. Servant and master, when once they have reached their full span allotted, then do the Anunnaki, the great gods, with Mammetum, Maker of Destiny, settle destiny. Death and life they determine; of death is the day not revealed.
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet X (the Wine-maker's wisdom)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [reverie, cost]
-
-- text: |
     All that was bright was turned into darkness.
   author: "Anonymous (Babylonian)"
   source: "Epic of Gilgamesh, Tablet XI (Utnapishtim, on the coming of the Flood)"
   translation: "R. Campbell Thompson, 1928"
   source_url: "https://archive.org/details/thompson-1928-gilgamesh"
   moods: [opening, jupiter_secondary]
-
-- text: |
-    The day is short, and the task is great, and the workmen are sluggish, and the reward is much, and the Master of the house is urgent.
-  author: "Rabbi Tarphon"
-  source: "Pirkei Avot 2:20"
-  translation: "Charles Taylor, 1897"
-  source_url: "https://archive.org/details/sayingsofjewish00tayl"
-  moods: [opening, warning]
 
 - text: |
     It is not for thee to finish the work, nor art thou free to desist therefrom.
@@ -389,46 +148,12 @@
   moods: [warning, ending]
 
 - text: |
-    The ones who were born are to die, and the ones who have died are to be brought to life, and the ones brought to life are to be judged.
-  author: "Rabbi Elazar Ha-kappar"
-  source: "Pirkei Avot 4:22"
-  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.4.22"
-  moods: [opening, ending, reverie]
-
-# Batch 2: Plato's Apology (Jowett), Plutarch's Moralia.
-
-- text: |
-    For the penalty of unrighteousness is swifter than death; that penalty has already overtaken his accusers as death will soon overtake him.
-  author: "Plato"
-  source: "Apology (Socrates, after the verdict)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
-  moods: [ending, cost, warning]
-
-- text: |
     I am old and move slowly, and the slower runner has overtaken me, and my accusers are keen and quick, and the faster runner, who is unrighteousness, has overtaken them.
   author: "Plato"
   source: "Apology (Socrates, after the verdict)"
   translation: "Benjamin Jowett, 1871"
   source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
   moods: [ending, reverie, cost]
-
-- text: |
-    When my sons are grown up, I would ask you, O my friends, to punish them; and I would have you trouble them, as I have troubled you, if they seem to care about riches, or anything, more than about virtue.
-  author: "Plato"
-  source: "Apology (Socrates's final request to the jurors)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
-  moods: [ending, reverie]
-
-- text: |
-    God only is wise; and by his answer he intends to show that the wisdom of men is worth little or nothing.
-  author: "Plato"
-  source: "Apology (Socrates, on the oracle at Delphi)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
-  moods: [reverie, cost, sun_secondary]
 
 - text: |
     For the sensible make their life pleasanter and more endurable by mitigating their sorrows with the consideration of their blessings, while most people, like sieves, let the worst things stick to them while the best pass through.
@@ -439,28 +164,12 @@
   moods: [opening, cost, warning]
 
 - text: |
-    For the body is weighed down by the burden of what presses on it, but the soul often adds to the real load a burden of its own.
-  author: "Plutarch"
-  source: "Moralia, 'On Exile' §II"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [opening, cost, reverie]
-
-- text: |
     A patrician's slipper is no cure for the gout, nor a costly ring for a whitlow, nor a diadem for the headache.
   author: "Plutarch"
   source: "Moralia, 'On Contentedness of Mind' §I"
   translation: "A. R. Shilleto, 1898"
   source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
   moods: [warning, cut]
-
-- text: |
-    Trouble and life are truly near akin. With the luxurious or the glorious life trouble consorts, and in the life of poverty lasts with it to the end.
-  author: "Plutarch"
-  source: "Moralia, 'On Contentedness of Mind' §III (quoting Menander)"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [opening, cost]
 
 - text: |
     Events will take their course, it is no good our being angry at them, he is happiest who wisely turns them to the best account.
@@ -479,55 +188,12 @@
   moods: [warning, cut]
 
 - text: |
-    Every one of you has some trouble, and he who has mine only is not so bad off.
-  author: "Plutarch"
-  source: "Moralia, 'On Contentedness of Mind' §XI (Pittacus)"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [reverie, cost]
-
-- text: |
     Whenever then you admire anyone carried by in his litter as a greater man than yourself, lower your eyes and look at those that bear the litter.
   author: "Plutarch"
   source: "Moralia, 'On Contentedness of Mind' §X"
   translation: "A. R. Shilleto, 1898"
   source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
   moods: [warning, reverie]
-
-- text: |
-    Vice fabricates for itself each of its own torments, being the terrible author of its own misery in life.
-  author: "Plutarch"
-  source: "Moralia, 'On Those Who Are Punished by the Deity Late' §IX"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [warning, cost]
-
-- text: |
-    Man is shut up in life as in a prison from which there is no egress or escape, and though doubtless during his life he has much feasting and business and gifts and favours and amusement, yet, just like people playing at dice or draughts in a prison, the rope is all the time hanging over his head.
-  author: "Plutarch"
-  source: "Moralia, 'On Those Who Are Punished by the Deity Late' §IX"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [reverie, cost, ending]
-
-# Batch 3: Baudelaire (Flowers of Evil, Paris Spleen), Dickinson (pre-1930).
-# Secondary yield from a Moon- and Venus-weighted pass.
-
-- text: |
-    If you would not feel the horrible burden of Time weighing on your shoulders and crushing you to the earth, be drunken continually. Drunken with what? With wine, with poetry, or with virtue, as you will. But be drunken.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'Be Drunken'"
-  translation: "Arthur Symons, 1913"
-  source_url: "https://www.gutenberg.org/cache/epub/50489/pg50489.txt"
-  moods: [opening, cost, moon_secondary]
-
-- text: |
-    Yes, Time has reappeared; Time reigns a monarch now; and with the hideous Ancient has returned all his demoniacal following of Memories, Regrets, Tremors, Fears, Dolours, Nightmares, and twittering nerves.
-  author: "Charles Baudelaire"
-  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
-  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
-  moods: [cost, ending]
 
 - text: |
     I assure you that the seconds are strongly and solemnly accentuated now; and each, as it drips from the pendulum, says: "I am Life: intolerable, implacable Life!"
@@ -548,26 +214,6 @@
   moods: [opening, ending, reverie]
 
 - text: |
-    Since then 't is centuries; but each
-    Feels shorter than the day
-    I first surmised the horses' heads
-    Were toward eternity.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXVII — 'The Chariot'"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [ending, reverie]
-
-- text: |
-    I heard a fly buzz when I died;
-    The stillness round my form
-    Was like the stillness in the air
-    Between the heaves of storm.
-  author: "Emily Dickinson"
-  source: "Poems, Second Series (1891), Book IV. Time and Eternity, XLVI — 'Dying'"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [opening, ending]
-
-- text: |
     Safe in their alabaster chambers,
     Untouched by morning and untouched by noon,
     Sleep the meek members of the resurrection,
@@ -576,24 +222,6 @@
   source: "Poems, First Series (1890), Book IV. Time and Eternity, IV"
   source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
   moods: [ending, reverie, moon_secondary]
-
-- text: |
-    The bustle in a house
-    The morning after death
-    Is solemnest of industries
-    Enacted upon earth, —
-    The sweeping up the heart,
-    And putting love away
-    We shall not want to use again
-    Until eternity.
-  author: "Emily Dickinson"
-  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXII"
-  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
-  moods: [ending, cost]
-
-# Batch 4: Persian / Sufi — Ferdowsi (Warner 1905–1906), Attar (FitzGerald 1889), Rumi (Whinfield 1887).
-# The tragic register of the Shahnameh (the failed sons, the fallen kings);
-# the desert-crossings and cost-of-journey of the Conference of the Birds.
 
 - text: |
     Although thou ridest on the heaven above,
@@ -605,104 +233,9 @@
   moods: [cost, warning, ending]
 
 - text: |
-    Be on thy guard as touching this world's love;
-    A bow is useless if it be not bent.
-    The process of the turning sky above
-    Is, favouring first, to plunder in the event.
-  author: "Ferdowsi"
-  source: "Shahnameh, Faridun §13 (the poet's counsel after Iraj's murder)"
-  translation: "Arthur George Warner & Edmond Warner, 1905"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
-  moods: [opening, cost, warning]
-
-- text: |
-    I have lost to-day
-    All strength and courage. Fight not with Turan:
-    I have done harm enough.
-  author: "Ferdowsi"
-  source: "Shahnameh, Kai Kaus §21 (Rustam, having slain Suhrab, to the nobles)"
-  translation: "Arthur George Warner & Edmond Warner, 1906"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
-  moods: [cost, ending, mars_secondary]
-
-- text: |
-    I have slain my son now when my head is grey.
-    He is cut off both root and stem, his loins
-    Are pierced, and heaven will weep for him for ever.
-  author: "Ferdowsi"
-  source: "Shahnameh, Kai Kaus §21 (Rustam to Zawara)"
-  translation: "Arthur George Warner & Edmond Warner, 1906"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
-  moods: [cost, ending]
-
-- text: |
-    We are the quarry, and death hunteth us
-    No matter whether we wear casque or crown,
-    But all are borne out when their end hath come,
-    And afterward we wot not how they do.
-  author: "Ferdowsi"
-  source: "Shahnameh, Kai Kaus §21 (Gudarz comforting Rustam)"
-  translation: "Arthur George Warner & Edmond Warner, 1906"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol2"
-  moods: [opening, cost, reverie]
-
-- text: |
-    Day darkened to Jamshid, he lost the Grace
-    That lighteneth the world, and though with tears
-    Of blood he sought for pardon Grace was not,
-    And dread of coming evil was his lot.
-  author: "Ferdowsi"
-  source: "Shahnameh, §1 ('The Greatness and Fall of Jamshid')"
-  translation: "Arthur George Warner & Edmond Warner, 1905"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
-  moods: [cost, ending]
-
-- text: |
-    A Road still waxing in Self-sacrifice
-    As it went on: still ringing with the Cries
-    And Groans of Those who had not yet prevail'd,
-    And bleaching with the Bones of those who fail'd.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Tajidar describes the Road"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [warning, cost, opening]
-
-- text: |
-    Till of the mighty Host that fledged the Dome
-    Of Heav'n and Floor of Earth on leaving Home,
-    A Handful reach'd and scrambled up the Knees
-    Of Kaf whose Feet dip in the Seven Seas.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), after the great attrition"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [cost, ending]
-
-- text: |
-    But Thirty — thirty desperate draggled Things,
-    Half-dead, with scarce a Feather on their Wings,
-    Stunn'd, blinded, deafen'd with the Crash and Craze
-    Of Rock and Sea collapsing in a Blaze.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the thirty survivors arrive"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [cost, ending, jupiter_secondary]
-
-- text: |
-    Consort with grief and put up with sadness,
-    Seek long life in your own death!
-  author: "Rumi"
-  source: "Masnavi, Book II, Story X ('Bayazid and the Saint')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, cost]
-
-- text: |
-    Where earth shall take the measure of my height.
-  author: "Ferdowsi"
-  source: "Shahnameh, Faridun §13 (Faridun praying for a respite before death)"
-  translation: "Arthur George Warner & Edmond Warner, 1905"
-  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
-  moods: [cost, ending]
+    Do not act as if thou wert going to live ten thousand years. Death hangs over thee. While thou livest, while it is in thy power, be good.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book IV, §17"
+  translation: "George Long, 1862"
+  source_url: "https://www.gutenberg.org/cache/epub/15877/pg15877.txt"
+  moods: [warning, command]

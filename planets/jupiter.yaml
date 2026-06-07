@@ -1,20 +1,6 @@
 # Jupiter — expansive, affirmative, oracular.
-# Batch of 10 verified fragments drawn from primary public-domain sources.
+# Curated keepers from the source review.
 # See spec/PLANETS.md §8 (Jupiter) and §11 (Sourcing Notes).
-
-- text: |
-    Thy infinite gifts come to me only on these very small hands of mine. Ages pass, and still thou pourest, and still there is room to fill.
-  author: "Rabindranath Tagore"
-  source: "Gitanjali, Song 1"
-  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
-  moods: [gift, opening]
-
-- text: |
-    But I find that thy will knows no end in me. And when old words die out on the tongue, new melodies break forth from the heart; and where the old tracks are lost, new country is revealed with its wonders.
-  author: "Rabindranath Tagore"
-  source: "Gitanjali, Song 37"
-  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
-  moods: [opening, affirmation]
 
 - text: |
     Time is endless in thy hands, my lord. There is none to count thy minutes.
@@ -31,13 +17,6 @@
   moods: [opening, affirmation]
 
 - text: |
-    Philosophy is at once the most sublime and the most trivial of human pursuits. It works in the minutest crannies and it opens out the widest vistas.
-  author: "William James"
-  source: "Pragmatism, Lecture I (The Present Dilemma in Philosophy)"
-  source_url: "https://www.gutenberg.org/cache/epub/5116/pg5116.txt"
-  moods: [opening, affirmation]
-
-- text: |
     Man is a stream whose source is hidden. Our being is descending into us from we know not whence.
   author: "Ralph Waldo Emerson"
   source: "Essays: First Series, 'The Over-Soul'"
@@ -45,11 +24,25 @@
   moods: [reverie, opening]
 
 - text: |
-    Every spirit builds itself a house; and beyond its house a world; and beyond its world, a heaven.
+    From within or from behind, a light shines through us upon things and makes us aware that we are nothing, but the light is all.
   author: "Ralph Waldo Emerson"
-  source: "Nature, Ch. VIII (Prospects)"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie]
+
+- text: |
+    We lie in the lap of immense intelligence, which makes us receivers of its truth and organs of its activity.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, affirmation, reverie]
+
+- text: |
+    Beauty is the mark God sets upon virtue. Every natural action is graceful. Every heroic act is also decent, and causes the place and the bystanders to shine.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. III (Beauty)"
   source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
-  moods: [opening, affirmation]
+  moods: [opening, affirmation, venus_secondary]
 
 - text: |
     The light which puts out our eyes is darkness to us. Only that day dawns to which we are awake. There is more day to dawn. The sun is but a morning star.
@@ -57,21 +50,6 @@
   source: "Walden, Conclusion"
   source_url: "https://www.gutenberg.org/cache/epub/205/pg205.txt"
   moods: [opening, affirmation]
-
-- text: |
-    Heaven is under our feet as well as over our heads.
-  author: "Henry David Thoreau"
-  source: "Walden, 'The Pond in Winter'"
-  source_url: "https://www.gutenberg.org/cache/epub/205/pg205.txt"
-  moods: [reverie, affirmation]
-
-- text: |
-    The Self is subtler than the subtle, greater than the great; It dwells in the heart of each living being.
-  author: "Katha-Upanishad"
-  source: "Katha-Upanishad, Part Second, verse XX"
-  translation: "Swami Paramananda, 1919"
-  source_url: "https://www.gutenberg.org/cache/epub/3283/pg3283.txt"
-  moods: [opening, reverie]
 
 - text: |
     This is the spirit that Beauty must ever induce, wonderment and a delicious trouble, longing and love and a trembling that is all delight.
@@ -82,91 +60,11 @@
   moods: [opening, affirmation]
 
 - text: |
-    There was something undefined and complete, coming into existence before Heaven and Earth. How still it was and formless, standing alone, and undergoing no change, reaching everywhere and in no danger (of being exhausted)! It may be regarded as the Mother of all things.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 25"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, reverie]
-
-- text: |
-    All-pervading is the Great Tao! It may be found on the left hand and on the right. All things depend on it for their production, which it gives to them, not one refusing obedience to it. When its work is accomplished, it does not claim the name of having done it.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 34"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, affirmation]
-
-- text: |
-    The Tao in its regular course does nothing (for the sake of doing it), and so there is nothing which it does not do.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 37"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, affirmation, mercury_secondary]
-
-- text: |
     The tree which fills the arms grew from the tiniest sprout; the tower of nine storeys rose from a (small) heap of earth; the journey of a thousand li commenced with a single step.
   author: "Lao Tzu"
   source: "Tao Te Ching, Ch. 64"
   translation: "James Legge, 1891"
   source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, affirmation]
-
-- text: |
-    All things are produced by the Tao, and nourished by its outflowing operation. They receive their forms according to the nature of each, and are completed according to the circumstances of their condition. Therefore all things without exception honour the Tao, and exalt its outflowing operation.
-  author: "Lao Tzu"
-  source: "Tao Te Ching, Ch. 51"
-  translation: "James Legge, 1891"
-  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    He interprets between gods and men, conveying and taking across to the gods the prayers and sacrifices of men, and to men the commands and replies of the gods; he is the mediator who spans the chasm which divides them, and therefore in him all is bound together.
-  author: "Plato"
-  source: "Symposium (Diotima on the nature of Love)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, affirmation]
-
-- text: |
-    All creation or passage of non-being into being is poetry or making, and the processes of all art are creative; and the masters of arts are all poets or makers.
-  author: "Plato"
-  source: "Symposium (Diotima to Socrates)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, affirmation]
-
-- text: |
-    Beauty absolute, separate, simple, and everlasting, which without diminution and without increase, or any change, is imparted to the ever-growing and perishing beauties of all other things.
-  author: "Plato"
-  source: "Symposium (Diotima's ladder)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, reverie]
-
-- text: |
-    The true order of going, or being led by another, to the things of love, is to begin from the beauties of earth and mount upwards for the sake of that other beauty, using these as steps only, and from one going on to two, and from two to all fair forms, and from fair forms to fair practices, and from fair practices to fair notions, until from fair notions he arrives at the notion of absolute beauty.
-  author: "Plato"
-  source: "Symposium (Diotima's ladder)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, affirmation, gift]
-
-- text: |
-    This is that life above all others which man should live, in the contemplation of beauty absolute; a beauty which if you once beheld, you would see not to be after the measure of gold, and garments, and fair boys and youths, whose presence now entrances you.
-  author: "Plato"
-  source: "Symposium (Diotima's ladder, conclusion)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
-  moods: [opening, affirmation, venus_secondary]
-
-- text: |
-    To the mortal creature, generation is a sort of eternity and immortality; and if love is of the everlasting possession of the good, all men will necessarily desire immortality together with good: Wherefore love is of immortality.
-  author: "Plato"
-  source: "Symposium (Diotima to Socrates)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
   moods: [opening, affirmation]
 
 - text: |
@@ -178,28 +76,20 @@
   moods: [reverie, affirmation]
 
 - text: |
-    He stretcheth out the north over the empty place, and hangeth the earth upon nothing.
-  author: "The Book of Job"
-  source: "Job 26:7 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, reverie]
+    Either death is a state of nothingness and utter unconsciousness, or, as men say, there is a change and migration of the soul from this world to another.
+  author: "Plato"
+  source: "Apology (Socrates, reflecting on death)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [reverie, opening, saturn_secondary]
 
 - text: |
-    Where wast thou when I laid the foundations of the earth? declare, if thou hast understanding. Who hath laid the measures thereof, if thou knowest? or who hath stretched the line upon it? When the morning stars sang together, and all the sons of God shouted for joy?
-  author: "The Book of Job"
-  source: "Job 38:4–7 (the Voice from the whirlwind)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [opening, affirmation, sun_secondary]
-
-- text: |
-    I have heard of thee by the hearing of the ear: but now mine eye seeth thee.
-  author: "The Book of Job"
-  source: "Job 42:5 (Job)"
-  translation: "King James Version, 1611"
-  source_url: "https://www.gutenberg.org/cache/epub/10/pg10.txt"
-  moods: [ending, affirmation]
+    How I wish that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
+  author: "Plato"
+  source: "Symposium (Socrates to Agathon, at the couch)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, paradox]
 
 - text: |
     Empires wax and wane; states cleave asunder and coalesce.
@@ -218,44 +108,12 @@
   moods: [opening, reverie]
 
 - text: |
-    Heroes are men who cherish lofty designs in their bosoms and have plans to achieve them; they have all-embracing schemes and the whole world is at their mercy.
-  author: "Luo Guanzhong"
-  source: "Romance of the Three Kingdoms, Ch. 21 (Cao Cao, Discusses Heroes)"
-  translation: "C. H. Brewitt-Taylor, 1925"
-  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_21"
-  moods: [opening, affirmation]
-
-- text: |
     Living you were valorous, dead you left behind a name.
   author: "Luo Guanzhong"
   source: "Romance of the Three Kingdoms, Ch. 91 (Zhuge Liang, sacrificial prayer at the Lu waters)"
   translation: "C. H. Brewitt-Taylor, 1925"
   source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_91"
   moods: [affirmation, saturn_secondary]
-
-- text: |
-    Fill thy belly: each day and night be thou merry, and daily keep holiday revel; each day and night do thou dance and rejoice; and fresh be thy raiment, let thy head be clean washen, and bathe thyself in the water; cherish the little one holding thy hand; be thy spouse in thy bosom happy — for this is the dower of man.
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet X (Siduri the Wine-maker to Gilgamesh)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [affirmation, opening, saturn_secondary]
-
-- text: |
-    Six days, a sennight the hurricane, deluge, and tempest continued sweeping the land: when the seventh day came, were quelled the warfare, tempest and deluge which like to an army embattled were fighting. Lulled was the sea, all spent was the gale, assuaged was the deluge.
-  author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Tablet XI (Utnapishtim's Flood narrative)"
-  translation: "R. Campbell Thompson, 1928"
-  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
-  moods: [reverie, ending]
-
-- text: |
-    Beloved is man that he was created in the image; greater love was it that it was made known to him that he was created in the image of God.
-  author: "Rabbi Akiva"
-  source: "Pirkei Avot 3:14"
-  translation: "Charles Taylor, 1897"
-  source_url: "https://archive.org/details/sayingsofjewish00tayl"
-  moods: [affirmation, opening]
 
 - text: |
     With ten utterances the world was created.
@@ -266,126 +124,12 @@
   moods: [opening, reverie]
 
 - text: |
-    This world is like a vestibule before the world to come; prepare yourself in the vestibule, so that you may enter the banqueting-hall.
-  author: "Rabbi Jacob"
-  source: "Pirkei Avot 4:16"
-  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.4.16"
-  moods: [reverie, ending, saturn_secondary]
-
-# Batch 2: Plato's Apology (Jowett), Emerson deep read, Plutarch's Moralia.
-
-- text: |
-    Either death is a state of nothingness and utter unconsciousness, or, as men say, there is a change and migration of the soul from this world to another.
-  author: "Plato"
-  source: "Apology (Socrates, reflecting on death)"
-  translation: "Benjamin Jowett, 1871"
-  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
-  moods: [reverie, opening, saturn_secondary]
-
-- text: |
-    The Supreme Critic on the errors of the past and the present, and the only prophet of that which must be, is that great nature in which we rest as the earth lies in the soft arms of the atmosphere; that Unity, that Over-soul, within which every man's particular being is contained and made one with all other.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'The Over-Soul'"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    We live in succession, in division, in parts, in particles. Meantime within man is the soul of the whole; the wise silence; the universal beauty, to which every part and particle is equally related; the eternal ONE.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'The Over-Soul'"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    From within or from behind, a light shines through us upon things and makes us aware that we are nothing, but the light is all.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'The Over-Soul'"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, reverie]
-
-- text: |
-    The soul looketh steadily forwards, creating a world before her, leaving worlds behind her. She has no dates, nor rites, nor persons, nor specialties nor men. The soul knows only the soul; the web of events is the flowing robe in which she is clothed.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'The Over-Soul'"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    We lie in the lap of immense intelligence, which makes us receivers of its truth and organs of its activity.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'Self-Reliance'"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, affirmation, reverie]
-
-- text: |
-    I became a transparent eye-ball; I am nothing; I see all; the currents of the Universal Being circulate through me; I am part or particle of God.
-  author: "Ralph Waldo Emerson"
-  source: "Nature, Ch. I"
-  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    Beauty is the mark God sets upon virtue. Every natural action is graceful. Every heroic act is also decent, and causes the place and the bystanders to shine.
-  author: "Ralph Waldo Emerson"
-  source: "Nature, Ch. III (Beauty)"
-  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
-  moods: [opening, affirmation, venus_secondary]
-
-- text: |
-    For man, as Plato says, is not an earthly and immovable but heavenly plant, the head making the body erect as from a root, and turned up to heaven.
-  author: "Plutarch"
-  source: "Moralia, 'On Exile' §V"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
-    See you the boundless reach of sky above, and how it holds the earth in its soft arms? These are the boundaries of our country, nor is there either exile or stranger or foreigner in these, where there is the same fire, water and air, the same rulers controllers and presidents, the sun the moon and the morning star.
-  author: "Plutarch"
-  source: "Moralia, 'On Exile' §V"
-  translation: "A. R. Shilleto, 1898"
-  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
-  moods: [opening, reverie, affirmation]
-
-- text: |
     Socrates said, that he was not an Athenian or Greek, but a citizen of the world.
   author: "Plutarch"
   source: "Moralia, 'On Exile' §V"
   translation: "A. R. Shilleto, 1898"
   source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
   moods: [opening, declaration, sun_secondary]
-
-- text: |
-    To the persevering mortal, said Zoroaster, the blessed Immortals are swift.
-  author: "Ralph Waldo Emerson"
-  source: "Essays: First Series, 'Self-Reliance' (quoting Zoroaster)"
-  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
-  moods: [opening, affirmation, gift]
-
-# Batch 4: Persian / Sufi tradition — Rumi (Whinfield 1887), Attar (FitzGerald 1889).
-
-- text: |
-    To each person have I allotted peculiar forms,
-    To each have I given particular usages.
-    What is praiseworthy in thee is blamable in him,
-    What is poison for thee is honey for him.
-  author: "Rumi"
-  source: "Masnavi, Book II, Story VII ('Moses and the Shepherd'), 'Religious forms indifferent'"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, affirmation, reverie]
-
-- text: |
-    I regard not the outside and the words,
-    I regard the inside and the state of heart.
-    I look at the heart if it be humble,
-    Though the words may be the reverse of humble.
-  author: "Rumi"
-  source: "Masnavi, Book II, Story VII ('Moses and the Shepherd')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [opening, affirmation]
 
 - text: |
     I died as a mineral and arose a plant,
@@ -397,17 +141,6 @@
   translation: "E. H. Whinfield, 1887"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, affirmation, saturn_secondary]
-
-- text: |
-    I shall die once again as a man
-    To rise an angel perfect from head to foot!
-    Again when I suffer dissolution as an angel,
-    I shall become what passes the conception of man!
-  author: "Rumi"
-  source: "Masnavi, Book III, Story XVII ('The Vakil of Bokhara')"
-  translation: "E. H. Whinfield, 1887"
-  source_url: "https://archive.org/details/masnaviimanavi"
-  moods: [affirmation, reverie]
 
 - text: |
     Pain is a treasure, for it contains mercies;
@@ -428,39 +161,6 @@
   translation: "E. H. Whinfield, 1887"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, reverie]
-
-- text: |
-    Behold the Grace of Allah comes and goes
-    As to Itself is good: and no one knows
-    Which way it turns: in that mysterious Court
-    Not he most finds who furthest travels for't.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Pheasant answered by Tajidar"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [opening, reverie, mercury_secondary]
-
-- text: |
-    Come you lost Atoms to your Centre draw,
-    And be the Eternal Mirror that you saw:
-    Rays that have wander'd into Darkness wide
-    Return, and back into your Sun subside.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [opening, affirmation, ending]
-
-- text: |
-    The Sun of my Perfection is a Glass
-    Wherein from Seeing into Being pass
-    All who, reflecting as reflected see
-    Themselves in Me, and Me in Them.
-  author: "Attar"
-  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne (climax)"
-  translation: "Edward FitzGerald, 1889"
-  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
-  moods: [opening, affirmation, mercury_secondary]
 
 - text: |
     As Water lifted from the Deep, again
