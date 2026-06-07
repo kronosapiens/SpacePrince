@@ -40,15 +40,9 @@ describe("propagation projections", () => {
       playerAspects: getAspects(chart),
       opponentAspects: getAspects(opp),
     });
-    // No combust, so direct deltas should appear for the active pair.
-    // Each entry is { delta: number; polarity: Polarity }.
-    Object.values(projected.self).forEach((d) => {
-      expect(typeof d!.delta).toBe("number");
-      expect(["Testimony", "Affliction"]).toContain(d!.polarity);
-    });
-    Object.values(projected.other).forEach((d) => {
-      expect(typeof d!.delta).toBe("number");
-      expect(["Testimony", "Affliction"]).toContain(d!.polarity);
-    });
+    // No combust: every projected delta is a finite integer (number model).
+    for (const d of [...Object.values(projected.self), ...Object.values(projected.other)]) {
+      expect(Number.isInteger(d!.delta)).toBe(true);
+    }
   });
 });

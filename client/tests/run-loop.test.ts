@@ -2,31 +2,18 @@ import { describe, expect, it } from "vitest";
 import { beginRun, isRunOver } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
-import { seededChart } from "@/game/chart";
 import { mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes } from "@/game/narrative";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
-import type { Profile, RunState, PlanetName } from "@/game/types";
-
-function makeStubProfile(seed = 7, lifetimeCount = 64): Profile {
-  return {
-    id: `stub_${seed}`,
-    name: "Stub",
-    birthData: { iso: "2000-01-01T00:00:00Z", lat: 0, lon: 0 },
-    chart: seededChart(seed, "Stub"),
-    lifetimeEncounterCount: lifetimeCount, // unlock all 7 planets for the run-loop test
-    scarsLevel: 0,
-    createdAt: 0,
-    schemaVersion: 1,
-  };
-}
+import type { RunState, PlanetName } from "@/game/types";
+import { createStubProfile } from "./fixtures";
 
 describe("Run loop integration", () => {
   it("resolves a combat encounter and persists run state across turns", () => {
-    const profile = makeStubProfile(7);
+    const profile = createStubProfile({ seed: 7 });
     const run = beginRun(profile, 42);
     const enc = beginCombatEncounter({
       run,
@@ -63,7 +50,7 @@ describe("Run loop integration", () => {
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {
-    const profile = makeStubProfile(7);
+    const profile = createStubProfile({ seed: 7 });
     const run = beginRun(profile, 17);
     const startId = run.currentMap.currentNodeId;
     const startLayer = run.currentMap.graph.nodes.find((n) => n.id === startId)!.layer;
@@ -76,7 +63,7 @@ describe("Run loop integration", () => {
   });
 
   it("eligibleNext excludes already-visited neighbors", () => {
-    const profile = makeStubProfile(7);
+    const profile = createStubProfile({ seed: 7 });
     const run = beginRun(profile, 17);
     const startId = run.currentMap.currentNodeId;
     const firstNeighbor = eligibleNext(run.currentMap.graph, startId, [])[0]!;
@@ -88,7 +75,7 @@ describe("Run loop integration", () => {
   });
 
   it("narrative outcomes can heal / harm / spend distance and uncombust", () => {
-    const profile = makeStubProfile(11);
+    const profile = createStubProfile({ seed: 11 });
     let r = beginRun(profile, 5);
     r = { ...r, runDistance: 10, perPlanetState: { ...r.perPlanetState } };
     r.perPlanetState.Sun = { affliction: 5, combusted: true };
@@ -103,7 +90,7 @@ describe("Run loop integration", () => {
   });
 
   it("isRunOver true iff every player planet is combusted", () => {
-    const profile = makeStubProfile(13);
+    const profile = createStubProfile({ seed: 13 });
     const run = beginRun(profile, 1);
     expect(isRunOver(run)).toBe(false);
     const dead = { ...run };
