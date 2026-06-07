@@ -25,3 +25,7 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 .gstack/
+
+# Claude Code (local / transient)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
