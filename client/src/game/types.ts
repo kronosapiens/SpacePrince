@@ -14,7 +14,7 @@ export type Dignity = "Domicile" | "Exaltation" | "Neutral" | "Detriment" | "Fal
 export type AspectType =
   | "Conjunction" | "Sextile" | "Square" | "Trine" | "Opposition" | "None";
 
-export type Polarity = "Testimony" | "Affliction" | "Friction";
+export type Polarity = "Testimony" | "Affliction";
 
 export interface PlanetBaseStats {
   damage: number;
@@ -74,7 +74,10 @@ export interface TurnLogEntry {
   turnIndex: number;
   playerPlanet: PlanetName;
   opponentPlanet: PlanetName;
-  polarity: Polarity;
+  /** Valence the player chose this turn (lands on the opponent). */
+  playerValence: Polarity;
+  /** Valence the opponent precommitted this turn (lands on the player). */
+  opponentValence: Polarity;
   playerDelta: number;
   opponentDelta: number;
   playerCrit: boolean;
@@ -85,7 +88,6 @@ export interface TurnLogEntry {
   turnScore: number;
   directBreakdown: {
     playerBase: number;
-    friction: number;
     playerCritMultiplier: number;
     playerResult: number;
     opponentBase: number;
@@ -104,6 +106,10 @@ export interface CombatEncounter {
   opponentChart: Chart;
   opponentState: SideState;
   sequence: PlanetName[]; // length = unlocked.length at encounter start
+  /** Opponent's precommitted action per turn, parallel to `sequence`. Drawn
+   *  stat-weighted (P(afflict) = damage / (damage + healing)) and locked at
+   *  turn start, so the player always chooses with full information. */
+  opponentActions: Polarity[];
   turnIndex: number;
   log: TurnLogEntry[];
   resolved: boolean;

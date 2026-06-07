@@ -47,3 +47,10 @@ export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction
   tension: "#CD2626", // square, opposition
 } as const;
+
+/** Action valence colors — afflict (warm red) / testify (sage green). Shared
+ *  by the action buttons and the opponent's precommitted-verb label. */
+export const VALENCE_COLOR = {
+  Affliction: "#FF8C6B",
+  Testimony: "#8FBC8F",
+} as const;

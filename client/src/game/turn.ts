@@ -1,8 +1,8 @@
 import { PLANETS } from "./data";
 import {
   computeDirectExchange,
+  drawValence,
   getEffectiveStatsFromPlacement,
-  getPolarity,
 } from "./combat";
 import { getAspects } from "./aspects";
 import { maybeCombust } from "./combust";
@@ -40,12 +40,14 @@ export function resolveTurn(
   run: RunState,
   playerChart: Chart,
   playerPlanet: PlanetName,
+  playerValence: Polarity,
   rng: () => number,
 ): TurnResult | null {
   const enc = run.currentEncounter;
   if (!enc || enc.kind !== "combat" || enc.resolved) return null;
   const opponentPlanet = enc.sequence[enc.turnIndex];
   if (!opponentPlanet) return null;
+  const opponentValence = enc.opponentActions[enc.turnIndex] ?? "Affliction";
 
   const playerStateMap = cloneSideState(run.perPlanetState);
   const opponentStateMap = cloneSideState(enc.opponentState);
@@ -57,41 +59,47 @@ export function resolveTurn(
     opponentPlacement,
     playerStateMap[playerPlanet],
     opponentStateMap[opponentPlanet],
+    playerValence,
+    opponentValence,
     rng,
   );
+  // Each planet receives the *other* side's action: the player's planet takes
+  // the opponent's precommitted valence, the opponent's planet takes the
+  // player's chosen valence.
   const playerDelta = applyEffect(
     playerStateMap[playerPlanet],
-    direct.polarity,
+    opponentValence,
     direct.opponentToPlayer,
   );
   const opponentDelta = applyEffect(
     opponentStateMap[opponentPlanet],
-    direct.polarity,
+    playerValence,
     direct.playerToOpponent,
   );
 
   const propagation = [
-    ...propagate(playerStateMap, playerChart, playerPlanet, direct.polarity, direct.opponentToPlayer, rng, "self"),
-    ...propagate(opponentStateMap, enc.opponentChart, opponentPlanet, direct.polarity, direct.playerToOpponent, rng, "other"),
+    ...propagate(playerStateMap, playerChart, playerPlanet, opponentValence, direct.opponentToPlayer, rng, "self"),
+    ...propagate(opponentStateMap, enc.opponentChart, opponentPlanet, playerValence, direct.playerToOpponent, rng, "other"),
   ];
 
   const playerCombust =
-    direct.polarity !== "Testimony" && playerDelta > 0
+    opponentValence !== "Testimony" && playerDelta > 0
       ? maybeCombust(playerPlacement, playerStateMap[playerPlanet], rng)
       : false;
   const opponentCombust =
-    direct.polarity !== "Testimony" && opponentDelta > 0
+    playerValence !== "Testimony" && opponentDelta > 0
       ? maybeCombust(opponentPlacement, opponentStateMap[opponentPlanet], rng)
       : false;
 
-  const score = turnScore(playerDelta, opponentDelta, propagation);
+  const score = turnScore(playerDelta, opponentDelta, playerValence, opponentValence, propagation);
 
   const log: TurnLogEntry = {
     id: `turn_${enc.id}_${enc.turnIndex}_${Date.now()}`,
     turnIndex: enc.turnIndex,
     playerPlanet,
     opponentPlanet,
-    polarity: direct.polarity,
+    playerValence,
+    opponentValence,
     playerDelta,
     opponentDelta,
     playerCrit: direct.playerCrit,
@@ -102,7 +110,6 @@ export function resolveTurn(
     turnScore: score,
     directBreakdown: {
       playerBase: direct.playerBase,
-      friction: direct.friction,
       playerCritMultiplier: direct.playerCrit ? 2 : 1,
       playerResult: direct.playerToOpponent,
       opponentBase: direct.opponentBase,
@@ -111,13 +118,22 @@ export function resolveTurn(
     },
   };
 
-  // Pick next opponent planet from non-combusted ones; advance turnIndex.
+  // Pick next opponent planet from non-combusted ones and precommit its verb;
+  // advance turnIndex.
   const nextTurnIndex = enc.turnIndex + 1;
   const allOppCombusted = PLANETS.every((p) => opponentStateMap[p].combusted);
   const newSequence = [...enc.sequence];
+  const newOpponentActions = [...enc.opponentActions];
   if (nextTurnIndex < newSequence.length && !allOppCombusted) {
     const selectable = PLANETS.filter((p) => !opponentStateMap[p].combusted);
-    if (selectable.length > 0) newSequence[nextTurnIndex] = pickWeighted(selectable, rng);
+    if (selectable.length > 0) {
+      const nextOpponent = pickWeighted(selectable, rng);
+      newSequence[nextTurnIndex] = nextOpponent;
+      newOpponentActions[nextTurnIndex] = drawValence(
+        getEffectiveStatsFromPlacement(enc.opponentChart.planets[nextOpponent]),
+        rng,
+      );
+    }
   }
 
   const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted;
@@ -127,6 +143,7 @@ export function resolveTurn(
     ...enc,
     opponentState: opponentStateMap,
     sequence: newSequence,
+    opponentActions: newOpponentActions,
     turnIndex: nextTurnIndex,
     log: [log, ...enc.log].slice(0, 24),
     resolved: encounterEnded,
@@ -153,26 +170,25 @@ function computeDirectPhase(
   opponentPlacement: PlanetPlacement,
   playerState: PlanetState,
   opponentState: PlanetState,
+  playerValence: Polarity,
+  opponentValence: Polarity,
   rng: () => number,
 ) {
-  const polarity = getPolarity(playerPlacement.element, opponentPlacement.element);
   const playerEff = playerState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(playerPlacement);
   const opponentEff = opponentState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(opponentPlacement);
   const playerCrit = rollCrit(playerEff.luck, rng);
   const opponentCrit = rollCrit(opponentEff.luck, rng);
-  // Reuse the polarity/element exchange formula from combat.ts; multiply by
-  // crit factor here. Projection (computeProjectedEffects) uses the same
-  // function without crit, so projection and resolution can never drift.
-  const exchange = computeDirectExchange(polarity, playerEff, opponentEff);
+  // Reuse the exchange formula from combat.ts; multiply by crit factor here.
+  // Projection (computeProjectedEffects) uses the same function without crit,
+  // so projection and resolution can never drift.
+  const exchange = computeDirectExchange(playerValence, opponentValence, playerEff, opponentEff);
   return {
-    polarity,
     playerCrit,
     opponentCrit,
     playerToOpponent: exchange.playerToOpponent * (playerCrit ? 2 : 1),
     opponentToPlayer: exchange.opponentToPlayer * (opponentCrit ? 2 : 1),
-    friction: exchange.polarityMultiplier,
-    playerBase: polarity === "Testimony" ? playerEff.healing : playerEff.damage,
-    opponentBase: polarity === "Testimony" ? opponentEff.healing : opponentEff.damage,
+    playerBase: playerValence === "Testimony" ? playerEff.healing : playerEff.damage,
+    opponentBase: opponentValence === "Testimony" ? opponentEff.healing : opponentEff.damage,
   };
 }
 

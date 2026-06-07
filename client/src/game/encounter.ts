@@ -1,11 +1,13 @@
 import { PLANETS } from "./data";
 import { blankSideState, seededChart } from "./chart";
+import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { pickWeighted, mulberry32 } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
   CombatEncounter,
   NarrativeEncounter,
   PlanetName,
+  Polarity,
   RunState,
 } from "./types";
 
@@ -24,8 +26,13 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const turnCount = playerUnlocked.length;
   const rng = mulberry32(encounterIdSeed ?? opponentSeed);
   const sequence: PlanetName[] = [];
+  const opponentActions: Polarity[] = [];
   for (let i = 0; i < turnCount; i++) {
-    sequence.push(pickWeighted(PLANETS, rng));
+    const planet = pickWeighted(PLANETS, rng);
+    sequence.push(planet);
+    opponentActions.push(
+      drawValence(getEffectiveStatsFromPlacement(opponentChart.planets[planet]), rng),
+    );
   }
   return {
     kind: "combat",
@@ -33,6 +40,7 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
     opponentChart,
     opponentState: blankSideState(),
     sequence,
+    opponentActions,
     turnIndex: 0,
     log: [],
     resolved: false,

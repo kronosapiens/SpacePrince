@@ -208,7 +208,10 @@ function runScheduler(args: {
     epoch: previousEncounter.turnIndex,
   });
 
-  const sign = entry.polarity === "Testimony" ? -1 : 1;
+  // Each planet's direct delta carries the sign of the action it *received*:
+  // the player's planet took the opponent's valence, and vice versa.
+  const selfSign = entry.opponentValence === "Testimony" ? -1 : 1;
+  const otherSign = entry.playerValence === "Testimony" ? -1 : 1;
   const propagationSteps = entry.propagation.filter((p) => p.target);
   const playerSteps = propagationSteps.filter((s) => s.side === "self");
   const opponentSteps = propagationSteps.filter((s) => s.side === "other");
@@ -224,9 +227,10 @@ function runScheduler(args: {
     actionDelta: number;
     actionCrit: boolean;
     actionCombust: boolean;
+    sign: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, steps } = args;
+    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, sign, steps } = args;
     const isSelf = side === "self";
 
     // Primary direct phase — apply delta, light action-glow, impact, crit.
@@ -404,6 +408,7 @@ function runScheduler(args: {
     actionDelta: entry.playerDelta,
     actionCrit: entry.playerCrit,
     actionCombust: entry.playerCombust ?? false,
+    sign: selfSign,
     steps: playerSteps,
   });
   const opponentBase = playerPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
@@ -414,6 +419,7 @@ function runScheduler(args: {
     actionDelta: entry.opponentDelta,
     actionCrit: entry.opponentCrit,
     actionCombust: entry.opponentCombust ?? false,
+    sign: otherSign,
     steps: opponentSteps,
   });
 

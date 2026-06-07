@@ -4,14 +4,15 @@ import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
-import { PLANETS, SIGNS, SIGN_ELEMENT } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
-import { getPolarity } from "@/game/combat";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { getEffectiveStats } from "@/game/combat";
+import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
+import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_PLANET_SET,
   EMPTY_PROPAGATION_KEYS,
@@ -23,7 +24,6 @@ import type {
   Polarity,
   Profile,
   RunState,
-  SignName,
   TurnLogEntry,
 } from "@/game/types";
 
@@ -43,7 +43,7 @@ interface CombatScreenProps {
   /** Resolves a turn; returns null if the click was rejected (e.g. encounter
    *  resolved). Persistence + lifetime-bump + outcome construction happen
    *  inside the implementation (real or dev). */
-  onCommitTurn: (planet: PlanetName, rng: () => number) => CommitTurnResult | null;
+  onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => CommitTurnResult | null;
   /** Clear `run.currentEncounter` and return to the map. */
   onClearEncounter: () => void;
   devUnlockAll: boolean;
@@ -56,12 +56,30 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
+  // Desktop-only: which action button the pointer is over. Drives the live
+  // projection preview. Null on touch (no hover) — both buttons still render
+  // lit and the projection falls back to the planet's default verb.
+  const [pendingAction, setPendingAction] = useState<Polarity | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
   const displayTurnIndex = animation?.turnIndex ?? encounter.turnIndex;
+  // Opponent's precommitted verb. `opponentAction` is this turn's (feeds the
+  // live projection); `displayOpponentAction` follows the animation's turn
+  // index — its slot isn't overwritten on advance, so it reads correctly
+  // both pre-commit and mid-playback.
+  const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
+  const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
+  // Magnitude of the opponent's precommitted verb (its effective damage/healing),
+  // shown next to the verb in the seam — e.g. "AFFLICTS 5".
+  const displayOpponentAmount =
+    displayOpponentTurn && displayOpponentAction
+      ? getEffectiveStats(encounter.opponentChart, displayOpponentTurn)[
+          displayOpponentAction === "Testimony" ? "healing" : "damage"
+        ]
+      : null;
   const displayedRunDistance = animation?.distanceBefore ?? run.runDistance;
   const displayPlayerState = animation?.selfState ?? run.perPlanetState;
   const displayOpponentState = animation?.otherState ?? encounter.opponentState;
@@ -85,35 +103,40 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [profile.lifetimeEncounterCount, devUnlockAll],
   );
 
+  // Selection wins over hover — locks the panel to the selected planet so
+  // mousing around the chart doesn't blow the read away. The panel (with its
+  // action buttons) shows for either.
+  const inspected = selected ?? hovered;
+
+  // The valence the live projection reflects: the button being hovered, else
+  // the inspected planet's stronger verb (its natural default). The default
+  // keeps the projection meaningful on touch, where there's no hover.
+  const previewValence: Polarity | null = (() => {
+    if (!inspected) return null;
+    if (pendingAction) return pendingAction;
+    const eff = getEffectiveStats(profile.chart, inspected);
+    return eff.damage >= eff.healing ? "Affliction" : "Testimony";
+  })();
+
   const projection = useMemo(() => {
     if (animation) return null;
-    if (!selected || !opponentTurn) return null;
-    if (run.perPlanetState[selected].combusted) return null;
+    if (!inspected || !opponentTurn || !previewValence) return null;
+    if (run.perPlanetState[inspected].combusted) return null;
     const playerAspects = getAspects(profile.chart);
     const opponentAspects = getAspects(encounter.opponentChart);
     return computeProjectedEffects({
       playerChart: profile.chart,
       opponentChart: encounter.opponentChart,
-      playerPlanet: selected,
+      playerPlanet: inspected,
       opponentPlanet: opponentTurn,
+      playerValence: previewValence,
+      opponentValence: opponentAction,
       playerState: run.perPlanetState,
       opponentState: encounter.opponentState,
       playerAspects,
       opponentAspects,
     });
-  }, [animation, selected, opponentTurn, run.perPlanetState, encounter.opponentState, encounter.opponentChart, profile.chart]);
-
-  // Per-sign polarity tints on the player's rim — at a glance, which of my
-  // signs would resolve as Testimony / Affliction against the opponent's
-  // current turn. The mirror on the opponent chart is the same matchup
-  // commuted, so it adds no new info; we don't render it there.
-  const selfSignPolarities = useMemo<Partial<Record<SignName, Polarity>>>(() => {
-    if (!displayOpponentTurn) return {};
-    const oppElement = encounter.opponentChart.planets[displayOpponentTurn].element;
-    const out: Partial<Record<SignName, Polarity>> = {};
-    for (const sign of SIGNS) out[sign] = getPolarity(SIGN_ELEMENT[sign], oppElement);
-    return out;
-  }, [displayOpponentTurn, encounter.opponentChart]);
+  }, [animation, inspected, previewValence, opponentTurn, opponentAction, run.perPlanetState, encounter.opponentState, encounter.opponentChart, profile.chart]);
 
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection. Mid-animation: the snapshot captured at commit, with each
@@ -146,20 +169,37 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     };
   }, [animation, projection]);
 
+  // Click/tap a planet to select it — keeps the panel sticky (the commit path
+  // on touch, where there's no hover). Hover shows the same panel transiently.
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
       if (animation) {
         skipAnimation();
         setSelected(null);
+        setPendingAction(null);
         return;
       }
       if (encounter.resolved) return;
       if (!playerUnlocked.includes(planet)) return;
       if (run.perPlanetState[planet].combusted) return;
-      if (selected !== planet) {
-        setSelected(planet);
-        return;
-      }
+      setSelected(planet);
+      setPendingAction(null);
+    },
+    [animation, encounter.resolved, run.perPlanetState, playerUnlocked, skipAnimation],
+  );
+
+  // Hovering a planet previews it; reset the per-button preview so the
+  // projection falls back to the newly-inspected planet's default verb.
+  const handlePlayerHover = useCallback((planet: PlanetName | null) => {
+    setHovered(planet);
+    setPendingAction(null);
+  }, []);
+
+  // Commit the chosen action for a specific planet (the one whose panel is open).
+  const handleCommit = useCallback(
+    (planet: PlanetName, action: Polarity) => {
+      if (animation || encounter.resolved || !opponentTurn) return;
+      if (run.perPlanetState[planet].combusted) return;
       // Deterministic per (run, encounter, turn) — same seed produces the
       // same fight every time, which is the point of `/encounter/<seed>`.
       const rng = mulberry32(
@@ -167,13 +207,22 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       );
       const previousRun = run;
       const previousEncounter = encounter;
-      // Snapshot the projection so the badges can persist through the
-      // animation rather than vanishing all at once. The hook clears each
-      // planet's projection as that planet's impact pulse fires.
-      const projectionSnapshot = projection
-        ? { self: { ...projection.self }, other: { ...projection.other } }
-        : null;
-      const committed = onCommitTurn(planet, rng);
+      // Snapshot the projection for the *chosen* action so the badges shown
+      // during playback match the committed turn (the live projection previews
+      // the planet's default verb, which may differ from what was clicked).
+      const projectionSnapshot = computeProjectedEffects({
+        playerChart: profile.chart,
+        opponentChart: encounter.opponentChart,
+        playerPlanet: planet,
+        opponentPlanet: opponentTurn,
+        playerValence: action,
+        opponentValence: opponentAction,
+        playerState: run.perPlanetState,
+        opponentState: encounter.opponentState,
+        playerAspects: getAspects(profile.chart),
+        opponentAspects: getAspects(encounter.opponentChart),
+      });
+      const committed = onCommitTurn(planet, action, rng);
       if (!committed) return;
       startAnimation({
         entry: committed.log,
@@ -182,13 +231,24 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         projectedDeltas: projectionSnapshot,
       });
       setSelected(null);
+      setHovered(null);
+      setPendingAction(null);
     },
-    [animation, encounter, run, selected, playerUnlocked, onCommitTurn, skipAnimation, startAnimation, projection],
+    [animation, encounter, run, opponentTurn, opponentAction, profile.chart, onCommitTurn, startAnimation],
   );
 
-  // Selection wins over hover — locks the panel to the selected planet so
-  // mousing around the chart doesn't blow the read away.
-  const inspected = selected ?? hovered;
+  // The action fan-out rides the bottom of the stats panel — local to the
+  // planet. Shown for the inspected planet (hover or select) when committable.
+  const playerActions: PlanetStatsActions | undefined =
+    inspected && !animation && !encounter.resolved && !run.perPlanetState[inspected].combusted
+      ? {
+          afflict: getEffectiveStats(profile.chart, inspected).damage,
+          testify: getEffectiveStats(profile.chart, inspected).healing,
+          pending: pendingAction,
+          onChoose: (v) => handleCommit(inspected, v),
+          onPreview: setPendingAction,
+        }
+      : undefined;
 
   // Clicking anywhere outside a planet glyph clears the selection. Planet
   // and continue-button clicks stopPropagation, so they don't reach this
@@ -196,7 +256,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // get its selection state mid-flight.
   const handleClearSelection = useCallback(() => {
     if (animation) return;
-    if (selected !== null) setSelected(null);
+    if (selected !== null) {
+      setSelected(null);
+      setPendingAction(null);
+    }
   }, [animation, selected]);
 
   const handleContinue = useCallback(() => {
@@ -222,7 +285,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
-          onPlanetHover={setHovered}
+          onPlanetHover={handlePlayerHover}
           projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
           activePlanet={animation?.playerPlanet ?? null}
           activePropagationKeys={activePropagationKeys.self}
@@ -231,8 +294,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           critPlanets={critPlayer}
           combustingPlanets={combustingPlayer}
           animationEpoch={animationEpoch}
-          signPolarities={selfSignPolarities}
           statsPanelPlanet={inspected}
+          statsPanelActions={playerActions}
+          statsPanelReserveActions
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>
@@ -249,6 +313,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               {PLANET_GLYPH[displayOpponentTurn]}
             </span>
             <span className="combat-opp-name">{displayOpponentTurn.toUpperCase()}</span>
+            {displayOpponentAction && (
+              <span
+                className="combat-opp-action"
+                style={{ color: VALENCE_COLOR[displayOpponentAction] }}
+              >
+                {displayOpponentAction === "Testimony" ? "TESTIFIES" : "AFFLICTS"}
+                {displayOpponentAmount != null ? ` ${displayOpponentAmount}` : ""}
+              </span>
+            )}
           </div>
         )}
         {encounter.resolved && !animation && (

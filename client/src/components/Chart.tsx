@@ -5,6 +5,8 @@ import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
   PLANET_STATS_PANEL_H,
+  PLANET_STATS_PANEL_ACTION_H,
+  type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import {
@@ -23,11 +25,6 @@ import type {
   Polarity,
   SignName,
 } from "@/game/types";
-
-// Sign-label tints used to surface combat polarity around the chart rim.
-// Match v1's values so the affordance reads the same.
-const SIGN_AFFLICTION_COLOR = "#FF8C6B";
-const SIGN_TESTIMONY_COLOR = "#8FBC8F";
 
 const SIGN_LABELS: Record<SignName, string> = {
   Aries: "ARI", Taurus: "TAU", Gemini: "GEM", Cancer: "CAN",
@@ -123,17 +120,16 @@ export interface ChartProps {
   combustingPlanets?: ReadonlySet<PlanetName>;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
-  /** Per-sign polarity coloring — used during combat to indicate, for each
-   *  zodiac sign on the rim, what the polarity outcome would be against the
-   *  reference planet (opponent-of-turn for the player chart, player's
-   *  hovered/selected for the opponent chart). Affliction = red, Testimony
-   *  = green, Friction or absent = neutral. */
-  signPolarities?: Partial<Record<SignName, Polarity>>;
   /** When set, render the planet stats panel inside the chart at the
    *  anti-centroid placement. The position is fixed per-chart (depends only
    *  on planet positions), so swapping which planet is inspected doesn't
    *  jump the panel around. */
   statsPanelPlanet?: PlanetName | null;
+  /** When set, render the combat action fan-out under the stats panel. */
+  statsPanelActions?: PlanetStatsActions;
+  /** Reserve the taller (action-row) panel height when placing, so the panel
+   *  doesn't shift between hover (stats only) and select (stats + actions). */
+  statsPanelReserveActions?: boolean;
 }
 
 export function Chart(props: ChartProps) {
@@ -166,12 +162,22 @@ export function Chart(props: ChartProps) {
     critPlanets,
     combustingPlanets,
     animationEpoch,
-    signPolarities,
     statsPanelPlanet,
+    statsPanelActions,
+    statsPanelReserveActions,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
-  const panelPlacement = useMemo(() => computePanelPlacement(points), [points]);
+  // Place the panel in the emptiest interior wedge — the wheel's middle isn't
+  // reliably clear (same-sign planets cluster toward the center). Reserve the
+  // taller action height so the spot doesn't shift when buttons appear.
+  const panelHeight = statsPanelReserveActions
+    ? PLANET_STATS_PANEL_ACTION_H
+    : PLANET_STATS_PANEL_H;
+  const panelPlacement = useMemo(
+    () => computePanelPlacement(points, panelHeight),
+    [points, panelHeight],
+  );
   const aspects = useMemo(() => aspectsProp ?? getAspects(chart), [chart, aspectsProp]);
   const pointMap = useMemo(() => {
     const m: Record<PlanetName, PlanetPoint> = {} as Record<PlanetName, PlanetPoint>;
@@ -319,7 +325,7 @@ export function Chart(props: ChartProps) {
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
         fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.45" strokeWidth={1} />
       <SignTicks />
-      <SignLabels ascSignIdx={ascSignIdx} signPolarities={signPolarities} />
+      <SignLabels ascSignIdx={ascSignIdx} />
       {aspectLines}
       {propagationLines}
 
@@ -329,6 +335,7 @@ export function Chart(props: ChartProps) {
           planet={statsPanelPlanet}
           cx={panelPlacement.cx}
           cy={panelPlacement.cy}
+          actions={statsPanelActions}
         />
       )}
 
@@ -456,12 +463,12 @@ function PlanetGlyph({
   const ux = dx / d;
   const uy = dy / d;
   const badgeOffset = r;
-  const badgeR = Math.max(12, r * 0.5);
-  const badgeFontSize = Math.max(12, Math.round(r * 0.48));
-  // Projection badge is ~20% smaller — only ever a single digit, doesn't
+  const badgeR = Math.max(14, r * 0.6);
+  const badgeFontSize = Math.max(15, Math.round(r * 0.62));
+  // Projection badge is a touch smaller — only ever a single digit, doesn't
   // need to fit two-digit values like the persistent affliction badge.
-  const projBadgeR = Math.max(10, r * 0.4);
-  const projFontSize = Math.max(10, Math.round(r * 0.38));
+  const projBadgeR = Math.max(12, r * 0.5);
+  const projFontSize = Math.max(13, Math.round(r * 0.5));
   // Pill width grows with text length. Floor at 2*r (square-ish).
   // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
   // visual padding so multi-char content like "2.5" doesn't get crowded
@@ -690,36 +697,24 @@ function SignTicks() {
   return <g>{lines}</g>;
 }
 
-function SignLabels({
-  ascSignIdx,
-  signPolarities,
-}: {
-  ascSignIdx: number;
-  signPolarities?: Partial<Record<SignName, Polarity>>;
-}) {
+function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
   const out = [];
   for (let i = 0; i < 12; i++) {
     const sign = SIGNS[i]!;
     const offset = (i - ascSignIdx + 12) % 12;
     const ang = 180 + offset * 30 + 15;
     const p = polar(CHART_CENTER, CHART_CENTER, SIGN_LABEL_R, ang);
-    const polarity = signPolarities?.[sign];
-    const tint =
-      polarity === "Affliction" ? SIGN_AFFLICTION_COLOR :
-      polarity === "Testimony" ? SIGN_TESTIMONY_COLOR :
-      NEUTRAL.bone;
-    const opacity = polarity === "Affliction" || polarity === "Testimony" ? 0.95 : 0.7;
     out.push(
       <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={tint} fillOpacity={opacity}
+          fontSize={20} fill={NEUTRAL.bone} fillOpacity={0.7}
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={tint} fillOpacity={opacity}
+          fontSize={22} fill={NEUTRAL.bone} fillOpacity={0.7}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}
@@ -797,69 +792,6 @@ function signMidDeg(signIdx: number, ascSignIdx: number): number {
   return 180 + offset * 30 + 15;
 }
 
-/** Find the panel position with maximum clearance to the nearest planet
- *  glyph, by sweeping a 2D grid of candidate centers across the chart
- *  interior. The chart never changes once mounted (memoized via useMemo
- *  on `points`), so this runs once per chart load — ~1100 candidates ×
- *  7 planets is trivial in absolute terms. */
-function computePanelPlacement(points: PlanetPoint[]): { cx: number; cy: number } {
-  if (points.length === 0) return { cx: CHART_CENTER, cy: CHART_CENTER };
-  const halfW = PLANET_STATS_PANEL_W / 2;
-  const halfH = PLANET_STATS_PANEL_H / 2;
-  // Allowed region for the panel center: the panel rect must stay inside
-  // the inner ring with a visual margin so it doesn't crowd the rim.
-  const RING_MARGIN = 50;
-  const RING_LIMIT = INNER_RING_R - RING_MARGIN;
-  // Grid sweep ±180 viewBox units from chart center (covers everywhere
-  // a 400×102 panel could plausibly land), step 10. 37×37 = 1369 cells.
-  const GRID_HALF = 180;
-  const STEP = 10;
-
-  let bestCx = CHART_CENTER;
-  let bestCy = CHART_CENTER;
-  let bestOverlap = Infinity; // smaller is better; negative = clearance
-  for (let dx = -GRID_HALF; dx <= GRID_HALF; dx += STEP) {
-    for (let dy = -GRID_HALF; dy <= GRID_HALF; dy += STEP) {
-      // Check that all four panel corners stay inside the inner ring.
-      // Worst-case corner is the one whose components share signs with
-      // (dx, dy), so we only need that one check.
-      const fx = Math.abs(dx) + halfW;
-      const fy = Math.abs(dy) + halfH;
-      if (Math.hypot(fx, fy) > RING_LIMIT) continue;
-      const cx = CHART_CENTER + dx;
-      const cy = CHART_CENTER + dy;
-      const overlap = maxPlanetOverlap(cx, cy, points);
-      if (overlap < bestOverlap) {
-        bestOverlap = overlap;
-        bestCx = cx;
-        bestCy = cy;
-      }
-    }
-  }
-  return { cx: bestCx, cy: bestCy };
-}
-
-/** Worst overlap between any planet glyph (treated as a circle of radius
- *  PLANET_R_REST + PANEL_PLANET_BUFFER) and the panel rect centered at
- *  (panelCx, panelCy). Positive = overlap depth; ≤0 = clear. */
-function maxPlanetOverlap(panelCx: number, panelCy: number, points: PlanetPoint[]): number {
-  const PANEL_PLANET_BUFFER = 14; // visual breathing room beyond the glyph circle
-  const left = panelCx - PLANET_STATS_PANEL_W / 2;
-  const right = panelCx + PLANET_STATS_PANEL_W / 2;
-  const top = panelCy - PLANET_STATS_PANEL_H / 2;
-  const bottom = panelCy + PLANET_STATS_PANEL_H / 2;
-  let worst = -Infinity;
-  for (const p of points) {
-    // Distance from planet center to nearest point on panel rect.
-    const dx = Math.max(left - p.cx, 0, p.cx - right);
-    const dy = Math.max(top - p.cy, 0, p.cy - bottom);
-    const dist = Math.hypot(dx, dy);
-    const planetR = p.glyphR + PANEL_PLANET_BUFFER;
-    const overlap = planetR - dist;
-    if (overlap > worst) worst = overlap;
-  }
-  return worst;
-}
 
 function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
   const ascIdx = SIGNS.indexOf(chart.ascendantSign);
@@ -897,4 +829,65 @@ function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
     });
   }
   return out;
+}
+
+/** Find the panel position with maximum clearance to the nearest planet glyph,
+ *  by sweeping a grid of candidate centers across the chart interior. The wheel
+ *  interior isn't reliably empty — same-sign planets cluster toward the center
+ *  (CLUSTER_PATTERNS) — so the panel needs to dodge to the emptiest wedge.
+ *  Memoized on points + height, so it runs once per chart. */
+function computePanelPlacement(
+  points: PlanetPoint[],
+  panelH: number,
+): { cx: number; cy: number } {
+  if (points.length === 0) return { cx: CHART_CENTER, cy: CHART_CENTER };
+  const halfW = PLANET_STATS_PANEL_W / 2;
+  const halfH = panelH / 2;
+  // The panel rect must stay inside the inner ring with a visual margin.
+  const RING_LIMIT = INNER_RING_R - 50;
+  const GRID_HALF = 180;
+  const STEP = 10;
+
+  let bestCx = CHART_CENTER;
+  let bestCy = CHART_CENTER;
+  let bestOverlap = Infinity; // smaller is better; negative = clearance
+  for (let dx = -GRID_HALF; dx <= GRID_HALF; dx += STEP) {
+    for (let dy = -GRID_HALF; dy <= GRID_HALF; dy += STEP) {
+      // Worst-case corner shares signs with (dx, dy) — only that one matters.
+      if (Math.hypot(Math.abs(dx) + halfW, Math.abs(dy) + halfH) > RING_LIMIT) continue;
+      const cx = CHART_CENTER + dx;
+      const cy = CHART_CENTER + dy;
+      const overlap = maxPlanetOverlap(cx, cy, points, panelH);
+      if (overlap < bestOverlap) {
+        bestOverlap = overlap;
+        bestCx = cx;
+        bestCy = cy;
+      }
+    }
+  }
+  return { cx: bestCx, cy: bestCy };
+}
+
+/** Worst overlap between any planet glyph (circle of radius glyphR + buffer)
+ *  and the panel rect centered at (panelCx, panelCy). >0 = overlap depth. */
+function maxPlanetOverlap(
+  panelCx: number,
+  panelCy: number,
+  points: PlanetPoint[],
+  panelH: number,
+): number {
+  const PANEL_PLANET_BUFFER = 14;
+  const left = panelCx - PLANET_STATS_PANEL_W / 2;
+  const right = panelCx + PLANET_STATS_PANEL_W / 2;
+  const top = panelCy - panelH / 2;
+  const bottom = panelCy + panelH / 2;
+  let worst = -Infinity;
+  for (const p of points) {
+    const dx = Math.max(left - p.cx, 0, p.cx - right);
+    const dy = Math.max(top - p.cy, 0, p.cy - bottom);
+    const dist = Math.hypot(dx, dy);
+    const overlap = p.glyphR + PANEL_PLANET_BUFFER - dist;
+    if (overlap > worst) worst = overlap;
+  }
+  return worst;
 }

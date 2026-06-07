@@ -40,7 +40,7 @@ describe("Run loop integration", () => {
       const playerPlanet = (unlockedPlanets(profile.lifetimeEncounterCount).filter(
         (p) => !r.perPlanetState[p].combusted,
       )[0] ?? "Sun") as PlanetName;
-      const result = resolveTurn(r, profile.chart, playerPlanet, rng);
+      const result = resolveTurn(r, profile.chart, playerPlanet, "Affliction", rng);
       if (!result) break;
       r = result.run;
     }

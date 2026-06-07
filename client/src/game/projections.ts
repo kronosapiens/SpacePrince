@@ -13,6 +13,10 @@ export interface ComputeProjectedEffectsInput {
   opponentChart: Chart;
   playerPlanet: PlanetName;
   opponentPlanet: PlanetName;
+  /** Valence the player is choosing (lands on the opponent). */
+  playerValence: Polarity;
+  /** Valence the opponent precommitted (lands on the player). */
+  opponentValence: Polarity;
   playerState: SideState;
   opponentState: SideState;
   playerAspects: AspectConnection[];
@@ -87,27 +91,31 @@ export function computeProjectedEffects(
 ): ProjectedEffectsBySide {
   const {
     playerChart, opponentChart, playerPlanet, opponentPlanet,
+    playerValence, opponentValence,
     playerState, opponentState, playerAspects, opponentAspects,
   } = input;
   if (playerState[playerPlanet].combusted || opponentState[opponentPlanet].combusted) return EMPTY;
 
   const projected = getProjectedPair(
     playerChart, opponentChart, playerPlanet, opponentPlanet,
+    playerValence, opponentValence,
     playerState[playerPlanet].combusted, opponentState[opponentPlanet].combusted,
   );
 
   const selfFinal: Partial<Record<PlanetName, InProgress>> = {};
   const otherFinal: Partial<Record<PlanetName, InProgress>> = {};
 
-  applyMag(playerState, selfFinal, playerPlanet, projected.polarity, projected.opponentToPlayer);
-  applyMag(opponentState, otherFinal, opponentPlanet, projected.polarity, projected.playerToOpponent);
+  // Player's planet takes the opponent's valence; opponent's planet takes the
+  // player's. Propagation ripples through each actor's own chart from there.
+  applyMag(playerState, selfFinal, playerPlanet, opponentValence, projected.opponentToPlayer);
+  applyMag(opponentState, otherFinal, opponentPlanet, playerValence, projected.playerToOpponent);
 
   if (!playerState[playerPlanet].combusted && projected.opponentToPlayer > 0) {
     for (const a of playerAspects) {
       if (a.from !== playerPlanet) continue;
       if (playerState[a.to].combusted) continue;
       const mag = Math.abs(projected.opponentToPlayer * a.multiplier);
-      const polarity = a.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
+      const polarity = a.multiplier < 0 ? flipPolarity(opponentValence) : opponentValence;
       applyMag(playerState, selfFinal, a.to, polarity, mag);
     }
   }
@@ -117,7 +125,7 @@ export function computeProjectedEffects(
       if (a.from !== opponentPlanet) continue;
       if (opponentState[a.to].combusted) continue;
       const mag = Math.abs(projected.playerToOpponent * a.multiplier);
-      const polarity = a.multiplier < 0 ? flipPolarity(projected.polarity) : projected.polarity;
+      const polarity = a.multiplier < 0 ? flipPolarity(playerValence) : playerValence;
       applyMag(opponentState, otherFinal, a.to, polarity, mag);
     }
   }

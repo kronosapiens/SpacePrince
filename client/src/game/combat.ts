@@ -1,20 +1,19 @@
-import { ELEMENT_QUALITIES, PLANET_SECT } from "./data";
+import { PLANET_SECT } from "./data";
 import type {
   Chart,
-  ElementType,
   PlanetName,
   PlanetPlacement,
   PlanetStats,
   Polarity,
 } from "./types";
 
-export function getPolarity(a: ElementType, b: ElementType): Polarity {
-  const qa = ELEMENT_QUALITIES[a];
-  const qb = ELEMENT_QUALITIES[b];
-  const shared = qa.filter((q) => qb.includes(q)).length;
-  if (shared === 2) return "Testimony";
-  if (shared === 1) return "Friction";
-  return "Affliction";
+/** Stat-weighted action draw — `P(afflict) = damage / (damage + healing)`.
+ *  Used to precommit the opponent's verb each turn (the player chooses theirs).
+ *  No planet has a zero in either stat, so no draw is fully deterministic. */
+export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
+  const total = stats.damage + stats.healing;
+  if (total <= 0) return "Affliction";
+  return rng() < stats.damage / total ? "Affliction" : "Testimony";
 }
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
@@ -33,17 +32,16 @@ export function getEffectiveStats(chart: Chart, planet: PlanetName): PlanetStats
 const ZERO_STATS: PlanetStats = { damage: 0, healing: 0, durability: 0, luck: 0 };
 
 export function computeDirectExchange(
-  polarity: Polarity,
+  playerValence: Polarity,
+  opponentValence: Polarity,
   playerStats: PlanetStats,
   opponentStats: PlanetStats,
 ) {
-  const polarityMultiplier = polarity === "Affliction" ? 2 : 1;
   const playerToOpponent =
-    (polarity === "Testimony" ? playerStats.healing : playerStats.damage) * polarityMultiplier;
+    playerValence === "Testimony" ? playerStats.healing : playerStats.damage;
   const opponentToPlayer =
-    (polarity === "Testimony" ? opponentStats.healing : opponentStats.damage) * polarityMultiplier;
+    opponentValence === "Testimony" ? opponentStats.healing : opponentStats.damage;
   return {
-    polarityMultiplier,
     playerToOpponent: Math.max(0, playerToOpponent),
     opponentToPlayer: Math.max(0, opponentToPlayer),
   };
@@ -54,18 +52,17 @@ export function getProjectedPair(
   opponentChart: Chart,
   playerPlanet: PlanetName,
   opponentPlanet: PlanetName,
+  playerValence: Polarity,
+  opponentValence: Polarity,
   playerCombusted = false,
   opponentCombusted = false,
 ) {
-  const pp = playerChart.planets[playerPlanet];
-  const op = opponentChart.planets[opponentPlanet];
-  const polarity = getPolarity(pp.element, op.element);
   const playerStats = playerCombusted ? ZERO_STATS : getEffectiveStats(playerChart, playerPlanet);
   const opponentStats = opponentCombusted ? ZERO_STATS : getEffectiveStats(opponentChart, opponentPlanet);
-  const exchange = computeDirectExchange(polarity, playerStats, opponentStats);
-  const selfDelta = polarity === "Testimony" ? -exchange.opponentToPlayer : exchange.opponentToPlayer;
-  const otherDelta = polarity === "Testimony" ? -exchange.playerToOpponent : exchange.playerToOpponent;
-  return { polarity, selfDelta, otherDelta, ...exchange };
+  const exchange = computeDirectExchange(playerValence, opponentValence, playerStats, opponentStats);
+  const selfDelta = opponentValence === "Testimony" ? -exchange.opponentToPlayer : exchange.opponentToPlayer;
+  const otherDelta = playerValence === "Testimony" ? -exchange.playerToOpponent : exchange.playerToOpponent;
+  return { playerValence, opponentValence, selfDelta, otherDelta, ...exchange };
 }
 
 function normalizeLongitude(value: number): number {

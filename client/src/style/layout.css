@@ -387,7 +387,11 @@
   height: 100%;
   justify-content: center;
 }
-.combat-side > svg { width: min(480px, 34vw); height: auto; }
+/* Fill the available real estate: grow with the viewport, but never let two
+   wheels + seam + padding overflow (≈328px of horizontal overhead → cap at
+   ~50vw per side), and never taller than the viewport. Everything inside the
+   wheel (badges, stats, glyphs) scales with this, so bigger = more legible. */
+.combat-side > svg { width: min(600px, calc(50vw - 170px), 80vh); height: auto; }
 .combat-side-label {
   font-family: var(--sans);
   font-size: 10px;
@@ -413,16 +417,23 @@
 }
 .combat-opp-of-turn.is-dim { opacity: 0.45; }
 .combat-opp-glyph {
-  font-size: 44px;
+  font-size: 56px;
   font-family: var(--serif);
   filter: drop-shadow(0 0 12px currentColor);
   line-height: 1;
 }
 .combat-opp-name {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 28px;
   letter-spacing: 0.22em;
   color: var(--bone);
+}
+.combat-opp-action {
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.30em;
+  font-weight: 600;
+  filter: drop-shadow(0 0 6px currentColor);
 }
 .combat-vesica {
   position: absolute;
@@ -460,7 +471,7 @@
 }
 .combat-distance-v {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 500;
   color: var(--bone);
   letter-spacing: 0.02em;
@@ -476,6 +487,34 @@
   z-index: 5;
 }
 
+/* Action fan-out — SVG buttons under the stats panel, shown for the inspected
+   planet (hover or select). Afflict / Testify; clicking one commits the turn.
+   Both verbs are always lit in their valence color (--action-c) with stroke +
+   glow, so pointer and touch read the same. The hovered verb (.is-on, desktop
+   only) gets an extra fill-tint + brighter glow and previews its projection. */
+.panel-action { cursor: pointer; }
+.panel-action-bg {
+  fill: rgba(11, 10, 15, 0.55);
+  stroke: var(--action-c);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px var(--action-c));
+  transition: fill 140ms ease, fill-opacity 140ms ease, filter 140ms ease;
+}
+.panel-action.is-on .panel-action-bg {
+  fill: var(--action-c);
+  fill-opacity: 0.18;
+  filter: drop-shadow(0 0 10px var(--action-c));
+}
+.panel-action-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 25px;
+  letter-spacing: 0.02em;
+  fill: var(--action-c);
+  dominant-baseline: middle;
+  user-select: none;
+}
+
 /* Stats panel rendered inside the chart SVG, in the largest empty angular
    wedge between planets. Sized in viewBox units (1000-unit chart) so it
    scales with the chart on resize. v1 style: gold uppercase eyebrow title,
@@ -487,18 +526,18 @@
 }
 .planet-stats-title {
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 500;
   fill: var(--gold);
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   dominant-baseline: middle;
 }
 .planet-stats-epithet {
-  font-size: 20px;
+  font-size: 24px;
 }
 .planet-stats-row {
   font-family: var(--sans);
-  font-size: 20px;
+  font-size: 23px;
   fill: var(--bone);
   letter-spacing: 0.02em;
   dominant-baseline: middle;

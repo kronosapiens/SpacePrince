@@ -91,34 +91,49 @@ Effective combat stats are currently:
 Affliction does not currently scale stats.
 Combusted planets are treated as zero-output for direct resolution.
 
-## 7. Polarity
+## 7. Action and Valence
 
-Polarity between acting self planet and acting opponent planet is based on element quality overlap:
+Each turn, both sides commit one planet to one of two actions.
 
-- `Testimony`: 2 shared qualities
-- `Friction`: 1 shared quality
-- `Affliction`: 0 shared qualities
+- **Afflict** — uses the planet's `damage` stat.
+- **Testify** — uses the planet's `healing` stat.
+
+Valence is no longer derived from an element matchup.
+It is set per side:
+
+- **Player side:** chosen.
+  Selecting a planet fans out the two actions; the player picks one.
+- **Opponent side:** drawn and precommitted.
+  The verb is a stat-weighted random draw — `P(afflict) = damage / (damage + healing)`, `P(testify) = healing / (damage + healing)`.
+  It is locked at turn start and surfaced to the player — alongside the already-revealed opponent planet — before the player chooses, so the player always acts with full information.
+  No planet has a zero in either stat, so no opponent action is fully deterministic.
+
+The earlier `Testimony` / `Friction` / `Affliction` tiers (element-quality overlap) are removed.
+`Friction` no longer exists; the two remaining valences are `Affliction` and `Testimony`.
 
 ## 8. Direct Resolution
 
-Both sides resolve each action (simultaneous exchange):
+Both sides resolve simultaneously.
+The opponent's verb is precommitted (§7), so the player chooses with full information.
 
 - Self acting planet -> opponent active planet
 - Opponent active planet -> self acting planet
 
-Base trait:
+Base amount is the stat for the action:
 
-- `Affliction` / `Friction`: `damage`
-- `Testimony`: `healing`
+- `Afflict`: `damage`
+- `Testify`: `healing`
 
 Multipliers:
 
-- Polarity: `2` for `Affliction`, `1` for `Friction`, `1` for `Testimony`
 - Crit: `2` on crit, else `1`
 
 Raw direct amount:
 
-- `raw = baseTrait * polarityMultiplier * critMultiplier`
+- `raw = baseStat * critMultiplier`
+
+The polarity multiplier (formerly `2` for `Affliction`, `1` otherwise) is removed with the matchup tiers.
+Magnitude is the planet's own stat; dignity, sect, and element/modality buffs (§4–5) remain the only sources of contextual strength.
 
 ## 9. Crit
 
@@ -188,6 +203,7 @@ The game's progression is layered:
 Per encounter:
 
 - Opponent planet is selected randomly each turn from non-combusted opponent planets.
+- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§7).
 - If all opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
 
@@ -223,26 +239,36 @@ The run-end-only structure suggests room for an achievements layer — recogniti
 
 UI label: `Distance`.
 
+Only **resolution** scores.
+Distance accrues from testimony — affliction actually healed — not from affliction created.
+Affliction is the setup; resolving it is the payoff.
+
 Per turn:
 
-- `turnAffliction`: sum of all positive deltas (direct + propagation, both sides)
-- `turnTestimony`: sum of absolute negative deltas (direct + propagation, both sides)
-- `turnScore = turnAffliction + turnTestimony`
+- `turnScore`: sum of testimony magnitudes (affliction actually reduced) across direct effects and propagation, both sides.
+- Affliction created contributes nothing.
 
 Run score accumulates `turnScore`.
+
+Because only real reductions count, testifying a planet already at zero affliction scores nothing — affliction must exist before it can be resolved.
+This makes each turn a two-beat: afflict to set up, testify to cash.
 
 ## 15. Interaction Chart Semantics
 
 Columns:
 
 - Planet
-- Polarity
+- Action
 - Impact
 - Luck
 
+Action display:
+
+- the opponent's precommitted verb for the turn (`Afflict` / `Testify`)
+
 Impact display:
 
-- one-decimal direct output after polarity multiplier
+- one-decimal direct output for the action's stat (`damage` for `Afflict`, `healing` for `Testify`)
 
 ## 16. Prototype Scope
 

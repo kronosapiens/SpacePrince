@@ -10,6 +10,7 @@ import type {
   CombatEncounter,
   NodeOutcome,
   PlanetName,
+  Polarity,
   Profile,
   RunState,
   TurnLogEntry,
@@ -52,9 +53,10 @@ export function useCommitTurn() {
       run: RunState,
       playerChart: Chart,
       planet: PlanetName,
+      valence: Polarity,
       rng: () => number,
     ): CommitTurnResult | null => {
-      const result = resolveTurn(run, playerChart, planet, rng);
+      const result = resolveTurn(run, playerChart, planet, valence, rng);
       if (!result) return null;
       let nextRun = result.run;
       if (result.encounterEnded && result.encounter.kind === "combat") {

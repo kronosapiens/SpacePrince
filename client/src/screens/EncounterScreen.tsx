@@ -15,7 +15,7 @@ import {
   makeDevRun,
   seedFromHash,
 } from "@/state/dev-state";
-import type { CombatEncounter, PlanetName, RunState } from "@/game/types";
+import type { CombatEncounter, PlanetName, Polarity, RunState } from "@/game/types";
 
 export function EncounterScreen() {
   const settings = loadDevSettings();
@@ -42,7 +42,7 @@ function NormalEncounterScreen() {
         run={run}
         profile={profile}
         encounter={enc}
-        onCommitTurn={(planet, rng) => commitTurn(run, profile.chart, planet, rng)}
+        onCommitTurn={(planet, valence, rng) => commitTurn(run, profile.chart, planet, valence, rng)}
         onClearEncounter={() => dispatchRun({ type: "run/clearEncounter" })}
         devUnlockAll={settings.unlockAll}
       />
@@ -89,8 +89,8 @@ function DevCombatScreen() {
   }, [baseRun, encounter]);
 
   const onCommitTurn = useCallback(
-    (planet: PlanetName, rng: () => number): CommitTurnResult | null => {
-      const result = resolveTurn(run, profile.chart, planet, rng);
+    (planet: PlanetName, valence: Polarity, rng: () => number): CommitTurnResult | null => {
+      const result = resolveTurn(run, profile.chart, planet, valence, rng);
       if (!result || result.encounter.kind !== "combat") return null;
       const nextRun = result.run;
       setRun(nextRun);

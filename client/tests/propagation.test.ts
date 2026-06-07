@@ -14,6 +14,8 @@ describe("propagation projections", () => {
       opponentChart: opp,
       playerPlanet: "Sun",
       opponentPlanet: "Moon",
+      playerValence: "Affliction",
+      opponentValence: "Affliction",
       playerState,
       opponentState: blankSideState(),
       playerAspects: getAspects(chart),
@@ -31,6 +33,8 @@ describe("propagation projections", () => {
       opponentChart: opp,
       playerPlanet: "Mars",
       opponentPlanet: "Saturn",
+      playerValence: "Affliction",
+      opponentValence: "Affliction",
       playerState: blankSideState(),
       opponentState: blankSideState(),
       playerAspects: getAspects(chart),
@@ -40,11 +44,11 @@ describe("propagation projections", () => {
     // Each entry is { delta: number; polarity: Polarity }.
     Object.values(projected.self).forEach((d) => {
       expect(typeof d!.delta).toBe("number");
-      expect(["Testimony", "Affliction", "Friction"]).toContain(d!.polarity);
+      expect(["Testimony", "Affliction"]).toContain(d!.polarity);
     });
     Object.values(projected.other).forEach((d) => {
       expect(typeof d!.delta).toBe("number");
-      expect(["Testimony", "Affliction", "Friction"]).toContain(d!.polarity);
+      expect(["Testimony", "Affliction"]).toContain(d!.polarity);
     });
   });
 });
