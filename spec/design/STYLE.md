@@ -126,12 +126,14 @@ The screen receives an ambient tint in the active planet's primary color at 8% o
 
 Transitions between tints take 2000ms, linear easing — slow enough to feel like the light changing in a room, fast enough that a player who looks away and back perceives the new state.
 
-### Aspect propagation color
+### Aspect and valence color
 
-When an aspect propagates between two planets, the line's stroke transitions from the source planet's color to the destination planet's color over the propagation duration (§7). The transition is positional along the line — a literal traveling band of color — not a global crossfade.
+Two orthogonal signals share the chart and must read apart:
 
-A trine propagation uses both planets' primary colors.
-A square propagation uses both planets' *secondary* colors (the darker / heavier ones — Mars iron, Saturn dark earth, Venus copper). The visual difference between a harmonious and a discordant propagation should be perceptible without text.
+- **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#CD2626`) for tense (square, opposition). The astrological convention. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
+- **Effect polarity (heal/harm)** — afflict/testify and the projected-effect badge use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
+
+Rejected: coloring the lines by the two connected planets' own hues (primary for trine, secondary for square, a band traveling along the line). It was tried and read muddy — planet hues already carry identity on the glyphs, and doubling them onto the lines blurred mood. Mood lives in red/green; identity stays on the glyphs.
 
 ---
 
@@ -176,8 +178,8 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 |---------------------------|----------|-----------------------------|--------------------------------------------------------------------|
 | Encounter open            | 1200ms   | ease-out                    | Two charts arrive into facing position. Ceremonial, unhurried.     |
 | Planet activate           | 600ms    | ease-in-out, looping        | The active planet pulses — a slow heartbeat at the planet's tone.  |
-| Aspect propagation (trine)| 1000ms   | ease-out                    | Color travels along the line. Resolves cleanly into the target.    |
-| Aspect propagation (square)| 1400ms  | ease-in, hold, ease-out     | Color travels, pauses just before terminus, completes. Dissonant.  |
+| Aspect propagation (trine)| 1000ms   | ease-out                    | The green line flares brighter, then clears into the target.       |
+| Aspect propagation (square)| 1400ms  | ease-in, hold, ease-out     | The red line flares, holds just short of terminus, then clears. Dissonant. |
 | Combust                   | 1800ms   | cubic-bezier(.7,.0,.85,.0)  | The planet glyph desaturates to gray. Slow, then sudden.           |
 | Tint shift                | 2000ms   | linear                      | Ambient color changes between planetary registers. Light shifting. |
 | Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |

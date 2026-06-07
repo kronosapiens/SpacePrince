@@ -34,15 +34,17 @@ export const PLANET_SECONDARY: Record<PlanetName, string> = {
   Saturn: "#C5A8D8",
 };
 
-/** Aspect-line colors per v1: green for harmonious, red for tense. */
+/** Aspect-line colors: green for harmonious, red for tense (astrological
+ *  convention). The heal/harm valence uses amber/violet so the two read apart. */
 export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction
   tension: "#CD2626", // square, opposition
 } as const;
 
-/** Action valence colors — afflict (warm red) / testify (sage green). Shared
- *  by the action buttons and the opponent's precommitted-verb label. */
+/** Action valence colors — afflict (amber) / testify (violet). Kept off the
+ *  aspect red/green. Shared by the action buttons, the opponent's precommitted-
+ *  verb label, and the projection badge. */
 export const VALENCE_COLOR = {
-  Affliction: "#FF8C6B",
-  Testimony: "#8FBC8F",
+  Affliction: "#E8913A",
+  Testimony: "#9D86D9",
 } as const;

@@ -17,7 +17,7 @@ import {
   STROKE_LIGHT, STROKE_MEDIUM,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
+import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import type {
   AspectConnection,
   Chart as ChartType,
@@ -228,12 +228,10 @@ export function Chart(props: ChartProps) {
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
         const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
-        // The chart has two orthogonal signals to communicate: aspect mood
-        // (harmony/tension) and effect polarity (heal/harm). Aspects own
-        // red/green per astrological convention; polarity lives on the
-        // projection badge so the two channels don't fight. Fallback if
-        // red/green ever feels too noisy: bone (harmony) / mist (tension)
-        // — achromatic, doesn't compete, but loses the mood affordance.
+        // Two orthogonal signals: aspect mood (harmony/tension) and effect
+        // polarity (heal/harm). Aspects use the red/green of astrological
+        // convention; polarity uses amber/violet — different hue families, so
+        // the two channels don't fight.
         const isHarmony =
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
@@ -572,8 +570,8 @@ function PlanetGlyph({
         let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
         if (showProjection && projection) {
           const isHarm = projection.polarity !== "Testimony";
-          // Sign carried by color alone (soft pink-red = damage, sage green
-          // = heal); drop the "+" / "−" prefix so the digits read cleanly.
+          // Sign carried by color alone (amber = damage, violet = heal); drop
+          // the "+" / "−" prefix so the digits read cleanly.
           const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
           const wP = widthFor(text, projFontSize, projBadgeR);
           // Both centers sit on the planet rim. Projection is rotated around
@@ -592,10 +590,9 @@ function PlanetGlyph({
             pX: projDirX * badgeOffset,
             pY: projDirY * badgeOffset,
             text,
-            // Softer than ASPECT_COLOR.tension (#CD2626) — the saturated red
-            // felt aggressive on the small preview badge. Salmon-coral reads
-            // as "incoming damage" without screaming.
-            col: isHarm ? "#FF9F90" : ASPECT_COLOR.harmony,
+            // Valence, not aspect mood: amber = incoming harm, violet = incoming
+            // heal — matching the action-verb colors.
+            col: isHarm ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
           };
         }
 
