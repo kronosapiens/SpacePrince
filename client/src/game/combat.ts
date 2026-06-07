@@ -1,4 +1,3 @@
-import { PLANET_SECT } from "./data";
 import type {
   Chart,
   PlanetName,
@@ -63,30 +62,4 @@ export function getProjectedPair(
   const selfDelta = opponentValence === "Testimony" ? -exchange.opponentToPlayer : exchange.opponentToPlayer;
   const otherDelta = playerValence === "Testimony" ? -exchange.playerToOpponent : exchange.playerToOpponent;
   return { playerValence, opponentValence, selfDelta, otherDelta, ...exchange };
-}
-
-function normalizeLongitude(value: number): number {
-  const n = value % 360;
-  return n < 0 ? n + 360 : n;
-}
-
-function resolveMercurySect(mercuryLongitude: number, sunLongitude: number): "Day" | "Night" {
-  const delta = normalizeLongitude(mercuryLongitude - sunLongitude);
-  return delta > 180 ? "Day" : "Night";
-}
-
-export function getResolvedSect(chart: Chart, planet: PlanetName): "Day" | "Night" {
-  const base = PLANET_SECT[planet];
-  if (base !== "Flexible") return base;
-  const mercuryLong = chart.planets.Mercury.eclipticLongitude;
-  const sunLong = chart.planets.Sun.eclipticLongitude;
-  if (mercuryLong === undefined || sunLong === undefined) {
-    return chart.isDiurnal ? "Day" : "Night";
-  }
-  return resolveMercurySect(mercuryLong, sunLong);
-}
-
-export function isInSect(chart: Chart, planet: PlanetName): boolean {
-  const chartSect = chart.isDiurnal ? "Day" : "Night";
-  return getResolvedSect(chart, planet) === chartSect;
 }

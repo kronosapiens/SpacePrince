@@ -1,7 +1,8 @@
 import {
   Body,
+  Ecliptic,
   EclipticGeoMoon,
-  EclipticLongitude,
+  GeoVector,
   Observer,
   SiderealTime,
   SunPosition,
@@ -12,9 +13,11 @@ import {
 } from "astronomy-engine";
 import type { PlanetName } from "@/game/types";
 
-// EclipticLongitude is helio for non-Sun/Moon and apparent for those (relative to Earth).
-// astronomy-engine returns geocentric apparent ecliptic longitude for Mercury..Saturn via this function,
-// so we use SunPosition + EclipticGeoMoon for those two specifically.
+// Astrology is geocentric and tropical: positions are where a planet appears from
+// Earth, in the ecliptic of date. SunPosition / EclipticGeoMoon give that directly
+// for the luminaries; the five planets compose GeoVector (geocentric apparent) with
+// Ecliptic (which converts to true ecliptic of date). EclipticLongitude is *not*
+// usable here — it is heliocentric, so it would put Mercury/Venus nowhere near the Sun.
 const NON_LUMINARY_BODIES: Partial<Record<PlanetName, Body>> = {
   Mercury: Body.Mercury,
   Venus: Body.Venus,
@@ -46,7 +49,11 @@ export function computeBirthChart(
   longitudes.Sun = normalizeLongitude(SunPosition(time).elon);
   longitudes.Moon = normalizeLongitude(EclipticGeoMoon(time).lon);
   for (const planet of Object.keys(NON_LUMINARY_BODIES) as PlanetName[]) {
-    longitudes[planet] = normalizeLongitude(EclipticLongitude(NON_LUMINARY_BODIES[planet]!, time));
+    // GeoVector: geocentric apparent (aberration-corrected) EQJ vector.
+    // Ecliptic: converts it to the true ecliptic of date — same frame as the
+    // Sun/Moon above — and gives ecliptic longitude as .elon.
+    const ecl = Ecliptic(GeoVector(NON_LUMINARY_BODIES[planet]!, time, true));
+    longitudes[planet] = normalizeLongitude(ecl.elon);
   }
 
   const ascendantLongitude = computeAscendant(time, latitude, longitudeDeg);

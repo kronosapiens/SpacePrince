@@ -11,6 +11,7 @@ import {
   SIGN_ELEMENT,
   SIGN_MODALITY,
 } from "./data";
+import { computeBirthChart } from "@/astronomy/compute";
 import { mulberry32, randomSeed } from "./rng";
 import type {
   Chart,
@@ -93,7 +94,6 @@ export function derivePlacements({
     planets[planet] = {
       planet,
       sign,
-      eclipticLongitude: longitude,
       element,
       modality,
       base,
@@ -115,36 +115,32 @@ export function wholeSignHouses(ascendantSign: SignName): Record<number, SignNam
   return houses;
 }
 
+// A real ephemeris chart computed from a seeded random birth moment and place.
+// The skies span ~200 years so slow planets (Jupiter, Saturn) land in varied signs.
+const SEED_EPOCH_MS = Date.UTC(1900, 0, 1);
+const SEED_SPAN_DAYS = 200 * 365;
+
 /**
- * Used for opponent NPC charts (random) and as a stub when no birth data is supplied.
- * Mercury within ±28° of Sun, Venus within ±47° of Sun (real elongation limits).
+ * Opponent NPC, dev, and preview charts. Same generator as a player's Prince
+ * (`computeBirthChart`) — a real chart for a deterministic-random birth, not
+ * fabricated longitudes. The seed fixes the birth, so the chart is reproducible.
  */
 export function seededChart(seed = randomSeed(), name = "Prince"): Chart {
   const rng = mulberry32(seed);
-  const isDiurnal = rng() > 0.5;
-  const sunLong = rng() * 360;
-  const sample = (max: number) => (rng() + rng() - 1) * max;
-  const longitudes: Record<PlanetName, number> = {
-    Sun: sunLong,
-    Mercury: normalizeLongitude(sunLong + sample(28)),
-    Venus: normalizeLongitude(sunLong + sample(47)),
-    Moon: rng() * 360,
-    Mars: rng() * 360,
-    Jupiter: rng() * 360,
-    Saturn: rng() * 360,
-  };
-  const ascendantLongitude = rng() * 360;
-  const { planets, ascendantSign } = derivePlacements({
-    longitudes,
-    ascendantLongitude,
-    isDiurnal,
-  });
+  const dayOffset = Math.floor(rng() * SEED_SPAN_DAYS);
+  const secondOffset = Math.floor(rng() * 86_400);
+  const iso = new Date(SEED_EPOCH_MS + dayOffset * 86_400_000 + secondOffset * 1000).toISOString();
+  const latitude = (rng() * 2 - 1) * 66;
+  const longitude = (rng() * 2 - 1) * 180;
+
+  const birth = computeBirthChart(iso, latitude, longitude);
+  const { planets, ascendantSign } = derivePlacements(birth);
   return {
     id: `chart_${seed}`,
     name,
-    isDiurnal,
+    isDiurnal: birth.isDiurnal,
     ascendantSign,
-    ascendantLongitude,
+    ascendantLongitude: birth.ascendantLongitude,
     planets,
   };
 }

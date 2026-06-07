@@ -35,3 +35,33 @@ describe("computeBirthChart — known dates", () => {
     expect(midnight.isDiurnal).toBe(false);
   });
 });
+
+describe("computeBirthChart — geocentric frame", () => {
+  const sep = (a: number, b: number) => {
+    const d = Math.abs(((a - b) % 360) + 360) % 360;
+    return Math.min(d, 360 - d);
+  };
+
+  // The defining tell of geocentric (not heliocentric) positions: as seen from
+  // Earth, Mercury never strays >28° from the Sun, Venus never >47°. Heliocentric
+  // longitudes would scatter them anywhere up to 180° away.
+  it("Mercury ≤28° and Venus ≤47° from the Sun, every month of 2000", () => {
+    for (let m = 1; m <= 12; m++) {
+      const mm = String(m).padStart(2, "0");
+      const { longitudes: l } = computeBirthChart(`2000-${mm}-15T12:00:00Z`, 40.0, -74.0);
+      expect(sep(l.Mercury, l.Sun)).toBeLessThanOrEqual(28.5);
+      expect(sep(l.Venus, l.Sun)).toBeLessThanOrEqual(47.5);
+    }
+  });
+
+  // Real geocentric signs on 2000-01-01 (tropical, of-date) — locks the frame.
+  it("places planets in their real signs on 2000-01-01", () => {
+    const { longitudes: l } = computeBirthChart("2000-01-01T12:00:00Z", 51.5, -0.13);
+    expect(signFromLongitude(l.Sun)).toBe("Capricorn");
+    expect(signFromLongitude(l.Mercury)).toBe("Capricorn");
+    expect(signFromLongitude(l.Venus)).toBe("Sagittarius");
+    expect(signFromLongitude(l.Mars)).toBe("Aquarius");
+    expect(signFromLongitude(l.Jupiter)).toBe("Aries");
+    expect(signFromLongitude(l.Saturn)).toBe("Taurus");
+  });
+});
