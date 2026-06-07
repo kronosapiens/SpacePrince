@@ -1,7 +1,10 @@
-# Space Prince — Mechanics (Current Prototype)
+# Space Prince — Mechanics
 
-This file documents the mechanics implemented in `client/`.
-If this conflicts with older design docs, this file reflects runtime behavior.
+The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
+
+**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–20` D&D-style band (15 is heavy, 20 the top). Affliction accumulates toward a probabilistic combustion, offset by `durability × dignity`.
+
+> The combat structure (§§5–6, 9, 12) runs in `client/`; the number model (§§2, 4, 7, 10) is specified here and the client does not yet match it.
 
 ## 1. Entities
 
@@ -9,7 +12,6 @@ If this conflicts with older design docs, this file reflects runtime behavior.
 - Signs: 12 zodiac signs.
 - Each planet placement stores:
   - `sign`
-  - `eclipticLongitude` (optional, currently populated by generator)
   - `element`
   - `modality`
   - `dignity`
@@ -30,91 +32,89 @@ The short display label per planet (e.g., "the warrior") lives in `client/src/ga
 - **Jupiter** — balanced and generous across all stats; expansion, gift.
 - **Saturn** — top durability, slow elsewhere; limit, time, endurance.
 
-Base stats per planet (`damage, healing, durability, luck`):
+Base stats per planet, even values on a roughly `1–20` D&D-style scale:
 
-- Sun: `3, 2, 3, 2`
-- Moon: `1, 4, 1, 2`
-- Mercury: `2, 2, 2, 4`
-- Venus: `1, 4, 2, 3`
-- Mars: `4, 1, 2, 1`
-- Jupiter: `2, 3, 3, 3`
-- Saturn: `2, 1, 4, 1`
+| Planet  | Damage | Healing | Durability | Luck | Total |
+|---------|-------:|--------:|-----------:|-----:|------:|
+| Sun     |     12 |       8 |         12 |    8 |    40 |
+| Moon    |      4 |      16 |          4 |    8 |    32 |
+| Mercury |      8 |       8 |          8 |   16 |    40 |
+| Venus   |      4 |      16 |          8 |   12 |    40 |
+| Mars    |     16 |       4 |          8 |    4 |    32 |
+| Jupiter |      8 |      12 |         12 |   12 |    44 |
+| Saturn  |      8 |       4 |         16 |    4 |    32 |
+
+Base values are multiples of 4 and buffs (§4) add `+2`, so are always even — which means `×0.5` multipliers still yield integers (§9).
+
+**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~40–44) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 32) a higher single-stat peak (`16`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
 
 ## 3. Chart Generation
 
-Charts are generated from a deterministic RNG seed.
+Every chart — player or opponent — comes from one generator: real ephemeris positions for a birth moment and place, via `astronomy-engine` (`client/src/astronomy/compute.ts`). There are no fabricated skies.
 
-- Sun longitude is sampled uniformly in `[0, 360)`.
-- Mercury longitude is sampled around Sun within `±28°`.
-- Venus longitude is sampled around Sun within `±47°`.
-- Other planet longitudes are sampled uniformly in `[0, 360)`.
-- Sign is derived from longitude (`floor(longitude / 30)`).
+- **Player** Princes use the player's real birth data: ISO datetime, latitude, longitude.
+- **Opponent, dev, and preview** charts (`seededChart`) use a deterministic-random birth — a seeded moment over ~200 years and a random place — so they are reproducible from the seed yet astronomically real.
 
-These are plausibility constraints, not full ephemeris astronomy.
+For a given moment and place it computes:
+
+- apparent **geocentric** ecliptic longitude per planet, in the tropical zodiac (ecliptic of date) — the frame astrology uses, so Mercury stays within `±28°` of the Sun and Venus within `±47°`
+- Ascendant from local sidereal time and the obliquity of date
+- sect (`isDiurnal`) from whether the Sun is above the horizon at birth
+
+Sign, dignity, element/modality, and buffs derive from longitude the same way regardless of source (sign = `floor(longitude / 30)`).
 
 ## 4. Stat Buffs
 
-Buffs are additive at generation:
+Buffs are additive at generation, and always evenly-valued.
+A planet's effective stat is base + buffs — the value used in combat.
 
-- Element:
-  - Fire `+1 damage`
-  - Earth `+1 durability`
-  - Water `+1 healing`
-  - Air `+1 luck`
-- Modality:
-  - Cardinal `+1 damage`
-  - Fixed `+1 durability`
-  - Mutable `+1 healing`
+Element — each element buffs the one stat it expresses:
 
-## 5. Sect
+| Element | Damage | Healing | Durability | Luck |
+|---------|:------:|:-------:|:----------:|:----:|
+| Fire    |   +2   |         |            |      |
+| Water   |        |   +2    |            |      |
+| Earth   |        |         |     +2     |      |
+| Air     |        |         |            |  +2  |
 
-Sect is chart-level (`Day` if diurnal, else `Night`).
+Modality — three of the four stats; modality does not touch luck:
 
-Planet sect:
+| Modality | Damage | Healing | Durability | Luck |
+|----------|:------:|:-------:|:----------:|:----:|
+| Cardinal |   +2   |         |            |      |
+| Mutable  |        |   +2    |            |      |
+| Fixed    |        |         |     +2     |      |
 
-- Day: `Sun, Jupiter, Saturn`
-- Night: `Moon, Venus, Mars`
-- Mercury: conditional by solar phase proxy (relative ecliptic longitude to Sun)
+Sect — a conditional `+2 luck`, the companion to Air.
+A planet gains it when its sect matches the chart's.
+Chart sect is `Day` when the birth is diurnal, else `Night`; sect changes nothing but luck.
 
-Current effect:
+| Sect  | Planets              |
+|-------|----------------------|
+| Day   | Sun, Jupiter, Saturn |
+| Night | Moon, Venus, Mars    |
 
-- In-sect planets get `+1 luck`.
-- This is baked into `buffs.luck` at chart generation time.
-- Sect does not directly modify base output or aspect multipliers.
+Mercury has no fixed sect — it takes `Day` or `Night` from its solar phase (ecliptic longitude relative to the Sun), then matches the chart the same way.
 
-## 6. Effective Combat Stats
-
-Effective combat stats are currently:
-
-- `effectiveStat = max(0, base + buffs)`
-
-Affliction does not currently scale stats.
-Combusted planets are treated as zero-output for direct resolution.
-
-## 7. Action and Valence
+## 5. Action and Valence
 
 Each turn, both sides commit one planet to one of two actions.
 
 - **Afflict** — uses the planet's `damage` stat.
 - **Testify** — uses the planet's `healing` stat.
 
-Valence is no longer derived from an element matchup.
-It is set per side:
+Action is set per side:
 
-- **Player side:** chosen.
+- **Player side:** explictly chosen.
   Selecting a planet fans out the two actions; the player picks one.
-- **Opponent side:** drawn and precommitted.
-  The verb is a stat-weighted random draw — `P(afflict) = damage / (damage + healing)`, `P(testify) = healing / (damage + healing)`.
+- **Opponent side:** randomly drawn and precommitted.
+  The verb is a stat-weighted random draw — `P(afflict) = damage / (damage + healing)`, `P(testify) = 1 - P(afflict)`.
   It is locked at turn start and surfaced to the player — alongside the already-revealed opponent planet — before the player chooses, so the player always acts with full information.
-  No planet has a zero in either stat, so no opponent action is fully deterministic.
 
-The earlier `Testimony` / `Friction` / `Affliction` tiers (element-quality overlap) are removed.
-`Friction` no longer exists; the two remaining valences are `Affliction` and `Testimony`.
-
-## 8. Direct Resolution
+## 6. Direct Resolution
 
 Both sides resolve simultaneously.
-The opponent's verb is precommitted (§7), so the player chooses with full information.
+The opponent's verb is precommitted (§5), so the player chooses with full information.
 
 - Self acting planet -> opponent active planet
 - Opponent active planet -> self acting planet
@@ -132,26 +132,23 @@ Raw direct amount:
 
 - `raw = baseStat * critMultiplier`
 
-The polarity multiplier (formerly `2` for `Affliction`, `1` otherwise) is removed with the matchup tiers.
-Magnitude is the planet's own stat; dignity, sect, and element/modality buffs (§4–5) remain the only sources of contextual strength.
+Magnitude is the planet's own stat; dignity, sect, and element/modality buffs (§4) are the only sources of contextual strength.
 
-## 9. Crit
+## 7. Crit
 
 Each side rolls independently per action:
 
-- `critChance = effectiveLuck * 0.10`
-- no hard cap is currently applied
-- crit doubles direct outgoing effect
+- `critChance = effectiveLuck * 0.025` (effective luck runs ~4–20, so ~10–50%)
+- crit doubles the direct outgoing effect (`×2`)
 
-## 10. Affliction Value Model
+## 8. Affliction Value Model
 
-Affliction state is real-valued in the game state.
+Affliction is integer-valued — every direct and propagated effect is a whole number.
 
-- direct and propagated effects apply their full real-valued amounts
-- healing still clamps at zero
-- UI rounds values for readability (planet chips, projections, etc.)
+- direct and propagated effects apply their full amounts
+- healing (testimony) clamps affliction at zero
 
-## 11. Aspects and Propagation
+## 9. Aspects and Propagation
 
 Aspect multipliers:
 
@@ -165,37 +162,39 @@ Rules:
 
 - one-hop propagation from active source to connected targets
 - magnitude: `abs(directAmount * aspectMultiplier)`
-- negative multipliers invert polarity (`Affliction <-> Testimony`)
-- propagation applies the same real-valued effect model as direct effects
+- negative multipliers invert the valence (`Affliction <-> Testimony`)
+- propagation applies the same integer effect model as direct effects
 - combusted targets are skipped
-- combusted active source does not propagate
 
-## 12. Combustion
+## 10. Combustion
 
-Combustion is checked when non-testimony affliction is applied (direct or propagation).
+Each planet takes **at most one** affliction application per turn — the direct blow if it is the acting planet, otherwise a single propagated ripple if aspected to it. Combustion is rolled once, at that application, and only for affliction.
 
-- `threshold = durability * 10`
-- `ratio = min(1, affliction / threshold)`
+**Functional affliction** subtracts a durability offset, scaled by dignity:
 
-Dignity factor:
+- `functional = max(0, affliction - durability * dignityMult)`
 
-- Domicile: `0.75`
-- Exaltation: `0.9`
-- Neutral: `1.0`
-- Detriment: `1.15`
-- Fall: `1.3`
+`durability` is the effective durability (§4); `dignityMult` is:
 
-Probability:
+- Domicile: `3`
+- Exaltation: `2.5`
+- Neutral: `2`
+- Detriment: `1.5`
+- Fall: `1`
 
-- `p = clamp(ratio * dignityFactor, 0, 0.95)`
+**Combustion probability** reads the functional value directly as a percent:
 
-No one-time exaltation save is currently applied.
+- `p = min(1, functional / 100)`
 
-## 13. Encounter / Map / Run Flow
+So a planet is **dead safe** while its raw affliction stays under its offset (`durability * dignityMult`, ~4–60 across the roster), then the per-hit combust chance climbs one point per point of functional affliction. Well-buffered, dignified planets endure into 3-digit raw affliction before they are likely to go; fragile, debilitated planets fold early.
+
+Dignity scales the offset: domicile offsets more (safer), fall less (riskier). Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
+
+## 11. Encounter / Map / Run Flow
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative). Resolves in turns; turn count per encounter equals the number of unlocked planets (see §13.1).
+- **Encounter** — one node traversal (combat or narrative). Resolves in turns; turn count per encounter equals the number of unlocked planets (see §11.1).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
 - **Run** — a sequence of maps. After completing a map, a new map is generated and begun. The structure is similar to FTL's sectors.
 - **Run end** — the run ends only when **all seven of the player's planets combust**, regardless of how many maps were completed.
@@ -203,13 +202,13 @@ The game's progression is layered:
 Per encounter:
 
 - Opponent planet is selected randomly each turn from non-combusted opponent planets.
-- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§7).
+- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
 
 Affliction and combust state **persist across encounters and across maps within a run**. They reset only on run end.
 
-### 13.1 Planet Unlock Schedule
+### 11.1 Planet Unlock Schedule
 
 A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run. The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward), with unlocks at encounter counts of `2^i` for `i = 0..6`:
 
@@ -231,21 +230,21 @@ The Prince NFT artifact reveals planets on the same cumulative-encounter schedul
 
 **Dev mode** overrides this schedule and unlocks all seven planets immediately. Dev mode is for development and is never active in production.
 
-### 13.2 Achievements (deferred)
+### 11.2 Achievements (deferred)
 
 The run-end-only structure suggests room for an achievements layer — recognitions for completing multiple maps in a single run, encountering rare topologies (e.g. the canonical Sephirot pattern from `MAP.md §2`), or other lifetime markers. Achievements are out of scope for v1; they're noted here so the surrounding mechanics leave room for them.
 
-## 14. Scoring (Distance)
+## 12. Scoring (Distance)
 
 UI label: `Distance`.
 
 Only **resolution** scores.
-Distance accrues from testimony — affliction actually healed — not from affliction created.
+Distance accrues from testimony — affliction healed — not from affliction created.
 Affliction is the setup; resolving it is the payoff.
 
 Per turn:
 
-- `turnScore`: sum of testimony magnitudes (affliction actually reduced) across direct effects and propagation, both sides.
+- `turnScore`: sum of testimony magnitudes (affliction reduced) across direct effects and propagation, both sides.
 - Affliction created contributes nothing.
 
 Run score accumulates `turnScore`.
@@ -253,7 +252,7 @@ Run score accumulates `turnScore`.
 Because only real reductions count, testifying a planet already at zero affliction scores nothing — affliction must exist before it can be resolved.
 This makes each turn a two-beat: afflict to set up, testify to cash.
 
-## 15. Interaction Chart Semantics
+## 13. Interaction Chart Semantics
 
 Columns:
 
@@ -268,9 +267,9 @@ Action display:
 
 Impact display:
 
-- one-decimal direct output for the action's stat (`damage` for `Afflict`, `healing` for `Testify`)
+- the direct output for the action's stat (`damage` for `Afflict`, `healing` for `Testify`)
 
-## 16. Prototype Scope
+## 14. Prototype Scope
 
 Intentionally out of scope for now:
 
