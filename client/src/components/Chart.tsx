@@ -189,6 +189,7 @@ export function Chart(props: ChartProps) {
   // allActive overrides unlock-gating: every planet renders in full state.
   const isUnlocked = (p: PlanetName) =>
     allActive || (unlockedPlanets ? unlockedPlanets.includes(p) : true);
+  const isCombusted = (p: PlanetName) => state?.[p]?.combusted ?? false;
 
   const entranceClass =
     entrance === "left" ? "anim-encounter-open-left" :
@@ -211,6 +212,8 @@ export function Chart(props: ChartProps) {
   const aspectLines = showAspects
     ? aspects.map((a, i) => {
         if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
+        // A combusted planet is dead — drop its aspect lines to others.
+        if (isCombusted(a.from) || isCombusted(a.to)) return null;
         if (a.from > a.to) return null; // dedupe pairs (getAspects emits both directions)
         const from = pointMap[a.from];
         const to = pointMap[a.to];
