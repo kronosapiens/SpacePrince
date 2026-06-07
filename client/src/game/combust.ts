@@ -1,13 +1,21 @@
-import { DIGNITY_COMBUST_FACTOR } from "./data";
+import { DIGNITY_DURABILITY_MULT } from "./data";
 import type { PlanetPlacement, PlanetState } from "./types";
 
+/**
+ * Combustion probability (MECHANICS.md §10). Effective durability, scaled by
+ * dignity, offsets affliction; only the remainder ("functional affliction")
+ * carries risk, read directly as a percent.
+ *
+ *   functional = max(0, affliction − durability × dignityMult)
+ *   p          = min(1, functional / 100)
+ */
 export function combustionProbability(placement: PlanetPlacement, state: PlanetState): number {
   if (state.combusted) return 0;
   if (state.affliction <= 0) return 0;
   const durability = placement.base.durability + placement.buffs.durability;
-  const threshold = durability * 10;
-  const ratio = threshold === 0 ? 1 : Math.min(1, state.affliction / threshold);
-  return Math.max(0, Math.min(0.95, ratio * DIGNITY_COMBUST_FACTOR[placement.dignity]));
+  const offset = durability * DIGNITY_DURABILITY_MULT[placement.dignity];
+  const functional = Math.max(0, state.affliction - offset);
+  return Math.min(1, functional / 100);
 }
 
 /** Returns true and mutates state.combusted if the roll succeeds. */

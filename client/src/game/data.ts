@@ -26,14 +26,17 @@ export const MACROBIAN_ORDER: PlanetName[] = [
 // Cumulative lifetime encounter thresholds at which each Macrobian planet unlocks.
 export const MACROBIAN_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
 
+// Even values on a roughly 1-20 D&D-style scale (MECHANICS.md §2). Even base +
+// even buffs keeps every magnitude whole, so the ×0.5 aspect multipliers (§9)
+// still land on integers.
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun:     { damage: 3, healing: 2, durability: 3, luck: 2 },
-  Moon:    { damage: 1, healing: 4, durability: 1, luck: 2 },
-  Mercury: { damage: 2, healing: 2, durability: 2, luck: 4 },
-  Venus:   { damage: 1, healing: 4, durability: 2, luck: 3 },
-  Mars:    { damage: 4, healing: 1, durability: 2, luck: 1 },
-  Jupiter: { damage: 2, healing: 3, durability: 3, luck: 3 },
-  Saturn:  { damage: 2, healing: 1, durability: 4, luck: 1 },
+  Sun:     { damage: 12, healing: 8,  durability: 12, luck: 8 },
+  Moon:    { damage: 4,  healing: 16, durability: 4,  luck: 8 },
+  Mercury: { damage: 8,  healing: 8,  durability: 8,  luck: 16 },
+  Venus:   { damage: 4,  healing: 16, durability: 8,  luck: 12 },
+  Mars:    { damage: 16, healing: 4,  durability: 8,  luck: 4 },
+  Jupiter: { damage: 8,  healing: 12, durability: 12, luck: 12 },
+  Saturn:  { damage: 8,  healing: 4,  durability: 16, luck: 4 },
 };
 
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
@@ -68,16 +71,16 @@ export const ELEMENT_QUALITIES: Record<ElementType, [Quality, Quality]> = {
 };
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {
-  Cardinal: { damage: 1, healing: 0, durability: 0, luck: 0 },
-  Fixed:    { damage: 0, healing: 0, durability: 1, luck: 0 },
-  Mutable:  { damage: 0, healing: 1, durability: 0, luck: 0 },
+  Cardinal: { damage: 2, healing: 0, durability: 0, luck: 0 },
+  Fixed:    { damage: 0, healing: 0, durability: 2, luck: 0 },
+  Mutable:  { damage: 0, healing: 2, durability: 0, luck: 0 },
 };
 
 export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
-  Fire:  { damage: 1, healing: 0, durability: 0, luck: 0 },
-  Earth: { damage: 0, healing: 0, durability: 1, luck: 0 },
-  Water: { damage: 0, healing: 1, durability: 0, luck: 0 },
-  Air:   { damage: 0, healing: 0, durability: 0, luck: 1 },
+  Fire:  { damage: 2, healing: 0, durability: 0, luck: 0 },
+  Earth: { damage: 0, healing: 0, durability: 2, luck: 0 },
+  Water: { damage: 0, healing: 2, durability: 0, luck: 0 },
+  Air:   { damage: 0, healing: 0, durability: 0, luck: 2 },
 };
 
 export const RULERSHIP: Record<SignName, PlanetName> = {
@@ -97,7 +100,7 @@ export const PLANET_SECT: Record<PlanetName, "Day" | "Night" | "Flexible"> = {
   Mercury: "Flexible",
 };
 
-export const IN_SECT_LUCK_BONUS = 1;
+export const IN_SECT_LUCK_BONUS = 2;
 
 export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Conjunction: 1,
@@ -107,12 +110,16 @@ export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Opposition: -1,
 };
 
-export const DIGNITY_COMBUST_FACTOR: Record<Dignity, number> = {
-  Domicile: 0.75,
-  Exaltation: 0.9,
-  Neutral: 1,
-  Detriment: 1.15,
-  Fall: 1.3,
+// Combustion durability-offset multiplier by dignity (MECHANICS.md §10): higher
+// dignity absorbs more affliction before any combustion risk. Functional
+// affliction = max(0, affliction − durability × this); even durability keeps it
+// whole (×2.5 and ×1.5 of an even number are integers).
+export const DIGNITY_DURABILITY_MULT: Record<Dignity, number> = {
+  Domicile: 3,
+  Exaltation: 2.5,
+  Neutral: 2,
+  Detriment: 1.5,
+  Fall: 1,
 };
 
 export const TIME_BUCKET_MS = 5 * 60 * 1000;

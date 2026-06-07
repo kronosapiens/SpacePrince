@@ -4,8 +4,6 @@ The source of truth for the game's mechanics. Where an older design doc conflict
 
 **Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–20` D&D-style band (15 is heavy, 20 the top). Affliction accumulates toward a probabilistic combustion, offset by `durability × dignity`.
 
-> The combat structure (§§5–6, 9, 12) runs in `client/`; the number model (§§2, 4, 7, 10) is specified here and the client does not yet match it.
-
 ## 1. Entities
 
 - Planets: `Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn`
