@@ -103,6 +103,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [profile.lifetimeEncounterCount, devUnlockAll],
   );
 
+
   // Selection wins over hover — locks the panel to the selected planet so
   // mousing around the chart doesn't blow the read away. The panel (with its
   // action buttons) shows for either.
@@ -245,8 +246,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           afflict: getEffectiveStats(profile.chart, inspected).damage,
           testify: getEffectiveStats(profile.chart, inspected).healing,
           pending: pendingAction,
-          onChoose: (v) => handleCommit(inspected, v),
-          onPreview: setPendingAction,
+          // First click/tap arms the action (and previews its spread); a second
+          // on the same action confirms. Uniform across pointer and touch.
+          onChoose: (v) =>
+            pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
         }
       : undefined;
 

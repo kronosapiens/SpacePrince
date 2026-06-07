@@ -5,16 +5,15 @@ import { PLANET_ROLE } from "@/game/data";
 import { VALENCE_COLOR } from "@/svg/palette";
 
 /** When present, the panel grows a row of two action buttons under the stats:
- *  the combat fan-out. Both verbs are always lit in their valence color, so
- *  touch reads the same as pointer. `pending` (the hovered verb, desktop only)
- *  gets an extra emphasis and drives the caller's projection preview.
- *  The panel owns its own layout; combat owns the logic. */
+ *  the combat fan-out. Both verbs are always lit in their valence color.
+ *  `pending` is the armed verb (first-clicked) — it gets an extra emphasis;
+ *  a second click on it confirms. The panel owns its layout; combat owns the
+ *  arm/commit logic via `onChoose`. */
 export interface PlanetStatsActions {
   afflict: number;
   testify: number;
   pending: Polarity | null;
   onChoose: (v: Polarity) => void;
-  onPreview: (v: Polarity) => void;
 }
 
 interface PlanetStatsPanelProps {
@@ -78,7 +77,6 @@ function ActionButtons({ cx, y, actions }: { cx: number; y: number; actions: Pla
           className={`panel-action ${actions.pending === d.v ? "is-on" : ""}`}
           transform={`translate(${cx + d.dx}, ${y})`}
           style={{ "--action-c": VALENCE_COLOR[d.v] } as CSSProperties}
-          onMouseEnter={() => actions.onPreview(d.v)}
           onClick={(e) => {
             e.stopPropagation();
             actions.onChoose(d.v);
