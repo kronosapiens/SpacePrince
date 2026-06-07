@@ -450,9 +450,10 @@ function PlanetGlyph({
 
   const fill = combusted ? "#3B2F2F" : c;
   const fillOpacity = combusted ? 0.4 : 0.92;
-  // Derive a neutral glyph tone from the planet fill: darker on light discs,
-  // lighter on dark discs, avoiding hard black/white contrast.
-  const glyphFill = combusted ? NEUTRAL.mist : contrastGrayForFill(fill);
+  // Glyph in a deep shade of the planet's own color: colored and high-contrast
+  // (via value), but on-palette — same hue family, so no complementary clash
+  // and the rainbow corona stays coherent.
+  const glyphFill = combusted ? NEUTRAL.mist : deepShade(c);
 
   // Affliction + projection badges — pill-shaped, gold border, drop shadow,
   // matching the v1 treatment. Pills sit on the chart-facing side of the
@@ -759,17 +760,46 @@ function polar(cx: number, cy: number, r: number, deg: number): { x: number; y: 
   return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
 }
 
-function contrastGrayForFill(hex: string): string {
+/** Deep shade of a planet's own color for its glyph: same hue, saturation
+ *  nudged up, lightness dropped low. Every disc sits at HSL lightness ≥ ~0.5,
+ *  so a fixed low-lightness glyph reads with strong value contrast while
+ *  staying in the planet's hue family (no off-palette clash). */
+function deepShade(hex: string): string {
   const rgb = parseHexColor(hex);
-  if (!rgb) return "#808080";
-  const [r, g, b] = rgb.map((v) => {
-    const c = v / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  const luminance = 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-  const gray = Math.round(clamp(210 - luminance * 190, 54, 190));
-  const h = gray.toString(16).padStart(2, "0");
-  return `#${h}${h}${h}`;
+  if (!rgb) return NEUTRAL.void;
+  const [h, s] = rgbToHsl(rgb);
+  return hslToHex(h, clamp(s * 1.25 + 0.1, 0.45, 0.95), 0.2);
+}
+
+function rgbToHsl([r, g, b]: [number, number, number]): [number, number, number] {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (d === 0) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h: number;
+  if (max === rn) h = ((gn - bn) / d) % 6;
+  else if (max === gn) h = (bn - rn) / d + 2;
+  else h = (rn - gn) / d + 4;
+  h = h * 60;
+  if (h < 0) h += 360;
+  return [h, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) { r = c; g = x; }
+  else if (h < 120) { r = x; g = c; }
+  else if (h < 180) { g = c; b = x; }
+  else if (h < 240) { g = x; b = c; }
+  else if (h < 300) { r = x; b = c; }
+  else { r = c; b = x; }
+  const to = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
 }
 
 function parseHexColor(hex: string): [number, number, number] | null {
