@@ -419,8 +419,7 @@ function PlanetGlyph({
 }) {
   const c = PLANET_PRIMARY[point.planet];
   const sec = PLANET_SECONDARY[point.planet];
-  // Active no longer enlarges the glyph — the ring carries the state,
-  // matches the on-hover treatment.
+  // Active state is carried by the ring, not glyph size.
   const r = point.glyphR;
   const interactive = !passive && (!!onClick || !!onHover) && !combusted && !ghost;
 

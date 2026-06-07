@@ -66,8 +66,7 @@ export function applyOutcomes(
     const placement = profile.chart.planets[touchedAfflictionPlanet];
     const state = perPlanetState[touchedAfflictionPlanet];
     if (combustionProbability(placement, state) > 0) {
-      // Use a deterministic mini-RNG keyed on run id + planet to avoid Math.random in pure logic
-      // but for narrative we can roll real rng — narrative resolution is not replayed, so Math.random is acceptable.
+      // Narrative resolution isn't replayed, so Math.random is fine here (combat uses seeded RNG).
       maybeCombust(placement, state, Math.random);
     }
   }
@@ -91,10 +90,9 @@ export interface NarrativeCtxBuild {
 }
 
 export function buildNarrativeContext(input: NarrativeCtxBuild) {
-  const { profile, run, joyPlanet, rulerPlanet } = input;
+  const { run, joyPlanet, rulerPlanet } = input;
   const joyAffliction = joyPlanet ? run.perPlanetState[joyPlanet].affliction : 0;
   const joyCombusted = joyPlanet ? run.perPlanetState[joyPlanet].combusted : false;
-  void profile; // reserved for future ruler-aspecting-ASC logic
   return {
     joyPlanet,
     joyAffliction,

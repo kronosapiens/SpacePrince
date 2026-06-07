@@ -3,7 +3,6 @@ import type {
   ModalityType,
   PlanetBaseStats,
   PlanetName,
-  Quality,
   SignName,
   Dignity,
   AspectType,
@@ -61,13 +60,6 @@ export const SIGN_MODALITY: Record<SignName, ModalityType> = {
   Aries: "Cardinal", Taurus: "Fixed", Gemini: "Mutable", Cancer: "Cardinal",
   Leo: "Fixed", Virgo: "Mutable", Libra: "Cardinal", Scorpio: "Fixed",
   Sagittarius: "Mutable", Capricorn: "Cardinal", Aquarius: "Fixed", Pisces: "Mutable",
-};
-
-export const ELEMENT_QUALITIES: Record<ElementType, [Quality, Quality]> = {
-  Fire: ["Hot", "Dry"],
-  Air: ["Hot", "Wet"],
-  Water: ["Cold", "Wet"],
-  Earth: ["Cold", "Dry"],
 };
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {

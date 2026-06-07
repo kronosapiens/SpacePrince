@@ -11,8 +11,7 @@ export interface DevSettings {
 }
 
 const DEFAULT: DevSettings = {
-  // Default true while we're iterating on screens & flows. Can be toggled off
-  // from the Index screen's cheats panel for normal gameplay.
+  // Dev mode defaults on; toggle it off in the Index screen's cheats panel.
   devModeActive: true,
   unlockAll: false,
   forceNarrativeHouse: null,

@@ -34,14 +34,6 @@ export const PLANET_SECONDARY: Record<PlanetName, string> = {
   Saturn: "#C5A8D8",
 };
 
-/** Color used to render sign labels — element family. */
-export const SIGN_ELEMENT_COLOR = {
-  Fire: "#E04A3F",
-  Earth: "#E8E2D4",
-  Air: "#E8E2D4",
-  Water: "#9EC9A8",
-} as const;
-
 /** Aspect-line colors per v1: green for harmonious, red for tense. */
 export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction

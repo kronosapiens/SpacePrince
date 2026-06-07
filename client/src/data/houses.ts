@@ -40,9 +40,3 @@ export const HOUSES: HouseDef[] = [
   { num: 11, name: "Friendship",      classicalName: "Agathos Daimon",  valence: "good", joy: "Jupiter", ruler: "Saturn",  kind: "benefic-joy",       theme: "Friends, allies, hopes, gifts that arrive from outside.",                                              angular: null  },
   { num: 12, name: "The Hidden",      classicalName: "Kakos Daimon",    valence: "bad",  joy: "Saturn",  ruler: "Jupiter", kind: "contained-malefic", theme: "Sorrows, hidden enemies, exile — slow heavy concealment, contained when honestly employed.",          angular: null  },
 ];
-
-export function getHouse(num: number): HouseDef {
-  const h = HOUSES[num - 1];
-  if (!h) throw new Error(`No house ${num}`);
-  return h;
-}

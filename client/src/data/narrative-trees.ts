@@ -1,5 +1,4 @@
 import type { Omen, PlanetName } from "@/game/types";
-import { HOUSES, type HouseDef } from "./houses";
 
 export type Outcome =
   | { kind: "affliction"; planet: PlanetName; delta: number }       // positive = harm; negative = heal
@@ -815,10 +814,6 @@ export function getTreeNode(tree: NarrativeTree, nodeId: string): TreeNode {
   return n;
 }
 
-export function getTreeForHouse(house: HouseDef): NarrativeTree {
-  return getTree(house.num);
-}
-
 // Resolve aside text whether it's a literal string or a function of context.
 export function resolveAside(option: Option, ctx: NarrativeContext): string | undefined {
   if (option.aside === undefined) return undefined;
@@ -830,5 +825,3 @@ export function resolveAside(option: Option, ctx: NarrativeContext): string | un
 export function visibleOptions(node: TreeNode, ctx: NarrativeContext): Option[] {
   return node.options.filter((o) => (o.visibleIf ? o.visibleIf(ctx) : true));
 }
-
-void HOUSES; // re-export keep-around (unused locally but consumers may import)

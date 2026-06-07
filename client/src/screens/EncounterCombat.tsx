@@ -189,8 +189,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, encounter.resolved, run.perPlanetState, playerUnlocked, skipAnimation],
   );
 
-  // Hovering a planet previews it; reset the per-button preview so the
-  // projection falls back to the newly-inspected planet's default verb.
+  // Hover previews a planet; clear the armed action so its projection shows the default verb.
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
     setHovered(planet);
     setPendingAction(null);

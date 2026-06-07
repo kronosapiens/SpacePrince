@@ -1,6 +1,5 @@
 export type ElementType = "Fire" | "Earth" | "Air" | "Water";
 export type ModalityType = "Cardinal" | "Fixed" | "Mutable";
-export type Quality = "Hot" | "Cold" | "Wet" | "Dry";
 
 export type SignName =
   | "Aries" | "Taurus" | "Gemini" | "Cancer" | "Leo" | "Virgo"
@@ -140,11 +139,6 @@ export interface MapNode {
   id: string;
   layer: number;
   pillar: Pillar;
-}
-
-export interface PositionedMapNode extends MapNode {
-  x: number;
-  y: number;
 }
 
 export interface MapEdge {

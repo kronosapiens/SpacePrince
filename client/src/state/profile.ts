@@ -19,7 +19,3 @@ export function saveProfile(profile: Profile): void {
 export function clearProfile(): void {
   localStorage.removeItem(PROFILE_KEY);
 }
-
-export function bumpEncounterCount(profile: Profile, delta = 1): Profile {
-  return { ...profile, lifetimeEncounterCount: profile.lifetimeEncounterCount + delta };
-}
