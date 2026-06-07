@@ -95,8 +95,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       const luckPlanet = joyPlanet ?? house.ruler;
       const placement = profile.chart.planets[luckPlanet];
       const luck = placement.base.luck + placement.buffs.luck;
-      // Luck runs ~4–20 on the even-stat scale; ~0.46 at luck 4, ~0.70 at luck 20.
-      const chance = Math.min(0.85, 0.4 + luck * 0.015);
+      // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
+      const chance = Math.min(0.85, 0.4 + luck * 0.03);
       const success = Math.random() < chance;
       outcomes = success ? (option.outcomesOnSuccess ?? []) : (option.outcomesOnFail ?? []);
       resolutionText = success ? "The wager holds." : "The wager falls.";

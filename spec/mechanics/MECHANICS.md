@@ -2,7 +2,7 @@
 
 The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
 
-**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–20` D&D-style band (15 is heavy, 20 the top). Affliction accumulates toward a probabilistic combustion, offset by `durability × dignity`.
+**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a probabilistic combustion, offset by `durability × dignity`.
 
 ## 1. Entities
 
@@ -30,21 +30,21 @@ The short display label per planet (e.g., "the warrior") lives in `client/src/ga
 - **Jupiter** — balanced and generous across all stats; expansion, gift.
 - **Saturn** — top durability, slow elsewhere; limit, time, endurance.
 
-Base stats per planet, even values on a roughly `1–20` D&D-style scale:
+Base stats per planet, even values on a roughly `1–10` scale:
 
 | Planet  | Damage | Healing | Durability | Luck | Total |
 |---------|-------:|--------:|-----------:|-----:|------:|
-| Sun     |     12 |       8 |         12 |    8 |    40 |
-| Moon    |      4 |      16 |          4 |    8 |    32 |
-| Mercury |      8 |       8 |          8 |   16 |    40 |
-| Venus   |      4 |      16 |          8 |   12 |    40 |
-| Mars    |     16 |       4 |          8 |    4 |    32 |
-| Jupiter |      8 |      12 |         12 |   12 |    44 |
-| Saturn  |      8 |       4 |         16 |    4 |    32 |
+| Sun     |      6 |       4 |          6 |    4 |    20 |
+| Moon    |      2 |       8 |          2 |    4 |    16 |
+| Mercury |      4 |       4 |          4 |    8 |    20 |
+| Venus   |      2 |       8 |          4 |    6 |    20 |
+| Mars    |      8 |       2 |          4 |    2 |    16 |
+| Jupiter |      4 |       6 |          6 |    6 |    22 |
+| Saturn  |      4 |       2 |          8 |    2 |    16 |
 
-Base values are multiples of 4 and buffs (§4) add `+2`, so are always even — which means `×0.5` multipliers still yield integers (§9).
+Base values are even and buffs (§4) add `+2`, so every magnitude stays even — which means `×0.5` multipliers still yield integers (§9).
 
-**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~40–44) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 32) a higher single-stat peak (`16`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
+**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~20–22) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 16) a higher single-stat peak (`8`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
 
 ## 3. Chart Generation
 
@@ -136,7 +136,7 @@ Magnitude is the planet's own stat; dignity, sect, and element/modality buffs (�
 
 Each side rolls independently per action:
 
-- `critChance = effectiveLuck * 0.025` (effective luck runs ~4–20, so ~10–50%)
+- `critChance = effectiveLuck * 0.05` (effective luck runs ~2–12, so ~10–60%)
 - crit doubles the direct outgoing effect (`×2`)
 
 ## 8. Affliction Value Model
@@ -184,7 +184,7 @@ Each planet takes **at most one** affliction application per turn — the direct
 
 - `p = min(1, functional / 100)`
 
-So a planet is **dead safe** while its raw affliction stays under its offset (`durability * dignityMult`, ~4–60 across the roster), then the per-hit combust chance climbs one point per point of functional affliction. Well-buffered, dignified planets endure into 3-digit raw affliction before they are likely to go; fragile, debilitated planets fold early.
+So a planet is **dead safe** while its raw affliction stays under its offset (`durability * dignityMult`, ~2–36 across the roster), then the per-hit combust chance climbs one point per point of functional affliction. Well-buffered, dignified planets rarely build enough raw affliction to be at much risk; fragile, debilitated planets fold early.
 
 Dignity scales the offset: domicile offsets more (safer), fall less (riskier). Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
 

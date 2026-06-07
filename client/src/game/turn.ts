@@ -161,9 +161,9 @@ export function resolveTurn(
 }
 
 function rollCrit(luck: number, rng: () => number): boolean {
-  // critChance = effectiveLuck × 0.025 (MECHANICS.md §7). Effective luck runs
-  // ~4–20, so ~10–50%. Crit doubles the outgoing effect (applied by the caller).
-  const chance = Math.max(0, luck * 0.025);
+  // critChance = effectiveLuck × 0.05 (MECHANICS.md §7). Effective luck runs
+  // ~2–12, so ~10–60%. Crit doubles the outgoing effect (applied by the caller).
+  const chance = Math.max(0, luck * 0.05);
   return rng() < chance;
 }
 

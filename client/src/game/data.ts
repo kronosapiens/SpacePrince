@@ -25,17 +25,17 @@ export const MACROBIAN_ORDER: PlanetName[] = [
 // Cumulative lifetime encounter thresholds at which each Macrobian planet unlocks.
 export const MACROBIAN_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
 
-// Even values on a roughly 1-20 D&D-style scale (MECHANICS.md §2). Even base +
-// even buffs keeps every magnitude whole, so the ×0.5 aspect multipliers (§9)
-// still land on integers.
+// Even values on a roughly 1-10 scale (MECHANICS.md §2). Even base + even buffs
+// keeps every magnitude whole, so the ×0.5 aspect multipliers (§9) still land
+// on integers.
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun:     { damage: 12, healing: 8,  durability: 12, luck: 8 },
-  Moon:    { damage: 4,  healing: 16, durability: 4,  luck: 8 },
-  Mercury: { damage: 8,  healing: 8,  durability: 8,  luck: 16 },
-  Venus:   { damage: 4,  healing: 16, durability: 8,  luck: 12 },
-  Mars:    { damage: 16, healing: 4,  durability: 8,  luck: 4 },
-  Jupiter: { damage: 8,  healing: 12, durability: 12, luck: 12 },
-  Saturn:  { damage: 8,  healing: 4,  durability: 16, luck: 4 },
+  Sun:     { damage: 6, healing: 4, durability: 6, luck: 4 },
+  Moon:    { damage: 2, healing: 8, durability: 2, luck: 4 },
+  Mercury: { damage: 4, healing: 4, durability: 4, luck: 8 },
+  Venus:   { damage: 2, healing: 8, durability: 4, luck: 6 },
+  Mars:    { damage: 8, healing: 2, durability: 4, luck: 2 },
+  Jupiter: { damage: 4, healing: 6, durability: 6, luck: 6 },
+  Saturn:  { damage: 4, healing: 2, durability: 8, luck: 2 },
 };
 
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
