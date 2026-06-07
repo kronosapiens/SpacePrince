@@ -308,7 +308,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       <div className="combat-seam">
         {(!encounter.resolved || animation) && displayOpponentTurn && (
           <div className="combat-opp-of-turn">
-            <span className="eyebrow">ANSWER</span>
             <span
               className="combat-opp-glyph"
               style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}
@@ -322,7 +321,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 style={{ color: VALENCE_COLOR[displayOpponentAction] }}
               >
                 {displayOpponentAction === "Testimony" ? "TESTIFIES" : "AFFLICTS"}
-                {displayOpponentAmount != null ? ` ${displayOpponentAmount}` : ""}
+                {displayOpponentAmount != null && (
+                  <span className="combat-opp-amount">{displayOpponentAmount}</span>
+                )}
               </span>
             )}
           </div>

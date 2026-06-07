@@ -114,12 +114,25 @@
   transform-box: fill-box;
 }
 
+/* Active (opponent-of-turn) planet halo — a breathing glow so the turn's
+   focal planet is unmistakable. */
+@keyframes active-halo-breath {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50%      { opacity: 1;   transform: scale(1.07); }
+}
+.anim-active-halo {
+  animation: active-halo-breath 3s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
   .anim-impact,
   .anim-crit-burst,
   .anim-combust-ripple,
-  .anim-map-current-halo { animation: none; }
+  .anim-map-current-halo,
+  .anim-active-halo { animation: none; }
 }
 
 .anim-fragment-in {

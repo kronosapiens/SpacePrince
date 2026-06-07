@@ -14,7 +14,7 @@ import {
   INNER_RING_R, OUTER_RING_R,
   PLANET_R_REST, PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
-  STROKE_LIGHT,
+  STROKE_LIGHT, STROKE_MEDIUM,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
@@ -464,12 +464,12 @@ function PlanetGlyph({
   const ux = dx / d;
   const uy = dy / d;
   const badgeOffset = r;
-  const badgeR = Math.max(14, r * 0.6);
-  const badgeFontSize = Math.max(15, Math.round(r * 0.62));
-  // Projection badge is a touch smaller — only ever a single digit, doesn't
-  // need to fit two-digit values like the persistent affliction badge.
-  const projBadgeR = Math.max(12, r * 0.5);
-  const projFontSize = Math.max(13, Math.round(r * 0.5));
+  const badgeR = Math.max(12, r * 0.5);
+  const badgeFontSize = Math.max(13, Math.round(r * 0.5));
+  // Projection badge shares the affliction badge's size; the affliction pill
+  // still widens for two-digit values via widthFor.
+  const projBadgeR = badgeR;
+  const projFontSize = badgeFontSize;
   // Pill width grows with text length. Floor at 2*r (square-ish).
   // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
   // visual padding so multi-char content like "2.5" doesn't get crowded
@@ -495,8 +495,16 @@ function PlanetGlyph({
       className={outerClass}
     >
       {active && (
+        <circle
+          className="anim-active-halo"
+          r={point.glyphR * 2.5}
+          fill={`url(#v2-halo-${point.planet})`}
+          style={{ pointerEvents: "none" }}
+        />
+      )}
+      {active && (
         <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
+          stroke={c} strokeOpacity="1" strokeWidth={STROKE_MEDIUM} />
       )}
       {(inspect || selected) && !active && (
         <circle r={point.glyphR + 10} fill="none"
