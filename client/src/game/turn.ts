@@ -1,9 +1,5 @@
 import { PLANETS } from "./data";
-import {
-  computeDirectExchange,
-  drawValence,
-  getEffectiveStatsFromPlacement,
-} from "./combat";
+import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects } from "./aspects";
 import { maybeCombust } from "./combust";
 import { cloneSideState } from "./chart";
@@ -14,6 +10,7 @@ import type {
   CombatEncounter,
   PlanetName,
   PlanetPlacement,
+  PlanetStats,
   PlanetState,
   Polarity,
   PropagationEntry,
@@ -54,42 +51,32 @@ export function resolveTurn(
   const playerPlacement = playerChart.planets[playerPlanet];
   const opponentPlacement = enc.opponentChart.planets[opponentPlanet];
 
-  const direct = computeDirectPhase(
-    playerPlacement,
-    opponentPlacement,
-    playerStateMap[playerPlanet],
-    opponentStateMap[opponentPlanet],
-    playerValence,
-    opponentValence,
-    rng,
-  );
-  // Each planet receives the *other* side's action: the player's planet takes
-  // the opponent's precommitted valence, the opponent's planet takes the
-  // player's chosen valence.
-  const playerDelta = applyEffect(
-    playerStateMap[playerPlanet],
-    opponentValence,
-    direct.opponentToPlayer,
-  );
-  const opponentDelta = applyEffect(
-    opponentStateMap[opponentPlanet],
-    playerValence,
-    direct.playerToOpponent,
+  // Sequential resolution (MECHANICS §6): your action lands on the opponent's
+  // chart first (phase 1), then the opponent's lands on yours (phase 2). Phase 2
+  // reads the post-phase-1 state, so combusting the opponent's acting planet in
+  // phase 1 preempts — zeroes — its phase-2 response.
+  const playerEff = playerStateMap[playerPlanet].combusted
+    ? ZERO_STATS
+    : getEffectiveStatsFromPlacement(playerPlacement);
+  const phase1 = resolveAction(
+    playerEff, playerValence,
+    opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other", rng,
   );
 
-  const propagation = [
-    ...propagate(playerStateMap, playerChart, playerPlanet, opponentValence, direct.opponentToPlayer, rng, "self"),
-    ...propagate(opponentStateMap, enc.opponentChart, opponentPlanet, playerValence, direct.playerToOpponent, rng, "other"),
-  ];
+  const opponentEff = opponentStateMap[opponentPlanet].combusted
+    ? ZERO_STATS
+    : getEffectiveStatsFromPlacement(opponentPlacement);
+  const phase2 = resolveAction(
+    opponentEff, opponentValence,
+    playerStateMap, playerChart, playerPlanet, playerPlacement, "self", rng,
+  );
 
-  const playerCombust =
-    opponentValence !== "Testimony" && playerDelta > 0
-      ? maybeCombust(playerPlacement, playerStateMap[playerPlanet], rng)
-      : false;
-  const opponentCombust =
-    playerValence !== "Testimony" && opponentDelta > 0
-      ? maybeCombust(opponentPlacement, opponentStateMap[opponentPlanet], rng)
-      : false;
+  const opponentDelta = phase1.delta;
+  const playerDelta = phase2.delta;
+  const opponentCombust = phase1.combust;
+  const playerCombust = phase2.combust;
+  // Opponent's chart (phase 1) before yours (phase 2) — the order the UI replays.
+  const propagation = [...phase1.propagation, ...phase2.propagation];
 
   const score = turnScore(playerDelta, opponentDelta, playerValence, opponentValence, propagation);
 
@@ -102,19 +89,19 @@ export function resolveTurn(
     opponentValence,
     playerDelta,
     opponentDelta,
-    playerCrit: direct.playerCrit,
-    opponentCrit: direct.opponentCrit,
+    playerCrit: phase1.crit,
+    opponentCrit: phase2.crit,
     playerCombust,
     opponentCombust,
     propagation,
     turnScore: score,
     directBreakdown: {
-      playerBase: direct.playerBase,
-      playerCritMultiplier: direct.playerCrit ? 2 : 1,
-      playerResult: direct.playerToOpponent,
-      opponentBase: direct.opponentBase,
-      opponentCritMultiplier: direct.opponentCrit ? 2 : 1,
-      opponentResult: direct.opponentToPlayer,
+      playerBase: phase1.base,
+      playerCritMultiplier: phase1.crit ? 2 : 1,
+      playerResult: phase1.amount,
+      opponentBase: phase2.base,
+      opponentCritMultiplier: phase2.crit ? 2 : 1,
+      opponentResult: phase2.amount,
     },
   };
 
@@ -167,31 +154,31 @@ function rollCrit(luck: number, rng: () => number): boolean {
   return rng() < chance;
 }
 
-function computeDirectPhase(
-  playerPlacement: PlanetPlacement,
-  opponentPlacement: PlanetPlacement,
-  playerState: PlanetState,
-  opponentState: PlanetState,
-  playerValence: Polarity,
-  opponentValence: Polarity,
+/**
+ * Resolves one side's action against the other. The acting planet's stats
+ * (`attackerEff`) set the magnitude; the effect lands on `side`'s active planet
+ * and propagates through `chart`. The same per-direction base stat the
+ * projection preview uses (combat.ts `computeDirectExchange`), so they don't
+ * drift. Sequenced by the caller — phase 1 (your action) before phase 2 (theirs).
+ */
+function resolveAction(
+  attackerEff: PlanetStats,
+  valence: Polarity,
+  side: SideState,
+  chart: Chart,
+  active: PlanetName,
+  placement: PlanetPlacement,
+  sideTag: "self" | "other",
   rng: () => number,
 ) {
-  const playerEff = playerState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(playerPlacement);
-  const opponentEff = opponentState.combusted ? ZERO_STATS : getEffectiveStatsFromPlacement(opponentPlacement);
-  const playerCrit = rollCrit(playerEff.luck, rng);
-  const opponentCrit = rollCrit(opponentEff.luck, rng);
-  // Reuse the exchange formula from combat.ts; multiply by crit factor here.
-  // Projection (computeProjectedEffects) uses the same function without crit,
-  // so projection and resolution can never drift.
-  const exchange = computeDirectExchange(playerValence, opponentValence, playerEff, opponentEff);
-  return {
-    playerCrit,
-    opponentCrit,
-    playerToOpponent: exchange.playerToOpponent * (playerCrit ? 2 : 1),
-    opponentToPlayer: exchange.opponentToPlayer * (opponentCrit ? 2 : 1),
-    playerBase: playerValence === "Testimony" ? playerEff.healing : playerEff.damage,
-    opponentBase: opponentValence === "Testimony" ? opponentEff.healing : opponentEff.damage,
-  };
+  const crit = rollCrit(attackerEff.luck, rng);
+  const base = valence === "Testimony" ? attackerEff.healing : attackerEff.damage;
+  const amount = Math.max(0, base) * (crit ? 2 : 1);
+  const delta = applyEffect(side[active], valence, amount);
+  const propagation = propagate(side, chart, active, valence, amount, rng, sideTag);
+  const combust =
+    valence !== "Testimony" && delta > 0 ? maybeCombust(placement, side[active], rng) : false;
+  return { crit, base, amount, delta, combust, propagation };
 }
 
 function applyEffect(state: PlanetState, polarity: Polarity, raw: number): number {

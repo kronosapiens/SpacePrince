@@ -111,11 +111,12 @@ Action is set per side:
 
 ## 6. Direct Resolution
 
-Both sides resolve simultaneously.
-The opponent's verb is precommitted (§5), so the player chooses with full information.
+Resolution is **sequential**, in two phases:
 
-- Self acting planet -> opponent active planet
-- Opponent active planet -> self acting planet
+1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is rolled there.
+2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
+
+The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free Distance (§12) you'd otherwise deny.
 
 Base amount is the stat for the action:
 
