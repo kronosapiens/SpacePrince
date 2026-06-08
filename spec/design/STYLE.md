@@ -187,7 +187,7 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 
 ### Combat turn composition
 
-In a combat turn, both charts' propagations run **simultaneously** — when the player commits a planet, the player-chart and opponent-chart light up their internal aspect webs at the same time, in parallel. The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+In a combat turn the two charts resolve **sequentially** (MECHANICS §6): when the player commits, the opponent's chart lights up first — the player's action landing on it and propagating through its web — then, after a short pause, the player's chart resolves the opponent's reply. Watching the opponent before yourself keeps the two readable and lets a phase-1 combust visibly preempt the response. The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
 
 Narrative encounters do not use propagation animations. Resolution applies plain state-change flashes on affected planets — see `SCREENS.md §3.5`.
 

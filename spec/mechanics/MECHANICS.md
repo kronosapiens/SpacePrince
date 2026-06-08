@@ -111,7 +111,7 @@ Action is set per side:
 
 ## 6. Direct Resolution
 
-Resolution is **sequential**, in two phases:
+Resolution is **sequential**, in two phases — the intent → act → response rhythm of Slay the Spire rather than the simultaneous trade of FTL (`spec/concept/INFLUENCES.md`):
 
 1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is rolled there.
 2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.

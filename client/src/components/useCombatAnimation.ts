@@ -26,7 +26,7 @@ export const ANIMATION_TIMINGS = {
   propagationClearOffset: 360,
   combustRippleDuration: 1000,
   endOffset: 360,
-  /** Pause between the player's resolution phase and the opponent's, so the
+  /** Pause between the opponent's resolution phase and the player's, so the
    *  two charts read sequentially rather than simultaneously. */
   interPhasePause: 240,
 } as const;
@@ -400,20 +400,12 @@ function runScheduler(args: {
     return Math.max(propagationEnd, lastCombustClearLocal);
   };
 
-  // Sequential phases: player chart resolves first, then opponent.
-  const playerPhaseEnd = schedulePhase({
-    base: 0,
-    side: "self",
-    actionPlanet: entry.playerPlanet,
-    actionDelta: entry.playerDelta,
-    actionCrit: entry.playerCrit,
-    actionCombust: entry.playerCombust ?? false,
-    sign: selfSign,
-    steps: playerSteps,
-  });
-  const opponentBase = playerPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
+  // Sequential phases (MECHANICS §6): the opponent's chart resolves first — your
+  // action landing on it — then your chart, the opponent's reply. Watching the
+  // opponent before yourself keeps the two readable and lets a phase-1 combust
+  // visibly preempt the phase-2 response.
   const opponentPhaseEnd = schedulePhase({
-    base: opponentBase,
+    base: 0,
     side: "other",
     actionPlanet: entry.opponentPlanet,
     actionDelta: entry.opponentDelta,
@@ -422,6 +414,17 @@ function runScheduler(args: {
     sign: otherSign,
     steps: opponentSteps,
   });
+  const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
+  const playerPhaseEnd = schedulePhase({
+    base: selfBase,
+    side: "self",
+    actionPlanet: entry.playerPlanet,
+    actionDelta: entry.playerDelta,
+    actionCrit: entry.playerCrit,
+    actionCombust: entry.playerCombust ?? false,
+    sign: selfSign,
+    steps: playerSteps,
+  });
 
-  schedule(() => setAnimation(null), opponentPhaseEnd + ANIMATION_TIMINGS.endOffset);
+  schedule(() => setAnimation(null), playerPhaseEnd + ANIMATION_TIMINGS.endOffset);
 }

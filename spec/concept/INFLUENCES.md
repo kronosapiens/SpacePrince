@@ -125,6 +125,7 @@ The world doesn’t just unlock new dialogue — it changes mechanically in resp
 - Risk as a core experiential driver
 - Replayability through recombination, not content exhaustion
 - Clear cause-and-effect relationships
+- Slay the Spire's turn rhythm — telegraphed enemy intent, then you act, then the enemy responds (sequential, not simultaneous). Combat resolution adopts this directly and extends it with *preemption*: combust an opponent's planet on your turn and its response is denied (`MECHANICS.md §6`).
 
 ### What We Reject
 
