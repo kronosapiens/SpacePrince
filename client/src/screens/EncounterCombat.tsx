@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
@@ -80,7 +80,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           displayOpponentAction === "Testimony" ? "healing" : "damage"
         ]
       : null;
-  const displayedRunDistance = animation?.distanceBefore ?? run.runDistance;
+  const displayedRunDistance = animation?.runningDistance ?? run.runDistance;
+  const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
+  // Tint each distance flash with the color of the planet resolving on that
+  // beat, so the number flashes through the wave's planets rather than one hue.
+  const distanceFlashColor = animation?.distanceFlashPlanet
+    ? PLANET_PRIMARY[animation.distanceFlashPlanet]
+    : null;
   const displayPlayerState = animation?.selfState ?? run.perPlanetState;
   const displayOpponentState = animation?.otherState ?? encounter.opponentState;
   const activePropagationKeys = animation?.activePropagationKeys ?? EMPTY_PROPAGATION_KEYS;
@@ -283,7 +289,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           unlockedPlanets={playerUnlocked}
           selectedPlanet={selected}
           hoveredPlanet={hovered}
-          inspectPlanet={selected}
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
@@ -313,7 +318,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             >
               {PLANET_GLYPH[displayOpponentTurn]}
             </span>
-            <span className="combat-opp-name">{displayOpponentTurn.toUpperCase()}</span>
+            <SeamName>{displayOpponentTurn.toUpperCase()}</SeamName>
             {displayOpponentAction && (
               <span
                 className="combat-opp-action"
@@ -329,7 +334,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         )}
         {encounter.resolved && !animation && (
           <div className="combat-opp-of-turn is-dim">
-            <span className="combat-opp-name">{run.over ? "COMBUST" : "SETTLED"}</span>
+            <SeamName>{run.over ? "COMBUST" : "SETTLED"}</SeamName>
           </div>
         )}
 
@@ -347,7 +352,32 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
         <div className="combat-distance">
           <span className="eyebrow">DISTANCE</span>
-          <span className="combat-distance-v">{Math.round(displayedRunDistance)}</span>
+          <span
+            className="combat-distance-v"
+            style={
+              distanceFlashColor
+                ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
+                : undefined
+            }
+          >
+            {distanceFlashEpoch > 0 && (
+              <span
+                key={distanceFlashEpoch}
+                className="combat-distance-flash anim-distance-flash"
+                aria-hidden
+              />
+            )}
+            <span
+              key={`n-${distanceFlashEpoch}`}
+              className={
+                distanceFlashEpoch > 0
+                  ? "combat-distance-n anim-distance-pop"
+                  : "combat-distance-n"
+              }
+            >
+              {Math.round(displayedRunDistance)}
+            </span>
+          </span>
         </div>
       </div>
 
@@ -381,5 +411,20 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         </div>
       )}
     </div>
+  );
+}
+
+/** Opponent label at constant width. An invisible "MERCURY" sizer reserves the
+ *  widest planet name's width so the seam — and thus the two wheels — never
+ *  shifts horizontally as the name changes each turn. The visible label centres
+ *  over the reserved space. */
+function SeamName({ children }: { children: string }) {
+  return (
+    <span className="combat-opp-name">
+      <span className="combat-opp-name-sizer" aria-hidden>
+        MERCURY
+      </span>
+      <span className="combat-opp-name-text">{children}</span>
+    </span>
   );
 }

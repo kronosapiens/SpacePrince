@@ -46,7 +46,15 @@ export interface CombatAnimationState {
   playerPlanet: PlanetName;
   opponentPlanet: PlanetName;
   turnIndex: number;
-  distanceBefore: number;
+  /** Distance shown right now — starts at the pre-turn total and ticks up as
+   *  each planet's affliction resolves, in step with the resolution beats. */
+  runningDistance: number;
+  /** Bumps once per distance increase; used as a React key so the flash
+   *  behind the number re-triggers on every resolution. */
+  distanceFlashEpoch: number;
+  /** The planet whose affliction resolved on the latest beat — its color tints
+   *  that beat's flash, so the number flashes through the wave's planets. */
+  distanceFlashPlanet: PlanetName | null;
   activePropagationKeys: FlagPair<string>;
   actionPulse: { player: PlanetName | null; opponent: PlanetName | null };
   impactPlanets: FlagPair<PlanetName>;
@@ -197,7 +205,9 @@ function runScheduler(args: {
     playerPlanet: entry.playerPlanet,
     opponentPlanet: entry.opponentPlanet,
     turnIndex: previousEncounter.turnIndex,
-    distanceBefore: previousRun.runDistance,
+    runningDistance: previousRun.runDistance,
+    distanceFlashEpoch: 0,
+    distanceFlashPlanet: null,
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,
     actionPulse: { player: null, opponent: null },
     impactPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
@@ -228,9 +238,12 @@ function runScheduler(args: {
     actionCrit: boolean;
     actionCombust: boolean;
     sign: number;
+    /** Distance resolved by this phase's direct hit (only testimony scores).
+     *  Added when the primary lands, so the number ticks with the impact. */
+    actionScore: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, sign, steps } = args;
+    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, sign, actionScore, steps } = args;
     const isSelf = side === "self";
 
     // Primary direct phase — apply delta, light action-glow, impact, crit.
@@ -239,6 +252,11 @@ function runScheduler(args: {
         const next = cloneAnimation(state);
         if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
         else applyDelta(next.otherState, actionPlanet, actionDelta * sign);
+        if (actionScore > 0) {
+          next.runningDistance += actionScore;
+          next.distanceFlashEpoch += 1;
+          next.distanceFlashPlanet = actionPlanet;
+        }
         next.actionPulse = isSelf
           ? { ...next.actionPulse, player: actionPlanet }
           : { ...next.actionPulse, opponent: actionPlanet };
@@ -317,6 +335,13 @@ function runScheduler(args: {
             };
           } else {
             applyDelta(targetState, step.target, step.delta);
+            // Propagated testimony resolves affliction (delta stored negative) —
+            // tick the distance with this planet's resolution beat.
+            if (step.polarity === "Testimony") {
+              next.runningDistance += Math.abs(step.delta);
+              next.distanceFlashEpoch += 1;
+              next.distanceFlashPlanet = step.target;
+            }
           }
           next.impactPlanets = {
             ...next.impactPlanets,
@@ -404,6 +429,13 @@ function runScheduler(args: {
   // action landing on it — then your chart, the opponent's reply. Watching the
   // opponent before yourself keeps the two readable and lets a phase-1 combust
   // visibly preempt the phase-2 response.
+  // Direct distance resolved per side: your action landing on the opponent's
+  // chart, and theirs on yours — each scores only when its valence is testimony
+  // (mirrors `turnScore`'s directResolved so the ticked total lands exactly on
+  // the committed run distance).
+  const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
+  const selfActionScore = entry.opponentValence === "Testimony" ? entry.playerDelta : 0;
+
   const opponentPhaseEnd = schedulePhase({
     base: 0,
     side: "other",
@@ -412,6 +444,7 @@ function runScheduler(args: {
     actionCrit: entry.opponentCrit,
     actionCombust: entry.opponentCombust ?? false,
     sign: otherSign,
+    actionScore: otherActionScore,
     steps: opponentSteps,
   });
   const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
@@ -423,6 +456,7 @@ function runScheduler(args: {
     actionCrit: entry.playerCrit,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,
+    actionScore: selfActionScore,
     steps: playerSteps,
   });
 

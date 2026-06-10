@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { seededChart } from "@/game/chart";
 import { newMapState } from "@/game/run";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { beginCombatEncounter } from "@/game/encounter";
 import { rollNodeContent } from "@/game/map-content";
 import { mulberry32, hashString } from "@/game/rng";
 import { PLANETS } from "@/game/data";
@@ -12,7 +11,6 @@ import { getTree } from "@/data/narrative-trees";
 import { pickFragment } from "@/data/chorus";
 import type {
   Chart,
-  CombatEncounter,
   MapState,
   NarrativeEncounter,
   NodeContent,
@@ -278,28 +276,6 @@ function makeDevWalkedMap(seed: number): MapState {
     path.push(cur);
   }
   return { ...base, rolledNodes: rolled, visitedNodeIds: path, currentNodeId: cur };
-}
-
-/** Build an ephemeral combat encounter. */
-export function makeDevCombat(seed: number, profile: Profile): CombatEncounter {
-  const run = makeDevRun(seed, profile);
-  const encounter = beginCombatEncounter({
-    run,
-    opponentSeed: seed,
-    lifetimeEncounterCount: profile.lifetimeEncounterCount,
-  });
-  return {
-    ...encounter,
-    opponentState: syntheticDevSideState(seed, "opponent"),
-    turnIndex: syntheticDevTurnIndex(seed, encounter),
-  };
-}
-
-/** Stable turn progress for generated combat pages. */
-export function syntheticDevTurnIndex(seed: number, encounter: CombatEncounter): number {
-  if (encounter.sequence.length <= 1) return 0;
-  const rng = mulberry32(hashString(`${seed}_turn`));
-  return Math.floor(rng() * encounter.sequence.length);
 }
 
 /** Build an ephemeral narrative encounter. House defaults to seed-picked

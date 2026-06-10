@@ -394,7 +394,7 @@
 .combat-side > svg { width: min(600px, calc(50vw - 170px), 80vh); height: auto; }
 .combat-side-label {
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 0.32em;
   color: var(--mist);
   font-weight: 500;
@@ -422,11 +422,29 @@
   filter: drop-shadow(0 0 12px currentColor);
   line-height: 1;
 }
+/* Constant width via an invisible "MERCURY" sizer: the widest planet name
+   reserves the seam's width so the two wheels never shift horizontally as the
+   name changes each turn. The visible name centres over the reserved space. The
+   sizer inherits font-size, so the reserved width scales with the viewport. */
 .combat-opp-name {
+  position: relative;
+  display: inline-block;
   font-family: var(--serif);
   font-size: 28px;
   letter-spacing: 0.22em;
   color: var(--bone);
+}
+.combat-opp-name-sizer {
+  visibility: hidden;
+  white-space: nowrap;
+}
+.combat-opp-name-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  text-align: center;
+  white-space: nowrap;
 }
 .combat-opp-action {
   font-family: var(--sans);
@@ -478,6 +496,7 @@
   z-index: 3;
 }
 .combat-distance-v {
+  position: relative;
   font-family: var(--serif);
   font-size: 30px;
   font-weight: 500;
@@ -485,6 +504,25 @@
   color: var(--bone);
   letter-spacing: 0.02em;
   font-feature-settings: "tnum";
+}
+.combat-distance-n {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+/* Violet pulse behind the number, replayed per resolution as affliction clears. */
+.combat-distance-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--flash-color, var(--testimony)) 0%, transparent 68%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 .continue-prompt {
   position: fixed;

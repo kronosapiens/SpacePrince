@@ -153,7 +153,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           state={run.perPlanetState}
           unlockedPlanets={playerUnlocked}
           activePlanet={joyPlanet ?? null}
-          inspectPlanet={joyPlanet ?? null}
           entrance="left"
           showColorField
           alwaysShowAfflictionBadges

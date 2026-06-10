@@ -75,7 +75,7 @@ export interface ChartProps {
   state?: Partial<Record<PlanetName, PlanetStatus>>;
   /** Planets the player has not yet revealed. Render as ghost (dashed outline, faded glyph). */
   unlockedPlanets?: PlanetName[];
-  /** Tap-preview selection. Highlights planet with gold inspect ring, brightens its aspects. */
+  /** Tap-preview selection. Highlights planet with gold selection ring, brightens its aspects. */
   selectedPlanet?: PlanetName | null;
   /** Always-active planet (e.g. opponent-of-the-turn). Pulses with full halo. */
   activePlanet?: PlanetName | null;
@@ -84,8 +84,6 @@ export interface ChartProps {
   allActive?: boolean;
   /** Hover preview state. */
   hoveredPlanet?: PlanetName | null;
-  /** Sustained inspection (Chart Study). Brighter aspects, gold ring. */
-  inspectPlanet?: PlanetName | null;
   /** Show the af Klint color-field blooms behind each visible planet. Default true. */
   showColorField?: boolean;
   /** Show the sacred-geometry substrate (hexagram + vesica). Mint + Chart Study. */
@@ -141,7 +139,6 @@ export function Chart(props: ChartProps) {
     activePlanet,
     allActive = false,
     hoveredPlanet,
-    inspectPlanet,
     showColorField = true,
     showSubstrate = false,
     showAspects = true,
@@ -227,7 +224,6 @@ export function Chart(props: ChartProps) {
                          activePlanet === a.from || activePlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
                          selectedPlanet === a.from || selectedPlanet === a.to;
-        const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
         // Two orthogonal signals: aspect mood (harmony/tension) and effect
         // polarity (heal/harm). Aspects use the red/green of astrological
         // convention; polarity uses amber/violet — different hue families, so
@@ -235,8 +231,10 @@ export function Chart(props: ChartProps) {
         const isHarmony =
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
-        const opacity = isActive ? 0.8 : isInspect ? 0.5 : 0.2;
-        const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
+        // Active lines (hovered / selected / combat-active / propagating) render
+        // at full strength; the rest stay at the legible resting baseline.
+        const opacity = isActive ? 1 : 0.5;
+        const sw = isActive ? 1.6 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
         const len = Math.hypot(dx, dy) || 1;
@@ -340,7 +338,9 @@ export function Chart(props: ChartProps) {
         />
       )}
 
-      {/* Active + Word layer: planets + halos + glyphs + badges */}
+      {/* Planet layer: halos + glyphs. Badges draw in a separate pass below,
+          so a selected/active planet's halo can't occlude a neighbouring
+          planet's affliction badge (SVG paints in document order). */}
       {points.map((p) => {
         const status = state?.[p.planet];
         const combusted = status?.combusted ?? false;
@@ -348,10 +348,7 @@ export function Chart(props: ChartProps) {
         const isSelected = selectedPlanet === p.planet;
         const isActive = (allActive && !combusted) || activePlanet === p.planet;
         const isHovered = hoveredPlanet === p.planet;
-        const isInspect = inspectPlanet === p.planet;
-        const projectionChip = projection?.deltas[p.planet];
         const isActionPulse = actionPulsePlanet === p.planet;
-        const isImpacting = impactPlanets?.has(p.planet) ?? false;
         const isCritting = critPlanets?.has(p.planet) ?? false;
         const isCombusting = combustingPlanets?.has(p.planet) ?? false;
         return (
@@ -359,22 +356,35 @@ export function Chart(props: ChartProps) {
             key={p.planet}
             point={p}
             combusted={combusted}
-            affliction={status?.affliction ?? 0}
-            hideAfflictionBadge={hideAfflictionBadges}
-            alwaysShowAfflictionBadge={alwaysShowAfflictionBadges}
             ghost={!unlocked}
             selected={isSelected}
             active={isActive}
             hovered={isHovered}
-            inspect={isInspect}
             onClick={handleClick}
             onHover={handleHover}
             passive={passive}
-            projection={projectionChip}
             actionPulse={isActionPulse}
-            impact={isImpacting}
             crit={isCritting}
             combusting={isCombusting}
+            animationEpoch={animationEpoch}
+          />
+        );
+      })}
+
+      {/* Badge layer: above every planet's halo. */}
+      {points.map((p) => {
+        if (!isUnlocked(p.planet)) return null;
+        const status = state?.[p.planet];
+        return (
+          <PlanetBadges
+            key={p.planet}
+            point={p}
+            combusted={status?.combusted ?? false}
+            affliction={status?.affliction ?? 0}
+            hideAfflictionBadge={hideAfflictionBadges}
+            alwaysShowAfflictionBadge={alwaysShowAfflictionBadges}
+            projection={projection?.deltas[p.planet]}
+            impact={impactPlanets?.has(p.planet) ?? false}
             animationEpoch={animationEpoch}
           />
         );
@@ -390,30 +400,22 @@ export function aspectKey(from: PlanetName, to: PlanetName): string {
 // ─── Internal pieces ────────────────────────────────────────────────────
 
 function PlanetGlyph({
-  point, combusted, affliction, hideAfflictionBadge, ghost,
-  alwaysShowAfflictionBadge,
-  selected, active, hovered, inspect,
+  point, combusted, ghost,
+  selected, active, hovered,
   onClick, onHover, passive,
-  projection,
-  actionPulse, impact, crit, combusting,
+  actionPulse, crit, combusting,
   animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
-  affliction: number;
-  hideAfflictionBadge: boolean;
-  alwaysShowAfflictionBadge: boolean;
   ghost: boolean;
   selected: boolean;
   active: boolean;
   hovered: boolean;
-  inspect: boolean;
   onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
-  projection?: ProjectionChip;
   actionPulse: boolean;
-  impact: boolean;
   crit: boolean;
   combusting: boolean;
   animationEpoch?: number;
@@ -455,35 +457,12 @@ function PlanetGlyph({
   // and the rainbow corona stays coherent.
   const glyphFill = combusted ? NEUTRAL.mist : deepShade(c);
 
-  // Affliction + projection badges — pill-shaped, gold border, drop shadow,
-  // matching the v1 treatment. Pills sit on the chart-facing side of the
-  // planet; projection sits beside the affliction along the perpendicular.
-  const dx = CHART_CENTER - point.cx;
-  const dy = CHART_CENTER - point.cy;
-  const d = Math.hypot(dx, dy) || 1;
-  const ux = dx / d;
-  const uy = dy / d;
-  const badgeOffset = r;
-  const badgeR = Math.max(12, r * 0.5);
-  const badgeFontSize = Math.max(13, Math.round(r * 0.5));
-  // Projection badge shares the affliction badge's size; the affliction pill
-  // still widens for two-digit values via widthFor.
-  const projBadgeR = badgeR;
-  const projFontSize = badgeFontSize;
-  // Pill width grows with text length. Floor at 2*r (square-ish).
-  // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
-  // visual padding so multi-char content like "2.5" doesn't get crowded
-  // against the rounded ends.
-  const widthFor = (text: string, fontSize: number, pillR: number) =>
-    Math.max(2 * pillR, text.length * fontSize * 0.7 + pillR * 0.7);
-
   // Outer wrapper carries the optional action-glow pulse. The desaturation
   // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
   // ripple overlays don't desaturate with it.
   const epoch = animationEpoch ?? 0;
   const outerClass = actionPulse ? "anim-action-glow" : undefined;
   const glyphClass = combusted || combusting ? "anim-combust" : undefined;
-  const badgeClass = impact ? "anim-impact" : undefined;
 
   return (
     <g
@@ -506,11 +485,11 @@ function PlanetGlyph({
         <circle r={point.glyphR + 10} fill="none"
           stroke={c} strokeOpacity="1" strokeWidth={STROKE_MEDIUM} />
       )}
-      {(inspect || selected) && !active && (
+      {selected && !active && (
         <circle r={point.glyphR + 10} fill="none"
           stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
       )}
-      {hovered && !selected && !inspect && (
+      {hovered && !selected && (
         <circle r={point.glyphR + 6} fill="none"
           stroke={NEUTRAL.bone} strokeOpacity="0.6" strokeWidth={STROKE_LIGHT} />
       )}
@@ -551,141 +530,183 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {(() => {
-        const showAffliction =
-          !hideAfflictionBadge && !combusted &&
-          (alwaysShowAfflictionBadge || affliction > 0);
-        // Show the projection badge whenever there's any projected effect —
-        // including testimony at zero delta (planet already at 0 affliction).
-        // The polarity tells the player "this would heal", even if the
-        // numeric outcome is the same as standing still.
-        const showProjection = !combusted && projection !== undefined;
-        if (!showAffliction && !showProjection) return null;
+    </g>
+  );
+}
 
-        const afflictionText = String(Math.round(affliction));
-        const wA = widthFor(afflictionText, badgeFontSize, badgeR);
-        const aX = ux * badgeOffset;
-        const aY = uy * badgeOffset;
+// Affliction + projection badges — pill-shaped, gold border, drop shadow.
+// Rendered in a pass above every planet's glyph/halo so a selected or active
+// planet's halo can't occlude a neighbouring planet's badge. Pills sit on the
+// chart-facing side of the planet; projection sits beside the affliction along
+// the perpendicular.
+function PlanetBadges({
+  point, combusted, affliction,
+  hideAfflictionBadge, alwaysShowAfflictionBadge,
+  projection, impact, animationEpoch,
+}: {
+  point: PlanetPoint;
+  combusted: boolean;
+  affliction: number;
+  hideAfflictionBadge: boolean;
+  alwaysShowAfflictionBadge: boolean;
+  projection?: ProjectionChip;
+  impact: boolean;
+  animationEpoch?: number;
+}) {
+  const r = point.glyphR;
+  const dx = CHART_CENTER - point.cx;
+  const dy = CHART_CENTER - point.cy;
+  const d = Math.hypot(dx, dy) || 1;
+  const ux = dx / d;
+  const uy = dy / d;
+  const badgeOffset = r;
+  const badgeR = Math.max(12, r * 0.5);
+  const badgeFontSize = Math.max(13, Math.round(r * 0.5));
+  // Projection badge shares the affliction badge's size; the affliction pill
+  // still widens for two-digit values via widthFor.
+  const projBadgeR = badgeR;
+  const projFontSize = badgeFontSize;
+  // Pill width grows with text length. Floor at 2*r (square-ish).
+  // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
+  // visual padding so multi-char content like "2.5" doesn't get crowded
+  // against the rounded ends.
+  const widthFor = (text: string, fontSize: number, pillR: number) =>
+    Math.max(2 * pillR, text.length * fontSize * 0.7 + pillR * 0.7);
 
-        let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
-        if (showProjection && projection) {
-          const isHarm = projection.polarity !== "Testimony";
-          // Sign carried by color alone (amber = damage, violet = heal); drop
-          // the "+" / "−" prefix so the digits read cleanly.
-          const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
-          const wP = widthFor(text, projFontSize, projBadgeR);
-          // Both centers sit on the planet rim. Projection is rotated around
-          // the rim from the affliction by the angle at which the two badges
-          // just clear each other — chord = sum of their (approximated
-          // circular) radii plus a small visual gap so the strokes don't
-          // fuse at the tangent point.
-          const chord = wA / 2 + wP / 2 + 2;
-          const projAngle = 2 * Math.asin(Math.min(1, chord / (2 * badgeOffset)));
-          const cos = Math.cos(projAngle);
-          const sin = Math.sin(projAngle);
-          const projDirX = ux * cos - uy * sin;
-          const projDirY = uy * cos + ux * sin;
-          projBadge = {
-            wP,
-            pX: projDirX * badgeOffset,
-            pY: projDirY * badgeOffset,
-            text,
-            // Valence, not aspect mood: amber = incoming harm, violet = incoming
-            // heal — matching the action-verb colors.
-            col: isHarm ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
-          };
-        }
+  const epoch = animationEpoch ?? 0;
+  const badgeClass = impact ? "anim-impact" : undefined;
 
-        const shadow: CSSProperties = {
-          filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))",
-          pointerEvents: "none",
-          userSelect: "none",
-        };
+  const showAffliction =
+    !hideAfflictionBadge && !combusted &&
+    (alwaysShowAfflictionBadge || affliction > 0);
+  // Show the projection badge whenever there's any projected effect —
+  // including testimony at zero delta (planet already at 0 affliction).
+  // The polarity tells the player "this would heal", even if the
+  // numeric outcome is the same as standing still.
+  const showProjection = !combusted && projection !== undefined;
+  if (!showAffliction && !showProjection) return null;
 
-        return (
-          <>
-            {showAffliction && (
-              // Outer g positions; inner g animates. Splitting prevents the
-              // CSS keyframe `transform` from clobbering the SVG translate
-              // attribute mid-animation (which would snap the badge to (0,0)
-              // = planet center for one frame).
-              <g
-                transform={`translate(${aX}, ${aY})`}
-                style={shadow}
+  const afflictionText = String(Math.round(affliction));
+  const wA = widthFor(afflictionText, badgeFontSize, badgeR);
+  const aX = ux * badgeOffset;
+  const aY = uy * badgeOffset;
+
+  let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
+  if (showProjection && projection) {
+    const isHarm = projection.polarity !== "Testimony";
+    // Sign carried by color alone (amber = damage, violet = heal); drop
+    // the "+" / "−" prefix so the digits read cleanly.
+    const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
+    const wP = widthFor(text, projFontSize, projBadgeR);
+    // Both centers sit on the planet rim. Projection is rotated around
+    // the rim from the affliction by the angle at which the two badges
+    // just clear each other — chord = sum of their (approximated
+    // circular) radii plus a small visual gap so the strokes don't
+    // fuse at the tangent point.
+    const chord = wA / 2 + wP / 2 + 2;
+    const projAngle = 2 * Math.asin(Math.min(1, chord / (2 * badgeOffset)));
+    const cos = Math.cos(projAngle);
+    const sin = Math.sin(projAngle);
+    const projDirX = ux * cos - uy * sin;
+    const projDirY = uy * cos + ux * sin;
+    projBadge = {
+      wP,
+      pX: projDirX * badgeOffset,
+      pY: projDirY * badgeOffset,
+      text,
+      // Valence, not aspect mood: amber = incoming harm, violet = incoming
+      // heal — matching the action-verb colors.
+      col: isHarm ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
+    };
+  }
+
+  const shadow: CSSProperties = {
+    filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))",
+    pointerEvents: "none",
+    userSelect: "none",
+  };
+
+  return (
+    <g transform={`translate(${point.cx}, ${point.cy})`}>
+      {showAffliction && (
+        // Outer g positions; inner g animates. Splitting prevents the
+        // CSS keyframe `transform` from clobbering the SVG translate
+        // attribute mid-animation (which would snap the badge to (0,0)
+        // = planet center for one frame).
+        <g
+          transform={`translate(${aX}, ${aY})`}
+          style={shadow}
+        >
+          <g
+            className={badgeClass}
+            key={`badge-${epoch}-${impact ? 1 : 0}`}
+          >
+            <rect
+              x={-wA / 2} y={-badgeR}
+              width={wA} height={2 * badgeR}
+              rx={badgeR} ry={badgeR}
+              fill={NEUTRAL.void} fillOpacity="0.92"
+              stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
+            <foreignObject
+              x={-wA / 2} y={-badgeR}
+              width={wA} height={2 * badgeR}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: NEUTRAL.bone,
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 700,
+                  fontSize: `${badgeFontSize}px`,
+                  lineHeight: 1,
+                  userSelect: "none",
+                }}
               >
-                <g
-                  className={badgeClass}
-                  key={`badge-${epoch}-${impact ? 1 : 0}`}
-                >
-                  <rect
-                    x={-wA / 2} y={-badgeR}
-                    width={wA} height={2 * badgeR}
-                    rx={badgeR} ry={badgeR}
-                    fill={NEUTRAL.void} fillOpacity="0.92"
-                    stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
-                  <foreignObject
-                    x={-wA / 2} y={-badgeR}
-                    width={wA} height={2 * badgeR}
-                  >
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: NEUTRAL.bone,
-                        fontFamily: "'Inter', sans-serif",
-                        fontWeight: 700,
-                        fontSize: `${badgeFontSize}px`,
-                        lineHeight: 1,
-                        userSelect: "none",
-                      }}
-                    >
-                      {afflictionText}
-                    </div>
-                  </foreignObject>
-                </g>
-              </g>
-            )}
-            {projBadge && (
-              <g
-                transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
-                style={shadow}
-              >
-                <rect
-                  x={-projBadge.wP / 2} y={-projBadgeR}
-                  width={projBadge.wP} height={2 * projBadgeR}
-                  rx={projBadgeR} ry={projBadgeR}
-                  fill={NEUTRAL.void} fillOpacity="0.84"
-                  stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
-                <foreignObject
-                  x={-projBadge.wP / 2} y={-projBadgeR}
-                  width={projBadge.wP} height={2 * projBadgeR}
-                >
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: projBadge.col,
-                      fontFamily: "'Inter', sans-serif",
-                      fontWeight: 700,
-                      fontSize: `${projFontSize}px`,
-                      lineHeight: 1,
-                      userSelect: "none",
-                    }}
-                  >
-                    {projBadge.text}
-                  </div>
-                </foreignObject>
-              </g>
-            )}
-          </>
-        );
-      })()}
+                {afflictionText}
+              </div>
+            </foreignObject>
+          </g>
+        </g>
+      )}
+      {projBadge && (
+        <g
+          transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
+          style={shadow}
+        >
+          <rect
+            x={-projBadge.wP / 2} y={-projBadgeR}
+            width={projBadge.wP} height={2 * projBadgeR}
+            rx={projBadgeR} ry={projBadgeR}
+            fill={NEUTRAL.void} fillOpacity="0.84"
+            stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
+          <foreignObject
+            x={-projBadge.wP / 2} y={-projBadgeR}
+            width={projBadge.wP} height={2 * projBadgeR}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: projBadge.col,
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                fontSize: `${projFontSize}px`,
+                lineHeight: 1,
+                userSelect: "none",
+              }}
+            >
+              {projBadge.text}
+            </div>
+          </foreignObject>
+        </g>
+      )}
     </g>
   );
 }

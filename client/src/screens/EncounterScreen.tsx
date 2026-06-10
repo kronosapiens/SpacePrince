@@ -11,10 +11,10 @@ import { resolveTurn } from "@/game/turn";
 import {
   generateSeedHash,
   makeDevProfile,
-  makeDevCombat,
-  makeDevRun,
   seedFromHash,
 } from "@/state/dev-state";
+import { beginRun } from "@/game/run";
+import { beginCombatEncounter } from "@/game/encounter";
 import type { CombatEncounter, PlanetName, Polarity, RunState } from "@/game/types";
 
 export function EncounterScreen() {
@@ -79,8 +79,20 @@ function DevCombatScreen() {
   // charts, not just the opponent's. `makeDevProfile` is pure (no storage),
   // so useMemo is StrictMode-safe.
   const profile = useMemo(() => makeDevProfile(seed), [seed]);
-  const baseRun = useMemo(() => makeDevRun(seed, profile), [seed, profile]);
-  const encounter = useMemo(() => makeDevCombat(seed, profile), [seed, profile]);
+  // Build a clean, playable fight with the real run/encounter builders — turn 0,
+  // distance 0, blank boards — not the synthetic mid-fight snapshot the static
+  // preview screens use. So the turn counter and distance climb as you play.
+  const baseRun = useMemo(() => beginRun(profile, seed), [profile, seed]);
+  const encounter = useMemo(
+    () =>
+      beginCombatEncounter({
+        run: baseRun,
+        opponentSeed: seed,
+        lifetimeEncounterCount: profile.lifetimeEncounterCount,
+        devUnlockAll: true,
+      }),
+    [baseRun, seed, profile.lifetimeEncounterCount],
+  );
   const [run, setRun] = useState<RunState>({ ...baseRun, currentEncounter: encounter });
 
   // Reset the in-memory run when seed changes (Reroll → new hash → remount via key).

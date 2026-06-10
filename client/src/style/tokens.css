@@ -9,6 +9,7 @@
   --mist: #9A95A0;
   --gold: #C9A96A;
   --gold-hi: #FFD24A;
+  --testimony: #9D86D9; /* resolution/heal valence — mirrors VALENCE_COLOR.Testimony */
 
   /* Planetary primaries (saturated v2) */
   --sun: #FFD24A;
