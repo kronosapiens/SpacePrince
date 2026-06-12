@@ -9,6 +9,8 @@ import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
 
+const RECHART_INTERVAL_MS = 3000;
+
 export function TitleScreen() {
   const navigate = useNavigate();
   const run = useRun();
@@ -16,14 +18,23 @@ export function TitleScreen() {
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
-    setActive("Sun"); // ceremonial gold tint on Title
+    // Neutral bone glow on Title — clear any planet tint carried in from
+    // another screen so the background falls back to the resting neutral.
+    setActive(null);
   }, [setActive]);
 
-  // Fresh random sample chart per mount — i.e. per page refresh. State
-  // changes during the visit (hover, etc.) shouldn't re-roll the chart.
-  // useState initializer captures it once and holds it for the lifetime
-  // of this Title mount.
-  const [chart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+  // Cycle a fresh random sample chart every few seconds so the Title canvas
+  // stays alive. Only the interval re-rolls it — hover and other state changes
+  // during the visit don't.
+  const [chart, setChart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChart(seededChart(randomSeed(), "Sample")),
+      RECHART_INTERVAL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, []);
 
   const beginLabel = run && !run.over ? "Start" : "Begin";
   const handleBegin = () => navigate(ROUTES.start);
