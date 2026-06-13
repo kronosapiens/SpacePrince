@@ -175,9 +175,13 @@ function resolveAction(
   const base = valence === "Testimony" ? attackerEff.healing : attackerEff.damage;
   const amount = Math.max(0, base) * (crit ? 2 : 1);
   const delta = applyEffect(side[active], valence, amount);
-  const propagation = propagate(side, chart, active, valence, amount, rng, sideTag);
+  // Combustion is resolved before propagation: a planet destroyed by the blow
+  // can't conduct it onward, so `propagate`'s `combusted` guard short-circuits.
+  // (Aligns the active planet with the long-standing "combusted planets are
+  // skipped by propagation" rule — previously only previously-dead planets.)
   const combust =
     valence !== "Testimony" && delta > 0 ? maybeCombust(placement, side[active], rng) : false;
+  const propagation = propagate(side, chart, active, valence, amount, rng, sideTag);
   return { crit, base, amount, delta, combust, propagation };
 }
 

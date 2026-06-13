@@ -164,6 +164,7 @@ Rules:
 - negative multipliers invert the valence (`Affliction <-> Testimony`)
 - propagation applies the same integer effect model as direct effects
 - combusted targets are skipped
+- combustion resolves before propagation: if the blow combusts the planet it lands on, that planet conducts nothing onward — propagation is short-circuited, not rolled then negated
 
 ## 10. Combustion
 
