@@ -110,8 +110,10 @@ export interface ChartProps {
   activePropagationKeys?: ReadonlySet<string>;
   /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
   actionPulsePlanet?: PlanetName | null;
-  /** Planets whose affliction badge should pulse (took a hit this beat). */
-  impactPlanets?: ReadonlySet<PlanetName>;
+  /** Planets that took a hit this beat, mapped to the polarity received.
+   *  Drives the badge pulse (presence) and the glyph's in-place valence
+   *  bloom (heal = testimony/violet, harm = affliction/amber). */
+  impactPlanets?: ReadonlyMap<PlanetName, Polarity>;
   /** Planets whose direct hit was a crit — fires a radial burst. */
   critPlanets?: ReadonlySet<PlanetName>;
   /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
@@ -312,6 +314,14 @@ export function Chart(props: ChartProps) {
             </radialGradient>
           );
         })}
+        {/* Valence bloom — soft heal/harm glow behind a planet receiving a hit. */}
+        {(["Testimony", "Affliction"] as const).map((pol) => (
+          <radialGradient key={`vb-${pol}`} id={`v2-valence-${pol}`}>
+            <stop offset="0%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0.9" />
+            <stop offset="55%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0.34" />
+            <stop offset="100%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0" />
+          </radialGradient>
+        ))}
       </defs>
 
       {/* Field layer */}
@@ -351,6 +361,7 @@ export function Chart(props: ChartProps) {
         const isActionPulse = actionPulsePlanet === p.planet;
         const isCritting = critPlanets?.has(p.planet) ?? false;
         const isCombusting = combustingPlanets?.has(p.planet) ?? false;
+        const impactPolarity = impactPlanets?.get(p.planet);
         return (
           <PlanetGlyph
             key={p.planet}
@@ -366,6 +377,7 @@ export function Chart(props: ChartProps) {
             actionPulse={isActionPulse}
             crit={isCritting}
             combusting={isCombusting}
+            impactPolarity={impactPolarity}
             animationEpoch={animationEpoch}
           />
         );
@@ -404,6 +416,7 @@ function PlanetGlyph({
   selected, active, hovered,
   onClick, onHover, passive,
   actionPulse, crit, combusting,
+  impactPolarity,
   animationEpoch,
 }: {
   point: PlanetPoint;
@@ -418,6 +431,7 @@ function PlanetGlyph({
   actionPulse: boolean;
   crit: boolean;
   combusting: boolean;
+  impactPolarity?: Polarity;
   animationEpoch?: number;
 }) {
   const c = PLANET_PRIMARY[point.planet];
@@ -493,6 +507,19 @@ function PlanetGlyph({
         <circle r={point.glyphR + 6} fill="none"
           stroke={NEUTRAL.bone} strokeOpacity="0.6" strokeWidth={STROKE_LIGHT} />
       )}
+      {/* Receive-pulse: soft in-place valence glow behind the glyph when this
+          planet takes testimony (heal) or affliction (harm) this beat. Behind
+          the glyph so the symbol stays readable; an opacity bloom, not an
+          outward ring, so it reads apart from the crit/combust bursts. */}
+      {impactPolarity && !combusting && (
+        <circle
+          key={`bloom-${epoch}-${impactPolarity}`}
+          r={r + 9}
+          fill={`url(#v2-valence-${impactPolarity})`}
+          className="anim-impact-bloom"
+          style={{ pointerEvents: "none" }}
+        />
+      )}
       <g className={glyphClass}>
         <circle r={r}
           fill={fill} fillOpacity={fillOpacity}
@@ -519,16 +546,30 @@ function PlanetGlyph({
         />
       )}
       {combusting && (
-        <circle
-          key={`ripple-${epoch}`}
-          r={r + 2}
-          fill="none"
-          stroke={c}
-          strokeOpacity={0.85}
-          strokeWidth={1.5}
-          className="anim-combust-ripple"
-          style={{ pointerEvents: "none" }}
-        />
+        <>
+          <circle
+            key={`ripple-${epoch}`}
+            r={r + 2}
+            fill="none"
+            stroke={c}
+            strokeOpacity={0.95}
+            strokeWidth={2.5}
+            className="anim-combust-ripple"
+            style={{ pointerEvents: "none" }}
+          />
+          {/* Second bone shockwave, slightly delayed — sells the death as a
+              flare-and-collapse rather than a single faint ring. */}
+          <circle
+            key={`ripple2-${epoch}`}
+            r={r + 2}
+            fill="none"
+            stroke={NEUTRAL.bone}
+            strokeOpacity={0.7}
+            strokeWidth={1.5}
+            className="anim-combust-ripple-2"
+            style={{ pointerEvents: "none" }}
+          />
+        </>
       )}
     </g>
   );

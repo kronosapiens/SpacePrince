@@ -14,6 +14,7 @@ import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
+  EMPTY_IMPACT_MAP,
   EMPTY_PLANET_SET,
   EMPTY_PROPAGATION_KEYS,
   useCombatAnimation,
@@ -92,8 +93,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const activePropagationKeys = animation?.activePropagationKeys ?? EMPTY_PROPAGATION_KEYS;
   const actionPulsePlayer = animation?.actionPulse.player ?? null;
   const actionPulseOpponent = animation?.actionPulse.opponent ?? null;
-  const impactPlayer = animation?.impactPlanets.self ?? EMPTY_PLANET_SET;
-  const impactOpponent = animation?.impactPlanets.other ?? EMPTY_PLANET_SET;
+  const impactPlayer = animation?.impactPlanets.self ?? EMPTY_IMPACT_MAP;
+  const impactOpponent = animation?.impactPlanets.other ?? EMPTY_IMPACT_MAP;
   const critPlayer = animation?.critPlanets.self ?? EMPTY_PLANET_SET;
   const critOpponent = animation?.critPlanets.other ?? EMPTY_PLANET_SET;
   const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;

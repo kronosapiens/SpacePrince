@@ -4,6 +4,7 @@ import type { ProjectedEffect } from "@/game/projections";
 import type {
   CombatEncounter,
   PlanetName,
+  Polarity,
   RunState,
   SideState,
   TurnLogEntry,
@@ -38,6 +39,11 @@ interface FlagPair<T> {
   other: ReadonlySet<T>;
 }
 
+/** Planets that took an effect this beat, mapped to the polarity they
+ *  received. Heal (testimony) vs harm (affliction) drive the glyph's
+ *  in-place valence bloom; presence alone drives the badge pulse. */
+export type ImpactMap = ReadonlyMap<PlanetName, Polarity>;
+
 export type ProjectionDeltas = Partial<Record<PlanetName, ProjectedEffect>>;
 
 export interface CombatAnimationState {
@@ -57,7 +63,7 @@ export interface CombatAnimationState {
   distanceFlashPlanet: PlanetName | null;
   activePropagationKeys: FlagPair<string>;
   actionPulse: { player: PlanetName | null; opponent: PlanetName | null };
-  impactPlanets: FlagPair<PlanetName>;
+  impactPlanets: { self: ImpactMap; other: ImpactMap };
   critPlanets: FlagPair<PlanetName>;
   combustingPlanets: FlagPair<PlanetName>;
   /** Snapshot of the per-planet projection deltas captured at commit, so
@@ -76,6 +82,7 @@ export const EMPTY_PROPAGATION_KEYS: FlagPair<string> = {
   other: new Set(),
 };
 export const EMPTY_PLANET_SET: ReadonlySet<PlanetName> = new Set();
+export const EMPTY_IMPACT_MAP: ImpactMap = new Map();
 
 // ── Hook ────────────────────────────────────────────────────────────────
 
@@ -150,6 +157,19 @@ function removeFromFlag<T>(set: ReadonlySet<T>, value: T): ReadonlySet<T> {
   return next;
 }
 
+function addToImpact(map: ImpactMap, planet: PlanetName, polarity: Polarity): ImpactMap {
+  const next = new Map(map);
+  next.set(planet, polarity);
+  return next;
+}
+
+function removeFromImpact(map: ImpactMap, planet: PlanetName): ImpactMap {
+  if (!map.has(planet)) return map;
+  const next = new Map(map);
+  next.delete(planet);
+  return next;
+}
+
 function cloneSide(state: SideState): SideState {
   const out = {} as SideState;
   for (const [planet, value] of Object.entries(state) as Array<
@@ -210,7 +230,7 @@ function runScheduler(args: {
     distanceFlashPlanet: null,
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,
     actionPulse: { player: null, opponent: null },
-    impactPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
+    impactPlanets: { self: EMPTY_IMPACT_MAP, other: EMPTY_IMPACT_MAP },
     critPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     projectedDeltas,
@@ -245,6 +265,9 @@ function runScheduler(args: {
   }): number => {
     const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, sign, actionScore, steps } = args;
     const isSelf = side === "self";
+    // The action planet receives the opposing valence: sign < 0 means the hit
+    // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
+    const receivedPolarity: Polarity = sign < 0 ? "Testimony" : "Affliction";
 
     // Primary direct phase — apply delta, light action-glow, impact, crit.
     schedule(() => {
@@ -262,7 +285,7 @@ function runScheduler(args: {
           : { ...next.actionPulse, opponent: actionPlanet };
         next.impactPlanets = {
           ...next.impactPlanets,
-          [side]: addToFlag(next.impactPlanets[side], actionPlanet),
+          [side]: addToImpact(next.impactPlanets[side], actionPlanet, receivedPolarity),
         };
         next.consumedProjections = {
           ...next.consumedProjections,
@@ -284,7 +307,7 @@ function runScheduler(args: {
         ...state,
         impactPlanets: {
           ...state.impactPlanets,
-          [side]: removeFromFlag(state.impactPlanets[side], actionPlanet),
+          [side]: removeFromImpact(state.impactPlanets[side], actionPlanet),
         },
       }));
     }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryImpactClear);
@@ -342,11 +365,13 @@ function runScheduler(args: {
               next.distanceFlashEpoch += 1;
               next.distanceFlashPlanet = step.target;
             }
+            // Bloom only on non-combust hits — a combusting planet gets the
+            // ripple instead, not a heal/harm pulse.
+            next.impactPlanets = {
+              ...next.impactPlanets,
+              [side]: addToImpact(next.impactPlanets[side], step.target, step.polarity),
+            };
           }
-          next.impactPlanets = {
-            ...next.impactPlanets,
-            [side]: addToFlag(next.impactPlanets[side], step.target),
-          };
           next.consumedProjections = {
             ...next.consumedProjections,
             [side]: addToFlag(next.consumedProjections[side], step.target),
@@ -364,7 +389,7 @@ function runScheduler(args: {
           },
           impactPlanets: {
             ...state.impactPlanets,
-            [side]: removeFromFlag(state.impactPlanets[side], step.target),
+            [side]: removeFromImpact(state.impactPlanets[side], step.target),
           },
         }));
       }, delay + ANIMATION_TIMINGS.propagationClearOffset);
