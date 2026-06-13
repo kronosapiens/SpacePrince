@@ -1,13 +1,17 @@
 import { ASPECT_COLOR } from "@/svg/palette";
-import { STROKE_MEDIUM } from "@/svg/viewbox";
+import { STROKE_HEAVY } from "@/svg/viewbox";
 import type { PlanetName } from "@/game/types";
 
 type AspectKind = "Conjunction" | "Sextile" | "Square" | "Trine" | "Opposition";
 
-// Pulse uses the same red/green as the static aspect line — just brighter,
-// briefly. The pulse signals "energy is flowing along this line right now,"
-// not the heal/harm of the effect. That signal lives on the projection
-// badge and the target planet's impact pulse.
+// A bright pulse travels source → target along the aspect line, arriving as the
+// target blooms — so you can follow which planet acted and where its effect
+// lands, rather than seeing the whole web flash at once. Direction comes from
+// the line orientation (from = source = path origin); the travel is a single
+// dash sweeping the normalised pathLength (see motion.css `prop-travel`). The
+// head keeps the aspect's harmony/tension family but brightened, with a soft
+// glow, so it pops out of the dim static aspect web. The pulse signals "energy
+// is flowing here, this way" — heal/harm still lives on the target's bloom.
 export interface PropagationLineProps {
   fromX: number;
   fromY: number;
@@ -20,20 +24,25 @@ export interface PropagationLineProps {
   active: boolean;
 }
 
+// Brightened harmony/tension tints for the traveling head.
+const HEAD_COLOR = { harmony: "#E4FAD6", tension: "#FFA89C" } as const;
+
 export function PropagationLine(props: PropagationLineProps) {
   const { fromX, fromY, toX, toY, aspect, active } = props;
   if (!active) return null;
   const harmony = aspect === "Trine" || aspect === "Sextile" || aspect === "Conjunction";
-  const stroke = harmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
+  const head = harmony ? HEAD_COLOR.harmony : HEAD_COLOR.tension;
+  const glow = harmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
   return (
-    <g style={{ pointerEvents: "none" }}>
-      <line
-        x1={fromX} y1={fromY} x2={toX} y2={toY}
-        stroke={stroke}
-        strokeWidth={STROKE_MEDIUM}
-        strokeLinecap="round"
-        className="anim-propagation-pulse"
-      />
-    </g>
+    <line
+      x1={fromX} y1={fromY} x2={toX} y2={toY}
+      pathLength={100}
+      stroke={head}
+      strokeWidth={STROKE_HEAVY}
+      strokeLinecap="round"
+      strokeDasharray="16 200"
+      className="anim-prop-travel"
+      style={{ pointerEvents: "none", filter: `drop-shadow(0 0 7px ${glow}) drop-shadow(0 0 12px ${glow})` }}
+    />
   );
 }

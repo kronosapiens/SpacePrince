@@ -12,9 +12,10 @@ import type {
 
 // ── Timing constants ────────────────────────────────────────────────────
 // JS-side schedule cadence. These are independent of CSS keyframe durations
-// except for `combustRippleDuration`, which must be ≥ the CSS ripple duration
-// (currently `combust-ripple 1000ms` in motion.css) so the schedule waits long
-// enough for the ripple to play out.
+// except where a beat must outlast its animation: `combustRippleDuration` must
+// be ≥ the CSS ripple (currently `combust-ripple 1000ms`), and
+// `propagationClearOffset` must be ≥ the CSS travel (`prop-travel 460ms`) so the
+// pulse reaches the target before its line is cleared.
 
 export const ANIMATION_TIMINGS = {
   primaryDelay: 200,
@@ -23,8 +24,8 @@ export const ANIMATION_TIMINGS = {
   primaryCritClear: 720,
   propagationStart: 800,
   propagationStep: 520,
-  propagationApplyOffset: 160,
-  propagationClearOffset: 360,
+  propagationApplyOffset: 230,
+  propagationClearOffset: 500,
   combustRippleDuration: 1000,
   endOffset: 360,
   /** Pause between the opponent's resolution phase and the player's, so the
@@ -335,16 +336,22 @@ function runScheduler(args: {
     steps.forEach((step, stepIndex) => {
       const key = aspectKey(step.source, step.target);
       const delay = base + ANIMATION_TIMINGS.propagationStart + stepIndex * ANIMATION_TIMINGS.propagationStep;
+      // A "Combusts" marker shares its source→target with the hit step that
+      // caused it; the hit already lights the traveling line, so the marker only
+      // fires the ripple — otherwise the same aspect pulses twice.
+      const lightsLine = step.note !== "Combusts";
 
-      schedule(() => {
-        updateAnimation((state) => ({
-          ...state,
-          activePropagationKeys: {
-            ...state.activePropagationKeys,
-            [side]: addToFlag(state.activePropagationKeys[side], key),
-          },
-        }));
-      }, delay);
+      if (lightsLine) {
+        schedule(() => {
+          updateAnimation((state) => ({
+            ...state,
+            activePropagationKeys: {
+              ...state.activePropagationKeys,
+              [side]: addToFlag(state.activePropagationKeys[side], key),
+            },
+          }));
+        }, delay);
+      }
 
       schedule(() => {
         updateAnimation((state) => {
@@ -380,19 +387,21 @@ function runScheduler(args: {
         });
       }, delay + ANIMATION_TIMINGS.propagationApplyOffset);
 
-      schedule(() => {
-        updateAnimation((state) => ({
-          ...state,
-          activePropagationKeys: {
-            ...state.activePropagationKeys,
-            [side]: removeFromFlag(state.activePropagationKeys[side], key),
-          },
-          impactPlanets: {
-            ...state.impactPlanets,
-            [side]: removeFromImpact(state.impactPlanets[side], step.target),
-          },
-        }));
-      }, delay + ANIMATION_TIMINGS.propagationClearOffset);
+      if (lightsLine) {
+        schedule(() => {
+          updateAnimation((state) => ({
+            ...state,
+            activePropagationKeys: {
+              ...state.activePropagationKeys,
+              [side]: removeFromFlag(state.activePropagationKeys[side], key),
+            },
+            impactPlanets: {
+              ...state.impactPlanets,
+              [side]: removeFromImpact(state.impactPlanets[side], step.target),
+            },
+          }));
+        }, delay + ANIMATION_TIMINGS.propagationClearOffset);
+      }
 
       if (step.note === "Combusts") {
         const rippleClearAt = delay + ANIMATION_TIMINGS.propagationApplyOffset + ANIMATION_TIMINGS.combustRippleDuration;
