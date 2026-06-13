@@ -122,7 +122,7 @@ export interface ChartProps {
    *  zodiac sign on the rim, what the polarity outcome would be against the
    *  reference planet (opponent-of-turn for the player chart, player's
    *  hovered/selected for the opponent chart). Affliction = red, Testimony
-   *  = green, Friction or absent = neutral. */
+   *  = green, absent = neutral. */
   signPolarities?: Partial<Record<SignName, Polarity>>;
 }
 

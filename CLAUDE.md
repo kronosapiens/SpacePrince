@@ -34,7 +34,7 @@ Space Prince is a **fully onchain game** with a thin presentation client.
 ```
 cairo/        Cairo crates — onchain backend
 client/       React/Vite/TS — browser client (current prototype, v2)
-client-v1/    React/Vite/TS — earlier prototype, archived for reference
+client_v1/    React/Vite/TS — earlier prototype, archived for reference
 spec/         Design spec (see outline below)
 planets/      Per-planet YAML reference notes
 img/          Chart and prototype screenshots
@@ -58,7 +58,6 @@ The spec is divided by what kind of question each document answers.
 
 - `MECHANICS.md` — **runtime source of truth** for combat. When older docs conflict, this wins.
 - `CHART.md` — chart-construction spec (Cairo-first)
-- `CHART_PLAN.md` — implementation decisions made while planning the Cairo chart pipeline
 - `MAP.md` — run map topology (Sephirot-pattern node graph)
 - `HOUSES.md` — narrative encounter system organized around the twelve houses
 

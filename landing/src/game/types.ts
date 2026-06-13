@@ -1,6 +1,5 @@
 export type ElementType = "Fire" | "Earth" | "Air" | "Water";
 export type ModalityType = "Cardinal" | "Fixed" | "Mutable";
-export type Quality = "Hot" | "Cold" | "Wet" | "Dry";
 
 export type SignName =
   | "Aries" | "Taurus" | "Gemini" | "Cancer" | "Leo" | "Virgo"
@@ -14,7 +13,7 @@ export type Dignity = "Domicile" | "Exaltation" | "Neutral" | "Detriment" | "Fal
 export type AspectType =
   | "Conjunction" | "Sextile" | "Square" | "Trine" | "Opposition" | "None";
 
-export type Polarity = "Testimony" | "Affliction" | "Friction";
+export type Polarity = "Testimony" | "Affliction";
 
 export interface PlanetBaseStats {
   damage: number;
