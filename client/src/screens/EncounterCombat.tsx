@@ -4,6 +4,7 @@ import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
+import { resolveTurn } from "@/game/turn";
 import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -48,10 +49,14 @@ interface CombatScreenProps {
   /** Clear `run.currentEncounter` and return to the map. */
   onClearEncounter: () => void;
   devUnlockAll: boolean;
+  /** Dev only: show the animation console — fire any gesture on demand
+   *  (planet, valence, forced crit/combust) without playing real turns. */
+  devAnimationControls?: boolean;
 }
 
 export function EncounterCombatScreen(props: CombatScreenProps) {
   const { run, profile, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
+  const devAnimationControls = props.devAnimationControls ?? false;
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
@@ -244,6 +249,46 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, encounter, run, opponentTurn, opponentAction, profile.chart, onCommitTurn, startAnimation],
   );
 
+  // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
+  // propagation match the charts) but as a fresh single-turn snapshot, then
+  // overrides the crit/combust flags the scheduler reads — so a combust flare is
+  // viewable on turn 0 without grinding affliction. Non-committal: nothing is
+  // dispatched, so it replays from the same baseline every time.
+  const fireDevAnimation = useCallback(
+    (cfg: {
+      playerPlanet: PlanetName;
+      opponentPlanet: PlanetName;
+      valence: Polarity;
+      crit: boolean;
+      combust: boolean;
+    }) => {
+      if (animation) skipAnimation();
+      const devEncounter: CombatEncounter = {
+        ...encounter,
+        sequence: [cfg.opponentPlanet],
+        opponentActions: [cfg.valence],
+        turnIndex: 0,
+        resolved: false,
+      };
+      const devRun: RunState = { ...run, currentEncounter: devEncounter };
+      const rng = mulberry32((run.seed ^ hashString(cfg.opponentPlanet)) >>> 0);
+      const result = resolveTurn(devRun, profile.chart, cfg.playerPlanet, cfg.valence, rng);
+      if (!result) return;
+      const entry: TurnLogEntry = { ...result.log };
+      // opponentCrit / opponentCombust = the player's action landing on the
+      // target planet (phase 1) — that's the gesture you're evaluating.
+      if (cfg.crit) entry.opponentCrit = true;
+      if (cfg.combust) entry.opponentCombust = true;
+      startAnimation({
+        entry,
+        previousRun: devRun,
+        previousEncounter: devEncounter,
+        projectedDeltas: null,
+      });
+    },
+    [animation, skipAnimation, encounter, run, profile.chart, startAnimation],
+  );
+
   // The action fan-out rides the bottom of the stats panel — local to the
   // planet. Shown for the inspected planet (hover or select) when committable.
   const playerActions: PlanetStatsActions | undefined =
@@ -411,6 +456,16 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           </button>
         </div>
       )}
+
+      {devAnimationControls && (
+        <DevAnimationPanel
+          playerPlanets={playerUnlocked}
+          opponentPlanets={PLANETS}
+          animating={animation !== null}
+          onFire={fireDevAnimation}
+          onSkip={skipAnimation}
+        />
+      )}
     </div>
   );
 }
@@ -427,5 +482,101 @@ function SeamName({ children }: { children: string }) {
       </span>
       <span className="combat-opp-name-text">{children}</span>
     </span>
+  );
+}
+
+// ─── Dev animation console ────────────────────────────────────────────────
+// Utilitarian dev overlay (inline-styled so it stays out of the game's CSS
+// vocabulary). Fires a chosen gesture through the real resolver; see
+// `fireDevAnimation`.
+
+const DEV_PANEL: CSSProperties = {
+  position: "fixed", left: 16, top: 16, zIndex: 50,
+  display: "flex", flexDirection: "column", gap: 7,
+  padding: "11px 13px", minWidth: 184,
+  background: "rgba(11, 10, 15, 0.93)", border: "1px solid #2A2730",
+  borderRadius: 8, boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
+  font: "12px/1.3 ui-monospace, SFMono-Regular, monospace", color: "#E8E2D4",
+};
+const DEV_HEADER: CSSProperties = {
+  display: "flex", alignItems: "center", gap: 7,
+  background: "transparent", border: "none", padding: 0,
+  color: "#9A95A0", font: "inherit", cursor: "pointer", textAlign: "left",
+};
+const DEV_ROW: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 };
+const DEV_LABEL: CSSProperties = { color: "#9A95A0" };
+const DEV_SELECT: CSSProperties = {
+  background: "#0B0A0F", color: "#E8E2D4", border: "1px solid #2A2730",
+  borderRadius: 4, padding: "2px 4px", font: "inherit",
+};
+const DEV_SEG: CSSProperties = {
+  background: "transparent", color: "#9A95A0", border: "1px solid #2A2730",
+  borderRadius: 4, padding: "2px 7px", cursor: "pointer", font: "inherit",
+};
+const DEV_SEG_ON: CSSProperties = { ...DEV_SEG, color: "#0B0A0F", background: "#C9A96A", borderColor: "#C9A96A" };
+const DEV_CHECK: CSSProperties = { display: "flex", alignItems: "center", gap: 4, cursor: "pointer" };
+const DEV_BTN: CSSProperties = {
+  flex: 1, background: "transparent", color: "#E8E2D4", border: "1px solid #2A2730",
+  borderRadius: 4, padding: "4px 0", cursor: "pointer", font: "inherit",
+};
+const DEV_FIRE: CSSProperties = { ...DEV_BTN, color: "#0B0A0F", background: "#C9A96A", borderColor: "#C9A96A", fontWeight: 600 };
+
+function DevAnimationPanel({
+  playerPlanets, opponentPlanets, animating, onFire, onSkip,
+}: {
+  playerPlanets: PlanetName[];
+  opponentPlanets: PlanetName[];
+  animating: boolean;
+  onFire: (cfg: {
+    playerPlanet: PlanetName; opponentPlanet: PlanetName;
+    valence: Polarity; crit: boolean; combust: boolean;
+  }) => void;
+  onSkip: () => void;
+}) {
+  const [playerPlanet, setPlayerPlanet] = useState<PlanetName>(playerPlanets[0] ?? "Sun");
+  const [opponentPlanet, setOpponentPlanet] = useState<PlanetName>(opponentPlanets[0] ?? "Sun");
+  const [valence, setValence] = useState<Polarity>("Affliction");
+  const [crit, setCrit] = useState(false);
+  const [combust, setCombust] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <div style={DEV_PANEL} onClick={(e) => e.stopPropagation()}>
+      <button style={DEV_HEADER} onClick={() => setCollapsed((c) => !c)}>
+        <span>{collapsed ? "▸" : "▾"}</span>
+        <span style={{ letterSpacing: "0.08em" }}>ANIMATION CONSOLE</span>
+      </button>
+      {collapsed ? null : (
+        <>
+      <label style={DEV_ROW}>
+        <span style={DEV_LABEL}>Player</span>
+        <select style={DEV_SELECT} value={playerPlanet} onChange={(e) => setPlayerPlanet(e.target.value as PlanetName)}>
+          {playerPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
+        </select>
+      </label>
+      <label style={DEV_ROW}>
+        <span style={DEV_LABEL}>Target</span>
+        <select style={DEV_SELECT} value={opponentPlanet} onChange={(e) => setOpponentPlanet(e.target.value as PlanetName)}>
+          {opponentPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
+        </select>
+      </label>
+      <div style={DEV_ROW}>
+        <span style={DEV_LABEL}>Verb</span>
+        <div style={{ display: "flex", gap: 4 }}>
+          <button style={valence === "Affliction" ? DEV_SEG_ON : DEV_SEG} onClick={() => setValence("Affliction")}>Afflict</button>
+          <button style={valence === "Testimony" ? DEV_SEG_ON : DEV_SEG} onClick={() => setValence("Testimony")}>Testify</button>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 14 }}>
+        <label style={DEV_CHECK}><input type="checkbox" checked={crit} onChange={(e) => setCrit(e.target.checked)} />Crit</label>
+        <label style={DEV_CHECK}><input type="checkbox" checked={combust} onChange={(e) => setCombust(e.target.checked)} />Combust</label>
+      </div>
+      <div style={{ display: "flex", gap: 6 }}>
+        <button style={DEV_FIRE} onClick={() => onFire({ playerPlanet, opponentPlanet, valence, crit, combust })}>Fire</button>
+        <button style={{ ...DEV_BTN, opacity: animating ? 1 : 0.4 }} disabled={!animating} onClick={onSkip}>Skip</button>
+      </div>
+        </>
+      )}
+    </div>
   );
 }

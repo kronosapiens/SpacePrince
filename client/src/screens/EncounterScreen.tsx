@@ -140,6 +140,7 @@ function DevCombatScreen() {
       onCommitTurn={onCommitTurn}
       onClearEncounter={onClearEncounter}
       devUnlockAll
+      devAnimationControls
     />
   );
 }
