@@ -102,16 +102,16 @@ export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Opposition: -1,
 };
 
-// Combustion durability-offset multiplier by dignity (MECHANICS.md §10): higher
-// dignity absorbs more affliction before any combustion risk. Functional
-// affliction = max(0, affliction − durability × this); even durability keeps it
-// whole (×2.5 and ×1.5 of an even number are integers).
+// Combustion ceiling multiplier by dignity (MECHANICS.md §10): the ceiling is
+// durability × 20 × this, and combustion probability is affliction / ceiling.
+// Higher dignity raises the ceiling (slower to combust); a soft ±0.2 spread so
+// dignity nudges risk without dominating durability.
 export const DIGNITY_DURABILITY_MULT: Record<Dignity, number> = {
-  Domicile: 3,
-  Exaltation: 2.5,
-  Neutral: 2,
-  Detriment: 1.5,
-  Fall: 1,
+  Domicile: 1.2,
+  Exaltation: 1.1,
+  Neutral: 1,
+  Detriment: 0.9,
+  Fall: 0.8,
 };
 
 export const TIME_BUCKET_MS = 5 * 60 * 1000;

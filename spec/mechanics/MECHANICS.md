@@ -2,7 +2,7 @@
 
 The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
 
-**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a probabilistic combustion, offset by `durability × dignity`.
+**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a probabilistic combustion whose ceiling is set by `durability × dignity`.
 
 ## 1. Entities
 
@@ -169,25 +169,22 @@ Rules:
 
 Each planet takes **at most one** affliction application per turn — the direct blow if it is the acting planet, otherwise a single propagated ripple if aspected to it. Combustion is rolled once, at that application, and only for affliction.
 
-**Functional affliction** subtracts a durability offset, scaled by dignity:
+Affliction fills toward a **combustion ceiling** set by durability and scaled by dignity. The fraction filled reads directly as the per-hit probability:
 
-- `functional = max(0, affliction - durability * dignityMult)`
+- `ceiling = durability * 20 * dignityMult`
+- `p = min(1, affliction / ceiling)`
 
 `durability` is the effective durability (§4); `dignityMult` is:
 
-- Domicile: `3`
-- Exaltation: `2.5`
-- Neutral: `2`
-- Detriment: `1.5`
-- Fall: `1`
+- Domicile: `1.2`
+- Exaltation: `1.1`
+- Neutral: `1.0`
+- Detriment: `0.9`
+- Fall: `0.8`
 
-**Combustion probability** reads the functional value directly as a percent:
+Ceilings run from ~32 (a fragile, fallen planet) to ~190+ (durable, dignified) across the roster. A planet at zero affliction is safe; from there each point of affliction adds `1 / ceiling` to the per-hit combust chance, so durable, dignified planets convert affliction to risk slowly while fragile, debilitated ones fold fast. There is **no safe band** — any standing affliction carries some risk, so only healing affliction back to zero is full safety.
 
-- `p = min(1, functional / 100)`
-
-So a planet is **dead safe** while its raw affliction stays under its offset (`durability * dignityMult`, ~2–36 across the roster), then the per-hit combust chance climbs one point per point of functional affliction. Well-buffered, dignified planets rarely build enough raw affliction to be at much risk; fragile, debilitated planets fold early.
-
-Dignity scales the offset: domicile offsets more (safer), fall less (riskier). Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
+Dignity scales the ceiling: domicile raises it (safer), fall lowers it (riskier). Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
 
 ## 11. Encounter / Map / Run Flow
 

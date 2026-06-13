@@ -20,8 +20,9 @@ function state(affliction: number, combusted = false): PlanetState {
 }
 
 describe("combustionProbability", () => {
-  // functional = max(0, affliction − durability × dignityMult); p = min(1, functional / 100).
-  // dignityMult: Domicile 3, Exaltation 2.5, Neutral 2, Detriment 1.5, Fall 1.
+  // ceiling = durability × 20 × dignityMult; p = min(1, affliction / ceiling).
+  // dignityMult: Domicile 1.2, Exaltation 1.1, Neutral 1.0, Detriment 0.9, Fall 0.8.
+  // durability 8, Neutral → ceiling 160.
 
   it("zero affliction → zero probability", () => {
     expect(combustionProbability(placement(8), state(0))).toBe(0);
@@ -31,50 +32,48 @@ describe("combustionProbability", () => {
     expect(combustionProbability(placement(8), state(80, true))).toBe(0);
   });
 
-  it("affliction within the durability offset → zero (the safe zone)", () => {
-    // Neutral, durability 8 → offset 16; affliction 15 < 16.
-    expect(combustionProbability(placement(8), state(15))).toBe(0);
+  it("any standing affliction carries risk — no safe band", () => {
+    // durability 8 → ceiling 160; affliction 16 → 0.10.
+    expect(combustionProbability(placement(8), state(16))).toBeCloseTo(0.1, 5);
   });
 
-  it("functional affliction reads directly as a percent", () => {
-    // Neutral, durability 8 → offset 16; functional 56 − 16 = 40 → 0.40.
-    expect(combustionProbability(placement(8), state(56))).toBeCloseTo(0.4, 5);
+  it("affliction reads as a fraction of the ceiling", () => {
+    // ceiling 160; affliction 80 → 0.50.
+    expect(combustionProbability(placement(8), state(80))).toBeCloseTo(0.5, 5);
   });
 
-  it("caps at 1.0", () => {
-    // functional 200 − 16 = 184 → min(1, 1.84) = 1.
+  it("caps at 1.0 once affliction reaches the ceiling", () => {
+    expect(combustionProbability(placement(8), state(160))).toBe(1);
     expect(combustionProbability(placement(8), state(200))).toBe(1);
   });
 
-  it("higher dignity offsets more (lower risk) for the same affliction", () => {
-    const aff = 56;
-    const fall = combustionProbability(placement(8, "Fall"), state(aff)); // offset 8 → 0.48
-    const neutral = combustionProbability(placement(8, "Neutral"), state(aff)); // offset 16 → 0.40
-    const domicile = combustionProbability(placement(8, "Domicile"), state(aff)); // offset 24 → 0.32
-    expect(fall).toBeCloseTo(0.48, 5);
-    expect(neutral).toBeCloseTo(0.4, 5);
-    expect(domicile).toBeCloseTo(0.32, 5);
-    expect(fall).toBeGreaterThan(neutral);
-    expect(neutral).toBeGreaterThan(domicile);
-  });
-
-  it("half-step dignities (Exaltation 2.5, Detriment 1.5) stay integer-clean", () => {
-    // durability 8 → Exaltation offset 20 (functional 36), Detriment offset 12 (functional 44).
-    expect(combustionProbability(placement(8, "Exaltation"), state(56))).toBeCloseTo(0.36, 5);
-    expect(combustionProbability(placement(8, "Detriment"), state(56))).toBeCloseTo(0.44, 5);
+  it("dignity scales the ceiling — better dignity, lower risk", () => {
+    const aff = 96; // durability 8 → neutral ceiling 160
+    const fall = combustionProbability(placement(8, "Fall"), state(aff)); // 96/128
+    const detriment = combustionProbability(placement(8, "Detriment"), state(aff)); // 96/144
+    const neutral = combustionProbability(placement(8, "Neutral"), state(aff)); // 96/160
+    const exaltation = combustionProbability(placement(8, "Exaltation"), state(aff)); // 96/176
+    const domicile = combustionProbability(placement(8, "Domicile"), state(aff)); // 96/192
+    expect(fall).toBeCloseTo(0.75, 5);
+    expect(neutral).toBeCloseTo(0.6, 5);
+    expect(domicile).toBeCloseTo(0.5, 5);
+    expect(fall).toBeGreaterThan(detriment);
+    expect(detriment).toBeGreaterThan(neutral);
+    expect(neutral).toBeGreaterThan(exaltation);
+    expect(exaltation).toBeGreaterThan(domicile);
   });
 });
 
 describe("maybeCombust", () => {
   it("commits combustion when the roll lands under probability", () => {
-    // Neutral, durability 8 → offset 16; functional 66 − 16 = 50 → p 0.50.
-    const s = state(66);
+    // durability 8 → ceiling 160; affliction 80 → p 0.50.
+    const s = state(80);
     expect(maybeCombust(placement(8), s, () => 0.1)).toBe(true);
     expect(s.combusted).toBe(true);
   });
 
   it("does not commit when the roll lands above probability", () => {
-    const s = state(66);
+    const s = state(80);
     expect(maybeCombust(placement(8), s, () => 0.9)).toBe(false);
     expect(s.combusted).toBe(false);
   });
