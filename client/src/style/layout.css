@@ -534,169 +534,183 @@
   z-index: 5;
 }
 
-/* Action fan-out — SVG buttons under the stats panel. Afflict / Testify; first
-   click arms (.is-on), a second click on the same one confirms. Un-armed: dark
-   fill with a valence-color stroke + label. Armed: a solid, bright valence fill
-   that stays put (no fade to a faint tint), with a dark label so it reads. */
-.panel-action { cursor: pointer; }
-.panel-action-bg {
-  fill: rgba(11, 10, 15, 0.55);
-  stroke: var(--action-c);
-  stroke-width: 2.5;
-  filter: drop-shadow(0 0 6px var(--action-c));
-}
-.panel-action.is-on .panel-action-bg {
-  fill: var(--action-c);
-  filter: drop-shadow(0 0 12px var(--action-c));
-  /* Gentle breath on the armed button — nudges the player to click again. */
-  animation: armed-pulse 1.3s ease-in-out infinite;
-}
-@keyframes armed-pulse {
-  0%, 100% { filter: drop-shadow(0 0 7px var(--action-c)); }
-  50%      { filter: drop-shadow(0 0 16px var(--action-c)); }
+/* Stats panel — an HTML card inside an SVG <foreignObject> (client study chrome,
+   not the on-chain artifact, so HTML-in-SVG is fine; see STYLE.md). The browser
+   lays out the table, gridlines, spacing, and text wrapping; the card auto-sizes
+   and the box height animates for the study drop-down. Sized in viewBox units
+   (1000-unit chart) so it scales with the chart. */
+.ps-fo {
+  transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .panel-action.is-on .panel-action-bg { animation: none; }
+  .ps-fo { transition: none; }
 }
-.panel-action-label {
+.ps-card {
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(11, 10, 15, 0.72);
+  border: 1px solid rgba(201, 169, 106, 0.35);
+  border-radius: 14px;
+}
+.ps-content {
+  box-sizing: border-box;
+  position: relative;
+  padding: 16px 26px 20px;
+}
+
+/* The study "i" toggle, top-right. */
+.ps-i {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201, 169, 106, 0.45);
+  background: rgba(11, 10, 15, 0.4);
+  color: var(--gold);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+.ps-i:hover { border-color: var(--gold); }
+.ps-i.is-on {
+  opacity: 1;
+  border-color: var(--gold);
+  background: rgba(201, 169, 106, 0.18);
+}
+
+.ps-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.ps-epithet { font-size: 24px; }
+
+/* Closed: operational read-outs (Resolve · Crit + the action fan-out). */
+.ps-ops { animation: ps-fade 220ms ease; }
+.ps-opline {
+  font-family: var(--sans);
+  font-size: 23px;
+  color: var(--bone);
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin-top: 16px;
+}
+.ps-actions {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 20px;
+}
+.ps-action {
+  width: 165px;
+  padding: 11px 0;
+  border-radius: 999px;
+  border: 2.5px solid var(--vc);
+  background: rgba(11, 10, 15, 0.55);
+  color: var(--vc);
   font-family: var(--serif);
   font-style: italic;
   font-size: 25px;
   letter-spacing: 0.02em;
-  fill: var(--action-c);
-  dominant-baseline: middle;
-  user-select: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px var(--vc));
+  transition: background 160ms ease, color 160ms ease;
 }
-.panel-action.is-on .panel-action-label {
-  fill: var(--void);
+.ps-action.is-on {
+  background: var(--vc);
+  color: var(--void);
+  filter: drop-shadow(0 0 12px var(--vc));
+  animation: armed-pulse 1.3s ease-in-out infinite;
 }
-
-/* Stats panel rendered inside the chart SVG, in the largest empty angular
-   wedge between planets. Sized in viewBox units (1000-unit chart) so it
-   scales with the chart on resize. v1 style: gold uppercase eyebrow title,
-   serif body in bone, gold-tinted border. */
-.planet-stats-bg {
-  fill: rgba(11, 10, 15, 0.72);
-  stroke: rgba(201, 169, 106, 0.35);
-  stroke-width: 1;
-}
-.planet-stats-title {
-  font-family: var(--serif);
-  font-size: 32px;
-  font-weight: 500;
-  fill: var(--gold);
-  letter-spacing: 0.08em;
-  dominant-baseline: middle;
-}
-.planet-stats-epithet {
-  font-size: 24px;
-}
-.planet-stats-row {
-  font-family: var(--sans);
-  font-size: 23px;
-  fill: var(--bone);
-  letter-spacing: 0.02em;
-  dominant-baseline: middle;
-}
-
-/* Study mode (the inspect "i") — opt-in gloss + stat derivation. Same palette
-   as the panel; quiet by default, gold when engaged. See SCREENS.md §3.6.1.
-   The box keeps its top and drops open downward; the action fan-out cross-fades
-   out as the derivation fades in. */
-.planet-stats-bg,
-.planet-stats-cliprect {
-  transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.planet-stats-closed,
-.planet-stats-ext {
-  transition: opacity 200ms ease;
+@keyframes armed-pulse {
+  0%, 100% { filter: drop-shadow(0 0 7px var(--vc)); }
+  50%      { filter: drop-shadow(0 0 16px var(--vc)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .planet-stats-bg,
-  .planet-stats-cliprect,
-  .planet-stats-closed,
-  .planet-stats-ext {
-    transition: none;
-  }
+  .ps-action.is-on { animation: none; }
 }
-.planet-stats-gloss {
+
+/* Open: the symbolic gloss + the derivation table. */
+.ps-study { animation: ps-fade 220ms ease; }
+.ps-gloss {
   font-family: var(--serif);
   font-style: italic;
   font-size: 24px;
-  fill: var(--bone);
+  line-height: 1.25;
+  color: var(--bone);
   opacity: 0.92;
-  letter-spacing: 0.01em;
-  dominant-baseline: middle;
+  text-align: center;
+  margin-top: 18px;
 }
-.planet-stats-divider {
-  stroke: rgba(201, 169, 106, 0.28);
-  stroke-width: 1;
+.ps-table {
+  width: 100%;
+  margin-top: 22px;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
-/* Hairline table grid — quieter than the header underline. */
-.planet-stats-grid {
-  stroke: rgba(201, 169, 106, 0.13);
-  stroke-width: 1;
+.ps-table th,
+.ps-table td {
+  text-align: center;
+  padding: 5px 0;
 }
-/* Derivation table: gold column headers (tappable for a concept blurb), bone
-   row labels, bone numeric cells. */
-.planet-stats-col {
+/* Hairline inner grid — quieter than the header underline. */
+.ps-table th:not(:last-child),
+.ps-table td:not(:last-child) {
+  border-right: 1px solid rgba(201, 169, 106, 0.13);
+}
+.ps-table tbody tr:not(:last-child) td {
+  border-bottom: 1px solid rgba(201, 169, 106, 0.13);
+}
+.ps-table thead th {
   font-family: var(--sans);
   font-size: 17px;
-  fill: var(--gold);
+  color: var(--gold);
   opacity: 0.8;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  dominant-baseline: middle;
+  border-bottom: 1px solid rgba(201, 169, 106, 0.28);
 }
-.planet-stats-coltap { cursor: pointer; }
-.planet-stats-coltap.is-open .planet-stats-col,
-.planet-stats-coltap:hover .planet-stats-col { opacity: 1; }
-.planet-stats-rowlabel {
+.ps-table tbody td {
   font-family: var(--sans);
   font-size: 20px;
-  fill: var(--gold);
-  opacity: 0.75;
-  letter-spacing: 0.02em;
-  dominant-baseline: middle;
-}
-.planet-stats-cell {
-  font-family: var(--sans);
-  font-size: 20px;
-  fill: var(--bone);
-  dominant-baseline: middle;
+  color: var(--bone);
   font-variant-numeric: tabular-nums;
 }
-/* Blurb is HTML inside an SVG <foreignObject> so it wraps to the panel width —
-   hence `color` (not `fill`) and a normal `line-height`. */
-.planet-stats-blurb-fo {
+.ps-table tbody td.ps-rowlabel {
+  color: var(--gold);
+  opacity: 0.78;
+}
+.ps-coltap { cursor: pointer; }
+.ps-coltap.is-open,
+.ps-coltap:hover { opacity: 1; }
+
+.ps-blurb {
   font-family: var(--sans);
   font-size: 20px;
-  line-height: 22px;
+  line-height: 1.4;
   color: var(--bone);
   opacity: 0.85;
   letter-spacing: 0.01em;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(201, 169, 106, 0.28);
 }
-.planet-stats-i { cursor: pointer; }
-.planet-stats-i-ring {
-  fill: rgba(11, 10, 15, 0.4);
-  stroke: rgba(201, 169, 106, 0.45);
-  stroke-width: 1.5;
+
+@keyframes ps-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.planet-stats-i-label {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 15px;
-  fill: var(--gold);
-  opacity: 0.7;
-  dominant-baseline: middle;
-  user-select: none;
-}
-.planet-stats-i:hover .planet-stats-i-ring { stroke: var(--gold); }
-.planet-stats-i.is-on .planet-stats-i-ring {
-  fill: rgba(201, 169, 106, 0.18);
-  stroke: var(--gold);
-}
-.planet-stats-i.is-on .planet-stats-i-label { opacity: 1; }
 
 @media (max-width: 899px) {
   .combat {

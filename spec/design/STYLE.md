@@ -18,6 +18,7 @@ The chart, the map, the encounter, the menus — all of it is one visual artifac
 These are not negotiable inside this document — they come from elsewhere in the spec.
 
 - **SVG-native.** The NFT chart is generated entirely on-chain as SVG (see `spec/concept/NFT.md`). The rest of the client renders in the same medium so the artifact a player owns is visually continuous with the world they play in. No raster art, no 3D, no canvas-rendered scenes.
+  - *Exception — UI chrome.* Client-only readout chrome (e.g. the study stats panel) may embed HTML via `<foreignObject>` when a real layout engine earns its keep — tables, wrapping prose, auto-sizing. This is **not** for the chart art or anything that is or resembles the on-chain artifact; those stay pure SVG. The line is: chart/world = SVG, data readouts = HTML-in-SVG, both still inside the chart's coordinate space and palette.
 - **Planetary palette.** The seven palettes in `VIBES.md §Color` are the entire color universe. New colors are not introduced. Backgrounds, text, line work, and chrome are all derived from the palette plus a small neutral scale (§5).
 - **Active-planet tint.** The screen's ambient color reflects the active planet (`VIBES.md §Color`). The tint is global; the chart, map, and chrome all sit inside it.
 - **Diagram as world.** The chart is the visual ground (`VIBES.md §The Chart as Visual Center`). It is never a corner HUD. The map is a diagram of emanation, not a level select. The encounter is two charts speaking, not a battle screen.
