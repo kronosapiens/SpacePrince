@@ -1,7 +1,7 @@
 import { PLANETS } from "./data";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects } from "./aspects";
-import { maybeCombust } from "./combust";
+import { applyCombust } from "./combust";
 import { cloneSideState } from "./chart";
 import { turnScore } from "./score";
 import { pickWeighted } from "./rng";
@@ -180,8 +180,8 @@ function resolveAction(
   // (Aligns the active planet with the long-standing "combusted planets are
   // skipped by propagation" rule — previously only previously-dead planets.)
   const combust =
-    valence !== "Testimony" && delta > 0 ? maybeCombust(placement, side[active], rng) : false;
-  const propagation = propagate(side, chart, active, valence, amount, rng, sideTag);
+    valence !== "Testimony" && delta > 0 ? applyCombust(placement, side[active]) : false;
+  const propagation = propagate(side, chart, active, valence, amount, sideTag);
   return { crit, base, amount, delta, combust, propagation };
 }
 
@@ -202,7 +202,6 @@ function propagate(
   active: PlanetName,
   polarity: Polarity,
   amount: number,
-  rng: () => number,
   sideTag: "self" | "other",
 ): PropagationEntry[] {
   if (amount <= 0) return [];
@@ -222,7 +221,7 @@ function propagate(
     const delta = applyEffect(target, effPolarity, magnitude);
     const targetPlacement = chart.planets[a.to];
     const combust = effPolarity !== "Testimony" && delta > 0
-      ? maybeCombust(targetPlacement, target, rng)
+      ? applyCombust(targetPlacement, target)
       : false;
     out.push({
       side: sideTag,

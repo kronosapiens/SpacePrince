@@ -22,6 +22,7 @@ Map topology is specified in `spec/mechanics/MAP.md`.
 ### In Scope (v1)
 
 - Chart-conditioning model: how a chart makes a house friendly or hostile.
+- **Essential dignity as an input.** Dignity (domicile / exaltation / detriment / fall) was pulled out of combat (`MECHANICS.md §10`) to live here — a planet's competence in its sign should shape how it fares in narrative encounters, expressed with more texture than the `±2` stat nudge it was in combat. The chart already computes it (`CHART.md`); the mechanic is TBD.
 - Twelve house archetypes: theme, native valence, joy.
 - Outcome vocabulary: what resources narrative encounters can move.
 - Encounter shape: decision tree depth, push-your-luck structure, exits.

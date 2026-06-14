@@ -2,7 +2,7 @@
 
 The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
 
-**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a probabilistic combustion whose ceiling is set by `durability × dignity`.
+**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a deterministic combustion at a ceiling set by durability.
 
 ## 1. Entities
 
@@ -113,7 +113,7 @@ Action is set per side:
 
 Resolution is **sequential**, in two phases — the intent → act → response rhythm of Slay the Spire rather than the simultaneous trade of FTL (`spec/concept/INFLUENCES.md`):
 
-1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is rolled there.
+1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is resolved there.
 2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
 
 The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free Distance (§12) you'd otherwise deny.
@@ -131,7 +131,7 @@ Raw direct amount:
 
 - `raw = baseStat * critMultiplier`
 
-Magnitude is the planet's own stat; dignity, sect, and element/modality buffs (§4) are the only sources of contextual strength.
+Magnitude is the planet's own stat; sect and element/modality buffs (§4) are the only sources of contextual strength.
 
 ## 7. Crit
 
@@ -164,28 +164,22 @@ Rules:
 - negative multipliers invert the valence (`Affliction <-> Testimony`)
 - propagation applies the same integer effect model as direct effects
 - combusted targets are skipped
-- combustion resolves before propagation: if the blow combusts the planet it lands on, that planet conducts nothing onward — propagation is short-circuited, not rolled then negated
+- combustion resolves before propagation: if the blow combusts the planet it lands on, that planet conducts nothing onward — propagation is short-circuited, not computed then negated
 
 ## 10. Combustion
 
-Each planet takes **at most one** affliction application per turn — the direct blow if it is the acting planet, otherwise a single propagated ripple if aspected to it. Combustion is rolled once, at that application, and only for affliction.
+Each planet takes **at most one** affliction application per turn — the direct blow if it is the acting planet, otherwise a single propagated ripple if aspected to it. Combustion is checked once, at that application, and only for affliction.
 
-Affliction fills toward a **combustion ceiling** set by durability and scaled by dignity. The fraction filled reads directly as the per-hit probability:
+Affliction accumulates toward a **combustion ceiling** set by durability alone. A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
 
-- `ceiling = durability * 20 * dignityMult`
-- `p = min(1, affliction / ceiling)`
+- `ceiling = durability * 20` (durability = core + sign buffs, per §4)
+- combust when `affliction >= ceiling`
 
-`durability` is the effective durability (§4); `dignityMult` is:
+Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
 
-- Domicile: `1.2`
-- Exaltation: `1.1`
-- Neutral: `1.0`
-- Detriment: `0.9`
-- Fall: `0.8`
+Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
 
-Ceilings run from ~32 (a fragile, fallen planet) to ~190+ (durable, dignified) across the roster. A planet at zero affliction is safe; from there each point of affliction adds `1 / ceiling` to the per-hit combust chance, so durable, dignified planets convert affliction to risk slowly while fragile, debilitated ones fold fast. There is **no safe band** — any standing affliction carries some risk, so only healing affliction back to zero is full safety.
-
-Dignity scales the ceiling: domicile raises it (safer), fall lowers it (riskier). Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
+**Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet's competence in its sign is expressed narratively rather than as a stat nudge. The chart still computes each planet's dignity; combat simply does not read it.
 
 ## 11. Encounter / Map / Run Flow
 

@@ -117,6 +117,38 @@ The player's only per-turn action in combat is choosing which of their planets a
 
 In narrative encounters, the same grammar governs *inspecting* the chart. Decision options are committed by single-tap on the option — each option's text label is itself the commit affordance, no separate confirm step.
 
+### 3.6.1 Study annotations (the inspect "i")
+
+A newcomer with no astrology cannot form intent — choosing which planet to send presumes knowing what a planet connotes.
+Study annotations are the opt-in foothold that closes this gap without imposing instruction on a fluent player. See `VIBES.md` ("Offer a foothold; never force a lesson").
+
+A small **"i" in the top-right of the inspect panel** (`PlanetStatsPanel`) toggles study annotation.
+The toggle is **sticky** across inspections and **commit-safe** — entering study mode never previews, advances, or commits a turn.
+A player who never touches it sees the plain panel; the annotations exist only while study mode is on, so a fluent player carries no extra text.
+
+With study **off**, the panel shows only **operational numbers** — what matters this turn:
+
+- **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out. Now that combustion is deterministic, this is literally its HP. "Resolve" stays in a bespoke, character register (the operational sibling of Afflict/Testify, not the generic "HP") and maps cleanly to its underlying stat, Durability — more legible than the earlier, too-abstract "Light."
+- **Crit %** — `luck × 5%`.
+- **Afflict / Testify** — the planet's damage and healing, carried by the two action buttons.
+
+These re-express the four core stats operationally: damage → afflict, healing → testify, durability → Resolve, luck → crit.
+
+With study **on**, the box **drops open downward** (its top fixed) and the action buttons clear to make room for two things:
+
+- **Symbolic gloss** — one evocative line naming what the planet is *about* (e.g. *"Mars — the drive to act, to cut, to assert"*), drawn from the planetary voice (`PLANETS.md`). A study annotation, **not** a chorus fragment: it may name the symbol plainly, where a fragment never explains (`PLANETS.md §1`). Authored, never generated.
+- **Stat table** — rows for the four core stats, columns **Core · Placement · Total**. `Core` is the innate base; `Placement` bundles the sign-derived buffs (element, mode, sect); `Total` is the sum, tying back to the operational numbers above. (Dignity is **not** here — it's a house-encounter input, not a combat stat; see `MECHANICS.md §10`.)
+
+Depth scales inversely with how often a thing is needed.
+The table shows the numbers at a glance; the *concept* explanations — what Core or Placement each mean — sit one tap deeper (tap a column header), since a player needs them roughly once.
+A basic explanation three taps deep is acceptable.
+
+**Scope.** v1 annotates the seven planets, where the blocked decision lives.
+Signs, houses, and the Afflict/Testify verbs extend the same mechanism later.
+
+**Relationship to Chart Study (§7).** Same teaching impulse, different moment: study annotations serve the player mid-encounter at the point of decision, while Chart Study stays the between-runs contemplative surface.
+They share a register; §7.4's deferred annotation path should reuse this vocabulary.
+
 ### 3.7 Chrome
 
 The encounter screen is allowed restrained, functional chrome where it does necessary work — telling the player whose turn it is, what the run state is, and how to leave. The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.

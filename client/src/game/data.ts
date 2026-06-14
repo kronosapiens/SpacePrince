@@ -4,7 +4,6 @@ import type {
   PlanetBaseStats,
   PlanetName,
   SignName,
-  Dignity,
   AspectType,
 } from "./types";
 
@@ -43,7 +42,7 @@ export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
 export const PLANET_ROLE: Record<PlanetName, string> = {
   Sun:     "the sovereign",
   Moon:    "the healer",
-  Mercury: "the fool",
+  Mercury: "the shifter",
   Venus:   "the lover",
   Mars:    "the warrior",
   Jupiter: "the patron",
@@ -100,18 +99,6 @@ export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
   Trine: 0.5,
   Square: -0.5,
   Opposition: -1,
-};
-
-// Combustion ceiling multiplier by dignity (MECHANICS.md §10): the ceiling is
-// durability × 20 × this, and combustion probability is affliction / ceiling.
-// Higher dignity raises the ceiling (slower to combust); a soft ±0.2 spread so
-// dignity nudges risk without dominating durability.
-export const DIGNITY_DURABILITY_MULT: Record<Dignity, number> = {
-  Domicile: 1.2,
-  Exaltation: 1.1,
-  Neutral: 1,
-  Detriment: 0.9,
-  Fall: 0.8,
 };
 
 export const TIME_BUCKET_MS = 5 * 60 * 1000;

@@ -4,8 +4,7 @@ import { getAspects } from "@/game/aspects";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
-  PLANET_STATS_PANEL_H,
-  PLANET_STATS_PANEL_ACTION_H,
+  panelHeightFor,
   type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
@@ -130,6 +129,11 @@ export interface ChartProps {
   /** Reserve the taller (action-row) panel height when placing, so the panel
    *  doesn't shift between hover (stats only) and select (stats + actions). */
   statsPanelReserveActions?: boolean;
+  /** Study mode — the stats panel grows the gloss + stat derivation
+   *  (spec/design/SCREENS.md §3.6.1). Reserves the taller study height. */
+  statsPanelStudy?: boolean;
+  /** Shows the study "i" toggle on the stats panel; called when it's tapped. */
+  onToggleStudy?: () => void;
 }
 
 export function Chart(props: ChartProps) {
@@ -164,15 +168,17 @@ export function Chart(props: ChartProps) {
     statsPanelPlanet,
     statsPanelActions,
     statsPanelReserveActions,
+    statsPanelStudy,
+    onToggleStudy,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
   // Place the panel in the emptiest interior wedge — the wheel's middle isn't
   // reliably clear (same-sign planets cluster toward the center). Reserve the
   // taller action height so the spot doesn't shift when buttons appear.
-  const panelHeight = statsPanelReserveActions
-    ? PLANET_STATS_PANEL_ACTION_H
-    : PLANET_STATS_PANEL_H;
+  // Placement reserves the *closed* height only — study mode anchors this box's
+  // top and grows downward, so the location stays put when it opens.
+  const panelHeight = panelHeightFor({ actions: !!statsPanelReserveActions });
   const panelPlacement = useMemo(
     () => computePanelPlacement(points, panelHeight),
     [points, panelHeight],
@@ -338,16 +344,6 @@ export function Chart(props: ChartProps) {
       {aspectLines}
       {propagationLines}
 
-      {statsPanelPlanet && (
-        <PlanetStatsPanel
-          chart={chart}
-          planet={statsPanelPlanet}
-          cx={panelPlacement.cx}
-          cy={panelPlacement.cy}
-          actions={statsPanelActions}
-        />
-      )}
-
       {/* Planet layer: halos + glyphs. Badges draw in a separate pass below,
           so a selected/active planet's halo can't occlude a neighbouring
           planet's affliction badge (SVG paints in document order). */}
@@ -401,6 +397,21 @@ export function Chart(props: ChartProps) {
           />
         );
       })}
+
+      {/* Stats panel last = highest z. When it clashes with a planet in a busy
+          chart, the panel sits on top — it's the focused read. */}
+      {statsPanelPlanet && (
+        <PlanetStatsPanel
+          chart={chart}
+          planet={statsPanelPlanet}
+          cx={panelPlacement.cx}
+          cy={panelPlacement.cy}
+          height={panelHeight}
+          actions={statsPanelActions}
+          study={statsPanelStudy}
+          onToggleStudy={onToggleStudy}
+        />
+      )}
     </svg>
   );
 }

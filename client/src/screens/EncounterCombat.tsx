@@ -62,6 +62,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
+  // Study mode (the inspect "i") — sticky across inspections, so a learner can
+  // sweep the chart without re-toggling. Commit-safe: a pure display flag.
+  const [study, setStudy] = useState(false);
   // Desktop-only: which action button the pointer is over. Drives the live
   // projection preview. Null on touch (no hover) — both buttons still render
   // lit and the projection falls back to the planet's default verb.
@@ -350,6 +353,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           statsPanelPlanet={inspected}
           statsPanelActions={playerActions}
           statsPanelReserveActions
+          statsPanelStudy={study}
+          onToggleStudy={() => setStudy((s) => !s)}
           alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>
@@ -538,7 +543,7 @@ function DevAnimationPanel({
   const [valence, setValence] = useState<Polarity>("Affliction");
   const [crit, setCrit] = useState(false);
   const [combust, setCombust] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div style={DEV_PANEL} onClick={(e) => e.stopPropagation()}>

@@ -599,6 +599,105 @@
   dominant-baseline: middle;
 }
 
+/* Study mode (the inspect "i") — opt-in gloss + stat derivation. Same palette
+   as the panel; quiet by default, gold when engaged. See SCREENS.md §3.6.1.
+   The box keeps its top and drops open downward; the action fan-out cross-fades
+   out as the derivation fades in. */
+.planet-stats-bg,
+.planet-stats-cliprect {
+  transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.planet-stats-closed,
+.planet-stats-ext {
+  transition: opacity 200ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .planet-stats-bg,
+  .planet-stats-cliprect,
+  .planet-stats-closed,
+  .planet-stats-ext {
+    transition: none;
+  }
+}
+.planet-stats-gloss {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 24px;
+  fill: var(--bone);
+  opacity: 0.92;
+  letter-spacing: 0.01em;
+  dominant-baseline: middle;
+}
+.planet-stats-divider {
+  stroke: rgba(201, 169, 106, 0.28);
+  stroke-width: 1;
+}
+/* Hairline table grid — quieter than the header underline. */
+.planet-stats-grid {
+  stroke: rgba(201, 169, 106, 0.13);
+  stroke-width: 1;
+}
+/* Derivation table: gold column headers (tappable for a concept blurb), bone
+   row labels, bone numeric cells. */
+.planet-stats-col {
+  font-family: var(--sans);
+  font-size: 17px;
+  fill: var(--gold);
+  opacity: 0.8;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  dominant-baseline: middle;
+}
+.planet-stats-coltap { cursor: pointer; }
+.planet-stats-coltap.is-open .planet-stats-col,
+.planet-stats-coltap:hover .planet-stats-col { opacity: 1; }
+.planet-stats-rowlabel {
+  font-family: var(--sans);
+  font-size: 20px;
+  fill: var(--gold);
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+  dominant-baseline: middle;
+}
+.planet-stats-cell {
+  font-family: var(--sans);
+  font-size: 20px;
+  fill: var(--bone);
+  dominant-baseline: middle;
+  font-variant-numeric: tabular-nums;
+}
+/* Blurb is HTML inside an SVG <foreignObject> so it wraps to the panel width —
+   hence `color` (not `fill`) and a normal `line-height`. */
+.planet-stats-blurb-fo {
+  font-family: var(--sans);
+  font-size: 20px;
+  line-height: 22px;
+  color: var(--bone);
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+}
+.planet-stats-i { cursor: pointer; }
+.planet-stats-i-ring {
+  fill: rgba(11, 10, 15, 0.4);
+  stroke: rgba(201, 169, 106, 0.45);
+  stroke-width: 1.5;
+}
+.planet-stats-i-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  fill: var(--gold);
+  opacity: 0.7;
+  dominant-baseline: middle;
+  user-select: none;
+}
+.planet-stats-i:hover .planet-stats-i-ring { stroke: var(--gold); }
+.planet-stats-i.is-on .planet-stats-i-ring {
+  fill: rgba(201, 169, 106, 0.18);
+  stroke: var(--gold);
+}
+.planet-stats-i.is-on .planet-stats-i-label { opacity: 1; }
+
 @media (max-width: 899px) {
   .combat {
     grid-template-columns: 1fr;

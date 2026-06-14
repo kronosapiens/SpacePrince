@@ -1,31 +1,29 @@
-import { DIGNITY_DURABILITY_MULT } from "./data";
 import type { PlanetPlacement, PlanetState } from "./types";
 
 /**
- * Combustion probability (MECHANICS.md §10). Affliction fills toward a
- * combustion ceiling of durability × 20, scaled by dignity; the fraction
- * filled reads directly as the per-hit probability.
+ * Combustion ceiling (MECHANICS.md §10) — the affliction a planet absorbs
+ * before it goes out. Set by durability alone (core + sign buffs).
  *
- *   ceiling = durability × 20 × dignityMult
- *   p       = min(1, affliction / ceiling)
+ *   ceiling = durability × 20
  */
-export function combustionProbability(placement: PlanetPlacement, state: PlanetState): number {
-  if (state.combusted) return 0;
-  if (state.affliction <= 0) return 0;
-  const durability = placement.base.durability + placement.buffs.durability;
-  const ceiling = durability * 20 * DIGNITY_DURABILITY_MULT[placement.dignity];
-  return Math.min(1, state.affliction / ceiling);
+export function combustionCeiling(placement: PlanetPlacement): number {
+  return (placement.base.durability + placement.buffs.durability) * 20;
 }
 
-/** Returns true and mutates state.combusted if the roll succeeds. */
-export function maybeCombust(
-  placement: PlanetPlacement,
-  state: PlanetState,
-  rng: () => number,
-): boolean {
-  const p = combustionProbability(placement, state);
-  if (p <= 0) return false;
-  if (rng() < p) {
+/**
+ * Deterministic combustion (MECHANICS.md §10): a planet combusts the moment its
+ * affliction reaches the ceiling — no roll. Affliction below the ceiling is a
+ * readable, recoverable margin; at the line, the candle goes out.
+ */
+export function shouldCombust(placement: PlanetPlacement, state: PlanetState): boolean {
+  if (state.combusted) return false;
+  if (state.affliction <= 0) return false;
+  return state.affliction >= combustionCeiling(placement);
+}
+
+/** Sets `state.combusted` when the ceiling is reached; returns whether it just did. */
+export function applyCombust(placement: PlanetPlacement, state: PlanetState): boolean {
+  if (shouldCombust(placement, state)) {
     state.combusted = true;
     return true;
   }
