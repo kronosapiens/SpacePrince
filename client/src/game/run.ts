@@ -35,6 +35,7 @@ export function beginRun(profile: Profile, seed = randomSeed()): RunState {
     mapHistory: [],
     currentEncounter: null,
     seenFragmentIds: [],
+    seenScenarioIds: [],
     loreCounters: {},
     lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
     over: false,

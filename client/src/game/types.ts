@@ -197,6 +197,9 @@ export interface RunState {
   mapHistory: MapState[];
   currentEncounter: EncounterState | null;
   seenFragmentIds: string[];
+  /** Scenario ids consumed this run — enforces the no-repeat rule
+   *  (`spec/mechanics/ENCOUNTERS.md §8`). Mirrors `seenFragmentIds`. */
+  seenScenarioIds: string[];
   loreCounters: Record<string, number>;
   lifetimeEncounterAtRunStart: number;
   over: boolean;

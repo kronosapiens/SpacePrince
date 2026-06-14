@@ -7,7 +7,7 @@ import { rollNodeContent } from "@/game/map-content";
 import { mulberry32, hashString } from "@/game/rng";
 import { PLANETS } from "@/game/data";
 import { HOUSES } from "@/data/houses";
-import { getTree } from "@/data/narrative-trees";
+import { pickScenario } from "@/data/narrative-trees";
 import { pickFragment } from "@/data/chorus";
 import type {
   Chart,
@@ -115,6 +115,7 @@ export function makeDevRun(seed: number, profile: Profile): RunState {
     mapHistory: [],
     currentEncounter: null,
     seenFragmentIds: [],
+    seenScenarioIds: [],
     loreCounters: {},
     lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
     over: false,
@@ -287,8 +288,8 @@ export function makeDevNarrative(
 ): NarrativeEncounter {
   const house = forceHouse ?? (1 + (Math.abs(seed) % 12));
   const houseDef = HOUSES[house - 1]!;
-  const tree = getTree(house);
   const rng = mulberry32(seed);
+  const tree = pickScenario(house, [], rng);
   const fragment = pickFragment({
     planet: houseDef.ruler,
     mood: tree.fragmentMood,
@@ -299,7 +300,7 @@ export function makeDevNarrative(
     kind: "narrative",
     id: `dev_narr_${seed}_${house}`,
     house,
-    treeId: `house_${house}_v1`,
+    treeId: tree.scenarioId,
     currentNodeId: tree.rootId,
     visitedNodeIds: [tree.rootId],
     fragmentId: fragment?.id ?? `${houseDef.ruler.toLowerCase()}-stub`,

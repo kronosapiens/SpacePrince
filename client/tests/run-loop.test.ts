@@ -4,7 +4,7 @@ import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
-import { applyOutcomes } from "@/game/narrative";
+import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
@@ -80,10 +80,17 @@ describe("Run loop integration", () => {
     r = { ...r, runDistance: 10, perPlanetState: { ...r.perPlanetState } };
     r.perPlanetState.Sun = { affliction: 5, combusted: true };
 
+    const ctx = buildNarrativeContext({
+      profile,
+      run: r,
+      joyPlanet: null,
+      rulerPlanet: "Sun",
+      unlocked: [...PLANETS],
+    });
     r = applyOutcomes(r, profile, [
-      { kind: "uncombust", planet: "Sun" },
+      { kind: "uncombust", target: "Sun" },
       { kind: "distance", delta: -3 },
-    ]);
+    ], ctx);
     expect(r.perPlanetState.Sun.combusted).toBe(false);
     expect(r.perPlanetState.Sun.affliction).toBe(0);
     expect(r.runDistance).toBe(7);

@@ -7,7 +7,7 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
-import { getTree, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
+import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment } from "@/data/chorus";
 import { mulberry32 } from "@/game/rng";
 import type {
@@ -50,9 +50,16 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const { setActive } = useActivePlanet();
 
   const house = HOUSES[encounter.house - 1]!;
-  const tree = useMemo(() => getTree(encounter.house), [encounter.house]);
+  const tree = useMemo(
+    () => getScenario(encounter.treeId, encounter.house),
+    [encounter.treeId, encounter.house],
+  );
   const ariaPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
+  const playerUnlocked = useMemo(
+    () => unlockedPlanets(profile.lifetimeEncounterCount),
+    [profile.lifetimeEncounterCount],
+  );
 
   useEffect(() => {
     setActive(ariaPlanet);
@@ -77,13 +84,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         run,
         joyPlanet,
         rulerPlanet: house.ruler,
+        unlocked: playerUnlocked,
       }),
-    [profile, run, joyPlanet, house.ruler],
+    [profile, run, joyPlanet, house.ruler, playerUnlocked],
   );
 
   const [resolved, setResolved] = useState(encounter.resolved);
   const [resolutionLine, setResolutionLine] = useState<string | null>(encounter.resolutionText ?? null);
-  const playerUnlocked = unlockedPlanets(profile.lifetimeEncounterCount);
   const node = useMemo(() => getTreeNode(tree, encounter.currentNodeId), [tree, encounter.currentNodeId]);
   const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
 
@@ -102,7 +109,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       resolutionText = success ? "The wager holds." : "The wager falls.";
     }
 
-    let nextRun = applyOutcomes(run, profile, outcomes);
+    let nextRun = applyOutcomes(run, profile, outcomes, ctx);
     if (fragment && !nextRun.seenFragmentIds.includes(fragment.id)) {
       nextRun = { ...nextRun, seenFragmentIds: [...nextRun.seenFragmentIds, fragment.id] };
     }
@@ -184,7 +191,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         </div>
 
         <div className="narrative-body">
-          <div className="narrative-house">{HOUSE_NAMES[house.num - 1]}</div>
+          <div className="narrative-house">
+            {HOUSE_NAMES[house.num - 1]}
+            <span className="narrative-house-gloss"> — {house.gloss}</span>
+          </div>
           <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
         </div>
 

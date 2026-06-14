@@ -824,6 +824,11 @@
   letter-spacing: 0.01em;
   margin-bottom: 6px;
 }
+.narrative-house-gloss {
+  color: var(--mist);
+  font-weight: 400;
+  font-style: italic;
+}
 .narrative-options {
   grid-column: 1 / 3;
   display: flex;

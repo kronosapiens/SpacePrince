@@ -290,13 +290,19 @@ The pool size (12 houses × 2–3 = **24–36 distinct narrative beats**) sets h
 
 Per `PLANETS.md §1–2` and `SCREENS.md §3.2`.
 
+**Register: concrete but generic.**
+The body is a plain, tangible folk-situation — a coin at the foot of a tree, a stranger on the road, a letter in an unknown hand — stated plainly, with legible choices.
+The symbolism lives in the *structure* (house, planet, cost), not in the prose: no portentous mysticism, no purple lines, no Greek classical names in the body.
+The only elevated register is the **aria** (the curated fragment floating above); the situation below it stays grounded.
+
 - **Aria** — one curated, public-domain chorus fragment in the **ruler's** voice (`fragmentMood` per tree). One per *encounter*, not per node. Never explains the mechanic.
-- **Node text** — 1–2 sentences, present tense, second person, evocative. Sets the dilemma, not the numbers.
-- **Option label** — imperative, second person, short. The *choice* ("Stake your name."), never the mechanic.
-- **Aside** — the plain mechanical summary, utilitarian register, explicit ("Cost: 2 Distance · heal 2 across unlocked planets."). All numbers live here.
+- **Node text** — 1–2 sentences, present tense, second person, concrete and grounded (a thing happens; a choice is offered). Sets the dilemma, not the numbers.
+- **Option label** — imperative, second person, short. The *choice* ("Take the one coin and go."), never the mechanic.
+- **Aside** — the plain mechanical summary, utilitarian register, explicit ("+2 Distance · heal 2 where it's needed most"). All numbers live here.
 - **Resolution line** — one short consequence sentence.
 
-Voice matches the aria planet and the house's classical name and theme (`HOUSES.md §5`).
+The aria carries the planet's voice; the body stays plain.
+Tonal range still tracks the house — a bad-place situation reads grimmer than a good-place one (`HOUSES.md §5`).
 
 ---
 

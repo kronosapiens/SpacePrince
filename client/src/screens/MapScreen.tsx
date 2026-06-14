@@ -17,7 +17,7 @@ import { RULERSHIP } from "@/game/data";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
-import { getTree } from "@/data/narrative-trees";
+import { pickScenario } from "@/data/narrative-trees";
 import {
   generateSeedHash,
   getOrCreateDevProfile,
@@ -127,8 +127,8 @@ function NormalMapScreen() {
         });
       } else {
         const house = HOUSES[content.house - 1]!;
-        const tree = getTree(content.house);
         const rng = mulberry32(hashString(`${run.id}_${content.house}_${nodeId}`));
+        const tree = pickScenario(content.house, nextRun.seenScenarioIds ?? [], rng);
         const fragment = pickFragment({
           planet: house.ruler,
           mood: tree.fragmentMood,
@@ -138,10 +138,14 @@ function NormalMapScreen() {
         encounter = beginNarrativeEncounter({
           run: nextRun,
           house: content.house,
-          treeId: `house_${content.house}_v1`,
+          treeId: tree.scenarioId,
           rootNodeId: tree.rootId,
           fragmentId: fragment?.id ?? `${house.ruler.toLowerCase()}-stub`,
         });
+        nextRun = {
+          ...nextRun,
+          seenScenarioIds: [...(nextRun.seenScenarioIds ?? []), tree.scenarioId],
+        };
       }
       nextRun = { ...nextRun, currentEncounter: encounter };
       // commitNarrative covers any pre-encounter run mutations (rolledNodes,
