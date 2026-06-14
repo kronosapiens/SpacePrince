@@ -1216,6 +1216,122 @@
 }
 .page-dropdown-item.is-current { color: var(--bone); }
 
+/* ─── Animation console (dev) ─────────────────────────────────────────────
+   Matches the Page-picker vocabulary: sans font, uppercase tracking, pill
+   borders, blur backdrop, bone/mist/smoke tokens. */
+.anim-console {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 206px;
+  padding: 12px 14px;
+  background: rgba(11, 10, 15, 0.95);
+  border: 1px solid var(--smoke);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--sans);
+}
+.anim-console-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--mist);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 200ms ease;
+}
+.anim-console-header:hover { color: var(--bone); }
+.anim-console-caret { font-size: 10px; }
+.anim-console-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.anim-console-label {
+  color: var(--mist);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.anim-console-select {
+  padding: 4px 10px;
+  background: rgba(11, 10, 15, 0.6);
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  color: var(--bone);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 200ms ease;
+}
+.anim-console-select:hover { border-color: var(--mist); }
+.anim-console-segs { display: flex; gap: 5px; }
+.anim-console-seg {
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  color: var(--mist);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+.anim-console-seg:hover { border-color: var(--mist); }
+.anim-console-seg.is-on { color: var(--bone); border-color: var(--mist); }
+.anim-console-checks { display: flex; gap: 18px; }
+.anim-console-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mist);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.anim-console-check input { accent-color: var(--mist); }
+.anim-console-actions { display: flex; gap: 7px; }
+.anim-console-btn {
+  flex: 1;
+  padding: 7px 12px;
+  background: rgba(11, 10, 15, 0.68);
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  color: var(--mist);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.anim-console-btn:hover { border-color: var(--mist); color: var(--bone); }
+.anim-console-btn.is-primary { color: var(--bone); border-color: var(--mist); }
+.anim-console-btn:disabled { opacity: 0.4; cursor: default; }
+.anim-console-btn:disabled:hover { border-color: var(--smoke); color: var(--mist); }
+
 /* ── Index (dev) ──────────────────────────────────────────────────────── */
 
 .index-screen {

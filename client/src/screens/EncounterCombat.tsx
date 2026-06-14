@@ -491,40 +491,8 @@ function SeamName({ children }: { children: string }) {
 }
 
 // ─── Dev animation console ────────────────────────────────────────────────
-// Utilitarian dev overlay (inline-styled so it stays out of the game's CSS
-// vocabulary). Fires a chosen gesture through the real resolver; see
-// `fireDevAnimation`.
-
-const DEV_PANEL: CSSProperties = {
-  position: "fixed", left: 16, top: 16, zIndex: 50,
-  display: "flex", flexDirection: "column", gap: 7,
-  padding: "11px 13px", minWidth: 184,
-  background: "rgba(11, 10, 15, 0.93)", border: "1px solid #2A2730",
-  borderRadius: 8, boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
-  font: "12px/1.3 ui-monospace, SFMono-Regular, monospace", color: "#E8E2D4",
-};
-const DEV_HEADER: CSSProperties = {
-  display: "flex", alignItems: "center", gap: 7,
-  background: "transparent", border: "none", padding: 0,
-  color: "#9A95A0", font: "inherit", cursor: "pointer", textAlign: "left",
-};
-const DEV_ROW: CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 };
-const DEV_LABEL: CSSProperties = { color: "#9A95A0" };
-const DEV_SELECT: CSSProperties = {
-  background: "#0B0A0F", color: "#E8E2D4", border: "1px solid #2A2730",
-  borderRadius: 4, padding: "2px 4px", font: "inherit",
-};
-const DEV_SEG: CSSProperties = {
-  background: "transparent", color: "#9A95A0", border: "1px solid #2A2730",
-  borderRadius: 4, padding: "2px 7px", cursor: "pointer", font: "inherit",
-};
-const DEV_SEG_ON: CSSProperties = { ...DEV_SEG, color: "#0B0A0F", background: "#C9A96A", borderColor: "#C9A96A" };
-const DEV_CHECK: CSSProperties = { display: "flex", alignItems: "center", gap: 4, cursor: "pointer" };
-const DEV_BTN: CSSProperties = {
-  flex: 1, background: "transparent", color: "#E8E2D4", border: "1px solid #2A2730",
-  borderRadius: 4, padding: "4px 0", cursor: "pointer", font: "inherit",
-};
-const DEV_FIRE: CSSProperties = { ...DEV_BTN, color: "#0B0A0F", background: "#C9A96A", borderColor: "#C9A96A", fontWeight: 600 };
+// Fires a chosen gesture through the real resolver (see `fireDevAnimation`).
+// Styled like the Page picker — `.anim-console-*` classes in layout.css.
 
 function DevAnimationPanel({
   playerPlanets, opponentPlanets, animating, onFire, onSkip,
@@ -546,40 +514,40 @@ function DevAnimationPanel({
   const [collapsed, setCollapsed] = useState(true);
 
   return (
-    <div style={DEV_PANEL} onClick={(e) => e.stopPropagation()}>
-      <button style={DEV_HEADER} onClick={() => setCollapsed((c) => !c)}>
-        <span>{collapsed ? "▸" : "▾"}</span>
-        <span style={{ letterSpacing: "0.08em" }}>ANIMATION CONSOLE</span>
+    <div className="anim-console" onClick={(e) => e.stopPropagation()}>
+      <button className="anim-console-header" onClick={() => setCollapsed((c) => !c)}>
+        <span className="anim-console-caret" aria-hidden>{collapsed ? "▸" : "▾"}</span>
+        <span>Animation Console</span>
       </button>
       {collapsed ? null : (
         <>
-      <label style={DEV_ROW}>
-        <span style={DEV_LABEL}>Player</span>
-        <select style={DEV_SELECT} value={playerPlanet} onChange={(e) => setPlayerPlanet(e.target.value as PlanetName)}>
-          {playerPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-      </label>
-      <label style={DEV_ROW}>
-        <span style={DEV_LABEL}>Target</span>
-        <select style={DEV_SELECT} value={opponentPlanet} onChange={(e) => setOpponentPlanet(e.target.value as PlanetName)}>
-          {opponentPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-      </label>
-      <div style={DEV_ROW}>
-        <span style={DEV_LABEL}>Verb</span>
-        <div style={{ display: "flex", gap: 4 }}>
-          <button style={valence === "Affliction" ? DEV_SEG_ON : DEV_SEG} onClick={() => setValence("Affliction")}>Afflict</button>
-          <button style={valence === "Testimony" ? DEV_SEG_ON : DEV_SEG} onClick={() => setValence("Testimony")}>Testify</button>
-        </div>
-      </div>
-      <div style={{ display: "flex", gap: 14 }}>
-        <label style={DEV_CHECK}><input type="checkbox" checked={crit} onChange={(e) => setCrit(e.target.checked)} />Crit</label>
-        <label style={DEV_CHECK}><input type="checkbox" checked={combust} onChange={(e) => setCombust(e.target.checked)} />Combust</label>
-      </div>
-      <div style={{ display: "flex", gap: 6 }}>
-        <button style={DEV_FIRE} onClick={() => onFire({ playerPlanet, opponentPlanet, valence, crit, combust })}>Fire</button>
-        <button style={{ ...DEV_BTN, opacity: animating ? 1 : 0.4 }} disabled={!animating} onClick={onSkip}>Skip</button>
-      </div>
+          <label className="anim-console-row">
+            <span className="anim-console-label">Player</span>
+            <select className="anim-console-select" value={playerPlanet} onChange={(e) => setPlayerPlanet(e.target.value as PlanetName)}>
+              {playerPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </label>
+          <label className="anim-console-row">
+            <span className="anim-console-label">Target</span>
+            <select className="anim-console-select" value={opponentPlanet} onChange={(e) => setOpponentPlanet(e.target.value as PlanetName)}>
+              {opponentPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </label>
+          <div className="anim-console-row">
+            <span className="anim-console-label">Verb</span>
+            <div className="anim-console-segs">
+              <button className={`anim-console-seg${valence === "Affliction" ? " is-on" : ""}`} onClick={() => setValence("Affliction")}>Afflict</button>
+              <button className={`anim-console-seg${valence === "Testimony" ? " is-on" : ""}`} onClick={() => setValence("Testimony")}>Testify</button>
+            </div>
+          </div>
+          <div className="anim-console-checks">
+            <label className="anim-console-check"><input type="checkbox" checked={crit} onChange={(e) => setCrit(e.target.checked)} />Crit</label>
+            <label className="anim-console-check"><input type="checkbox" checked={combust} onChange={(e) => setCombust(e.target.checked)} />Combust</label>
+          </div>
+          <div className="anim-console-actions">
+            <button className="anim-console-btn is-primary" onClick={() => onFire({ playerPlanet, opponentPlanet, valence, crit, combust })}>Fire</button>
+            <button className="anim-console-btn" disabled={!animating} onClick={onSkip}>Skip</button>
+          </div>
         </>
       )}
     </div>
