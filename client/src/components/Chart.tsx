@@ -115,6 +115,11 @@ export interface ChartProps {
   critPlanets?: ReadonlySet<PlanetName>;
   /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
   combustingPlanets?: ReadonlySet<PlanetName>;
+  /** Planets whose projection badge is sliding into the affliction badge this beat. */
+  mergingPlanets?: ReadonlySet<PlanetName>;
+  /** Multiplier for this chart's projection-badge values — 2 while a crit on
+   *  this side's incoming attack is being shown. */
+  badgeScale?: number;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
   /** When set, render the planet stats panel inside the chart at the
@@ -161,6 +166,8 @@ export function Chart(props: ChartProps) {
     impactPlanets,
     critPlanets,
     combustingPlanets,
+    mergingPlanets,
+    badgeScale = 1,
     animationEpoch,
     statsPanelPlanet,
     statsPanelActions,
@@ -389,6 +396,8 @@ export function Chart(props: ChartProps) {
             hideAfflictionBadge={hideAfflictionBadges}
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}
+            merging={mergingPlanets?.has(p.planet) ?? false}
+            projectionScale={badgeScale}
             animationEpoch={animationEpoch}
           />
         );
@@ -590,13 +599,15 @@ function PlanetGlyph({
 function PlanetBadges({
   point, combusted, affliction,
   hideAfflictionBadge,
-  projection, impact, animationEpoch,
+  projection, impact, merging, projectionScale, animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
   affliction: number;
   hideAfflictionBadge: boolean;
   projection?: ProjectionChip;
+  merging: boolean;
+  projectionScale: number;
   impact: boolean;
   animationEpoch?: number;
 }) {
@@ -641,7 +652,7 @@ function PlanetBadges({
     const isHarm = projection.polarity !== "Testimony";
     // Sign carried by color alone (amber = damage, violet = heal); drop
     // the "+" / "−" prefix so the digits read cleanly.
-    const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
+    const text = Math.abs(projection.delta * projectionScale).toFixed(1).replace(/\.0$/, "");
     const wP = widthFor(text, projFontSize, projBadgeR);
     // Both centers sit on the planet rim. Projection is rotated around
     // the rim from the affliction by the angle at which the two badges
@@ -722,6 +733,18 @@ function PlanetBadges({
           transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
           style={shadow}
         >
+          {/* Inner g carries the merge animation — the projection pill slides
+              into the affliction badge and fades, so the delta visibly merges
+              into the running total. Outer g keeps the SVG positioning. */}
+          <g
+            key={`proj-${epoch}-${merging ? 1 : 0}`}
+            className={merging ? "anim-badge-merge" : undefined}
+            style={
+              merging
+                ? ({ "--mdx": `${aX - projBadge.pX}px`, "--mdy": `${aY - projBadge.pY}px` } as CSSProperties)
+                : undefined
+            }
+          >
           <rect
             x={-projBadge.wP / 2} y={-projBadgeR}
             width={projBadge.wP} height={2 * projBadgeR}
@@ -750,6 +773,7 @@ function PlanetBadges({
               {projBadge.text}
             </div>
           </foreignObject>
+          </g>
         </g>
       )}
     </g>

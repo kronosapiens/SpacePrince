@@ -95,6 +95,16 @@
   50%      { transform: scale(1.18); }
 }
 
+/* The projection badge slides into the affliction badge and fades, so the
+   incoming delta visibly merges into the running total. --mdx/--mdy carry the
+   per-planet vector from the projection pill to the affliction pill. */
+@keyframes badge-merge {
+  to {
+    transform: translate(var(--mdx, 0px), var(--mdy, 0px));
+    opacity: 0;
+  }
+}
+
 /* Receive-pulse — in-place valence glow when a planet takes testimony (heal)
    or affliction (harm). Opacity bloom with only a hint of scale, so it reads
    apart from the outward ring bursts of crit and combust. Color comes from the
@@ -141,6 +151,7 @@
 
 .anim-action-glow    { animation: action-glow-pulse var(--m-planet-active) var(--ease-out) both; }
 .anim-impact         { animation: affliction-impact 360ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-badge-merge    { animation: badge-merge 200ms var(--ease-out) forwards; }
 .anim-impact-bloom     { animation: impact-bloom 460ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-crit-burst     { animation: crit-burst 720ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
@@ -168,6 +179,7 @@
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
   .anim-impact,
+  .anim-badge-merge,
   .anim-impact-bloom,
   .anim-crit-burst,
   .anim-combust-ripple,

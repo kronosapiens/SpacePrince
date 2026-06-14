@@ -19,6 +19,10 @@ import type {
 
 export const ANIMATION_TIMINGS = {
   primaryDelay: 200,
+  /** Lead before an impact's apply beat to start the projection badge sliding
+   *  into the affliction badge, so it lands just as the count ticks. Matches the
+   *  `badge-merge` keyframe duration in motion.css. */
+  mergeLead: 200,
   primaryImpactClear: 360,
   primaryGlowClear: 600,
   primaryCritClear: 720,
@@ -75,6 +79,13 @@ export interface CombatAnimationState {
    *  pulse fires, the projection badge for that planet stops rendering.
    *  Accumulates only; never cleared until the animation ends. */
   consumedProjections: FlagPair<PlanetName>;
+  /** Planets whose projection badge is currently sliding into the affliction
+   *  badge (set `mergeLead` before the apply, cleared when consumed). Drives the
+   *  `badge-merge` animation so the delta visibly merges into the running total. */
+  mergingPlanets: FlagPair<PlanetName>;
+  /** Per side, whether a crit doubled this phase's outgoing effect — drives the
+   *  2× display on that side's projection badges for the rest of the phase. */
+  critScale: { self: boolean; other: boolean };
   epoch: number;
 }
 
@@ -236,6 +247,8 @@ function runScheduler(args: {
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     projectedDeltas,
     consumedProjections: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
+    mergingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
+    critScale: { self: false, other: false },
     epoch: previousEncounter.turnIndex,
   });
 
@@ -257,6 +270,9 @@ function runScheduler(args: {
     actionPlanet: PlanetName;
     actionDelta: number;
     actionCrit: boolean;
+    /** The acting (attacker) planet — on the *other* chart from `side`. Flashed
+     *  at phase start when this attack crits. */
+    attackerPlanet: PlanetName;
     actionCombust: boolean;
     sign: number;
     /** Distance resolved by this phase's direct hit (only testimony scores).
@@ -264,11 +280,49 @@ function runScheduler(args: {
     actionScore: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, actionCrit, actionCombust, sign, actionScore, steps } = args;
+    const { base, side, actionPlanet, actionDelta, actionCrit, attackerPlanet, actionCombust, sign, actionScore, steps } = args;
     const isSelf = side === "self";
     // The action planet receives the opposing valence: sign < 0 means the hit
     // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
     const receivedPolarity: Polarity = sign < 0 ? "Testimony" : "Affliction";
+
+    // Crit announce — at phase start, flash the attacker (the acting planet, on
+    // the *other* chart) and double this phase's receiver badges for the rest of
+    // the phase. The impact-time crit-burst on the receiver still fires below.
+    const attackerSide = isSelf ? "other" : "self";
+    if (actionCrit) {
+      schedule(() => {
+        updateAnimation((state) => ({
+          ...state,
+          critPlanets: {
+            ...state.critPlanets,
+            [attackerSide]: addToFlag(state.critPlanets[attackerSide], attackerPlanet),
+          },
+          critScale: { ...state.critScale, [side]: true },
+        }));
+      }, base);
+      schedule(() => {
+        updateAnimation((state) => ({
+          ...state,
+          critPlanets: {
+            ...state.critPlanets,
+            [attackerSide]: removeFromFlag(state.critPlanets[attackerSide], attackerPlanet),
+          },
+        }));
+      }, base + ANIMATION_TIMINGS.primaryCritClear);
+    }
+
+    // Start the direct target's projection badge sliding into its affliction
+    // badge, so it lands as the count ticks (mergeLead before the apply).
+    schedule(() => {
+      updateAnimation((state) => ({
+        ...state,
+        mergingPlanets: {
+          ...state.mergingPlanets,
+          [side]: addToFlag(state.mergingPlanets[side], actionPlanet),
+        },
+      }));
+    }, base + ANIMATION_TIMINGS.primaryDelay - ANIMATION_TIMINGS.mergeLead);
 
     // Primary direct phase — apply delta, light action-glow, impact, crit.
     schedule(() => {
@@ -351,6 +405,20 @@ function runScheduler(args: {
             },
           }));
         }, delay);
+      }
+
+      if (step.note !== "Combusts") {
+        // Slide this target's projection badge into its affliction badge,
+        // arriving as the propagated delta applies.
+        schedule(() => {
+          updateAnimation((state) => ({
+            ...state,
+            mergingPlanets: {
+              ...state.mergingPlanets,
+              [side]: addToFlag(state.mergingPlanets[side], step.target),
+            },
+          }));
+        }, delay + ANIMATION_TIMINGS.propagationApplyOffset - ANIMATION_TIMINGS.mergeLead);
       }
 
       schedule(() => {
@@ -470,24 +538,32 @@ function runScheduler(args: {
   const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
   const selfActionScore = entry.opponentValence === "Testimony" ? entry.playerDelta : 0;
 
+  // Phase 1: your action lands on the opponent's chart. The crit is the
+  // *player's* attack (playerCrit, phase1.crit); the attacker is your planet,
+  // which lives on the self chart.
   const opponentPhaseEnd = schedulePhase({
     base: 0,
     side: "other",
     actionPlanet: entry.opponentPlanet,
     actionDelta: entry.opponentDelta,
-    actionCrit: entry.opponentCrit,
+    actionCrit: entry.playerCrit,
+    attackerPlanet: entry.playerPlanet,
     actionCombust: entry.opponentCombust ?? false,
     sign: otherSign,
     actionScore: otherActionScore,
     steps: opponentSteps,
   });
   const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
+  // Phase 2: the opponent's reply lands on your chart. The crit is the
+  // *opponent's* attack (opponentCrit, phase2.crit); the attacker is the
+  // opponent's planet, on the other chart.
   const playerPhaseEnd = schedulePhase({
     base: selfBase,
     side: "self",
     actionPlanet: entry.playerPlanet,
     actionDelta: entry.playerDelta,
-    actionCrit: entry.playerCrit,
+    actionCrit: entry.opponentCrit,
+    attackerPlanet: entry.opponentPlanet,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,
     actionScore: selfActionScore,

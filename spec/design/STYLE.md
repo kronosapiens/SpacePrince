@@ -185,6 +185,8 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 | Tint shift                | 2000ms   | linear                      | Ambient color changes between planetary registers. Light shifting. |
 | Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |
 | Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
+| Badge merge               | 200ms    | ease-out                    | The incoming Δ badge slides into the affliction total and fades — the addition is seen, not inferred. |
+| Crit                      | 720ms    | ease-out                    | At a phase's start the attacker flashes; the receiving chart's badges read 2× for the rest of the phase; the receiver bursts on impact. |
 
 ### Combat turn composition
 

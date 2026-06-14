@@ -107,6 +107,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const critOpponent = animation?.critPlanets.other ?? EMPTY_PLANET_SET;
   const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;
   const combustingOpponent = animation?.combustingPlanets.other ?? EMPTY_PLANET_SET;
+  const mergingPlayer = animation?.mergingPlanets.self ?? EMPTY_PLANET_SET;
+  const mergingOpponent = animation?.mergingPlanets.other ?? EMPTY_PLANET_SET;
   const animationEpoch = animation?.epoch ?? encounter.turnIndex;
 
   useEffect(() => {
@@ -349,6 +351,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           impactPlanets={impactPlayer}
           critPlanets={critPlayer}
           combustingPlanets={combustingPlayer}
+          mergingPlanets={mergingPlayer}
+          badgeScale={animation?.critScale.self ? 2 : 1}
           animationEpoch={animationEpoch}
           statsPanelPlanet={inspected}
           statsPanelActions={playerActions}
@@ -447,6 +451,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           impactPlanets={impactOpponent}
           critPlanets={critOpponent}
           combustingPlanets={combustingOpponent}
+          mergingPlanets={mergingOpponent}
+          badgeScale={animation?.critScale.other ? 2 : 1}
           animationEpoch={animationEpoch}
         />
         <div className="combat-side-label">OTHER</div>
