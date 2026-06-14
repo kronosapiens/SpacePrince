@@ -355,7 +355,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           statsPanelReserveActions
           statsPanelStudy={study}
           onToggleStudy={() => setStudy((s) => !s)}
-          alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">SELF</div>
       </div>
@@ -449,7 +448,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           critPlanets={critOpponent}
           combustingPlanets={combustingOpponent}
           animationEpoch={animationEpoch}
-          alwaysShowAfflictionBadges
         />
         <div className="combat-side-label">OTHER</div>
       </div>

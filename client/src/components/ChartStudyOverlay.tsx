@@ -52,7 +52,6 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
             onPlanetClick={(p) => setSelected((cur) => (cur === p ? null : p))}
             onPlanetHover={setHovered}
             statsPanelPlanet={inspected}
-            alwaysShowAfflictionBadges
           />
         </div>
       </div>

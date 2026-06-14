@@ -155,7 +155,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           activePlanet={joyPlanet ?? null}
           entrance="left"
           showColorField
-          alwaysShowAfflictionBadges
           passive
         />
       </div>

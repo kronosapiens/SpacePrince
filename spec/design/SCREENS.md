@@ -100,10 +100,9 @@ The total turn animation budget is roughly **3–4 seconds**, intentionally long
 
 ### 3.5.1 Affliction badges
 
-Affliction badges are visible on gameplay chart surfaces even when the value is zero.
-This applies to the Map chart anchor, the Combat encounter charts, and the Narrative encounter chart.
-Affliction badges are hidden on entry and exit surfaces: Title, Mint / Start, and End-of-run.
-Chart Study follows the gameplay rule because its purpose is to inspect current chart state.
+An affliction badge appears only when a planet's affliction is **above zero** — so the badge's presence is itself the signal ("this planet is hurt"), and a chart of unharmed planets stays clean rather than littered with zeros. Combusted planets show no badge (their grayed-out state carries the meaning). This holds on every surface; the badge is never shown at zero.
+
+(Earlier drafts kept badges visible at zero on gameplay surfaces for an always-on readout. That was reversed: now that combustion is deterministic, affliction reads as a damage meter, and a damage meter belongs only where there's damage. Discoverability of the affliction system is carried by the study panel, §3.6.1, not by ambient zeros.)
 
 ### 3.6 Interaction grammar
 

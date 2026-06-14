@@ -91,8 +91,6 @@ export interface ChartProps {
   showAspects?: boolean;
   /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
   hideAfflictionBadges?: boolean;
-  /** Show affliction badges even when value is zero. Used on gameplay surfaces. */
-  alwaysShowAfflictionBadges?: boolean;
   scale?: number;
   entrance?: "left" | "right" | "none";
   side?: "self" | "other";
@@ -149,7 +147,6 @@ export function Chart(props: ChartProps) {
     showSubstrate = false,
     showAspects = true,
     hideAfflictionBadges = false,
-    alwaysShowAfflictionBadges = false,
     entrance = "none",
     side,
     onPlanetClick,
@@ -390,7 +387,6 @@ export function Chart(props: ChartProps) {
             combusted={status?.combusted ?? false}
             affliction={status?.affliction ?? 0}
             hideAfflictionBadge={hideAfflictionBadges}
-            alwaysShowAfflictionBadge={alwaysShowAfflictionBadges}
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}
             animationEpoch={animationEpoch}
@@ -593,14 +589,13 @@ function PlanetGlyph({
 // the perpendicular.
 function PlanetBadges({
   point, combusted, affliction,
-  hideAfflictionBadge, alwaysShowAfflictionBadge,
+  hideAfflictionBadge,
   projection, impact, animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
   affliction: number;
   hideAfflictionBadge: boolean;
-  alwaysShowAfflictionBadge: boolean;
   projection?: ProjectionChip;
   impact: boolean;
   animationEpoch?: number;
@@ -628,9 +623,7 @@ function PlanetBadges({
   const epoch = animationEpoch ?? 0;
   const badgeClass = impact ? "anim-impact" : undefined;
 
-  const showAffliction =
-    !hideAfflictionBadge && !combusted &&
-    (alwaysShowAfflictionBadge || affliction > 0);
+  const showAffliction = !hideAfflictionBadge && !combusted && affliction > 0;
   // Show the projection badge whenever there's any projected effect —
   // including testimony at zero delta (planet already at 0 affliction).
   // The polarity tells the player "this would heal", even if the
