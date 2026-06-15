@@ -46,3 +46,20 @@ export function getFragmentById(id: string): Fragment | null {
   }
   return null;
 }
+
+/**
+ * Work title for display in an aria attribution — author + title, no page /
+ * chapter / verse locator (the full citation stays in `source`). Derived from
+ * `source` unless the fragment carries an explicit `title` (incl. "" to show
+ * the author alone). Validated against the whole corpus by chorus.test.ts.
+ */
+export function fragmentTitle(f: Pick<Fragment, "title" | "source">): string {
+  if (f.title !== undefined) return f.title;
+  if (!f.source) return "";
+  let s = f.source.trim();
+  if (/^Fragments?\b/.test(s)) return "Fragments"; // Heraclitus, Sappho — numbered collections
+  s = s.replace(/\s*\([^()]*\)\s*$/, "").trim();    // drop a trailing parenthetical note
+  s = s.split(",")[0]!.trim();                        // keep the work title, drop the locator
+  s = s.replace(/\s+\d+:\d+(?:[–-]\d+)?$/, "").trim(); // drop a trailing scripture verse
+  return s;
+}

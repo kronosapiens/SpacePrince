@@ -14,6 +14,10 @@ export interface RawFragment {
   text: string;
   author?: string;
   source?: string;
+  /** Optional display title override. When absent it's derived from `source`
+   *  (see `fragmentTitle` in chorus.ts); set explicitly when the work title
+   *  can't be inferred. Empty string → show the author alone. */
+  title?: string;
   translation?: string;
   source_url?: string;
   moods?: string[];

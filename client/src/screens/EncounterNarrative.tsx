@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
+import { PLANET_PRIMARY } from "@/svg/palette";
+import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { ROUTES } from "@/routes";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -8,11 +10,12 @@ import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
-import { getFragmentById, pickFragment } from "@/data/chorus";
+import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
 import { mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
   PlanetName,
+  Polarity,
   Profile,
   RunState,
 } from "@/game/types";
@@ -91,8 +94,24 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
   const [resolved, setResolved] = useState(encounter.resolved);
   const [resolutionLine, setResolutionLine] = useState<string | null>(encounter.resolutionText ?? null);
+  // Two-tap commit (mirrors combat, SCREENS.md §3.6): first tap arms an option
+  // with a glow, second tap on the same option commits. Cleared on node change.
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  useEffect(() => setSelectedOptionId(null), [encounter.currentNodeId]);
+  // Resolution flash: dramatize the state change on the chart (SCREENS.md §3.5).
+  const [flash, setFlash] = useState<{
+    epoch: number;
+    impact: Map<PlanetName, Polarity>;
+    combusting: Set<PlanetName>;
+    distance: number; // signed delta; 0 = unchanged
+  } | null>(null);
+  const epochRef = useRef(0);
+  // Freeze the option list at decision time so it stays put after resolution
+  // (the visibility predicates read run-state, which the outcome can change).
+  const [frozenOptions, setFrozenOptions] = useState<Option[] | null>(null);
   const node = useMemo(() => getTreeNode(tree, encounter.currentNodeId), [tree, encounter.currentNodeId]);
   const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
+  const shownOptions = resolved ? (frozenOptions ?? options) : options;
 
   const handleOption = (option: Option) => {
     if (resolved) return;
@@ -113,6 +132,25 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     if (fragment && !nextRun.seenFragmentIds.includes(fragment.id)) {
       nextRun = { ...nextRun, seenFragmentIds: [...nextRun.seenFragmentIds, fragment.id] };
     }
+
+    // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
+    // a candle-out ripple for any combust, and a Distance pulse (SCREENS.md §3.5).
+    const impact = new Map<PlanetName, Polarity>();
+    const combusting = new Set<PlanetName>();
+    for (const p of PLANETS) {
+      const before = run.perPlanetState[p];
+      const after = nextRun.perPlanetState[p];
+      if (!before.combusted && after.combusted) combusting.add(p);
+      if (after.affliction < before.affliction) impact.set(p, "Testimony");
+      else if (after.affliction > before.affliction) impact.set(p, "Affliction");
+    }
+    epochRef.current += 1;
+    setFlash({
+      epoch: epochRef.current,
+      impact,
+      combusting,
+      distance: nextRun.runDistance - run.runDistance,
+    });
 
     if (option.next) {
       const updatedEnc: NarrativeEncounter = {
@@ -139,21 +177,38 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     });
     setResolved(true);
     setResolutionLine(resolutionText || option.text);
+    setFrozenOptions(options);
   };
 
-  const handleContinue = () => {
+  const continuedRef = useRef(false);
+  const handleContinue = useCallback(() => {
+    if (continuedRef.current) return; // timer + tap both call this; fire once
+    continuedRef.current = true;
     if (run.over) {
       navigate(ROUTES.end);
       return;
     }
     onClearEncounter();
     navigate(ROUTES.map);
-  };
+  }, [run.over, onClearEncounter, navigate]);
+
+  // No Continue button: once resolved, the line gets a beat to land and then
+  // the world carries the player onward (SCREENS.md §10). A tap skips the wait.
+  useEffect(() => {
+    if (!resolved) return;
+    // Let the flash land before leaving — longer when a planet combusts.
+    const ms = run.over ? 2800 : flash?.combusting.size ? 2400 : 1800;
+    const t = setTimeout(handleContinue, ms);
+    return () => clearTimeout(t);
+  }, [resolved, run.over, flash, handleContinue]);
 
   const fragmentLines = (fragment?.text ?? "").split(/\n+/);
 
   return (
-    <div className="narrative">
+    <div
+      className={`narrative ${resolved ? "is-resolved" : ""}`}
+      onClick={resolved ? handleContinue : undefined}
+    >
       <div className="narrative-chart">
         <Chart
           chart={profile.chart}
@@ -163,6 +218,9 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           entrance="left"
           showColorField
           passive
+          impactPlanets={flash?.impact}
+          combustingPlanets={flash?.combusting}
+          animationEpoch={flash?.epoch}
         />
       </div>
 
@@ -184,7 +242,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
               </div>
               <div className="narrative-attrib">
                 {fragment.author?.toUpperCase() ?? ""}
-                {fragment.source ? ` · ${fragment.source.toUpperCase()}` : ""}
+                {fragmentTitle(fragment) ? ` · ${fragmentTitle(fragment).toUpperCase()}` : ""}
               </div>
             </>
           )}
@@ -198,33 +256,43 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
         </div>
 
-        <div className="narrative-options">
-          {!resolved && options.map((o, i) => (
-            <button
-              key={o.id}
-              className={`option ${i === 1 ? "is-emph" : ""}`}
-              onClick={() => handleOption(o)}
-              type="button"
-            >
-              <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
-              <span className="option-text">
-                {o.text}
-                {resolveAside(o, ctx) && (
-                  <span className="option-aside">{resolveAside(o, ctx)}</span>
-                )}
-              </span>
-            </button>
-          ))}
-          {resolved && (
-            <button className="begin-btn" onClick={handleContinue}>
-              {run.over ? "Walk back" : "Continue"}
-            </button>
-          )}
+        <div className={`narrative-options ${resolved ? "is-resolved" : ""}`} style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
+          {shownOptions.map((o, i) => {
+            // Branch options (those that open a follow-up node) carry no direct
+            // effect; cue that they lead onward, with a trailing arrow.
+            const baseAside = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
+            const aside = o.next && baseAside ? `${baseAside} →` : baseAside;
+            return (
+              <button
+                key={o.id}
+                className={`option ${i === 1 ? "is-emph" : ""} ${selectedOptionId === o.id ? "is-selected" : ""}`}
+                onClick={resolved ? handleContinue : () => (selectedOptionId === o.id ? handleOption(o) : setSelectedOptionId(o.id))}
+                aria-pressed={selectedOptionId === o.id}
+                type="button"
+              >
+                <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
+                <span className="option-text">
+                  {o.text}
+                  {aside && <span className="option-aside">{aside}</span>}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="narrative-distance">
           <span className="eyebrow">DISTANCE</span>
-          <span className="narrative-distance-v">{Math.round(run.runDistance)}</span>
+          <span
+            key={flash?.distance ? flash.epoch : "d"}
+            className={`narrative-distance-v ${flash?.distance ? "anim-distance-pop" : ""}`}
+            style={
+              flash?.distance
+                ? ({ "--flash-color": flash.distance > 0 ? "var(--testimony)" : "var(--affliction)" } as CSSProperties)
+                : undefined
+            }
+          >
+            {Math.round(run.runDistance)}
+          </span>
         </div>
       </div>
     </div>
