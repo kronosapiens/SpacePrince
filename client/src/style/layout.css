@@ -559,32 +559,29 @@
   padding: 16px 26px 20px;
 }
 
-/* The study "i" toggle, top-right. */
-.ps-i {
-  position: absolute;
-  top: 13px;
-  right: 15px;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1.5px solid rgba(201, 169, 106, 0.45);
-  background: rgba(11, 10, 15, 0.4);
+/* Golden disclosure triangle — points right when its section is closed and
+   rotates down when open. Sits to the left of every term that gates an
+   explanatory drop-down (the planet title → gloss + table; a column header →
+   its derivation blurb), replacing the old corner "i". */
+.ps-tri {
+  display: inline-block;
   color: var(--gold);
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 15px;
-  line-height: 1;
+  font-size: 0.5em;
+  vertical-align: middle;
+  margin-right: 0.4em;
   opacity: 0.7;
-  cursor: pointer;
-  transition: opacity 200ms ease, border-color 200ms ease, background 200ms ease;
+  transform: rotate(0deg);
+  transition: transform 200ms ease, opacity 200ms ease;
 }
-.ps-i:hover { border-color: var(--gold); }
-.ps-i.is-on {
-  opacity: 1;
-  border-color: var(--gold);
-  background: rgba(201, 169, 106, 0.18);
-}
+.is-open > .ps-tri { transform: rotate(90deg); opacity: 1; }
+
+/* Header triangles need a floor: 0.5em of the 17px header is ~8px. Pin them
+   legible so the open/closed rotation reads. */
+.ps-coltap .ps-tri { font-size: 11px; margin-right: 0.3em; }
+
+.ps-title-tap { cursor: pointer; }
+.ps-title-tap:hover .ps-tri { opacity: 1; }
+.ps-coltap:hover .ps-tri { opacity: 1; }
 
 .ps-title {
   font-family: var(--serif);
@@ -593,8 +590,12 @@
   color: var(--gold);
   letter-spacing: 0.08em;
   text-align: center;
+  line-height: 1.12;
 }
-.ps-epithet { font-size: 24px; }
+/* Epithet on its own line — the name + role together overrun the panel for the
+   longest planets (Saturn, Mercury) once the disclosure triangle is added.
+   Stacking reads as a name/title pair and is immune to label length. */
+.ps-epithet { display: block; font-size: 24px; }
 
 /* Closed: operational read-outs (Resolve · Crit + the action fan-out). */
 .ps-ops { animation: ps-fade 220ms ease; }

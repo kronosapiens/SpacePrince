@@ -93,20 +93,13 @@ export function PlanetStatsPanel({
     <foreignObject className="ps-fo" x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
       <div className="ps-card">
         <div className="ps-content" ref={contentRef}>
-          {onToggleStudy && (
-            <button
-              type="button"
-              className={`ps-i ${study ? "is-on" : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleStudy();
-              }}
-            >
-              i
-            </button>
-          )}
-          <div className="ps-title">
-            {planet.toUpperCase()},<span className="ps-epithet"> {PLANET_ROLE[planet].toUpperCase()}</span>
+          <div
+            className={`ps-title ${onToggleStudy ? "ps-title-tap" : ""} ${study ? "is-open" : ""}`}
+            onClick={onToggleStudy ? (e) => { e.stopPropagation(); onToggleStudy(); } : undefined}
+          >
+            {onToggleStudy && <span className="ps-tri" aria-hidden>▶</span>}
+            {planet.toUpperCase()}
+            <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
           </div>
 
           {study ? (
@@ -129,6 +122,7 @@ export function PlanetStatsPanel({
                             : undefined
                         }
                       >
+                        {c.concept && <span className="ps-tri" aria-hidden>▶</span>}
                         {c.header}
                       </th>
                     ))}
