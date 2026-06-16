@@ -22,6 +22,10 @@ import type {
 
 const ROMAN = ["i", "ii", "iii", "iv", "v"];
 
+const HOUSE_ROMAN = [
+  "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII",
+];
+
 const HOUSE_NAMES = [
   "First House", "Second House", "Third House", "Fourth House",
   "Fifth House", "Sixth House", "Seventh House", "Eighth House",
@@ -250,7 +254,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
         <div className="narrative-body">
           <div className="narrative-house">
-            {HOUSE_NAMES[house.num - 1]}
+            <span className="narrative-house-num">{HOUSE_ROMAN[house.num - 1]}:</span> {HOUSE_NAMES[house.num - 1]}
             <span className="narrative-house-gloss"> — {house.gloss}</span>
           </div>
           <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
