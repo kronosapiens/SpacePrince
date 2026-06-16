@@ -1,8 +1,8 @@
 import { type CSSProperties, useLayoutEffect, useRef, useState } from "react";
-import type { Chart, PlanetName, Polarity } from "@/game/types";
+import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
-import { DERIVATION_GLOSS, PLANET_GLOSS } from "@/game/glossary";
+import { PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { VALENCE_COLOR } from "@/svg/palette";
 
 /** When present, the panel grows the combat fan-out: two action buttons under
@@ -45,9 +45,9 @@ export function panelHeightFor({ actions }: { actions: boolean }): number {
   return actions ? PLANET_STATS_PANEL_H + ACTION_EXTRA : PLANET_STATS_PANEL_H;
 }
 
-const COLS: Array<{ key: "core" | "placement" | "total"; header: string; concept?: keyof typeof DERIVATION_GLOSS }> = [
-  { key: "core", header: "Core", concept: "core" },
-  { key: "placement", header: "Place", concept: "placement" },
+const COLS: Array<{ key: "core" | "placement" | "total"; header: string }> = [
+  { key: "core", header: "Core" },
+  { key: "placement", header: "Place" },
   { key: "total", header: "Total" },
 ];
 
@@ -65,7 +65,10 @@ export function PlanetStatsPanel({
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
-  const [openConcept, setOpenConcept] = useState<keyof typeof DERIVATION_GLOSS | null>(null);
+  // Tap a stat row to drop its provenance prose below the table; one open at
+  // a time.
+  const [openStat, setOpenStat] = useState<keyof PlanetStats | null>(null);
+  const toggleStat = (k: keyof PlanetStats) => setOpenStat((c) => (c === k ? null : k));
   const contentRef = useRef<HTMLDivElement>(null);
   const [boxH, setBoxH] = useState(height);
 
@@ -86,12 +89,13 @@ export function PlanetStatsPanel({
   const table = deriveStatTable(chart.planets[planet]);
   const x0 = cx - W / 2;
   const yTop = cy - height / 2; // top fixed; study grows downward
-  const toggleConcept = (k: keyof typeof DERIVATION_GLOSS) =>
-    setOpenConcept((c) => (c === k ? null : k));
 
   return (
     <foreignObject className="ps-fo" x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
-      <div className="ps-card">
+      {/* Swallow clicks on the card itself (padding, gloss, read-outs) so they
+          don't bubble to the combat container's clear-selection handler — only
+          clicking off the panel should dismiss it. */}
+      <div className="ps-card" onClick={(e) => e.stopPropagation()}>
         <div className="ps-content" ref={contentRef}>
           <div
             className={`ps-title ${onToggleStudy ? "ps-title-tap" : ""} ${study ? "is-open" : ""}`}
@@ -110,28 +114,24 @@ export function PlanetStatsPanel({
                   <tr>
                     <th aria-hidden />
                     {COLS.map((c) => (
-                      <th
-                        key={c.key}
-                        className={c.concept ? `ps-coltap ${openConcept === c.concept ? "is-open" : ""}` : undefined}
-                        onClick={
-                          c.concept
-                            ? (e) => {
-                                e.stopPropagation();
-                                toggleConcept(c.concept!);
-                              }
-                            : undefined
-                        }
-                      >
-                        {c.concept && <span className="ps-tri" aria-hidden>▶</span>}
-                        {c.header}
-                      </th>
+                      <th key={c.key}>{c.header}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {table.rows.map((row) => (
-                    <tr key={row.key}>
-                      <td className="ps-rowlabel">{row.label}</td>
+                    <tr
+                      key={row.key}
+                      className={`ps-statrow ${openStat === row.key ? "is-open" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleStat(row.key);
+                      }}
+                    >
+                      <td className="ps-rowlabel">
+                        <span className="ps-tri" aria-hidden>▶</span>
+                        {row.label}
+                      </td>
                       <td>{row.core}</td>
                       <td>{row.placement || ""}</td>
                       <td>{row.total}</td>
@@ -139,7 +139,7 @@ export function PlanetStatsPanel({
                   ))}
                 </tbody>
               </table>
-              {openConcept && <div className="ps-blurb">{DERIVATION_GLOSS[openConcept].blurb}</div>}
+              {openStat && <div className="ps-blurb">{describeStat(chart.planets[planet], openStat)}</div>}
             </div>
           ) : (
             <div className="ps-ops">

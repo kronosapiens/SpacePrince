@@ -561,8 +561,8 @@
 
 /* Golden disclosure triangle — points right when its section is closed and
    rotates down when open. Sits to the left of every term that gates an
-   explanatory drop-down (the planet title → gloss + table; a column header →
-   its derivation blurb), replacing the old corner "i". */
+   explanatory drop-down (the planet title → gloss + table; a stat row → its
+   provenance prose), replacing the old corner "i". */
 .ps-tri {
   display: inline-block;
   color: var(--gold);
@@ -573,15 +573,18 @@
   transform: rotate(0deg);
   transition: transform 200ms ease, opacity 200ms ease;
 }
-.is-open > .ps-tri { transform: rotate(90deg); opacity: 1; }
+/* Descendant (not child): the row-label triangle is nested inside its td, so
+   the open class sits on an ancestor row rather than the triangle's parent. */
+.is-open .ps-tri { transform: rotate(90deg); opacity: 1; }
 
-/* Header triangles need a floor: 0.5em of the 17px header is ~8px. Pin them
-   legible so the open/closed rotation reads. */
-.ps-coltap .ps-tri { font-size: 11px; margin-right: 0.3em; }
+/* Row-label triangles need a floor: 0.5em of the 20px cell is ~10px, which
+   reads as a dot and hides the open/closed rotation. Pin them legible. */
+.ps-rowlabel .ps-tri { font-size: 11px; margin-right: 0.3em; }
+
+.ps-statrow:hover .ps-tri { opacity: 1; }
 
 .ps-title-tap { cursor: pointer; }
 .ps-title-tap:hover .ps-tri { opacity: 1; }
-.ps-coltap:hover .ps-tri { opacity: 1; }
 
 .ps-title {
   font-family: var(--serif);
@@ -692,9 +695,11 @@
   color: var(--gold);
   opacity: 0.78;
 }
-.ps-coltap { cursor: pointer; }
-.ps-coltap.is-open,
-.ps-coltap:hover { opacity: 1; }
+/* Clickable stat rows — tap to explain where the number came from (the
+   provenance prose renders in the shared blurb area below the table). */
+.ps-statrow { cursor: pointer; }
+.ps-statrow:hover .ps-rowlabel,
+.ps-statrow.is-open .ps-rowlabel { opacity: 1; }
 
 .ps-blurb {
   font-family: var(--sans);

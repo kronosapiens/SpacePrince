@@ -121,10 +121,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   );
 
 
-  // Selection wins over hover — locks the panel to the selected planet so
-  // mousing around the chart doesn't blow the read away. The panel (with its
-  // action buttons) shows for either.
-  const inspected = selected ?? hovered;
+  // The panel (with its action buttons + live projection) is click-only:
+  // hovering the chart highlights a planet but no longer pops the panel, so it
+  // doesn't flicker as the mouse moves. Tap a planet to inspect, tap to commit.
+  const inspected = selected;
 
   // The valence the live projection reflects: the button being hovered, else
   // the inspected planet's stronger verb (its natural default). The default
@@ -187,8 +187,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     };
   }, [animation, projection]);
 
-  // Click/tap a planet to select it — keeps the panel sticky (the commit path
-  // on touch, where there's no hover). Hover shows the same panel transiently.
+  // Click/tap a planet to select it — this is the only way the panel opens, and
+  // it stays put (the commit path) until commit or another planet is clicked.
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
       if (animation) {
@@ -206,10 +206,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, encounter.resolved, run.perPlanetState, playerUnlocked, skipAnimation],
   );
 
-  // Hover previews a planet; clear the armed action so its projection shows the default verb.
+  // Hover only highlights the planet under the cursor; it no longer opens the
+  // panel or previews a projection.
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
     setHovered(planet);
-    setPendingAction(null);
   }, []);
 
   // Commit the chosen action for a specific planet (the one whose panel is open).
