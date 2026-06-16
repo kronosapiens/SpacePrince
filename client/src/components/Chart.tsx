@@ -31,6 +31,20 @@ const SIGN_LABELS: Record<SignName, string> = {
   Sagittarius: "SAG", Capricorn: "CAP", Aquarius: "AQU", Pisces: "PIS",
 };
 
+// Measure a badge label's advance width in the badge font. A canvas advance at
+// `fontPx` equals SVG user units at the same nominal font-size, so the result
+// drops straight into pill geometry. Measuring (vs. estimating from character
+// count) keeps the pill's padding constant across 1-, 2-, and 3-digit values —
+// a char-count estimate over-budgets every extra glyph and lets longer numbers
+// drift looser. One shared context; font is re-set per call (cheap).
+const badgeMeasureCtx =
+  typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : null;
+function measureBadgeText(text: string, fontPx: number): number {
+  if (!badgeMeasureCtx) return text.length * fontPx * 0.6; // SSR / no-canvas fallback
+  badgeMeasureCtx.font = `700 ${fontPx}px 'Inter', sans-serif`;
+  return badgeMeasureCtx.measureText(text).width;
+}
+
 /** Hand-tuned cluster patterns per stack size (from Claude Design v2).
  *  Each entry is [radius, angle-offset-deg]. Sized to read at 1-7 stack. */
 const CLUSTER_PATTERNS: Record<number, Array<[number, number]>> = {
@@ -624,12 +638,11 @@ function PlanetBadges({
   // still widens for two-digit values via widthFor.
   const projBadgeR = badgeR;
   const projFontSize = badgeFontSize;
-  // Pill width grows with text length. Floor at 2*r (square-ish).
-  // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
-  // visual padding so multi-char content like "2.5" doesn't get crowded
-  // against the rounded ends.
+  // Pill width = measured content + a fixed pad, floored at 2*r (circle). The
+  // pad is proportional to font size, not character count, so "+6" and "+12"
+  // carry the same breathing room rather than longer numbers drifting looser.
   const widthFor = (text: string, fontSize: number, pillR: number) =>
-    Math.max(2 * pillR, text.length * fontSize * 0.7 + pillR * 0.7);
+    Math.max(2 * pillR, measureBadgeText(text, fontSize) + fontSize * 0.8);
 
   const epoch = animationEpoch ?? 0;
   const badgeClass = impact ? "anim-impact" : undefined;
@@ -647,13 +660,17 @@ function PlanetBadges({
   const aX = ux * badgeOffset;
   const aY = uy * badgeOffset;
 
-  let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
+  let projBadge: { wP: number; pX: number; pY: number; sign: string; mag: string; col: string } | null = null;
   if (showProjection && projection) {
     const isHarm = projection.polarity !== "Testimony";
-    // Sign carried by color alone (amber = damage, violet = heal); drop
-    // the "+" / "−" prefix so the digits read cleanly.
-    const text = Math.abs(projection.delta * projectionScale).toFixed(1).replace(/\.0$/, "");
-    const wP = widthFor(text, projFontSize, projBadgeR);
+    // Sign prefix + valence color both carry direction — amber "+N" adds
+    // affliction, violet "−N" heals it — so the impact reads at a glance.
+    // The sign renders as a smaller, lighter prefix (see below) so the digit —
+    // the thing the player reads — sits centered in the pill rather than shoved
+    // right by a full-size operator.
+    const sign = isHarm ? "+" : "−";
+    const mag = Math.abs(projection.delta * projectionScale).toFixed(1).replace(/\.0$/, "");
+    const wP = widthFor(sign + mag, projFontSize, projBadgeR);
     // Both centers sit on the planet rim. Projection is rotated around
     // the rim from the affliction by the angle at which the two badges
     // just clear each other — chord = sum of their (approximated
@@ -669,7 +686,8 @@ function PlanetBadges({
       wP,
       pX: projDirX * badgeOffset,
       pY: projDirY * badgeOffset,
-      text,
+      sign,
+      mag,
       // Valence, not aspect mood: amber = incoming harm, violet = incoming
       // heal — matching the action-verb colors.
       col: isHarm ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
@@ -770,7 +788,17 @@ function PlanetBadges({
                 userSelect: "none",
               }}
             >
-              {projBadge.text}
+              <span
+                style={{
+                  fontSize: "0.72em",
+                  fontWeight: 600,
+                  opacity: 0.85,
+                  marginRight: "0.5px",
+                }}
+              >
+                {projBadge.sign}
+              </span>
+              {projBadge.mag}
             </div>
           </foreignObject>
           </g>
