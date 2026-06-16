@@ -1,4 +1,4 @@
-import { type CSSProperties, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
@@ -71,6 +71,11 @@ export function PlanetStatsPanel({
   const toggleStat = (k: keyof PlanetStats) => setOpenStat((c) => (c === k ? null : k));
   const contentRef = useRef<HTMLDivElement>(null);
   const [boxH, setBoxH] = useState(height);
+  // The height transition is suppressed until the first paint lands, so the
+  // panel snaps into being on the initial click rather than growing in. Once
+  // ready, later height changes (the study + stat drop-downs) animate.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
   // Auto-size the box to its content — no hand-tuned height constants. The
   // foreignObject animates between measured heights (the drop-down), and the
@@ -91,7 +96,7 @@ export function PlanetStatsPanel({
   const yTop = cy - height / 2; // top fixed; study grows downward
 
   return (
-    <foreignObject className="ps-fo" x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
+    <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
       {/* Swallow clicks on the card itself (padding, gloss, read-outs) so they
           don't bubble to the combat container's clear-selection handler — only
           clicking off the panel should dismiss it. */}
@@ -144,7 +149,7 @@ export function PlanetStatsPanel({
           ) : (
             <div className="ps-ops">
               <div className="ps-opline">
-                Resolve {table.durability} · Crit {table.critPct}%
+                Resolve {table.durability} · Crit {table.critPct}
               </div>
               {actions && (
                 <div className="ps-actions">

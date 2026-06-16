@@ -539,11 +539,15 @@
    lays out the table, gridlines, spacing, and text wrapping; the card auto-sizes
    and the box height animates for the study drop-down. Sized in viewBox units
    (1000-unit chart) so it scales with the chart. */
-.ps-fo {
+/* No transition until `is-ready` (set after first paint), so the panel snaps
+   into being on the initial click instead of growing in. Once ready, the study
+   and stat drop-downs animate their height change. */
+.ps-fo { transition: none; }
+.ps-fo.is-ready {
   transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .ps-fo { transition: none; }
+  .ps-fo.is-ready { transition: none; }
 }
 .ps-card {
   box-sizing: border-box;
@@ -600,8 +604,9 @@
    Stacking reads as a name/title pair and is immune to label length. */
 .ps-epithet { display: block; font-size: 24px; }
 
-/* Closed: operational read-outs (Resolve · Crit + the action fan-out). */
-.ps-ops { animation: ps-fade 220ms ease; }
+/* Closed: operational read-outs (Resolve · Crit + the action fan-out). No
+   entrance fade here — this is the panel's initial state on click, which should
+   simply appear; the fade is reserved for the study drop-down below. */
 .ps-opline {
   font-family: var(--sans);
   font-size: 23px;

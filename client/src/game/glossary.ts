@@ -6,15 +6,16 @@ import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 // annotations, NOT chorus fragments: a fragment never explains, but a gloss may
 // name the symbol plainly (spec/concept/PLANETS.md §1).
 
-/** One evocative line per planet — what it is *about*, in its own register. */
+/** One grounded line per planet — its core astrological significations in a
+ *  plain, textbook register (drawn from spec/concept/PLANETS.md archetypes). */
 export const PLANET_GLOSS: Record<PlanetName, string> = {
-  Sun: "The will to shine — vitality, command, the self that takes the throne.",
-  Moon: "The tide within — feeling, refuge, the body that remembers.",
-  Mercury: "The quick mind — speech, exchange, the messenger who slips between.",
-  Venus: "The pull toward — love, beauty, the things we draw close.",
-  Mars: "The drive to act — to cut, to assert, to take the field.",
-  Jupiter: "The open hand — fortune, faith, the room to grow.",
-  Saturn: "The hard line — limit, time, the weight that endures.",
+  Sun: "Identity and vitality — the self, the will, and the urge to lead.",
+  Moon: "The emotional inner life — instinct, memory, comfort, and changing moods.",
+  Mercury: "The thinking mind — reason, language, and the exchange of ideas.",
+  Venus: "Love and harmony — beauty, pleasure, relationship, and what one values.",
+  Mars: "Drive and assertion — energy, courage, desire, and the force to act.",
+  Jupiter: "Expansion and fortune — growth, abundance, faith, and the search for meaning.",
+  Saturn: "Limit and structure — time, discipline, boundaries, and endurance.",
 };
 
 // Per-stat provenance copy — the astrology behind a single number, so a tap
@@ -29,8 +30,17 @@ const STAT_WORD: Record<keyof PlanetStats, string> = {
 
 const article = (s: string) => (/^[aeiou]/i.test(s) ? "an" : "a");
 
-/** Prose for the per-stat drop-down: the planet's innate level, then — naming
- *  only the sign qualities that actually lift this stat — the placement buff. */
+// The combat metric each stat surfaces as, in the panel's own labels — closes
+// the blurb with a plain "Expressed as …".
+const STAT_METRIC: Record<keyof PlanetStats, string> = {
+  damage: "Afflict",
+  healing: "Testify",
+  durability: "Resolve",
+  luck: "Crit",
+};
+
+/** Prose for the per-stat drop-down: the planet's innate level, the sign
+ *  qualities that lift this stat, and the combat metric the stat drives. */
 export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string {
   const word = STAT_WORD[key];
   const core = p.base[key];
@@ -51,5 +61,6 @@ export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string
   if (sect > 0) {
     parts.push(`In sect, it adds ${sect}.`);
   }
+  parts.push(`Expressed as ${STAT_METRIC[key]}.`);
   return parts.join(" ");
 }
