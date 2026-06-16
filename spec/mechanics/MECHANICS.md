@@ -172,7 +172,7 @@ Each planet takes **at most one** affliction application per turn — the direct
 
 Affliction accumulates toward a **combustion ceiling** set by durability alone. A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
 
-- `ceiling = durability * 20` (durability = core + sign buffs, per §4)
+- `ceiling = durability * 10` (durability = core + sign buffs, per §4)
 - combust when `affliction >= ceiling`
 
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.

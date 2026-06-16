@@ -1,13 +1,18 @@
 import type { PlanetPlacement, PlanetState } from "./types";
 
+/** Resolve (the combustion ceiling) per point of durability. Kept as a named
+ *  constant so the math, MECHANICS.md §10, and any UI copy stay in sync. */
+export const RESOLVE_PER_DURABILITY = 10;
+
 /**
  * Combustion ceiling (MECHANICS.md §10) — the affliction a planet absorbs
- * before it goes out. Set by durability alone (core + sign buffs).
+ * before it goes out, surfaced in the UI as "Resolve". Set by durability alone
+ * (core + sign buffs).
  *
- *   ceiling = durability × 20
+ *   ceiling = durability × RESOLVE_PER_DURABILITY
  */
 export function combustionCeiling(placement: PlanetPlacement): number {
-  return (placement.base.durability + placement.buffs.durability) * 20;
+  return (placement.base.durability + placement.buffs.durability) * RESOLVE_PER_DURABILITY;
 }
 
 /**
