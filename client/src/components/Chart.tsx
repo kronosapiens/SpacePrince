@@ -532,24 +532,25 @@ function PlanetGlyph({
         />
       )}
       {/* Invite: a pulsing halo + bright ring in the planet's own color on every
-          tappable planet this turn, so the eye lands on the choices. On hover the
-          bright ring gives way to the shared selection ring below (the halo
-          stays); all of it clears once a planet is selected, or while active. */}
+          tappable planet this turn, so the eye lands on the choices. On hover both
+          the halo and the ring snap to full, steady brightness (no pulse) — a
+          bright focus state. All of it clears once a planet is selected, or while
+          active. */}
       {invite && interactive && !selected && !active && (
         <circle r={r * 1.8}
           fill={`url(#v2-halo-${point.planet})`}
-          className="anim-invite-glow"
-          style={{ opacity: 0.35, pointerEvents: "none" }} />
+          className={hovered ? undefined : "anim-invite-glow"}
+          style={{ opacity: hovered ? 1 : 0.35, pointerEvents: "none" }} />
       )}
-      {invite && interactive && !selected && !active && !hovered && (
+      {invite && interactive && !selected && !active && (
         <circle r={r + 6} fill="none"
           stroke={c} strokeWidth={STROKE_MEDIUM}
-          className="anim-invite-ring"
-          style={{ opacity: 0.75, pointerEvents: "none" }} />
+          className={hovered ? "invite-ring" : "invite-ring anim-invite-ring"}
+          style={{ opacity: hovered ? 1 : 0.75, pointerEvents: "none" }} />
       )}
-      {/* One distinctive ring, shared across both charts: the opponent's acting
-          planet, the player's selection, and any hover all use it. */}
-      {(active || selected || hovered) && (
+      {/* The distinctive ring is select-only (plus the opponent's acting planet)
+          — hover is carried by the solid halo + bright ring, not this ring. */}
+      {(active || selected) && (
         <circle r={point.glyphR + 10} fill="none"
           stroke={c} strokeOpacity="1" strokeWidth={STROKE_MEDIUM} />
       )}
