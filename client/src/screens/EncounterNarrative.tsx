@@ -211,7 +211,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   return (
     <div
       className={`narrative ${resolved ? "is-resolved" : ""}`}
-      onClick={resolved ? handleContinue : undefined}
+      onClick={resolved ? handleContinue : () => setSelectedOptionId(null)}
     >
       <div className="narrative-chart">
         <Chart
@@ -260,7 +260,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
         </div>
 
-        <div className={`narrative-options ${resolved ? "is-resolved" : ""}`} style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
+        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${selectedOptionId ? "is-arming" : ""}`} style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
           {shownOptions.map((o, i) => {
             // Branch options (those that open a follow-up node) carry no direct
             // effect; cue that they lead onward, with a trailing arrow.
@@ -270,7 +270,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
               <button
                 key={o.id}
                 className={`option ${i === 1 ? "is-emph" : ""} ${selectedOptionId === o.id ? "is-selected" : ""}`}
-                onClick={resolved ? handleContinue : () => (selectedOptionId === o.id ? handleOption(o) : setSelectedOptionId(o.id))}
+                onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); selectedOptionId === o.id ? handleOption(o) : setSelectedOptionId(o.id); }}
                 aria-pressed={selectedOptionId === o.id}
                 type="button"
               >

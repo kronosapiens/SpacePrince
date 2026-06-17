@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type MouseEvent } from "react";
 import { layoutNodes, eligibleNext } from "@/game/map-gen";
 import { seededChart } from "@/game/chart";
 import { RULERSHIP } from "@/game/data";
@@ -32,6 +32,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   // on the same node fires onSelectNode. Clicking a different eligible node
   // switches the highlight without committing.
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
 
   // Reset preview when the player actually moves (current node changes).
   useEffect(() => {
@@ -165,7 +166,9 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const isNarrative = content?.kind === "narrative";
     const isCombat = content?.kind === "combat";
 
-    if (isCurrent) {
+    // Halo gradient for the current node and for eligible nodes (the latter use
+    // it for the breathing "you can go here" glow, mirroring combat planets).
+    if (isCurrent || isEligible) {
       haloDefs.push(
         <radialGradient key={`mh-${n.id}`} id={`m2-halo-${n.id}`}>
           <stop offset="0%" stopColor={color} stopOpacity="0.7" />
@@ -176,7 +179,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
 
     const isSelected = isEligible && n.id === selectedNodeId;
     const handleClick = onSelectNode && isEligible
-      ? () => {
+      ? (e: MouseEvent) => {
+          e.stopPropagation();
           if (selectedNodeId === n.id) {
             onSelectNode(n.id);
             setSelectedNodeId(null);
@@ -186,6 +190,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         }
       : undefined;
     const isClickable = !!handleClick;
+    const isHovered = isClickable && hoveredNodeId === n.id;
 
     // Distant nodes (>1 layer ahead, or off-path) render as light outline
     // circles only — no fill, no glyph, regardless of whether content has
@@ -204,7 +209,9 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         key={n.id}
         transform={`translate(${n.x}, ${n.y})`}
         onClick={handleClick}
-        style={{ cursor: isClickable ? "pointer" : "default" }}
+        onMouseEnter={isClickable ? () => setHoveredNodeId(n.id) : undefined}
+        onMouseLeave={isClickable ? () => setHoveredNodeId(null) : undefined}
+        style={{ cursor: isClickable ? "pointer" : "default", color }}
       >
         {isCurrent && (
           <>
@@ -213,13 +220,25 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
               stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
           </>
         )}
+        {/* Eligible (not yet previewed): the breathing "you can go here" glow —
+            halo + ring in the node's color, snapping to full brightness on hover.
+            Ceases on every node once any node is previewed (focus collapses to
+            the chosen one), mirroring the combat chart's invite affordance. */}
+        {isEligible && !isSelected && !selectedNodeId && (
+          <>
+            <circle r={NODE_R * 1.8} fill={`url(#m2-halo-${n.id})`}
+              className={isHovered ? undefined : "anim-invite-glow"}
+              style={{ opacity: isHovered ? 1 : 0.35, pointerEvents: "none" }} />
+            <circle r={NODE_R + 6} fill="none" stroke={color} strokeWidth={2}
+              className={isHovered ? "invite-ring" : "invite-ring anim-invite-ring"}
+              style={{ opacity: isHovered ? 1 : 0.7, pointerEvents: "none" }} />
+          </>
+        )}
+        {/* Tap-previewed: the distinctive commit ring (same role as the combat
+            selection ring). */}
         {isSelected && (
           <circle r={NODE_R + 10} fill="none"
-            stroke={color} strokeOpacity="0.95" strokeWidth={1.8} />
-        )}
-        {isEligible && !isSelected && (
-          <circle r={NODE_R + 10} fill="none"
-            stroke={color} strokeOpacity="0.7" strokeWidth={1} />
+            stroke={color} strokeOpacity="1" strokeWidth={2.4} />
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
@@ -267,6 +286,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       style={{ width: "100%", height: "100%", ...style }}
       role="img"
       aria-label="Map"
+      onClick={() => setSelectedNodeId(null)}
     >
       <defs>{edgeDefs}{haloDefs}</defs>
       {edgeEls}
