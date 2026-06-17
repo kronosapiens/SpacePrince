@@ -13,7 +13,7 @@ import {
   INNER_RING_R, OUTER_RING_R,
   PLANET_R_REST, PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
-  STROKE_LIGHT, STROKE_MEDIUM,
+  STROKE_MEDIUM,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
@@ -110,6 +110,9 @@ export interface ChartProps {
   side?: "self" | "other";
   onPlanetClick?: (p: PlanetName) => void;
   onPlanetHover?: (p: PlanetName | null) => void;
+  /** When true, the player's tappable planets carry a quiet breathing ring
+   *  inviting a choice — the combat decision phase. Off everywhere else. */
+  inviteInteraction?: boolean;
   style?: CSSProperties;
   className?: string;
   passive?: boolean;
@@ -170,6 +173,7 @@ export function Chart(props: ChartProps) {
     side,
     onPlanetClick,
     onPlanetHover,
+    inviteInteraction = false,
     style,
     className,
     passive = false,
@@ -388,6 +392,7 @@ export function Chart(props: ChartProps) {
             onClick={handleClick}
             onHover={handleHover}
             passive={passive}
+            invite={inviteInteraction}
             actionPulse={isActionPulse}
             crit={isCritting}
             combusting={isCombusting}
@@ -444,7 +449,7 @@ export function aspectKey(from: PlanetName, to: PlanetName): string {
 function PlanetGlyph({
   point, combusted, ghost,
   selected, active, hovered,
-  onClick, onHover, passive,
+  onClick, onHover, passive, invite,
   actionPulse, crit, combusting,
   impactPolarity,
   animationEpoch,
@@ -458,6 +463,7 @@ function PlanetGlyph({
   onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
+  invite: boolean;
   actionPulse: boolean;
   crit: boolean;
   combusting: boolean;
@@ -525,17 +531,27 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {active && (
+      {/* Invite: a pulsing halo + bright ring in the planet's own color on every
+          tappable planet this turn, so the eye lands on the choices. On hover the
+          bright ring gives way to the shared selection ring below (the halo
+          stays); all of it clears once a planet is selected, or while active. */}
+      {invite && interactive && !selected && !active && (
+        <circle r={r * 1.8}
+          fill={`url(#v2-halo-${point.planet})`}
+          className="anim-invite-glow"
+          style={{ opacity: 0.35, pointerEvents: "none" }} />
+      )}
+      {invite && interactive && !selected && !active && !hovered && (
+        <circle r={r + 6} fill="none"
+          stroke={c} strokeWidth={STROKE_MEDIUM}
+          className="anim-invite-ring"
+          style={{ opacity: 0.75, pointerEvents: "none" }} />
+      )}
+      {/* One distinctive ring, shared across both charts: the opponent's acting
+          planet, the player's selection, and any hover all use it. */}
+      {(active || selected || hovered) && (
         <circle r={point.glyphR + 10} fill="none"
           stroke={c} strokeOpacity="1" strokeWidth={STROKE_MEDIUM} />
-      )}
-      {selected && !active && (
-        <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
-      )}
-      {hovered && !selected && (
-        <circle r={point.glyphR + 6} fill="none"
-          stroke={NEUTRAL.bone} strokeOpacity="0.6" strokeWidth={STROKE_LIGHT} />
       )}
       {/* Receive-pulse: soft in-place valence glow behind the glyph when this
           planet takes testimony (heal) or affliction (harm) this beat. Behind

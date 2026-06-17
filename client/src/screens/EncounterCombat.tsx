@@ -359,6 +359,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           statsPanelReserveActions
           statsPanelStudy={study}
           onToggleStudy={() => setStudy((s) => !s)}
+          inviteInteraction={!animation && !encounter.resolved && !selected}
         />
         <div className="combat-side-label">SELF</div>
       </div>
