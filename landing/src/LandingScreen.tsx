@@ -7,6 +7,8 @@ import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
 
+const RECHART_INTERVAL_MS = 3000;
+
 export function LandingScreen() {
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const { setActive } = useActivePlanet();
@@ -15,7 +17,18 @@ export function LandingScreen() {
     setActive("Sun");
   }, [setActive]);
 
-  const [chart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+  // Cycle a fresh random sample chart every few seconds so the canvas stays
+  // alive — mirrors the client Title screen (TitleScreen.tsx). Only the
+  // interval re-rolls it; hover and other state changes during the visit don't.
+  const [chart, setChart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setChart(seededChart(randomSeed(), "Sample")),
+      RECHART_INTERVAL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, []);
 
   return (
     <div className="title">
