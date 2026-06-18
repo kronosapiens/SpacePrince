@@ -8,7 +8,7 @@ It is the **canonical object** through which identity, memory, and progression a
 The Prince NFT functions simultaneously as:
 
 1. **A save file** — a complete, auditable record of the Prince’s state
-2. **An enchanted object** — forged through play, marked by effort and failure
+2. **An enchanted object** — forged through play, marked by effort and attention
 3. **A generative artifact** — a visual system that evolves deterministically over time
 
 The NFT is not something you decorate.
@@ -176,22 +176,29 @@ The visual system mirrors the mechanical structure of the game.
 1. **Immutable Core** — Derived from mint inputs (lat, long, timestamp). Determines base geometry, symmetry, and color. Never changes.
 
 2. **Evolutionary Layers** — Evolve with progression:
-   - **Planet revelation.** Planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn) at cumulative-encounter counts of `2^i` for `i = 0..6`. See `spec/mechanics/MECHANICS.md §13.1`. Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
+   - **Planet revelation.** Planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn) at cumulative-encounter counts of `2^i` for `i = 0..6`. See `spec/mechanics/MECHANICS.md §11.1`. Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
    - **Houses add structure.**
-   - **Death adds scars.**
 
-3. **Temporary States** — Run-specific effects (glow, distortion) that recede when the run ends.
+3. **The Star-Field** — Every run inscribes one star (see below). The permanent, accumulating record of play.
 
-### Death as Entropy
+4. **Temporary States** — Run-specific effects (glow, distortion) that recede when the run ends.
 
-Each death darkens the background slightly. This degradation is monotonic and irreversible — the Prince remains intact while the surrounding context erodes. A darkened background signifies duration, not weakness.
+### The Star-Field
+
+Every run inscribes a **star** into the field behind the chart.
+
+When a run ends — whether by completing its seven maps or by full combustion before then (`MECHANICS.md §11`) — its **final Distance** (`MECHANICS.md §12`) is recorded as a single permanent point of light, its position and color derived deterministically from the score. A run of greater care leaves a brighter, differently-placed star; a run that combusts out early leaves a fainter one. Completion and failure are recorded the same way, on one axis — the star the run made.
+
+The points accumulate. Over a Prince's life the field fills from a dark sky into a populated one: a visible, non-comparative record of every passage. Reputation without ranking — a sky to read, not a scoreboard to top.
+
+There are **no scars and no entropy-darkening.** The only thing a run leaves behind is the star its Distance earned.
 
 ### Evolution Rules
 
 The NFT only evolves on **meaningful state changes**:
 - House unlocks
 - Planetary expression unlocks
-- Death scars
+- A run's final Distance (a new star)
 - Major world thresholds
 
 It does not evolve on individual actions, minor choices, or time passage alone.
@@ -208,7 +215,7 @@ The Prince NFT must be:
 The rendered image is a **pure function** of:
 - Birth data
 - Unlocked systems
-- Recorded scars
+- Recorded run-scores (the star-field)
 - World flags
 
 This ensures:
@@ -226,7 +233,7 @@ Because the Prince is abstract and symbolic:
 
 Observers may notice:
 - Depth vs simplicity
-- Scar patterns
+- The density and color of the star-field
 - Structural completeness
 - Planetary dominance
 

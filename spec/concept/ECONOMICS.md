@@ -182,7 +182,7 @@ Who buys a mature Prince, and why?
 **The tension:**
 If the journey IS the game (Siddhartha's path), then buying a mature Prince is buying someone else's enlightenment.
 You get the artifact but not the understanding.
-The NFT shows scars you didn't earn and Houses you didn't unlock.
+The NFT shows a star-field you didn't fill and Houses you didn't unlock.
 
 This may be fine — not everyone wants the journey, and that's their choice.
 But it does mean the secondary market is for a *different product* than the primary experience.
@@ -266,8 +266,8 @@ Space Prince must never monetize:
 - Boosts, accelerators, or rerolls
 - RNG influence
 - Permission restoration
-- Scar removal
-- Background entropy reversal
+- Star-field alteration
+- Reversal of recorded history
 
 If money can substitute for experience, the design has failed.
 
@@ -279,7 +279,7 @@ Space Prince frames progression as **craft**.
 
 Each run:
 - Consumes something real (money, gas, attention)
-- Leaves something permanent (scars, entropy, unlocks)
+- Leaves something permanent (a star in the field, unlocks)
 - Cannot be rushed or undone
 
 Over time, players should describe their experience in terms of:

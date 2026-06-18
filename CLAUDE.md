@@ -49,6 +49,7 @@ The spec is divided by what kind of question each document answers.
 
 - `LORE.md` — what lore is for in this game (not backstory; structural)
 - `ASTROLOGY.md` — astrology as a symbolic system, historically grounded
+- `PRIMER.md` — player-facing on-ramp: what astrology is and what you're playing (framing + codex)
 - `PLANETS.md` — the philosophical chorus / voice for each of the seven planets
 - `NFT.md` — what the Prince NFT is and how it evolves with play
 - `ECONOMICS.md` — economics as commitment reinforcement, not extraction

@@ -23,7 +23,7 @@ It is the character, the save file, and the artifact forged through attention.
 ## What This Is
 
 - A **fully onchain** game (client is presentation only)
-- A **single-player** roguelike where death advances metaprogression
+- A **single-player** roguelike where play accrues into a permanent record
 - A **generative NFT** that evolves as a permanent record of play
 - An **art game** grounded in Hellenistic astrology
 
@@ -50,7 +50,7 @@ It increases specificity.
   A chart full of squares is harder to play and rewards mastery.
 
 - **Failure is canonical.**
-  Death darkens the NFT and unlocks new understanding.
+  A run ends in combustion as readily as in completion — either way, the world records the Distance it reached.
   The chart was always complete — the player is catching up.
 
 ---

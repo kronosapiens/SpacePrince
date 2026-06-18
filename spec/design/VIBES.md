@@ -12,6 +12,27 @@ The guiding principle:
 
 ---
 
+## Audience & Exposition
+
+The player we build for is the **curious outsider**: drawn by the art, the mystery, or the artifact, who knows no astrology and is not asked to believe in any of it.
+Astrology is taught from zero — as a language for reading agents, roles, and change — with every term introduced on first use.
+The game is a gateway *into* astrology, not a test of it.
+
+The governing rule is **front-load intent, not information.**
+A newcomer should arrive knowing *why this matters* and *what they will do* — enough to form intent — and learn the *concepts* by living them.
+Exposition is generous in availability and invisible by default: a player who never summons a word of it still plays.
+
+It is delivered across surfaces, deepest-on-demand:
+
+- **The premise beat** — a few lines at mint, stating the stakes and the action (what this is, why it's permanent, that play is choosing a planet to send). The minimum that prevents a cold bounce. Copy in `PRIMER.md` ("The framing").
+- **The experiential first run** — the arc in `spec/v2/ONBOARD.md` teaches "choose a planet, face the terrain, live with it" through play, not text.
+- **Just-in-time** — each concept introduced where it appears: a planet at its unlock ceremony, a house at the first house-node, a mechanic at the inspect "i" (`SCREENS.md §3.6.1`).
+- **The codex** — the full, explicit account of astrology and the game, *summoned, never gated*, and usable as a standalone explainer outside the game. Copy in `PRIMER.md` ("The codex").
+
+This extends, not overturns, "offer a foothold; never force a lesson" (see "What the Client Must Never Do"): the foothold is now a graded set of surfaces, but every one of them is opt-in.
+
+---
+
 ## Planetary Voice
 
 Every planet has a **voice** — a tonal register drawn from real philosophical, literary, and spiritual traditions.

@@ -38,8 +38,8 @@ A root node typically offers one of each, plus conditional branches that the cha
 Pressing looks like free Distance, because affliction taken can later be healed in combat for more Distance.
 The bound is not an arbitrary cap — it is **run-length**.
 
-The run ends when all seven planets combust (`MECHANICS.md §11`).
-Affliction taken in narrative pushes planets toward their combustion ceiling, shortening the run, which lowers *lifetime* Distance.
+A run ends on full combustion, or on completing its seventh map (`MECHANICS.md §11`).
+Affliction taken in narrative pushes planets toward their combustion ceiling, raising the risk of combusting out before the seventh map — forfeiting the encounters you'd otherwise have scored, which lowers the run's final Distance.
 So Press trades run-length for Distance-now; Tend spends Distance to buy run-length back.
 The master loop:
 

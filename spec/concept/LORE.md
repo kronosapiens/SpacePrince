@@ -204,7 +204,7 @@ The Prince NFT is itself a lore document.
 Its:
 - Structure
 - Motion
-- Scars
+- Stars
 - Asymmetries
 
 …are records of interpretation.

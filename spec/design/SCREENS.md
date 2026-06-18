@@ -36,6 +36,7 @@ Listed roughly in the order a player encounters them.
 | Encounter       | Combat (symmetric) or narrative (asymmetric column)      | Designed (§3)    |
 | End-of-run      | Browsable history of the run's maps                      | Designed (§6)    |
 | Chart Study     | Inspect own chart between runs (earned annotations)      | Stub (§7)        |
+| Primer          | Framing at first arrival; codex summoned on demand       | Designed (§9.6)  |
 
 Dev-only:
 
@@ -173,7 +174,7 @@ Transitions between major surfaces fade through the Void canvas with an active-p
 
 - **Map → Encounter** inherits the "Encounter open" 1200ms ease-out from `STYLE.md §7`.
 - **Encounter → Map** is a faster ~600ms fade (the player is leaving, not arriving).
-- **Encounter → End-of-run** (on full combust): a slower fade, ~1800ms, matching the combust motion's weight.
+- **Encounter → End-of-run** (on run end — full combust or completion): a slower fade, ~1800ms; on a combust-out it matches the combust motion's weight.
 
 ### 3.9 Open questions
 
@@ -190,7 +191,7 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 ### 4.1 Layout
 
 - **Centered diagram** with breathing room — at least 15% margin on each side, per `STYLE.md §10`.
-- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32, 64 — per `MECHANICS.md §13.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
+- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32, 64 — per `MECHANICS.md §11.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
 - **Distance readout** in the same position and treatment as the encounter screen (per §3.7).
 
 ### 4.2 Nodes
@@ -275,7 +276,9 @@ Between encounters, the map's ambient tint **fades to neutral** — no active pl
 
 ## 5. Mint Screen
 
-The player's first touch. Three beats: input, confirmation, reveal. Each is irreversible at its end.
+The player's first irreversible act. Three beats: input, confirmation, reveal. Each is irreversible at its end.
+
+On first arrival the **framing** (§9.6) precedes input; the mint screen itself carries no explanatory copy.
 
 ### 5.1 Beats
 
@@ -295,9 +298,9 @@ Each planet appears at its computed sign placement, in its glyph and color, sepa
 
 This is the **only time** the player sees their full chart until cumulative encounter 64.
 
-The chart then **gates back** to its starting state: the Moon remains in full visual treatment, the other six planets recede to **ghost** (hairline outline, no color), per `NFT.md` and `MECHANICS.md §13.1`. The player is left with what they currently have access to.
+The chart then **gates back** to its starting state: the Moon remains in full visual treatment, the other six planets recede to **ghost** (hairline outline, no color), per `NFT.md` and `MECHANICS.md §11.1`. The player is left with what they currently have access to.
 
-Future unlocks (per `MECHANICS.md §13.1`) reveal one planet at a time *between encounters*, not in a single ceremony. The mint is the only staged unfolding in the game.
+Future unlocks (per `MECHANICS.md §11.1`) reveal one planet at a time *between encounters*, not in a single ceremony. The mint is the only staged unfolding in the game.
 
 ### 5.3 NFT artifact
 
@@ -319,15 +322,17 @@ The NFT renders the player's chart at its current unlock state — Moon visible,
 
 ## 6. End-of-Run Screen
 
-What the player sees when a run ends — that is, when **all seven of the player's planets have combust** (per `MECHANICS.md §13`). *"Failure is not punishment; it is acknowledgment. When a run ends, the world remembers."*
+What the player sees when a run ends — on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished), per `MECHANICS.md §11`. *"Failure is not punishment; it is acknowledgment. When a run ends, the world remembers."*
 
-A run typically spans multiple maps. End-of-run is the wrap of the entire arc, not the end of any single map.
+A run spans up to seven maps. End-of-run is the wrap of the entire arc, not the end of any single map.
 
-### 6.1 The map browser
+### 6.1 The star, and the map browser
 
-End-of-run is **the run's map history, browsable**. The player can page through every map they walked, in order, with the path-trace and outcomes preserved on each.
+The run's permanent output is its **final Distance**, inscribed as a new **star** in the Prince's NFT field (`NFT.md`, "The Star-Field"). End-of-run is where the player watches that star take its place — the quiet payoff of the passage, whether the run completed or combusted out.
 
-The current chart in end state is *not* shown here — it's always all-combust, and showing it adds nothing the player doesn't already know.
+Beneath that, end-of-run is **the run's map history, browsable**. The player can page through every map they walked, in order, with the path-trace and outcomes preserved on each.
+
+The current chart is not the focus — a combusted-out run is all-dark, a completed one is not, but re-showing it adds nothing the player doesn't already know. The star and the walked maps are the record.
 
 - Maps appear as a horizontal carousel or sequence — first map leftmost, last (where final combust occurred) rightmost.
 - Each map renders at full fidelity when selected. The player can revisit each, click through, and see what happened at each node (traces per `§4.2`).
@@ -419,6 +424,7 @@ A combined lobby surface — the player's entry point, also serving as Prince se
 - **Wordmark "SPACE PRINCE"** appears small at the top. This is the only screen where the wordmark exists.
 - **One primary affordance:** **Begin** (see §9.2).
 - **Chart Study** as a quiet secondary affordance (per `§7`).
+- **Codex** as a quiet secondary affordance — opens the primer's codex (§9.6). Always available, never demanded.
 
 ### 9.2 Begin — state-dependent
 
@@ -441,7 +447,9 @@ A new player landing here without a minted Prince sees a shorter version of this
 
 - A blank canvas (no chart).
 - The line *"A position has not yet been recognized."*
-- A single affordance: **Recognize a Position**, which leads to Mint (`§5`).
+- A single affordance: **Recognize a Position**.
+
+Recognizing does not go straight to birth-data input. It first presents the **framing** (§9.6) — a few lines of intent and stakes — from which the player proceeds into Mint (`§5`) or opens the codex. This is the game's one mandatory beat of explanation, and it is deliberately short; the long-form codex stays opt-in.
 
 This preserves the *recognition* tone from the archived `v1/ONBOARD.md` minute 0–1 without that doc's ten-minute arc.
 
@@ -449,11 +457,20 @@ This preserves the *recognition* tone from the archived `v1/ONBOARD.md` minute 0
 
 Account, wallet, and configuration management are **not** in-game surfaces. They live in the **Cartridge Controller** web wallet's config modal, accessed once the user is logged in. The game does not duplicate that surface.
 
+### 9.6 Primer — the framing and the codex
+
+The game's explanatory copy lives in `PRIMER.md` and surfaces in two places, by length:
+
+- **The framing** — the ~5-line intent-and-stakes beat. Shown **once**, at first arrival, between "Recognize a Position" (§9.4) and Mint (§5). Two affordances: **`Recognize a Position`** (continue into the mint) and **`New to astrology? Read on →`** (open the codex). "Clicking past" the framing *is* choosing to recognize — the gesture leads into the mint, not around it.
+- **The codex** — the full account of astrology and the game. **Opt-in, never gated:** reachable from the framing's "Read on" and from the quiet Codex affordance on the Title (§9.1). Also usable as a standalone explainer outside the game (`PRIMER.md`, "Role").
+
+**Returning players never see this.** A player who already has a Prince enters through Begin (§9.2, continue or new run) and bypasses the framing entirely; the codex stays available on the Title for whoever wants it. Per `VIBES.md` ("Audience & Exposition"), this is *front-load intent, not information* made literal: the short thing is unavoidable, the long thing is summoned.
+
 ---
 
 ## 10. Navigation
 
-The screen graph is small enough to draw in a sentence: *Mint → Title (lobby) → (Map ↔ Encounter, looping; new maps generate after each L7 completion) → End-of-run (only on full combust) → Title*. Chart Study is reachable from Title and from End-of-run.
+The screen graph is small enough to draw in a sentence: *Mint → Title (lobby) → (Map ↔ Encounter, looping; new maps generate after each L7 completion) → End-of-run (on combust or completion) → Title*. On first arrival the framing (§9.6) precedes Mint. Chart Study and the codex are reachable from the Title; Chart Study also from End-of-run.
 
 In the current dev prototype, navigation is via the Index screen and direct routes (`/map`, `/encounter`, `/narrative`). Final-game navigation is mostly implicit — the world advances you through screens — with a small persistent way back to higher-level surfaces from any point.
 

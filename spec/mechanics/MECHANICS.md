@@ -185,10 +185,10 @@ Combustion is terminal — a combusted planet is zero-output and skipped by prop
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative). Resolves in turns; turn count per encounter equals the number of unlocked planets (see §11.1).
+- **Encounter** — one node traversal (combat or narrative). Combat resolves in a **fixed 3 turns** (with an early-game ramp, §11.1); narrative encounters are short decision trees (`HOUSES.md`).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
-- **Run** — a sequence of maps. After completing a map, a new map is generated and begun. The structure is similar to FTL's sectors.
-- **Run end** — the run ends only when **all seven of the player's planets combust**, regardless of how many maps were completed.
+- **Run** — **up to seven maps.** After completing a map, the next is generated and begun. The structure is similar to FTL's sectors.
+- **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished). Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage. Either way, the run's **final Distance (§12)** is its permanent record, inscribed as a star in the NFT field (`NFT.md`).
 
 Per encounter:
 
@@ -214,6 +214,8 @@ A Prince's chart is fixed at mint, but planets are unlocked progressively as a *
 | 64 | Saturn | 7 |
 
 The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart. Saturn arrives last as the final teacher.
+
+**Encounter length and the unlock ramp.** Combat resolves in a fixed **3 turns**, but a player can never send more distinct planets than they have unlocked, so the earliest encounters are shorter: `turns = min(3, unlockedPlanets)`. The Moon-only first encounter is a single turn (observation, per `spec/v2/ONBOARD.md`); the two-planet stage is two turns; from Venus (the third planet) onward, every encounter is the full three. Past three planets the cap stops biting — a full seven-planet chart still resolves in three turns, which makes *which three you send* a genuine choice rather than a roll-call of the whole chart.
 
 Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.
 
@@ -242,6 +244,8 @@ Run score accumulates `turnScore`.
 
 Because only real reductions count, testifying a planet already at zero affliction scores nothing — affliction must exist before it can be resolved.
 This makes each turn a two-beat: afflict to set up, testify to cash.
+
+A run's **final accumulated Distance** is its permanent output. When the run ends — combustion or completion (§11) — that value is inscribed as a star in the Prince's NFT field (`NFT.md`, "The Star-Field"). Nothing else about the run is recorded: not how it ended, not which planets combust. Only the Distance, and the star it earns.
 
 ## 13. Interaction Chart Semantics
 
