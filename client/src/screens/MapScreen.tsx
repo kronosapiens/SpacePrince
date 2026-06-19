@@ -158,6 +158,7 @@ function NormalMapScreen() {
 
   useEffect(() => {
     if (!run) return;
+    if (run.over) return; // run already ended (combust or seventh-map completion)
     if (run.currentEncounter) return;
     if (run.currentMap.currentNodeId !== TERMINAL_NODE_ID) return;
     rolloverMap(run);

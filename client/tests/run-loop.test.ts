@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { beginRun, isRunOver } from "@/game/run";
+import { beginRun, isRunOver, rolloverMap, MAPS_PER_RUN } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
@@ -94,6 +94,41 @@ describe("Run loop integration", () => {
     expect(r.perPlanetState.Sun.combusted).toBe(false);
     expect(r.perPlanetState.Sun.affliction).toBe(0);
     expect(r.runDistance).toBe(7);
+  });
+
+  it("combat resolves in min(3, unlocked) turns — fixed cap with an early ramp", () => {
+    const profile = createStubProfile({ seed: 7 });
+    const run = beginRun(profile, 42);
+    const begin = (lifetimeEncounterCount: number) =>
+      beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount });
+
+    // Full chart (lifetime 64 → all seven unlocked) still caps at three turns.
+    expect(begin(64).sequence).toHaveLength(3);
+    expect(begin(64).opponentActions).toHaveLength(3);
+    // Ramp floor: the Moon-only first encounter is a single turn; two planets, two.
+    expect(begin(1).sequence).toHaveLength(1);
+    expect(begin(2).sequence).toHaveLength(2);
+  });
+
+  it("a run ends by completion when the seventh map is finished", () => {
+    const profile = createStubProfile({ seed: 3 });
+    let r = beginRun(profile, 9);
+    // Six rollovers: each archives the current map and begins a fresh one,
+    // never ending the run.
+    for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
+      r = rolloverMap(r, 100 + i);
+      expect(r.over).toBe(false);
+      expect(r.mapHistory).toHaveLength(i + 1);
+    }
+    // On the seventh map now (mapHistory holds six). Completing it ends the run
+    // by completion: the final map stays in place, history is untouched.
+    const finalMap = r.currentMap;
+    r = rolloverMap(r, 999);
+    expect(r.over).toBe(true);
+    expect(r.mapHistory).toHaveLength(MAPS_PER_RUN - 1);
+    expect(r.currentMap).toBe(finalMap);
+    // End-of-Run reads mapHistory + currentMap → exactly seven maps.
+    expect([...r.mapHistory, r.currentMap]).toHaveLength(MAPS_PER_RUN);
   });
 
   it("isRunOver true iff every player planet is combusted", () => {

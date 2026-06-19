@@ -11,6 +11,13 @@ import type {
   RunState,
 } from "./types";
 
+/** Combat resolves in a fixed three turns, with an early-game ramp: a player
+ *  can never send more distinct planets than they have unlocked, so the
+ *  earliest encounters are shorter — `turns = min(3, unlocked)` (MECHANICS
+ *  §11.1). Past three unlocked planets the cap stops biting, making *which
+ *  three you send* the choice rather than a roll-call of the whole chart. */
+export const MAX_COMBAT_TURNS = 3;
+
 export interface BeginCombatInput {
   run: RunState;
   opponentSeed: number;
@@ -23,7 +30,7 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
   const playerUnlocked = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
-  const turnCount = playerUnlocked.length;
+  const turnCount = Math.min(MAX_COMBAT_TURNS, playerUnlocked.length);
   const rng = mulberry32(encounterIdSeed ?? opponentSeed);
   const sequence: PlanetName[] = [];
   const opponentActions: Polarity[] = [];

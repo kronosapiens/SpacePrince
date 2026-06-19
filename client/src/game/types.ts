@@ -103,7 +103,7 @@ export interface CombatEncounter {
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
-  sequence: PlanetName[]; // length = unlocked.length at encounter start
+  sequence: PlanetName[]; // length = min(3, unlocked) at encounter start (MECHANICS §11.1)
   /** Opponent's precommitted action per turn, parallel to `sequence`. Drawn
    *  stat-weighted (P(afflict) = damage / (damage + healing)) and locked at
    *  turn start, so the player always chooses with full information. */

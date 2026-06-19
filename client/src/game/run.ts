@@ -42,12 +42,23 @@ export function beginRun(profile: Profile, seed = randomSeed()): RunState {
   };
 }
 
+/** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
+export const MAPS_PER_RUN = 7;
+
 export function isRunOver(run: RunState): boolean {
   return PLANETS.every((p) => run.perPlanetState[p].combusted);
 }
 
-/** Called at L7 traversal — generate a fresh map and archive the prior one. */
+/** Called at L7 traversal. Generates a fresh map and archives the prior one —
+ *  unless the seventh map was just completed, in which case the run ends by
+ *  *completion* (MECHANICS §11): the current map stays in place as the final,
+ *  completed map (End-of-Run reads `mapHistory` + `currentMap`) and the run is
+ *  marked over. Either ending — completion here, or full combustion in
+ *  `turn.ts` — inscribes the run's final Distance as a star. */
 export function rolloverMap(run: RunState, seed = randomSeed()): RunState {
+  if (run.mapHistory.length + 1 >= MAPS_PER_RUN) {
+    return { ...run, currentEncounter: null, over: true };
+  }
   return {
     ...run,
     currentMap: newMapState(seed),
