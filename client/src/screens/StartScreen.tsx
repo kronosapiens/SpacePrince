@@ -6,6 +6,7 @@ import { ROUTES } from "@/routes";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { useProfileDispatch } from "@/state/ProfileStore";
+import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -37,6 +38,7 @@ export function StartScreen() {
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
   const dispatchProfile = useProfileDispatch();
+  const startRun = useStartRun();
   const [stage, setStage] = useState<Stage>("input");
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -142,7 +144,11 @@ export function StartScreen() {
       schemaVersion: 1,
     };
     dispatchProfile({ type: "profile/set", profile });
-    navigate(ROUTES.title);
+    // Begin a fresh run for the newly-minted Prince and drop straight into it.
+    // A fresh run/start replaces any stale run carried in localStorage, so the
+    // map the player lands on always matches the chart they just minted.
+    startRun(profile);
+    navigate(ROUTES.map);
   };
 
   const showCeremony = stage === "revealing" || stage === "settled";
