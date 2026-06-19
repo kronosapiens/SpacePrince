@@ -216,7 +216,10 @@ export function Chart(props: ChartProps) {
         const isHarmony =
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
-        const opacity = isActive ? 0.8 : isInspect ? 0.5 : 0.2;
+        // Active lines (hovered / selected / combat-active / propagating) render
+        // at full strength; the rest stay at the legible resting baseline.
+        // Parity with the main client.
+        const opacity = isActive ? 1 : isInspect ? 0.7 : 0.5;
         const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
