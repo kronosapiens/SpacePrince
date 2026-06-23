@@ -20,10 +20,10 @@ function state(affliction: number, combusted = false): PlanetState {
 }
 
 describe("combustionCeiling", () => {
-  // ceiling = durability × 20; dignity no longer feeds it (moved to houses).
-  it("is durability × 20", () => {
-    expect(combustionCeiling(placement(8))).toBe(160);
-    expect(combustionCeiling(placement(2))).toBe(40);
+  // ceiling = durability × 10 (MECHANICS §10); dignity no longer feeds it.
+  it("is durability × 10", () => {
+    expect(combustionCeiling(placement(8))).toBe(80);
+    expect(combustionCeiling(placement(2))).toBe(20);
   });
 });
 
@@ -33,28 +33,28 @@ describe("shouldCombust", () => {
   });
 
   it("below the ceiling is a safe, recoverable margin", () => {
-    expect(shouldCombust(placement(8), state(159))).toBe(false);
+    expect(shouldCombust(placement(8), state(79))).toBe(false);
   });
 
   it("combusts the moment affliction reaches the ceiling", () => {
-    expect(shouldCombust(placement(8), state(160))).toBe(true);
-    expect(shouldCombust(placement(8), state(200))).toBe(true);
+    expect(shouldCombust(placement(8), state(80))).toBe(true);
+    expect(shouldCombust(placement(8), state(120))).toBe(true);
   });
 
   it("an already-combusted planet does not re-trigger", () => {
-    expect(shouldCombust(placement(8), state(200, true))).toBe(false);
+    expect(shouldCombust(placement(8), state(120, true))).toBe(false);
   });
 });
 
 describe("applyCombust", () => {
   it("commits combustion at/above the ceiling and reports it", () => {
-    const s = state(160);
+    const s = state(80);
     expect(applyCombust(placement(8), s)).toBe(true);
     expect(s.combusted).toBe(true);
   });
 
   it("leaves a sub-ceiling planet untouched", () => {
-    const s = state(120);
+    const s = state(79);
     expect(applyCombust(placement(8), s)).toBe(false);
     expect(s.combusted).toBe(false);
   });
