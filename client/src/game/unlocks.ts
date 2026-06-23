@@ -3,8 +3,9 @@ import type { PlanetName } from "./types";
 
 /**
  * Macrobian ascent. Cumulative lifetime encounter count gates planet unlocks.
- * Encounter 1 → Moon. Encounter 2 → Mercury. 4 → Venus. 8 → Sun.
- * 16 → Mars. 32 → Jupiter. 64 → Saturn.
+ * The Moon is present from the first encounter (threshold 0); each subsequent
+ * planet unlocks at 2^i encounters: Mercury 1, Venus 2, Sun 4, Mars 8,
+ * Jupiter 16, Saturn 32.
  */
 export function unlockedPlanets(
   lifetimeCount: number,

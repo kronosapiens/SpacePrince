@@ -201,17 +201,17 @@ Affliction and combust state **persist across encounters and across maps within 
 
 ### 11.1 Planet Unlock Schedule
 
-A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run. The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward), with unlocks at encounter counts of `2^i` for `i = 0..6`:
+A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run. The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward). The Moon is present from the first encounter; each subsequent planet unlocks at a cumulative count of `2^i` for `i = 0..5`:
 
-| Encounter # | Unlock | Total planets |
+| Cumulative encounters | Unlock | Total planets |
 |-----|--------|---------------|
-| 1 | Moon | 1 |
-| 2 | Mercury | 2 |
-| 4 | Venus | 3 |
-| 8 | Sun | 4 |
-| 16 | Mars | 5 |
-| 32 | Jupiter | 6 |
-| 64 | Saturn | 7 |
+| 0 (start) | Moon | 1 |
+| 1 | Mercury | 2 |
+| 2 | Venus | 3 |
+| 4 | Sun | 4 |
+| 8 | Mars | 5 |
+| 16 | Jupiter | 6 |
+| 32 | Saturn | 7 |
 
 The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart. Saturn arrives last as the final teacher.
 

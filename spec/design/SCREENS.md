@@ -296,7 +296,7 @@ After confirmation, the chart wheel is computed on-chain (per `CHART.md`). Durin
 
 Each planet appears at its computed sign placement, in its glyph and color, separated by ~2–3 seconds. The total ceremony runs roughly 15–20 seconds — intentionally long enough to mask the on-chain compute and to give the act its weight. After all seven planets have appeared, the chart sits whole for a brief held moment.
 
-This is the **only time** the player sees their full chart until cumulative encounter 64.
+This is the **only time** the player sees their full chart until cumulative encounter 32 (Saturn, the final unlock — `MECHANICS.md §11.1`).
 
 The chart then **gates back** to its starting state: the Moon remains in full visual treatment, the other six planets recede to **ghost** (hairline outline, no color), per `NFT.md` and `MECHANICS.md §11.1`. The player is left with what they currently have access to.
 

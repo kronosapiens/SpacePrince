@@ -102,12 +102,13 @@ describe("Run loop integration", () => {
     const begin = (lifetimeEncounterCount: number) =>
       beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount });
 
-    // Full chart (lifetime 64 → all seven unlocked) still caps at three turns.
+    // Full chart (lifetime ≥ 32 → all seven unlocked) still caps at three turns.
     expect(begin(64).sequence).toHaveLength(3);
     expect(begin(64).opponentActions).toHaveLength(3);
-    // Ramp floor: the Moon-only first encounter is a single turn; two planets, two.
-    expect(begin(1).sequence).toHaveLength(1);
-    expect(begin(2).sequence).toHaveLength(2);
+    // Ramp floor: the Moon-only first encounter (count 0) is a single turn; the
+    // next encounter, with Mercury unlocked, is two.
+    expect(begin(0).sequence).toHaveLength(1);
+    expect(begin(1).sequence).toHaveLength(2);
   });
 
   it("a run ends by completion when the seventh map is finished", () => {

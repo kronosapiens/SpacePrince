@@ -21,8 +21,11 @@ export const MACROBIAN_ORDER: PlanetName[] = [
   "Moon", "Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn",
 ];
 
-// Cumulative lifetime encounter thresholds at which each Macrobian planet unlocks.
-export const MACROBIAN_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
+// Cumulative lifetime encounter thresholds at which each Macrobian planet
+// unlocks. The Moon is present from the first encounter (threshold 0, since the
+// count starts at 0 and increments after each encounter); each subsequent
+// planet unlocks at 2^i encounters.
+export const MACROBIAN_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 
 // Even values on a roughly 1-10 scale (MECHANICS.md §2). Even base + even buffs
 // keeps every magnitude whole, so the ×0.5 aspect multipliers (§9) still land
