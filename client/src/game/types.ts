@@ -181,32 +181,32 @@ export interface MapState {
   outcomes: Record<string, NodeOutcome>;
 }
 
-// ── Run / Profile ─────────────────────────────────────────────────────────────
+// ── Run / Prince (STATE.md) ──────────────────────────────────────────────────
 
-export interface Omen {
-  id: string;
-  description: string;
-  effect: { kind: "luck-bonus" | "damage-bonus" | "healing-bonus"; value: number; planet?: PlanetName };
-  expires: "run-end" | "encounter-end" | "next-encounter";
-}
+/** Append-only, in-memory log of finished maps (each carries its own per-node
+ *  `outcomes`). The End-of-Run screen reads it; it is NOT persisted — a real
+ *  client would read these from chain events. The in-memory replacement for the
+ *  old `mapHistory`. See `STATE.md`. */
+export type RunEvent = { kind: "map-completed"; map: MapState };
 
-export interface RunState {
+export interface Run {
   id: string;
   seed: number;
-  startedAt: number;
-  perPlanetState: SideState;
-  runDistance: number;
-  runOmens: Omen[];
-  currentMap: MapState;
-  mapHistory: MapState[];
-  currentEncounter: EncounterState | null;
+  /** Per-planet affliction + combust; persists across encounters and maps,
+   *  resets only at run start. */
+  state: SideState;
+  /** Cumulative Distance — this run's permanent record (one star). */
+  distance: number;
+  /** The current map only; finished maps are pushed to `events`. */
+  map: MapState;
+  /** Maps finished this run (0..MAPS_PER_RUN); the run ends by completion at the cap. */
+  mapsCompleted: number;
+  encounter: EncounterState | null;
+  /** No-repeat bookkeeping — active-run-only (STATE.md). */
   seenFragmentIds: string[];
-  /** Scenario ids consumed this run — enforces the no-repeat rule
-   *  (`spec/mechanics/ENCOUNTERS.md §8`). Mirrors `seenFragmentIds`. */
   seenScenarioIds: string[];
-  loreCounters: Record<string, number>;
-  lifetimeEncounterAtRunStart: number;
-  over: boolean;
+  /** In-memory run history for the End screen; not persisted. */
+  events: RunEvent[];
 }
 
 export interface BirthData {
@@ -215,17 +215,15 @@ export interface BirthData {
   lon: number;
 }
 
-export interface Profile {
+export interface Prince {
   id: string;
-  name: string;
-  birthData: BirthData;
+  position: BirthData;
   chart: Chart;
-  lifetimeEncounterCount: number;
-  scarsLevel: number;
-  /** ID of the most recent run that bumped scarsLevel — used for idempotency
-   *  so revisiting End-of-Run doesn't double-count. Optional for back-compat
-   *  with previously-saved profiles that predate this field. */
-  lastScarsBumpRunId?: string | null;
-  createdAt: number;
-  schemaVersion: 1;
+  /** Cumulative lifetime encounters; gates the unlock ramp (MECHANICS §11.1). */
+  numEncounters: number;
+  /** Reserved bitmap of unlocked achievements (deferred, §11.2). */
+  achievements: number;
+  /** Every run this Prince has played. The active run is the tail iff it is not
+   *  over; the star-field derives from runs[].distance (STATE.md). */
+  runs: Run[];
 }

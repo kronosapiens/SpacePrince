@@ -5,6 +5,7 @@ import { VesicaSeam } from "@/components/VesicaSeam";
 import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
+import { isOver } from "@/game/run";
 import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -24,23 +25,23 @@ import type {
   CombatEncounter,
   PlanetName,
   Polarity,
-  Profile,
-  RunState,
+  Prince,
+  Run,
   TurnLogEntry,
 } from "@/game/types";
 
 /** Outcome of a committed combat turn — feeds the animation playback. */
 export interface CommitTurnResult {
   log: TurnLogEntry;
-  nextRun: RunState;
+  nextRun: Run;
   encounter: CombatEncounter;
   encounterEnded: boolean;
   runEnded: boolean;
 }
 
 interface CombatScreenProps {
-  run: RunState;
-  profile: Profile;
+  run: Run;
+  prince: Prince;
   encounter: CombatEncounter;
   /** Resolves a turn; returns null if the click was rejected (e.g. encounter
    *  resolved). Persistence + lifetime-bump + outcome construction happen
@@ -55,7 +56,7 @@ interface CombatScreenProps {
 }
 
 export function EncounterCombatScreen(props: CombatScreenProps) {
-  const { run, profile, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
+  const { run, prince, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const devAnimationControls = props.devAnimationControls ?? false;
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
@@ -71,6 +72,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const [pendingAction, setPendingAction] = useState<Polarity | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
+
+  // `over` is derived (STATE.md): the run ended once every fielded planet combust.
+  const runEnded = isOver(run, prince.numEncounters);
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -89,14 +93,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           displayOpponentAction === "Testimony" ? "healing" : "damage"
         ]
       : null;
-  const displayedRunDistance = animation?.runningDistance ?? run.runDistance;
+  const displayedRunDistance = animation?.runningDistance ?? run.distance;
   const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
   // Tint each distance flash with the color of the planet resolving on that
   // beat, so the number flashes through the wave's planets rather than one hue.
   const distanceFlashColor = animation?.distanceFlashPlanet
     ? PLANET_PRIMARY[animation.distanceFlashPlanet]
     : null;
-  const displayPlayerState = animation?.selfState ?? run.perPlanetState;
+  const displayPlayerState = animation?.selfState ?? run.state;
   const displayOpponentState = animation?.otherState ?? encounter.opponentState;
   const activePropagationKeys = animation?.activePropagationKeys ?? EMPTY_PROPAGATION_KEYS;
   const actionPulsePlayer = animation?.actionPulse.player ?? null;
@@ -116,8 +120,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [displayOpponentTurn, setActive]);
 
   const playerUnlocked = useMemo(
-    () => unlockedPlanets(profile.lifetimeEncounterCount, devUnlockAll),
-    [profile.lifetimeEncounterCount, devUnlockAll],
+    () => unlockedPlanets(prince.numEncounters, devUnlockAll),
+    [prince.numEncounters, devUnlockAll],
   );
 
 
@@ -132,29 +136,29 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const previewValence: Polarity | null = (() => {
     if (!inspected) return null;
     if (pendingAction) return pendingAction;
-    const eff = getEffectiveStats(profile.chart, inspected);
+    const eff = getEffectiveStats(prince.chart, inspected);
     return eff.damage >= eff.healing ? "Affliction" : "Testimony";
   })();
 
   const projection = useMemo(() => {
     if (animation) return null;
     if (!inspected || !opponentTurn || !previewValence) return null;
-    if (run.perPlanetState[inspected].combusted) return null;
-    const playerAspects = getAspects(profile.chart);
+    if (run.state[inspected].combusted) return null;
+    const playerAspects = getAspects(prince.chart);
     const opponentAspects = getAspects(encounter.opponentChart);
     return computeProjectedEffects({
-      playerChart: profile.chart,
+      playerChart: prince.chart,
       opponentChart: encounter.opponentChart,
       playerPlanet: inspected,
       opponentPlanet: opponentTurn,
       playerValence: previewValence,
       opponentValence: opponentAction,
-      playerState: run.perPlanetState,
+      playerState: run.state,
       opponentState: encounter.opponentState,
       playerAspects,
       opponentAspects,
     });
-  }, [animation, inspected, previewValence, opponentTurn, opponentAction, run.perPlanetState, encounter.opponentState, encounter.opponentChart, profile.chart]);
+  }, [animation, inspected, previewValence, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, prince.chart]);
 
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection. Mid-animation: the snapshot captured at commit, with each
@@ -199,11 +203,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       }
       if (encounter.resolved) return;
       if (!playerUnlocked.includes(planet)) return;
-      if (run.perPlanetState[planet].combusted) return;
+      if (run.state[planet].combusted) return;
       setSelected(planet);
       setPendingAction(null);
     },
-    [animation, encounter.resolved, run.perPlanetState, playerUnlocked, skipAnimation],
+    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation],
   );
 
   // Hover only highlights the planet under the cursor; it no longer opens the
@@ -216,7 +220,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const handleCommit = useCallback(
     (planet: PlanetName, action: Polarity) => {
       if (animation || encounter.resolved || !opponentTurn) return;
-      if (run.perPlanetState[planet].combusted) return;
+      if (run.state[planet].combusted) return;
       // Deterministic per (run, encounter, turn) — same seed produces the
       // same fight every time, which is the point of `/encounter/<seed>`.
       const rng = mulberry32(
@@ -228,15 +232,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       // during playback match the committed turn (the live projection previews
       // the planet's default verb, which may differ from what was clicked).
       const projectionSnapshot = computeProjectedEffects({
-        playerChart: profile.chart,
+        playerChart: prince.chart,
         opponentChart: encounter.opponentChart,
         playerPlanet: planet,
         opponentPlanet: opponentTurn,
         playerValence: action,
         opponentValence: opponentAction,
-        playerState: run.perPlanetState,
+        playerState: run.state,
         opponentState: encounter.opponentState,
-        playerAspects: getAspects(profile.chart),
+        playerAspects: getAspects(prince.chart),
         opponentAspects: getAspects(encounter.opponentChart),
       });
       const committed = onCommitTurn(planet, action, rng);
@@ -251,7 +255,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       setHovered(null);
       setPendingAction(null);
     },
-    [animation, encounter, run, opponentTurn, opponentAction, profile.chart, onCommitTurn, startAnimation],
+    [animation, encounter, run, opponentTurn, opponentAction, prince.chart, onCommitTurn, startAnimation],
   );
 
   // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
@@ -275,9 +279,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         turnIndex: 0,
         resolved: false,
       };
-      const devRun: RunState = { ...run, currentEncounter: devEncounter };
+      const devRun: Run = { ...run, encounter: devEncounter };
       const rng = mulberry32((run.seed ^ hashString(cfg.opponentPlanet)) >>> 0);
-      const result = resolveTurn(devRun, profile.chart, cfg.playerPlanet, cfg.valence, rng);
+      const result = resolveTurn(devRun, prince.chart, cfg.playerPlanet, cfg.valence, rng);
       if (!result) return;
       const entry: TurnLogEntry = { ...result.log };
       // opponentCrit / opponentCombust = the player's action landing on the
@@ -291,16 +295,16 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         projectedDeltas: null,
       });
     },
-    [animation, skipAnimation, encounter, run, profile.chart, startAnimation],
+    [animation, skipAnimation, encounter, run, prince.chart, startAnimation],
   );
 
   // The action fan-out rides the bottom of the stats panel — local to the
   // planet. Shown for the inspected planet (hover or select) when committable.
   const playerActions: PlanetStatsActions | undefined =
-    inspected && !animation && !encounter.resolved && !run.perPlanetState[inspected].combusted
+    inspected && !animation && !encounter.resolved && !run.state[inspected].combusted
       ? {
-          afflict: getEffectiveStats(profile.chart, inspected).damage,
-          testify: getEffectiveStats(profile.chart, inspected).healing,
+          afflict: getEffectiveStats(prince.chart, inspected).damage,
+          testify: getEffectiveStats(prince.chart, inspected).healing,
           pending: pendingAction,
           // First click/tap arms the action (and previews its spread); a second
           // on the same action confirms. Uniform across pointer and touch.
@@ -323,19 +327,19 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const handleContinue = useCallback(() => {
     if (animation) return;
-    if (run.over) {
+    if (runEnded) {
       navigate(ROUTES.end);
       return;
     }
     onClearEncounter();
     navigate(ROUTES.map);
-  }, [animation, run.over, onClearEncounter, navigate]);
+  }, [animation, runEnded, onClearEncounter, navigate]);
 
   return (
     <div className="combat" onClick={handleClearSelection}>
       <div className="combat-side">
         <Chart
-          chart={profile.chart}
+          chart={prince.chart}
           state={displayPlayerState}
           unlockedPlanets={playerUnlocked}
           selectedPlanet={selected}
@@ -389,7 +393,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         )}
         {encounter.resolved && !animation && (
           <div className="combat-opp-of-turn is-dim">
-            <SeamName>{run.over ? "COMBUST" : "SETTLED"}</SeamName>
+            <SeamName>{runEnded ? "COMBUST" : "SETTLED"}</SeamName>
           </div>
         )}
 
@@ -463,7 +467,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       {encounter.resolved && !animation && (
         <div className="continue-prompt">
           <button className="begin-btn" onClick={handleContinue}>
-            {run.over ? "Walk back" : "Continue"}
+            {runEnded ? "Walk back" : "Continue"}
           </button>
         </div>
       )}

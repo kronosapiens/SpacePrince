@@ -5,14 +5,14 @@ import { CityPicker } from "@/components/CityPicker";
 import { ROUTES } from "@/routes";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
-import { useProfileDispatch } from "@/state/ProfileStore";
+import { usePrinceDispatch } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
-import type { Chart as ChartType, Profile, PlanetName, SignName } from "@/game/types";
+import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
 
 type Stage = "input" | "revealing" | "settled";
 
@@ -37,7 +37,7 @@ const SCAFFOLD_CHART = seededChart(0, "");
 export function StartScreen() {
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
-  const dispatchProfile = useProfileDispatch();
+  const dispatchPrince = usePrinceDispatch();
   const startRun = useStartRun();
   const [stage, setStage] = useState<Stage>("input");
   const [form, setForm] = useState<FormState>({
@@ -129,25 +129,22 @@ export function StartScreen() {
     if (!computed) return;
     const ms = quantizeMs(localToUtcMs(form.date, form.time, form.tz));
     const iso = new Date(ms).toISOString();
-    const profile: Profile = {
+    const prince: Prince = {
       id: computed.id,
-      name: computed.name,
-      birthData: {
+      position: {
         iso,
         lat: roundLat(Number(form.lat)),
         lon: roundLon(Number(form.lon)),
       },
       chart: computed,
-      lifetimeEncounterCount: 0,
-      scarsLevel: 0,
-      createdAt: Date.now(),
-      schemaVersion: 1,
+      numEncounters: 0,
+      achievements: 0,
+      runs: [],
     };
-    dispatchProfile({ type: "profile/set", profile });
-    // Begin a fresh run for the newly-minted Prince and drop straight into it.
-    // A fresh run/start replaces any stale run carried in localStorage, so the
-    // map the player lands on always matches the chart they just minted.
-    startRun(profile);
+    dispatchPrince({ kind: "mint", prince });
+    // Append a fresh run for the newly-minted Prince and drop straight into it,
+    // so the map the player lands on always matches the chart they just minted.
+    startRun();
     navigate(ROUTES.map);
   };
 

@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ActivePlanetTint } from "@/components/ActivePlanetTint";
 import { PageDropdown } from "@/components/PageDropdown";
+import { DevConsole } from "@/components/DevConsole";
 import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { StartScreen } from "@/screens/StartScreen";
@@ -29,6 +30,7 @@ export function App() {
         <Route path="*" element={<Navigate to={ROUTES.title} replace />} />
       </Routes>
       <PageDropdown />
+      {import.meta.env.DEV && <DevConsole />}
     </>
   );
 }

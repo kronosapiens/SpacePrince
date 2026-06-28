@@ -14,8 +14,8 @@ import type {
   MapState,
   NarrativeEncounter,
   NodeContent,
-  Profile,
-  RunState,
+  Prince,
+  Run,
   SideState,
 } from "@/game/types";
 
@@ -58,42 +58,38 @@ export function useDevHouseParam(): number | null {
  *  not the player. Persisted in sessionStorage so dev mode feels like one Prince. */
 const SESSION_PROFILE_KEY = "sp:dev-profile:v1";
 
-export function getOrCreateDevProfile(): Profile {
+export function getOrCreateDevProfile(): Prince {
   try {
     const raw = sessionStorage.getItem(SESSION_PROFILE_KEY);
-    if (raw) return JSON.parse(raw) as Profile;
+    if (raw) return JSON.parse(raw) as Prince;
   } catch {}
   const seed = Math.floor(Math.random() * 2 ** 31);
   const chart: Chart = seededChart(seed, "Dev Prince");
-  const profile: Profile = {
+  const prince: Prince = {
     id: `dev_${seed}`,
-    name: "Dev Prince",
-    birthData: { iso: new Date().toISOString(), lat: 0, lon: 0 },
+    position: { iso: new Date().toISOString(), lat: 0, lon: 0 },
     chart,
-    lifetimeEncounterCount: 999,
-    scarsLevel: 0,
-    createdAt: Date.now(),
-    schemaVersion: 1,
+    numEncounters: 999,
+    achievements: 0,
+    runs: [],
   };
-  sessionStorage.setItem(SESSION_PROFILE_KEY, JSON.stringify(profile));
-  return profile;
+  sessionStorage.setItem(SESSION_PROFILE_KEY, JSON.stringify(prince));
+  return prince;
 }
 
-/** Seed-driven dev profile. Pure, no storage. Each URL hash maps
+/** Seed-driven dev Prince. Pure, no storage. Each URL hash maps
  *  deterministically to a (player chart, opponent chart) pair so reroll
  *  refreshes both. */
-export function makeDevProfile(seed: number): Profile {
+export function makeDevProfile(seed: number): Prince {
   const chartSeed = hashString(`${seed}_player`);
   const chart: Chart = seededChart(chartSeed, "Dev Prince");
   return {
     id: `dev_${seed}`,
-    name: "Dev Prince",
-    birthData: { iso: new Date(0).toISOString(), lat: 0, lon: 0 },
+    position: { iso: new Date(0).toISOString(), lat: 0, lon: 0 },
     chart,
-    lifetimeEncounterCount: 999,
-    scarsLevel: 0,
-    createdAt: 0,
-    schemaVersion: 1,
+    numEncounters: 999,
+    achievements: 0,
+    runs: [],
   };
 }
 
@@ -102,23 +98,19 @@ export function clearDevProfile(): void {
 }
 
 /** Build an ephemeral run state from a seed. */
-export function makeDevRun(seed: number, profile: Profile): RunState {
-  const currentMap = makeDevMap(seed);
+export function makeDevRun(seed: number): Run {
+  const map = makeDevMap(seed);
   return {
     id: `dev_run_${seed}`,
     seed,
-    startedAt: Date.now(),
-    perPlanetState: syntheticDevSideState(seed, "player"),
-    runDistance: syntheticDevDistance(seed, currentMap),
-    runOmens: [],
-    currentMap,
-    mapHistory: [],
-    currentEncounter: null,
+    state: syntheticDevSideState(seed, "player"),
+    distance: syntheticDevDistance(seed, map),
+    map,
+    mapsCompleted: 0,
+    encounter: null,
     seenFragmentIds: [],
     seenScenarioIds: [],
-    loreCounters: {},
-    lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
-    over: false,
+    events: [],
   };
 }
 

@@ -7,7 +7,7 @@ import type {
   NarrativeEncounter,
   PlanetName,
   Polarity,
-  RunState,
+  Run,
 } from "./types";
 
 /** Every encounter resolves in a fixed three turns, regardless of unlock tier
@@ -17,7 +17,7 @@ import type {
 export const MAX_COMBAT_TURNS = 3;
 
 export interface BeginCombatInput {
-  run: RunState;
+  run: Run;
   opponentSeed: number;
   lifetimeEncounterCount: number;
   devUnlockAll?: boolean;
@@ -56,7 +56,7 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
 }
 
 export interface BeginNarrativeInput {
-  run: RunState;
+  run: Run;
   house: number;
   treeId: string;
   rootNodeId: string;

@@ -13,7 +13,7 @@ import type {
   PlanetState,
   Polarity,
   PropagationEntry,
-  RunState,
+  Run,
   SideState,
   TurnLogEntry,
 } from "./types";
@@ -21,7 +21,7 @@ import type {
 const ZERO_STATS = { damage: 0, healing: 0, durability: 0, luck: 0 };
 
 interface TurnResult {
-  run: RunState;
+  run: Run;
   encounter: CombatEncounter;
   log: TurnLogEntry;
   encounterEnded: boolean;
@@ -33,19 +33,19 @@ interface TurnResult {
  * and combustion persist across encounters and maps within a run.
  */
 export function resolveTurn(
-  run: RunState,
+  run: Run,
   playerChart: Chart,
   playerPlanet: PlanetName,
   playerValence: Polarity,
   rng: () => number,
 ): TurnResult | null {
-  const enc = run.currentEncounter;
+  const enc = run.encounter;
   if (!enc || enc.kind !== "combat" || enc.resolved) return null;
   const opponentPlanet = enc.sequence[enc.turnIndex];
   if (!opponentPlanet) return null;
   const opponentValence = enc.opponentActions[enc.turnIndex] ?? "Affliction";
 
-  const playerStateMap = cloneSideState(run.perPlanetState);
+  const playerStateMap = cloneSideState(run.state);
   const opponentStateMap = cloneSideState(enc.opponentState);
   const playerPlacement = playerChart.planets[playerPlanet];
   const opponentPlacement = enc.opponentChart.planets[opponentPlanet];
@@ -140,12 +140,13 @@ export function resolveTurn(
     resolved: encounterEnded,
   };
 
-  const updatedRun: RunState = {
+  // `over` is derived (isOver), never stored: we surface `runEnded` for callers
+  // and let the unlock tier decide when the run actually ends.
+  const updatedRun: Run = {
     ...run,
-    perPlanetState: playerStateMap,
-    runDistance: run.runDistance + score,
-    currentEncounter: updatedEnc,
-    over: runEnded,
+    state: playerStateMap,
+    distance: run.distance + score,
+    encounter: updatedEnc,
   };
 
   return { run: updatedRun, encounter: updatedEnc, log, encounterEnded, runEnded };

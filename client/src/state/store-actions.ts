@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import { useRunDispatch } from "./RunStore";
-import { useProfileDispatch } from "./ProfileStore";
+import { usePrinceDispatch } from "./PrinceStore";
 import { resolveTurn } from "@/game/turn";
 import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
 import { randomSeed } from "@/game/rng";
@@ -11,46 +10,45 @@ import type {
   NodeOutcome,
   PlanetName,
   Polarity,
-  Profile,
-  RunState,
+  Run,
   TurnLogEntry,
 } from "@/game/types";
 
 /** Shape returned by `useCommitTurn` — feeds the combat animation. */
 export interface CommitTurnResult {
   log: TurnLogEntry;
-  nextRun: RunState;
+  nextRun: Run;
   encounter: CombatEncounter;
   encounterEnded: boolean;
   runEnded: boolean;
 }
 
 /**
- * Cross-store thunk hooks. These wrap impure work (RNG, time, computed
- * `nextRun` shapes) and dispatch the resolved state to the pure reducers.
+ * Cross-cutting thunk hooks. These wrap impure work (RNG, time, computed
+ * `nextRun` shapes) and dispatch the resolved state to the pure Prince reducer.
+ * A run lives inside the Prince (STATE.md); these mutate the tail run.
  */
 
-/** Begin a new run for the given profile. Returns the run that was dispatched. */
+/** Append a fresh run to the Prince. Returns the run that was dispatched. */
 export function useStartRun() {
-  const dispatchRun = useRunDispatch();
+  const dispatch = usePrinceDispatch();
   return useCallback(
-    (profile: Profile, seed: number = randomSeed()): RunState => {
-      const run = beginRun(profile, seed);
-      dispatchRun({ type: "run/start", run });
+    (seed: number = randomSeed()): Run => {
+      const run = beginRun(seed);
+      dispatch({ kind: "startRun", run });
       return run;
     },
-    [dispatchRun],
+    [dispatch],
   );
 }
 
-/** Resolve a combat turn and dispatch the result. Bumps lifetimeEncounterCount
- *  and adds a NodeOutcome when the encounter ends. */
+/** Resolve a combat turn and dispatch the result. Bumps `numEncounters` and
+ *  records a NodeOutcome on the map when the encounter ends. */
 export function useCommitTurn() {
-  const dispatchRun = useRunDispatch();
-  const dispatchProfile = useProfileDispatch();
+  const dispatch = usePrinceDispatch();
   return useCallback(
     (
-      run: RunState,
+      run: Run,
       playerChart: Chart,
       planet: PlanetName,
       valence: Polarity,
@@ -61,30 +59,25 @@ export function useCommitTurn() {
       let nextRun = result.run;
       if (result.encounterEnded && result.encounter.kind === "combat") {
         const combusts = PLANETS.filter(
-          (p) =>
-            nextRun.perPlanetState[p].combusted &&
-            !run.perPlanetState[p].combusted,
+          (p) => nextRun.state[p].combusted && !run.state[p].combusted,
         );
         const outcome: NodeOutcome = {
-          nodeId: nextRun.currentMap.currentNodeId,
+          nodeId: nextRun.map.currentNodeId,
           kind: "combat",
           summary: `Combat · ${result.encounter.opponentChart.name}`,
-          distanceDelta: nextRun.runDistance - run.runDistance,
+          distanceDelta: nextRun.distance - run.distance,
           combusts,
         };
         nextRun = {
           ...nextRun,
-          currentMap: {
-            ...nextRun.currentMap,
-            outcomes: {
-              ...nextRun.currentMap.outcomes,
-              [outcome.nodeId]: outcome,
-            },
+          map: {
+            ...nextRun.map,
+            outcomes: { ...nextRun.map.outcomes, [outcome.nodeId]: outcome },
           },
         };
-        dispatchProfile({ type: "profile/incrementLifetime" });
+        dispatch({ kind: "incrementEncounters" });
       }
-      dispatchRun({ type: "run/commitTurn", nextRun });
+      dispatch({ kind: "commitRun", run: nextRun });
       return {
         log: result.log,
         nextRun,
@@ -93,85 +86,61 @@ export function useCommitTurn() {
         runEnded: result.runEnded,
       };
     },
-    [dispatchRun, dispatchProfile],
+    [dispatch],
   );
 }
 
 /** Resolve a narrative step (mid-tree or terminal) and dispatch. When the
- *  encounter resolves, also bumps lifetime + records a NodeOutcome. */
+ *  encounter resolves, bumps `numEncounters` + records a NodeOutcome. */
 export function useCommitNarrative() {
-  const dispatchRun = useRunDispatch();
-  const dispatchProfile = useProfileDispatch();
+  const dispatch = usePrinceDispatch();
   return useCallback(
-    (args: {
-      run: RunState;
-      nextRun: RunState;
-      summary: string;
-      resolved: boolean;
-    }) => {
+    (args: { run: Run; nextRun: Run; summary: string; resolved: boolean }) => {
       let next = args.nextRun;
       if (args.resolved) {
         const combusts = PLANETS.filter(
-          (p) =>
-            next.perPlanetState[p].combusted &&
-            !args.run.perPlanetState[p].combusted,
+          (p) => next.state[p].combusted && !args.run.state[p].combusted,
         );
         const outcome: NodeOutcome = {
-          nodeId: next.currentMap.currentNodeId,
+          nodeId: next.map.currentNodeId,
           kind: "narrative",
           summary: args.summary,
-          distanceDelta: next.runDistance - args.run.runDistance,
+          distanceDelta: next.distance - args.run.distance,
           combusts,
         };
         next = {
           ...next,
-          currentMap: {
-            ...next.currentMap,
-            outcomes: {
-              ...next.currentMap.outcomes,
-              [outcome.nodeId]: outcome,
-            },
+          map: {
+            ...next.map,
+            outcomes: { ...next.map.outcomes, [outcome.nodeId]: outcome },
           },
         };
-        dispatchProfile({ type: "profile/incrementLifetime" });
+        dispatch({ kind: "incrementEncounters" });
       }
-      dispatchRun({ type: "run/commitNarrative", nextRun: next });
+      dispatch({ kind: "commitRun", run: next });
       return next;
     },
-    [dispatchRun, dispatchProfile],
+    [dispatch],
   );
 }
 
 /** Roll over to a fresh map (terminal node reached). */
 export function useRolloverMap() {
-  const dispatchRun = useRunDispatch();
+  const dispatch = usePrinceDispatch();
   return useCallback(
-    (run: RunState, seed: number = randomSeed()): RunState => {
+    (run: Run, seed: number = randomSeed()): Run => {
       const nextRun = rolloverMapFn(run, seed);
-      dispatchRun({ type: "run/rolloverMap", nextRun });
+      dispatch({ kind: "commitRun", run: nextRun });
       return nextRun;
     },
-    [dispatchRun],
+    [dispatch],
   );
 }
 
-/** End-of-Run: idempotent scars bump keyed on the run id. */
-export function useBumpScars() {
-  const dispatchProfile = useProfileDispatch();
-  return useCallback(
-    (runId: string) => {
-      dispatchProfile({ type: "profile/incrementScars", runId });
-    },
-    [dispatchProfile],
-  );
-}
-
-/** Reset everything — both stores cleared, localStorage wiped. */
+/** Reset everything — the Prince and all its runs, localStorage wiped. */
 export function useResetAll() {
-  const dispatchRun = useRunDispatch();
-  const dispatchProfile = useProfileDispatch();
+  const dispatch = usePrinceDispatch();
   return useCallback(() => {
-    dispatchRun({ type: "run/clear" });
-    dispatchProfile({ type: "profile/clear" });
-  }, [dispatchRun, dispatchProfile]);
+    dispatch({ kind: "clear" });
+  }, [dispatch]);
 }

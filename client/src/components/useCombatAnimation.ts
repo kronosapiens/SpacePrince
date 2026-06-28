@@ -5,7 +5,7 @@ import type {
   CombatEncounter,
   PlanetName,
   Polarity,
-  RunState,
+  Run,
   SideState,
   TurnLogEntry,
 } from "@/game/types";
@@ -105,7 +105,7 @@ export interface CombatAnimationApi {
    *  display falls back to the new committed state when animation ends). */
   start(args: {
     entry: TurnLogEntry;
-    previousRun: RunState;
+    previousRun: Run;
     previousEncounter: CombatEncounter;
     projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   }): void;
@@ -134,7 +134,7 @@ export function useCombatAnimation(): CombatAnimationApi {
   const start = useCallback(
     (args: {
       entry: TurnLogEntry;
-      previousRun: RunState;
+      previousRun: Run;
       previousEncounter: CombatEncounter;
       projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
     }) => {
@@ -206,7 +206,7 @@ function applyDelta(state: SideState, planet: PlanetName, delta: number) {
 
 function runScheduler(args: {
   entry: TurnLogEntry;
-  previousRun: RunState;
+  previousRun: Run;
   previousEncounter: CombatEncounter;
   projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   setAnimation: (
@@ -232,12 +232,12 @@ function runScheduler(args: {
   };
 
   setAnimation({
-    selfState: cloneSide(previousRun.perPlanetState),
+    selfState: cloneSide(previousRun.state),
     otherState: cloneSide(previousEncounter.opponentState),
     playerPlanet: entry.playerPlanet,
     opponentPlanet: entry.opponentPlanet,
     turnIndex: previousEncounter.turnIndex,
-    runningDistance: previousRun.runDistance,
+    runningDistance: previousRun.distance,
     distanceFlashEpoch: 0,
     distanceFlashPlanet: null,
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,

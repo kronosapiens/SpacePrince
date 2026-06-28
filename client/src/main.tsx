@@ -2,8 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ActivePlanetProvider } from "@/state/ActivePlanetContext";
-import { ProfileStoreProvider } from "@/state/ProfileStore";
-import { RunStoreProvider } from "@/state/RunStore";
+import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { App } from "./App";
 import "./style/reset.css";
 import "./style/tokens.css";
@@ -16,13 +15,11 @@ if (!rootEl) throw new Error("#root missing");
 ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ProfileStoreProvider>
-        <RunStoreProvider>
-          <ActivePlanetProvider>
-            <App />
-          </ActivePlanetProvider>
-        </RunStoreProvider>
-      </ProfileStoreProvider>
+      <PrinceStoreProvider>
+        <ActivePlanetProvider>
+          <App />
+        </ActivePlanetProvider>
+      </PrinceStoreProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );

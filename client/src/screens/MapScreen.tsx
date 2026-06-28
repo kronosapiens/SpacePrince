@@ -4,8 +4,8 @@ import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
 import { ROUTES } from "@/routes";
-import { useProfile } from "@/state/ProfileStore";
-import { useRun, useRunDispatch } from "@/state/RunStore";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { isOver } from "@/game/run";
 import { useStartRun, useRolloverMap } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -30,7 +30,7 @@ import type {
   EncounterState,
   MapState,
   PlanetName,
-  RunState,
+  Run,
   NodeContent,
 } from "@/game/types";
 
@@ -44,22 +44,22 @@ export function MapScreen() {
 
 function NormalMapScreen() {
   const navigate = useNavigate();
-  const profile = useProfile();
-  const run = useRun();
-  const dispatchRun = useRunDispatch();
+  const prince = usePrince();
+  const run = useActiveRun();
+  const dispatch = usePrinceDispatch();
   const startRun = useStartRun();
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
   const [studyOpen, setStudyOpen] = useState(false);
 
-  // Bootstrap: if we have a profile but no live run, start one. Persistence
-  // is handled by the RunStore effect. If the run is `over`, leave it alone —
-  // EndOfRunScreen handles the "Begin again" path via run/clear.
+  // Bootstrap: a minted Prince with no runs yet gets one (StartScreen normally
+  // appends the first run, but direct nav lands here). The tail run — over or
+  // not — is left alone; an over run redirects to the End screen below.
   useEffect(() => {
-    if (!profile) return;
+    if (!prince) return;
     if (run) return;
-    startRun(profile);
-  }, [profile, run, startRun]);
+    startRun();
+  }, [prince, run, startRun]);
 
   // Tint follows the player's current node when it has content; otherwise
   // falls back to the terminal node's ruler (the map's destination), so a
@@ -67,7 +67,7 @@ function NormalMapScreen() {
   // sitting on neutral bone until the first encounter resolves.
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
-    return mapTintPlanet(run.currentMap);
+    return mapTintPlanet(run.map);
   }, [run]);
 
   useEffect(() => {
@@ -76,44 +76,44 @@ function NormalMapScreen() {
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(
-    () => (profile ? unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll) : []),
-    [profile, settings.unlockAll],
+    () => (prince ? unlockedPlanets(prince.numEncounters, settings.unlockAll) : []),
+    [prince, settings.unlockAll],
   );
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
-      if (!run || !profile) return;
-      let nextRun: RunState = { ...run };
-      const existing = nextRun.currentMap.rolledNodes[nodeId];
+      if (!run || !prince) return;
+      let nextRun: Run = { ...run };
+      const existing = nextRun.map.rolledNodes[nodeId];
       let content: NodeContent;
       if (existing) {
         content = existing;
       } else {
-        const rng = mulberry32(hashString(`${run.currentMap.seed}_${nodeId}`));
+        const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
         content = rollNodeContent({
           rng,
-          lastNarrativeHouse: nextRun.currentMap.lastNarrativeHouse,
+          lastNarrativeHouse: nextRun.map.lastNarrativeHouse,
           forceNarrativeHouse: settings.forceNarrativeHouse,
           forceCombat: settings.forceCombat,
         });
         nextRun = {
           ...nextRun,
-          currentMap: {
-            ...nextRun.currentMap,
-            rolledNodes: { ...nextRun.currentMap.rolledNodes, [nodeId]: content },
-            lastNarrativeHouse: content.kind === "narrative" ? content.house : nextRun.currentMap.lastNarrativeHouse,
+          map: {
+            ...nextRun.map,
+            rolledNodes: { ...nextRun.map.rolledNodes, [nodeId]: content },
+            lastNarrativeHouse: content.kind === "narrative" ? content.house : nextRun.map.lastNarrativeHouse,
           },
         };
       }
 
       nextRun = {
         ...nextRun,
-        currentMap: {
-          ...nextRun.currentMap,
+        map: {
+          ...nextRun.map,
           currentNodeId: nodeId,
-          visitedNodeIds: nextRun.currentMap.visitedNodeIds.includes(nodeId)
-            ? nextRun.currentMap.visitedNodeIds
-            : [...nextRun.currentMap.visitedNodeIds, nodeId],
+          visitedNodeIds: nextRun.map.visitedNodeIds.includes(nodeId)
+            ? nextRun.map.visitedNodeIds
+            : [...nextRun.map.visitedNodeIds, nodeId],
         },
       };
 
@@ -122,7 +122,7 @@ function NormalMapScreen() {
         encounter = beginCombatEncounter({
           run: nextRun,
           opponentSeed: content.opponentSeed,
-          lifetimeEncounterCount: profile.lifetimeEncounterCount,
+          lifetimeEncounterCount: prince.numEncounters,
           devUnlockAll: settings.unlockAll,
         });
       } else {
@@ -147,55 +147,55 @@ function NormalMapScreen() {
           seenScenarioIds: [...(nextRun.seenScenarioIds ?? []), tree.scenarioId],
         };
       }
-      nextRun = { ...nextRun, currentEncounter: encounter };
-      // commitNarrative covers any pre-encounter run mutations (rolledNodes,
-      // visitedNodeIds, currentNodeId). The reducer just adopts the new state.
-      dispatchRun({ type: "run/commitNarrative", nextRun });
+      nextRun = { ...nextRun, encounter };
+      // Commit the pre-encounter run mutations (rolledNodes, visitedNodeIds,
+      // currentNodeId, the new encounter) to the tail run.
+      dispatch({ kind: "commitRun", run: nextRun });
       navigate(ROUTES.encounter);
     },
-    [run, profile, settings, navigate, dispatchRun],
+    [run, prince, settings, navigate, dispatch],
   );
 
   useEffect(() => {
-    if (!run) return;
-    if (run.over) return; // run already ended (combust or seventh-map completion)
-    if (run.currentEncounter) return;
-    if (run.currentMap.currentNodeId !== TERMINAL_NODE_ID) return;
+    if (!run || !prince) return;
+    if (isOver(run, prince.numEncounters)) return; // ended (combust or completion)
+    if (run.encounter) return;
+    if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
     rolloverMap(run);
-  }, [run, rolloverMap]);
+  }, [run, prince, rolloverMap]);
 
-  if (!profile) return <Navigate to={ROUTES.title} replace />;
+  if (!prince) return <Navigate to={ROUTES.title} replace />;
   if (!run) return null;
-  if (run.currentEncounter) return <Navigate to={ROUTES.encounter} replace />;
-  if (run.over) return <Navigate to={ROUTES.end} replace />;
+  if (run.encounter) return <Navigate to={ROUTES.encounter} replace />;
+  if (isOver(run, prince.numEncounters)) return <Navigate to={ROUTES.end} replace />;
 
-  const mapNumber = run.mapHistory.length + 1;
-  const runNumber = profile.scarsLevel + 1;
+  const mapNumber = run.mapsCompleted + 1;
+  const runNumber = prince.runs.length;
 
   return (
     <div className="map-screen">
       <div className="map-anchor">
         <ChartAnchor
-          chart={profile.chart}
-          state={run.perPlanetState}
+          chart={prince.chart}
+          state={run.state}
           unlockedPlanets={playerUnlocked}
           onExpand={() => setStudyOpen(true)}
         />
       </div>
       <div className="map-distance">
         <span className="eyebrow">DISTANCE</span>
-        <span className="map-distance-v">{Math.round(run.runDistance)}</span>
+        <span className="map-distance-v">{Math.round(run.distance)}</span>
       </div>
       <div className="map-diagram-wrap">
-        <MapDiagram map={run.currentMap} onSelectNode={handleNodeSelect} />
+        <MapDiagram map={run.map} onSelectNode={handleNodeSelect} />
       </div>
       <div className="map-caption">
         <span className="eyebrow">RUN {roman(runNumber)} · MAP {roman(mapNumber)}</span>
       </div>
       {studyOpen && (
         <ChartStudyOverlay
-          chart={profile.chart}
-          state={run.perPlanetState}
+          chart={prince.chart}
+          state={run.state}
           unlockedPlanets={playerUnlocked}
           onClose={() => setStudyOpen(false)}
         />

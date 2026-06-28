@@ -2,9 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
-import { useProfile } from "@/state/ProfileStore";
-import { useRun, useRunDispatch } from "@/state/RunStore";
-import { useBumpScars } from "@/state/store-actions";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { useStartRun } from "@/state/store-actions";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { loadDevSettings } from "@/state/settings";
 import {
@@ -27,43 +26,43 @@ export function EndOfRunScreen() {
 
 function NormalEndOfRunScreen() {
   const navigate = useNavigate();
-  const profile = useProfile();
-  const run = useRun();
-  const dispatchRun = useRunDispatch();
-  const bumpScars = useBumpScars();
+  const prince = usePrince();
+  const run = useActiveRun();
+  const startRun = useStartRun();
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
     setActive(null);
   }, [setActive]);
 
-  useEffect(() => {
-    if (!profile || !run) return;
-    if (!run.over) return;
-    bumpScars(run.id);
-  }, [profile, run, bumpScars]);
-
+  // The finished run keeps only its current map; prior maps live in the
+  // in-memory event log (STATE.md). Reconstruct the full sequence for the
+  // rainbow. (After a reload `events` is empty, so only the last map shows —
+  // accepted: a real client would read these from chain events.)
   const allMaps: MapState[] = useMemo(() => {
     if (!run) return [];
-    return [...run.mapHistory, run.currentMap];
+    return [...run.events.map((e) => e.map), run.map];
   }, [run]);
 
-  const totalEncounters = useMemo(() => {
-    if (!run || !profile) return 0;
-    return profile.lifetimeEncounterCount - run.lifetimeEncounterAtRunStart;
-  }, [run, profile]);
+  // Encounters resolved this run = one NodeOutcome recorded per resolved node.
+  const totalEncounters = useMemo(
+    () => allMaps.reduce((n, m) => n + Object.keys(m.outcomes).length, 0),
+    [allMaps],
+  );
 
-  if (!profile) return <Navigate to={ROUTES.title} replace />;
+  if (!prince) return <Navigate to={ROUTES.title} replace />;
   if (!run) return <Navigate to={ROUTES.title} replace />;
 
+  // The finished run stays in `prince.runs` (its Distance is now a permanent
+  // star); "New Game" just appends a fresh run and drops into it.
   const beginNew = () => {
-    dispatchRun({ type: "run/clear" });
+    startRun();
     navigate(ROUTES.map);
   };
 
   return (
     <EndOfRunView
-      runDistance={run.runDistance}
+      runDistance={run.distance}
       numMaps={allMaps.length}
       totalEncounters={totalEncounters}
       allMaps={allMaps}

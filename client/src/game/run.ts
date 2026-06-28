@@ -1,12 +1,11 @@
-import { PLANETS } from "./data";
 import { blankSideState } from "./chart";
 import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
 import { mulberry32, randomSeed } from "./rng";
-import type {
-  MapState,
-  Profile,
-  RunState,
-} from "./types";
+import { unlockedPlanets } from "./unlocks";
+import type { MapState, Prince, Run } from "./types";
+
+/** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
+export const MAPS_PER_RUN = 7;
 
 export function newMapState(seed: number): MapState {
   return {
@@ -21,48 +20,59 @@ export function newMapState(seed: number): MapState {
   };
 }
 
-export function beginRun(profile: Profile, seed = randomSeed()): RunState {
+export function beginRun(seed = randomSeed()): Run {
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
   return {
     id: `run_${seed}`,
     seed,
-    startedAt: Date.now(),
-    perPlanetState: blankSideState(),
-    runDistance: 0,
-    runOmens: [],
-    currentMap: newMapState(mapSeed),
-    mapHistory: [],
-    currentEncounter: null,
+    state: blankSideState(),
+    distance: 0,
+    map: newMapState(mapSeed),
+    mapsCompleted: 0,
+    encounter: null,
     seenFragmentIds: [],
     seenScenarioIds: [],
-    loreCounters: {},
-    lifetimeEncounterAtRunStart: profile.lifetimeEncounterCount,
-    over: false,
+    events: [],
   };
 }
 
-/** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
-export const MAPS_PER_RUN = 7;
-
-export function isRunOver(run: RunState): boolean {
-  return PLANETS.every((p) => run.perPlanetState[p].combusted);
+/** Whether a run has ended — derived, never stored (STATE.md). A run is over
+ *  when the seventh map is finished (completion) or every planet the player has
+ *  *fielded* (its unlock tier) is combust (full combustion). */
+export function isOver(run: Run, numEncounters: number): boolean {
+  if (run.mapsCompleted >= MAPS_PER_RUN) return true;
+  const tier = unlockedPlanets(numEncounters);
+  return tier.length > 0 && tier.every((p) => run.state[p].combusted);
 }
 
-/** Called at L7 traversal. Generates a fresh map and archives the prior one —
- *  unless the seventh map was just completed, in which case the run ends by
- *  *completion* (MECHANICS §11): the current map stays in place as the final,
- *  completed map (End-of-Run reads `mapHistory` + `currentMap`) and the run is
- *  marked over. Either ending — completion here, or full combustion in
- *  `turn.ts` — inscribes the run's final Distance as a star. */
-export function rolloverMap(run: RunState, seed = randomSeed()): RunState {
-  if (run.mapHistory.length + 1 >= MAPS_PER_RUN) {
-    return { ...run, currentEncounter: null, over: true };
+/** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
+ *  the finished map to the event log and generates a fresh one. The seventh
+ *  completion ends the run: the final map stays current (not archived), so the
+ *  End screen's `[...events.map(e => e.map), run.map]` is exactly seven. */
+export function rolloverMap(run: Run, seed = randomSeed()): Run {
+  const mapsCompleted = run.mapsCompleted + 1;
+  if (mapsCompleted >= MAPS_PER_RUN) {
+    return { ...run, mapsCompleted, encounter: null };
   }
-  return {
-    ...run,
-    currentMap: newMapState(seed),
-    mapHistory: [...run.mapHistory, run.currentMap],
-    currentEncounter: null,
-  };
+  const events = [...run.events, { kind: "map-completed" as const, map: run.map }];
+  return { ...run, map: newMapState(seed), mapsCompleted, encounter: null, events };
+}
+
+// ── Prince-level derivations (never stored; STATE.md) ───────────────────────
+// A Prince owns its runs; the active run is the tail iff it is not over. All
+// runs but a live tail are complete, so the star-field is just their distances.
+// (The active run is selected by the `useActiveRun` store hook, which returns
+// the tail even when over so the End screen can read the just-finished run.)
+
+/** Every finished run (excludes a live tail). */
+export function completedRuns(prince: Prince): Run[] {
+  const tail = prince.runs.at(-1);
+  if (!tail) return [];
+  return isOver(tail, prince.numEncounters) ? prince.runs : prince.runs.slice(0, -1);
+}
+
+/** The NFT star-field: one star (Distance) per completed run. */
+export function starField(prince: Prince): number[] {
+  return completedRuns(prince).map((r) => r.distance);
 }

@@ -7,6 +7,7 @@ import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { ROUTES } from "@/routes";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
+import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
@@ -16,8 +17,8 @@ import type {
   NarrativeEncounter,
   PlanetName,
   Polarity,
-  Profile,
-  RunState,
+  Prince,
+  Run,
 } from "@/game/types";
 
 const ROMAN = ["i", "ii", "iii", "iv", "v"];
@@ -33,7 +34,7 @@ const HOUSE_NAMES = [
 ];
 
 export interface CommitNarrativeArgs {
-  nextRun: RunState;
+  nextRun: Run;
   /** Free-form summary of the choice made (used in NodeOutcome). */
   summary: string;
   /** True when the choice resolved the encounter. */
@@ -41,8 +42,8 @@ export interface CommitNarrativeArgs {
 }
 
 interface NarrativeScreenProps {
-  run: RunState;
-  profile: Profile;
+  run: Run;
+  prince: Prince;
   encounter: NarrativeEncounter;
   /** Persistence + (when resolved) lifetime bump + outcome construction
    *  happens inside the implementation (real or dev). */
@@ -52,7 +53,7 @@ interface NarrativeScreenProps {
 }
 
 export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
-  const { run, profile, encounter, onCommit, onClearEncounter } = props;
+  const { run, prince, encounter, onCommit, onClearEncounter } = props;
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
@@ -64,8 +65,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const ariaPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
   const playerUnlocked = useMemo(
-    () => unlockedPlanets(profile.lifetimeEncounterCount),
-    [profile.lifetimeEncounterCount],
+    () => unlockedPlanets(prince.numEncounters),
+    [prince.numEncounters],
   );
 
   useEffect(() => {
@@ -87,13 +88,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const ctx = useMemo(
     () =>
       buildNarrativeContext({
-        profile,
+        prince,
         run,
         joyPlanet,
         rulerPlanet: house.ruler,
         unlocked: playerUnlocked,
       }),
-    [profile, run, joyPlanet, house.ruler, playerUnlocked],
+    [prince, run, joyPlanet, house.ruler, playerUnlocked],
   );
 
   const [resolved, setResolved] = useState(encounter.resolved);
@@ -123,7 +124,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     let resolutionText = "";
     if (option.outcomesOnSuccess || option.outcomesOnFail) {
       const luckPlanet = joyPlanet ?? house.ruler;
-      const placement = profile.chart.planets[luckPlanet];
+      const placement = prince.chart.planets[luckPlanet];
       const luck = placement.base.luck + placement.buffs.luck;
       // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
       const chance = Math.min(0.85, 0.4 + luck * 0.03);
@@ -132,7 +133,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       resolutionText = success ? "The wager holds." : "The wager falls.";
     }
 
-    let nextRun = applyOutcomes(run, profile, outcomes, ctx);
+    let nextRun = applyOutcomes(run, prince, outcomes, ctx);
     if (fragment && !nextRun.seenFragmentIds.includes(fragment.id)) {
       nextRun = { ...nextRun, seenFragmentIds: [...nextRun.seenFragmentIds, fragment.id] };
     }
@@ -142,8 +143,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     const impact = new Map<PlanetName, Polarity>();
     const combusting = new Set<PlanetName>();
     for (const p of PLANETS) {
-      const before = run.perPlanetState[p];
-      const after = nextRun.perPlanetState[p];
+      const before = run.state[p];
+      const after = nextRun.state[p];
       if (!before.combusted && after.combusted) combusting.add(p);
       if (after.affliction < before.affliction) impact.set(p, "Testimony");
       else if (after.affliction > before.affliction) impact.set(p, "Affliction");
@@ -153,7 +154,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       epoch: epochRef.current,
       impact,
       combusting,
-      distance: nextRun.runDistance - run.runDistance,
+      distance: nextRun.distance - run.distance,
     });
 
     if (option.next) {
@@ -162,7 +163,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         currentNodeId: option.next,
         visitedNodeIds: [...encounter.visitedNodeIds, option.next],
       };
-      nextRun = { ...nextRun, currentEncounter: updatedEnc };
+      nextRun = { ...nextRun, encounter: updatedEnc };
       onCommit({ nextRun, summary: option.text, resolved: false });
       return;
     }
@@ -172,7 +173,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       resolved: true,
       resolutionText: resolutionText || option.text,
     };
-    nextRun = { ...nextRun, currentEncounter: finalEnc };
+    nextRun = { ...nextRun, encounter: finalEnc };
 
     onCommit({
       nextRun,
@@ -184,27 +185,30 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     setFrozenOptions(options);
   };
 
+  // `over` is derived (STATE.md): the run ended if every fielded planet combust.
+  const runEnded = isOver(run, prince.numEncounters);
+
   const continuedRef = useRef(false);
   const handleContinue = useCallback(() => {
     if (continuedRef.current) return; // timer + tap both call this; fire once
     continuedRef.current = true;
-    if (run.over) {
+    if (runEnded) {
       navigate(ROUTES.end);
       return;
     }
     onClearEncounter();
     navigate(ROUTES.map);
-  }, [run.over, onClearEncounter, navigate]);
+  }, [runEnded, onClearEncounter, navigate]);
 
   // No Continue button: once resolved, the line gets a beat to land and then
   // the world carries the player onward (SCREENS.md §10). A tap skips the wait.
   useEffect(() => {
     if (!resolved) return;
     // Let the flash land before leaving — longer when a planet combusts.
-    const ms = run.over ? 2800 : flash?.combusting.size ? 2400 : 1800;
+    const ms = runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800;
     const t = setTimeout(handleContinue, ms);
     return () => clearTimeout(t);
-  }, [resolved, run.over, flash, handleContinue]);
+  }, [resolved, runEnded, flash, handleContinue]);
 
   const fragmentLines = (fragment?.text ?? "").split(/\n+/);
 
@@ -215,8 +219,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     >
       <div className="narrative-chart">
         <Chart
-          chart={profile.chart}
-          state={run.perPlanetState}
+          chart={prince.chart}
+          state={run.state}
           unlockedPlanets={playerUnlocked}
           activePlanet={joyPlanet ?? null}
           entrance="left"
@@ -295,7 +299,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                 : undefined
             }
           >
-            {Math.round(run.runDistance)}
+            {Math.round(run.distance)}
           </span>
         </div>
       </div>

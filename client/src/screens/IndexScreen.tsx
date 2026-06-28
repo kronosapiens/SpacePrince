@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { useProfile, useProfileDispatch } from "@/state/ProfileStore";
-import { useRun, useRunDispatch } from "@/state/RunStore";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useResetAll } from "@/state/store-actions";
 import { loadDevSettings, saveDevSettings, type DevSettings } from "@/state/settings";
 import { unlockedPlanets } from "@/game/unlocks";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
-import type { Profile } from "@/game/types";
+import type { Prince } from "@/game/types";
 
 export function IndexScreen() {
-  const profile = useProfile();
-  const run = useRun();
-  const dispatchProfile = useProfileDispatch();
-  const dispatchRun = useRunDispatch();
+  const prince = usePrince();
+  const run = useActiveRun();
+  const dispatch = usePrinceDispatch();
   const resetAll = useResetAll();
   const [settings, setSettings] = useState<DevSettings>(() => loadDevSettings());
 
@@ -47,29 +45,32 @@ export function IndexScreen() {
       </section>
 
       <section>
-        <div className="t-chrome-em" style={{ marginBottom: 8 }}>Profile</div>
-        {profile ? (
+        <div className="t-chrome-em" style={{ marginBottom: 8 }}>Prince</div>
+        {prince ? (
           <>
             <div className="index-row">
-              <span>Name: {profile.name}</span>
-              <span className="muted">{profile.id}</span>
+              <span>{prince.chart.name}</span>
+              <span className="muted">{prince.id}</span>
             </div>
             <div className="index-row">
-              Lifetime encounters: {profile.lifetimeEncounterCount}
+              Lifetime encounters: {prince.numEncounters}
               <span className="muted">
-                ({unlockedPlanets(profile.lifetimeEncounterCount, settings.unlockAll).length} unlocked)
+                ({unlockedPlanets(prince.numEncounters, settings.unlockAll).length} unlocked)
               </span>
+            </div>
+            <div className="index-row">
+              Runs: {prince.runs.length}
             </div>
             <div className="index-row">
               <button
                 className="title-second"
                 onClick={() => {
-                  if (!profile) return;
-                  const v = window.prompt("Set lifetimeEncounterCount", String(profile.lifetimeEncounterCount));
+                  if (!prince) return;
+                  const v = window.prompt("Set numEncounters", String(prince.numEncounters));
                   if (v == null) return;
                   const n = Math.max(0, Math.floor(Number(v)));
                   if (Number.isFinite(n)) {
-                    dispatchProfile({ type: "profile/setEncounterCount", count: n });
+                    dispatch({ kind: "setEncounters", count: n });
                   }
                 }}
               >
@@ -79,53 +80,44 @@ export function IndexScreen() {
                 className="title-second"
                 onClick={resetAll}
               >
-                Reset all (profile + run)
+                Reset Prince (all runs)
               </button>
             </div>
           </>
         ) : (
-          <div className="index-row muted">No profile.</div>
+          <div className="index-row muted">No Prince.</div>
         )}
-        {!profile && (
+        {!prince && (
           <div className="index-row">
             <button
               className="title-second"
               onClick={() => {
                 const seed = randomSeed();
                 const chart = seededChart(seed, "Stub Prince");
-                const next: Profile = {
+                const next: Prince = {
                   id: `stub_${seed}`,
-                  name: "Stub Prince",
-                  birthData: { iso: new Date().toISOString(), lat: 0, lon: 0 },
+                  position: { iso: new Date().toISOString(), lat: 0, lon: 0 },
                   chart,
-                  lifetimeEncounterCount: 0,
-                  scarsLevel: 0,
-                  createdAt: Date.now(),
-                  schemaVersion: 1,
+                  numEncounters: 0,
+                  achievements: 0,
+                  runs: [],
                 };
-                dispatchProfile({ type: "profile/set", profile: next });
+                dispatch({ kind: "mint", prince: next });
               }}
             >
-              Create stub profile (seeded chart)
+              Create stub Prince (seeded chart)
             </button>
           </div>
         )}
       </section>
 
       <section>
-        <div className="t-chrome-em" style={{ marginBottom: 8 }}>Run</div>
+        <div className="t-chrome-em" style={{ marginBottom: 8 }}>Active run</div>
         {run ? (
           <>
             <div className="index-row">Run id: <span className="muted">{run.id}</span></div>
-            <div className="index-row">Distance: {run.runDistance.toFixed(1)}</div>
-            <div className="index-row">
-              <button
-                className="title-second"
-                onClick={() => dispatchRun({ type: "run/clear" })}
-              >
-                Clear run
-              </button>
-            </div>
+            <div className="index-row">Distance: {run.distance.toFixed(1)}</div>
+            <div className="index-row">Maps completed: {run.mapsCompleted}</div>
           </>
         ) : (
           <div className="index-row muted">No run in progress.</div>

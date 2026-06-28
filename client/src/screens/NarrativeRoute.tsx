@@ -11,7 +11,7 @@ import {
   seedFromHash,
   useDevHouseParam,
 } from "@/state/dev-state";
-import type { RunState } from "@/game/types";
+import type { Run } from "@/game/types";
 
 /**
  * /narrative/:seed — dev-only route. Renders a narrative encounter
@@ -36,22 +36,22 @@ export function NarrativeRoute() {
   }, [settings.devModeActive, seedHash, house, navigate]);
 
   const seed = seedHash ? seedFromHash(seedHash) : 0;
-  const profile = useMemo(() => getOrCreateDevProfile(), []);
-  const baseRun = useMemo(() => makeDevRun(seed, profile), [seed, profile]);
+  const prince = useMemo(() => getOrCreateDevProfile(), []);
+  const baseRun = useMemo(() => makeDevRun(seed), [seed]);
   const encounter = useMemo(
     () => makeDevNarrative(seed, house, baseRun.seenFragmentIds),
     [seed, house, baseRun.seenFragmentIds],
   );
-  const [run, setRun] = useState<RunState>(() => ({ ...baseRun, currentEncounter: encounter }));
+  const [run, setRun] = useState<Run>(() => ({ ...baseRun, encounter }));
 
   // Reset the live run when seed/house changes (Reroll → new hash).
   useEffect(() => {
-    setRun({ ...baseRun, currentEncounter: encounter });
+    setRun({ ...baseRun, encounter });
   }, [baseRun, encounter]);
 
   const onCommit = useCallback((args: CommitNarrativeArgs) => setRun(args.nextRun), []);
   const onClearEncounter = useCallback(
-    () => setRun((prev) => ({ ...prev, currentEncounter: null })),
+    () => setRun((prev) => ({ ...prev, encounter: null })),
     [],
   );
 
@@ -61,14 +61,14 @@ export function NarrativeRoute() {
   // Drive the screen off the live run so post-commit updates flow through;
   // fall back to the seed-built encounter on the first frame.
   const liveEncounter =
-    run.currentEncounter && run.currentEncounter.kind === "narrative"
-      ? run.currentEncounter
+    run.encounter && run.encounter.kind === "narrative"
+      ? run.encounter
       : encounter;
 
   return (
     <EncounterNarrativeScreen
       run={run}
-      profile={profile}
+      prince={prince}
       encounter={liveEncounter}
       onCommit={onCommit}
       onClearEncounter={onClearEncounter}

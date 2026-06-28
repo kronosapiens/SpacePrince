@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { useRun } from "@/state/RunStore";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { PLANETS } from "@/game/data";
@@ -13,7 +14,8 @@ const RECHART_INTERVAL_MS = 3000;
 
 export function TitleScreen() {
   const navigate = useNavigate();
-  const run = useRun();
+  const prince = usePrince();
+  const run = useActiveRun();
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const { setActive } = useActivePlanet();
 
@@ -36,8 +38,10 @@ export function TitleScreen() {
     return () => window.clearInterval(id);
   }, []);
 
-  const beginLabel = run && !run.over ? "Start" : "Begin";
-  const handleBegin = () => navigate(ROUTES.start);
+  // A live run (tail, not over) lets the player resume; otherwise mint a new one.
+  const hasLiveRun = !!(prince && run && !isOver(run, prince.numEncounters));
+  const beginLabel = hasLiveRun ? "Continue" : "Begin";
+  const handleBegin = () => navigate(hasLiveRun ? ROUTES.map : ROUTES.start);
 
   return (
     <div className="title">
