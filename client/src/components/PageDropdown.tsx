@@ -1,28 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { generateSeedHash } from "@/state/dev-state";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { spawn, type SpawnKind } from "@/state/dev-spawn";
 
 interface Page {
   label: string;
-  path: string;
+  kind: "nav" | SpawnKind;
+  to?: string;
 }
 
+// Title/Start are plain navigation; the rest spawn a fresh real game positioned
+// at that screen (see dev-spawn). "Regenerate" re-rolls the current screen kind.
 const PAGES: Page[] = [
-  { label: "Title", path: ROUTES.title },
-  { label: "Start", path: ROUTES.start },
-  { label: "Map", path: ROUTES.map },
-  { label: "Encounter", path: ROUTES.encounter },
-  { label: "Narrative", path: ROUTES.narrative },
-  { label: "End of Run", path: ROUTES.end },
+  { label: "Title", kind: "nav", to: ROUTES.title },
+  { label: "Start", kind: "nav", to: ROUTES.start },
+  { label: "Map", kind: "map" },
+  { label: "Combat", kind: "combat" },
+  { label: "Narrative", kind: "narrative" },
+  { label: "End of Run", kind: "end" },
 ];
 
-/** Floating "Page" dropdown in the upper-right corner. Lets the user jump
- *  to any of the 7 screens. Useful while iterating on the design — visible
- *  whenever dev mode is on (which is the default). */
+/** Floating "Page" dropdown in the upper-right corner. Jumps to any screen —
+ *  spawning a fresh real game where one is needed — and re-rolls the current
+ *  screen. Dev chrome; gated to dev builds by its caller (App). */
 export function PageDropdown() {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = usePrinceDispatch();
+  const prince = usePrince();
+  const run = useActiveRun();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -30,9 +37,7 @@ export function PageDropdown() {
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -43,12 +48,21 @@ export function PageDropdown() {
     setOpen(false);
   }, [location.pathname]);
 
-  const current = detectCurrentPage(location.pathname);
-  const canRefresh = isRefreshablePage(current.path);
+  // Carry the current unlock tier across re-rolls so you can pin it and spin.
+  const tier = prince?.numEncounters;
+  const encKind = run?.encounter?.kind ?? null;
+  const currentKind = detectKind(location.pathname, encKind);
 
-  const handleRefresh = () => {
-    if (!canRefresh) return;
-    navigate(`${current.path}/${generateSeedHash()}`);
+  const launch = (kind: SpawnKind) => {
+    const { prince: p, route } = spawn(kind, { tier });
+    dispatch({ kind: "mint", prince: p });
+    navigate(route);
+  };
+
+  const go = (page: Page) => {
+    setOpen(false);
+    if (page.kind === "nav") navigate(page.to!);
+    else launch(page.kind);
   };
 
   return (
@@ -60,20 +74,17 @@ export function PageDropdown() {
         aria-expanded={open}
       >
         <span className="page-dropdown-eyebrow">Page</span>
-        <span className="page-dropdown-current">{current.label}</span>
+        <span className="page-dropdown-current">{currentLabel(location.pathname, encKind)}</span>
         <span className="page-dropdown-caret" aria-hidden>▾</span>
       </button>
       {open && (
         <ul className="page-dropdown-list" role="menu">
           {PAGES.map((p) => (
-            <li key={p.path} role="menuitem">
+            <li key={p.label} role="menuitem">
               <button
                 type="button"
-                className={`page-dropdown-item ${p.path === current.path ? "is-current" : ""}`}
-                onClick={() => {
-                  setOpen(false);
-                  navigate(p.path);
-                }}
+                className="page-dropdown-item"
+                onClick={() => go(p)}
               >
                 {p.label}
               </button>
@@ -81,11 +92,11 @@ export function PageDropdown() {
           ))}
         </ul>
       )}
-      {canRefresh && (
+      {currentKind && (
         <button
           type="button"
           className="page-refresh-button"
-          onClick={handleRefresh}
+          onClick={() => launch(currentKind)}
         >
           Regenerate
         </button>
@@ -94,17 +105,22 @@ export function PageDropdown() {
   );
 }
 
-function detectCurrentPage(pathname: string): Page {
-  if (pathname === "/") return PAGES[0]!;
+/** The spawn kind to re-roll for the current screen, or null (Title/Start/Index). */
+function detectKind(pathname: string, encKind: string | null): SpawnKind | null {
   const first = "/" + (pathname.split("/").filter(Boolean)[0] ?? "");
-  return PAGES.find((p) => p.path === first) ?? PAGES[0]!;
+  if (first === ROUTES.map) return "map";
+  if (first === ROUTES.end) return "end";
+  if (first === ROUTES.encounter) return encKind === "narrative" ? "narrative" : "combat";
+  return null;
 }
 
-function isRefreshablePage(path: string): boolean {
-  return (
-    path === ROUTES.map ||
-    path === ROUTES.encounter ||
-    path === ROUTES.narrative ||
-    path === ROUTES.end
-  );
+function currentLabel(pathname: string, encKind: string | null): string {
+  const kind = detectKind(pathname, encKind);
+  if (kind === "map") return "Map";
+  if (kind === "end") return "End of Run";
+  if (kind === "combat") return "Combat";
+  if (kind === "narrative") return "Narrative";
+  if (pathname === ROUTES.start) return "Start";
+  if (pathname === ROUTES.index) return "Index";
+  return "Title";
 }

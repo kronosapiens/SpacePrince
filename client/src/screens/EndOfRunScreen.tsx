@@ -1,16 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { loadDevSettings } from "@/state/settings";
-import {
-  generateSeedHash,
-  makeDevEndState,
-  seedFromHash,
-} from "@/state/dev-state";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
 import { seededChart } from "@/game/chart";
@@ -19,12 +13,6 @@ import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
 
 export function EndOfRunScreen() {
-  const settings = loadDevSettings();
-  if (settings.devModeActive) return <DevEndOfRunScreen />;
-  return <NormalEndOfRunScreen />;
-}
-
-function NormalEndOfRunScreen() {
   const navigate = useNavigate();
   const prince = usePrince();
   const run = useActiveRun();
@@ -67,39 +55,6 @@ function NormalEndOfRunScreen() {
       totalEncounters={totalEncounters}
       allMaps={allMaps}
       onBegin={beginNew}
-      beginLabel="New Game"
-    />
-  );
-}
-
-/** Hash-driven End of Run preview. Each URL hash maps to a deterministic
- *  collection of completed maps + aggregate stats so designers can iterate
- *  on the screen at varying fullness. */
-function DevEndOfRunScreen() {
-  const navigate = useNavigate();
-  const { seed: seedHash } = useParams<{ seed?: string }>();
-  const { setActive } = useActivePlanet();
-
-  useEffect(() => { setActive(null); }, [setActive]);
-
-  useEffect(() => {
-    if (!seedHash) {
-      navigate(`${ROUTES.end}/${generateSeedHash()}`, { replace: true });
-    }
-  }, [seedHash, navigate]);
-
-  const seed = seedHash ? seedFromHash(seedHash) : 0;
-  const end = useMemo(() => makeDevEndState(seed), [seed]);
-
-  if (!seedHash) return null;
-
-  return (
-    <EndOfRunView
-      runDistance={end.runDistance}
-      numMaps={end.numMaps}
-      totalEncounters={end.totalEncounters}
-      allMaps={end.allMaps}
-      onBegin={() => navigate(ROUTES.title)}
       beginLabel="New Game"
     />
   );

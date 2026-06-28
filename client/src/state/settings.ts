@@ -1,18 +1,15 @@
 const SETTINGS_KEY = "sp:settings:v1";
 
 export interface DevSettings {
-  /** When true, the normal game-state machine is suspended:
-   *  /map, /encounter, /narrative each render fresh random state on visit;
-   *  navigation is unrestricted; encounters expose a Skip affordance. */
-  devModeActive: boolean;
+  /** Reveal every planet on charts regardless of the run's unlock tier. */
   unlockAll: boolean;
+  /** Force the next rolled node to a narrative of this house (dev steering). */
   forceNarrativeHouse: number | null;
+  /** Force the next rolled node to combat (dev steering). */
   forceCombat: boolean;
 }
 
 const DEFAULT: DevSettings = {
-  // Dev mode defaults on; toggle it off in the Index screen's cheats panel.
-  devModeActive: true,
   unlockAll: false,
   forceNarrativeHouse: null,
   forceCombat: false,

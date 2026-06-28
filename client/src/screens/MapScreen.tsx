@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
@@ -18,14 +18,7 @@ import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter"
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
 import { pickScenario } from "@/data/narrative-trees";
-import {
-  generateSeedHash,
-  getOrCreateDevProfile,
-  makeDevMap,
-  seedFromHash,
-  syntheticDevDistance,
-} from "@/state/dev-state";
-import { blankSideState, seededChart } from "@/game/chart";
+import { seededChart } from "@/game/chart";
 import type {
   EncounterState,
   MapState,
@@ -34,15 +27,7 @@ import type {
   NodeContent,
 } from "@/game/types";
 
-const blankSideStateConst = blankSideState();
-
 export function MapScreen() {
-  const settings = loadDevSettings();
-  if (settings.devModeActive) return <DevMapScreen />;
-  return <NormalMapScreen />;
-}
-
-function NormalMapScreen() {
   const navigate = useNavigate();
   const prince = usePrince();
   const run = useActiveRun();
@@ -234,71 +219,4 @@ function rulerOf(map: MapState, nodeId: string | undefined): PlanetName | null {
   if (content.kind === "narrative") return HOUSES[content.house - 1]!.ruler;
   const chart = seededChart(content.opponentSeed, "");
   return RULERSHIP[chart.ascendantSign];
-}
-
-// ── Dev mode map ───────────────────────────────────────────────────────────
-
-function DevMapScreen() {
-  const navigate = useNavigate();
-  const { seed: seedHash } = useParams<{ seed?: string }>();
-
-  // Bare /map → generate a hash and replace into the URL.
-  useEffect(() => {
-    if (!seedHash) {
-      navigate(`${ROUTES.map}/${generateSeedHash()}`, { replace: true });
-    }
-  }, [seedHash, navigate]);
-
-  const seed = seedHash ? seedFromHash(seedHash) : 0;
-  const profile = useMemo(() => getOrCreateDevProfile(), []);
-  const map = useMemo(() => makeDevMap(seed), [seed]);
-  const distance = useMemo(() => syntheticDevDistance(seed, map), [seed, map]);
-  const { setActive } = useActivePlanet();
-  const tintPlanet = useMemo(() => mapTintPlanet(map), [map]);
-  useEffect(() => { setActive(tintPlanet); }, [tintPlanet, setActive]);
-  const [studyOpen, setStudyOpen] = useState(false);
-
-  const handleNodeSelect = useCallback(
-    (nodeId: string) => {
-      const content = map.rolledNodes[nodeId];
-      if (!content) return;
-      const nextHash = generateSeedHash();
-      if (content.kind === "combat") {
-        navigate(`${ROUTES.encounter}/${nextHash}`);
-      } else {
-        navigate(`${ROUTES.narrative}/${nextHash}?house=${content.house}`);
-      }
-    },
-    [map, navigate],
-  );
-
-  if (!seedHash) return null; // wait for redirect
-
-  return (
-    <div className="map-screen">
-      <div className="map-anchor">
-        <ChartAnchor
-          chart={profile.chart}
-          state={blankSideStateConst}
-          unlockedPlanets={unlockedPlanets(999)}
-          onExpand={() => setStudyOpen(true)}
-        />
-      </div>
-      <div className="map-distance">
-        <span className="eyebrow">DISTANCE</span>
-        <span className="map-distance-v">{Math.round(distance)}</span>
-      </div>
-      <div className="map-diagram-wrap">
-        <MapDiagram map={map} onSelectNode={handleNodeSelect} />
-      </div>
-      {studyOpen && (
-        <ChartStudyOverlay
-          chart={profile.chart}
-          state={blankSideStateConst}
-          unlockedPlanets={unlockedPlanets(999)}
-          onClose={() => setStudyOpen(false)}
-        />
-      )}
-    </div>
-  );
 }

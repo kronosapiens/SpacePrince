@@ -3,15 +3,14 @@ import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore"
 import { useResetAll } from "@/state/store-actions";
 import { unlockedPlanets } from "@/game/unlocks";
 import { isOver, starField } from "@/game/run";
-import { loadDevSettings, saveDevSettings } from "@/state/settings";
 
 const UNLOCK_MAX = 36; // Saturn unlocks at 32 (MACROBIAN thresholds); a little headroom.
 
 /**
- * Dev-only console (rendered only under `import.meta.env.DEV`). Lets you drive
- * the *real* continuous game: flip out of the ephemeral preview mode, scrub the
- * Prince's unlock tier live, and reset. State mutations go through the Prince
- * store, so the chart fills in on the anchor as you drag. Not production UI —
+ * Dev-only console (rendered only under `import.meta.env.DEV`). Scrubs the
+ * Prince's unlock tier live, shows a run/star readout, and resets. Mutations go
+ * through the Prince store, so the chart fills in on the anchor as you drag.
+ * Screen-spawning ("Regenerate") lives in the Page dropdown. Not production UI —
  * styled inline.
  */
 export function DevConsole() {
@@ -20,14 +19,6 @@ export function DevConsole() {
   const dispatch = usePrinceDispatch();
   const resetAll = useResetAll();
   const [collapsed, setCollapsed] = useState(true);
-  // Read once on mount; toggling reloads so the screen switch takes effect.
-  const [liveGame] = useState(() => !loadDevSettings().devModeActive);
-
-  const toggleLiveGame = () => {
-    const s = loadDevSettings();
-    saveDevSettings({ ...s, devModeActive: !s.devModeActive });
-    window.location.reload();
-  };
 
   const unlocked = prince ? unlockedPlanets(prince.numEncounters) : [];
   const stars = prince ? starField(prince) : [];
@@ -40,11 +31,6 @@ export function DevConsole() {
       </button>
       {!collapsed && (
         <div style={body}>
-          <label style={row}>
-            <input type="checkbox" checked={liveGame} onChange={toggleLiveGame} />
-            Live game <span style={muted}>(reloads)</span>
-          </label>
-
           {prince ? (
             <>
               <div style={{ ...row, flexDirection: "column", alignItems: "stretch", gap: 4 }}>
