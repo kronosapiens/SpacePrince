@@ -195,7 +195,7 @@ export interface Run {
   /** Per-planet affliction + combust; persists across encounters and maps,
    *  resets only at run start. */
   state: SideState;
-  /** Cumulative Distance — this run's permanent record (one star). */
+  /** Cumulative Distance — this run's score, its permanent record. */
   distance: number;
   /** The current map only; finished maps are pushed to `events`. */
   map: MapState;
@@ -224,6 +224,6 @@ export interface Prince {
   /** Reserved bitmap of unlocked achievements (deferred, §11.2). */
   achievements: number;
   /** Every run this Prince has played. The active run is the tail iff it is not
-   *  over; the star-field derives from runs[].distance (STATE.md). */
+   *  over (STATE.md). Historical runs (incl. their Distance) are read off this. */
   runs: Run[];
 }
