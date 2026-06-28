@@ -72,7 +72,7 @@ export function DevConsole() {
 const panel: React.CSSProperties = {
   position: "fixed",
   left: 12,
-  bottom: 12,
+  top: 12,
   zIndex: 9999,
   font: "12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace",
   color: "#ddd",

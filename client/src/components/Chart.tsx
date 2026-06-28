@@ -99,10 +99,13 @@ export interface ChartProps {
   hoveredPlanet?: PlanetName | null;
   /** Show the af Klint color-field blooms behind each visible planet. Default true. */
   showColorField?: boolean;
-  /** Show the sacred-geometry substrate (hexagram + vesica). Mint + Chart Study. */
+  /** Show the sacred-geometry ground (hexagram + vesica). On by default; pass
+   *  false to suppress it on a given chart. */
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
+  /** Render the resting aspect web at full opacity (Title / Landing showcase). */
+  aspectsFull?: boolean;
   /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
   hideAfflictionBadges?: boolean;
   scale?: number;
@@ -166,8 +169,9 @@ export function Chart(props: ChartProps) {
     allActive = false,
     hoveredPlanet,
     showColorField = true,
-    showSubstrate = false,
+    showSubstrate = true,
     showAspects = true,
+    aspectsFull = false,
     hideAfflictionBadges = false,
     entrance = "none",
     side,
@@ -262,8 +266,9 @@ export function Chart(props: ChartProps) {
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
         // Active lines (hovered / selected / combat-active / propagating) render
-        // at full strength; the rest stay at the legible resting baseline.
-        const opacity = isActive ? 1 : 0.5;
+        // at full strength; the rest stay at the legible resting baseline —
+        // unless `aspectsFull` (Title / Landing) lifts the whole web to full.
+        const opacity = isActive || aspectsFull ? 1 : 0.5;
         const sw = isActive ? 1.6 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
@@ -309,7 +314,7 @@ export function Chart(props: ChartProps) {
   const handleClick = onPlanetClick && !passive ? onPlanetClick : undefined;
   const handleHover = onPlanetHover && !passive ? onPlanetHover : undefined;
 
-  // Substrate (hexagram + vesica) — only when explicitly requested.
+  // Sacred-geometry ground (static hexagram + vesica), shown by default.
   const substrate = showSubstrate ? renderSubstrate() : null;
 
   return (
@@ -870,25 +875,25 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
 
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
-  const r = INNER_RING_R - 20;
-  const tri1: Array<{ x: number; y: number }> = [];
-  const tri2: Array<{ x: number; y: number }> = [];
-  for (let i = 0; i < 3; i++) {
-    tri1.push(polar(cx, cy, r, 90 + i * 120));
-    tri2.push(polar(cx, cy, r, 270 + i * 120));
-  }
+  const hexR = INNER_RING_R - 20;
+  const circR = INNER_RING_R - 100;
+  const off = 60;
+  // Two interlaced hexagrams (four triangles) → a twelve-point star with one
+  // vertex on each sign tick (ticks sit on every 30°).
+  const triangles = [0, 30, 60, 90].map((base) =>
+    [0, 120, 240].map((step) => polar(cx, cy, hexR, base + step)),
+  );
   return (
-    <g opacity={0.18}>
-      <polygon points={tri1.map((p) => `${p.x},${p.y}`).join(" ")}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <polygon points={tri2.map((p) => `${p.x},${p.y}`).join(" ")}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx} cy={cy} r={INNER_RING_R - 80}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx - 60} cy={cy} r={INNER_RING_R - 100}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx + 60} cy={cy} r={INNER_RING_R - 100}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+    <g opacity={0.12}>
+      {triangles.map((tri, i) => (
+        <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      ))}
+      {/* Four-fold vesica: left/right + top/bottom. */}
+      <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
     </g>
   );
 }

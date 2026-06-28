@@ -55,6 +55,7 @@ export function TitleScreen() {
             onPlanetHover={setHovered}
             hideAfflictionBadges
             showColorField
+            aspectsFull
           />
         </div>
       </div>

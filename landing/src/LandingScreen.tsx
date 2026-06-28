@@ -45,6 +45,7 @@ export function LandingScreen() {
             onPlanetHover={setHovered}
             hideAfflictionBadges
             showColorField
+            aspectsFull
           />
         </div>
       </div>

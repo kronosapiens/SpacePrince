@@ -86,10 +86,13 @@ export interface ChartProps {
   inspectPlanet?: PlanetName | null;
   /** Show the af Klint color-field blooms behind each visible planet. Default true. */
   showColorField?: boolean;
-  /** Show the sacred-geometry substrate (hexagram + vesica). Mint + Chart Study. */
+  /** Show the sacred-geometry ground (hexagram + vesica). On by default; pass
+   *  false to suppress it on a given chart. */
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
+  /** Render the resting aspect web at full opacity (Title / Landing showcase). */
+  aspectsFull?: boolean;
   /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
   hideAfflictionBadges?: boolean;
   /** Show affliction badges even when value is zero. Used on gameplay surfaces. */
@@ -137,8 +140,9 @@ export function Chart(props: ChartProps) {
     hoveredPlanet,
     inspectPlanet,
     showColorField = true,
-    showSubstrate = false,
+    showSubstrate = true,
     showAspects = true,
+    aspectsFull = false,
     hideAfflictionBadges = false,
     alwaysShowAfflictionBadges = false,
     entrance = "none",
@@ -219,7 +223,7 @@ export function Chart(props: ChartProps) {
         // Active lines (hovered / selected / combat-active / propagating) render
         // at full strength; the rest stay at the legible resting baseline.
         // Parity with the main client.
-        const opacity = isActive ? 1 : isInspect ? 0.7 : 0.5;
+        const opacity = isActive || aspectsFull ? 1 : isInspect ? 0.7 : 0.5;
         const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
@@ -425,9 +429,8 @@ function PlanetGlyph({
 
   const fill = combusted ? "#3B2F2F" : c;
   const fillOpacity = combusted ? 0.4 : 0.92;
-  // Derive a neutral glyph tone from the planet fill: darker on light discs,
-  // lighter on dark discs, avoiding hard black/white contrast.
-  const glyphFill = combusted ? NEUTRAL.mist : contrastGrayForFill(fill);
+  // Glyph reads as a deep shade of the planet's own hue (mirrors the client).
+  const glyphFill = combusted ? NEUTRAL.mist : deepShade(c);
 
   // Affliction + projection badges — pill-shaped, gold border, drop shadow,
   // matching the v1 treatment. Pills sit on the chart-facing side of the
@@ -714,25 +717,25 @@ function SignLabels({
 
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
-  const r = INNER_RING_R - 20;
-  const tri1: Array<{ x: number; y: number }> = [];
-  const tri2: Array<{ x: number; y: number }> = [];
-  for (let i = 0; i < 3; i++) {
-    tri1.push(polar(cx, cy, r, 90 + i * 120));
-    tri2.push(polar(cx, cy, r, 270 + i * 120));
-  }
+  const hexR = INNER_RING_R - 20;
+  const circR = INNER_RING_R - 100;
+  const off = 60;
+  // Two interlaced hexagrams (four triangles) → a twelve-point star with one
+  // vertex on each sign tick (ticks sit on every 30°).
+  const triangles = [0, 30, 60, 90].map((base) =>
+    [0, 120, 240].map((step) => polar(cx, cy, hexR, base + step)),
+  );
   return (
-    <g opacity={0.18}>
-      <polygon points={tri1.map((p) => `${p.x},${p.y}`).join(" ")}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <polygon points={tri2.map((p) => `${p.x},${p.y}`).join(" ")}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx} cy={cy} r={INNER_RING_R - 80}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx - 60} cy={cy} r={INNER_RING_R - 100}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx + 60} cy={cy} r={INNER_RING_R - 100}
-        fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+    <g opacity={0.12}>
+      {triangles.map((tri, i) => (
+        <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      ))}
+      {/* Four-fold vesica: left/right + top/bottom. */}
+      <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
     </g>
   );
 }
@@ -746,17 +749,46 @@ function polar(cx: number, cy: number, r: number, deg: number): { x: number; y: 
   return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
 }
 
-function contrastGrayForFill(hex: string): string {
+/** Deep shade of a planet's own color for its glyph: same hue, saturation
+ *  nudged up, lightness dropped low. Every disc sits at HSL lightness ≥ ~0.5,
+ *  so a fixed low-lightness glyph reads with strong value contrast while
+ *  staying in the planet's hue family (no off-palette clash). */
+function deepShade(hex: string): string {
   const rgb = parseHexColor(hex);
-  if (!rgb) return "#808080";
-  const [r, g, b] = rgb.map((v) => {
-    const c = v / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  const luminance = 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-  const gray = Math.round(clamp(210 - luminance * 190, 54, 190));
-  const h = gray.toString(16).padStart(2, "0");
-  return `#${h}${h}${h}`;
+  if (!rgb) return NEUTRAL.void;
+  const [h, s] = rgbToHsl(rgb);
+  return hslToHex(h, clamp(s * 1.25 + 0.1, 0.45, 0.95), 0.2);
+}
+
+function rgbToHsl([r, g, b]: [number, number, number]): [number, number, number] {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (d === 0) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h: number;
+  if (max === rn) h = ((gn - bn) / d) % 6;
+  else if (max === gn) h = (bn - rn) / d + 2;
+  else h = (rn - gn) / d + 4;
+  h = h * 60;
+  if (h < 0) h += 360;
+  return [h, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) { r = c; g = x; }
+  else if (h < 120) { r = x; g = c; }
+  else if (h < 180) { g = c; b = x; }
+  else if (h < 240) { g = x; b = c; }
+  else if (h < 300) { r = x; b = c; }
+  else { r = c; b = x; }
+  const to = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
 }
 
 function parseHexColor(hex: string): [number, number, number] | null {
