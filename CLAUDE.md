@@ -57,6 +57,7 @@ The spec is divided by what kind of question each document answers.
 ### `spec/mechanics/` — how the game *works*
 
 - `MECHANICS.md` — **runtime source of truth** for combat. When older docs conflict, this wins.
+- `STATE.md` — **data source of truth**: canonical structures for the chart + all game state (onchain-bound, mirrored by the client)
 - `CHART.md` — chart-construction spec (Cairo-first)
 - `MAP.md` — run map topology (Sephirot-pattern node graph)
 - `HOUSES.md` — narrative encounter system organized around the twelve houses
