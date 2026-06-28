@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useResetAll } from "@/state/store-actions";
+import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
 import { isOver, starField } from "@/game/run";
 
@@ -24,6 +25,18 @@ export function DevConsole() {
   const stars = prince ? starField(prince) : [];
   const runOver = prince && run ? isOver(run, prince.numEncounters) : false;
 
+  // Set the unlock tier. A live combat is re-mirrored so the opponent re-fields
+  // to the new tier alongside the player (Moon v Moon, 2v2, …).
+  const setTier = (count: number) => {
+    dispatch({ kind: "setEncounters", count });
+    if (run?.encounter?.kind === "combat") {
+      dispatch({
+        kind: "commitRun",
+        run: { ...run, encounter: remirrorCombat(run.encounter, count, run.seed) },
+      });
+    }
+  };
+
   return (
     <div style={panel}>
       <button style={header} onClick={() => setCollapsed((c) => !c)} type="button">
@@ -43,9 +56,7 @@ export function DevConsole() {
                   min={0}
                   max={UNLOCK_MAX}
                   value={Math.min(prince.numEncounters, UNLOCK_MAX)}
-                  onChange={(e) =>
-                    dispatch({ kind: "setEncounters", count: Number(e.target.value) })
-                  }
+                  onChange={(e) => setTier(Number(e.target.value))}
                 />
                 <div style={muted}>{unlocked.join(" · ") || "(none)"}</div>
               </div>

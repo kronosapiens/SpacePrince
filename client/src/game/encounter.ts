@@ -3,6 +3,7 @@ import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { pickWeighted, mulberry32 } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
+  Chart,
   CombatEncounter,
   NarrativeEncounter,
   PlanetName,
@@ -24,14 +25,14 @@ export interface BeginCombatInput {
   encounterIdSeed?: number;
 }
 
-export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
-  const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
-  const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
-  // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
-  // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is a
-  // fixed three regardless, so a single planet is simply sent on repeat turns.
-  const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
-  const rng = mulberry32(encounterIdSeed ?? opponentSeed);
+/** Roll the opponent's three turns from a roster: a stat-weighted planet per
+ *  turn and its precommitted verb. Shared by encounter start and dev
+ *  re-mirroring (when the unlock tier changes, the opponent re-fields to match). */
+export function rollOpponentTurns(
+  opponentChart: Chart,
+  roster: PlanetName[],
+  rng: () => number,
+): { sequence: PlanetName[]; opponentActions: Polarity[] } {
   const sequence: PlanetName[] = [];
   const opponentActions: Polarity[] = [];
   for (let i = 0; i < MAX_COMBAT_TURNS; i++) {
@@ -41,6 +42,18 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
       drawValence(getEffectiveStatsFromPlacement(opponentChart.planets[planet]), rng),
     );
   }
+  return { sequence, opponentActions };
+}
+
+export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
+  const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
+  // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
+  // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is a
+  // fixed three regardless, so a single planet is simply sent on repeat turns.
+  const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
+  const rng = mulberry32(encounterIdSeed ?? opponentSeed);
+  const { sequence, opponentActions } = rollOpponentTurns(opponentChart, roster, rng);
   return {
     kind: "combat",
     id: `enc_combat_${run.id}_${opponentSeed}`,

@@ -1,6 +1,6 @@
 import { seededChart } from "@/game/chart";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
+import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { mulberry32, hashString, randomSeed } from "@/game/rng";
@@ -149,6 +149,23 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
     events,
   };
   return devPrince(seed, opts.tier, run);
+}
+
+/** Re-mirror a live combat to a new unlock tier (dev console). Rebuilds the
+ *  roster + opponent turns for `tier`, preserving the charts, boards, and the
+ *  current turn — so scrubbing the unlock slider keeps the matchup mirrored
+ *  (Moon v Moon, 2v2, …) instead of leaving the opponent at the spawn tier. */
+export function remirrorCombat(enc: CombatEncounter, tier: number, seed: number): CombatEncounter {
+  const roster = unlockedPlanets(tier);
+  const rng = mulberry32(hashString(`${seed}_remirror_${tier}`));
+  const { sequence, opponentActions } = rollOpponentTurns(enc.opponentChart, roster, rng);
+  return {
+    ...enc,
+    roster,
+    sequence,
+    opponentActions,
+    turnIndex: Math.min(enc.turnIndex, sequence.length - 1),
+  };
 }
 
 // ── internals ───────────────────────────────────────────────────────────────
