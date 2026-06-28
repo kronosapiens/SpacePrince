@@ -67,6 +67,7 @@ The spec is divided by what kind of question each document answers.
 - `SCREENS.md` — the screen set and how surfaces relate (encounter is the anchor, chart is always present)
 - `STYLE.md` — visual vocabulary: SVG primitives, stroke scale, palette, typography
 - `VIBES.md` — felt qualities: how mechanical state becomes experience
+- `MUSIC.md` — sonic vocabulary: the music workstream (Holst-derived, FTL-structured; strategy only so far)
 - `swatches/` — color swatches per planet
 - `tree.html` — Sephirot tree prototype
 
