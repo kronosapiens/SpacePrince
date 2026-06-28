@@ -89,7 +89,7 @@ This means:
 - No visual cue that a chart is "yours" vs "someone else's" — they are both charts.
 - The narrative framing of *whose* chart it is and *why* you're facing them lives in encounter setup, not in visual differentiation.
 
-**Asymmetric matchups are expected.** The opponent renders with whatever planets that source Prince has actually unlocked at the time of matching, regardless of the player's own unlock tier. A Run-1 player with only the Moon may face a fully-charted opponent — turn count is bounded by the *player's* unlocked planet count, so encounters remain short. The asymmetry is part of the tutorial: the player learns to read chart complexity from the outside before they have it themselves. Subject to balance review during playtesting.
+**Mirrored matchups.** The opponent fields exactly the planets the player has unlocked — Moon vs Moon at the first encounter, two-vs-two next, up to seven-vs-seven (per `MECHANICS.md §11.1`). The adversary's chart still has its own placements; only its *fielded* roster mirrors the player's tier, so the unfielded planets render as ghosts on the opponent side too. This keeps early fights fair and legible — one planet read against one — and lets chart complexity grow symmetrically on both sides as the player ascends. (Earlier drafts used asymmetric matchups, a single-planet player against a full chart, as a read-the-complexity-from-outside tutorial; mirroring replaces that in favor of accessibility. Subject to balance review during playtesting.)
 
 ### 3.5 Visual climax
 

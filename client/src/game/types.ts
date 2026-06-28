@@ -103,7 +103,11 @@ export interface CombatEncounter {
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
-  sequence: PlanetName[]; // length = min(3, unlocked) at encounter start (MECHANICS §11.1)
+  /** Fielded planets — the roster both sides draw from, mirroring the player's
+   *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
+   *  placements; only these are sent and rendered solid. */
+  roster: PlanetName[];
+  sequence: PlanetName[]; // opponent's planet per turn; length is always 3
   /** Opponent's precommitted action per turn, parallel to `sequence`. Drawn
    *  stat-weighted (P(afflict) = damage / (damage + healing)) and locked at
    *  turn start, so the player always chooses with full information. */

@@ -96,19 +96,22 @@ describe("Run loop integration", () => {
     expect(r.runDistance).toBe(7);
   });
 
-  it("combat resolves in min(3, unlocked) turns — fixed cap with an early ramp", () => {
+  it("combat is always 3 turns; the opponent fields the player's tier (mirror)", () => {
     const profile = createStubProfile({ seed: 7 });
     const run = beginRun(profile, 42);
     const begin = (lifetimeEncounterCount: number) =>
       beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount });
 
-    // Full chart (lifetime ≥ 32 → all seven unlocked) still caps at three turns.
-    expect(begin(64).sequence).toHaveLength(3);
-    expect(begin(64).opponentActions).toHaveLength(3);
-    // Ramp floor: the Moon-only first encounter (count 0) is a single turn; the
-    // next encounter, with Mercury unlocked, is two.
-    expect(begin(0).sequence).toHaveLength(1);
-    expect(begin(1).sequence).toHaveLength(2);
+    // Fixed three turns regardless of unlock tier (MECHANICS §11.1).
+    for (const count of [0, 1, 2, 64]) {
+      expect(begin(count).sequence).toHaveLength(3);
+      expect(begin(count).opponentActions).toHaveLength(3);
+    }
+    // Mirrored roster: a tier-1 opponent fields only the Moon, sent on repeat.
+    expect(begin(0).roster).toEqual(["Moon"]);
+    expect(new Set(begin(0).sequence)).toEqual(new Set(["Moon"]));
+    // Tier-2 fields Moon + Mercury.
+    expect(begin(1).roster).toEqual(["Moon", "Mercury"]);
   });
 
   it("a run ends by completion when the seventh map is finished", () => {

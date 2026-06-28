@@ -185,16 +185,16 @@ Combustion is terminal — a combusted planet is zero-output and skipped by prop
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative). Combat resolves in a **fixed 3 turns** (with an early-game ramp, §11.1); narrative encounters are short decision trees (`HOUSES.md`).
+- **Encounter** — one node traversal (combat or narrative). Combat resolves in a **fixed 3 turns**, regardless of unlock tier (§11.1); narrative encounters are short decision trees (`HOUSES.md`).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
 - **Run** — **up to seven maps.** After completing a map, the next is generated and begun. The structure is similar to FTL's sectors.
 - **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished). Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage. Either way, the run's **final Distance (§12)** is its permanent record, inscribed as a star in the NFT field (`NFT.md`).
 
 Per encounter:
 
-- Opponent planet is selected randomly each turn from non-combusted opponent planets.
+- Opponent planet is selected randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
-- If all opponent planets combust before the final turn, the encounter ends early.
+- If all fielded opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
 
 Affliction and combust state **persist across encounters and across maps within a run**. They reset only on run end.
@@ -215,7 +215,7 @@ A Prince's chart is fixed at mint, but planets are unlocked progressively as a *
 
 The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart. Saturn arrives last as the final teacher.
 
-**Encounter length and the unlock ramp.** Combat resolves in a fixed **3 turns**, but a player can never send more distinct planets than they have unlocked, so the earliest encounters are shorter: `turns = min(3, unlockedPlanets)`. The Moon-only first encounter is a single turn (observation, per `spec/v2/ONBOARD.md`); the two-planet stage is two turns; from Venus (the third planet) onward, every encounter is the full three. Past three planets the cap stops biting — a full seven-planet chart still resolves in three turns, which makes *which three you send* a genuine choice rather than a roll-call of the whole chart.
+**Encounter length and the mirrored opponent.** Combat always resolves in a fixed **3 turns**, regardless of unlock tier. Difficulty ramps not through encounter length but through the opponent's *roster*: the adversary fields exactly the planets the player has unlocked — Moon vs Moon at the first encounter, two-vs-two at the next tier, up to a full seven-vs-seven. Both sides may send the same planet on more than one turn, so a one-planet player plays a full three-turn fight with the Moon alone. Mirroring keeps the early game fair and legible: the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
 
 Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.
 

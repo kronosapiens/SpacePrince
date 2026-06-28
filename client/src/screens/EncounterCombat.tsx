@@ -440,6 +440,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         <Chart
           chart={encounter.opponentChart}
           state={displayOpponentState}
+          unlockedPlanets={encounter.roster}
           activePlanet={displayOpponentTurn}
           hoveredPlanet={hoveredOpponent}
           entrance="right"

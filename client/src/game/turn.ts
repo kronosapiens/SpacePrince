@@ -1,4 +1,3 @@
-import { PLANETS } from "./data";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects } from "./aspects";
 import { applyCombust } from "./combust";
@@ -108,11 +107,14 @@ export function resolveTurn(
   // Pick next opponent planet from non-combusted ones and precommit its verb;
   // advance turnIndex.
   const nextTurnIndex = enc.turnIndex + 1;
-  const allOppCombusted = PLANETS.every((p) => opponentStateMap[p].combusted);
+  // Only the fielded roster matters (mirrored matchup, MECHANICS §11.1): the
+  // opponent re-draws from its roster, and the encounter/run end when those
+  // planets are spent — never the unfielded ones.
+  const allOppCombusted = enc.roster.every((p) => opponentStateMap[p].combusted);
   const newSequence = [...enc.sequence];
   const newOpponentActions = [...enc.opponentActions];
   if (nextTurnIndex < newSequence.length && !allOppCombusted) {
-    const selectable = PLANETS.filter((p) => !opponentStateMap[p].combusted);
+    const selectable = enc.roster.filter((p) => !opponentStateMap[p].combusted);
     if (selectable.length > 0) {
       const nextOpponent = pickWeighted(selectable, rng);
       newSequence[nextTurnIndex] = nextOpponent;
@@ -124,7 +126,9 @@ export function resolveTurn(
   }
 
   const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted;
-  const runEnded = PLANETS.every((p) => playerStateMap[p].combusted);
+  // The run ends when every planet the player has *fielded* this run is combust;
+  // unlocked tier == roster, so locked planets (never sent) don't keep it alive.
+  const runEnded = enc.roster.every((p) => playerStateMap[p].combusted);
 
   const updatedEnc: CombatEncounter = {
     ...enc,
