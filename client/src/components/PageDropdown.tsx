@@ -16,7 +16,7 @@ const PAGES: Page[] = [
   { label: "Title", kind: "nav", to: ROUTES.title },
   { label: "Start", kind: "nav", to: ROUTES.start },
   { label: "Map", kind: "map" },
-  { label: "Combat", kind: "combat" },
+  { label: "Encounter", kind: "combat" },
   { label: "Narrative", kind: "narrative" },
   { label: "End of Run", kind: "end" },
 ];
@@ -118,7 +118,7 @@ function currentLabel(pathname: string, encKind: string | null): string {
   const kind = detectKind(pathname, encKind);
   if (kind === "map") return "Map";
   if (kind === "end") return "End of Run";
-  if (kind === "combat") return "Combat";
+  if (kind === "combat") return "Encounter";
   if (kind === "narrative") return "Narrative";
   if (pathname === ROUTES.start) return "Start";
   if (pathname === ROUTES.index) return "Index";
