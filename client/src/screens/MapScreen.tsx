@@ -154,9 +154,6 @@ export function MapScreen() {
   if (run.encounter) return <Navigate to={ROUTES.encounter} replace />;
   if (isOver(run, prince.numEncounters)) return <Navigate to={ROUTES.end} replace />;
 
-  const mapNumber = run.mapsCompleted + 1;
-  const runNumber = prince.runs.length;
-
   return (
     <div className="map-screen">
       <div className="map-anchor">
@@ -174,9 +171,6 @@ export function MapScreen() {
       <div className="map-diagram-wrap">
         <MapDiagram map={run.map} onSelectNode={handleNodeSelect} />
       </div>
-      <div className="map-caption">
-        <span className="eyebrow">RUN {roman(runNumber)} · MAP {roman(mapNumber)}</span>
-      </div>
       {studyOpen && (
         <ChartStudyOverlay
           chart={prince.chart}
@@ -187,21 +181,6 @@ export function MapScreen() {
       )}
     </div>
   );
-}
-
-function roman(n: number): string {
-  if (n <= 0) return "I";
-  const numerals: Array<[number, string]> = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
-  ];
-  let v = n;
-  let out = "";
-  for (const [k, s] of numerals) {
-    while (v >= k) { out += s; v -= k; }
-  }
-  return out;
 }
 
 /** Pick a planet for the active-planet tint of a map screen. Prefer the

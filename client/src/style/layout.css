@@ -332,11 +332,12 @@
 }
 .map-distance {
   position: absolute;
-  top: 36px;
-  right: 48px;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 2px;
   z-index: 5;
 }
@@ -355,14 +356,6 @@
   justify-content: center;
   padding: 6vh 4vw;
 }
-.map-caption {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
 @media (max-width: 720px) {
   .map-anchor { width: clamp(80px, 25vw, 130px); top: 8px; left: 8px; }
 }
