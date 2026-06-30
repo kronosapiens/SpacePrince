@@ -727,15 +727,18 @@ function renderSubstrate() {
   );
   return (
     <g opacity={0.12}>
-      {triangles.map((tri, i) => (
-        <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
-          fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      ))}
-      {/* Four-fold vesica: left/right + top/bottom. */}
-      <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-      <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      {/* Gentle, near-subliminal rotation of the whole ground (motion.css). */}
+      <g className="chart-substrate-spin">
+        {triangles.map((tri, i) => (
+          <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
+            fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        ))}
+        {/* Four-fold vesica: left/right + top/bottom. */}
+        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+      </g>
     </g>
   );
 }

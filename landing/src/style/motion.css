@@ -29,5 +29,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-propagation-pulse { animation: none; }
+  .anim-propagation-pulse,
+  .chart-substrate-spin { animation: none; }
+}
+
+/* Sacred-geometry ground (Chart substrate): a gentle, near-subliminal full
+   turn. transform-box: fill-box centers the rotation on the symmetric figure's
+   own bbox (= chart center). Mirrors the main client. */
+.chart-substrate-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chart-substrate-spin 120s linear infinite;
+}
+@keyframes chart-substrate-spin {
+  to { transform: rotate(360deg); }
 }
