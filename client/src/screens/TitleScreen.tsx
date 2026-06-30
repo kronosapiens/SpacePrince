@@ -11,6 +11,7 @@ import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
 
 const RECHART_INTERVAL_MS = 3000;
+const TITLE_FADE_MS = 420; // matches the .title opacity transition (layout.css)
 
 export function TitleScreen() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export function TitleScreen() {
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const [hovered, setHovered] = useState<PlanetName | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
@@ -45,12 +47,14 @@ export function TitleScreen() {
   const hasLiveRun = !!(prince && run && !isOver(run, prince.numEncounters));
   const label = hasLiveRun ? "Continue" : "New Game";
   const handleBegin = () => {
+    if (leaving) return;
     if (!hasLiveRun) dispatch({ kind: "clear" });
-    navigate(ROUTES.play);
+    setLeaving(true); // fade out, then hand off to /play
+    window.setTimeout(() => navigate(ROUTES.play), TITLE_FADE_MS);
   };
 
   return (
-    <div className="title">
+    <div className={`title ${leaving ? "is-leaving" : ""}`}>
       <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
       <div className="title-stage">
         <div className="title-chart">

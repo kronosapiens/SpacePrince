@@ -80,6 +80,16 @@
   min-height: 100vh;
   display: grid;
   grid-template-rows: 1fr auto 1fr;
+  transition: opacity 420ms ease;
+}
+/* Dip-through-black handoff between the contemplative beats (Title → framing
+   → mint). The incoming surface fades up via `.anim-surface-in`. */
+.title.is-leaving,
+.mint-framing.is-leaving {
+  opacity: 0;
+}
+.mint-framing {
+  transition: opacity 400ms ease;
 }
 
 .title-wordmark {

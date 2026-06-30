@@ -29,6 +29,7 @@ interface FormState {
 const REVEAL_INTERVAL_MS = 2500;
 const HELD_MOMENT_MS = 1500;
 const GHOST_FADE_MS = 1500;
+const FRAMING_FADE_MS = 400; // matches .mint-framing opacity transition (layout.css)
 
 // Stable scaffold chart shown before the player has supplied inputs. Real
 // planet positions are hidden via unlockedPlanets={[]}; only the substrate
@@ -50,6 +51,7 @@ export function StartScreen() {
   });
   const [revealedCount, setRevealedCount] = useState(0);
   const [ghosted, setGhosted] = useState(false);
+  const [leavingFraming, setLeavingFraming] = useState(false);
 
   const computed: ChartType | null = useMemo(() => {
     if (!form.lat || !form.lon) return null;
@@ -167,7 +169,7 @@ export function StartScreen() {
 
       <div className="mint-center">
         {stage === "framing" && (
-          <div className="mint-framing">
+          <div className={`mint-framing anim-surface-in ${leavingFraming ? "is-leaving" : ""}`}>
             <p>
               You are about to recognize a <strong>Prince</strong>: a single moment and
               place — a latitude, a longitude, a time — resolved into a chart of seven
@@ -182,14 +184,21 @@ export function StartScreen() {
               and balance, not conquest.
             </p>
             <p>Nothing resets. Every run is kept, and leaves a single star in your sky.</p>
-            <button className="begin-btn" onClick={() => setStage("input")} type="button">
+            <button
+              className="begin-btn"
+              type="button"
+              onClick={() => {
+                setLeavingFraming(true); // fade out, then reveal the input form
+                window.setTimeout(() => setStage("input"), FRAMING_FADE_MS);
+              }}
+            >
               Continue
             </button>
           </div>
         )}
 
         {stage === "input" && (
-          <div className="mint-stage">
+          <div className="mint-stage anim-surface-in">
             <Chart
               chart={computed ?? SCAFFOLD_CHART}
               unlockedPlanets={[]}
@@ -215,7 +224,7 @@ export function StartScreen() {
 
         {stage === "input" && (
           <>
-            <div className="mint-form">
+            <div className="mint-form anim-surface-in">
               <Field label="Date">
                 <input
                   type="date"
