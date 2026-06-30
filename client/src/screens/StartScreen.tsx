@@ -12,7 +12,10 @@ import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
 
-type Stage = "input" | "revealing" | "settled";
+// The framing (SCREENS.md §9.6 / PRIMER.md) opens the mint — its intent-and-
+// stakes beat. It rides the mint surface so Continue (resume) bypasses it for
+// free: only a New Game, a fresh mint, passes through it.
+type Stage = "framing" | "input" | "revealing" | "settled";
 
 interface FormState {
   name: string;
@@ -36,7 +39,7 @@ export function StartScreen() {
   const { setActive } = useActivePlanet();
   const dispatchPrince = usePrinceDispatch();
   const startRun = useStartRun();
-  const [stage, setStage] = useState<Stage>("input");
+  const [stage, setStage] = useState<Stage>("framing");
   const [form, setForm] = useState<FormState>({
     name: "",
     date: "1990-01-01",
@@ -103,7 +106,7 @@ export function StartScreen() {
   // Keep the canvas neutral on the input + settled stages — no carry-over tint
   // from the previous screen.
   useEffect(() => {
-    if (stage === "input" || stage === "settled") setActive(null);
+    if (stage === "framing" || stage === "input" || stage === "settled") setActive(null);
   }, [stage, setActive]);
 
   const revealedPlanets: PlanetName[] = useMemo(
@@ -163,6 +166,28 @@ export function StartScreen() {
       </div>
 
       <div className="mint-center">
+        {stage === "framing" && (
+          <div className="mint-framing">
+            <p>
+              You are about to recognize a <strong>Prince</strong>: a single moment and
+              place — a latitude, a longitude, a time — resolved into a chart of seven
+              planets. It is unique, it is yours, and it is claimed only once.
+            </p>
+            <p>
+              You will not grow stronger here. The chart you are given is the chart you
+              keep — what changes is not your power but how well you come to read it.
+            </p>
+            <p>
+              You play by choosing which planet to send against what you meet. Attention
+              and balance, not conquest.
+            </p>
+            <p>Nothing resets. Every run is kept, and leaves a single star in your sky.</p>
+            <button className="begin-btn" onClick={() => setStage("input")} type="button">
+              Continue
+            </button>
+          </div>
+        )}
+
         {stage === "input" && (
           <div className="mint-stage">
             <Chart

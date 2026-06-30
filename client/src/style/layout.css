@@ -185,6 +185,31 @@
   justify-content: center;
 }
 
+/* The framing — the mint's opening intent-and-stakes beat (SCREENS.md §9.6). */
+.mint-framing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: min(560px, 84vw);
+  margin: auto 0;
+  font-family: var(--serif);
+  color: var(--bone);
+  text-align: center;
+}
+.mint-framing p {
+  margin: 0;
+  font-size: clamp(15px, 1.5vw, 19px);
+  line-height: 1.65;
+  opacity: 0.9;
+}
+.mint-framing strong {
+  font-weight: 600;
+}
+.mint-framing .begin-btn {
+  margin-top: 10px;
+}
+
 .mint-form {
   display: grid;
   grid-template-columns: 1fr;
