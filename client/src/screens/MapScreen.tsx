@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
-import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { isOver } from "@/game/run";
-import { useStartRun, useRolloverMap } from "@/state/store-actions";
+import { useRolloverMap } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, hashString } from "@/game/rng";
@@ -28,23 +26,12 @@ import type {
 } from "@/game/types";
 
 export function MapScreen() {
-  const navigate = useNavigate();
   const prince = usePrince();
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
-  const startRun = useStartRun();
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
   const [studyOpen, setStudyOpen] = useState(false);
-
-  // Bootstrap: a minted Prince with no runs yet gets one (StartScreen normally
-  // appends the first run, but direct nav lands here). The tail run — over or
-  // not — is left alone; an over run redirects to the End screen below.
-  useEffect(() => {
-    if (!prince) return;
-    if (run) return;
-    startRun();
-  }, [prince, run, startRun]);
 
   // Tint follows the player's current node when it has content; otherwise
   // falls back to the terminal node's ruler (the map's destination), so a
@@ -134,11 +121,11 @@ export function MapScreen() {
       }
       nextRun = { ...nextRun, encounter };
       // Commit the pre-encounter run mutations (rolledNodes, visitedNodeIds,
-      // currentNodeId, the new encounter) to the tail run.
+      // currentNodeId, the new encounter) to the tail run. PlaySurface sees the
+      // encounter and renders it — no navigation needed.
       dispatch({ kind: "commitRun", run: nextRun });
-      navigate(ROUTES.encounter);
     },
-    [run, prince, settings, navigate, dispatch],
+    [run, prince, settings, dispatch],
   );
 
   useEffect(() => {
@@ -149,10 +136,9 @@ export function MapScreen() {
     rolloverMap(run);
   }, [run, prince, rolloverMap]);
 
-  if (!prince) return <Navigate to={ROUTES.title} replace />;
-  if (!run) return null;
-  if (run.encounter) return <Navigate to={ROUTES.encounter} replace />;
-  if (isOver(run, prince.numEncounters)) return <Navigate to={ROUTES.end} replace />;
+  // PlaySurface only renders Map for a live, non-over run with no encounter;
+  // this is a defensive null-guard for TS narrowing.
+  if (!prince || !run) return null;
 
   return (
     <div className="map-screen">

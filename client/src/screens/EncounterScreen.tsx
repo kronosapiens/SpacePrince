@@ -1,5 +1,3 @@
-import { Navigate } from "react-router-dom";
-import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useCommitNarrative, useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
@@ -16,12 +14,12 @@ export function EncounterScreen() {
   const commitNarrative = useCommitNarrative();
   const settings = loadDevSettings();
 
-  if (!prince) return <Navigate to={ROUTES.title} replace />;
-  if (!run) return <Navigate to={ROUTES.title} replace />;
+  // PlaySurface only renders this for a run with a live encounter.
+  if (!prince || !run || !run.encounter) return null;
   const enc = run.encounter;
-  if (!enc) return <Navigate to={ROUTES.map} replace />;
 
-  // Clearing the encounter = commit the tail run with no live encounter.
+  // Clearing the encounter returns the surface to Map — or to End if the run
+  // ended (PlaySurface derives that from `isOver`).
   const clearEncounter = () =>
     dispatch({ kind: "commitRun", run: { ...run, encounter: null } });
 

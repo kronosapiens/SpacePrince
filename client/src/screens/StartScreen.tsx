@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
 import { CityPicker } from "@/components/CityPicker";
-import { ROUTES } from "@/routes";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
@@ -35,7 +33,6 @@ const GHOST_FADE_MS = 1500;
 const SCAFFOLD_CHART = seededChart(0, "");
 
 export function StartScreen() {
-  const navigate = useNavigate();
   const { setActive } = useActivePlanet();
   const dispatchPrince = usePrinceDispatch();
   const startRun = useStartRun();
@@ -142,10 +139,8 @@ export function StartScreen() {
       runs: [],
     };
     dispatchPrince({ kind: "mint", prince });
-    // Append a fresh run for the newly-minted Prince and drop straight into it,
-    // so the map the player lands on always matches the chart they just minted.
+    // Append a fresh run; PlaySurface then renders the map (we're on /play).
     startRun();
-    navigate(ROUTES.map);
   };
 
   const showCeremony = stage === "revealing" || stage === "settled";

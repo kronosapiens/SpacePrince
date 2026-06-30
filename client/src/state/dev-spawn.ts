@@ -9,7 +9,6 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { HOUSES } from "@/data/houses";
 import { pickScenario } from "@/data/narrative-trees";
 import { pickFragment } from "@/data/chorus";
-import { ROUTES } from "@/routes";
 import type {
   CombatEncounter,
   MapState,
@@ -46,13 +45,14 @@ export interface SpawnOpts {
 
 const DEFAULT_TIER = 32; // Saturn unlocks at 32 → all seven planets shown.
 
-/** Spawn the right Prince for a screen kind and the route to land on. */
-export function spawn(kind: SpawnKind, opts: SpawnOpts = {}): { prince: Prince; route: string } {
+/** Spawn the Prince for a screen kind. Every surface lives at /play; the caller
+ *  mints it and navigates there, and PlaySurface derives which screen to show. */
+export function spawn(kind: SpawnKind, opts: SpawnOpts = {}): Prince {
   switch (kind) {
-    case "map": return { prince: spawnMap(opts), route: ROUTES.map };
-    case "combat": return { prince: spawnCombat(opts), route: ROUTES.encounter };
-    case "narrative": return { prince: spawnNarrative(opts), route: ROUTES.encounter };
-    case "end": return { prince: spawnEnd(opts), route: ROUTES.end };
+    case "map": return spawnMap(opts);
+    case "combat": return spawnCombat(opts);
+    case "narrative": return spawnNarrative(opts);
+    case "end": return spawnEnd(opts);
   }
 }
 

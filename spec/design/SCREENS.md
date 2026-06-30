@@ -472,7 +472,20 @@ The game's explanatory copy lives in `PRIMER.md` and surfaces in two places, by 
 
 The screen graph is small enough to draw in a sentence: *Mint → Title (lobby) → (Map ↔ Encounter, looping; new maps generate after each L7 completion) → End-of-run (on combust or completion) → Title*. On first arrival the framing (§9.6) precedes Mint. Chart Study and the codex are reachable from the Title; Chart Study also from End-of-run.
 
-In the current dev prototype, navigation is via the Index screen and direct routes (`/map`, `/encounter`, `/narrative`). Final-game navigation is mostly implicit — the world advances you through screens — with a small persistent way back to higher-level surfaces from any point.
+### Routing and identity
+
+The client runs at **two routes only**: `/` (the Title/lobby) and `/play`.
+Everything else — Mint, Map, Encounter, End-of-run — is a single **state-derived surface** at `/play`: the screen shown is a pure function of the active run, not the URL.
+Map → Encounter → End-of-run all fall out of run state (an encounter is set; the run is over); only `/` ↔ `/play` is a route change.
+This removes the URL-vs-state mismatch a screen-per-route design invites, makes refresh-during-play resume correctly, and sets up the "chart is always present, surfaces flow through it" goal — the chart can persist across surfaces instead of remounting per route.
+
+**Identity lives in the URL; the screen does not.**
+The URL identifies *which Prince* is in play — the NFT — never which screen.
+This mirrors how Loot Survivor's `?id=` points at a game session, with one structural difference: our NFT is the **Prince** (a persistent character), and runs are *nested* play-throughs whose record (the star-field) accumulates inside it — so a run is never its own URL or token, the way an independent session-NFT is.
+Onchain, `/play` gains a `?prince=0x…` param resolved against chain; the surface layer is unchanged, because it is already a function of `(prince, run)`.
+The local prototype holds a single Prince in `localStorage`, so no param is needed yet.
+
+Final-game navigation is otherwise implicit — the world advances you through surfaces — with a small persistent way back to higher-level surfaces from any point.
 
 Forbidden:
 

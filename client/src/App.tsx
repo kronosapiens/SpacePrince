@@ -4,10 +4,7 @@ import { PageDropdown } from "@/components/PageDropdown";
 import { DevConsole } from "@/components/DevConsole";
 import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
-import { StartScreen } from "@/screens/StartScreen";
-import { MapScreen } from "@/screens/MapScreen";
-import { EncounterScreen } from "@/screens/EncounterScreen";
-import { EndOfRunScreen } from "@/screens/EndOfRunScreen";
+import { PlaySurface } from "@/screens/PlaySurface";
 import { IndexScreen } from "@/screens/IndexScreen";
 
 export function App() {
@@ -16,10 +13,7 @@ export function App() {
       <ActivePlanetTint />
       <Routes>
         <Route path={ROUTES.title} element={<TitleScreen />} />
-        <Route path={ROUTES.start} element={<StartScreen />} />
-        <Route path={ROUTES.map} element={<MapScreen />} />
-        <Route path={ROUTES.encounter} element={<EncounterScreen />} />
-        <Route path={ROUTES.end} element={<EndOfRunScreen />} />
+        <Route path={ROUTES.play} element={<PlaySurface />} />
         <Route path={ROUTES.index} element={<IndexScreen />} />
         <Route path="*" element={<Navigate to={ROUTES.title} replace />} />
       </Routes>

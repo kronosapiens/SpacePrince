@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
-import { usePrince, useActiveRun } from "@/state/PrinceStore";
-import { useStartRun } from "@/state/store-actions";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
@@ -13,10 +10,9 @@ import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
 
 export function EndOfRunScreen() {
-  const navigate = useNavigate();
   const prince = usePrince();
   const run = useActiveRun();
-  const startRun = useStartRun();
+  const dispatch = usePrinceDispatch();
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
@@ -38,15 +34,11 @@ export function EndOfRunScreen() {
     [allMaps],
   );
 
-  if (!prince) return <Navigate to={ROUTES.title} replace />;
-  if (!run) return <Navigate to={ROUTES.title} replace />;
+  if (!prince || !run) return null;
 
-  // The finished run stays in `prince.runs` (its Distance is now a permanent
-  // star); "New Game" just appends a fresh run and drops into it.
-  const beginNew = () => {
-    startRun();
-    navigate(ROUTES.map);
-  };
+  // New Game clears the finished Prince; PlaySurface then opens on mint
+  // (a fresh Prince per run, matching the current design).
+  const beginNew = () => dispatch({ kind: "clear" });
 
   return (
     <EndOfRunView

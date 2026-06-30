@@ -1,8 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
-import { ROUTES } from "@/routes";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
@@ -58,7 +56,6 @@ interface CombatScreenProps {
 export function EncounterCombatScreen(props: CombatScreenProps) {
   const { run, prince, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const devAnimationControls = props.devAnimationControls ?? false;
-  const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
@@ -327,13 +324,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   const handleContinue = useCallback(() => {
     if (animation) return;
-    if (runEnded) {
-      navigate(ROUTES.end);
-      return;
-    }
+    // Clear the encounter; PlaySurface then shows End (run over) or Map.
     onClearEncounter();
-    navigate(ROUTES.map);
-  }, [animation, runEnded, onClearEncounter, navigate]);
+  }, [animation, onClearEncounter]);
 
   return (
     <div className="combat" onClick={handleClearSelection}>

@@ -1,10 +1,8 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Chart } from "@/components/Chart";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
-import { ROUTES } from "@/routes";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { isOver } from "@/game/run";
@@ -54,7 +52,6 @@ interface NarrativeScreenProps {
 
 export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const { run, prince, encounter, onCommit, onClearEncounter } = props;
-  const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
   const house = HOUSES[encounter.house - 1]!;
@@ -192,13 +189,9 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const handleContinue = useCallback(() => {
     if (continuedRef.current) return; // timer + tap both call this; fire once
     continuedRef.current = true;
-    if (runEnded) {
-      navigate(ROUTES.end);
-      return;
-    }
+    // Clear the encounter; PlaySurface then shows End (run over) or Map.
     onClearEncounter();
-    navigate(ROUTES.map);
-  }, [runEnded, onClearEncounter, navigate]);
+  }, [onClearEncounter]);
 
   // No Continue button: once resolved, the line gets a beat to land and then
   // the world carries the player onward (SCREENS.md §10). A tap skips the wait.

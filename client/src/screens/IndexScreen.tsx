@@ -31,10 +31,7 @@ export function IndexScreen() {
         {(
           [
             ["Title", ROUTES.title],
-            ["Start", ROUTES.start],
-            ["Map", ROUTES.map],
-            ["Encounter", ROUTES.encounter],
-            ["End of Run", ROUTES.end],
+            ["Play", ROUTES.play],
           ] as Array<[string, string]>
         ).map(([label, to]) => (
           <div key={to} className="index-row">
