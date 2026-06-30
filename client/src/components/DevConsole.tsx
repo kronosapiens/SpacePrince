@@ -2,15 +2,15 @@ import { useState } from "react";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
-
-const UNLOCK_MAX = 36; // Saturn unlocks at 32 (MACROBIAN thresholds); a little headroom.
+import { MACROBIAN_THRESHOLDS } from "@/game/data";
 
 /**
- * Dev-only console (rendered only under `import.meta.env.DEV`). One control:
- * scrub the Prince's planet-unlock tier live. Mutations go through the Prince
- * store, so the chart fills in on the anchor as you drag, and a live combat
- * re-mirrors so the opponent re-fields to match. Screen-spawning ("Regenerate")
- * lives in the Page dropdown. Not production UI — styled inline.
+ * Dev-only console (rendered only under `import.meta.env.DEV`). Two controls:
+ * a 7-stop slider that scrubs the Prince's planet-unlock tier (one stop per
+ * planet, snapping to its Macrobian threshold) and a Delete Prince button.
+ * Mutations go through the Prince store, so the chart fills in on the anchor as
+ * you drag, and a live combat re-mirrors so the opponent re-fields to match.
+ * Screen-spawning ("Regenerate") lives in the Page dropdown. Not production UI.
  */
 export function DevConsole() {
   const prince = usePrince();
@@ -20,9 +20,11 @@ export function DevConsole() {
 
   const unlocked = prince ? unlockedPlanets(prince.numEncounters) : [];
 
-  // Set the unlock tier. A live combat is re-mirrored so the opponent re-fields
+  // Set the unlock tier from a planet count (1–7): jump to that planet's
+  // Macrobian threshold. A live combat is re-mirrored so the opponent re-fields
   // to the new tier alongside the player (Moon v Moon, 2v2, …).
-  const setTier = (count: number) => {
+  const setPlanets = (n: number) => {
+    const count = MACROBIAN_THRESHOLDS[n - 1] ?? 0;
     dispatch({ kind: "setEncounters", count });
     if (run?.encounter?.kind === "combat") {
       dispatch({
@@ -40,20 +42,29 @@ export function DevConsole() {
       {!collapsed && (
         <div style={body}>
           {prince ? (
-            <div style={{ ...row, flexDirection: "column", alignItems: "stretch", gap: 4 }}>
-              <div>
-                Unlock: <strong>{prince.numEncounters}</strong> enc ·{" "}
-                <strong>{unlocked.length}</strong> planet{unlocked.length === 1 ? "" : "s"}
+            <>
+              <div style={{ ...row, flexDirection: "column", alignItems: "stretch", gap: 4 }}>
+                <div>
+                  Planets: <strong>{unlocked.length}</strong> / 7
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={7}
+                  step={1}
+                  value={Math.min(Math.max(unlocked.length, 1), 7)}
+                  onChange={(e) => setPlanets(Number(e.target.value))}
+                />
+                <div style={muted}>{unlocked.join(" · ") || "(none)"}</div>
               </div>
-              <input
-                type="range"
-                min={0}
-                max={UNLOCK_MAX}
-                value={Math.min(prince.numEncounters, UNLOCK_MAX)}
-                onChange={(e) => setTier(Number(e.target.value))}
-              />
-              <div style={muted}>{unlocked.join(" · ") || "(none)"}</div>
-            </div>
+              <button
+                style={dangerBtn}
+                type="button"
+                onClick={() => dispatch({ kind: "clear" })}
+              >
+                Delete Prince
+              </button>
+            </>
           ) : (
             <div style={muted}>No Prince — mint one from the Title.</div>
           )}
@@ -94,3 +105,13 @@ const body: React.CSSProperties = {
 };
 const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 6 };
 const muted: React.CSSProperties = { color: "#888", fontSize: 11 };
+const dangerBtn: React.CSSProperties = {
+  padding: "5px 8px",
+  background: "transparent",
+  border: "1px solid rgba(220,90,90,0.5)",
+  borderRadius: 4,
+  color: "#e88",
+  cursor: "pointer",
+  font: "inherit",
+  textAlign: "center",
+};
