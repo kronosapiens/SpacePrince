@@ -727,8 +727,14 @@ function renderSubstrate() {
   );
   return (
     <g opacity={0.12}>
-      {/* Gentle, near-subliminal rotation of the whole ground (motion.css). */}
-      <g className="chart-substrate-spin">
+      {/* Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
+          itself — exactly what the on-chain NFT SVG will emit. Omitted under
+          prefers-reduced-motion (the still figure reads fine at any angle). */}
+      <g>
+        {!prefersReducedMotion() && (
+          <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+            from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="120s" repeatCount="indefinite" />
+        )}
         {triangles.map((tri, i) => (
           <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
             fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
@@ -741,6 +747,14 @@ function renderSubstrate() {
       </g>
     </g>
   );
+}
+
+/** Whether the OS asks for reduced motion. SMIL can't read the media query, so
+ *  we gate the rotation in JS instead (the NFT SVG just always includes it). */
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 // ─── Geometry ───────────────────────────────────────────────────────────
