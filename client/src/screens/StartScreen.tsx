@@ -171,19 +171,32 @@ export function StartScreen() {
         {stage === "framing" && (
           <div className={`mint-framing anim-surface-in ${leavingFraming ? "is-leaving" : ""}`}>
             <p>
-              You are about to recognize a <strong>Prince</strong>: a single moment and
-              place — a latitude, a longitude, a time — resolved into a chart of seven
-              planets. It is unique, it is yours, and it is claimed only once.
+              Astrology is one of humanity's oldest systems of knowledge. For four
+              millennia, astrologers have been making sense of the stars.
             </p>
             <p>
-              You will not grow stronger here. The chart you are given is the chart you
-              keep — what changes is not your power but how well you come to read it.
+              Space Prince is a game about astrology. But it's unlike others you've played.
             </p>
             <p>
-              You play by choosing which planet to send against what you meet. Attention
-              and balance, not conquest.
+              Instead of playing <strong>as a character</strong>, you play as <strong>yourself</strong> —
+              your birth chart is your stats sheet.
+              Instead of getting stronger and dominating others, you play by {" "}
+              <strong>creating and relieving tension.</strong> {" "}
             </p>
-            <p>Nothing resets. Every run is kept, and leaves a single star in your sky.</p>
+            <p>
+              The goal isn't to win, but to better understand yourself.
+            </p>
+            <p>
+              To begin, <strong>cast your chart</strong> and create a
+              globally unique token: your Space Prince.
+              Nobody else can play as you, because <strong>nobody else is you.</strong>
+            </p>
+            <p>
+              All of your games will be permanently recorded and reflected in
+              your Prince's visual appearance.
+              The video game save file turned art object.
+            </p>
+            <p>Are you ready?</p>
             <button
               className="begin-btn"
               type="button"
