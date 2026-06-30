@@ -251,8 +251,8 @@ export function StartScreen() {
                 />
               </Field>
             </div>
-            <button className="begin-btn" onClick={handleConfirm} disabled={!computed}>
-              Begin
+            <button className="begin-btn mint-submit" onClick={handleConfirm} disabled={!computed}>
+              Cast Chart
             </button>
           </>
         )}

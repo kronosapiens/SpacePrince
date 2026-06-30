@@ -227,6 +227,10 @@
   width: min(420px, 80vw);
   text-align: left;
 }
+/* A little breathing room above the mint's primary button. */
+.mint-submit {
+  margin-top: 16px;
+}
 .mint-row {
   display: grid;
   grid-template-columns: minmax(110px, 1fr) 2fr;
@@ -253,6 +257,14 @@
 }
 .mint-row input:focus,
 .mint-row select:focus { border-color: var(--bone); }
+/* Tint the native date/time picker icons to bone so they match the custom
+   compass on the Place field. `brightness(0)` first makes the result
+   deterministic regardless of the OS/browser default indicator color. */
+.mint-row input::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(0.92) sepia(0.18) saturate(0.55) brightness(1.04);
+  opacity: 0.85;
+  cursor: pointer;
+}
 
 .mint-caption-italic {
   font-family: var(--serif);
@@ -288,11 +300,74 @@
   flex-direction: column;
   gap: 4px;
 }
+.city-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* One underline across the whole field (like the date/time inputs), running
+     under the compass — not a short underline that stops before it. */
+  border-bottom: 1px solid var(--mist);
+  transition: border-color 200ms ease;
+}
+.city-field:focus-within {
+  border-bottom-color: var(--bone);
+}
+/* The inputs sit inside the field's shared underline — drop their own. */
+.city-field input {
+  border-bottom: 0;
+}
 .city-search {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 .city-input {
   width: 100%;
+}
+.city-input::placeholder {
+  color: var(--mist);
+  opacity: 1;
+}
+/* A picked city shows via the placeholder; render it bright like the date/time
+   values rather than dim hint text. */
+.city-input.has-city::placeholder {
+  color: var(--bone);
+}
+.city-manual {
+  display: flex;
+  gap: 10px;
+}
+.city-manual input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.city-manual input::-webkit-outer-spin-button,
+.city-manual input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Manual-coordinates affordance — parallels the native date/time picker icons. */
+.city-compass {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: transparent;
+  border: 0;
+  color: var(--bone);
+  opacity: 0.85; /* match the brightness of the native date/time picker icons */
+  /* The native indicators baseline-align (sit a touch far); nudge to match. */
+  transform: translateX(-3px);
+  cursor: pointer;
+  transition: opacity 200ms ease;
+}
+.city-compass:hover,
+.city-compass.is-active {
+  opacity: 1;
 }
 .city-results {
   position: absolute;
@@ -341,14 +416,6 @@
   font-size: 14px;
   cursor: default;
 }
-.city-readout {
-  font-family: var(--serif);
-  font-size: 14px;
-  color: var(--bone);
-  margin-top: 6px;
-  min-height: 1.2em;
-}
-.city-readout .muted { color: var(--mist); }
 
 /* ── Map ──────────────────────────────────────────────────────────────── */
 
