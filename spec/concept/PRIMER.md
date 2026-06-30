@@ -18,17 +18,23 @@ Stays above the named mechanics — *testimony, affliction, combustion, Resolve,
 
 ## The framing — shown at mint
 
-*A few lines: the minimum that creates intent and stakes. No history, no concept list, no named mechanics. Affordances below are illustrative; exact labels and placement are `SCREENS.md` decisions.*
+*A few lines: the minimum that creates intent and stakes.*
 
-> You are about to recognize a **Prince**: a single moment and place — a latitude, a longitude, a time — resolved into a chart of seven planets. It is unique, it is yours, and it is claimed only once.
->
-> You will not grow stronger here. The chart you are given is the chart you keep — what changes is not your power but how well you come to read it.
->
-> You play by choosing which planet to send against what you meet. Attention and balance, not conquest.
->
-> Nothing resets. Every run is kept, and leaves a single star in your sky.
+```
+Astrology is one of humanity's oldest systems of knowledge. For four millennia, astrologers have been making sense of the stars.
 
-> **[ New to astrology? Read on → ]**   ·   **[ Recognize a Position ]**
+Space Prince is a game about astrology. But it's unlike others you've played.
+
+Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by **creating and relieving tension.**
+
+The goal isn't to win, but to better understand yourself.
+
+To begin, **cast your chart** and create a globally unique token: your Space Prince. Nobody else can play as you, because **nobody else is you.**
+
+All of your games will be permanently recorded and reflected in your Prince's visual appearance. The video game save file turned art object.
+
+Are you ready?
+```
 
 ---
 
