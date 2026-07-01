@@ -20,10 +20,14 @@ const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE
 // Semantic: solid past, translucent future, faint untouched skeleton.
 // Each tier bundles the values that move together (opacity + stroke
 // width) so retuning one stays internally consistent.
+// Opacity floors are tuned so even the faintest tier clears the noise floor of
+// social-media video re-encoding (H.264/VP9 quantization flattens sub-~0.3
+// strokes on the near-black ground to solid black). Ratios between tiers are
+// preserved so the walked > reachable > skeleton hierarchy still reads.
 const TIER = {
-  traversed:  { opacity: 1,    stroke: 1.6 }, // the path you walked — fully realized
-  eligible:   { opacity: 0.7,  stroke: 1.3 }, // immediate next steps — possibility, not yet real
-  background: { opacity: 0.25, stroke: 1   }, // distant / untouched — the Sephirot skeleton
+  traversed:  { opacity: 1,    stroke: 1.8 }, // the path you walked — fully realized
+  eligible:   { opacity: 0.75, stroke: 1.5 }, // immediate next steps — possibility, not yet real
+  background: { opacity: 0.42, stroke: 1.3 }, // distant / untouched — the Sephirot skeleton
 } as const;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {

@@ -131,7 +131,7 @@ Transitions between tints take 2000ms, linear easing — slow enough to feel lik
 
 Two orthogonal signals share the chart and must read apart:
 
-- **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#CD2626`) for tense (square, opposition). The astrological convention. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
+- **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Medium when hovered, selected, or propagating (§3). The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
 - **Effect polarity (heal/harm)** — afflict/testify and the projected-effect badge use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
 
 Rejected: coloring the lines by the two connected planets' own hues (primary for trine, secondary for square, a band traveling along the line). It was tried and read muddy — planet hues already carry identity on the glyphs, and doubling them onto the lines blurred mood. Mood lives in red/green; identity stays on the glyphs.
@@ -323,7 +323,7 @@ Things this document deliberately does not yet answer, listed so they don't get 
 
 Recently resolved (see referenced sections):
 
-- *Aspect graph at rest* — always visible at Hairline weight, brightening to Light when active. Confirmed by prototype (`img/chart-v3.png`).
+- *Aspect graph at rest* — the web renders at a uniform opacity; **stroke weight** carries the rest→active step (Light → Medium), not opacity. Earlier passes dimmed resting lines and lifted the Title web to full via an `aspectsFull` flag; that opacity split was removed as an unnecessary layer — stroke alone reads cleanly and keeps the combat web legible for planning propagation. Confirmed by prototype (`img/chart-v3.png`).
 - *Touch interaction model* — see `SCREENS.md §3.6`. Double-tap to commit, universal tap-to-inspect across both charts.
 - *Sign and planet glyphs* — standard Unicode in v1 (replace prototype's text labels like "LIB" with `♎` etc.). Authored SVG alternatives reserved for later.
 - *Loading and transition states between scenes* — fade through Void with active-planet tint shift, ~1000ms each direction. Map → Encounter inherits the "Encounter open" 1200ms ease-out from `§7`; Encounter → Map is a faster ~600ms fade.

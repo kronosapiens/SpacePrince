@@ -38,7 +38,8 @@ export const PLANET_SECONDARY: Record<PlanetName, string> = {
  *  convention). The heal/harm valence uses amber/violet so the two read apart. */
 export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction
-  tension: "#CD2626", // square, opposition
+  tension: "#E15555", // square, opposition — luminant red, not deep-saturated, so
+                      // thin lines survive video chroma subsampling (a dark red artifacts)
 } as const;
 
 /** Action valence colors — afflict (amber) / testify (violet). Kept off the

@@ -13,10 +13,10 @@ import {
   INNER_RING_R, OUTER_RING_R,
   PLANET_R_REST, PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
-  STROKE_MEDIUM,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
+import { CHART_STYLE } from "@/svg/chart-style";
 import type {
   AspectConnection,
   Chart as ChartType,
@@ -104,8 +104,6 @@ export interface ChartProps {
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
-  /** Render the resting aspect web at full opacity (Title / Landing showcase). */
-  aspectsFull?: boolean;
   /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
   hideAfflictionBadges?: boolean;
   scale?: number;
@@ -171,7 +169,6 @@ export function Chart(props: ChartProps) {
     showColorField = true,
     showSubstrate = true,
     showAspects = true,
-    aspectsFull = false,
     hideAfflictionBadges = false,
     entrance = "none",
     side,
@@ -265,11 +262,11 @@ export function Chart(props: ChartProps) {
         const isHarmony =
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
-        // Active lines (hovered / selected / combat-active / propagating) render
-        // at full strength; the rest stay at the legible resting baseline —
-        // unless `aspectsFull` (Title / Landing) lifts the whole web to full.
-        const opacity = isActive || aspectsFull ? 1 : 0.5;
-        const sw = isActive ? 1.6 : 0.6;
+        // The web renders at a single opacity on every screen; the active stroke
+        // bump (hover / select / combat-active / propagating) is what emphasizes a
+        // line. No separate resting-brightness tier to reason about.
+        const opacity = CHART_STYLE.aspect.opacity;
+        const sw = isActive ? CHART_STYLE.aspect.activeStroke : CHART_STYLE.aspect.restStroke;
         const dx = to.cx - from.cx;
         const dy = to.cy - from.cy;
         const len = Math.hypot(dx, dy) || 1;
@@ -331,8 +328,8 @@ export function Chart(props: ChartProps) {
           const c = PLANET_PRIMARY[p];
           return (
             <radialGradient key={`b-${p}`} id={`v2-bloom-${p}`}>
-              <stop offset="0%" stopColor={c} stopOpacity="0.32" />
-              <stop offset="60%" stopColor={c} stopOpacity="0.08" />
+              <stop offset="0%" stopColor={c} stopOpacity={CHART_STYLE.glow.colorField.core} />
+              <stop offset="60%" stopColor={c} stopOpacity={CHART_STYLE.glow.colorField.mid} />
               <stop offset="100%" stopColor={c} stopOpacity="0" />
             </radialGradient>
           );
@@ -341,8 +338,8 @@ export function Chart(props: ChartProps) {
           const c = PLANET_PRIMARY[p];
           return (
             <radialGradient key={`h-${p}`} id={`v2-halo-${p}`}>
-              <stop offset="0%" stopColor={c} stopOpacity="0.7" />
-              <stop offset="50%" stopColor={c} stopOpacity="0.18" />
+              <stop offset="0%" stopColor={c} stopOpacity={CHART_STYLE.glow.halo.core} />
+              <stop offset="50%" stopColor={c} stopOpacity={CHART_STYLE.glow.halo.mid} />
               <stop offset="100%" stopColor={c} stopOpacity="0" />
             </radialGradient>
           );
@@ -350,8 +347,8 @@ export function Chart(props: ChartProps) {
         {/* Valence bloom — soft heal/harm glow behind a planet receiving a hit. */}
         {(["Testimony", "Affliction"] as const).map((pol) => (
           <radialGradient key={`vb-${pol}`} id={`v2-valence-${pol}`}>
-            <stop offset="0%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0.9" />
-            <stop offset="55%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0.34" />
+            <stop offset="0%" stopColor={VALENCE_COLOR[pol]} stopOpacity={CHART_STYLE.glow.valence.core} />
+            <stop offset="55%" stopColor={VALENCE_COLOR[pol]} stopOpacity={CHART_STYLE.glow.valence.mid} />
             <stop offset="100%" stopColor={VALENCE_COLOR[pol]} stopOpacity="0" />
           </radialGradient>
         ))}
@@ -363,9 +360,9 @@ export function Chart(props: ChartProps) {
 
       {/* Diagram layer: rings + ticks + sign labels + aspect web */}
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={OUTER_RING_R}
-        fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1.5} />
+        fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.outer.opacity} strokeWidth={CHART_STYLE.ring.outer.stroke} />
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
-        fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.45" strokeWidth={1} />
+        fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.inner.opacity} strokeWidth={CHART_STYLE.ring.inner.stroke} />
       <SignTicks />
       <SignLabels ascSignIdx={ascSignIdx} />
       {aspectLines}
@@ -492,10 +489,11 @@ function PlanetGlyph({
     return (
       <g transform={`translate(${point.cx}, ${point.cy})`}>
         <circle r={point.glyphR} fill="none"
-          stroke={c} strokeOpacity={0.35} strokeWidth={Math.max(1, point.glyphR * 0.05)}
-          strokeDasharray="2 4" />
+          stroke={c} strokeOpacity={CHART_STYLE.ghost.outlineOpacity}
+          strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, point.glyphR * CHART_STYLE.planet.rimStrokeRatio)}
+          strokeDasharray={CHART_STYLE.ghost.dash} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(point.glyphR * 0.85)} fill={c} fillOpacity={0.4}
+          fontSize={Math.round(point.glyphR * 0.85)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
           style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -506,7 +504,7 @@ function PlanetGlyph({
   }
 
   const fill = combusted ? "#3B2F2F" : c;
-  const fillOpacity = combusted ? 0.4 : 0.92;
+  const fillOpacity = combusted ? CHART_STYLE.planet.discCombustedOpacity : CHART_STYLE.planet.discOpacity;
   // Glyph in a deep shade of the planet's own color: colored and high-contrast
   // (via value), but on-palette — same hue family, so no complementary clash
   // and the rainbow corona stays coherent.
@@ -545,19 +543,19 @@ function PlanetGlyph({
         <circle r={r * 1.8}
           fill={`url(#v2-halo-${point.planet})`}
           className={hovered ? undefined : "anim-invite-glow"}
-          style={{ opacity: hovered ? 1 : 0.35, pointerEvents: "none" }} />
+          style={{ opacity: hovered ? CHART_STYLE.invite.halo.hover : CHART_STYLE.invite.halo.rest, pointerEvents: "none" }} />
       )}
       {invite && interactive && !selected && !active && (
         <circle r={r + 6} fill="none"
-          stroke={c} strokeWidth={STROKE_MEDIUM}
+          stroke={c} strokeWidth={CHART_STYLE.invite.ring.stroke}
           className={hovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-          style={{ opacity: hovered ? 1 : 0.75, pointerEvents: "none" }} />
+          style={{ opacity: hovered ? CHART_STYLE.invite.ring.hover : CHART_STYLE.invite.ring.rest, pointerEvents: "none" }} />
       )}
       {/* The distinctive ring is select-only (plus the opponent's acting planet)
           — hover is carried by the solid halo + bright ring, not this ring. */}
       {(active || selected) && (
         <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity="1" strokeWidth={STROKE_MEDIUM} />
+          stroke={c} strokeOpacity={CHART_STYLE.selectRing.opacity} strokeWidth={CHART_STYLE.selectRing.stroke} />
       )}
       {/* Receive-pulse: soft in-place valence glow behind the glyph when this
           planet takes testimony (heal) or affliction (harm) this beat. Behind
@@ -575,7 +573,8 @@ function PlanetGlyph({
       <g className={glyphClass}>
         <circle r={r}
           fill={fill} fillOpacity={fillOpacity}
-          stroke={sec} strokeOpacity="0.9" strokeWidth={Math.max(1, r * 0.05)} />
+          stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
+          strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
         <text textAnchor="middle" dominantBaseline="central"
           fontSize={Math.round(r * 0.85)}
           fill={glyphFill}
@@ -591,8 +590,8 @@ function PlanetGlyph({
           r={r + 4}
           fill="none"
           stroke={c}
-          strokeOpacity={0.8}
-          strokeWidth={2}
+          strokeOpacity={CHART_STYLE.crit.opacity}
+          strokeWidth={CHART_STYLE.crit.stroke}
           className="anim-crit-burst"
           style={{ pointerEvents: "none" }}
         />
@@ -604,8 +603,8 @@ function PlanetGlyph({
             r={r + 2}
             fill="none"
             stroke={c}
-            strokeOpacity={0.95}
-            strokeWidth={2.5}
+            strokeOpacity={CHART_STYLE.combust.ripple.opacity}
+            strokeWidth={CHART_STYLE.combust.ripple.stroke}
             className="anim-combust-ripple"
             style={{ pointerEvents: "none" }}
           />
@@ -616,8 +615,8 @@ function PlanetGlyph({
             r={r + 2}
             fill="none"
             stroke={NEUTRAL.bone}
-            strokeOpacity={0.7}
-            strokeWidth={1.5}
+            strokeOpacity={CHART_STYLE.combust.shockwave.opacity}
+            strokeWidth={CHART_STYLE.combust.shockwave.stroke}
             className="anim-combust-ripple-2"
             style={{ pointerEvents: "none" }}
           />
@@ -741,8 +740,8 @@ function PlanetBadges({
               x={-wA / 2} y={-badgeR}
               width={wA} height={2 * badgeR}
               rx={badgeR} ry={badgeR}
-              fill={NEUTRAL.void} fillOpacity="0.92"
-              stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
+              fill={NEUTRAL.void} fillOpacity={CHART_STYLE.badge.afflictionFill}
+              stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.badge.afflictionBorder} strokeWidth={CHART_STYLE.badge.borderStroke} />
             <foreignObject
               x={-wA / 2} y={-badgeR}
               width={wA} height={2 * badgeR}
@@ -789,8 +788,8 @@ function PlanetBadges({
             x={-projBadge.wP / 2} y={-projBadgeR}
             width={projBadge.wP} height={2 * projBadgeR}
             rx={projBadgeR} ry={projBadgeR}
-            fill={NEUTRAL.void} fillOpacity="0.84"
-            stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
+            fill={NEUTRAL.void} fillOpacity={CHART_STYLE.badge.projectionFill}
+            stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.badge.projectionBorder} strokeWidth={CHART_STYLE.badge.borderStroke} />
           <foreignObject
             x={-projBadge.wP / 2} y={-projBadgeR}
             width={projBadge.wP} height={2 * projBadgeR}
@@ -814,7 +813,7 @@ function PlanetBadges({
                 style={{
                   fontSize: "0.72em",
                   fontWeight: 600,
-                  opacity: 0.85,
+                  opacity: CHART_STYLE.badge.signPrefixOpacity,
                   marginRight: "0.5px",
                 }}
               >
@@ -839,7 +838,7 @@ function SignTicks() {
     lines.push(
       <line key={`tick_${i}`}
         x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-        stroke={NEUTRAL.gold} strokeOpacity="0.85" strokeWidth={2.5} strokeLinecap="round" />,
+        stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.tick.opacity} strokeWidth={CHART_STYLE.tick.stroke} strokeLinecap="round" />,
     );
   }
   return <g>{lines}</g>;
@@ -855,14 +854,14 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
     out.push(
       <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={NEUTRAL.bone} fillOpacity={0.7}
+          fontSize={20} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={NEUTRAL.bone} fillOpacity={0.7}
+          fontSize={22} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}
@@ -884,7 +883,7 @@ function renderSubstrate() {
     [0, 120, 240].map((step) => polar(cx, cy, hexR, base + step)),
   );
   return (
-    <g opacity={0.12}>
+    <g opacity={CHART_STYLE.substrate.opacity}>
       {/* Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
           itself — exactly what the on-chain NFT SVG will emit. Omitted under
           prefers-reduced-motion (the still figure reads fine at any angle). */}
@@ -895,13 +894,13 @@ function renderSubstrate() {
         )}
         {triangles.map((tri, i) => (
           <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+            fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
         {/* Four-fold vesica: left/right + top/bottom. */}
-        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
       </g>
     </g>
   );
