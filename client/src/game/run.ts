@@ -1,21 +1,34 @@
 import { blankSideState } from "./chart";
+import { rollNodeContent } from "./map-content";
 import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
-import { mulberry32, randomSeed } from "./rng";
+import { hashString, mulberry32, randomSeed } from "./rng";
 import { unlockedPlanets } from "./unlocks";
-import type { MapState, Run } from "./types";
+import type { MapState, NodeContent, Run } from "./types";
 
 /** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
 export const MAPS_PER_RUN = 7;
 
 export function newMapState(seed: number): MapState {
+  const graph = buildMapGraph(seed);
+  // Every node's content is fixed at map creation, seeded on (map seed, node
+  // id). Onchain the map seed itself is a VRF draw at creation — a map is
+  // unknowable until it exists, then fully derivable, and the client renders
+  // all of it (no fog of war). The root is an entry, not an encounter, so it
+  // carries no content.
+  const rolledNodes: Record<string, NodeContent> = {};
+  for (const node of graph.nodes) {
+    if (node.id === ROOT_NODE_ID) continue;
+    rolledNodes[node.id] = rollNodeContent({
+      rng: mulberry32(hashString(`${seed}_${node.id}`)),
+    });
+  }
   return {
     id: `map_${seed}`,
     seed,
-    graph: buildMapGraph(seed),
+    graph,
     currentNodeId: ROOT_NODE_ID,
     visitedNodeIds: [ROOT_NODE_ID],
-    rolledNodes: {},
-    lastNarrativeHouse: null,
+    rolledNodes,
     outcomes: {},
   };
 }

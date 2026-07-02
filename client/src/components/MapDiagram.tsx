@@ -17,7 +17,7 @@ interface MapDiagramProps {
 const NODE_R = 22;
 const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE_R
 // Tiered visual scale used by both the edge web and the nodes themselves.
-// Semantic: solid past, translucent future, faint untouched skeleton.
+// Semantic: solid past, translucent next-steps, faint distance.
 // Each tier bundles the values that move together (opacity + stroke
 // width) so retuning one stays internally consistent.
 // Opacity floors are tuned so even the faintest tier clears the noise floor of
@@ -27,7 +27,7 @@ const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE
 const TIER = {
   traversed:  { opacity: 1,    stroke: 1.8 }, // the path you walked — fully realized
   eligible:   { opacity: 0.75, stroke: 1.5 }, // immediate next steps — possibility, not yet real
-  background: { opacity: 0.42, stroke: 1.3 }, // distant / untouched — the Sephirot skeleton
+  background: { opacity: 0.42, stroke: 1.3 }, // distant — content visible but faint
 } as const;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
@@ -170,6 +170,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const isNarrative = content?.kind === "narrative";
     const isCombat = content?.kind === "combat";
 
+    // Content opacity by temporal tier. The whole map's content renders from
+    // the start — a map's fate is fixed at creation (VRF seed onchain), so
+    // hiding it would misstate what the player can actually know. The tiers
+    // grade attention, not information: distance reads faint, not blank.
+    const op = isEligible ? TIER.eligible.opacity
+      : isTraversed ? TIER.traversed.opacity
+      : isDistant ? TIER.background.opacity
+      : 1; // current
+
     // Halo gradient for the current node and for eligible nodes (the latter use
     // it for the breathing "you can go here" glow, mirroring combat planets).
     if (isCurrent || isEligible) {
@@ -195,18 +204,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       : undefined;
     const isClickable = !!handleClick;
     const isHovered = isClickable && hoveredNodeId === n.id;
-
-    // Distant nodes (>1 layer ahead, or off-path) render as light outline
-    // circles only — no fill, no glyph, regardless of whether content has
-    // been pre-rolled. The player can't see what's on the road yet.
-    if (isDistant) {
-      return (
-        <g key={n.id} transform={`translate(${n.x}, ${n.y})`}>
-          <circle r={NODE_R} fill="none"
-            stroke={NEUTRAL.bone} strokeOpacity={TIER.background.opacity} strokeWidth={TIER.background.stroke} />
-        </g>
-      );
-    }
 
     return (
       <g
@@ -246,15 +243,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         )}
         <circle r={NODE_R}
           fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 0.98) : 0}
+          fillOpacity={isNarrative ? (isCurrent ? 0.98 : op) : 0}
           stroke={color}
-          strokeOpacity={isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 1}
-          strokeWidth={isCurrent ? 2.4 : 1.8} />
+          strokeOpacity={op}
+          strokeWidth={isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8} />
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
             fontSize={14}
             fill={NEUTRAL.void}
-            fillOpacity={isEligible ? TIER.eligible.opacity : 1}
+            fillOpacity={op}
             fontFamily="'Cormorant Garamond', Garamond, serif"
             fontWeight={700}
             style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -262,19 +259,18 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           </text>
         )}
         {isCombat && (() => {
-          const fillOp = isEligible ? TIER.eligible.opacity * 0.78 : isTraversed ? TIER.traversed.opacity * 0.78 : 0.85;
-          const strokeOp = isEligible ? TIER.eligible.opacity : isTraversed ? TIER.traversed.opacity : 1;
+          const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
             <>
               <polygon
                 points={trianglePoints(0, 0, COMBAT_TRI_R, 90)}
                 fill={color} fillOpacity={fillOp}
-                stroke={color} strokeOpacity={strokeOp}
+                stroke={color} strokeOpacity={op}
                 strokeWidth={1} strokeLinejoin="round" />
               <polygon
                 points={trianglePoints(0, 0, COMBAT_TRI_R, 270)}
                 fill={color} fillOpacity={fillOp}
-                stroke={color} strokeOpacity={strokeOp}
+                stroke={color} strokeOpacity={op}
                 strokeWidth={1} strokeLinejoin="round" />
             </>
           );

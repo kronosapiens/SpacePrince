@@ -1,7 +1,6 @@
 import { seededChart } from "@/game/chart";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
-import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { mulberry32, hashString, randomSeed } from "@/game/rng";
 import { PLANETS } from "@/game/data";
@@ -12,7 +11,6 @@ import { pickFragment } from "@/data/chorus";
 import type {
   CombatEncounter,
   MapState,
-  NodeContent,
   NodeOutcome,
   PlanetName,
   Prince,
@@ -205,20 +203,14 @@ function livedInDistance(seed: number): number {
   return 20 + Math.floor(mulberry32(hashString(`${seed}_dist`))() * 130);
 }
 
-/** A map with rolled content and a walk from the root. `toTerminal` walks the
- *  whole way (completed map, for the End rainbow); otherwise stops partway so
- *  the player sits at a mid-map node. Visited non-root nodes get a synthesized
- *  outcome (drives the End counts + visited styling). */
+/** A walk from the root over a real map (content comes pre-rolled from
+ *  `newMapState`). `toTerminal` walks the whole way (completed map, for the
+ *  End rainbow); otherwise stops partway so the player sits at a mid-map node.
+ *  Visited non-root nodes get a synthesized outcome (drives the End counts +
+ *  visited styling). */
 function walkMap(seed: number, toTerminal: boolean): MapState {
   const base = newMapState(seed);
-  const rolled: Record<string, NodeContent> = {};
-  let lastNarrative: number | null = null;
-  for (const node of base.graph.nodes) {
-    const r = mulberry32(hashString(`${seed}_${node.id}`));
-    const content = rollNodeContent({ rng: r, lastNarrativeHouse: lastNarrative });
-    rolled[node.id] = content;
-    if (content.kind === "narrative") lastNarrative = content.house;
-  }
+  const rolled = base.rolledNodes;
   const walkRng = mulberry32(hashString(`${seed}_walk`));
   const path: string[] = [base.currentNodeId];
   let cur = base.currentNodeId;
@@ -252,5 +244,5 @@ function walkMap(seed: number, toTerminal: boolean): MapState {
       combusts: [],
     };
   }
-  return { ...base, rolledNodes: rolled, visitedNodeIds: path, currentNodeId: cur, outcomes };
+  return { ...base, visitedNodeIds: path, currentNodeId: cur, outcomes };
 }

@@ -177,7 +177,6 @@ export interface MapState {
   currentNodeId: string;
   visitedNodeIds: string[];
   rolledNodes: Record<string, NodeContent>;
-  lastNarrativeHouse: number | null;
   outcomes: Record<string, NodeOutcome>;
 }
 

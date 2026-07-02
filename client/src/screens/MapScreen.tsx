@@ -22,7 +22,6 @@ import type {
   MapState,
   PlanetName,
   Run,
-  NodeContent,
 } from "@/game/types";
 
 export function MapScreen() {
@@ -56,15 +55,15 @@ export function MapScreen() {
     (nodeId: string) => {
       if (!run || !prince) return;
       let nextRun: Run = { ...run };
-      const existing = nextRun.map.rolledNodes[nodeId];
-      let content: NodeContent;
-      if (existing) {
-        content = existing;
-      } else {
+      // Content is pre-rolled at map creation; the dev force cheats re-roll
+      // the node here so "the next node you enter" is the forced kind. The
+      // !content fallback covers persisted maps that predate eager rolling.
+      const forced = settings.forceCombat || !!settings.forceNarrativeHouse;
+      let content = nextRun.map.rolledNodes[nodeId];
+      if (!content || forced) {
         const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
         content = rollNodeContent({
           rng,
-          lastNarrativeHouse: nextRun.map.lastNarrativeHouse,
           forceNarrativeHouse: settings.forceNarrativeHouse,
           forceCombat: settings.forceCombat,
         });
@@ -73,7 +72,6 @@ export function MapScreen() {
           map: {
             ...nextRun.map,
             rolledNodes: { ...nextRun.map.rolledNodes, [nodeId]: content },
-            lastNarrativeHouse: content.kind === "narrative" ? content.house : nextRun.map.lastNarrativeHouse,
           },
         };
       }

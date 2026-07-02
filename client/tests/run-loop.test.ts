@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { beginRun, isOver, rolloverMap, MAPS_PER_RUN } from "@/game/run";
+import { beginRun, isOver, newMapState, rolloverMap, MAPS_PER_RUN } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { rollNodeContent } from "@/game/map-content";
-import { eligibleNext } from "@/game/map-gen";
+import { eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
 import type { Run, PlanetName } from "@/game/types";
 import { createStubPrince } from "./fixtures";
@@ -40,13 +40,25 @@ describe("Run loop integration", () => {
     let total = 0;
     for (let seed = 0; seed < 1000; seed++) {
       const rng = mulberry32(seed);
-      const c = rollNodeContent({ rng, lastNarrativeHouse: null });
+      const c = rollNodeContent({ rng });
       total++;
       if (c.kind === "narrative") narrative++;
     }
     const ratio = narrative / total;
     expect(ratio).toBeGreaterThan(0.45);
     expect(ratio).toBeLessThan(0.55);
+  });
+
+  it("a new map pre-rolls content for every node except the root, deterministically", () => {
+    const map = newMapState(123);
+    for (const node of map.graph.nodes) {
+      if (node.id === ROOT_NODE_ID) {
+        expect(map.rolledNodes[node.id]).toBeUndefined();
+      } else {
+        expect(map.rolledNodes[node.id]).toBeDefined();
+      }
+    }
+    expect(newMapState(123).rolledNodes).toEqual(map.rolledNodes);
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {
