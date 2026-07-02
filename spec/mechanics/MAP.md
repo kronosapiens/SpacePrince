@@ -106,13 +106,13 @@ The canonical `[1, 2, 2, 1, 2, 1, 1]` pattern produces exactly 22 edges, matchin
 
 ## 4. Seeding
 
-Seed source is **TBD**. Candidate approaches:
+The map seed is a **VRF draw at map creation** — one call per map, never per node.
+A map is unknowable before it exists; once created, topology and per-node encounter content derive deterministically from the seed (content is seeded per-node on `(map seed, node id)`, so rolls are path-independent).
+The run as a whole is therefore never solvable in advance: each map's fate is fixed only when the previous map completes.
 
-- **Fixed random per run** — maximum variety, no authored meaning attached.
-- **Chart-derived** — each player's natal chart determines map shape; adds meaning but limits variety within a chart.
-- **Hybrid** — run-random seed, chart biases per-layer probabilities.
+Whether the chart should additionally *bias* generation (e.g. per-layer probabilities) on top of the seed remains open — see §6.
 
-The playground currently uses fixed random for design exploration.
+The client prototype stands in with local randomness for the VRF.
 
 ---
 
@@ -128,7 +128,6 @@ For any generated pattern, the following hold by construction:
 
 ## 6. Open Questions
 
-- Seed source (see §4).
 - Whether layer probability stays at flat `0.5` or becomes chart-derived.
 - Whether to guarantee a minimum traversal length or branch count.
 - Encounter assignment per node and per (pillar, layer) coordinate.

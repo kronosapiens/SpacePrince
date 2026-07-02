@@ -22,6 +22,22 @@ Space Prince inherits FTL's logic. The player's natal chart is who they are, and
 
 This produces a small screen set: two main surfaces (encounter, map) and a handful of supporting ones for entry and exit (mint, end-of-run, chart study, prince select).
 
+### 1.1 Client honesty
+
+All game state is public onchain data; a determined player can derive anything the chain has published.
+The client honors this as a rule: **it never presents derivable information as unknowable, and never frames a decision as a gamble whose outcome is already determined and readable.**
+Fake mystery loses to a block explorer, and a choice made against pretend-uncertainty is a lottery, not a commitment.
+
+Two boundaries keep the rule workable:
+
+- **Curation is not concealment.**
+The client may foreground a summary and leave depth to other surfaces — a combat node shows the opponent's chart *ruler*, not the whole chart — so long as it never asserts that the rest is unknown.
+- **Ceremonial pacing is not hiding.**
+The mint reveal dramatizes the arrival of knowledge; it withholds nothing from a choice.
+The rule bites only where the player is asked to *decide*.
+
+When a design genuinely needs hidden information, it must be hidden onchain — entropy that doesn't exist yet (the per-map VRF draw, `MAP.md §4`) or a commitment scheme — never client-side concealment.
+
 ---
 
 ## 2. The Screen Set
@@ -207,12 +223,18 @@ Each node also has one of four **temporal states** relative to the player's curr
 
 - **Current** — the player's standing position. Node radius stays the same as every other state — emphasis comes from the active-planet halo (planet-color radial gradient), a colored ring around the disc, and a slightly heavier disc stroke. There is exactly one current node per map.
 - **Eligible-next** — every node **one edge away** from current that the player hasn't already visited and isn't behind them in the topology. Includes forward-layer neighbors *and* same-layer (horizontal) siblings, so a "sidestep" along the current layer is allowed. Rendered with full content at full saturation. The eligible set surfaces a soft pulse on entry per the "Map node arrival" motion in `STYLE.md §7`. Backtracking is still impossible — once visited, a node is locked out, so a sidestep is a one-way street.
-- **Traversed (past)** — nodes on the player's walk-path so far, excluding current. Full content visible but **at reduced opacity (~0.35)**. The shape and ruler color are preserved so the player can read the path they came from; the desaturation says "this is memory, not action."
-- **Distant** — every other node. Always rendered as **unfilled outline circles only**, regardless of whether the topology is exposed. No content visible, no glyph, no ruler color. The road ahead is geometry; what waits on it is unknowable until the player approaches.
+- **Traversed (past)** — nodes on the player's walk-path so far, excluding current.
+Full content at **full opacity** — the solid, committed past.
+What marks it as memory rather than action is stillness: no halo, no ring, no pulse.
+- **Distant** — every other node. Full content — shape, glyph, ruler color — rendered at the faintest opacity tier.
+The road ahead is fully legible; it is simply not yet near.
 
-Distant nodes therefore render the same whether or not their content has been rolled. **Knowing what's there is a function of where the player stands**, not a function of internal state. This preserves the "diagram of emanation" feel from `VIBES.md`: meaning concentrates near the player and dissolves into potential at distance.
+The whole map renders its content from the start.
+A map's fate is fixed the moment it is created (§4.3), so hiding rolled content behind a fog of war would misstate the player's actual knowledge — **the map visual reflects exactly what is knowable**.
+This is the client-honesty rule (§1.1) applied to the map.
+The tiers grade *attention*, not information: meaning concentrates near the player (the "diagram of emanation" feel from `VIBES.md`) while the distance stays faint but readable.
 
-The progression from outline (distant) to full saturation (eligible) to full saturation + halo (current) to desaturation (past) reads as a wave passing across the map.
+The progression from faint (distant) through translucent (eligible) to full saturation + halo (current), with the walked path solid behind the player, reads as the map becoming real as it is walked.
 
 Click/tap on a traversed node will eventually reveal an outcome detail popup (especially relevant in the end-of-run map browser, per `§6.1`). Treatment TBD.
 
@@ -222,21 +244,23 @@ A map's full visual state — topology, content per node, walk-path so far, and 
 
 Walk derivation in dev mode: from the seed, walk 1–5 forward steps from L1 along eligibleNext (deterministic seeded RNG), with the final node becoming current and intermediate nodes becoming traversed. In real gameplay the walk is the player's actual history, but the same deterministic principle applies to topology + content rolls.
 
-### 4.3 Lazy node generation
+### 4.3 Node generation
 
-Nodes are not all rolled at map-generation time:
+A map is fully determined the moment it is created:
 
-- The **topology** is fixed at map generation (per `MAP.md`).
-- **Encounter content** (combat opponent, or narrative house) is rolled only for the *current* node and the *eligible-next* nodes.
-- As the player traverses, newly-eligible nodes get rolled. Once rolled, content is stable.
-- Distant nodes render as small unstyled placeholders (per §4.2) until they enter the eligible frontier.
+- The **map seed** is a VRF draw at map creation (`MAP.md §4`) — one call per map, never per node.
+- The **topology** derives from the seed (per `MAP.md`).
+- **Encounter content** (combat opponent, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
 
-The map manifests as the player approaches it — distant nodes are placeholders; near nodes are charged with content. This honors the "diagram of emanation" feel from `VIBES.md`: meaning concentrates near the player and dissolves into potential at distance.
+Before a map exists, nothing about it is knowable; once it exists, everything is — and the map renders accordingly (§4.2).
+An earlier draft rolled content lazily at the eligible frontier and hid distant nodes behind a fog of war.
+Both were dropped: under a per-map VRF seed the fog reflected no real uncertainty, and the map visual should reflect the actual knowledge available.
 
 **Roll parameters:**
 
 - **Combat-to-narrative ratio:** **50/50**. Refine in playtesting — earlier drafts ran a φ:1 (62/38) combat-heavy split, but rebalanced to give narrative beats equal footing in a run.
-- **House assignment** (for narrative nodes): **uniform random over the 12 houses, with a "no immediate repeat" rule** (a freshly-rolled narrative node cannot be the same house as the player's most-recent narrative node). Position-derived house assignment (upper layers = elevated houses, lower = grounded) is reserved for v2 if it earns its weight in playtesting.
+- **House assignment** (for narrative nodes): **uniform random over the 12 houses**.
+A "no immediate repeat" rule and position-derived house assignment (upper layers = elevated houses, lower = grounded) are deferred to v2 if they earn their weight in playtesting.
 - **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4` (asymmetric matchups expected).
 
 ### 4.4 Mobile
