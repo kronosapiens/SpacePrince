@@ -61,6 +61,7 @@ The spec is divided by what kind of question each document answers.
 - `CHART.md` — chart-construction spec (Cairo-first)
 - `MAP.md` — run map topology (Sephirot-pattern node graph)
 - `HOUSES.md` — narrative encounter system organized around the twelve houses
+- `ENCOUNTERS.md` — generation-ready authoring spec for narrative encounters (`HOUSES.md` is the *what*, this is the *how*)
 
 ### `spec/design/` — how the game *looks and feels*
 

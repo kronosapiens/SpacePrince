@@ -6,7 +6,7 @@ import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
-import { TIME_BUCKET_MS, MACROBIAN_ORDER, SIGNS } from "@/game/data";
+import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
@@ -354,5 +354,3 @@ function tzOffsetMs(ms: number, tz: string): number {
   );
   return wall - ms;
 }
-
-void SIGNS;

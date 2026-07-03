@@ -176,7 +176,7 @@ The visual system mirrors the mechanical structure of the game.
 1. **Immutable Core** — Derived from mint inputs (lat, long, timestamp). Determines base geometry, symmetry, and color. Never changes.
 
 2. **Evolutionary Layers** — Evolve with progression:
-   - **Planet revelation.** Planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn) at cumulative-encounter counts of `2^i` for `i = 0..6`. See `spec/mechanics/MECHANICS.md §11.1`. Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
+   - **Planet revelation.** Planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn) — the Moon from the start, each subsequent planet at a cumulative-encounter count of `2^i` for `i = 0..5`. See `spec/mechanics/MECHANICS.md §11.1`. Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
    - **Houses add structure.**
 
 3. **The Star-Field** — Every run inscribes one star (see below). The permanent, accumulating record of play.

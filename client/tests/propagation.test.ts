@@ -25,9 +25,15 @@ describe("propagation projections", () => {
     expect(projected.other).toEqual({});
   });
 
-  it("returns deltas only for non-combusted, non-zero magnitude", () => {
+  it("skips combusted propagation targets and drops zero-delta afflictions", () => {
     const chart = seededChart(7);
     const opp = seededChart(11);
+    // Every player planet except the struck one is combusted, so propagation
+    // has nowhere to land: only Mars itself may project.
+    const playerState = blankSideState();
+    for (const p of Object.keys(playerState) as Array<keyof typeof playerState>) {
+      if (p !== "Mars") playerState[p].combusted = true;
+    }
     const projected = computeProjectedEffects({
       playerChart: chart,
       opponentChart: opp,
@@ -35,14 +41,14 @@ describe("propagation projections", () => {
       opponentPlanet: "Saturn",
       playerValence: "Affliction",
       opponentValence: "Affliction",
-      playerState: blankSideState(),
+      playerState,
       opponentState: blankSideState(),
       playerAspects: getAspects(chart),
       opponentAspects: getAspects(opp),
     });
-    // No combust: every projected delta is a finite integer (number model).
+    expect(Object.keys(projected.self)).toEqual(["Mars"]);
     for (const d of [...Object.values(projected.self), ...Object.values(projected.other)]) {
-      expect(Number.isInteger(d!.delta)).toBe(true);
+      expect(d!.delta !== 0 || d!.polarity === "Testimony").toBe(true);
     }
   });
 });

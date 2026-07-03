@@ -90,7 +90,7 @@ Omen/Lore can return in v2 once combat consumes Omen and Lore unlocks real conte
 
 ## 3. Targeting Vocabulary (unlock-safe)
 
-A Prince's chart fills in progressively (`MECHANICS.md §11.1`: Moon first, Saturn at encounter 64).
+A Prince's chart fills in progressively (`MECHANICS.md §11.1`: Moon first, Saturn at encounter 32).
 **An encounter must never reference a locked planet.**
 Trees therefore target *abstract roles* resolved at runtime against the unlocked set, never raw planet names.
 
@@ -139,7 +139,7 @@ Dignity does two jobs here:
 - **Gates branches** (§4.3) — which premium / penalty options exist at all.
 - **Nudges exchange rates** (§1.4) — how favorably the trade resolves.
 
-(*Combat dependency:* this assumes the in-progress removal of `dignityMult` from the combustion ceiling, `MECHANICS.md §10`, and a re-anchoring of the dignity study annotation, `SCREENS.md §3.6.1`, away from "resilience." *Natal-lever alternative deferred to v2:* whether the ruler aspects the ASC, per `HOUSES.md §3.2`.)
+(*Natal-lever alternative deferred to v2:* whether the ruler aspects the ASC, per `HOUSES.md §3.2`.)
 
 ### 4.3 The authoring predicates
 

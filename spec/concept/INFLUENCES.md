@@ -311,11 +311,11 @@ A Prince's journey is Siddhartha's journey: self-discovery through experience, n
 
 **The Action Space:**
 
-The **Think / Wait / Fast** postures are inspired by Siddhartha's answer to the merchant Kamaswami:
+The archived v1 action space — the **Think / Wait / Fast** postures (`spec/v1/DESIGN.md`) — was inspired by Siddhartha's answer to the merchant Kamaswami:
 
 > *"I can think. I can wait. I can fast."*
 
-The posture system stands on its own as a design choice — three modes of engaging with pressure that map naturally to modality (Cardinal→Think, Fixed→Wait, Mutable→Fast).
+The postures did not survive into the current afflict/testify model (`MECHANICS.md §5`), but the sensibility did: pressure is met by choosing how to engage, not by out-scaling it.
 The Siddhartha connection is a philosophical resonance, not a design dependency.
 Players do not need to know the reference.
 
@@ -340,7 +340,7 @@ Other Princes are Govinda: different coordinates, different journeys, no judgmen
 **The Om:**
 
 At the end, Siddhartha hears the Om — the unity beneath all apparent opposition.
-This is the Fixed Stars layer: where distinctions collapse into facets of one thing.
+This was the aim of the v1 Fixed Stars layer (`spec/v1/DESIGN.md`): where distinctions collapse into facets of one thing.
 
 This is why the game has no tutorial, why death advances understanding, and why there is no win screen.
 

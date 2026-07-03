@@ -3,7 +3,7 @@ import type { Polarity, PropagationEntry } from "./types";
 /**
  * Distance scores only **resolution** — testimony that actually reduces
  * affliction. Affliction created is the setup and scores nothing; resolving it
- * is the payoff (see MECHANICS §14).
+ * is the payoff (see MECHANICS §12).
  *
  * `playerDelta` is the opponent's action landing on the player's active planet;
  * `opponentDelta` is the player's action landing on the opponent's. Each counts

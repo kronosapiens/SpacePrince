@@ -2,9 +2,9 @@ import type { Prince, Run } from "@/game/types";
 
 /**
  * The single store: a Prince owns its runs (STATE.md). Run mutations land on the
- * tail run (`commitRun`); a new run is appended (`startRun`). As with the prior
- * reducers, impure work (RNG, time) happens in `store-actions.ts` thunks that
- * pre-compute the next run and dispatch the resolved state here.
+ * tail run (`commitRun`); a new run is appended (`startRun`). Impure work
+ * (RNG, time) happens in `store-actions.ts` thunks that pre-compute the next
+ * run and dispatch the resolved state here.
  */
 export type PrinceAction =
   | { kind: "mint"; prince: Prince }

@@ -171,7 +171,7 @@ The encounter screen is allowed restrained, functional chrome where it does nece
 
 **Allowed:**
 
-- **Distance readout.** The run's accumulating score (per `MECHANICS.md §14`). Visible during encounters. Functional type at small size.
+- **Distance readout.** The run's accumulating score (per `MECHANICS.md §12`). Visible during encounters. Functional type at small size.
 - **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position.
 - **Opponent-of-the-turn indicator.** Text + glyph identifying which opponent planet is acting this turn (e.g. "ANSWER MERCURY ☿"). Lives in the center seam between charts in combat.
 
@@ -207,7 +207,7 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 ### 4.1 Layout
 
 - **Centered diagram** with breathing room — at least 15% margin on each side, per `STYLE.md §10`.
-- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32, 64 — per `MECHANICS.md §11.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
+- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per `MECHANICS.md §11.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
 - **Distance readout** in the same position and treatment as the encounter screen (per §3.7).
 
 ### 4.2 Nodes
@@ -261,7 +261,7 @@ Both were dropped: under a per-map VRF seed the fog reflected no real uncertaint
 - **Combat-to-narrative ratio:** **50/50**. Refine in playtesting — earlier drafts ran a φ:1 (62/38) combat-heavy split, but rebalanced to give narrative beats equal footing in a run.
 - **House assignment** (for narrative nodes): **uniform random over the 12 houses**.
 A "no immediate repeat" rule and position-derived house assignment (upper layers = elevated houses, lower = grounded) are deferred to v2 if they earn their weight in playtesting.
-- **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4` (asymmetric matchups expected).
+- **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4`.
 
 ### 4.4 Mobile
 

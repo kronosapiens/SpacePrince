@@ -106,15 +106,6 @@ export function derivePlacements({
   return { planets, ascendantSign };
 }
 
-export function wholeSignHouses(ascendantSign: SignName): Record<number, SignName> {
-  const ascIdx = SIGNS.indexOf(ascendantSign);
-  const houses: Record<number, SignName> = {};
-  for (let i = 0; i < 12; i++) {
-    houses[i + 1] = SIGNS[(ascIdx + i) % 12]!;
-  }
-  return houses;
-}
-
 // A real ephemeris chart computed from a seeded random birth moment and place.
 // The skies span ~200 years so slow planets (Jupiter, Saturn) land in varied signs.
 const SEED_EPOCH_MS = Date.UTC(1900, 0, 1);

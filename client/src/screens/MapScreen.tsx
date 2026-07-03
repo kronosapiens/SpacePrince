@@ -32,10 +32,6 @@ export function MapScreen() {
   const { setActive } = useActivePlanet();
   const [studyOpen, setStudyOpen] = useState(false);
 
-  // Tint follows the player's current node when it has content; otherwise
-  // falls back to the terminal node's ruler (the map's destination), so a
-  // freshly-entered map already carries the through-line color rather than
-  // sitting on neutral bone until the first encounter resolves.
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
     return mapTintPlanet(run.map);

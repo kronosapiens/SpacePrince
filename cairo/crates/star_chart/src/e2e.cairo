@@ -23,17 +23,6 @@ mod tests {
     }
 
     #[test]
-    fn end_to_end_chart_smoke() {
-        let c = compute_chart(ChartInput {
-            time_minute_since_1900: 66_348_000,
-            lat_bin: 377,
-            lon_bin: -1224,
-        });
-
-        assert(c.asc_sign < 12, 'asc range');
-    }
-
-    #[test]
     fn end_to_end_sign_fixtures() {
         let c0 = compute_chart(ChartInput { time_minute_since_1900: 89_835_270, lat_bin: 472, lon_bin: -847 });
         assert(c0.asc_sign == 7, 'asc0');

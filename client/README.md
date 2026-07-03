@@ -72,7 +72,6 @@ The current vocabulary:
 - `useCommitTurn` — resolve a combat turn, build the `NodeOutcome`, bump lifetime if encounter ends
 - `useCommitNarrative` — apply narrative outcomes, build the `NodeOutcome`, bump lifetime if encounter ends
 - `useRolloverMap` — terminal node reached, archive current map, generate a fresh one
-- `useBumpScars` — End-of-Run scars increment, idempotent per `runId`
 - `useResetAll` — clear both stores
 
 ### Persistence is an effect, not a call

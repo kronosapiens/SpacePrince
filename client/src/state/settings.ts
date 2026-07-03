@@ -28,12 +28,3 @@ export function loadDevSettings(): DevSettings {
 export function saveDevSettings(settings: DevSettings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
-
-/** Listen for changes to dev settings (other components may toggle them). */
-export function onDevSettingsChange(handler: () => void): () => void {
-  const listener = (e: StorageEvent) => {
-    if (e.key === SETTINGS_KEY) handler();
-  };
-  window.addEventListener("storage", listener);
-  return () => window.removeEventListener("storage", listener);
-}

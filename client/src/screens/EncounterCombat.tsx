@@ -207,8 +207,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation],
   );
 
-  // Hover only highlights the planet under the cursor; it no longer opens the
-  // panel or previews a projection.
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
     setHovered(planet);
   }, []);

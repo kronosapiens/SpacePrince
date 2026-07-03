@@ -78,10 +78,6 @@ export function rulerStrong(c: NarrativeContext): boolean {
   return isUnlocked(c, c.rulerPlanet) && band(c.dignities[c.rulerPlanet]) === "strong";
 }
 
-export function rulerWeak(c: NarrativeContext): boolean {
-  return isUnlocked(c, c.rulerPlanet) && band(c.dignities[c.rulerPlanet]) === "weak";
-}
-
 export function anyCombusted(c: NarrativeContext): boolean {
   return c.unlocked.some((p) => c.perPlanetState[p].combusted);
 }

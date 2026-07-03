@@ -3,17 +3,6 @@ pub const PLANET_COUNT: usize = 7;
 pub const CORE_VERSION: u16 = 1;
 pub const DATA_VERSION: u16 = 1;
 
-pub const SIGN_COUNT: u8 = 12;
-
-pub const ELEMENT_FIRE: u8 = 0;
-pub const ELEMENT_EARTH: u8 = 1;
-pub const ELEMENT_AIR: u8 = 2;
-pub const ELEMENT_WATER: u8 = 3;
-
-pub const MODALITY_CARDINAL: u8 = 0;
-pub const MODALITY_FIXED: u8 = 1;
-pub const MODALITY_MUTABLE: u8 = 2;
-
 pub const DIGNITY_DOMICILE: u8 = 0;
 pub const DIGNITY_EXALTATION: u8 = 1;
 pub const DIGNITY_NEUTRAL: u8 = 2;

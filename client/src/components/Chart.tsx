@@ -262,9 +262,6 @@ export function Chart(props: ChartProps) {
         const isHarmony =
           a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
         const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
-        // The web renders at a single opacity on every screen; the active stroke
-        // bump (hover / select / combat-active / propagating) is what emphasizes a
-        // line. No separate resting-brightness tier to reason about.
         const opacity = CHART_STYLE.aspect.opacity;
         const sw = isActive ? CHART_STYLE.aspect.activeStroke : CHART_STYLE.aspect.restStroke;
         const dx = to.cx - from.cx;

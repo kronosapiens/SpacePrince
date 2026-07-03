@@ -182,8 +182,6 @@ function resolveAction(
   const delta = applyEffect(side[active], valence, amount);
   // Combustion is resolved before propagation: a planet destroyed by the blow
   // can't conduct it onward, so `propagate`'s `combusted` guard short-circuits.
-  // (Aligns the active planet with the long-standing "combusted planets are
-  // skipped by propagation" rule — previously only previously-dead planets.)
   const combust =
     valence !== "Testimony" && delta > 0 ? applyCombust(placement, side[active]) : false;
   const propagation = propagate(side, chart, active, valence, amount, sideTag);
