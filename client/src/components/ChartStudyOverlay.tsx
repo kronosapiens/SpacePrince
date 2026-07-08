@@ -16,6 +16,8 @@ interface ChartStudyOverlayProps {
 export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: ChartStudyOverlayProps) {
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
+  // Study mode — sticky across inspections, same as combat's inspect "i".
+  const [study, setStudy] = useState(false);
   const inspected = selected ?? hovered;
 
   useEffect(() => {
@@ -52,6 +54,8 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
             onPlanetClick={(p) => setSelected((cur) => (cur === p ? null : p))}
             onPlanetHover={setHovered}
             statsPanelPlanet={inspected}
+            statsPanelStudy={study}
+            onToggleStudy={() => setStudy((s) => !s)}
           />
         </div>
       </div>

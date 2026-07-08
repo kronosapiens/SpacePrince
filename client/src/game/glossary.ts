@@ -18,6 +18,13 @@ export const PLANET_GLOSS: Record<PlanetName, string> = {
   Saturn: "Limit and structure — time, discipline, boundaries, and endurance.",
 };
 
+/** What the derivation table's columns mean. "Place" is spelled out here in
+ *  full as placement. */
+export const COLUMN_GLOSS: Record<"core" | "placement", string> = {
+  core: "The planet's core nature — the same for every chart.",
+  placement: "The planet's particular placement — effects differ by sign and sect.",
+};
+
 // Per-stat provenance copy — the astrology behind a single number, so a tap
 // teaches which sign quality lifts a stat (MECHANICS.md §4: each element/
 // modality "expresses" one stat). Composed, never hand-authored per combination.
@@ -45,7 +52,8 @@ export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string
   const word = STAT_WORD[key];
   const core = p.base[key];
   const coreQual = core >= 6 ? "strong" : core <= 2 ? "slight" : "modest";
-  const parts = [`${p.planet}'s ${core} ${word} is ${coreQual} by nature.`];
+  // Qualitative only — the numbers sit in the table right above this prose.
+  const parts = [`${p.planet}'s ${word} is ${coreQual} by nature.`];
 
   const el = ELEMENT_BUFFS[p.element][key];
   const mod = MODALITY_BUFFS[p.modality][key];
@@ -56,10 +64,10 @@ export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string
     // Name only the contributing qualities (modality before element, the way
     // signs are spoken — "a Cardinal Fire sign").
     const factors = [mod ? p.modality : "", el ? p.element : ""].filter(Boolean).join(" ");
-    parts.push(`${p.sign}, ${article(factors)} ${factors} sign, adds ${el + mod}.`);
+    parts.push(`${p.sign}, ${article(factors)} ${factors} sign, lifts it.`);
   }
   if (sect > 0) {
-    parts.push(`In sect, it adds ${sect}.`);
+    parts.push(el + mod > 0 ? "Sect lifts it further." : "Sect lifts it.");
   }
   parts.push(`Expressed as ${STAT_METRIC[key]}.`);
   return parts.join(" ");

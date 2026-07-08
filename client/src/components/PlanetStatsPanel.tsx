@@ -1,8 +1,9 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { CHART_SIZE } from "@/svg/viewbox";
 import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
-import { PLANET_GLOSS, describeStat } from "@/game/glossary";
+import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { VALENCE_COLOR } from "@/svg/palette";
 
 /** When present, the panel grows the combat fan-out: two action buttons under
@@ -51,6 +52,10 @@ const COLS: Array<{ key: "core" | "placement" | "total"; header: string }> = [
   { key: "total", header: "Total" },
 ];
 
+/** Everything the shared blurb area can explain: a stat row's provenance, or
+ *  what the Core / Place column means. */
+type BlurbKey = keyof PlanetStats | "core" | "placement";
+
 /** The stats panel — an HTML card inside a `<foreignObject>`, so the browser's
  *  layout engine handles columns, gridlines, spacing, and text wrapping (rather
  *  than hand-computed SVG coordinates). This is client study chrome, not the
@@ -65,10 +70,10 @@ export function PlanetStatsPanel({
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
-  // Tap a stat row to drop its provenance prose below the table; one open at
-  // a time.
-  const [openStat, setOpenStat] = useState<keyof PlanetStats | null>(null);
-  const toggleStat = (k: keyof PlanetStats) => setOpenStat((c) => (c === k ? null : k));
+  // Tap a stat row (its provenance) or a Core/Place column head (what the
+  // column means) to drop prose below the table; one open at a time.
+  const [openKey, setOpenKey] = useState<BlurbKey | null>(null);
+  const toggleKey = (k: BlurbKey) => setOpenKey((c) => (c === k ? null : k));
   const contentRef = useRef<HTMLDivElement>(null);
   const [boxH, setBoxH] = useState(height);
   // The height transition is suppressed until the first paint lands, so the
@@ -93,7 +98,11 @@ export function PlanetStatsPanel({
 
   const table = deriveStatTable(chart.planets[planet]);
   const x0 = cx - W / 2;
-  const yTop = cy - height / 2; // top fixed; study grows downward
+  // Top fixed; study grows downward — unless the grown box would run off the
+  // chart's bottom edge (SVG clips at the viewBox), in which case the panel
+  // slides up just enough to stay visible. `y` animates alongside `height`.
+  const EDGE_MARGIN = 10;
+  const yTop = Math.min(cy - height / 2, CHART_SIZE - EDGE_MARGIN - boxH);
 
   return (
     <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
@@ -118,19 +127,33 @@ export function PlanetStatsPanel({
                 <thead>
                   <tr>
                     <th aria-hidden />
-                    {COLS.map((c) => (
-                      <th key={c.key}>{c.header}</th>
-                    ))}
+                    {COLS.map(({ key, header }) =>
+                      key === "total" ? (
+                        <th key={key}>{header}</th>
+                      ) : (
+                        <th
+                          key={key}
+                          className={`ps-colhead ${openKey === key ? "is-open" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleKey(key);
+                          }}
+                        >
+                          <span className="ps-tri" aria-hidden>▶</span>
+                          {header}
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {table.rows.map((row) => (
                     <tr
                       key={row.key}
-                      className={`ps-statrow ${openStat === row.key ? "is-open" : ""}`}
+                      className={`ps-statrow ${openKey === row.key ? "is-open" : ""}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleStat(row.key);
+                        toggleKey(row.key);
                       }}
                     >
                       <td className="ps-rowlabel">
@@ -144,7 +167,13 @@ export function PlanetStatsPanel({
                   ))}
                 </tbody>
               </table>
-              {openStat && <div className="ps-blurb">{describeStat(chart.planets[planet], openStat)}</div>}
+              {openKey && (
+                <div className="ps-blurb">
+                  {openKey === "core" || openKey === "placement"
+                    ? COLUMN_GLOSS[openKey]
+                    : describeStat(chart.planets[planet], openKey)}
+                </div>
+              )}
             </div>
           ) : (
             <div className="ps-ops">
