@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
+import { playCombust, playCrit, playPropagation, playVerb } from "@/audio/engine";
 import type { ProjectedEffect } from "@/game/projections";
 import type {
   CombatEncounter,
@@ -292,6 +293,7 @@ function runScheduler(args: {
     const attackerSide = isSelf ? "other" : "self";
     if (actionCrit) {
       schedule(() => {
+        playCrit();
         updateAnimation((state) => ({
           ...state,
           critPlanets: {
@@ -326,6 +328,9 @@ function runScheduler(args: {
 
     // Primary direct phase — apply delta, light action-glow, impact, crit.
     schedule(() => {
+      // The acting planet speaks its verb (VIBES.md — "encounter turns produce
+      // sound from the active planets").
+      playVerb(attackerPlanet, receivedPolarity);
       updateAnimation((state) => {
         const next = cloneAnimation(state);
         if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
@@ -422,6 +427,11 @@ function runScheduler(args: {
       }
 
       schedule(() => {
+        // Propagation is audible: a harmonious hop resolves, an inverted hop
+        // (square/opposition — the polarity flipped) hangs. A combust marker
+        // instead cuts the target's own signature mid-phrase.
+        if (step.note === "Combusts") playCombust(step.target);
+        else playPropagation(step.polarity !== receivedPolarity);
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           const targetState = isSelf ? next.selfState : next.otherState;
@@ -494,6 +504,7 @@ function runScheduler(args: {
 
     if (actionCombust) {
       schedule(() => {
+        playCombust(actionPlanet);
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           if (isSelf) {

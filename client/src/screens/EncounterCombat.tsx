@@ -2,6 +2,7 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "r
 import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
+import { setAmbient } from "@/audio/engine";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
 import { PLANETS } from "@/game/data";
@@ -121,6 +122,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [prince.numEncounters, devUnlockAll],
   );
 
+  // The chart hums: one ambient voice per lit fielded planet, thinning as
+  // planets go dark (VIBES.md — "silences where voices used to be"). Follows
+  // the animation's display state so a mid-turn combust silences its voice on
+  // the beat it grays out.
+  const litKey = playerUnlocked.filter((p) => !displayPlayerState[p].combusted).join(",");
+  useEffect(() => {
+    setAmbient(litKey ? (litKey.split(",") as PlanetName[]) : []);
+  }, [litKey]);
+  useEffect(() => () => setAmbient(null), []);
 
   // The panel (with its action buttons + live projection) is click-only:
   // hovering the chart highlights a planet but no longer pops the panel, so it

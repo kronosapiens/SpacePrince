@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
+import { isMuted, setMuted } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
@@ -13,6 +14,21 @@ import type { Chart as ChartType, PlanetName } from "@/game/types";
 
 const RECHART_INTERVAL_MS = 3000;
 const TITLE_FADE_MS = 420; // matches the .title opacity transition (layout.css)
+
+/** Quiet functional chrome (SCREENS §3.7 register): the one player-facing
+ *  sound control, on the one screen that carries the wordmark. */
+function SoundToggle() {
+  const [muted, setMutedState] = useState(isMuted());
+  const toggle = () => {
+    setMuted(!muted);
+    setMutedState(!muted);
+  };
+  return (
+    <button className="sound-toggle" onClick={toggle} type="button">
+      {muted ? "SOUND OFF" : "SOUND ON"}
+    </button>
+  );
+}
 
 export function TitleScreen() {
   const navigate = useNavigate();
@@ -74,6 +90,7 @@ export function TitleScreen() {
         <button className="begin-btn" onClick={handleBegin} type="button">
           {label}
         </button>
+        <SoundToggle />
       </div>
     </div>
   );
