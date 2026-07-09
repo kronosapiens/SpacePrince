@@ -8,6 +8,7 @@ import { finishedRuns, isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { StarField } from "@/components/StarField";
+import { useCurrentSky } from "@/astronomy/transits";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -67,6 +68,10 @@ export function TitleScreen() {
   const shownPlanets = prince ? unlockedPlanets(prince.numEncounters) : PLANETS;
   // Finished runs each own a star; the live tail run hasn't earned its yet.
   const starRuns = prince ? finishedRuns(prince.runs, prince.numEncounters) : [];
+  // The sky right now, riding the rim of the Prince's chart (transits) — the
+  // Title reads differently every day. A sample chart isn't anyone, so the
+  // princeless Title carries no sky.
+  const sky = useCurrentSky();
 
   // Continue resumes a live (non-over) run; Begin starts a new run on the same
   // Prince (identity persists — the lifetime layer, SCREENS §9.2). A player
@@ -94,6 +99,7 @@ export function TitleScreen() {
             onPlanetHover={setHovered}
             hideAfflictionBadges
             showColorField
+            transits={prince ? sky : undefined}
           />
         </div>
       </div>

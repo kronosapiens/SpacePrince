@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties, type MouseEvent } from "react";
+import { useMemo, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import {
@@ -155,6 +155,11 @@ export interface ChartProps {
   statsPanelStudy?: boolean;
   /** Shows the study "i" toggle on the stats panel; called when it's tapped. */
   onToggleStudy?: () => void;
+  /** The current sky (transits): ghost glyphs riding the outer rim at their
+   *  present signs. Presentation only — a transiting planet conjunct or
+   *  opposite a natal placement renders a shade brighter (attention, not
+   *  information). Title and Chart Study pass this; gameplay surfaces don't. */
+  transits?: Partial<Record<PlanetName, SignName>>;
 }
 
 export function Chart(props: ChartProps) {
@@ -193,6 +198,7 @@ export function Chart(props: ChartProps) {
     statsPanelReserveActions,
     statsPanelStudy,
     onToggleStudy,
+    transits,
   } = props;
 
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
@@ -362,6 +368,7 @@ export function Chart(props: ChartProps) {
         fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.inner.opacity} strokeWidth={CHART_STYLE.ring.inner.stroke} />
       <SignTicks />
       <SignLabels ascSignIdx={ascSignIdx} />
+      {transits && <TransitRing transits={transits} chart={chart} ascSignIdx={ascSignIdx} />}
       {aspectLines}
       {propagationLines}
 
@@ -865,6 +872,64 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
         </text>
       </g>,
     );
+  }
+  return <g>{out}</g>;
+}
+
+/** Radius for transiting-planet glyphs — the rim outside the sign labels,
+ *  just inside the outer ring: the sky beyond the chart. */
+const TRANSIT_R = 466;
+
+/**
+ * The current sky as ghost glyphs riding the rim (transits — see
+ * `astronomy/transits.ts`). Field-layer treatment: small, Mist, hairline
+ * presence. A transiting planet standing conjunct or opposite a natal
+ * placement brightens a shade — the day touching the chart.
+ */
+function TransitRing({
+  transits,
+  chart,
+  ascSignIdx,
+}: {
+  transits: Partial<Record<PlanetName, SignName>>;
+  chart: ChartType;
+  ascSignIdx: number;
+}) {
+  const natalSignIdxs = new Set(PLANETS.map((p) => SIGNS.indexOf(chart.planets[p].sign)));
+  const bySign = new Map<SignName, PlanetName[]>();
+  for (const p of PLANETS) {
+    const sign = transits[p];
+    if (!sign) continue;
+    const arr = bySign.get(sign) ?? [];
+    arr.push(p);
+    bySign.set(sign, arr);
+  }
+  const out: ReactNode[] = [];
+  for (const [sign, group] of bySign) {
+    const signIdx = SIGNS.indexOf(sign);
+    const baseAng = signMidDeg(signIdx, ascSignIdx);
+    const touched =
+      natalSignIdxs.has(signIdx) || natalSignIdxs.has((signIdx + 6) % 12);
+    group.forEach((planet, i) => {
+      const ang = baseAng + (i - (group.length - 1) / 2) * 9;
+      const p = polar(CHART_CENTER, CHART_CENTER, TRANSIT_R, ang);
+      out.push(
+        <text
+          key={`transit_${planet}`}
+          x={p.x}
+          y={p.y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={18}
+          fill={NEUTRAL.mist}
+          fillOpacity={touched ? 0.75 : 0.35}
+          fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
+          style={{ pointerEvents: "none", userSelect: "none" }}
+        >
+          {PLANET_GLYPH[planet]}
+        </text>,
+      );
+    });
   }
   return <g>{out}</g>;
 }

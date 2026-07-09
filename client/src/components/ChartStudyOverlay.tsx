@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { StarField } from "@/components/StarField";
+import { useCurrentSky } from "@/astronomy/transits";
 import type { Chart as ChartType, PlanetName, Run, SideState } from "@/game/types";
 
 interface ChartStudyOverlayProps {
@@ -22,6 +23,9 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, starRuns, onC
   // Study mode — sticky across inspections, same as combat's inspect "i".
   const [study, setStudy] = useState(false);
   const inspected = selected ?? hovered;
+  // The current sky rides the rim (transits) — the contemplative surface is
+  // where reading today's sky against the natal chart belongs.
+  const sky = useCurrentSky();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -61,6 +65,7 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, starRuns, onC
             statsPanelPlanet={inspected}
             statsPanelStudy={study}
             onToggleStudy={() => setStudy((s) => !s)}
+            transits={sky}
           />
         </div>
       </div>
