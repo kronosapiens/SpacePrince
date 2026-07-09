@@ -1,4 +1,4 @@
-import type { PlanetName, PlanetPlacement, PlanetStats } from "./types";
+import type { AspectType, PlanetName, PlanetPlacement, PlanetStats } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 
 // Study-mode copy — the opt-in foothold for a player new to astrology
@@ -23,6 +23,16 @@ export const PLANET_GLOSS: Record<PlanetName, string> = {
 export const COLUMN_GLOSS: Record<"core" | "placement", string> = {
   core: "The planet's core nature — the same for every chart.",
   placement: "The planet's particular placement — effects differ by sign and sect.",
+};
+
+/** One plain line per aspect — what the angle is and what crosses it in play
+ *  (MECHANICS.md §9: trines/sextiles carry, squares/oppositions invert). */
+export const ASPECT_GLOSS: Record<Exclude<AspectType, "None">, string> = {
+  Conjunction: "Standing in the same sign — effects pass between the two at full strength.",
+  Sextile: "Two signs apart, an easy angle — effects pass at half strength, unaltered.",
+  Trine: "Four signs apart, a flowing angle — effects pass at half strength, unaltered.",
+  Square: "Three signs apart, a hard angle — effects pass at half strength and invert: harm crosses as healing, healing as harm.",
+  Opposition: "Faced across the wheel — effects pass at full strength, inverted.",
 };
 
 // Per-stat provenance copy — the astrology behind a single number, so a tap

@@ -1,10 +1,11 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CHART_SIZE } from "@/svg/viewbox";
-import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
+import type { AspectType, Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
+import { getAspects } from "@/game/aspects";
 import { PLANET_ROLE } from "@/game/data";
-import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
-import { VALENCE_COLOR } from "@/svg/palette";
+import { ASPECT_GLOSS, COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
+import { ASPECT_COLOR, VALENCE_COLOR } from "@/svg/palette";
 
 /** When present, the panel grows the combat fan-out: two action buttons under
  *  the readout. `pending` is the armed verb (first click); a second click on it
@@ -55,9 +56,11 @@ const COLS: Array<{ key: "core" | "placement" | "total"; header: string }> = [
   { key: "total", header: "Total" },
 ];
 
-/** Everything the shared blurb area can explain: a stat row's provenance, or
- *  what the Core / Place column means. */
-type BlurbKey = keyof PlanetStats | "core" | "placement";
+/** Everything the shared blurb area can explain: a stat row's provenance,
+ *  what the Core / Place column means, or one of the planet's aspects. */
+type BlurbKey = keyof PlanetStats | "core" | "placement" | `aspect:${string}`;
+
+const HARMONIOUS: ReadonlySet<AspectType> = new Set(["Conjunction", "Sextile", "Trine"]);
 
 /** The stats panel — an HTML card inside a `<foreignObject>`, so the browser's
  *  layout engine handles columns, gridlines, spacing, and text wrapping (rather
@@ -101,6 +104,10 @@ export function PlanetStatsPanel({
   });
 
   const table = deriveStatTable(chart.planets[planet]);
+  // The inspected planet's web, for the study aspects block — the vocabulary
+  // behind the red/green lines (SCREENS §3.6.1 extension: aspects join planets
+  // in the study layer).
+  const aspects = getAspects(chart).filter((a) => a.from === planet);
   const x0 = cx - W / 2;
   // Top fixed; study grows downward — unless the grown box would run off the
   // chart's bottom edge (SVG clips at the viewBox), in which case the panel
@@ -185,11 +192,46 @@ export function PlanetStatsPanel({
                   ))}
                 </tbody>
               </table>
+              {aspects.length > 0 && (
+                <div className="ps-aspects">
+                  {aspects.map((a) => {
+                    const key: BlurbKey = `aspect:${a.aspect}:${a.to}`;
+                    return (
+                      <div
+                        key={key}
+                        className={`ps-aspectrow ${openKey === key ? "is-open" : ""}`}
+                      >
+                        <span
+                          className="ps-tri ps-tri-tap"
+                          aria-hidden
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleKey(key);
+                          }}
+                        >▶</span>
+                        <span
+                          className="ps-aspectname"
+                          style={{
+                            color: HARMONIOUS.has(a.aspect)
+                              ? ASPECT_COLOR.harmony
+                              : ASPECT_COLOR.tension,
+                          }}
+                        >
+                          {a.aspect.toUpperCase()}
+                        </span>
+                        <span className="ps-aspectother">{a.to.toUpperCase()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               {openKey && (
                 <div className="ps-blurb">
                   {openKey === "core" || openKey === "placement"
                     ? COLUMN_GLOSS[openKey]
-                    : describeStat(chart.planets[planet], openKey)}
+                    : typeof openKey === "string" && openKey.startsWith("aspect:")
+                      ? ASPECT_GLOSS[openKey.split(":")[1] as Exclude<AspectType, "None">]
+                      : describeStat(chart.planets[planet], openKey as keyof PlanetStats)}
                 </div>
               )}
             </div>
