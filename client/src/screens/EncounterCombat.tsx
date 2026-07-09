@@ -305,6 +305,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           // on the same action confirms. Uniform across pointer and touch.
           onChoose: (v) =>
             pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
+          onClearPending: () => setPendingAction(null),
         }
       : undefined;
 

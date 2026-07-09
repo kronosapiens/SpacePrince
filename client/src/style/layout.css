@@ -734,18 +734,31 @@
   cursor: pointer;
   filter: drop-shadow(0 0 6px var(--vc));
   transition: background 160ms ease, color 160ms ease;
+  /* Invite breath — same grammar as the chart's rings: the tappable moves. */
+  animation: action-invite-breath 1.1s ease-in-out infinite;
 }
+/* No hover state: the verbs keep breathing under the pointer (unlike the
+   rings, whose breath snaps steady on hover). */
+/* Once a verb is armed, its sibling falls still — the armed verb is the one
+   promoted next click. The sibling stays clickable; it just stops asking. */
+.ps-actions:has(.is-on) .ps-action:not(.is-on) { animation: none; }
+/* Armed: filled and pulsing harder than the pre-arm breath. */
 .ps-action.is-on {
   background: var(--vc);
   color: var(--void);
   filter: drop-shadow(0 0 12px var(--vc));
-  animation: armed-pulse 1.3s ease-in-out infinite;
+  animation: armed-pulse 1.1s ease-in-out infinite;
+}
+@keyframes action-invite-breath {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--vc)); transform: scale(1); }
+  50%      { filter: drop-shadow(0 0 14px var(--vc)); transform: scale(1.03); }
 }
 @keyframes armed-pulse {
-  0%, 100% { filter: drop-shadow(0 0 7px var(--vc)); }
-  50%      { filter: drop-shadow(0 0 16px var(--vc)); }
+  0%, 100% { filter: drop-shadow(0 0 8px var(--vc)); transform: scale(1); }
+  50%      { filter: drop-shadow(0 0 18px var(--vc)); transform: scale(1.05); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .ps-action,
   .ps-action.is-on { animation: none; }
 }
 
@@ -1194,6 +1207,12 @@
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
+  transition: filter 220ms ease;
+}
+/* Button affordance: the inset chart brightens as one object under the
+   pointer, reading as "this opens" rather than part of the backdrop. */
+.chart-anchor-btn:hover {
+  filter: brightness(1.45);
 }
 .chart-anchor-btn:focus-visible {
   outline: 1px solid var(--gold);

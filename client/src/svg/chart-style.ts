@@ -1,4 +1,4 @@
-import { STROKE_MEDIUM } from "@/svg/viewbox";
+import { STROKE_HEAVY, STROKE_MEDIUM } from "@/svg/viewbox";
 
 /**
  * Every opacity / stroke-weight knob the Chart draws with, gathered in one
@@ -47,11 +47,13 @@ export const CHART_STYLE = {
   /** Diagram — ghost (un-revealed) planet: dashed outline + faded glyph. */
   ghost: { outlineOpacity: 0.35, glyphOpacity: 0.4, dash: "2 4" },
 
-  /** Active — combat decision invite: breathing halo + ring, both snapping to
-   *  full on hover. */
+  /** Active — the tappable invite: breathing halo + ring, both snapping to
+   *  full on hover. The ring is the clickability signal and must read against
+   *  the ambient blooms (playtesters missed it at medium weight), so it sits
+   *  at the heavy end of the stroke scale with a high opacity floor. */
   invite: {
     halo: { rest: 0.35, hover: 1 },
-    ring: { rest: 0.75, hover: 1, stroke: STROKE_MEDIUM },
+    ring: { rest: 0.85, hover: 1, stroke: STROKE_HEAVY },
   },
   /** Active — the select / opponent-acting ring. */
   selectRing: { opacity: 1, stroke: STROKE_MEDIUM },

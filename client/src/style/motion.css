@@ -176,23 +176,31 @@
   transform-box: fill-box;
 }
 
-/* Invite — every planet the player can tap this turn carries a glowing halo
-   (the planet's own radial gradient) plus a bright ring, both breathing in sync,
-   so the eye lands on the choices without hunting. On hover the bright ring gives
-   way to the shared selection ring. Inline base opacities hold under reduced
-   motion, leaving a still affordance. */
+/* Invite — everything tappable carries a glowing halo (the element's own
+   radial gradient) plus a bright ring, both breathing in sync, so the eye
+   lands on the choices without hunting. On hover the bright ring gives way to
+   the shared selection ring. Inline base opacities hold under reduced motion,
+   leaving a still affordance.
+   The ring breathes in *size* as well as brightness: the ambient blooms are
+   static, so motion is what marks the ring as an affordance rather than more
+   glow (playtesters couldn't find the clickables by brightness alone). */
 @keyframes invite-glow-breath {
   0%, 100% { opacity: 0.2; }
   50%      { opacity: 0.6; }
 }
 @keyframes invite-ring-breath {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); }
 }
 .anim-invite-glow { animation: invite-glow-breath 1.1s ease-in-out infinite; }
 /* The drop-shadow glow lives on the base ring class so it persists when the
-   pulse is removed on hover (the ring then sits solid at full brightness). */
-.invite-ring { filter: drop-shadow(0 0 5px currentColor); }
+   pulse is removed on hover (the ring then sits solid at full brightness).
+   fill-box/center keep the scale breath centered on the ring itself. */
+.invite-ring {
+  filter: drop-shadow(0 0 8px currentColor);
+  transform-box: fill-box;
+  transform-origin: center;
+}
 .anim-invite-ring { animation: invite-ring-breath 1.1s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {

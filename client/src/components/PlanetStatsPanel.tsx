@@ -14,6 +14,9 @@ export interface PlanetStatsActions {
   testify: number;
   pending: Polarity | null;
   onChoose: (v: Polarity) => void;
+  /** Clear the armed verb without dismissing the panel — fired when a click
+   *  lands on the card but off the action buttons. */
+  onClearPending: () => void;
 }
 
 interface PlanetStatsPanelProps {
@@ -108,8 +111,16 @@ export function PlanetStatsPanel({
     <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
       {/* Swallow clicks on the card itself (padding, gloss, read-outs) so they
           don't bubble to the combat container's clear-selection handler — only
-          clicking off the panel should dismiss it. */}
-      <div className="ps-card" onClick={(e) => e.stopPropagation()}>
+          clicking off the panel should dismiss it. A card click does un-arm a
+          pending verb, though: backing out of a choice shouldn't require
+          leaving the panel. */}
+      <div
+        className="ps-card"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (actions?.pending) actions.onClearPending();
+        }}
+      >
         <div className="ps-content" ref={contentRef}>
           <div
             className={`ps-title ${onToggleStudy ? "ps-title-tap" : ""} ${study ? "is-open" : ""}`}

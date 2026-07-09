@@ -53,6 +53,7 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
             hoveredPlanet={hovered}
             onPlanetClick={(p) => setSelected((cur) => (cur === p ? null : p))}
             onPlanetHover={setHovered}
+            inviteInteraction={!selected}
             statsPanelPlanet={inspected}
             statsPanelStudy={study}
             onToggleStudy={() => setStudy((s) => !s)}

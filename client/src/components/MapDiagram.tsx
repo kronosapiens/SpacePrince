@@ -230,9 +230,10 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             <circle r={NODE_R * 1.8} fill={`url(#m2-halo-${n.id})`}
               className={isHovered ? undefined : "anim-invite-glow"}
               style={{ opacity: isHovered ? 1 : 0.35, pointerEvents: "none" }} />
-            <circle r={NODE_R + 6} fill="none" stroke={color} strokeWidth={2}
+            {/* Stroke 3 ≈ the chart invite's heavy ring scaled to node radius. */}
+            <circle r={NODE_R + 6} fill="none" stroke={color} strokeWidth={3}
               className={isHovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-              style={{ opacity: isHovered ? 1 : 0.7, pointerEvents: "none" }} />
+              style={{ opacity: isHovered ? 1 : 0.85, pointerEvents: "none" }} />
           </>
         )}
         {/* Tap-previewed: the distinctive commit ring (same role as the combat

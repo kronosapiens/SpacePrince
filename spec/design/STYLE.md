@@ -187,6 +187,20 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 | Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
 | Badge merge               | 200ms    | ease-out                    | The incoming Δ badge slides into the affliction total and fades — the addition is seen, not inferred. |
 | Crit                      | 720ms    | ease-out                    | At a phase's start the attacker flashes; the receiving chart's badges read 2× for the rest of the phase; the receiver bursts on impact. |
+| Invite breath             | 1100ms   | ease-in-out, looping        | Everything tappable right now breathes — a ring, node, or verb swelling slightly in its own color. |
+| Armed pulse               | 1100ms   | ease-in-out, looping        | The armed verb pulses harder, filled; its alternatives fall still. The confirm is the only thing asking. |
+
+### The next click is always legible
+
+At any moment it should be obvious what the player can — or should — tap next.
+The signal is motion: every ambient glow is static, so a slow breath (the invite) is what marks the tappable.
+It is one grammar everywhere — a breathing ring on a planet or map node, a breathing verb in the stats panel.
+Hover snaps a ring's breath to a steady full glow (the verbs keep breathing); selecting collapses the invites to the chosen element.
+Arming (the first tap of tap-to-commit) promotes exactly one next click: the armed element pulses harder while its alternatives fall still.
+Stillness remains the default for everything that cannot be tapped right now.
+
+Hover is subordinate in this grammar: it may intensify or preview what is already legible, never carry anything alone.
+Mobile has no hover, so every affordance, reveal, and action must be reachable by taps alone — hover is strictly additive polish for pointer devices.
 
 ### Combat turn composition
 
@@ -196,9 +210,9 @@ Narrative encounters do not use propagation animations. Resolution applies plain
 
 ### What does not animate
 
-The chart wheel itself, at rest, does not animate. No drifting, no breathing, no idle motion on any element that isn't currently active. Stillness is a default state.
+The chart wheel itself, at rest, does not animate. No drifting, no breathing, no idle motion on any element that isn't currently tappable or active. Stillness is a default state.
 
-The cursor does not pulse. Buttons do not hover-glow. Inactive planets do not shimmer. The world is calm until it isn't.
+The cursor does not pulse. Chrome that merely informs does not glow. Inactive planets do not shimmer. The world is calm until it asks for a decision — the invite breath (above) is that ask, and it is the only motion granted to a resting element.
 
 ### Forbidden motions
 
@@ -278,6 +292,7 @@ The visual analogue to `VIBES.md §What the Client Must Never Do`.
 - **Never animate at rest.** Stillness is a state, not an absence of state.
 - **Never introduce a color outside the palette plus neutrals.** Including for "just this one error state."
 - **Never use a typeface outside the two specified faces.** Including for "just this one tooltip."
+- **Never gate an action or a reveal behind hover.** Hover is additive polish for pointer devices (§7); taps alone must reach everything.
 
 ---
 
@@ -309,7 +324,7 @@ Mobile is not the focus, but design decisions that bake in horizontal-only assum
 
 - No encounter chrome positioned strictly to the left or right of a single chart in a way that wouldn't survive stacking.
 - No chart-wheel sizing in absolute pixels that assumes a desktop viewport.
-- No interactions that rely on hover with no touch equivalent. Hover-vs-touch is itself an open question (§14), but the architecture must leave room to answer it.
+- No interactions that rely on hover with no touch equivalent. Hover's role is settled (§7): strictly additive, never necessary.
 
 The mobile layout doesn't have to be polished yet. It has to be possible.
 
