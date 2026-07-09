@@ -36,7 +36,7 @@ export function newMapState(seed: number): MapState {
   };
 }
 
-export function beginRun(seed = randomSeed()): Run {
+export function beginRun(seed = randomSeed(), opts: { mapsCap?: number } = {}): Run {
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
   return {
@@ -50,6 +50,7 @@ export function beginRun(seed = randomSeed()): Run {
     seenFragmentIds: [],
     seenScenarioIds: [],
     events: [],
+    ...(opts.mapsCap !== undefined ? { mapsCap: opts.mapsCap } : {}),
   };
 }
 
@@ -57,7 +58,7 @@ export function beginRun(seed = randomSeed()): Run {
  *  when the seventh map is finished (completion) or every planet the player has
  *  *fielded* (its unlock tier) is combust (full combustion). */
 export function isOver(run: Run, numEncounters: number): boolean {
-  if (run.mapsCompleted >= MAPS_PER_RUN) return true;
+  if (run.mapsCompleted >= (run.mapsCap ?? MAPS_PER_RUN)) return true;
   const tier = unlockedPlanets(numEncounters);
   return tier.length > 0 && tier.every((p) => run.state[p].combusted);
 }
@@ -74,7 +75,7 @@ export function finishedRuns(runs: Run[], numEncounters: number): Run[] {
  *  End screen's `[...events.map(e => e.map), run.map]` is exactly seven. */
 export function rolloverMap(run: Run, seed = randomSeed()): Run {
   const mapsCompleted = run.mapsCompleted + 1;
-  if (mapsCompleted >= MAPS_PER_RUN) {
+  if (mapsCompleted >= (run.mapsCap ?? MAPS_PER_RUN)) {
     return { ...run, mapsCompleted, encounter: null };
   }
   const events = [...run.events, { kind: "map-completed" as const, map: run.map }];

@@ -24,13 +24,16 @@ export function EndOfRunScreen() {
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
+  const isSample = !!prince?.sample;
+
   // Achievements accrue at run end (idempotent OR — a reload re-derives the
-  // same bits). Quiet marks; Chart Study is where they're read.
+  // same bits). Quiet marks; Chart Study is where they're read. A sample
+  // keeps nothing.
   useEffect(() => {
-    if (!run) return;
+    if (!run || isSample) return;
     const bits = earnedBits(run);
     if (bits) dispatch({ kind: "earnAchievements", bits });
-  }, [run, dispatch]);
+  }, [run, isSample, dispatch]);
 
   useEffect(() => {
     setActive(null);
@@ -64,6 +67,9 @@ export function EndOfRunScreen() {
   // that's the lifetime layer.
   const beginNew = () => startRun();
   const returnToTitle = () => navigate(ROUTES.title);
+  // The sample's conversion beat (FREE.md): the end of the free map lands as
+  // loss, and the way forward is casting a chart of one's own.
+  const castOwn = () => dispatch({ kind: "clear" });
 
   // Completion and combustion land on the same surface with different weight
   // (SCREENS §3.8): a combust-out arrives through a slower fade — the
@@ -71,6 +77,23 @@ export function EndOfRunScreen() {
   const completed = run.mapsCompleted >= MAPS_PER_RUN;
 
   const starRuns = finishedRuns(prince.runs, prince.numEncounters);
+
+  if (isSample) {
+    // Nothing kept: no star, no journal — the record was never theirs.
+    return (
+      <EndOfRunView
+        runDistance={run.distance}
+        numMaps={allMaps.length}
+        totalEncounters={totalEncounters}
+        allMaps={allMaps}
+        entryClass="anim-surface-in"
+        conversionLine="This Prince vanishes when you leave. Cast your own to keep it — and everything after."
+        onBegin={castOwn}
+        beginLabel="Cast Your Chart"
+        onReturn={returnToTitle}
+      />
+    );
+  }
 
   return (
     <EndOfRunView
@@ -107,6 +130,8 @@ interface EndOfRunViewProps {
   /** The run journal (SCREENS §6.4): one quiet line per finished run,
    *  newest last — reads as the lifetime unrolling. */
   journal?: Array<{ id: string; distance: number; mapsCompleted: number }>;
+  /** Free-tier conversion beat (FREE.md): the loss line above the actions. */
+  conversionLine?: string;
   onBegin: () => void;
   beginLabel: string;
   onReturn?: () => void;
@@ -125,6 +150,7 @@ function EndOfRunView({
   inscribingRunId,
   entryClass,
   journal,
+  conversionLine,
   onBegin,
   beginLabel,
   onReturn,
@@ -219,6 +245,10 @@ function EndOfRunView({
           );
         })}
       </div>
+
+      {conversionLine && (
+        <div className="eor-conversion anim-fragment-in">{conversionLine}</div>
+      )}
 
       {journal && journal.length > 1 && (
         <div className="eor-journal">

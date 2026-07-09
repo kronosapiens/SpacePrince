@@ -33,8 +33,8 @@ export interface CommitTurnResult {
 export function useStartRun() {
   const dispatch = usePrinceDispatch();
   return useCallback(
-    (seed: number = randomSeed()): Run => {
-      const run = beginRun(seed);
+    (seed: number = randomSeed(), opts: { mapsCap?: number } = {}): Run => {
+      const run = beginRun(seed, opts);
       dispatch({ kind: "startRun", run });
       return run;
     },

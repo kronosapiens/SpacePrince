@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { isMuted, setMuted } from "@/audio/engine";
 import { finishedRuns, isOver } from "@/game/run";
@@ -38,6 +38,7 @@ export function TitleScreen() {
   const prince = usePrince();
   const run = useActiveRun();
   const startRun = useStartRun();
+  const dispatch = usePrinceDispatch();
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const [leaving, setLeaving] = useState(false);
   const { setActive } = useActivePlanet();
@@ -81,7 +82,10 @@ export function TitleScreen() {
   const label = hasLiveRun ? "Continue" : "Begin";
   const handleBegin = () => {
     if (leaving) return;
-    if (prince && !hasLiveRun) startRun();
+    // A finished sample dissolves here (FREE.md: nothing kept) — Begin leads
+    // to the mint, not to a second free map.
+    if (prince?.sample && !hasLiveRun) dispatch({ kind: "clear" });
+    else if (prince && !hasLiveRun) startRun();
     setLeaving(true); // fade out, then hand off to /play
     window.setTimeout(() => navigate(ROUTES.play), TITLE_FADE_MS);
   };

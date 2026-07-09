@@ -17,6 +17,9 @@ export function PrinceStoreProvider({ children }: { children: ReactNode }) {
   const [prince, dispatch] = useReducer(princeReducer, undefined, () => loadPrince());
 
   useEffect(() => {
+    // A sample Prince is never persisted (FREE.md: nothing kept) — skip both
+    // the save and the clear, leaving storage exactly as it was.
+    if (prince?.sample) return;
     if (prince) savePrince(prince);
     else clearPrince();
   }, [prince]);

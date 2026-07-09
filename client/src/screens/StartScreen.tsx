@@ -6,7 +6,7 @@ import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { playSignature } from "@/audio/engine";
-import { hashString } from "@/game/rng";
+import { hashString, randomSeed } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { PLANET_PRIMARY } from "@/svg/palette";
@@ -153,6 +153,24 @@ export function StartScreen() {
     startRun();
   };
 
+  // The free tier (FREE.md): skip chart creation entirely — a random real
+  // chart, three planets fielded (the full wheel shows as ghosts — the
+  // artifact is a selling point), one map, never persisted.
+  const handleSample = () => {
+    const seed = randomSeed();
+    const prince: Prince = {
+      id: `sample_${seed}`,
+      position: { iso: new Date(0).toISOString(), lat: 0, lon: 0 },
+      chart: seededChart(seed, "Sample"),
+      numEncounters: 2, // Moon, Mercury, Venus — and it never increments
+      achievements: 0,
+      runs: [],
+      sample: true,
+    };
+    dispatchPrince({ kind: "mint", prince });
+    startRun(randomSeed(), { mapsCap: 1 });
+  };
+
   const showCeremony = stage === "revealing" || stage === "settled";
 
   return (
@@ -211,6 +229,16 @@ export function StartScreen() {
               }}
             >
               Continue
+            </button>
+            {/* The free tier (FREE.md): a random chart, three planets, one map,
+                nothing kept. The demo is explicitly not-you — the conversion
+                line is "that's a stranger; cast your own". */}
+            <button
+              className="begin-btn begin-btn-ghost"
+              type="button"
+              onClick={handleSample}
+            >
+              Play a sample
             </button>
           </div>
         )}

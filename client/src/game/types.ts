@@ -206,6 +206,9 @@ export interface Run {
   seenScenarioIds: string[];
   /** In-memory run history for the End screen; not persisted. */
   events: RunEvent[];
+  /** Prototype-only: maps-to-completion override (the free-tier sample plays
+   *  one map, FREE.md). Absent = the standard MAPS_PER_RUN. */
+  mapsCap?: number;
 }
 
 export interface BirthData {
@@ -225,4 +228,7 @@ export interface Prince {
   /** Every run this Prince has played. The active run is the tail iff it is not
    *  over (STATE.md). Historical runs (incl. their Distance) are read off this. */
   runs: Run[];
+  /** Free-tier sample (FREE.md): a random chart, three planets, one map,
+   *  never persisted — nothing kept when it ends. */
+  sample?: boolean;
 }

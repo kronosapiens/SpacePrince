@@ -27,6 +27,9 @@ export function princeReducer(state: Prince | null, action: PrinceAction): Princ
     case "setEncounters":
       return { ...state, numEncounters: Math.max(0, action.count) };
     case "incrementEncounters":
+      // A sample stays at its three planets (FREE.md) — its lifetime counter
+      // never moves, so no unlock fires mid-sample.
+      if (state.sample) return state;
       return { ...state, numEncounters: state.numEncounters + 1 };
     case "earnAchievements":
       // OR-merge — idempotent, achievements only accrue (MECHANICS §11.2).

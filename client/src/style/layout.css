@@ -457,21 +457,26 @@
   width: clamp(170px, 16vw, 240px);
   z-index: 5;
 }
-/* Run-open aria — the Moon speaks before the first step (PLANETS.md §1). */
+/* Run-open aria — the Moon speaks before the first step (PLANETS.md §1).
+   Set in the empty left column, clear of the diagram (STYLE §8: fragments
+   sit on empty ground). */
 .map-open-word {
   position: absolute;
-  bottom: 92px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(70%, 560px);
-  text-align: center;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(26vw, 360px);
+  text-align: left;
   font-family: var(--serif);
   font-style: italic;
   font-size: 18px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--mist);
   pointer-events: none;
   z-index: 4;
+}
+@media (max-width: 899px) {
+  .map-open-word { display: none; } /* no clear column on narrow layouts */
 }
 /* Unlock ceremony caption — the world speaking, so the serif voice. */
 .map-ceremony {
@@ -1293,6 +1298,19 @@
   font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--mist);
+}
+
+/* Free-tier conversion beat (FREE.md) — the loss line, in the world's voice. */
+.eor-conversion {
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--bone);
+  max-width: 560px;
+  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 /* The run journal (SCREENS §6.4) — one quiet line per finished run. */
