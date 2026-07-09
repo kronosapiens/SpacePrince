@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { StarField } from "@/components/StarField";
 import { useCurrentSky } from "@/astronomy/transits";
+import { unlockedAchievements } from "@/game/achievements";
+import { getFragmentById, fragmentTitle } from "@/data/chorus";
 import type { Chart as ChartType, PlanetName, Run, SideState } from "@/game/types";
 
 interface ChartStudyOverlayProps {
@@ -10,6 +12,11 @@ interface ChartStudyOverlayProps {
   unlockedPlanets: PlanetName[];
   /** Finished runs — rendered as the star-field behind the chart (NFT.md). */
   starRuns?: ReadonlyArray<Pick<Run, "id" | "seed" | "distance">>;
+  /** Lifetime achievement bitmap — read as quiet marks (MECHANICS §11.2). */
+  achievements?: number;
+  /** Every fragment heard across the Prince's life — the browsable archive
+   *  (SCREENS §7.4). Derived from runs' seenFragmentIds; nothing new stored. */
+  heardFragmentIds?: string[];
   onClose: () => void;
 }
 
@@ -17,15 +24,28 @@ interface ChartStudyOverlayProps {
  *  ChartAnchor. Shows the player's chart at full Chart Study fidelity:
  *  color-field blooms, aspect web, and the planet stats panel on hover or
  *  selection. Dismissed via backdrop click, the close button, or ESC. */
-export function ChartStudyOverlay({ chart, state, unlockedPlanets, starRuns, onClose }: ChartStudyOverlayProps) {
+export function ChartStudyOverlay({
+  chart,
+  state,
+  unlockedPlanets,
+  starRuns,
+  achievements = 0,
+  heardFragmentIds,
+  onClose,
+}: ChartStudyOverlayProps) {
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   // Study mode — sticky across inspections, same as combat's inspect "i".
   const [study, setStudy] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const inspected = selected ?? hovered;
   // The current sky rides the rim (transits) — the contemplative surface is
   // where reading today's sky against the natal chart belongs.
   const sky = useCurrentSky();
+  const marks = unlockedAchievements(achievements);
+  const heard = (heardFragmentIds ?? [])
+    .map((id) => getFragmentById(id))
+    .filter((f): f is NonNullable<typeof f> => f !== null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -68,6 +88,37 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, starRuns, onC
             transits={sky}
           />
         </div>
+        {(marks.length > 0 || heard.length > 0) && (
+          <div className="chart-study-foot">
+            {marks.map((a) => (
+              <span key={a.id} className="chart-study-mark">
+                {a.label}
+              </span>
+            ))}
+            {heard.length > 0 && (
+              <button
+                type="button"
+                className="chart-study-archive-toggle"
+                onClick={() => setArchiveOpen((o) => !o)}
+              >
+                {heard.length} {heard.length === 1 ? "FRAGMENT" : "FRAGMENTS"} HEARD
+              </button>
+            )}
+          </div>
+        )}
+        {archiveOpen && heard.length > 0 && (
+          <div className="chart-study-archive">
+            {heard.map((f) => (
+              <div key={f.id} className="chart-study-archive-item">
+                <div className="chart-study-archive-text">{f.text.trim()}</div>
+                <div className="chart-study-archive-attrib">
+                  {f.author?.toUpperCase()}
+                  {fragmentTitle(f) ? ` · ${fragmentTitle(f).toUpperCase()}` : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

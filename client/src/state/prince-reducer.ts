@@ -11,6 +11,7 @@ export type PrinceAction =
   | { kind: "clear" }
   | { kind: "setEncounters"; count: number }
   | { kind: "incrementEncounters" }
+  | { kind: "earnAchievements"; bits: number }
   | { kind: "startRun"; run: Run }
   | { kind: "commitRun"; run: Run };
 
@@ -27,6 +28,11 @@ export function princeReducer(state: Prince | null, action: PrinceAction): Princ
       return { ...state, numEncounters: Math.max(0, action.count) };
     case "incrementEncounters":
       return { ...state, numEncounters: state.numEncounters + 1 };
+    case "earnAchievements":
+      // OR-merge — idempotent, achievements only accrue (MECHANICS §11.2).
+      return state.achievements === (state.achievements | action.bits)
+        ? state
+        : { ...state, achievements: state.achievements | action.bits };
     case "startRun":
       return { ...state, runs: [...state.runs, action.run] };
     case "commitRun": {

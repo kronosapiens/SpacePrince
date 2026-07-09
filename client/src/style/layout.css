@@ -1237,6 +1237,64 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+/* Chart Study lifetime layers (SCREENS §7.4): quiet marks + fragment archive. */
+.chart-study-foot {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--mist);
+}
+.chart-study-mark { text-transform: uppercase; opacity: 0.8; }
+.chart-study-archive-toggle {
+  background: transparent;
+  border: none;
+  color: var(--mist);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 220ms ease;
+}
+.chart-study-archive-toggle:hover { color: var(--bone); }
+.chart-study-archive {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 44px;
+  max-height: 46%;
+  overflow-y: auto;
+  padding: 18px 22px;
+  background: rgba(11, 10, 15, 0.94);
+  border: 1px solid var(--smoke);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chart-study-archive-item .chart-study-archive-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--bone);
+}
+.chart-study-archive-item .chart-study-archive-attrib {
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--mist);
+}
+
 /* The run journal (SCREENS §6.4) — one quiet line per finished run. */
 .eor-journal {
   display: flex;

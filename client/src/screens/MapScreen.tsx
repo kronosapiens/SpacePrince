@@ -198,6 +198,8 @@ export function MapScreen() {
           state={run.state}
           unlockedPlanets={playerUnlocked}
           starRuns={finishedRuns(prince.runs, prince.numEncounters)}
+          achievements={prince.achievements}
+          heardFragmentIds={prince.runs.flatMap((r) => r.seenFragmentIds)}
           onClose={() => setStudyOpen(false)}
         />
       )}

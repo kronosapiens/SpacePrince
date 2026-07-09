@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
 import { StarField } from "@/components/StarField";
-import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { playStar } from "@/audio/engine";
+import { earnedBits } from "@/game/achievements";
 import { finishedRuns, MAPS_PER_RUN } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
@@ -19,8 +20,17 @@ export function EndOfRunScreen() {
   const prince = usePrince();
   const run = useActiveRun();
   const startRun = useStartRun();
+  const dispatch = usePrinceDispatch();
   const navigate = useNavigate();
   const { setActive } = useActivePlanet();
+
+  // Achievements accrue at run end (idempotent OR — a reload re-derives the
+  // same bits). Quiet marks; Chart Study is where they're read.
+  useEffect(() => {
+    if (!run) return;
+    const bits = earnedBits(run);
+    if (bits) dispatch({ kind: "earnAchievements", bits });
+  }, [run, dispatch]);
 
   useEffect(() => {
     setActive(null);
