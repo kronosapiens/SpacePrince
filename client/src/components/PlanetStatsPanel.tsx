@@ -73,8 +73,9 @@ export function PlanetStatsPanel({
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
-  // Tap a stat row (its provenance) or a Core/Place column head (what the
-  // column means) to drop prose below the table; one open at a time.
+  // Tap a disclosure triangle — a stat row's (provenance) or a Core/Place
+  // column head's (what the column means) — to drop prose below the table;
+  // one open at a time.
   const [openKey, setOpenKey] = useState<BlurbKey | null>(null);
   const toggleKey = (k: BlurbKey) => setOpenKey((c) => (c === k ? null : k));
   const contentRef = useRef<HTMLDivElement>(null);
@@ -122,11 +123,17 @@ export function PlanetStatsPanel({
         }}
       >
         <div className="ps-content" ref={contentRef}>
-          <div
-            className={`ps-title ${onToggleStudy ? "ps-title-tap" : ""} ${study ? "is-open" : ""}`}
-            onClick={onToggleStudy ? (e) => { e.stopPropagation(); onToggleStudy(); } : undefined}
-          >
-            {onToggleStudy && <span className="ps-tri" aria-hidden>▶</span>}
+          {/* The disclosure triangle alone is the toggle target (here and on
+              rows/column heads below) — the surrounding text stays inert so
+              stray clicks fall through to the card's un-arm/deselect swallow. */}
+          <div className={`ps-title ${study ? "is-open" : ""}`}>
+            {onToggleStudy && (
+              <span
+                className="ps-tri ps-tri-tap"
+                aria-hidden
+                onClick={(e) => { e.stopPropagation(); onToggleStudy(); }}
+              >▶</span>
+            )}
             {planet.toUpperCase()}
             <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
           </div>
@@ -142,15 +149,15 @@ export function PlanetStatsPanel({
                       key === "total" ? (
                         <th key={key}>{header}</th>
                       ) : (
-                        <th
-                          key={key}
-                          className={`ps-colhead ${openKey === key ? "is-open" : ""}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleKey(key);
-                          }}
-                        >
-                          <span className="ps-tri" aria-hidden>▶</span>
+                        <th key={key} className={`ps-colhead ${openKey === key ? "is-open" : ""}`}>
+                          <span
+                            className="ps-tri ps-tri-tap"
+                            aria-hidden
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleKey(key);
+                            }}
+                          >▶</span>
                           {header}
                         </th>
                       ),
@@ -159,16 +166,16 @@ export function PlanetStatsPanel({
                 </thead>
                 <tbody>
                   {table.rows.map((row) => (
-                    <tr
-                      key={row.key}
-                      className={`ps-statrow ${openKey === row.key ? "is-open" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleKey(row.key);
-                      }}
-                    >
+                    <tr key={row.key} className={`ps-statrow ${openKey === row.key ? "is-open" : ""}`}>
                       <td className="ps-rowlabel">
-                        <span className="ps-tri" aria-hidden>▶</span>
+                        <span
+                          className="ps-tri ps-tri-tap"
+                          aria-hidden
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleKey(row.key);
+                          }}
+                        >▶</span>
                         {row.label}
                       </td>
                       <td>{row.core}</td>

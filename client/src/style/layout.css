@@ -669,7 +669,8 @@
   color: var(--gold);
   font-size: 0.5em;
   vertical-align: middle;
-  margin-right: 0.4em;
+  --tri-gap: 0.4em;
+  margin-right: var(--tri-gap);
   opacity: 0.7;
   transform: rotate(0deg);
   transition: transform 200ms ease, opacity 200ms ease;
@@ -682,12 +683,18 @@
    ~10px, which reads as a dot and hides the open/closed rotation. Pin them
    legible. */
 .ps-rowlabel .ps-tri,
-.ps-colhead .ps-tri { font-size: 11px; margin-right: 0.3em; }
+.ps-colhead .ps-tri { font-size: 11px; --tri-gap: 0.3em; }
 
-.ps-statrow:hover .ps-tri { opacity: 1; }
-
-.ps-title-tap { cursor: pointer; }
-.ps-title-tap:hover .ps-tri { opacity: 1; }
+/* The triangle alone is the toggle target — a padded hit box around the small
+   glyph, so the rest of the title/row/header stays inert and stray clicks
+   fall through to the card (the un-arm / deselect surface). The negative
+   margins cancel the padding, leaving layout untouched. */
+.ps-tri-tap {
+  cursor: pointer;
+  padding: 10px;
+  margin: -10px calc(var(--tri-gap) - 10px) -10px -10px;
+}
+.ps-tri-tap:hover { opacity: 1; }
 
 .ps-title {
   font-family: var(--serif);
@@ -749,13 +756,16 @@
   filter: drop-shadow(0 0 12px var(--vc));
   animation: armed-pulse 1.1s ease-in-out infinite;
 }
+/* Both breaths run quieter than the chart's invite rings: the buttons are
+   large and self-evident, while the planets are small with more competing
+   for attention — the strong pulse belongs there. */
 @keyframes action-invite-breath {
-  0%, 100% { filter: drop-shadow(0 0 4px var(--vc)); transform: scale(1); }
-  50%      { filter: drop-shadow(0 0 14px var(--vc)); transform: scale(1.03); }
+  0%, 100% { filter: drop-shadow(0 0 5px var(--vc)); transform: scale(1); }
+  50%      { filter: drop-shadow(0 0 10px var(--vc)); transform: scale(1.015); }
 }
 @keyframes armed-pulse {
   0%, 100% { filter: drop-shadow(0 0 8px var(--vc)); transform: scale(1); }
-  50%      { filter: drop-shadow(0 0 18px var(--vc)); transform: scale(1.05); }
+  50%      { filter: drop-shadow(0 0 14px var(--vc)); transform: scale(1.02); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ps-action,
@@ -812,16 +822,9 @@
   color: var(--gold);
   opacity: 0.78;
 }
-/* Clickable stat rows — tap to explain where the number came from (the
-   provenance prose renders in the shared blurb area below the table). */
-.ps-statrow { cursor: pointer; }
-.ps-statrow:hover .ps-rowlabel,
+/* Open rows / column heads brighten their label; the toggle itself lives on
+   the .ps-tri-tap triangle (see above), not the row. */
 .ps-statrow.is-open .ps-rowlabel { opacity: 1; }
-
-/* Clickable column heads — Core and Place explain what their column means in
-   the same blurb area ("Place" is spelled out there as placement). */
-.ps-colhead { cursor: pointer; }
-.ps-colhead:hover,
 .ps-colhead.is-open { opacity: 1; }
 
 .ps-blurb {
