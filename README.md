@@ -11,7 +11,7 @@ This position determines an astrological natal chart — 7 planets, each placed 
 The chart is the character sheet: immutable, unique, and full of internal structure the player discovers through play.
 
 Players navigate encounters by choosing which planet to send against each opponent.
-Sign relationships determine the terrain — harmonious, tense, volatile — and the player's only action is choosing who to send and when.
+Each turn is one choice — which planet acts, and whether it afflicts or testifies — against an opponent whose own move is precommitted and shown.
 Affliction accumulates. Planets combust. Runs end.
 Over many runs, the chart reveals itself: new planets emerge, aspects activate, houses illuminate.
 
@@ -38,8 +38,8 @@ It increases specificity.
   Minting recognizes a position; it does not create one.
 
 - **Planet selection is the action.**
-  Each turn, the player chooses which planet to send against the opponent.
-  Sign relationships determine the outcome. Everything else emerges from chart structure.
+  Each turn, the player chooses which planet to send against the opponent, and whether it afflicts or testifies.
+  Aspects carry the blow onward through each chart's web. Everything else emerges from chart structure.
 
 - **Affliction is the only resource.**
   No HP, gold, energy, or inventory. A Prince's run state is 7 integers.

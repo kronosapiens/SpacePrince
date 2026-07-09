@@ -48,14 +48,12 @@ This is the moment of commitment.
 
 ## Minute 3–4: The Prince Appears
 
-A short delay.
-No loading bar, no mint animation.
+The staged Macrobian reveal (`SCREENS.md §5.2`): the seven planets paint in one at a time, Moon to Saturn, each sounding its signature as it arrives.
+The chart sits whole for a held moment — the only time the player sees it complete until the ascent finishes.
 
-> *The position has been recognized.*
-
-The Prince NFT appears.
-It is sparse — a single bright point (the Moon) on a dark field.
-The rest of the chart is potential, not yet revealed.
+Then it gates back.
+The Moon remains; the other six recede to ghosts.
+The player is left with what they have access to — a single bright point, the rest as potential.
 
 No stats, no labels, no explanation.
 The Moon's sign is visible — this is who you are, for now.
@@ -77,24 +75,20 @@ The player is given a single option:
 
 ## Minute 5–7: First Encounter (Moon Only)
 
-An opponent planet appears.
-The sign relationship between the opponent's planet and the player's Moon is visible — the terrain.
+An opponent appears — another chart, fielding only its Moon (the mirrored matchup, `MECHANICS.md §11.1`).
+It arrives already carrying affliction: a tension that predates the player, waiting to be resolved.
+Its move for the turn is precommitted and shown — the player always acts with full information.
 
-The player has no choice to make.
-Moon is their only planet.
-Moon responds automatically.
+The player has one planet and two verbs.
+Moon afflicts, or Moon testifies.
 
-The interaction resolves:
-- The sign relationship determines the character (harmonious, tense, volatile)
-- Affliction or testimony flows to the Moon
-- The Moon's voice speaks a brief fragment reflecting the outcome
+The interaction resolves over the fixed three turns:
+- Afflicting deepens the opponent's tension; testifying resolves it — and only resolution scores
+- The opponent's reply lands on the player's Moon
+- Affliction accumulates or eases, turn by turn
 
-This encounter is **observation, not strategy**.
-The player watches how their Moon behaves on this terrain.
-They begin to feel what a trine means vs. what a square means.
-
-The encounter is 1 turn.
-It ends.
+This first encounter is **the two-beat, felt before it is named**: afflict to set up, testify to cash.
+One planet, repeated across three turns, teaches the verbs before the roster grows.
 
 ---
 
@@ -116,17 +110,15 @@ The chart is no longer a single point — it has begun to take shape.
 
 ## Minute 8–10: Second Encounter (First Real Choice)
 
-A new opponent planet appears.
-The sign relationships between the opponent and **both** the player's Moon and Mercury are visible.
+A new opponent appears, now fielding two planets to mirror the player's two.
 
 For the first time, the player chooses: **Moon or Mercury?**
 
-The terrain is different for each.
-Maybe Moon makes a square (harsh) and Mercury makes a trine (smooth).
-Or the reverse.
-The choice is legible — the player can see what each matchup means, because they just watched Moon interact a moment ago.
+The two are different instruments.
+Moon heals deep; Mercury runs on luck.
+Tapping a planet previews exactly what its verb would do — the direct hit and everything the aspect web carries onward — so the choice is legible before it is committed.
 
-The encounter is 2 turns.
+The encounter is the same three turns.
 The player sends one planet, then the other (or the same one twice, at the cost of concentrated affliction).
 
 After resolution, the Moon and Mercury may have taken affliction.
@@ -140,7 +132,8 @@ Something has been written.
 By the end of ten minutes, without a single tutorial screen:
 
 - **Identity is irreversible** — the mint happened once, the chart is theirs
-- **Sign relationships are the terrain** — they watched Moon interact and saw the outcome differ by terrain
+- **The opponent's move is known before you act** — every choice is made with full information
+- **Afflict sets up, testify resolves** — only resolution scores; the two-beat is the game
 - **Planet selection is the choice** — they chose between Moon and Mercury and saw it matter
 - **Affliction accumulates** — their planets are no longer at zero
 - **The chart is alive** — it started as one point and already has two, with more implied
