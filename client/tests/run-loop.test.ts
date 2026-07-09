@@ -90,13 +90,17 @@ describe("Run loop integration", () => {
     r = { ...r, distance: 10, state: { ...r.state } };
     r.state.Sun = { affliction: 5, combusted: true };
 
-    const ctx = buildNarrativeContext({
+    const built = buildNarrativeContext({
       prince,
       run: r,
+      house: 9,
       joyPlanet: null,
       rulerPlanet: "Sun",
       unlocked: [...PLANETS],
     });
+    // Pin the conditioning planet to Neutral so the dignity nudge (tested
+    // separately below) doesn't shift this assertion with the stub chart.
+    const ctx = { ...built, dignities: { ...built.dignities, Sun: "Neutral" as const } };
     r = applyOutcomes(r, prince, [
       { kind: "uncombust", target: "Sun" },
       { kind: "distance", delta: -3 },

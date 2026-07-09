@@ -95,11 +95,12 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       buildNarrativeContext({
         prince,
         run,
+        house: encounter.house,
         joyPlanet,
         rulerPlanet: house.ruler,
         unlocked: playerUnlocked,
       }),
-    [prince, run, joyPlanet, house.ruler, playerUnlocked],
+    [prince, run, encounter.house, joyPlanet, house.ruler, playerUnlocked],
   );
 
   const [resolved, setResolved] = useState(encounter.resolved);

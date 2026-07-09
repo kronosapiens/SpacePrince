@@ -7,7 +7,7 @@ import {
 } from "@/data/narrative-trees";
 import { mulberry32 } from "@/game/rng";
 
-const AFFLICTION_ROLES = new Set(["allUnlocked", "mostAfflicted", "healthiest", "joy", "ruler"]);
+const AFFLICTION_ROLES = new Set(["allUnlocked", "mostAfflicted", "healthiest", "joy", "ruler", "tenant"]);
 const PLANET_NAMES = new Set(["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"]);
 
 const allOutcomes = (o: { outcomes?: Outcome[]; outcomesOnSuccess?: Outcome[]; outcomesOnFail?: Outcome[] }) =>

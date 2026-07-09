@@ -12,6 +12,7 @@ export type Target =
   | "healthiest"       // the unlocked planet with the most margin (Press absorbs)
   | "joy"              // the house's joy-planet — gated options only
   | "ruler"            // the house's ruler — gated options only
+  | "tenant"           // planets standing in this house of the *Prince's* chart — gated options only
   | PlanetName;        // explicit (uncombust rite)
 
 export type Outcome =
@@ -33,6 +34,9 @@ export interface NarrativeContext {
   unlocked: PlanetName[];
   perPlanetState: Record<PlanetName, { affliction: number; combusted: boolean }>;
   dignities: Record<PlanetName, Dignity>;
+  /** Unlocked planets standing in this whole-sign house of the Prince's own
+   *  chart — where a planet "has its say". Empty when the house is untenanted. */
+  tenants: PlanetName[];
 }
 
 /** Affliction at/above which a joy-planet's boon flattens (provisional, §6). */
@@ -82,6 +86,55 @@ export function anyCombusted(c: NarrativeContext): boolean {
   return c.unlocked.some((p) => c.perPlanetState[p].combusted);
 }
 
+/** A planet of the Prince's own chart stands (lit) in this house — the
+ *  chart-specific gate for tenant options. */
+export function tenantPresent(c: NarrativeContext): boolean {
+  return c.tenants.some((p) => !c.perPlanetState[p].combusted);
+}
+
+// ── Dignity as exchange rate (ENCOUNTERS.md §1.4, §6) ───────────────────────
+
+/** The conditioning planet (§4.2): the joy if unlocked, else the ruler. */
+export function conditioningPlanet(c: NarrativeContext): PlanetName {
+  return c.joyPlanet && isUnlocked(c, c.joyPlanet) ? c.joyPlanet : c.rulerPlanet;
+}
+
+/** Trade direction of an outcome list — Press cashes chart-health for
+ *  Distance, Tend spends Distance on chart-health (§1.2). Boons (gain + heal)
+ *  and pure gains are not trades and take no nudge. */
+export function tradeKind(outcomes: Outcome[]): "press" | "tend" | null {
+  const d = outcomes.find((o) => o.kind === "distance");
+  if (!d) return null;
+  const harms = outcomes.some((o) => o.kind === "affliction" && o.delta > 0);
+  const heals = outcomes.some(
+    (o) => (o.kind === "affliction" && o.delta < 0) || o.kind === "uncombust",
+  );
+  if (d.delta > 0 && harms) return "press";
+  if (d.delta < 0 && heals) return "tend";
+  return null;
+}
+
+/**
+ * Dignity nudge: a Strong / Weak conditioning planet shifts a trade's
+ * Distance term one point favorable / unfavorable — Press yields more or
+ * less, Tend costs less or more. "Valence is the house, dignity is the
+ * Prince" (§1.4). Applied identically at display (resolveAside) and at
+ * apply-time (applyOutcomes), so the aside's numbers stay honest.
+ */
+export function dignityNudge(outcomes: Outcome[], c: NarrativeContext): number {
+  if (!tradeKind(outcomes)) return 0;
+  const b = band(c.dignities[conditioningPlanet(c)]);
+  return b === "strong" ? 1 : b === "weak" ? -1 : 0;
+}
+
+const DIGNITY_LABEL: Record<Dignity, string | null> = {
+  Domicile: "in domicile",
+  Exaltation: "exalted",
+  Neutral: null,
+  Detriment: "in detriment",
+  Fall: "in fall",
+};
+
 // ── Tree shape ──────────────────────────────────────────────────────────────
 
 export interface Option {
@@ -130,6 +183,8 @@ export function resolveTargets(target: Target, ctx: NarrativeContext): PlanetNam
       return ctx.joyPlanet && alive.includes(ctx.joyPlanet) ? [ctx.joyPlanet] : [];
     case "ruler":
       return alive.includes(ctx.rulerPlanet) ? [ctx.rulerPlanet] : [];
+    case "tenant":
+      return ctx.tenants.filter((p) => alive.includes(p));
     default:
       return [target as PlanetName]; // explicit
   }
@@ -285,6 +340,15 @@ const home_hearth: NarrativeTree = {
       options: [
         { id: "sleep", text: "Sleep, and leave at dawn.", aside: "−1 Distance · heal 3 across all", outcomes: [D(-1), A("allUnlocked", -3)] },
         { id: "deep", text: "Let the house hold you longer.", visibleIf: rulerStrong, aside: "−2 Distance · heal 5 across all", outcomes: [D(-2), A("allUnlocked", -5)] },
+        // Tenant branch: a planet of the Prince's own chart lives in this house —
+        // the room already knows it (ENCOUNTERS.md §3 chart-conditioning).
+        {
+          id: "known",
+          text: "One of you has slept here before. Take the old bed.",
+          visibleIf: tenantPresent,
+          aside: (c) => `heal 4 on ${c.tenants.join(", ")} — at home here`,
+          outcomes: [A("tenant", -4)],
+        },
         { id: "move", text: "Don't trust an open door. Move on.", aside: "+1 Distance", outcomes: [D(1)] },
       ],
     },
@@ -578,6 +642,15 @@ const achievement_summit: NarrativeTree = {
       text: "A crowd you didn't gather waits to hear you speak from the high place.",
       options: [
         { id: "praise", text: "Speak, and take the praise.", aside: "+4 Distance · +2 affliction", outcomes: [D(4), A("healthiest", 2)] },
+        // Tenant branch: the planet standing at the Prince's own midheaven does
+        // the speaking — a bigger stage, and it carries the cost personally.
+        {
+          id: "herald",
+          text: "Let the one who lives at your summit speak for you.",
+          visibleIf: tenantPresent,
+          aside: (c) => `+5 Distance · +3 affliction on ${c.tenants.join(", ")}`,
+          outcomes: [D(5), A("tenant", 3)],
+        },
         { id: "plain", text: "Speak plainly, and briefly.", aside: "+2 Distance", outcomes: [D(2)] },
         { id: "quiet", text: "Step back into the quiet.", aside: "−1 Distance · heal 2 where it's needed most", outcomes: [D(-1), A("mostAfflicted", -2)] },
       ],
@@ -763,8 +836,21 @@ export function getTreeNode(tree: NarrativeTree, nodeId: string): TreeNode {
 }
 
 export function resolveAside(option: Option, ctx: NarrativeContext): string | undefined {
-  if (option.aside === undefined) return undefined;
-  return typeof option.aside === "string" ? option.aside : option.aside(ctx);
+  const base =
+    option.aside === undefined
+      ? undefined
+      : typeof option.aside === "string"
+        ? option.aside
+        : option.aside(ctx);
+  // Trades carry the dignity nudge in their aside — all numbers live here (§9),
+  // so the shift the Prince's chart applies must be visible before commit.
+  const nudge = option.outcomes ? dignityNudge(option.outcomes, ctx) : 0;
+  if (nudge === 0) return base;
+  const planet = conditioningPlanet(ctx);
+  const label = DIGNITY_LABEL[ctx.dignities[planet]];
+  if (!label) return base;
+  const suffix = `${planet} ${label}: ${nudge > 0 ? "+1" : "−1"} Distance`;
+  return base ? `${base} · ${suffix}` : suffix;
 }
 
 export function visibleOptions(node: TreeNode, ctx: NarrativeContext): Option[] {
