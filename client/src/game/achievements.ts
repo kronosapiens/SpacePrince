@@ -20,10 +20,11 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { bit: 2, id: "unscorched", label: "A full passage with every planet lit" },
 ];
 
-/** The canonical Kabbalistic layer pattern [1,2,2,1,2,1,1] (MAP.md §2). */
+/** The canonical Kabbalistic layer pattern [1,2,2,1,2,1,1] (MAP.md §2).
+ *  `MapNode.layer` is 0-based (node ids "1C".."7C" are 1-based display). */
 export function isCanonicalPattern(graph: MapGraph): boolean {
   const counts = new Array<number>(7).fill(0);
-  for (const node of graph.nodes) counts[node.layer - 1] = (counts[node.layer - 1] ?? 0) + 1;
+  for (const node of graph.nodes) counts[node.layer] = (counts[node.layer] ?? 0) + 1;
   return [1, 2, 2, 1, 2, 1, 1].every((n, i) => counts[i] === n);
 }
 
