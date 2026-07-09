@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Chart } from "@/components/Chart";
-import type { Chart as ChartType, PlanetName, SideState } from "@/game/types";
+import { StarField } from "@/components/StarField";
+import type { Chart as ChartType, PlanetName, Run, SideState } from "@/game/types";
 
 interface ChartStudyOverlayProps {
   chart: ChartType;
   state: SideState;
   unlockedPlanets: PlanetName[];
+  /** Finished runs — rendered as the star-field behind the chart (NFT.md). */
+  starRuns?: ReadonlyArray<Pick<Run, "id" | "seed" | "distance">>;
   onClose: () => void;
 }
 
@@ -13,7 +16,7 @@ interface ChartStudyOverlayProps {
  *  ChartAnchor. Shows the player's chart at full Chart Study fidelity:
  *  color-field blooms, aspect web, and the planet stats panel on hover or
  *  selection. Dismissed via backdrop click, the close button, or ESC. */
-export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: ChartStudyOverlayProps) {
+export function ChartStudyOverlay({ chart, state, unlockedPlanets, starRuns, onClose }: ChartStudyOverlayProps) {
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   // Study mode — sticky across inspections, same as combat's inspect "i".
@@ -36,6 +39,7 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
   return (
     <div className="chart-study-overlay anim-chart-study-fade" onClick={onClose} role="dialog" aria-label="Chart inspection">
       <div className="chart-study-stage" onClick={(e) => e.stopPropagation()}>
+        {starRuns && <StarField runs={starRuns} />}
         <button
           type="button"
           className="chart-study-close"

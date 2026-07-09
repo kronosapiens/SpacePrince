@@ -246,3 +246,22 @@
    fade-out half, giving a gentle dip through black. */
 @keyframes surface-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .anim-surface-in { animation: surface-fade-in 500ms var(--ease-out); }
+
+/* Star inscription (End-of-run, NFT.md "The Star-Field"): the run's star
+   blooms into its permanent place — slow arrival, brief over-brightness,
+   then it settles to rest among the others. */
+@keyframes star-inscribe {
+  0%   { opacity: 0; transform: scale(0.2); }
+  55%  { opacity: 1; transform: scale(2.4); }
+  100% { transform: scale(1); }
+}
+.anim-star-inscribe {
+  animation: star-inscribe 1800ms var(--ease-out) both;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+/* Combust-out arrival at End-of-run (SCREENS §3.8): the slower ~1800ms fade,
+   matching the combust motion's weight. Completion uses the ordinary
+   surface fade — same room, entered at a different pace. */
+.anim-eor-combust-in { animation: surface-fade-in 1800ms var(--ease-out) both; }

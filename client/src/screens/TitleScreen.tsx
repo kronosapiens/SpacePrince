@@ -4,11 +4,13 @@ import { ROUTES } from "@/routes";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { isMuted, setMuted } from "@/audio/engine";
-import { isOver } from "@/game/run";
+import { finishedRuns, isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
+import { StarField } from "@/components/StarField";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
+import { unlockedPlanets } from "@/game/unlocks";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
 
@@ -45,18 +47,26 @@ export function TitleScreen() {
     setActive(null);
   }, [setActive]);
 
-  // Cycle a fresh random sample chart every few seconds so the Title canvas
-  // stays alive. Only the interval re-rolls it — hover and other state changes
+  // With a Prince, the Title is the identity surface (SCREENS §9.1): their
+  // chart at its current unlock state, their star-field behind it. Without
+  // one, a fresh random sample cycles every few seconds so the canvas stays
+  // alive. Only the interval re-rolls it — hover and other state changes
   // during the visit don't.
-  const [chart, setChart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+  const [sample, setSample] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
 
   useEffect(() => {
+    if (prince) return;
     const id = window.setInterval(
-      () => setChart(seededChart(randomSeed(), "Sample")),
+      () => setSample(seededChart(randomSeed(), "Sample")),
       RECHART_INTERVAL_MS,
     );
     return () => window.clearInterval(id);
-  }, []);
+  }, [prince]);
+
+  const chart = prince ? prince.chart : sample;
+  const shownPlanets = prince ? unlockedPlanets(prince.numEncounters) : PLANETS;
+  // Finished runs each own a star; the live tail run hasn't earned its yet.
+  const starRuns = prince ? finishedRuns(prince.runs, prince.numEncounters) : [];
 
   // Continue resumes a live (non-over) run; Begin starts a new run on the same
   // Prince (identity persists — the lifetime layer, SCREENS §9.2). A player
@@ -75,10 +85,11 @@ export function TitleScreen() {
     <div className={`title ${leaving ? "is-leaving" : ""}`}>
       <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
       <div className="title-stage">
+        <StarField runs={starRuns} />
         <div className="title-chart">
           <Chart
             chart={chart}
-            unlockedPlanets={PLANETS}
+            unlockedPlanets={shownPlanets}
             hoveredPlanet={hovered}
             onPlanetHover={setHovered}
             hideAfflictionBadges

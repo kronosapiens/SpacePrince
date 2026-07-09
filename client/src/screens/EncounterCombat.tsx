@@ -1,8 +1,9 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
 import { setAmbient } from "@/audio/engine";
+import { pickFragment } from "@/data/chorus";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
 import { PLANETS } from "@/game/data";
@@ -319,6 +320,34 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         }
       : undefined;
 
+  // The combustion beat (PLANETS.md §1 secondary usages): when one of the
+  // player's own planets goes dark, it speaks a final fragment in its own
+  // voice — once per planet per encounter, held through the scheduler's pause.
+  const spokenRef = useRef<Set<PlanetName>>(new Set());
+  const [finalWord, setFinalWord] = useState<{ planet: PlanetName; text: string } | null>(null);
+  const finalWordTimer = useRef<number | null>(null);
+  useEffect(() => {
+    for (const planet of combustingPlayer) {
+      if (spokenRef.current.has(planet)) continue;
+      spokenRef.current.add(planet);
+      const fragment = pickFragment({
+        planet,
+        mood: "stillness",
+        exclude: run.seenFragmentIds,
+        rng: mulberry32(hashString(`${encounter.id}_${planet}_final`)),
+      });
+      if (!fragment) continue;
+      setFinalWord({ planet, text: fragment.text.trim() });
+      if (finalWordTimer.current !== null) window.clearTimeout(finalWordTimer.current);
+      finalWordTimer.current = window.setTimeout(() => setFinalWord(null), 6000);
+    }
+  }, [combustingPlayer, encounter.id, run.seenFragmentIds]);
+  useEffect(() => {
+    return () => {
+      if (finalWordTimer.current !== null) window.clearTimeout(finalWordTimer.current);
+    };
+  }, []);
+
   // Clicking anywhere outside a planet glyph clears the selection. Planet
   // and continue-button clicks stopPropagation, so they don't reach this
   // handler. Skipped during animation so an in-flight resolution doesn't
@@ -368,6 +397,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           inviteInteraction={!animation && !encounter.resolved && !selected}
         />
         <div className="combat-side-label">SELF</div>
+        {finalWord && (
+          <div className="combat-final-word" key={finalWord.planet}>
+            <span className="anim-fragment-in">{finalWord.text}</span>
+          </div>
+        )}
       </div>
 
       <div className="combat-seam">

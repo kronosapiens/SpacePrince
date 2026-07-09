@@ -3,8 +3,10 @@ import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
-import { isOver } from "@/game/run";
+import { finishedRuns, isOver } from "@/game/run";
 import { useRolloverMap } from "@/state/store-actions";
+import { takePendingUnlock } from "@/state/ceremony";
+import { playSignature } from "@/audio/engine";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, hashString } from "@/game/rng";
@@ -31,6 +33,23 @@ export function MapScreen() {
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
   const [studyOpen, setStudyOpen] = useState(false);
+
+  // Unlock ceremony (MECHANICS §11.1): surfacing back from the encounter that
+  // crossed a Macrobian threshold, the new planet emerges from ghost on the
+  // anchor — its signature sounds, a line names its sign, then the map is just
+  // the map again.
+  const [ceremonyPlanet, setCeremonyPlanet] = useState<PlanetName | null>(null);
+  useEffect(() => {
+    const planet = takePendingUnlock();
+    if (!planet) return;
+    setCeremonyPlanet(planet);
+    const soundT = window.setTimeout(() => playSignature(planet), 500);
+    const endT = window.setTimeout(() => setCeremonyPlanet(null), 6000);
+    return () => {
+      window.clearTimeout(soundT);
+      window.clearTimeout(endT);
+    };
+  }, []);
 
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
@@ -134,6 +153,17 @@ export function MapScreen() {
   // this is a defensive null-guard for TS narrowing.
   if (!prince || !run) return null;
 
+  // Run-open aria (PLANETS.md §1 secondary usages): before the first step of a
+  // fresh run, the Moon speaks. It holds until the player moves — an opening
+  // state, not an event, so a reload showing it again is honest.
+  const atRunOpen =
+    run.mapsCompleted === 0 &&
+    run.map.visitedNodeIds.length === 1 &&
+    Object.keys(run.map.outcomes).length === 0;
+  const openFragment = atRunOpen
+    ? pickFragment({ planet: "Moon", mood: "opening", rng: mulberry32(hashString(`${run.seed}_open`)) })
+    : null;
+
   return (
     <div className="map-screen">
       <div className="map-anchor">
@@ -141,8 +171,14 @@ export function MapScreen() {
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
+          ceremonyPlanet={ceremonyPlanet}
           onExpand={() => setStudyOpen(true)}
         />
+        {ceremonyPlanet && (
+          <div className="map-ceremony anim-surface-in">
+            {ceremonyPlanet} rises in {prince.chart.planets[ceremonyPlanet].sign}.
+          </div>
+        )}
       </div>
       <div className="map-distance">
         <span className="eyebrow">DISTANCE</span>
@@ -151,11 +187,15 @@ export function MapScreen() {
       <div className="map-diagram-wrap">
         <MapDiagram map={run.map} onSelectNode={handleNodeSelect} />
       </div>
+      {openFragment && (
+        <div className="map-open-word anim-fragment-in">{openFragment.text.trim()}</div>
+      )}
       {studyOpen && (
         <ChartStudyOverlay
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
+          starRuns={finishedRuns(prince.runs, prince.numEncounters)}
           onClose={() => setStudyOpen(false)}
         />
       )}

@@ -1,5 +1,6 @@
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useCommitNarrative, useCommitTurn } from "@/state/store-actions";
+import { noteEncounterResolved } from "@/state/ceremony";
 import { loadDevSettings } from "@/state/settings";
 import { EncounterCombatScreen } from "./EncounterCombat";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
@@ -29,7 +30,11 @@ export function EncounterScreen() {
         run={run}
         prince={prince}
         encounter={enc}
-        onCommitTurn={(planet, valence, rng) => commitTurn(run, prince.chart, planet, valence, rng)}
+        onCommitTurn={(planet, valence, rng) => {
+          const result = commitTurn(run, prince.chart, planet, valence, rng);
+          if (result?.encounterEnded) noteEncounterResolved(prince.numEncounters);
+          return result;
+        }}
         onClearEncounter={clearEncounter}
         devUnlockAll={settings.unlockAll}
       />
@@ -40,9 +45,10 @@ export function EncounterScreen() {
       run={run}
       prince={prince}
       encounter={enc}
-      onCommit={(args) =>
-        commitNarrative({ run, nextRun: args.nextRun, summary: args.summary, resolved: args.resolved })
-      }
+      onCommit={(args) => {
+        commitNarrative({ run, nextRun: args.nextRun, summary: args.summary, resolved: args.resolved });
+        if (args.resolved) noteEncounterResolved(prince.numEncounters);
+      }}
       onClearEncounter={clearEncounter}
     />
   );

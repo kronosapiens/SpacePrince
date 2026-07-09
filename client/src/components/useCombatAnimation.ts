@@ -582,5 +582,12 @@ function runScheduler(args: {
     steps: playerSteps,
   });
 
-  schedule(() => setAnimation(null), playerPhaseEnd + ANIMATION_TIMINGS.endOffset);
+  // The combustion beat: losing one of your own planets earns a held pause —
+  // the world stays still a moment before play resumes ("like a candle going
+  // out", VIBES.md). Opponent combusts don't hold; those are the win reading.
+  const selfCombusted =
+    (entry.playerCombust ?? false) || playerSteps.some((s) => s.note === "Combusts");
+  const combustHold = selfCombusted ? 900 : 0;
+
+  schedule(() => setAnimation(null), playerPhaseEnd + ANIMATION_TIMINGS.endOffset + combustHold);
 }

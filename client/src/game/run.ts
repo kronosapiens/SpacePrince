@@ -59,6 +59,12 @@ export function isOver(run: Run, numEncounters: number): boolean {
   return tier.length > 0 && tier.every((p) => run.state[p].combusted);
 }
 
+/** The runs that have earned their star (NFT.md "The Star-Field"): every run
+ *  but a still-live tail. At most one run is not-over — the active one. */
+export function finishedRuns(runs: Run[], numEncounters: number): Run[] {
+  return runs.filter((r, i) => i < runs.length - 1 || isOver(r, numEncounters));
+}
+
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
  *  the finished map to the event log and generates a fresh one. The seventh
  *  completion ends the run: the final map stays current (not archived), so the

@@ -2,8 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
+import { StarField } from "@/components/StarField";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
+import { playStar } from "@/audio/engine";
+import { finishedRuns, MAPS_PER_RUN } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
@@ -22,6 +25,13 @@ export function EndOfRunScreen() {
   useEffect(() => {
     setActive(null);
   }, [setActive]);
+
+  // The inscription (SCREENS §6.1): the finished run's star takes its place in
+  // the field. The bell sounds as the bloom peaks (~55% of the 1800ms motion).
+  useEffect(() => {
+    const t = window.setTimeout(() => playStar(), 990);
+    return () => window.clearTimeout(t);
+  }, []);
 
   // The finished run keeps only its current map; prior maps live in the
   // event log (STATE.md), persisted for the tail run so the rainbow survives
@@ -45,12 +55,20 @@ export function EndOfRunScreen() {
   const beginNew = () => startRun();
   const returnToTitle = () => navigate(ROUTES.title);
 
+  // Completion and combustion land on the same surface with different weight
+  // (SCREENS §3.8): a combust-out arrives through a slower fade — the
+  // acknowledgment register, not a punishment screen.
+  const completed = run.mapsCompleted >= MAPS_PER_RUN;
+
   return (
     <EndOfRunView
       runDistance={run.distance}
       numMaps={allMaps.length}
       totalEncounters={totalEncounters}
       allMaps={allMaps}
+      starRuns={finishedRuns(prince.runs, prince.numEncounters)}
+      inscribingRunId={run.id}
+      entryClass={completed ? "anim-surface-in" : "anim-eor-combust-in"}
       onBegin={beginNew}
       beginLabel="New Run"
       onReturn={returnToTitle}
@@ -63,6 +81,12 @@ interface EndOfRunViewProps {
   numMaps: number;
   totalEncounters: number;
   allMaps: MapState[];
+  /** All finished runs, the just-ended one included — the whole sky. */
+  starRuns?: ReadonlyArray<{ id: string; seed: number; distance: number }>;
+  /** The just-ended run: its star blooms into place on arrival. */
+  inscribingRunId?: string | null;
+  /** Entry motion — completion fades in normally; a combust-out arrives slower. */
+  entryClass?: string;
   onBegin: () => void;
   beginLabel: string;
   onReturn?: () => void;
@@ -77,6 +101,9 @@ function EndOfRunView({
   numMaps,
   totalEncounters,
   allMaps,
+  starRuns,
+  inscribingRunId,
+  entryClass,
   onBegin,
   beginLabel,
   onReturn,
@@ -123,7 +150,8 @@ function EndOfRunView({
   };
 
   return (
-    <div className="eor">
+    <div className={["eor", entryClass ?? ""].filter(Boolean).join(" ")}>
+      {starRuns && <StarField runs={starRuns} inscribingRunId={inscribingRunId} />}
       <div className="eor-counts">
         <div>
           <span className="eor-big">{Math.round(runDistance).toLocaleString()}</span>

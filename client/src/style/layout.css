@@ -138,6 +138,17 @@
 }
 .title-chart > svg { display: block; width: 100%; height: 100%; }
 
+/* The star-field (NFT.md): the Prince's accumulated runs as a sky behind the
+   chart. Field layer — fills its positioned container, never intercepts. */
+.star-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .title-foot {
   align-self: center;
   justify-self: center;
@@ -446,6 +457,31 @@
   width: clamp(170px, 16vw, 240px);
   z-index: 5;
 }
+/* Run-open aria — the Moon speaks before the first step (PLANETS.md §1). */
+.map-open-word {
+  position: absolute;
+  bottom: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(70%, 560px);
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--mist);
+  pointer-events: none;
+  z-index: 4;
+}
+/* Unlock ceremony caption — the world speaking, so the serif voice. */
+.map-ceremony {
+  margin-top: 10px;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--bone);
+}
 .map-distance {
   position: absolute;
   bottom: 36px;
@@ -489,12 +525,29 @@
   gap: 24px;
 }
 .combat-side {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   height: 100%;
   justify-content: center;
+}
+/* A combusting planet's final fragment — the world speaking, set on empty
+   ground beneath the chart (STYLE §8: fragments never overlay the chart). */
+.combat-final-word {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(80%, 460px);
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--mist);
+  pointer-events: none;
 }
 /* Fill the available real estate: grow with the viewport, but never let two
    wheels + seam + padding overflow (≈328px of horizontal overhead → cap at
