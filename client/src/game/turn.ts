@@ -77,7 +77,7 @@ export function resolveTurn(
   // Opponent's chart (phase 1) before yours (phase 2) — the order the UI replays.
   const propagation = [...phase1.propagation, ...phase2.propagation];
 
-  const score = turnScore(playerDelta, opponentDelta, playerValence, opponentValence, propagation);
+  const score = turnScore(opponentDelta, playerValence, propagation);
 
   const log: TurnLogEntry = {
     id: `turn_${enc.id}_${enc.turnIndex}_${Date.now()}`,

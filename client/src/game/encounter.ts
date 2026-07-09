@@ -1,6 +1,7 @@
 import { blankSideState, seededChart } from "./chart";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
-import { pickWeighted, mulberry32 } from "./rng";
+import { combustionCeiling } from "./combust";
+import { pickWeighted, mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
   Chart,
@@ -9,6 +10,7 @@ import type {
   PlanetName,
   Polarity,
   Run,
+  SideState,
 } from "./types";
 
 /** Every encounter resolves in a fixed three turns, regardless of unlock tier
@@ -45,6 +47,26 @@ export function rollOpponentTurns(
   return { sequence, opponentActions };
 }
 
+/** The opponent spawns already afflicted (MECHANICS §11): only resolution
+ *  scores (§12), so a blank chart gives a 3-turn fight nothing to resolve.
+ *  One fielded planet rolls heavy — 40–65% of its combustion ceiling — and
+ *  every other fielded planet rolls light (0–25%). Integer amounts, always
+ *  below ceiling: no planet spawns combusted. */
+export function afflictedSideState(
+  chart: Chart,
+  roster: PlanetName[],
+  rng: () => number,
+): SideState {
+  const state = blankSideState();
+  const heavyIdx = Math.floor(rng() * roster.length);
+  roster.forEach((planet, i) => {
+    const ceiling = combustionCeiling(chart.planets[planet]);
+    const frac = i === heavyIdx ? 0.4 + rng() * 0.25 : rng() * 0.25;
+    state[planet].affliction = Math.round(ceiling * frac);
+  });
+  return state;
+}
+
 export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
@@ -54,11 +76,14 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
   const rng = mulberry32(encounterIdSeed ?? opponentSeed);
   const { sequence, opponentActions } = rollOpponentTurns(opponentChart, roster, rng);
+  // Separate stream for the spawn affliction so its draws don't perturb the
+  // turn-sequence rolls above.
+  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? opponentSeed}_affliction`));
   return {
     kind: "combat",
     id: `enc_combat_${run.id}_${opponentSeed}`,
     opponentChart,
-    opponentState: blankSideState(),
+    opponentState: afflictedSideState(opponentChart, roster, stateRng),
     roster,
     sequence,
     opponentActions,
