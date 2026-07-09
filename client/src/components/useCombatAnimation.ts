@@ -434,8 +434,9 @@ function runScheduler(args: {
           } else {
             applyDelta(targetState, step.target, step.delta);
             // Propagated testimony resolves affliction (delta stored negative) —
-            // tick the distance with this planet's resolution beat.
-            if (step.polarity === "Testimony") {
+            // tick the distance with this planet's resolution beat. Only the
+            // opponent's chart scores (§12): self-side heals are survival.
+            if (step.polarity === "Testimony" && !isSelf) {
               next.runningDistance += Math.abs(step.delta);
               next.distanceFlashEpoch += 1;
               next.distanceFlashPlanet = step.target;
@@ -531,12 +532,12 @@ function runScheduler(args: {
   // action landing on it — then your chart, the opponent's reply. Watching the
   // opponent before yourself keeps the two readable and lets a phase-1 combust
   // visibly preempt the phase-2 response.
-  // Direct distance resolved per side: your action landing on the opponent's
-  // chart, and theirs on yours — each scores only when its valence is testimony
-  // (mirrors `turnScore`'s directResolved so the ticked total lands exactly on
-  // the committed run distance).
+  // Direct distance resolved: only your action landing on the opponent's chart
+  // scores (opponent-chart-only Distance, MECHANICS §12; mirrors `turnScore`'s
+  // directResolved so the ticked total lands exactly on the committed run
+  // distance). The opponent healing your chart is survival, not score — phase 2
+  // ticks nothing.
   const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
-  const selfActionScore = entry.opponentValence === "Testimony" ? entry.playerDelta : 0;
 
   // Phase 1: your action lands on the opponent's chart. The crit is the
   // *player's* attack (playerCrit, phase1.crit); the attacker is your planet,
@@ -566,7 +567,7 @@ function runScheduler(args: {
     attackerPlanet: entry.opponentPlanet,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,
-    actionScore: selfActionScore,
+    actionScore: 0,
     steps: playerSteps,
   });
 

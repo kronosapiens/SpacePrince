@@ -116,7 +116,7 @@ Resolution is **sequential**, in two phases — the intent → act → response 
 1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is resolved there.
 2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
 
-The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free Distance (§12) you'd otherwise deny.
+The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free healing — longevity, not Distance (§12) — that combusting it would deny.
 
 Base amount is the stat for the action:
 
@@ -192,6 +192,10 @@ The game's progression is layered:
 
 Per encounter:
 
+- The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a 3-turn fight to have anything to resolve.
+  One fielded planet rolls heavy: 40–65% of its combustion ceiling.
+  Every other fielded planet rolls light: 0–25% of its ceiling.
+  Amounts are integers, rolled deterministically from the node's opponent seed, and always below ceiling — no planet spawns combusted.
 - Opponent planet is selected randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
@@ -231,14 +235,19 @@ The run-end-only structure suggests room for an achievements layer — recogniti
 
 UI label: `Distance`.
 
-Only **resolution** scores.
+Only **resolution on the opponent's chart** scores.
 Distance accrues from testimony — affliction healed — not from affliction created.
 Affliction is the setup; resolving it is the payoff.
 
+The player's own chart never scores: personal chart management is about survival, opponent chart management is about scoring.
+The opponent healing your chart is a gift of longevity, not Distance.
+Every point of Distance therefore traces to the player's own action.
+
 Per turn:
 
-- `turnScore`: sum of testimony magnitudes (affliction reduced) across direct effects and propagation, both sides.
+- `turnScore`: sum of testimony magnitudes (affliction reduced) on the opponent's chart — the direct hit and its propagation, including afflictions inverted to testimony across squares and oppositions (§9).
 - Affliction created contributes nothing.
+- Phase 2 — the opponent's action on your chart (§6) — contributes nothing.
 
 Run score accumulates `turnScore`.
 
