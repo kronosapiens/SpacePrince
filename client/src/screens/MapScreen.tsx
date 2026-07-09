@@ -109,6 +109,7 @@ export function MapScreen() {
           opponentSeed: content.opponentSeed,
           lifetimeEncounterCount: prince.numEncounters,
           devUnlockAll: settings.unlockAll,
+          gate: nodeId === TERMINAL_NODE_ID,
         });
       } else {
         const house = HOUSES[content.house - 1]!;
@@ -126,6 +127,7 @@ export function MapScreen() {
           treeId: tree.scenarioId,
           rootNodeId: tree.rootId,
           fragmentId: fragment?.id ?? `${house.ruler.toLowerCase()}-stub`,
+          nodeId,
         });
         nextRun = {
           ...nextRun,

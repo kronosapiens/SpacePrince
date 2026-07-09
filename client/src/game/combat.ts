@@ -11,10 +11,14 @@ import { combustionCeiling } from "./combust";
 /** Stat-weighted action draw — `P(afflict) = damage / (damage + healing)`.
  *  Used to precommit the opponent's verb each turn (the player chooses theirs).
  *  No planet has a zero in either stat, so no draw is fully deterministic. */
-export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
-  const total = stats.damage + stats.healing;
+/** The opponent's verb draw is stat-weighted (MECHANICS §5). `aggression`
+ *  scales the damage weight — the run's map-over-map hardening: 0 leaves the
+ *  pure stat weighting, 0.9 nearly doubles the pull toward Afflict. */
+export function drawValence(stats: PlanetStats, rng: () => number, aggression = 0): Polarity {
+  const damage = stats.damage * (1 + aggression);
+  const total = damage + stats.healing;
   if (total <= 0) return "Affliction";
-  return rng() < stats.damage / total ? "Affliction" : "Testimony";
+  return rng() < damage / total ? "Affliction" : "Testimony";
 }
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {

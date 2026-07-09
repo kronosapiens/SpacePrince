@@ -1237,6 +1237,26 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+/* The run journal (SCREENS §6.4) — one quiet line per finished run. */
+.eor-journal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.eor-journal-row {
+  display: flex;
+  gap: 18px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+.eor-journal-row.is-current { color: var(--bone); }
+.eor-journal-n { min-width: 28px; text-align: right; color: var(--gold); opacity: 0.7; }
+
 .eor-actions {
   display: flex;
   justify-content: center;

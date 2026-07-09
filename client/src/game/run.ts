@@ -1,6 +1,6 @@
 import { blankSideState } from "./chart";
 import { rollNodeContent } from "./map-content";
-import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
+import { buildMapGraph, ROOT_NODE_ID, TERMINAL_NODE_ID } from "./map-gen";
 import { hashString, mulberry32, randomSeed } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type { MapState, NodeContent, Run } from "./types";
@@ -20,6 +20,9 @@ export function newMapState(seed: number): MapState {
     if (node.id === ROOT_NODE_ID) continue;
     rolledNodes[node.id] = rollNodeContent({
       rng: mulberry32(hashString(`${seed}_${node.id}`)),
+      // The terminal node is always combat — the gate beat that ends every map
+      // with weight (a full seeded pool against a hardened opponent).
+      forceCombat: node.id === TERMINAL_NODE_ID,
     });
   }
   return {

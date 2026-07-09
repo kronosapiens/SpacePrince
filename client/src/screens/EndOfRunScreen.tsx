@@ -60,15 +60,22 @@ export function EndOfRunScreen() {
   // acknowledgment register, not a punishment screen.
   const completed = run.mapsCompleted >= MAPS_PER_RUN;
 
+  const starRuns = finishedRuns(prince.runs, prince.numEncounters);
+
   return (
     <EndOfRunView
       runDistance={run.distance}
       numMaps={allMaps.length}
       totalEncounters={totalEncounters}
       allMaps={allMaps}
-      starRuns={finishedRuns(prince.runs, prince.numEncounters)}
+      starRuns={starRuns}
       inscribingRunId={run.id}
       entryClass={completed ? "anim-surface-in" : "anim-eor-combust-in"}
+      journal={starRuns.map((r) => ({
+        id: r.id,
+        distance: r.distance,
+        mapsCompleted: r.mapsCompleted,
+      }))}
       onBegin={beginNew}
       beginLabel="New Run"
       onReturn={returnToTitle}
@@ -87,6 +94,9 @@ interface EndOfRunViewProps {
   inscribingRunId?: string | null;
   /** Entry motion — completion fades in normally; a combust-out arrives slower. */
   entryClass?: string;
+  /** The run journal (SCREENS §6.4): one quiet line per finished run,
+   *  newest last — reads as the lifetime unrolling. */
+  journal?: Array<{ id: string; distance: number; mapsCompleted: number }>;
   onBegin: () => void;
   beginLabel: string;
   onReturn?: () => void;
@@ -104,6 +114,7 @@ function EndOfRunView({
   starRuns,
   inscribingRunId,
   entryClass,
+  journal,
   onBegin,
   beginLabel,
   onReturn,
@@ -198,6 +209,24 @@ function EndOfRunView({
           );
         })}
       </div>
+
+      {journal && journal.length > 1 && (
+        <div className="eor-journal">
+          <span className="eyebrow">RUNS</span>
+          {journal.map((r, i) => (
+            <div
+              key={r.id}
+              className={`eor-journal-row ${r.id === inscribingRunId ? "is-current" : ""}`}
+            >
+              <span className="eor-journal-n">{romanNumeral(i + 1)}</span>
+              <span>{Math.round(r.distance).toLocaleString()} distance</span>
+              <span>
+                {r.mapsCompleted} {r.mapsCompleted === 1 ? "map" : "maps"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="eor-actions">
         <button className="begin-btn" onClick={onBegin}>{beginLabel}</button>
