@@ -10,7 +10,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
-import { mulberry32 } from "@/game/rng";
+import { hashString, mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
   PlanetName,
@@ -125,7 +125,12 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       const luck = placement.base.luck + placement.buffs.luck;
       // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
       const chance = Math.min(0.85, 0.4 + luck * 0.03);
-      const success = Math.random() < chance;
+      // Seeded on (encounter, node, option): deterministic like every other
+      // roll — the prototype stand-in for onchain true RNG at resolution.
+      const wagerRng = mulberry32(
+        hashString(`${encounter.id}_${encounter.currentNodeId}_${option.id}_wager`),
+      );
+      const success = wagerRng() < chance;
       outcomes = success ? (option.outcomesOnSuccess ?? []) : (option.outcomesOnFail ?? []);
       resolutionText = success ? "The wager holds." : "The wager falls.";
     }

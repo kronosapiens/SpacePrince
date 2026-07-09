@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/routes";
 import { MapDiagram } from "@/components/MapDiagram";
-import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { useStartRun } from "@/state/store-actions";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
@@ -12,7 +15,8 @@ import type { MapState, PlanetName } from "@/game/types";
 export function EndOfRunScreen() {
   const prince = usePrince();
   const run = useActiveRun();
-  const dispatch = usePrinceDispatch();
+  const startRun = useStartRun();
+  const navigate = useNavigate();
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
@@ -20,9 +24,8 @@ export function EndOfRunScreen() {
   }, [setActive]);
 
   // The finished run keeps only its current map; prior maps live in the
-  // in-memory event log (STATE.md). Reconstruct the full sequence for the
-  // rainbow. (After a reload `events` is empty, so only the last map shows —
-  // accepted: a real client would read these from chain events.)
+  // event log (STATE.md), persisted for the tail run so the rainbow survives
+  // reload. Onchain, a real client would read these from chain events.
   const allMaps: MapState[] = useMemo(() => {
     if (!run) return [];
     return [...run.events.map((e) => e.map), run.map];
@@ -36,9 +39,11 @@ export function EndOfRunScreen() {
 
   if (!prince || !run) return null;
 
-  // New Game clears the finished Prince; PlaySurface then opens on mint
-  // (a fresh Prince per run, matching the current design).
-  const beginNew = () => dispatch({ kind: "clear" });
+  // Begin new run: a fresh run on the same Prince (SCREENS §6.3). Afflictions
+  // and combusts reset; numEncounters, unlocks, and the run record persist —
+  // that's the lifetime layer.
+  const beginNew = () => startRun();
+  const returnToTitle = () => navigate(ROUTES.title);
 
   return (
     <EndOfRunView
@@ -47,7 +52,8 @@ export function EndOfRunScreen() {
       totalEncounters={totalEncounters}
       allMaps={allMaps}
       onBegin={beginNew}
-      beginLabel="New Game"
+      beginLabel="New Run"
+      onReturn={returnToTitle}
     />
   );
 }
@@ -59,6 +65,7 @@ interface EndOfRunViewProps {
   allMaps: MapState[];
   onBegin: () => void;
   beginLabel: string;
+  onReturn?: () => void;
 }
 
 // Crossfade timing. The rainbow dims to ~0 over CROSSFADE_MS, layout snaps
@@ -72,6 +79,7 @@ function EndOfRunView({
   allMaps,
   onBegin,
   beginLabel,
+  onReturn,
 }: EndOfRunViewProps) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(0);
   const [transitioning, setTransitioning] = useState(false);
@@ -165,6 +173,11 @@ function EndOfRunView({
 
       <div className="eor-actions">
         <button className="begin-btn" onClick={onBegin}>{beginLabel}</button>
+        {onReturn && (
+          <button className="begin-btn begin-btn-ghost" onClick={onReturn} type="button">
+            Return to Title
+          </button>
+        )}
       </div>
     </div>
   );

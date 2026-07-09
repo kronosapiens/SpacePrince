@@ -16,7 +16,8 @@ export interface PickFragmentOptions {
   planet: PlanetName;
   mood?: Mood;
   exclude?: ReadonlyArray<string>;
-  rng?: () => number;
+  /** Required: every pick is seeded — no ambient randomness (determinism rule). */
+  rng: () => number;
 }
 
 /**
@@ -26,7 +27,7 @@ export interface PickFragmentOptions {
 export function pickFragment(opts: PickFragmentOptions): Fragment | null {
   const all = loadFragments()[opts.planet] ?? [];
   if (all.length === 0) return null;
-  const rng = opts.rng ?? Math.random;
+  const rng = opts.rng;
   const exclude = new Set(opts.exclude ?? []);
 
   const available = all.filter((f) => !exclude.has(f.id));

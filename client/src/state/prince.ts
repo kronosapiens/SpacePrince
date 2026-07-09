@@ -16,11 +16,14 @@ export function loadPrince(): Prince | null {
 }
 
 export function savePrince(prince: Prince): void {
-  // The run event log is in-memory only (STATE.md) — strip it from the persisted
-  // copy so reloads start with an empty log.
+  // localStorage stands in for the chain-event indexer (STATE.md): the tail run
+  // keeps its event log so map history survives reload; finished runs are inert
+  // apart from their scalars, so their logs are stripped.
   const persisted: Prince = {
     ...prince,
-    runs: prince.runs.map((r) => ({ ...r, events: [] })),
+    runs: prince.runs.map((r, i) =>
+      i === prince.runs.length - 1 ? r : { ...r, events: [] },
+    ),
   };
   localStorage.setItem(PRINCE_KEY, JSON.stringify(persisted));
 }
