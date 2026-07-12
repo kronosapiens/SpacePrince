@@ -4,7 +4,8 @@ import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
-import { PLANETS } from "@/game/data";
+import { PLANETS, RULERSHIP } from "@/game/data";
+import { setTheme } from "@/audio/engine";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
@@ -121,6 +122,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [prince.numEncounters, devUnlockAll],
   );
 
+  // The score (MUSIC.md): combat plays the opponent's theme at the up mix —
+  // the theme follows the encounter's identity (its chart ruler), stable for
+  // the whole fight, not the per-turn active planet.
+  const opponentRuler = RULERSHIP[encounter.opponentChart.ascendantSign];
+  useEffect(() => {
+    setTheme(opponentRuler, "combat");
+  }, [opponentRuler]);
 
   // The panel (with its action buttons + live projection) is click-only:
   // hovering the chart highlights a planet but no longer pops the panel, so it

@@ -10,6 +10,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
+import { playCombust, playPropagation, setTheme } from "@/audio/engine";
 import { mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
@@ -69,6 +70,12 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   useEffect(() => {
     setActive(ariaPlanet);
   }, [ariaPlanet, setActive]);
+
+  // The score: narrative sits close to the ruler's theme bed — the aria's
+  // planet carries the room (MUSIC.md: theme by planet, variant by surface).
+  useEffect(() => {
+    setTheme(ariaPlanet, "narrative");
+  }, [ariaPlanet]);
 
   const fragment = useMemo(() => {
     const fixed = getFragmentById(encounter.fragmentId);
@@ -153,6 +160,14 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       combusting,
       distance: nextRun.distance - run.distance,
     });
+    // Plain state-change sounds (SCREENS §3.5 — no propagation language here):
+    // a combust cuts that planet's signature; otherwise heal resolves, harm hangs.
+    if (combusting.size > 0) {
+      for (const p of combusting) playCombust(p);
+    } else if (impact.size > 0) {
+      const harmed = [...impact.values()].some((pol) => pol === "Affliction");
+      playPropagation(harmed);
+    }
 
     if (option.next) {
       const updatedEnc: NarrativeEncounter = {

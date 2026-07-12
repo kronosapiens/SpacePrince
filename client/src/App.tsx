@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ActivePlanetTint } from "@/components/ActivePlanetTint";
 import { PageDropdown } from "@/components/PageDropdown";
@@ -6,8 +7,12 @@ import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { PlaySurface } from "@/screens/PlaySurface";
 import { IndexScreen } from "@/screens/IndexScreen";
+import { installAudioUnlock } from "@/audio/engine";
 
 export function App() {
+  // Audio boots on the first gesture (browser autoplay policy); every sound
+  // call before then no-ops.
+  useEffect(() => installAudioUnlock(), []);
   return (
     <>
       <ActivePlanetTint />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapDiagram } from "@/components/MapDiagram";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { setTheme } from "@/audio/engine";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
@@ -16,7 +17,9 @@ export function EndOfRunScreen() {
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
+    // The score falls silent at the end of the passage.
     setActive(null);
+    setTheme(null);
   }, [setActive]);
 
   // The finished run keeps only its current map; prior maps live in the

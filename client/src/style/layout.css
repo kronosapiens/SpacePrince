@@ -70,6 +70,20 @@
 }
 .begin-btn-ghost:hover { background: transparent; color: var(--bone); border-color: var(--bone); }
 
+/* The one player-facing sound control — functional chrome at whisper volume. */
+.sound-toggle {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--mist);
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 220ms ease;
+}
+.sound-toggle:hover { color: var(--bone); }
+
 /* ── Title ─────────────────────────────────────────────────────────────── */
 
 /* Equal 1fr rows above and below the chart so the wordmark and the

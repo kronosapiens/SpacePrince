@@ -3,6 +3,7 @@ import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
 import { MapDiagram } from "@/components/MapDiagram";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useRolloverMap } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
@@ -40,6 +41,13 @@ export function MapScreen() {
   useEffect(() => {
     setActive(tintPlanet);
   }, [tintPlanet, setActive]);
+
+  // The score: on the map you hear yourself — the Prince's own chart ruler,
+  // at the down mix (MUSIC.md: theme by planet, variant by surface).
+  const chartRuler = prince ? RULERSHIP[prince.chart.ascendantSign] : null;
+  useEffect(() => {
+    if (chartRuler) setTheme(chartRuler, "map");
+  }, [chartRuler]);
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(
