@@ -45,12 +45,37 @@ export function setMuted(next: boolean): void {
   else stopAmbientVoices(0.1);
 }
 
-/** Install a one-time gesture listener that boots the audio engine. */
+/** Install gesture listeners that boot the audio engine. They keep listening
+ *  until the context is confirmed running — a single refused resume (stricter
+ *  browsers time the gesture window tightly around a dynamic import) must not
+ *  mean silence forever. */
 export function installAudioUnlock(): void {
   if (typeof window === "undefined") return;
-  const unlock = () => void init();
-  window.addEventListener("pointerdown", unlock, { once: true });
-  window.addEventListener("keydown", unlock, { once: true });
+  const unlock = () => {
+    ensureAudio()
+      .then(() => {
+        if (T && T.getContext().state === "running") {
+          window.removeEventListener("pointerdown", unlock);
+          window.removeEventListener("keydown", unlock);
+        }
+      })
+      .catch(() => {
+        /* retried on the next gesture */
+      });
+  };
+  window.addEventListener("pointerdown", unlock);
+  window.addEventListener("keydown", unlock);
+}
+
+/** Boot (or re-resume) the engine. Safe to call from any gesture handler. */
+export async function ensureAudio(): Promise<void> {
+  if (T) {
+    // Built, but a prior resume may have been refused outside a gesture —
+    // retry inside this one.
+    if (T.getContext().state !== "running") await T.start();
+    return;
+  }
+  return init();
 }
 
 async function init(): Promise<void> {
@@ -59,13 +84,16 @@ async function init(): Promise<void> {
     const tone = await import("tone");
     await tone.start();
     T = tone;
-    T.getDestination().volume.value = -8;
+    T.getDestination().volume.value = -4;
     T.getDestination().mute = muted;
     reverb = new T.Reverb({ decay: 4.5, wet: 0.3 }).toDestination();
     ambientBus = new T.Gain(0.0).connect(reverb);
     ambientBus.gain.value = 1;
     applyAmbient();
-  })();
+  })().catch((err) => {
+    initPromise = null; // let the next gesture retry from scratch
+    throw err;
+  });
   return initPromise;
 }
 

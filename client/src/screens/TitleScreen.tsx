@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { isMuted, setMuted } from "@/audio/engine";
+import { ensureAudio, isMuted, playPropagation, setMuted } from "@/audio/engine";
 import { finishedRuns, isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
@@ -23,8 +23,16 @@ const TITLE_FADE_MS = 420; // matches the .title opacity transition (layout.css)
 function SoundToggle() {
   const [muted, setMutedState] = useState(isMuted());
   const toggle = () => {
-    setMuted(!muted);
-    setMutedState(!muted);
+    const next = !muted;
+    setMuted(next);
+    setMutedState(next);
+    // Turning sound on answers audibly — the resolving fourth doubles as the
+    // confirmation note, and the click itself is the resume gesture.
+    if (!next) {
+      ensureAudio()
+        .then(() => playPropagation(false))
+        .catch(() => {});
+    }
   };
   return (
     <button className="sound-toggle" onClick={toggle} type="button">
