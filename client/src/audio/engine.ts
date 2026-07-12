@@ -267,24 +267,34 @@ export function playStar(): void {
   fx.triggerAttackRelease(midiToFreq(81), 1.0, now + 0.18, 0.2); // A5 under it
 }
 
-// ── Ambient hum ──────────────────────────────────────────────────────────
-// The chart hums: one soft voice per lit planet at its register's tonic —
-// stacked D octaves, so the texture is a single chord that thins as planets
-// combust ("silences where voices used to be").
+// ── Ambient bed ──────────────────────────────────────────────────────────
+// Not a drone. Two layers: a low pedal whose amplitude moves on a very slow
+// LFO (the floor, barely there), and one generative figure per lit planet —
+// quiet notes drawn from its own mode at its own register, on staggered
+// non-harmonic periods (SIGNATURES[planet].breath). The bed never repeats
+// exactly, and a combusted planet's figure audibly drops out ("silences
+// where voices used to be", VIBES.md).
+//
+// Timing uses Math.random deliberately: this is ephemeral presentation
+// texture, not game state — nothing derivable or replayable hangs on it.
 
-interface AmbientVoice {
-  osc: import("tone").Oscillator;
-  gain: import("tone").Gain;
+interface BreathVoice {
+  timer: number;
 }
 
-const ambientVoices = new Map<PlanetName, AmbientVoice>();
+const ambientVoices = new Map<PlanetName, BreathVoice>();
 let ambientSpec: PlanetName[] | null = null;
+let pedal: {
+  osc: import("tone").Oscillator;
+  gain: import("tone").Gain;
+  lfo: import("tone").LFO;
+} | null = null;
 
-const AMBIENT_VOICE_GAIN = 0.045;
 const AMBIENT_RAMP_S = 1.6;
+const PEDAL_MIDI = 38; // D2 — the shared tonic floor
 
 /**
- * Set the ambient hum to these planets' voices (null = fade to silence — the
+ * Set the ambient bed to these planets' figures (null = fade to silence — the
  * map between encounters "lets it breathe", SCREENS.md §4.6).
  */
 export function setAmbient(planets: PlanetName[] | null): void {
@@ -296,42 +306,78 @@ export function setAmbient(planets: PlanetName[] | null): void {
 function applyAmbient(): void {
   if (!T || !ambientBus || muted) return;
   const want = new Set(ambientSpec ?? []);
-  // Fade out voices no longer wanted.
+  if (want.size > 0) startPedal();
+  else stopPedal(AMBIENT_RAMP_S);
   for (const [planet, voice] of ambientVoices) {
     if (!want.has(planet)) {
-      voice.gain.gain.rampTo(0, AMBIENT_RAMP_S);
-      const held = voice;
-      setTimeout(() => {
-        held.osc.stop();
-        held.osc.dispose();
-        held.gain.dispose();
-      }, AMBIENT_RAMP_S * 1000 + 200);
+      window.clearTimeout(voice.timer);
       ambientVoices.delete(planet);
     }
   }
-  // Fade in new voices.
   for (const planet of want) {
-    if (ambientVoices.has(planet)) continue;
-    const gain = new T.Gain(0).connect(ambientBus);
-    const osc = new T.Oscillator({
-      frequency: midiToFreq(SIGNATURES[planet].root),
-      type: "sine",
-    }).connect(gain);
-    osc.start();
-    gain.gain.rampTo(AMBIENT_VOICE_GAIN, AMBIENT_RAMP_S);
-    ambientVoices.set(planet, { osc, gain });
+    if (!ambientVoices.has(planet)) startBreath(planet);
   }
+}
+
+function startBreath(planet: PlanetName): void {
+  const spec = SIGNATURES[planet].breath;
+  const voice: BreathVoice = { timer: 0 };
+  ambientVoices.set(planet, voice);
+  const tick = () => {
+    if (!T || muted || ambientVoices.get(planet) !== voice) return;
+    const inst = instrumentFor(planet);
+    if (inst) {
+      const now = T.now();
+      const deg = spec.degs[Math.floor(Math.random() * spec.degs.length)]!;
+      inst.triggerAttackRelease(midiToFreq(gestureMidi(planet, deg)), spec.dur, now, spec.vel);
+      if (spec.dyad) {
+        inst.triggerAttackRelease(
+          midiToFreq(gestureMidi(planet, deg + 2)),
+          spec.dur,
+          now + 0.03,
+          spec.vel * 0.8,
+        );
+      }
+    }
+    voice.timer = window.setTimeout(tick, spec.periodS * 1000 * (0.75 + Math.random() * 0.5));
+  };
+  // Staggered entry — planets don't all speak the moment a surface opens.
+  voice.timer = window.setTimeout(tick, (0.5 + Math.random()) * 0.4 * spec.periodS * 1000);
+}
+
+function startPedal(): void {
+  if (!T || !ambientBus || pedal) return;
+  const gain = new T.Gain(0).connect(ambientBus);
+  const osc = new T.Oscillator({ frequency: midiToFreq(PEDAL_MIDI), type: "sine" }).connect(gain);
+  // The pedal itself breathes: a very slow amplitude drift between near-silence
+  // and quiet, so even the floor is never static.
+  const lfo = new T.LFO({ frequency: 0.05, min: 0.012, max: 0.05 });
+  lfo.phase = 270; // start at the quiet end and rise
+  lfo.connect(gain.gain);
+  osc.start();
+  lfo.start();
+  pedal = { osc, gain, lfo };
+}
+
+function stopPedal(rampS: number): void {
+  if (!pedal) return;
+  const held = pedal;
+  pedal = null;
+  held.lfo.stop();
+  held.lfo.disconnect();
+  held.gain.gain.rampTo(0, rampS);
+  setTimeout(() => {
+    held.osc.stop();
+    held.osc.dispose();
+    held.gain.dispose();
+    held.lfo.dispose();
+  }, rampS * 1000 + 200);
 }
 
 function stopAmbientVoices(rampS: number): void {
   for (const [planet, voice] of ambientVoices) {
-    voice.gain.gain.rampTo(0, rampS);
-    const held = voice;
-    setTimeout(() => {
-      held.osc.stop();
-      held.osc.dispose();
-      held.gain.dispose();
-    }, rampS * 1000 + 100);
+    window.clearTimeout(voice.timer);
     ambientVoices.delete(planet);
   }
+  stopPedal(rampS);
 }
