@@ -86,7 +86,9 @@ async function init(): Promise<void> {
     T = tone;
     T.getDestination().volume.value = -4;
     T.getDestination().mute = muted;
-    reverb = new T.Reverb({ decay: 4.5, wet: 0.3 }).toDestination();
+    // Kept on the dry side — a long wet reverb smears attack transients into
+    // wash, which is half of what makes synth beds read as drone.
+    reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).toDestination();
     themeBus = new T.Gain(0.9).connect(reverb);
     for (const layer of LAYERS) {
       layerGains[layer] = new T.Gain(0).connect(themeBus);
@@ -314,32 +316,55 @@ function themeInstrument(layer: ThemeLayer, role: ThemeNote["role"]): AnyInstrum
   if (existing) return existing;
   let inst: AnyInstrument;
   switch (role) {
+    // Timbre note: the MIDI sketches auditioned through General MIDI
+    // instruments — percussive attacks, rich harmonics, natural decay. Pure
+    // sine/triangle waves at high sustain read as drone regardless of the
+    // harmony, so every pitched role here either evolves (FM) or decays
+    // (pluck, filtered mono bass). Notes bloom and recede; nothing holds a
+    // steady state.
     case "pad":
-      inst = new T.PolySynth(T.Synth, {
+      inst = new T.PolySynth(T.FMSynth, {
+        harmonicity: 1.007, // a hair off unison — slow beating keeps the chord alive
+        modulationIndex: 6,
         oscillator: { type: "sine" },
-        envelope: { attack: 0.5, decay: 0.2, sustain: 0.8, release: 1.4 },
-        volume: -13,
+        modulation: { type: "sine" },
+        envelope: { attack: 0.35, decay: 1.6, sustain: 0.3, release: 1.8 },
+        modulationEnvelope: { attack: 0.5, decay: 1.2, sustain: 0.4, release: 1.5 },
+        volume: -14,
       }).connect(bus);
       break;
     case "lead":
-      inst = new T.PolySynth(T.Synth, {
-        oscillator: { type: "triangle" },
-        envelope: { attack: 0.03, decay: 0.15, sustain: 0.6, release: 0.5 },
-        volume: -11,
+      inst = new T.PolySynth(T.FMSynth, {
+        harmonicity: 2,
+        modulationIndex: 4, // reedy, horn-adjacent — closer to the sketches' GM voices
+        envelope: { attack: 0.04, decay: 0.4, sustain: 0.4, release: 0.4 },
+        modulationEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.3, release: 0.4 },
+        volume: -12,
       }).connect(bus);
       break;
     case "bass":
-      inst = new T.PolySynth(T.Synth, {
-        oscillator: { type: "sine" },
-        envelope: { attack: 0.015, decay: 0.2, sustain: 0.7, release: 0.3 },
-        volume: -8,
+      inst = new T.MonoSynth({
+        oscillator: { type: "sawtooth" },
+        filter: { type: "lowpass", Q: 1 },
+        filterEnvelope: {
+          attack: 0.01,
+          decay: 0.25,
+          sustain: 0.4,
+          release: 0.3,
+          baseFrequency: 110,
+          octaves: 2.2,
+        },
+        envelope: { attack: 0.01, decay: 0.3, sustain: 0.6, release: 0.25 },
+        volume: -9,
       }).connect(bus);
       break;
     case "arp":
-      inst = new T.PolySynth(T.Synth, {
-        oscillator: { type: "triangle" },
-        envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.5 },
-        volume: -14,
+      // Karplus-Strong — an actual plucked string, like the sketches' harp.
+      inst = new T.PluckSynth({
+        attackNoise: 1.4,
+        dampening: 3800,
+        resonance: 0.95,
+        volume: -10,
       }).connect(bus);
       break;
     case "kick":
