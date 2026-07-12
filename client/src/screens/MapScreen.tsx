@@ -6,7 +6,7 @@ import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore"
 import { finishedRuns, isOver } from "@/game/run";
 import { useRolloverMap } from "@/state/store-actions";
 import { takePendingUnlock } from "@/state/ceremony";
-import { playSignature } from "@/audio/engine";
+import { playSignature, setTheme } from "@/audio/engine";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, hashString } from "@/game/rng";
@@ -59,6 +59,13 @@ export function MapScreen() {
   useEffect(() => {
     setActive(tintPlanet);
   }, [tintPlanet, setActive]);
+
+  // The score: on the map you hear yourself — the Prince's own chart ruler,
+  // at the down mix (MUSIC.md: theme by planet, variant by surface).
+  const chartRuler = prince ? RULERSHIP[prince.chart.ascendantSign] : null;
+  useEffect(() => {
+    if (chartRuler) setTheme(chartRuler, "map");
+  }, [chartRuler]);
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(

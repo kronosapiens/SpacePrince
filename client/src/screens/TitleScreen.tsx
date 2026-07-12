@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { ensureAudio, isMuted, playPropagation, setMuted } from "@/audio/engine";
+import { ensureAudio, isMuted, playPropagation, setMuted, setTheme } from "@/audio/engine";
 import { finishedRuns, isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
@@ -54,7 +54,9 @@ export function TitleScreen() {
   useEffect(() => {
     // Neutral bone glow on Title — clear any planet tint carried in from
     // another screen so the background falls back to the resting neutral.
+    // The score fades out too: the Title is arrival, not a surface.
     setActive(null);
+    setTheme(null);
   }, [setActive]);
 
   // With a Prince, the Title is the identity surface (SCREENS §9.1): their

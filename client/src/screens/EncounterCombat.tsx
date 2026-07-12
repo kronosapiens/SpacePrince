@@ -2,11 +2,11 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Chart } from "@/components/Chart";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
-import { setAmbient } from "@/audio/engine";
+import { setTheme } from "@/audio/engine";
 import { pickFragment } from "@/data/chorus";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
-import { PLANETS } from "@/game/data";
+import { PLANETS, RULERSHIP } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
@@ -123,15 +123,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [prince.numEncounters, devUnlockAll],
   );
 
-  // The chart hums: one ambient voice per lit fielded planet, thinning as
-  // planets go dark (VIBES.md — "silences where voices used to be"). Follows
-  // the animation's display state so a mid-turn combust silences its voice on
-  // the beat it grays out.
-  const litKey = playerUnlocked.filter((p) => !displayPlayerState[p].combusted).join(",");
+  // The score (MUSIC.md): combat plays the opponent's theme at the up mix —
+  // the theme follows the encounter's identity (its chart ruler), stable for
+  // the whole fight, not the per-turn active planet.
+  const opponentRuler = RULERSHIP[encounter.opponentChart.ascendantSign];
   useEffect(() => {
-    setAmbient(litKey ? (litKey.split(",") as PlanetName[]) : []);
-  }, [litKey]);
-  useEffect(() => () => setAmbient(null), []);
+    setTheme(opponentRuler, "combat");
+  }, [opponentRuler]);
 
   // The panel (with its action buttons + live projection) is click-only:
   // hovering the chart highlights a planet but no longer pops the panel, so it

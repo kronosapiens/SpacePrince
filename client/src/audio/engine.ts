@@ -41,8 +41,8 @@ export function setMuted(next: boolean): void {
     /* storage unavailable — session-only */
   }
   if (T) T.getDestination().mute = next;
-  if (!next) applyAmbient(); // re-establish the hum on unmute
-  else stopAmbientVoices(0.1);
+  if (!next) applyTheme(); // re-establish the score on unmute
+  else haltTheme(0.1);
 }
 
 /** Install gesture listeners that boot the audio engine. They keep listening
@@ -87,9 +87,12 @@ async function init(): Promise<void> {
     T.getDestination().volume.value = -4;
     T.getDestination().mute = muted;
     reverb = new T.Reverb({ decay: 4.5, wet: 0.3 }).toDestination();
-    ambientBus = new T.Gain(0.0).connect(reverb);
-    ambientBus.gain.value = 1;
-    applyAmbient();
+    themeBus = new T.Gain(0.9).connect(reverb);
+    for (const layer of LAYERS) {
+      layerGains[layer] = new T.Gain(0).connect(themeBus);
+    }
+    T.getTransport().start();
+    applyTheme();
   })().catch((err) => {
     initPromise = null; // let the next gesture retry from scratch
     throw err;
@@ -100,7 +103,11 @@ async function init(): Promise<void> {
 // ── Instruments ──────────────────────────────────────────────────────────
 
 let reverb: import("tone").Reverb | null = null;
-let ambientBus: import("tone").Gain | null = null;
+let themeBus: import("tone").Gain | null = null;
+
+const LAYERS = ["bed", "down", "up"] as const;
+type ThemeLayer = (typeof LAYERS)[number];
+const layerGains: Partial<Record<ThemeLayer, import("tone").Gain>> = {};
 
 type AnyInstrument = {
   triggerAttackRelease: (
@@ -267,117 +274,213 @@ export function playStar(): void {
   fx.triggerAttackRelease(midiToFreq(81), 1.0, now + 0.18, 0.2); // A5 under it
 }
 
-// ── Ambient bed ──────────────────────────────────────────────────────────
-// Not a drone. Two layers: a low pedal whose amplitude moves on a very slow
-// LFO (the floor, barely there), and one generative figure per lit planet —
-// quiet notes drawn from its own mode at its own register, on staggered
-// non-harmonic periods (SIGNATURES[planet].breath). The bed never repeats
-// exactly, and a combusted planet's figure audibly drops out ("silences
-// where voices used to be", VIBES.md).
-//
-// Timing uses Math.random deliberately: this is ephemeral presentation
-// texture, not game state — nothing derivable or replayable hangs on it.
+// ── The score: seven planet themes, vertically mixed ─────────────────────
+// Themes live in themes.ts (developed from spec/design/music-sketches).
+// All three layers of the active theme run in sync on the transport; the
+// surface chooses the mix (the FTL model): the map breathes the down layer,
+// combat drives the up layer, narrative sits close to the bed alone.
 
-interface BreathVoice {
-  timer: number;
+import { THEMES, nameToMidi, type ThemeNote } from "./themes";
+
+export type ThemeSurface = "map" | "combat" | "narrative";
+
+const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
+  map: { bed: 0.9, down: 1, up: 0 },
+  narrative: { bed: 0.6, down: 0.35, up: 0 },
+  combat: { bed: 1, down: 0, up: 1 },
+};
+
+const MIX_RAMP_S = 2.2; // FTL-style slow crossfade between variants
+const SWAP_FADE_S = 1.1; // theme-to-theme handoff
+
+interface StoppablePart {
+  stop(): unknown;
+  dispose(): unknown;
 }
 
-const ambientVoices = new Map<PlanetName, BreathVoice>();
-let ambientSpec: PlanetName[] | null = null;
-let pedal: {
-  osc: import("tone").Oscillator;
-  gain: import("tone").Gain;
-  lfo: import("tone").LFO;
-} | null = null;
+let desired: { planet: PlanetName; surface: ThemeSurface } | null = null;
+let playing: { planet: PlanetName; parts: StoppablePart[] } | null = null;
+let swapTimer: number | null = null;
 
-const AMBIENT_RAMP_S = 1.6;
-const PEDAL_MIDI = 38; // D2 — the shared tonic floor
+/** Per-layer instrument pool, so layer gains only touch the score. */
+const themeInstruments = new Map<string, AnyInstrument>();
+
+function themeInstrument(layer: ThemeLayer, role: ThemeNote["role"]): AnyInstrument | null {
+  if (!T) return null;
+  const bus = layerGains[layer];
+  if (!bus) return null;
+  const key = `${layer}:${role}`;
+  const existing = themeInstruments.get(key);
+  if (existing) return existing;
+  let inst: AnyInstrument;
+  switch (role) {
+    case "pad":
+      inst = new T.PolySynth(T.Synth, {
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.5, decay: 0.2, sustain: 0.8, release: 1.4 },
+        volume: -13,
+      }).connect(bus);
+      break;
+    case "lead":
+      inst = new T.PolySynth(T.Synth, {
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.03, decay: 0.15, sustain: 0.6, release: 0.5 },
+        volume: -11,
+      }).connect(bus);
+      break;
+    case "bass":
+      inst = new T.PolySynth(T.Synth, {
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.015, decay: 0.2, sustain: 0.7, release: 0.3 },
+        volume: -8,
+      }).connect(bus);
+      break;
+    case "arp":
+      inst = new T.PolySynth(T.Synth, {
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.5 },
+        volume: -14,
+      }).connect(bus);
+      break;
+    case "kick":
+      inst = new T.MembraneSynth({
+        pitchDecay: 0.03,
+        octaves: 4,
+        envelope: { attack: 0.001, decay: 0.35, sustain: 0, release: 0.1 },
+        volume: -9,
+      }).connect(bus);
+      break;
+    case "snare":
+      inst = new T.NoiseSynth({
+        noise: { type: "white" },
+        envelope: { attack: 0.001, decay: 0.16, sustain: 0 },
+        volume: -16,
+      }).connect(bus);
+      break;
+    case "hat":
+    default:
+      inst = new T.NoiseSynth({
+        noise: { type: "white" },
+        envelope: { attack: 0.001, decay: 0.045, sustain: 0 },
+        volume: -22,
+      }).connect(bus);
+      break;
+  }
+  themeInstruments.set(key, inst);
+  return inst;
+}
 
 /**
- * Set the ambient bed to these planets' figures (null = fade to silence — the
- * map between encounters "lets it breathe", SCREENS.md §4.6).
+ * Point the score at a planet's theme for a surface (null = fade to silence).
+ * Same planet, new surface → the layers crossfade in place; a new planet
+ * fades the bus, swaps the parts, and fades back in.
  */
-export function setAmbient(planets: PlanetName[] | null): void {
-  ambientSpec = planets ? [...planets] : null;
+export function setTheme(planet: PlanetName | null, surface: ThemeSurface = "map"): void {
+  desired = planet ? { planet, surface } : null;
   if (!T || muted) return;
-  applyAmbient();
+  applyTheme();
 }
 
-function applyAmbient(): void {
-  if (!T || !ambientBus || muted) return;
-  const want = new Set(ambientSpec ?? []);
-  if (want.size > 0) startPedal();
-  else stopPedal(AMBIENT_RAMP_S);
-  for (const [planet, voice] of ambientVoices) {
-    if (!want.has(planet)) {
-      window.clearTimeout(voice.timer);
-      ambientVoices.delete(planet);
-    }
+function applyTheme(): void {
+  if (!T || !themeBus || muted) return;
+  if (swapTimer !== null) {
+    window.clearTimeout(swapTimer);
+    swapTimer = null;
   }
-  for (const planet of want) {
-    if (!ambientVoices.has(planet)) startBreath(planet);
+  if (!desired) {
+    haltTheme(SWAP_FADE_S);
+    return;
+  }
+  const { planet, surface } = desired;
+  if (playing && playing.planet === planet) {
+    rampMix(surface, MIX_RAMP_S);
+    themeBus.gain.rampTo(0.9, MIX_RAMP_S);
+    return;
+  }
+  if (playing) {
+    // Fade the old theme out, then hand off.
+    themeBus.gain.rampTo(0, SWAP_FADE_S);
+    swapTimer = window.setTimeout(() => {
+      swapTimer = null;
+      stopParts();
+      startParts(planet, surface);
+    }, SWAP_FADE_S * 1000 + 50);
+    return;
+  }
+  startParts(planet, surface);
+}
+
+function startParts(planet: PlanetName, surface: ThemeSurface): void {
+  if (!T || !themeBus) return;
+  const spec = THEMES[planet];
+  const spb = 60 / spec.bpm;
+  const loopEnd = spec.beats * spb;
+  const layers: Array<[ThemeLayer, ThemeNote[]]> = [
+    ["bed", spec.bed],
+    ["down", spec.down],
+    ["up", spec.up],
+  ];
+  // Tone.Part's event type wants a `time` field on the event object itself.
+  type TimedNote = ThemeNote & { time: number };
+  const parts = layers.map(([layer, notes]) => {
+    const part = new T!.Part<TimedNote>(
+      (time, note) => {
+        const inst = themeInstrument(layer, note.role);
+        if (!inst) return;
+        if (note.role === "snare" || note.role === "hat") {
+          // NoiseSynth is unpitched: (duration, time, velocity).
+          (inst as unknown as import("tone").NoiseSynth).triggerAttackRelease(
+            note.d * spb,
+            time,
+            note.v,
+          );
+        } else {
+          inst.triggerAttackRelease(midiToFreq(nameToMidi(note.n)), note.d * spb, time, note.v);
+        }
+      },
+      notes.map((note) => ({ ...note, time: note.t * spb })),
+    );
+    part.loop = true;
+    part.loopEnd = loopEnd;
+    part.start("+0.05");
+    return part;
+  });
+  playing = { planet, parts };
+  // Enter at the surface's mix; snap layer gains before the bus fades in.
+  rampMix(surface, 0.01);
+  themeBus.gain.rampTo(0.9, SWAP_FADE_S);
+}
+
+function rampMix(surface: ThemeSurface, rampS: number): void {
+  const mix = SURFACE_MIX[surface];
+  for (const layer of LAYERS) {
+    layerGains[layer]?.gain.rampTo(mix[layer], rampS);
   }
 }
 
-function startBreath(planet: PlanetName): void {
-  const spec = SIGNATURES[planet].breath;
-  const voice: BreathVoice = { timer: 0 };
-  ambientVoices.set(planet, voice);
-  const tick = () => {
-    if (!T || muted || ambientVoices.get(planet) !== voice) return;
-    const inst = instrumentFor(planet);
-    if (inst) {
-      const now = T.now();
-      const deg = spec.degs[Math.floor(Math.random() * spec.degs.length)]!;
-      inst.triggerAttackRelease(midiToFreq(gestureMidi(planet, deg)), spec.dur, now, spec.vel);
-      if (spec.dyad) {
-        inst.triggerAttackRelease(
-          midiToFreq(gestureMidi(planet, deg + 2)),
-          spec.dur,
-          now + 0.03,
-          spec.vel * 0.8,
-        );
+function stopParts(): void {
+  if (!playing) return;
+  for (const part of playing.parts) {
+    part.stop();
+    part.dispose();
+  }
+  playing = null;
+}
+
+function haltTheme(fadeS: number): void {
+  if (!T || !themeBus) {
+    playing = null;
+    return;
+  }
+  themeBus.gain.rampTo(0, fadeS);
+  const held = playing;
+  playing = null;
+  window.setTimeout(() => {
+    if (held) {
+      for (const part of held.parts) {
+        part.stop();
+        part.dispose();
       }
     }
-    voice.timer = window.setTimeout(tick, spec.periodS * 1000 * (0.75 + Math.random() * 0.5));
-  };
-  // Staggered entry — planets don't all speak the moment a surface opens.
-  voice.timer = window.setTimeout(tick, (0.5 + Math.random()) * 0.4 * spec.periodS * 1000);
-}
-
-function startPedal(): void {
-  if (!T || !ambientBus || pedal) return;
-  const gain = new T.Gain(0).connect(ambientBus);
-  const osc = new T.Oscillator({ frequency: midiToFreq(PEDAL_MIDI), type: "sine" }).connect(gain);
-  // The pedal itself breathes: a very slow amplitude drift between near-silence
-  // and quiet, so even the floor is never static.
-  const lfo = new T.LFO({ frequency: 0.05, min: 0.012, max: 0.05 });
-  lfo.phase = 270; // start at the quiet end and rise
-  lfo.connect(gain.gain);
-  osc.start();
-  lfo.start();
-  pedal = { osc, gain, lfo };
-}
-
-function stopPedal(rampS: number): void {
-  if (!pedal) return;
-  const held = pedal;
-  pedal = null;
-  held.lfo.stop();
-  held.lfo.disconnect();
-  held.gain.gain.rampTo(0, rampS);
-  setTimeout(() => {
-    held.osc.stop();
-    held.osc.dispose();
-    held.gain.dispose();
-    held.lfo.dispose();
-  }, rampS * 1000 + 200);
-}
-
-function stopAmbientVoices(rampS: number): void {
-  for (const [planet, voice] of ambientVoices) {
-    window.clearTimeout(voice.timer);
-    ambientVoices.delete(planet);
-  }
-  stopPedal(rampS);
+  }, fadeS * 1000 + 100);
 }

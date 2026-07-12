@@ -33,19 +33,6 @@ export interface GestureNote {
 
 export type SignatureVoice = "tone" | "pluck" | "strike" | "pad";
 
-/** The planet's ambient figure: a quiet note (or in-mode dyad) drawn from a
- *  small degree pool every `periodS` seconds (±25% humanized). Periods are
- *  deliberately non-harmonic across planets so the bed never settles into a
- *  loop — the texture shifts continuously and thins as planets go dark. */
-export interface BreathSpec {
-  periodS: number;
-  degs: readonly number[];
-  dur: number;
-  vel: number;
-  /** Sound the drawn degree with its in-mode third above — a warm dyad. */
-  dyad?: boolean;
-}
-
 export interface Signature {
   /** MIDI note of the planet's tonic register (D across octaves — D2 = 38). */
   root: number;
@@ -54,7 +41,6 @@ export interface Signature {
   attack: number;
   release: number;
   gesture: readonly GestureNote[];
-  breath: BreathSpec;
 }
 
 /**
@@ -69,7 +55,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
     attack: 0.04,
     release: 0.8,
     gesture: [{ deg: 0, at: 0, dur: 1.3, vel: 0.5 }],
-    breath: { periodS: 13, degs: [0, 4], dur: 3, vel: 0.16 },
   },
   Moon: {
     // "Soft, layered, slightly distant — heard through water." 5–3–1 nocturne descent.
@@ -82,7 +67,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 2, at: 0.34, dur: 0.8, vel: 0.28 },
       { deg: 0, at: 0.72, dur: 1.3, vel: 0.3 },
     ],
-    breath: { periodS: 9, degs: [4, 2, 0, 5], dur: 2.5, vel: 0.14 },
   },
   Mercury: {
     // "Quick, metallic, slightly dissonant — a plucked note that doesn't quite settle."
@@ -95,7 +79,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 3, at: 0.09, dur: 0.14, vel: 0.4 },
       { deg: 5, at: 0.18, dur: 0.4, vel: 0.45 }, // ends on the 6th — unresolved
     ],
-    breath: { periodS: 8, degs: [1, 5, 3, 8], dur: 0.35, vel: 0.18 },
   },
   Venus: {
     // "Warm, harmonic, close — a chord rather than a line." The ♭7 sits quiet inside.
@@ -109,7 +92,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 4, at: 0, dur: 1.1, vel: 0.3 },
       { deg: 6, at: 0.05, dur: 1.0, vel: 0.16 },
     ],
-    breath: { periodS: 12, degs: [0, 2, 4], dur: 3, vel: 0.12, dyad: true },
   },
   Mars: {
     // "Percussive, sharp, brief — a strike, not a tone." Root hit, ♭2 grace.
@@ -121,7 +103,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 0, at: 0, dur: 0.12, vel: 0.85 },
       { deg: 1, at: 0.07, dur: 0.1, vel: 0.4 },
     ],
-    breath: { periodS: 15, degs: [0, 0, 1], dur: 0.15, vel: 0.12 },
   },
   Jupiter: {
     // "Resonant, wide, chordal — a low sustained harmony." The ♯11 opens the roof.
@@ -134,7 +115,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 4, at: 0, dur: 1.5, vel: 0.34 },
       { deg: 10, at: 0.12, dur: 1.4, vel: 0.26 }, // ♯4 up the octave
     ],
-    breath: { periodS: 16, degs: [0, 4, 3], dur: 4, vel: 0.13, dyad: true },
   },
   Saturn: {
     // "Low, sustained, mineral — the lowest note, held." A tritone shadow above it.
@@ -146,7 +126,6 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
       { deg: 0, at: 0, dur: 2.0, vel: 0.5 },
       { deg: 4, at: 0.5, dur: 1.4, vel: 0.18 }, // Locrian ♭5 — borrowed ground
     ],
-    breath: { periodS: 19, degs: [0, 0, 4], dur: 5, vel: 0.15 },
   },
 };
 

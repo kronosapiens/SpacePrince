@@ -9,9 +9,11 @@ The guiding principle:
 
 > **The same seven planets you play, in sound.**
 
-**Status:** direction committed, realization pending.
-The cohesion model (parallel modes on a shared tonic), the home pitch, the per-planet mode mapping, and the runtime architecture (jukebox now, layered later) are decided below.
-Two mode calls (Venus, Saturn) and the per-piece work remain; full realization is blocked on DAW infrastructure.
+**Status:** direction committed; first in-engine realization shipped.
+The cohesion model (parallel modes on a shared tonic), the home pitch, the per-planet mode mapping, and the runtime architecture are decided below.
+All seven themes now play in the client (`client/src/audio/themes.ts`, developed from `music-sketches/`), synthesized in Tone.js with the **layered model** (Architecture (b)) as vertical mixing: bed + down + up layers run in sync, and the surface picks the mix — map breathes the down layer, combat drives the up layer.
+Theme selection: the map plays the Prince's chart ruler, combat the opponent's chart ruler, narrative the house ruler.
+The DAW pass (real timbre and mix) remains future work; Venus and Saturn's open mode calls were resolved provisionally in the shipped themes (Venus Mixolydian, Saturn Locrian over a moving toll rather than a static pedal).
 
 ---
 

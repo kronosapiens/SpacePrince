@@ -5,7 +5,7 @@ import { MapDiagram } from "@/components/MapDiagram";
 import { StarField } from "@/components/StarField";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { playStar } from "@/audio/engine";
+import { playStar, setTheme } from "@/audio/engine";
 import { earnedBits } from "@/game/achievements";
 import { finishedRuns, MAPS_PER_RUN } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -36,7 +36,9 @@ export function EndOfRunScreen() {
   }, [run, isSample, dispatch]);
 
   useEffect(() => {
+    // The score falls silent for the inscription — the star bell lands alone.
     setActive(null);
+    setTheme(null);
   }, [setActive]);
 
   // The inscription (SCREENS §6.1): the finished run's star takes its place in

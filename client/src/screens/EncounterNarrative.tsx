@@ -10,7 +10,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
-import { playCombust, playPropagation, setAmbient } from "@/audio/engine";
+import { playCombust, playPropagation, setTheme } from "@/audio/engine";
 import { hashString, mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
@@ -71,11 +71,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     setActive(ariaPlanet);
   }, [ariaPlanet, setActive]);
 
-  // House ambience is shaped by its ruling planet (VIBES.md §Sound Design) —
-  // the aria's voice, held as a single quiet tone under the encounter.
+  // The score: narrative sits close to the ruler's theme bed — the aria's
+  // planet carries the room (MUSIC.md: theme by planet, variant by surface).
   useEffect(() => {
-    setAmbient([ariaPlanet]);
-    return () => setAmbient(null);
+    setTheme(ariaPlanet, "narrative");
   }, [ariaPlanet]);
 
   const fragment = useMemo(() => {
