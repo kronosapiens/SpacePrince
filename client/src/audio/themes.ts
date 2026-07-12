@@ -30,10 +30,14 @@ export interface ThemeNote {
   role: ThemeRole;
 }
 
+/** The lead's sampled voice — the GM instrument the sketch's lead track named. */
+export type LeadVoice = "horn" | "flute" | "strings";
+
 export interface ThemeSpec {
   bpm: number;
   /** Loop length in beats. */
   beats: number;
+  leadVoice: LeadVoice;
   bed: ThemeNote[];
   down: ThemeNote[];
   up: ThemeNote[];
@@ -78,6 +82,7 @@ function every(cycle: number, until: number, notes: ThemeNote[]): ThemeNote[] {
 // ── Jupiter · Lydian · 3/4 · 96 — broad, the ♯4 reaching (sketch 01) ───────
 
 const jupiter: ThemeSpec = {
+  leadVoice: "horn",
   bpm: 96,
   beats: 48, // sketch's 8 bars, then the lead answers an octave higher
   bed: [
@@ -121,6 +126,7 @@ const jupiter: ThemeSpec = {
 // ── Sun · Ionian · 4/4 · 72 — the home key, centered (sketch 02) ────────────
 
 const sun: ThemeSpec = {
+  leadVoice: "flute",
   bpm: 72,
   beats: 32,
   bed: [
@@ -152,6 +158,7 @@ const sun: ThemeSpec = {
 // ── Mercury · Dorian · 6/8 · 138 — moto perpetuo, ends unsettled (sketch 03) ─
 
 const mercury: ThemeSpec = {
+  leadVoice: "flute",
   bpm: 138,
   beats: 48,
   bed: [
@@ -195,6 +202,7 @@ const mercury: ThemeSpec = {
 // ── Venus · Mixolydian · 3/4 · 72 — warm, the ♭7 ache (composed) ────────────
 
 const venus: ThemeSpec = {
+  leadVoice: "flute",
   bpm: 72,
   beats: 36,
   bed: [
@@ -230,6 +238,7 @@ const venus: ThemeSpec = {
 // ── Mars · Phrygian · 5/4 · 138 — the Holst hammer, ♭II stabs (sketch 04) ───
 
 const mars: ThemeSpec = {
+  leadVoice: "horn",
   bpm: 138,
   beats: 40,
   bed: [
@@ -270,6 +279,7 @@ const mars: ThemeSpec = {
 // ── Moon · Aeolian · 6/8 · 63 — nocturne, half-lit (composed) ───────────────
 
 const moon: ThemeSpec = {
+  leadVoice: "flute",
   bpm: 63,
   beats: 24,
   bed: [
@@ -300,6 +310,7 @@ const moon: ThemeSpec = {
 // ── Saturn · Locrian · 4/4 · 50 — the toll, ♭II consolation (sketch 05) ─────
 
 const saturn: ThemeSpec = {
+  leadVoice: "strings",
   bpm: 50,
   beats: 24,
   bed: [

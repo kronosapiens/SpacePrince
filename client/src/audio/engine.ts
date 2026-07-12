@@ -282,7 +282,7 @@ export function playStar(): void {
 // surface chooses the mix (the FTL model): the map breathes the down layer,
 // combat drives the up layer, narrative sits close to the bed alone.
 
-import { THEMES, nameToMidi, type ThemeNote } from "./themes";
+import { THEMES, nameToMidi, type LeadVoice, type ThemeNote } from "./themes";
 
 export type ThemeSurface = "map" | "combat" | "narrative";
 
@@ -307,10 +307,77 @@ let swapTimer: number | null = null;
 /** Per-layer instrument pool, so layer gains only touch the score. */
 const themeInstruments = new Map<string, AnyInstrument>();
 
-function themeInstrument(layer: ThemeLayer, role: ThemeNote["role"]): AnyInstrument | null {
+// ── Sampled voices: the actual GM soundbank ─────────────────────────────────
+// The sketches were auditioned through FluidR3_GM; the same bank's per-note
+// renders are vendored under public/soundfont (see its README). Samplers load
+// async on first use; until a sampler's buffers arrive, the synth patch below
+// stands in, so the score never waits on the network. Percussion stays
+// synthesized — the kit punches better than GM drums at this scale.
+
+const GM_BY_ROLE: Partial<Record<ThemeNote["role"], string>> = {
+  pad: "string_ensemble_1",
+  arp: "orchestral_harp",
+  bass: "contrabass",
+};
+
+const GM_BY_LEAD: Record<LeadVoice, string> = {
+  horn: "french_horn",
+  flute: "flute",
+  strings: "string_ensemble_1",
+};
+
+const GM_VOLUME: Record<string, number> = {
+  string_ensemble_1: -6,
+  orchestral_harp: -1,
+  contrabass: -1,
+  french_horn: -3,
+  flute: -3,
+};
+
+/** Sampled every tritone, C and Gb per octave — Sampler shifts the rest. */
+const SAMPLE_NOTES = ["C1", "Gb1", "C2", "Gb2", "C3", "Gb3", "C4", "Gb4", "C5", "Gb5", "C6", "Gb6"];
+
+const samplers = new Map<string, { sampler: import("tone").Sampler; loaded: boolean }>();
+
+function samplerFor(gm: string, layer: ThemeLayer, bus: import("tone").Gain): AnyInstrument | null {
+  if (!T) return null;
+  const key = `${layer}:${gm}`;
+  let entry = samplers.get(key);
+  if (!entry) {
+    const urls: Record<string, string> = {};
+    for (const n of SAMPLE_NOTES) urls[n] = `${n}.mp3`;
+    const holder: { sampler: import("tone").Sampler; loaded: boolean } = {
+      loaded: false,
+      sampler: new T.Sampler({
+        urls,
+        baseUrl: `/soundfont/${gm}/`,
+        release: gm === "orchestral_harp" || gm === "contrabass" ? 0.3 : 0.9,
+        volume: GM_VOLUME[gm] ?? -8,
+        onload: () => {
+          holder.loaded = true;
+        },
+      }).connect(bus),
+    };
+    entry = holder;
+    samplers.set(key, entry);
+  }
+  return entry.loaded ? (entry.sampler as unknown as AnyInstrument) : null;
+}
+
+function themeInstrument(
+  layer: ThemeLayer,
+  role: ThemeNote["role"],
+  leadVoice: LeadVoice,
+): AnyInstrument | null {
   if (!T) return null;
   const bus = layerGains[layer];
   if (!bus) return null;
+  // Prefer the sampled GM voice; fall back to the synth patch until loaded.
+  const gm = role === "lead" ? GM_BY_LEAD[leadVoice] : GM_BY_ROLE[role];
+  if (gm) {
+    const sampled = samplerFor(gm, layer, bus);
+    if (sampled) return sampled;
+  }
   const key = `${layer}:${role}`;
   const existing = themeInstruments.get(key);
   if (existing) return existing;
@@ -450,7 +517,7 @@ function startParts(planet: PlanetName, surface: ThemeSurface): void {
   const parts = layers.map(([layer, notes]) => {
     const part = new T!.Part<TimedNote>(
       (time, note) => {
-        const inst = themeInstrument(layer, note.role);
+        const inst = themeInstrument(layer, note.role, spec.leadVoice);
         if (!inst) return;
         if (note.role === "snare" || note.role === "hat") {
           // NoiseSynth is unpitched: (duration, time, velocity).
