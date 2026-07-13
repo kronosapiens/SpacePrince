@@ -122,17 +122,25 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
   const shownOptions = resolved ? (frozenOptions ?? options) : options;
 
+  // The wager resolves against the conditioning planet's luck (ENCOUNTERS §5.3).
+  // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
+  // One value feeds both the roll and the displayed odds — the probability is
+  // derivable from public chart data, so hiding it would frame a readable bet
+  // as pretend-mystery (client honesty, SCREENS §1.1). The roll itself stays
+  // genuinely random at commit.
+  const wagerLuckPlanet = joyPlanet ?? house.ruler;
+  const wagerChance = useMemo(() => {
+    const placement = prince.chart.planets[wagerLuckPlanet];
+    const luck = placement.base.luck + placement.buffs.luck;
+    return Math.min(0.85, 0.4 + luck * 0.03);
+  }, [prince.chart, wagerLuckPlanet]);
+
   const handleOption = (option: Option) => {
     if (resolved) return;
     let outcomes = option.outcomes ?? [];
     let resolutionText = "";
     if (option.outcomesOnSuccess || option.outcomesOnFail) {
-      const luckPlanet = joyPlanet ?? house.ruler;
-      const placement = prince.chart.planets[luckPlanet];
-      const luck = placement.base.luck + placement.buffs.luck;
-      // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
-      const chance = Math.min(0.85, 0.4 + luck * 0.03);
-      const success = Math.random() < chance;
+      const success = Math.random() < wagerChance;
       outcomes = success ? (option.outcomesOnSuccess ?? []) : (option.outcomesOnFail ?? []);
       resolutionText = success ? "The wager holds." : "The wager falls.";
     }
@@ -276,7 +284,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           {shownOptions.map((o, i) => {
             // Branch options (those that open a follow-up node) carry no direct
             // effect; cue that they lead onward, with a trailing arrow.
-            const baseAside = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
+            let baseAside = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
+            // Wagers show their odds — the roll's probability is derivable, so
+            // it's shown (SCREENS §1.1).
+            if (o.outcomesOnSuccess || o.outcomesOnFail) {
+              const pct = `${Math.round(wagerChance * 100)}%`;
+              baseAside = baseAside ? `${baseAside} · ${pct}` : pct;
+            }
             const aside = o.next && baseAside ? `${baseAside} →` : baseAside;
             return (
               <button
