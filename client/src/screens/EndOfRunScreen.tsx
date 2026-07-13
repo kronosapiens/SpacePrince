@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapDiagram } from "@/components/MapDiagram";
-import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { useStartRun } from "@/state/store-actions";
 import { setTheme } from "@/audio/engine";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { RULERSHIP } from "@/game/data";
@@ -13,7 +14,7 @@ import type { MapState, PlanetName } from "@/game/types";
 export function EndOfRunScreen() {
   const prince = usePrince();
   const run = useActiveRun();
-  const dispatch = usePrinceDispatch();
+  const startRun = useStartRun();
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
@@ -39,9 +40,10 @@ export function EndOfRunScreen() {
 
   if (!prince || !run) return null;
 
-  // New Game clears the finished Prince; PlaySurface then opens on mint
-  // (a fresh Prince per run, matching the current design).
-  const beginNew = () => dispatch({ kind: "clear" });
+  // Begin new run: a fresh run on the same Prince (SCREENS §6.3). Afflictions
+  // and combusts reset; numEncounters, unlocks, and the run record persist —
+  // that's the lifetime layer. Wiping identity is dev-only (DevConsole).
+  const beginNew = () => startRun();
 
   return (
     <EndOfRunView
@@ -50,7 +52,7 @@ export function EndOfRunScreen() {
       totalEncounters={totalEncounters}
       allMaps={allMaps}
       onBegin={beginNew}
-      beginLabel="New Game"
+      beginLabel="New Run"
     />
   );
 }

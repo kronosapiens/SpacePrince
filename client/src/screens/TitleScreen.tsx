@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
-import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { useStartRun } from "@/state/store-actions";
 import { ensureAudio, isMuted, playPropagation, setMuted, setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -41,7 +42,7 @@ export function TitleScreen() {
   const navigate = useNavigate();
   const prince = usePrince();
   const run = useActiveRun();
-  const dispatch = usePrinceDispatch();
+  const startRun = useStartRun();
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const [leaving, setLeaving] = useState(false);
   const { setActive } = useActivePlanet();
@@ -67,14 +68,16 @@ export function TitleScreen() {
     return () => window.clearInterval(id);
   }, []);
 
-  // Continue resumes a live (non-over) run; New Game clears any prior Prince so
-  // the play surface opens on chart creation. Which surface /play shows is
-  // derived from run state by PlaySurface — the Title just routes there.
+  // Continue resumes a live (non-over) run; Begin starts a new run on the same
+  // Prince — identity persists, the lifetime layer accumulates (SCREENS §9.2).
+  // A player with no Prince falls through to the mint at /play; wiping identity
+  // is dev-only (DevConsole). Which surface /play shows is derived from run
+  // state by PlaySurface — the Title just routes there.
   const hasLiveRun = !!(prince && run && !isOver(run, prince.numEncounters));
-  const label = hasLiveRun ? "Continue" : "New Game";
+  const label = hasLiveRun ? "Continue" : "Begin";
   const handleBegin = () => {
     if (leaving) return;
-    if (!hasLiveRun) dispatch({ kind: "clear" });
+    if (prince && !hasLiveRun) startRun();
     setLeaving(true); // fade out, then hand off to /play
     window.setTimeout(() => navigate(ROUTES.play), TITLE_FADE_MS);
   };
