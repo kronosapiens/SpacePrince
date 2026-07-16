@@ -186,7 +186,6 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 | Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |
 | Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
 | Badge merge               | 200ms    | ease-out                    | The incoming Δ badge slides into the affliction total and fades — the addition is seen, not inferred. |
-| Crit                      | 720ms    | ease-out                    | At a phase's start the attacker flashes; the receiving chart's badges read 2× for the rest of the phase; the receiver bursts on impact. |
 | Invite breath             | 1100ms   | ease-in-out, looping        | Everything tappable right now breathes — a ring, node, or verb swelling slightly in its own color. |
 | Armed pulse               | 1100ms   | ease-in-out, looping        | The armed verb pulses harder, filled; its alternatives fall still. The confirm is the only thing asking. |
 

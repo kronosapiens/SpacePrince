@@ -57,8 +57,6 @@ export const CHART_STYLE = {
   },
   /** Active — the select / opponent-acting ring. */
   selectRing: { opacity: 1, stroke: STROKE_MEDIUM },
-  /** Active — crit burst ring. */
-  crit: { opacity: 0.8, stroke: 2 },
   /** Active — combust: colored flare ripple + delayed bone shockwave. */
   combust: {
     ripple: { opacity: 0.95, stroke: 2.5 },

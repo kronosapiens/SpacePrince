@@ -2,7 +2,7 @@
 
 The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
 
-**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a deterministic combustion at a ceiling set by durability.
+**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a deterministic combustion at a ceiling set by durability, and is capped there — a combusted planet holds `ceiling`, never more.
 
 ## 1. Entities
 
@@ -123,22 +123,25 @@ Base amount is the stat for the action:
 - `Afflict`: `damage`
 - `Testify`: `healing`
 
-Multipliers:
-
-- Crit: `2` on crit, else `1`
-
 Raw direct amount:
 
-- `raw = baseStat * critMultiplier`
+- `raw = baseStat` — no multipliers; there are no crits (§7)
 
 Magnitude is the planet's own stat; sect and element/modality buffs (§4) are the only sources of contextual strength.
 
-## 7. Crit
+## 7. Randomness
 
-Each side rolls independently per action:
+Randomness never decides how a committed action resolves; it only decides what is revealed next.
 
-- `critChance = effectiveLuck * 0.05` (effective luck runs ~2–12, so ~10–60%)
-- crit doubles the direct outgoing effect (`×2`)
+When the player commits an action, its full outcome — affliction, testimony, propagation, combustion, Distance — is computable from state the client already holds. The client renders the resolution immediately; the transaction confirms the same result behind the animation. There are no crits and no hidden rolls: anything derivable before commitment is shown (client honesty, `SCREENS.md` §1.1), and anything not derivable is genuinely unknown to everyone — including the contract — until the transaction lands.
+
+Fresh randomness enters only where the game is already pausing to reveal something new, and every reveal rides a transaction the player is already waiting on:
+
+- **Map creation.** The map seed is a VRF draw; from it derive node content (`MAP.md`) and, on rollover, the map-boundary uncombust rolls and barrage (§11.3) — all settled and fully displayed before the first node is entered.
+- **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5). By the time the resolution animation finishes, the next move has landed. Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
+- **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: `min(0.85, 0.4 + luck × 0.03)` on the conditioning planet's luck.
+
+Luck is therefore not a combat stat. Damage, healing, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck × 0.05` (~10–60% at effective luck 2–12), is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
 
 ## 8. Affliction Value Model
 
@@ -177,7 +180,9 @@ Affliction accumulates toward a **combustion ceiling** set by durability alone. 
 
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
 
-Combustion is terminal — a combusted planet is zero-output and skipped by propagation until run end (§11).
+Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
+
+A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat. Two processes exist: the map-boundary fortune roll (§11.3) and the narrative uncombust rites (`HOUSES.md`). Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
 
 **Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet's competence in its sign is expressed narratively rather than as a stat nudge. The chart still computes each planet's dignity; combat simply does not read it.
 
@@ -196,12 +201,12 @@ Per encounter:
   One fielded planet rolls heavy: 40–65% of its combustion ceiling.
   Every other fielded planet rolls light: 0–25% of its ceiling.
   Amounts are integers, rolled deterministically from the node's opponent seed, and always below ceiling — no planet spawns combusted.
-- Opponent planet is selected randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
+- Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
 
-Affliction and combust state **persist across encounters and across maps within a run**. They reset only on run end.
+Affliction and combust state **persist across encounters and across maps within a run**. Crossing a map boundary passes them through the uncombust rolls and barrage (§11.3). They reset only on run end.
 
 ### 11.1 Planet Unlock Schedule
 
@@ -230,6 +235,15 @@ The Prince NFT artifact reveals planets on the same cumulative-encounter schedul
 ### 11.2 Achievements (deferred)
 
 The run-end-only structure suggests room for an achievements layer — recognitions for completing multiple maps in a single run, encountering rare topologies (e.g. the canonical Sephirot pattern from `MAP.md §2`), or other lifetime markers. Achievements are out of scope for v1; they're noted here so the surrounding mechanics leave room for them.
+
+### 11.3 Map boundaries: uncombust rolls and the barrage
+
+Completing a map rolls the next one (§11), and the new map's seed also rolls what the crossing does to the player's chart — two steps, in order, both settled at map creation and shown on entry (§7):
+
+1. **Uncombust rolls.** Each combusted fielded planet rolls fortune (`luck × 0.05`, §7); on success it uncombusts at half ceiling (§10).
+2. **The barrage.** Each lit fielded planet — including any that just uncombusted — takes affliction: a uniform roll from `0` to `k × 5%` of its ceiling, where `k` is the number of maps completed this run. A successful fortune roll halves the planet's share. Amounts are integers, and a planet's resulting affliction is capped at `ceiling − 1` — like opponent spawns (§11), the barrage wounds but never combusts.
+
+The first map of a run has no boundary: the chart enters clean. Each crossing after that opens closer to the edge — by the seventh map the barrage rolls up to 30% of every ceiling — so later maps are higher-stakes before their first node is entered. The barrage is also what makes combustion a tide rather than a one-way ratchet: pressure rises map over map, and the uncombust processes (§10) push back.
 
 ## 12. Scoring (Distance)
 
@@ -263,7 +277,6 @@ Columns:
 - Planet
 - Action
 - Impact
-- Luck
 
 Action display:
 

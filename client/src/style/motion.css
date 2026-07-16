@@ -107,18 +107,12 @@
 
 /* Receive-pulse — in-place valence glow when a planet takes testimony (heal)
    or affliction (harm). Opacity bloom with only a hint of scale, so it reads
-   apart from the outward ring bursts of crit and combust. Color comes from the
+   apart from the outward ring burst of combust. Color comes from the
    gradient fill (amber/violet); this only animates the bloom in and out. */
 @keyframes impact-bloom {
   0%   { opacity: 0;   transform: scale(0.9); }
   35%  { opacity: 0.8; transform: scale(1.05); }
   100% { opacity: 0;   transform: scale(1.12); }
-}
-
-@keyframes crit-burst {
-  0%   { transform: scale(1);   opacity: 1; }
-  65%  { transform: scale(2.2); opacity: 0.22; }
-  100% { transform: scale(2.5); opacity: 0; }
 }
 
 @keyframes combust-ripple {
@@ -153,7 +147,6 @@
 .anim-impact         { animation: affliction-impact 360ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-badge-merge    { animation: badge-merge 200ms var(--ease-out) forwards; }
 .anim-impact-bloom     { animation: impact-bloom 460ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
-.anim-crit-burst     { animation: crit-burst 720ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple-2 { animation: combust-ripple-2 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-distance-flash { animation: distance-flash 520ms var(--ease-out) both; }
@@ -208,7 +201,6 @@
   .anim-impact,
   .anim-badge-merge,
   .anim-impact-bloom,
-  .anim-crit-burst,
   .anim-combust-ripple,
   .anim-combust-ripple-2,
   .anim-distance-flash,

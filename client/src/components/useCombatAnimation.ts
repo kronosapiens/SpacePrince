@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
-import { playCombust, playCrit, playPropagation, playVerb } from "@/audio/engine";
+import { playCombust, playPropagation, playVerb } from "@/audio/engine";
 import type { ProjectedEffect } from "@/game/projections";
 import type {
   CombatEncounter,
@@ -26,7 +26,6 @@ export const ANIMATION_TIMINGS = {
   mergeLead: 200,
   primaryImpactClear: 360,
   primaryGlowClear: 600,
-  primaryCritClear: 720,
   propagationStart: 800,
   propagationStep: 520,
   propagationApplyOffset: 230,
@@ -70,7 +69,6 @@ export interface CombatAnimationState {
   activePropagationKeys: FlagPair<string>;
   actionPulse: { player: PlanetName | null; opponent: PlanetName | null };
   impactPlanets: { self: ImpactMap; other: ImpactMap };
-  critPlanets: FlagPair<PlanetName>;
   combustingPlanets: FlagPair<PlanetName>;
   /** Snapshot of the per-planet projection deltas captured at commit, so
    *  the projection badges can persist through the animation rather than
@@ -84,9 +82,6 @@ export interface CombatAnimationState {
    *  badge (set `mergeLead` before the apply, cleared when consumed). Drives the
    *  `badge-merge` animation so the delta visibly merges into the running total. */
   mergingPlanets: FlagPair<PlanetName>;
-  /** Per side, whether a crit doubled this phase's outgoing effect — drives the
-   *  2× display on that side's projection badges for the rest of the phase. */
-  critScale: { self: boolean; other: boolean };
   epoch: number;
 }
 
@@ -244,12 +239,10 @@ function runScheduler(args: {
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,
     actionPulse: { player: null, opponent: null },
     impactPlanets: { self: EMPTY_IMPACT_MAP, other: EMPTY_IMPACT_MAP },
-    critPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     projectedDeltas,
     consumedProjections: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     mergingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
-    critScale: { self: false, other: false },
     epoch: previousEncounter.turnIndex,
   });
 
@@ -270,9 +263,7 @@ function runScheduler(args: {
     side: "self" | "other";
     actionPlanet: PlanetName;
     actionDelta: number;
-    actionCrit: boolean;
-    /** The acting (attacker) planet — on the *other* chart from `side`. Flashed
-     *  at phase start when this attack crits. */
+    /** The acting (attacker) planet — on the *other* chart from `side`. */
     attackerPlanet: PlanetName;
     actionCombust: boolean;
     sign: number;
@@ -281,38 +272,11 @@ function runScheduler(args: {
     actionScore: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, actionCrit, attackerPlanet, actionCombust, sign, actionScore, steps } = args;
+    const { base, side, actionPlanet, actionDelta, attackerPlanet, actionCombust, sign, actionScore, steps } = args;
     const isSelf = side === "self";
     // The action planet receives the opposing valence: sign < 0 means the hit
     // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
     const receivedPolarity: Polarity = sign < 0 ? "Testimony" : "Affliction";
-
-    // Crit announce — at phase start, flash the attacker (the acting planet, on
-    // the *other* chart) and double this phase's receiver badges for the rest of
-    // the phase. The impact-time crit-burst on the receiver still fires below.
-    const attackerSide = isSelf ? "other" : "self";
-    if (actionCrit) {
-      schedule(() => {
-        playCrit();
-        updateAnimation((state) => ({
-          ...state,
-          critPlanets: {
-            ...state.critPlanets,
-            [attackerSide]: addToFlag(state.critPlanets[attackerSide], attackerPlanet),
-          },
-          critScale: { ...state.critScale, [side]: true },
-        }));
-      }, base);
-      schedule(() => {
-        updateAnimation((state) => ({
-          ...state,
-          critPlanets: {
-            ...state.critPlanets,
-            [attackerSide]: removeFromFlag(state.critPlanets[attackerSide], attackerPlanet),
-          },
-        }));
-      }, base + ANIMATION_TIMINGS.primaryCritClear);
-    }
 
     // Start the direct target's projection badge sliding into its affliction
     // badge, so it lands as the count ticks (mergeLead before the apply).
@@ -326,7 +290,7 @@ function runScheduler(args: {
       }));
     }, base + ANIMATION_TIMINGS.primaryDelay - ANIMATION_TIMINGS.mergeLead);
 
-    // Primary direct phase — apply delta, light action-glow, impact, crit.
+    // Primary direct phase — apply delta, light action-glow, impact.
     schedule(() => {
       // The acting planet speaks its verb (VIBES.md — "encounter turns produce
       // sound from the active planets").
@@ -351,12 +315,6 @@ function runScheduler(args: {
           ...next.consumedProjections,
           [side]: addToFlag(next.consumedProjections[side], actionPlanet),
         };
-        if (actionCrit) {
-          next.critPlanets = {
-            ...next.critPlanets,
-            [side]: addToFlag(next.critPlanets[side], actionPlanet),
-          };
-        }
         return next;
       });
     }, base + ANIMATION_TIMINGS.primaryDelay);
@@ -381,14 +339,6 @@ function runScheduler(args: {
           : { ...state.actionPulse, opponent: null },
       }));
     }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear);
-
-    // Clear crit burst.
-    schedule(() => {
-      updateAnimation((state) => ({
-        ...state,
-        critPlanets: { ...state.critPlanets, [side]: EMPTY_PLANET_SET },
-      }));
-    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryCritClear);
 
     // Propagation steps for this side.
     let lastCombustClearLocal = 0;
@@ -535,7 +485,7 @@ function runScheduler(args: {
 
     const propagationEnd = steps.length > 0
       ? base + ANIMATION_TIMINGS.propagationStart + (steps.length - 1) * ANIMATION_TIMINGS.propagationStep + ANIMATION_TIMINGS.propagationClearOffset
-      : base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryCritClear;
+      : base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear;
     return Math.max(propagationEnd, lastCombustClearLocal);
   };
 
@@ -550,15 +500,13 @@ function runScheduler(args: {
   // ticks nothing.
   const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
 
-  // Phase 1: your action lands on the opponent's chart. The crit is the
-  // *player's* attack (playerCrit, phase1.crit); the attacker is your planet,
-  // which lives on the self chart.
+  // Phase 1: your action lands on the opponent's chart; the attacker is your
+  // planet, which lives on the self chart.
   const opponentPhaseEnd = schedulePhase({
     base: 0,
     side: "other",
     actionPlanet: entry.opponentPlanet,
     actionDelta: entry.opponentDelta,
-    actionCrit: entry.playerCrit,
     attackerPlanet: entry.playerPlanet,
     actionCombust: entry.opponentCombust ?? false,
     sign: otherSign,
@@ -566,15 +514,13 @@ function runScheduler(args: {
     steps: opponentSteps,
   });
   const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
-  // Phase 2: the opponent's reply lands on your chart. The crit is the
-  // *opponent's* attack (opponentCrit, phase2.crit); the attacker is the
+  // Phase 2: the opponent's reply lands on your chart; the attacker is the
   // opponent's planet, on the other chart.
   const playerPhaseEnd = schedulePhase({
     base: selfBase,
     side: "self",
     actionPlanet: entry.playerPlanet,
     actionDelta: entry.playerDelta,
-    actionCrit: entry.opponentCrit,
     attackerPlanet: entry.opponentPlanet,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,

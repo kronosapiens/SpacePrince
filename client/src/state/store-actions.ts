@@ -124,12 +124,13 @@ export function useCommitNarrative() {
   );
 }
 
-/** Roll over to a fresh map (terminal node reached). */
+/** Roll over to a fresh map (terminal node reached). The chart + fielded
+ *  roster feed the map boundary — uncombust rolls and the barrage (§11.3). */
 export function useRolloverMap() {
   const dispatch = usePrinceDispatch();
   return useCallback(
-    (run: Run, seed: number = randomSeed()): Run => {
-      const nextRun = rolloverMapFn(run, seed);
+    (run: Run, chart: Chart, roster: PlanetName[], seed: number = randomSeed()): Run => {
+      const nextRun = rolloverMapFn(run, chart, roster, seed);
       dispatch({ kind: "commitRun", run: nextRun });
       return nextRun;
     },

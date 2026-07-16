@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
 import { beginCombatEncounter } from "@/game/encounter";
+import { combustionCeiling } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
 import type { CombatEncounter, Run } from "@/game/types";
@@ -22,11 +23,13 @@ describe("sequential resolution — preemption", () => {
     const { prince, run } = setup();
     const enc = run.encounter as CombatEncounter;
     const active = enc.sequence[enc.turnIndex]!;
-    // Push the opponent's acting planet to certain combustion, and have it afflict.
-    enc.opponentState[active].affliction = 1000;
+    // Park the opponent's acting planet one point under its ceiling — any
+    // afflicting hit combusts it (affliction caps at the ceiling, §10).
+    enc.opponentState[active].affliction =
+      combustionCeiling(enc.opponentChart.planets[active]) - 1;
     enc.opponentActions[enc.turnIndex] = "Affliction";
 
-    // rng → 0: the player crits and the opponent's planet combusts on the hit.
+    // Resolution is deterministic (§7) — rng only feeds the next-turn draw.
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0)!;
     expect(result.encounter.opponentState[active].combusted).toBe(true);
     expect(result.log.opponentCombust).toBe(true);
@@ -41,9 +44,23 @@ describe("sequential resolution — preemption", () => {
     enc.opponentState[active].affliction = 0;
     enc.opponentActions[enc.turnIndex] = "Affliction";
 
-    // rng → 0.99: no crit, no combust anywhere.
+    // From zero affliction, one hit stays far below any ceiling — no combust.
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0.99)!;
     expect(result.encounter.opponentState[active].combusted).toBe(false);
     expect(result.log.playerDelta).toBeGreaterThan(0);
+  });
+
+  it("affliction caps at the ceiling — the finishing blow applies only the remainder", () => {
+    const { prince, run } = setup();
+    const enc = run.encounter as CombatEncounter;
+    const active = enc.sequence[enc.turnIndex]!;
+    const ceiling = combustionCeiling(enc.opponentChart.planets[active]);
+    enc.opponentState[active].affliction = ceiling - 1;
+
+    const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0)!;
+    expect(result.encounter.opponentState[active].affliction).toBe(ceiling);
+    expect(result.encounter.opponentState[active].combusted).toBe(true);
+    // Mars swings for its full stat, but only the last point applies (§8, §10).
+    expect(result.log.opponentDelta).toBe(1);
   });
 });

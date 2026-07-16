@@ -50,7 +50,7 @@ interface CombatScreenProps {
   onClearEncounter: () => void;
   devUnlockAll: boolean;
   /** Dev only: show the animation console — fire any gesture on demand
-   *  (planet, valence, forced crit/combust) without playing real turns. */
+   *  (planet, valence, forced combust) without playing real turns. */
   devAnimationControls?: boolean;
 }
 
@@ -105,8 +105,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const actionPulseOpponent = animation?.actionPulse.opponent ?? null;
   const impactPlayer = animation?.impactPlanets.self ?? EMPTY_IMPACT_MAP;
   const impactOpponent = animation?.impactPlanets.other ?? EMPTY_IMPACT_MAP;
-  const critPlayer = animation?.critPlanets.self ?? EMPTY_PLANET_SET;
-  const critOpponent = animation?.critPlanets.other ?? EMPTY_PLANET_SET;
   const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;
   const combustingOpponent = animation?.combustingPlanets.other ?? EMPTY_PLANET_SET;
   const mergingPlayer = animation?.mergingPlanets.self ?? EMPTY_PLANET_SET;
@@ -263,7 +261,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
   // propagation match the charts) but as a fresh single-turn snapshot, then
-  // overrides the crit/combust flags the scheduler reads — so a combust flare is
+  // overrides the combust flag the scheduler reads — so a combust flare is
   // viewable on turn 0 without grinding affliction. Non-committal: nothing is
   // dispatched, so it replays from the same baseline every time.
   const fireDevAnimation = useCallback(
@@ -271,7 +269,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       playerPlanet: PlanetName;
       opponentPlanet: PlanetName;
       valence: Polarity;
-      crit: boolean;
       combust: boolean;
     }) => {
       if (animation) skipAnimation();
@@ -287,9 +284,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       const result = resolveTurn(devRun, prince.chart, cfg.playerPlanet, cfg.valence, rng);
       if (!result) return;
       const entry: TurnLogEntry = { ...result.log };
-      // opponentCrit / opponentCombust = the player's action landing on the
-      // target planet (phase 1) — that's the gesture you're evaluating.
-      if (cfg.crit) entry.opponentCrit = true;
+      // opponentCombust = the player's action landing on the target planet
+      // (phase 1) — that's the gesture you're evaluating.
       if (cfg.combust) entry.opponentCombust = true;
       startAnimation({
         entry,
@@ -353,10 +349,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           activePropagationKeys={activePropagationKeys.self}
           actionPulsePlanet={actionPulsePlayer}
           impactPlanets={impactPlayer}
-          critPlanets={critPlayer}
           combustingPlanets={combustingPlayer}
           mergingPlanets={mergingPlayer}
-          badgeScale={animation?.critScale.self ? 2 : 1}
           animationEpoch={animationEpoch}
           statsPanelPlanet={inspected}
           statsPanelActions={playerActions}
@@ -455,10 +449,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           activePropagationKeys={activePropagationKeys.other}
           actionPulsePlanet={actionPulseOpponent}
           impactPlanets={impactOpponent}
-          critPlanets={critOpponent}
           combustingPlanets={combustingOpponent}
           mergingPlanets={mergingOpponent}
-          badgeScale={animation?.critScale.other ? 2 : 1}
           animationEpoch={animationEpoch}
         />
         <div className="combat-side-label">OTHER</div>
@@ -512,14 +504,13 @@ function DevAnimationPanel({
   animating: boolean;
   onFire: (cfg: {
     playerPlanet: PlanetName; opponentPlanet: PlanetName;
-    valence: Polarity; crit: boolean; combust: boolean;
+    valence: Polarity; combust: boolean;
   }) => void;
   onSkip: () => void;
 }) {
   const [playerPlanet, setPlayerPlanet] = useState<PlanetName>(playerPlanets[0] ?? "Sun");
   const [opponentPlanet, setOpponentPlanet] = useState<PlanetName>(opponentPlanets[0] ?? "Sun");
   const [valence, setValence] = useState<Polarity>("Affliction");
-  const [crit, setCrit] = useState(false);
   const [combust, setCombust] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
 
@@ -551,11 +542,10 @@ function DevAnimationPanel({
             </div>
           </div>
           <div className="anim-console-checks">
-            <label className="anim-console-check"><input type="checkbox" checked={crit} onChange={(e) => setCrit(e.target.checked)} />Crit</label>
             <label className="anim-console-check"><input type="checkbox" checked={combust} onChange={(e) => setCombust(e.target.checked)} />Combust</label>
           </div>
           <div className="anim-console-actions">
-            <button className="anim-console-btn is-primary" onClick={() => onFire({ playerPlanet, opponentPlanet, valence, crit, combust })}>Fire</button>
+            <button className="anim-console-btn is-primary" onClick={() => onFire({ playerPlanet, opponentPlanet, valence, combust })}>Fire</button>
             <button className="anim-console-btn" disabled={!animating} onClick={onSkip}>Skip</button>
           </div>
         </>

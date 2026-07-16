@@ -472,8 +472,35 @@
   justify-content: center;
   padding: 6vh 4vw;
 }
+/* Map-boundary record (MECHANICS §11.3) — what the crossing did, shown while
+   standing at the root. Quiet functional chrome, bottom-right (top-right
+   belongs to the dev chrome in dev builds). */
+.map-boundary {
+  position: absolute;
+  bottom: 36px;
+  right: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 5;
+}
+.map-boundary-line {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--mist);
+}
+.map-boundary-glyph {
+  font-family: 'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif;
+  font-size: 14px;
+}
 @media (max-width: 720px) {
   .map-anchor { width: clamp(80px, 25vw, 130px); top: 8px; left: 8px; }
+  .map-boundary { bottom: 8px; right: 8px; }
 }
 
 /* ── Combat ────────────────────────────────────────────────────────────── */
@@ -724,7 +751,7 @@
    Stacking reads as a name/title pair and is immune to label length. */
 .ps-epithet { display: block; font-size: 24px; }
 
-/* Closed: operational read-outs (Resolve · Crit + the action fan-out). No
+/* Closed: operational read-outs (Resolve · Fortune + the action fan-out). No
    entrance fade here — this is the panel's initial state on click, which should
    simply appear; the fade is reserved for the study drop-down below. */
 .ps-opline {

@@ -43,7 +43,7 @@ const STAT_METRIC: Record<keyof PlanetStats, string> = {
   damage: "Afflict",
   healing: "Testify",
   durability: "Resolve",
-  luck: "Crit",
+  luck: "Fortune",
 };
 
 /** Prose for the per-stat drop-down: the planet's innate level, the sign

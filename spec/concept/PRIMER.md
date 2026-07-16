@@ -12,7 +12,7 @@ Placement of both pieces is a small open question for `SCREENS.md` (the framing 
 **Voice.**
 Spare, confident, unhurried — Space Prince explaining itself, not a textbook.
 Assumes no astrology. Introduces every term on first use.
-Stays above the named mechanics — *testimony, affliction, combustion, Resolve, crit* are taught later, in play.
+Stays above the named mechanics — *testimony, affliction, combustion, Resolve, fortune* are taught later, in play.
 
 ---
 

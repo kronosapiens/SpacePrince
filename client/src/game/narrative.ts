@@ -1,6 +1,6 @@
 import { PLANETS } from "./data";
 import { cloneSideState } from "./chart";
-import { applyCombust } from "./combust";
+import { applyCombust, combustionCeiling, uncombust } from "./combust";
 import type { Dignity, PlanetName, Prince, Run } from "./types";
 import {
   resolveTargets,
@@ -57,21 +57,24 @@ export function applyOutcomes(
         for (const p of resolveTargets(o.target, liveCtx)) {
           const ps = state[p];
           if (ps.combusted) continue;
-          ps.affliction = Math.max(0, ps.affliction + o.delta);
+          const ceiling = combustionCeiling(prince.chart.planets[p]);
+          ps.affliction = Math.max(0, Math.min(ceiling, ps.affliction + o.delta));
           if (o.delta > 0) harmed.add(p);
         }
         break;
       }
       case "combust": {
+        // Authored combustion lands at the ceiling — affliction caps there and
+        // a combusted planet always holds it (MECHANICS §10).
         const p = o.target as PlanetName;
         state[p].combusted = o.value;
-        if (o.value) state[p].affliction = Math.max(state[p].affliction, 1);
+        if (o.value) state[p].affliction = combustionCeiling(prince.chart.planets[p]);
         break;
       }
       case "uncombust": {
+        // The rite returns the planet at half ceiling — back, but scarred (§10).
         const p = o.target as PlanetName;
-        state[p].combusted = false;
-        state[p].affliction = 0;
+        uncombust(prince.chart.planets[p], state[p]);
         break;
       }
     }

@@ -171,7 +171,7 @@ function instrumentFor(planet: PlanetName): AnyInstrument | null {
   return inst;
 }
 
-/** Shared soft voice for non-planet sounds (propagation, crit, star). */
+/** Shared soft voice for non-planet sounds (propagation, star). */
 function fxSynth(): AnyInstrument | null {
   if (!T || !reverb) return null;
   const existing = instruments.get("_fx");
@@ -232,16 +232,6 @@ export function playPropagation(inverted: boolean): void {
     fx.triggerAttackRelease(midiToFreq(69), 0.15, now, 0.24); // A4
     fx.triggerAttackRelease(midiToFreq(74), 0.35, now + 0.12, 0.22); // → D5, home
   }
-}
-
-/** A crit doubling through: a brief high shimmer. */
-export function playCrit(): void {
-  if (!T || muted) return;
-  const fx = fxSynth();
-  if (!fx) return;
-  const now = T.now();
-  fx.triggerAttackRelease(midiToFreq(86), 0.1, now, 0.26); // D6
-  fx.triggerAttackRelease(midiToFreq(93), 0.16, now + 0.06, 0.2); // A6
 }
 
 /**

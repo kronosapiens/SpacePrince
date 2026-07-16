@@ -129,15 +129,10 @@ export interface ChartProps {
    *  Drives the badge pulse (presence) and the glyph's in-place valence
    *  bloom (heal = testimony/violet, harm = affliction/amber). */
   impactPlanets?: ReadonlyMap<PlanetName, Polarity>;
-  /** Planets whose direct hit was a crit — fires a radial burst. */
-  critPlanets?: ReadonlySet<PlanetName>;
   /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
   combustingPlanets?: ReadonlySet<PlanetName>;
   /** Planets whose projection badge is sliding into the affliction badge this beat. */
   mergingPlanets?: ReadonlySet<PlanetName>;
-  /** Multiplier for this chart's projection-badge values — 2 while a crit on
-   *  this side's incoming attack is being shown. */
-  badgeScale?: number;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
   /** When set, render the planet stats panel inside the chart at the
@@ -183,10 +178,8 @@ export function Chart(props: ChartProps) {
     activePropagationKeys,
     actionPulsePlanet,
     impactPlanets,
-    critPlanets,
     combustingPlanets,
     mergingPlanets,
-    badgeScale = 1,
     animationEpoch,
     statsPanelPlanet,
     statsPanelActions,
@@ -376,7 +369,6 @@ export function Chart(props: ChartProps) {
         const isActive = (allActive && !combusted) || activePlanet === p.planet;
         const isHovered = hoveredPlanet === p.planet;
         const isActionPulse = actionPulsePlanet === p.planet;
-        const isCritting = critPlanets?.has(p.planet) ?? false;
         const isCombusting = combustingPlanets?.has(p.planet) ?? false;
         const impactPolarity = impactPlanets?.get(p.planet);
         return (
@@ -393,7 +385,6 @@ export function Chart(props: ChartProps) {
             passive={passive}
             invite={inviteInteraction}
             actionPulse={isActionPulse}
-            crit={isCritting}
             combusting={isCombusting}
             impactPolarity={impactPolarity}
             animationEpoch={animationEpoch}
@@ -415,7 +406,6 @@ export function Chart(props: ChartProps) {
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}
             merging={mergingPlanets?.has(p.planet) ?? false}
-            projectionScale={badgeScale}
             animationEpoch={animationEpoch}
           />
         );
@@ -449,7 +439,7 @@ function PlanetGlyph({
   point, combusted, ghost,
   selected, active, hovered,
   onClick, onHover, passive, invite,
-  actionPulse, crit, combusting,
+  actionPulse, combusting,
   impactPolarity,
   animationEpoch,
 }: {
@@ -464,7 +454,6 @@ function PlanetGlyph({
   passive: boolean;
   invite: boolean;
   actionPulse: boolean;
-  crit: boolean;
   combusting: boolean;
   impactPolarity?: Polarity;
   animationEpoch?: number;
@@ -557,7 +546,7 @@ function PlanetGlyph({
       {/* Receive-pulse: soft in-place valence glow behind the glyph when this
           planet takes testimony (heal) or affliction (harm) this beat. Behind
           the glyph so the symbol stays readable; an opacity bloom, not an
-          outward ring, so it reads apart from the crit/combust bursts. */}
+          outward ring, so it reads apart from the combust burst. */}
       {impactPolarity && !combusting && (
         <circle
           key={`bloom-${epoch}-${impactPolarity}`}
@@ -581,18 +570,6 @@ function PlanetGlyph({
           {PLANET_GLYPH[point.planet]}
         </text>
       </g>
-      {crit && (
-        <circle
-          key={`crit-${epoch}`}
-          r={r + 4}
-          fill="none"
-          stroke={c}
-          strokeOpacity={CHART_STYLE.crit.opacity}
-          strokeWidth={CHART_STYLE.crit.stroke}
-          className="anim-crit-burst"
-          style={{ pointerEvents: "none" }}
-        />
-      )}
       {combusting && (
         <>
           <circle
@@ -631,7 +608,7 @@ function PlanetGlyph({
 function PlanetBadges({
   point, combusted, affliction,
   hideAfflictionBadge,
-  projection, impact, merging, projectionScale, animationEpoch,
+  projection, impact, merging, animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
@@ -639,7 +616,6 @@ function PlanetBadges({
   hideAfflictionBadge: boolean;
   projection?: ProjectionChip;
   merging: boolean;
-  projectionScale: number;
   impact: boolean;
   animationEpoch?: number;
 }) {
@@ -687,7 +663,7 @@ function PlanetBadges({
     // the thing the player reads — sits centered in the pill rather than shoved
     // right by a full-size operator.
     const sign = isHarm ? "+" : "−";
-    const mag = Math.abs(projection.delta * projectionScale).toFixed(1).replace(/\.0$/, "");
+    const mag = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
     const wP = widthFor(sign + mag, projFontSize, projBadgeR);
     // Both centers sit on the planet rim. Projection is rotated around
     // the rim from the affliction by the angle at which the two badges

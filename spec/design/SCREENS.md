@@ -145,10 +145,10 @@ A player who never touches it sees the plain panel; the annotations exist only w
 With study **off**, the panel shows only **operational numbers** — what matters this turn:
 
 - **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out. Now that combustion is deterministic, this is literally its HP. "Resolve" stays in a bespoke, character register (the operational sibling of Afflict/Testify, not the generic "HP") and maps cleanly to its underlying stat, Durability — more legible than the earlier, too-abstract "Light."
-- **Crit %** — `luck × 5%`.
+- **Fortune %** — the fortune roll, `luck × 5%` (`MECHANICS.md §7`): the planet's odds at map boundaries (uncombusting, or halving its barrage share). Not a combat number — combat is deterministic — but shown here so luck stays a legible stat.
 - **Afflict / Testify** — the planet's damage and healing, carried by the two action buttons.
 
-These re-express the four core stats operationally: damage → afflict, healing → testify, durability → Resolve, luck → crit.
+These re-express the four core stats operationally: damage → afflict, healing → testify, durability → Resolve, luck → Fortune.
 
 With study **on**, the box **drops open downward** (its top fixed) and the action buttons clear to make room for two things:
 

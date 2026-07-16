@@ -196,7 +196,7 @@ export function PlanetStatsPanel({
           ) : (
             <div className="ps-ops">
               <div className="ps-opline">
-                Resolve {table.durability} · Crit {table.critPct}
+                Resolve {table.durability} · Fortune {table.fortunePct}%
               </div>
               {actions && (
                 <div className="ps-actions">

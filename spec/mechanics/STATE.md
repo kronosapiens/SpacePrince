@@ -64,18 +64,19 @@ Narrative {
 ## Randomness
 
 A single RNG primitive supplies true randomness on demand (VRF-style).
-It is spent deliberately, in only two kinds of place:
+Randomness never decides how a committed action resolves; it only decides what is revealed next (MECHANICS §7).
+It is spent deliberately:
 
-- **Once per run** — `Run.seed`, drawn at run start.
-- **At encounter resolution** — the adversary's chart, combat crits (`luck × 0.05`), and the opponent's precommitted action each turn.
+- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it.
+- **Once per map rollover** — the next map's seed; from it derive node content and the map-boundary uncombust rolls + barrage (MECHANICS §11.3), all shown on entry.
+- **At encounter arrival** — the adversary's chart and its spawn afflictions.
+- **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
+- **At wager commit** — the wager roll; the odds are displayed before commitment.
 
 Everything else is **pseudorandom**: a deterministic function of committed state that the client computes to render and the contract re-derives to bind, storing nothing.
-Map layout and node types are `f(Run.seed, position)`.
-The client shows the whole current map's node *types*, so routing is informed (Slay-the-Spire-style); only the *specifics* behind a node — the exact opponent, the crits — are drawn by true RNG on arrival.
-
-The determinism is safe only because combat is genuinely random.
-With a fixed `seed`, node types are knowable, but you cannot predict your chart-state two encounters out, so nothing past the immediate choice can be pre-solved.
-The map's uncertainty is downstream of combat's.
+Combat resolution itself is fully deterministic — no crits, no hidden rolls — so the client renders a committed turn instantly and the transaction confirms the identical result.
+The client shows the whole current map (node types, boundary results), so routing is informed (Slay-the-Spire-style); the adversary behind a combat node and each turn's next precommit are the only things it cannot know early.
+With a fixed seed the map is knowable, but each encounter's adversary and its turn-by-turn precommits are fresh draws, so nothing past the immediate choice can be pre-solved.
 
 ## Stored, derived, evented
 

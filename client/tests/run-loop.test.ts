@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { beginRun, isOver, newMapState, rolloverMap, MAPS_PER_RUN } from "@/game/run";
+import { combustionCeiling } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
@@ -86,9 +87,10 @@ describe("Run loop integration", () => {
 
   it("narrative outcomes can heal / harm / spend distance and uncombust", () => {
     const prince = createStubPrince({ seed: 11 });
+    const sunCeiling = combustionCeiling(prince.chart.planets.Sun);
     let r = beginRun(5);
     r = { ...r, distance: 10, state: { ...r.state } };
-    r.state.Sun = { affliction: 5, combusted: true };
+    r.state.Sun = { affliction: sunCeiling, combusted: true };
 
     const ctx = buildNarrativeContext({
       prince,
@@ -101,8 +103,9 @@ describe("Run loop integration", () => {
       { kind: "uncombust", target: "Sun" },
       { kind: "distance", delta: -3 },
     ], ctx);
+    // The rite returns the planet at half ceiling — back, but scarred (§10).
     expect(r.state.Sun.combusted).toBe(false);
-    expect(r.state.Sun.affliction).toBe(0);
+    expect(r.state.Sun.affliction).toBe(sunCeiling / 2);
     expect(r.distance).toBe(7);
   });
 
@@ -125,11 +128,12 @@ describe("Run loop integration", () => {
 
   it("a run ends by completion when the seventh map is finished", () => {
     const prince = createStubPrince({ seed: 3 });
+    const roster = unlockedPlanets(prince.numEncounters);
     let r = beginRun(9);
     // Six rollovers: each archives the current map and begins a fresh one,
     // never ending the run.
     for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
-      r = rolloverMap(r, 100 + i);
+      r = rolloverMap(r, prince.chart, roster, 100 + i);
       expect(isOver(r, prince.numEncounters)).toBe(false);
       expect(r.events).toHaveLength(i + 1);
       expect(r.mapsCompleted).toBe(i + 1);
@@ -137,7 +141,7 @@ describe("Run loop integration", () => {
     // On the seventh map now (events hold six). Completing it ends the run by
     // completion: the final map stays current and is NOT archived.
     const finalMap = r.map;
-    r = rolloverMap(r, 999);
+    r = rolloverMap(r, prince.chart, roster, 999);
     expect(isOver(r, prince.numEncounters)).toBe(true);
     expect(r.mapsCompleted).toBe(MAPS_PER_RUN);
     expect(r.events).toHaveLength(MAPS_PER_RUN - 1);

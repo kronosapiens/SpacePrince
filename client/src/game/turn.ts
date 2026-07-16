@@ -1,6 +1,6 @@
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects } from "./aspects";
-import { applyCombust } from "./combust";
+import { applyCombust, combustionCeiling } from "./combust";
 import { cloneSideState } from "./chart";
 import { turnScore } from "./score";
 import { pickWeighted } from "./rng";
@@ -59,7 +59,7 @@ export function resolveTurn(
     : getEffectiveStatsFromPlacement(playerPlacement);
   const phase1 = resolveAction(
     playerEff, playerValence,
-    opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other", rng,
+    opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other",
   );
 
   const opponentEff = opponentStateMap[opponentPlanet].combusted
@@ -67,7 +67,7 @@ export function resolveTurn(
     : getEffectiveStatsFromPlacement(opponentPlacement);
   const phase2 = resolveAction(
     opponentEff, opponentValence,
-    playerStateMap, playerChart, playerPlanet, playerPlacement, "self", rng,
+    playerStateMap, playerChart, playerPlanet, playerPlacement, "self",
   );
 
   const opponentDelta = phase1.delta;
@@ -88,24 +88,15 @@ export function resolveTurn(
     opponentValence,
     playerDelta,
     opponentDelta,
-    playerCrit: phase1.crit,
-    opponentCrit: phase2.crit,
     playerCombust,
     opponentCombust,
     propagation,
     turnScore: score,
-    directBreakdown: {
-      playerBase: phase1.base,
-      playerCritMultiplier: phase1.crit ? 2 : 1,
-      playerResult: phase1.amount,
-      opponentBase: phase2.base,
-      opponentCritMultiplier: phase2.crit ? 2 : 1,
-      opponentResult: phase2.amount,
-    },
   };
 
-  // Pick next opponent planet from non-combusted ones and precommit its verb;
-  // advance turnIndex.
+  // Draw the next turn's precommit — planet + verb. This is combat's only
+  // randomness (MECHANICS §7): the resolution above is deterministic, and the
+  // roll here decides what is *revealed* next, riding the same resolution.
   const nextTurnIndex = enc.turnIndex + 1;
   // Only the fielded roster matters (mirrored matchup, MECHANICS §11.1): the
   // opponent re-draws from its roster, and the encounter/run end when those
@@ -152,19 +143,13 @@ export function resolveTurn(
   return { run: updatedRun, encounter: updatedEnc, log, encounterEnded, runEnded };
 }
 
-function rollCrit(luck: number, rng: () => number): boolean {
-  // critChance = effectiveLuck × 0.05 (MECHANICS.md §7). Effective luck runs
-  // ~2–12, so ~10–60%. Crit doubles the outgoing effect (applied by the caller).
-  const chance = Math.max(0, luck * 0.05);
-  return rng() < chance;
-}
-
 /**
- * Resolves one side's action against the other. The acting planet's stats
- * (`attackerEff`) set the magnitude; the effect lands on `side`'s active planet
- * and propagates through `chart`. The same per-direction base stat the
- * projection preview uses (combat.ts `computeDirectExchange`), so they don't
- * drift. Sequenced by the caller — phase 1 (your action) before phase 2 (theirs).
+ * Resolves one side's action against the other. Fully deterministic — no rolls
+ * (MECHANICS §7). The acting planet's stats (`attackerEff`) set the magnitude;
+ * the effect lands on `side`'s active planet and propagates through `chart`.
+ * The same per-direction base stat the projection preview uses (combat.ts
+ * `computeDirectExchange`), so they don't drift. Sequenced by the caller —
+ * phase 1 (your action) before phase 2 (theirs).
  */
 function resolveAction(
   attackerEff: PlanetStats,
@@ -174,29 +159,30 @@ function resolveAction(
   active: PlanetName,
   placement: PlanetPlacement,
   sideTag: "self" | "other",
-  rng: () => number,
 ) {
-  const crit = rollCrit(attackerEff.luck, rng);
-  const base = valence === "Testimony" ? attackerEff.healing : attackerEff.damage;
-  const amount = Math.max(0, base) * (crit ? 2 : 1);
-  const delta = applyEffect(side[active], valence, amount);
+  const amount = Math.max(0, valence === "Testimony" ? attackerEff.healing : attackerEff.damage);
+  const delta = applyEffect(side[active], valence, amount, combustionCeiling(placement));
   // Combustion is resolved before propagation: a planet destroyed by the blow
   // can't conduct it onward, so `propagate`'s `combusted` guard short-circuits.
   const combust =
     valence !== "Testimony" && delta > 0 ? applyCombust(placement, side[active]) : false;
   const propagation = propagate(side, chart, active, valence, amount, sideTag);
-  return { crit, base, amount, delta, combust, propagation };
+  return { amount, delta, combust, propagation };
 }
 
-function applyEffect(state: PlanetState, polarity: Polarity, raw: number): number {
+/** Affliction is bounded on both sides (MECHANICS §8, §10): testimony clamps
+ *  at zero, affliction caps at the ceiling. Returns the amount that actually
+ *  applied — a finishing blow reports only what it took to reach the line. */
+function applyEffect(state: PlanetState, polarity: Polarity, raw: number, ceiling: number): number {
   if (raw <= 0 || state.combusted) return 0;
   if (polarity === "Testimony") {
     const before = state.affliction;
     state.affliction = Math.max(0, state.affliction - raw);
     return before - state.affliction;
   }
-  state.affliction += raw;
-  return raw;
+  const before = state.affliction;
+  state.affliction = Math.min(ceiling, state.affliction + raw);
+  return state.affliction - before;
 }
 
 function propagate(
@@ -221,8 +207,8 @@ function propagate(
     const effPolarity: Polarity = inverted
       ? polarity === "Testimony" ? "Affliction" : "Testimony"
       : polarity;
-    const delta = applyEffect(target, effPolarity, magnitude);
     const targetPlacement = chart.planets[a.to];
+    const delta = applyEffect(target, effPolarity, magnitude, combustionCeiling(targetPlacement));
     const combust = effPolarity !== "Testimony" && delta > 0
       ? applyCombust(targetPlacement, target)
       : false;

@@ -1,4 +1,5 @@
 import { seededChart } from "@/game/chart";
+import { combustionCeiling } from "@/game/combust";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
@@ -9,6 +10,7 @@ import { HOUSES } from "@/data/houses";
 import { pickScenario } from "@/data/narrative-trees";
 import { pickFragment } from "@/data/chorus";
 import type {
+  Chart,
   CombatEncounter,
   MapState,
   NodeOutcome,
@@ -63,7 +65,7 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   const map = walkMap(seed, false);
   const run: Run = {
     ...base,
-    state: livedInState(seed, "self", fielded),
+    state: livedInState(seed, "self", devPlayerChart(seed), fielded),
     distance: livedInDistance(seed),
     map,
   };
@@ -80,13 +82,13 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   // planet alive so the seam reads a real "their turn".
   const turnRng = mulberry32(hashString(`${seed}_turn`));
   const turnIndex = Math.floor(turnRng() * fresh.sequence.length);
-  const opponentState = livedInState(seed, "opp", roster);
+  const opponentState = livedInState(seed, "opp", fresh.opponentChart, roster);
   const acting = fresh.sequence[turnIndex];
   if (acting) opponentState[acting] = { affliction: opponentState[acting].affliction, combusted: false };
   const encounter: CombatEncounter = { ...fresh, turnIndex, opponentState };
   const run: Run = {
     ...base,
-    state: livedInState(seed, "self", roster),
+    state: livedInState(seed, "self", devPlayerChart(seed), roster),
     distance: livedInDistance(seed),
     encounter,
   };
@@ -113,7 +115,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   });
   const run: Run = {
     ...base,
-    state: livedInState(seed, "self", fielded),
+    state: livedInState(seed, "self", devPlayerChart(seed), fielded),
     distance: livedInDistance(seed),
     encounter,
     seenScenarioIds: [tree.scenarioId],
@@ -137,7 +139,7 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
   const run: Run = {
     id: `dev_run_${seed}`,
     seed,
-    state: livedInState(seed, "end"),
+    state: livedInState(seed, "end", devPlayerChart(seed)),
     distance,
     map: finalMap,
     mapsCompleted: MAPS_PER_RUN,
@@ -168,11 +170,15 @@ export function remirrorCombat(enc: CombatEncounter, tier: number, seed: number)
 
 // ── internals ───────────────────────────────────────────────────────────────
 
+function devPlayerChart(seed: number): Chart {
+  return seededChart(hashString(`${seed}_player`), "Dev Prince");
+}
+
 function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
   return {
     id: `dev_${seed}`,
     position: { iso: "1970-01-01T00:00:00.000Z", lat: 0, lon: 0 },
-    chart: seededChart(hashString(`${seed}_player`), "Dev Prince"),
+    chart: devPlayerChart(seed),
     numEncounters: tier,
     achievements: 0,
     runs: [run],
@@ -180,20 +186,30 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
 }
 
 /** Deterministic lived-in per-planet state: varied affliction, occasional
- *  combustion. If `keepAlive` is given, guarantees at least one of those planets
- *  survives — so a spawned run isn't already over (every fielded planet dead). */
-function livedInState(seed: number, tag: string, keepAlive?: PlanetName[]): SideState {
+ *  combustion. Afflictions are ceiling-relative (affliction caps at the
+ *  ceiling, MECHANICS §10; combusted planets hold it). If `keepAlive` is given,
+ *  guarantees at least one of those planets survives — so a spawned run isn't
+ *  already over (every fielded planet dead). */
+function livedInState(
+  seed: number,
+  tag: string,
+  chart: Chart,
+  keepAlive?: PlanetName[],
+): SideState {
   const rng = mulberry32(hashString(`${seed}_${tag}_state`));
   const out = {} as SideState;
   for (const p of PLANETS) {
+    const ceiling = combustionCeiling(chart.planets[p]);
     const r = rng();
     if (r < 0.5) out[p] = { affliction: 0, combusted: false };
-    else if (r < 0.8) out[p] = { affliction: 1 + Math.floor(rng() * 8), combusted: false };
-    else if (r < 0.92) out[p] = { affliction: 9 + Math.floor(rng() * 9), combusted: false };
-    else out[p] = { affliction: 12 + Math.floor(rng() * 12), combusted: true };
+    else if (r < 0.8) out[p] = { affliction: Math.round(ceiling * rng() * 0.4), combusted: false };
+    else if (r < 0.92) out[p] = { affliction: Math.round(ceiling * (0.4 + rng() * 0.55)), combusted: false };
+    else out[p] = { affliction: ceiling, combusted: true };
   }
   if (keepAlive?.length && keepAlive.every((p) => out[p].combusted)) {
-    out[keepAlive[0]!] = { affliction: 4 + Math.floor(rng() * 6), combusted: false };
+    const revived = keepAlive[0]!;
+    const ceiling = combustionCeiling(chart.planets[revived]);
+    out[revived] = { affliction: Math.round(ceiling * rng() * 0.3), combusted: false };
   }
   return out;
 }

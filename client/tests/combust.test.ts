@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCombust, combustionCeiling, shouldCombust } from "@/game/combust";
+import { applyCombust, combustionCeiling, shouldCombust, uncombust } from "@/game/combust";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
 
 // Effective durability = base.durability (buffs are zero in these fixtures).
@@ -57,5 +57,14 @@ describe("applyCombust", () => {
     const s = state(79);
     expect(applyCombust(placement(8), s)).toBe(false);
     expect(s.combusted).toBe(false);
+  });
+});
+
+describe("uncombust", () => {
+  it("returns the planet at half its ceiling — back, but scarred (§10)", () => {
+    const s = state(80, true);
+    uncombust(placement(8), s);
+    expect(s.combusted).toBe(false);
+    expect(s.affliction).toBe(40);
   });
 });

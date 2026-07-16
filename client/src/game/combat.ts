@@ -17,6 +17,13 @@ export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
   return rng() < stats.damage / total ? "Affliction" : "Testimony";
 }
 
+/** The fortune roll (MECHANICS.md §7) — `luck × 0.05`. The shared chance at
+ *  map boundaries: uncombusting a combusted planet, halving a barrage share.
+ *  Surfaced in the UI as `Fortune` (fortunePct below). */
+export function fortuneChance(luck: number): number {
+  return Math.max(0, Math.min(1, luck * 0.05));
+}
+
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
   return {
     damage: Math.max(0, p.base.damage + p.buffs.damage),
@@ -52,7 +59,7 @@ export interface StatTable {
   rows: StatRow[];
   /** Operational read-outs for the closed modal, derived from the totals. */
   durability: number; // combustion ceiling = HP
-  critPct: number; // luck total × 5
+  fortunePct: number; // the fortune roll as a percentage (luck total × 5, §7)
   afflict: number; // damage total
   testify: number; // healing total
 }
@@ -75,7 +82,7 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
   return {
     rows,
     durability: combustionCeiling(p),
-    critPct: Math.max(0, Math.min(100, total("luck") * 5)),
+    fortunePct: Math.round(fortuneChance(total("luck")) * 100),
     afflict: Math.max(0, total("damage")),
     testify: Math.max(0, total("healing")),
   };

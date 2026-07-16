@@ -78,20 +78,10 @@ export interface TurnLogEntry {
   opponentValence: Polarity;
   playerDelta: number;
   opponentDelta: number;
-  playerCrit: boolean;
-  opponentCrit: boolean;
   playerCombust?: boolean;
   opponentCombust?: boolean;
   propagation: PropagationEntry[];
   turnScore: number;
-  directBreakdown: {
-    playerBase: number;
-    playerCritMultiplier: number;
-    playerResult: number;
-    opponentBase: number;
-    opponentCritMultiplier: number;
-    opponentResult: number;
-  };
 }
 
 export type SideState = Record<PlanetName, PlanetState>;
@@ -170,6 +160,16 @@ export interface NodeOutcome {
   combusts: PlanetName[];
 }
 
+/** What the map boundary did to the player's chart (MECHANICS §11.3), rolled
+ *  from the map seed at creation and shown on entry. Two steps, in order:
+ *  uncombust rolls for combusted planets, then the barrage on lit ones. */
+export interface MapBoundary {
+  /** One entry per planet combusted at the crossing; failed rolls included. */
+  uncombusts: Array<{ planet: PlanetName; chance: number; success: boolean }>;
+  /** Planets the barrage actually wounded (zero-amount rolls are omitted). */
+  barrage: Array<{ planet: PlanetName; amount: number; halved: boolean }>;
+}
+
 export interface MapState {
   id: string;
   seed: number;
@@ -178,6 +178,8 @@ export interface MapState {
   visitedNodeIds: string[];
   rolledNodes: Record<string, NodeContent>;
   outcomes: Record<string, NodeOutcome>;
+  /** Absent on a run's first map (the chart enters clean, §11.3). */
+  boundary?: MapBoundary;
 }
 
 // ── Run / Prince (STATE.md) ──────────────────────────────────────────────────
