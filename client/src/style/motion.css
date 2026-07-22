@@ -183,9 +183,9 @@
 }
 @keyframes invite-ring-breath {
   0%, 100% { opacity: 0.75; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.06); }
+  50%      { opacity: 1; transform: scale(1.1); }
 }
-.anim-invite-glow { animation: invite-glow-breath 1.1s ease-in-out infinite; }
+.anim-invite-glow { animation: invite-glow-breath 1s ease-in-out infinite; }
 /* The drop-shadow glow lives on the base ring class so it persists when the
    pulse is removed on hover (the ring then sits solid at full brightness).
    fill-box/center keep the scale breath centered on the ring itself. */
@@ -194,7 +194,7 @@
   transform-box: fill-box;
   transform-origin: center;
 }
-.anim-invite-ring { animation: invite-ring-breath 1.1s ease-in-out infinite; }
+.anim-invite-ring { animation: invite-ring-breath 1s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
