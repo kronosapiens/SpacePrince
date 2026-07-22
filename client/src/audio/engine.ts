@@ -1,5 +1,6 @@
 import type { PlanetName } from "@/game/types";
 import type { Polarity } from "@/game/types";
+import { PLANETS } from "@/game/data";
 import { SIGNATURES, gestureMidi, type Signature } from "./signatures";
 
 /**
@@ -461,6 +462,16 @@ export function setTheme(planet: PlanetName | null, surface: ThemeSurface = "map
   desired = planet ? { planet, surface } : null;
   if (!T || muted) return;
   applyTheme();
+}
+
+/** Dev affordance: hop the score to the next planet's theme (PLANETS order),
+ *  keeping the current surface mix. Returns the planet now sounding, or null
+ *  when no theme is playing (title / end screens). */
+export function cycleTheme(): PlanetName | null {
+  if (!desired) return null;
+  const next = PLANETS[(PLANETS.indexOf(desired.planet) + 1) % PLANETS.length]!;
+  setTheme(next, desired.surface);
+  return next;
 }
 
 function applyTheme(): void {
