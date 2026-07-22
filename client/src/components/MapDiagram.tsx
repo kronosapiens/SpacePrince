@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties, type MouseEvent } from "react";
-import { layoutNodes, eligibleNext } from "@/game/map-gen";
+import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { seededChart } from "@/game/chart";
 import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
@@ -15,7 +15,6 @@ interface MapDiagramProps {
 }
 
 const NODE_R = 22;
-const COMBAT_TRI_R = 25; // hexagram outer radius — extends slightly past NODE_R
 // Tiered visual scale used by both the edge web and the nodes themselves.
 // Semantic: solid past, translucent next-steps, faint distance.
 // Each tier bundles the values that move together (opacity + stroke
@@ -179,6 +178,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       : isDistant ? TIER.background.opacity
       : 1; // current
 
+    // The root carries the Lot of Fortune's X — the threshold where the
+    // fortune roll acts at each crossing (MECHANICS §11.3). Its glow follows
+    // the same state language as every node: current pulses, history is quiet.
+    const isFortune = n.id === ROOT_NODE_ID;
+
     // Halo gradient for the current node and for eligible nodes (the latter use
     // it for the breathing "you can go here" glow, mirroring combat planets).
     if (isCurrent || isEligible) {
@@ -243,11 +247,27 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             stroke={color} strokeOpacity="1" strokeWidth={2.4} />
         )}
         <circle r={NODE_R}
-          fill={isNarrative ? color : "transparent"}
-          fillOpacity={isNarrative ? (isCurrent ? 0.98 : op) : 0}
+          fill={isNarrative || isFortune ? color : "transparent"}
+          fillOpacity={isNarrative || isFortune ? (isCurrent ? 0.98 : op) : 0}
           stroke={color}
           strokeOpacity={op}
           strokeWidth={isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8} />
+        {/* Void X on the bone disc — the narrative-token formula (solid coin,
+            dark mark) applied to the threshold. */}
+        {isFortune && (() => {
+          const d = NODE_R * Math.SQRT1_2;
+          // Constant bold weight, graded by opacity only — matching how the
+          // narrative numerals carry their mark across the tiers.
+          const sw = 3.2;
+          return (
+            <>
+              <line x1={-d} y1={-d} x2={d} y2={d} stroke={NEUTRAL.void}
+                strokeOpacity={op} strokeWidth={sw} strokeLinecap="round" />
+              <line x1={-d} y1={d} x2={d} y2={-d} stroke={NEUTRAL.void}
+                strokeOpacity={op} strokeWidth={sw} strokeLinecap="round" />
+            </>
+          );
+        })()}
         {isNarrative && r && (
           <text textAnchor="middle" dominantBaseline="central"
             fontSize={14}
@@ -264,12 +284,12 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           return (
             <>
               <polygon
-                points={trianglePoints(0, 0, COMBAT_TRI_R, 90)}
+                points={trianglePoints(0, 0, NODE_R, 90)}
                 fill={color} fillOpacity={fillOp}
                 stroke={color} strokeOpacity={op}
                 strokeWidth={1} strokeLinejoin="round" />
               <polygon
-                points={trianglePoints(0, 0, COMBAT_TRI_R, 270)}
+                points={trianglePoints(0, 0, NODE_R, 270)}
                 fill={color} fillOpacity={fillOp}
                 stroke={color} strokeOpacity={op}
                 strokeWidth={1} strokeLinejoin="round" />

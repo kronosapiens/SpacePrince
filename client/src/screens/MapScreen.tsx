@@ -164,9 +164,8 @@ export function MapScreen() {
           onExpand={() => setStudyOpen(true)}
         />
       </div>
-      <div className="map-distance">
-        <span className="eyebrow">DISTANCE</span>
-        <span className="map-distance-v">{Math.round(run.distance)}</span>
+      <div className="map-index">
+        <span className="map-index-v">{ROMAN[run.mapsCompleted] ?? String(run.mapsCompleted + 1)}</span>
       </div>
       {showBoundary && boundary && (
         <div className="map-boundary">

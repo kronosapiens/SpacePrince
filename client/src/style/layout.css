@@ -446,7 +446,7 @@
   width: clamp(170px, 16vw, 240px);
   z-index: 5;
 }
-.map-distance {
+.map-index {
   position: absolute;
   bottom: 36px;
   left: 50%;
@@ -457,12 +457,11 @@
   gap: 2px;
   z-index: 5;
 }
-.map-distance-v {
+.map-index-v {
   font-family: var(--serif);
   font-size: 28px;
   letter-spacing: 0.04em;
   color: var(--bone);
-  font-feature-settings: "tnum";
 }
 .map-diagram-wrap {
   position: absolute;
