@@ -529,13 +529,13 @@ function PlanetGlyph({
         <circle r={r * 1.8}
           fill={`url(#v2-halo-${point.planet})`}
           className={hovered ? undefined : "anim-invite-glow"}
-          style={{ opacity: hovered ? CHART_STYLE.invite.halo.hover : CHART_STYLE.invite.halo.rest, pointerEvents: "none" }} />
+          style={{ opacity: hovered ? CHART_STYLE.invite.halo.hover : undefined, pointerEvents: "none" }} />
       )}
       {invite && interactive && !selected && !active && (
         <circle r={r + 6} fill="none"
           stroke={c} strokeWidth={CHART_STYLE.invite.ring.stroke}
           className={hovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-          style={{ opacity: hovered ? CHART_STYLE.invite.ring.hover : CHART_STYLE.invite.ring.rest, pointerEvents: "none" }} />
+          style={{ opacity: hovered ? CHART_STYLE.invite.ring.hover : undefined, pointerEvents: "none" }} />
       )}
       {/* The distinctive ring is select-only (plus the opponent's acting planet)
           — hover is carried by the solid halo + bright ring, not this ring. */}

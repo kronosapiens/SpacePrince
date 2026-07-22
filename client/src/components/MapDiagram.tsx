@@ -231,13 +231,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             the chosen one), mirroring the combat chart's invite affordance. */}
         {isEligible && !isSelected && !selectedNodeId && (
           <>
+            {/* Resting opacity comes from the class (the shared --breath clock);
+                inline opacity only on hover, so it doesn't shadow the calc. */}
             <circle r={NODE_R * 1.8} fill={`url(#m2-halo-${n.id})`}
               className={isHovered ? undefined : "anim-invite-glow"}
-              style={{ opacity: isHovered ? 1 : 0.35, pointerEvents: "none" }} />
+              style={{ opacity: isHovered ? 1 : undefined, pointerEvents: "none" }} />
             {/* Stroke 3 ≈ the chart invite's heavy ring scaled to node radius. */}
             <circle r={NODE_R + 6} fill="none" stroke={color} strokeWidth={3}
               className={isHovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-              style={{ opacity: isHovered ? 1 : 0.85, pointerEvents: "none" }} />
+              style={{ opacity: isHovered ? 1 : undefined, pointerEvents: "none" }} />
           </>
         )}
         {/* Tap-previewed: the distinctive commit ring (same role as the combat

@@ -172,20 +172,29 @@
 /* Invite — everything tappable carries a glowing halo (the element's own
    radial gradient) plus a bright ring, both breathing in sync, so the eye
    lands on the choices without hunting. On hover the bright ring gives way to
-   the shared selection ring. Inline base opacities hold under reduced motion,
-   leaving a still affordance.
+   the shared selection ring.
    The ring breathes in *size* as well as brightness: the ambient blooms are
    static, so motion is what marks the ring as an affordance rather than more
-   glow (playtesters couldn't find the clickables by brightness alone). */
-@keyframes invite-glow-breath {
-  0%, 100% { opacity: 0.2; }
-  50%      { opacity: 0.6; }
+   glow (playtesters couldn't find the clickables by brightness alone).
+
+   One clock, many breathers: a registered custom property (--breath, 0→1→0
+   over 1s) animates on :root and never restarts, and every invite element
+   derives its opacity/scale from it via calc(). Hovers, tap-previews, and
+   remounts therefore can't knock an element out of phase — the whole surface
+   breathes together. Browsers without @property (Safari <16.4, Firefox <128)
+   degrade to a discrete once-per-half-cycle blink. */
+@property --breath {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
 }
-@keyframes invite-ring-breath {
-  0%, 100% { opacity: 0.75; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.1); }
+@keyframes breath-clock {
+  0%, 100% { --breath: 0; }
+  50%      { --breath: 1; }
 }
-.anim-invite-glow { animation: invite-glow-breath 1s ease-in-out infinite; }
+:root { animation: breath-clock 1s ease-in-out infinite; }
+
+.anim-invite-glow { opacity: calc(0.2 + 0.4 * var(--breath)); }
 /* The drop-shadow glow lives on the base ring class so it persists when the
    pulse is removed on hover (the ring then sits solid at full brightness).
    fill-box/center keep the scale breath centered on the ring itself. */
@@ -194,7 +203,10 @@
   transform-box: fill-box;
   transform-origin: center;
 }
-.anim-invite-ring { animation: invite-ring-breath 1s ease-in-out infinite; }
+.anim-invite-ring {
+  opacity: calc(0.75 + 0.25 * var(--breath));
+  transform: scale(calc(1 + 0.1 * var(--breath)));
+}
 
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
@@ -207,9 +219,10 @@
   .anim-distance-pop,
   .anim-map-current-halo,
   .anim-active-halo,
-  .anim-invite-glow,
-  .anim-invite-ring,
   .anim-surface-in { animation: none; }
+  /* Still the breath clock, holding it mid-inhale so the invite affordances
+     keep their tuned still-state brightness (glow 0.35, ring ~0.84). */
+  :root { animation: none; --breath: 0.375; }
   /* Show the propagation line solid (no travel) rather than frozen mid-sweep. */
   .anim-prop-travel { animation: none; stroke-dasharray: none; }
   /* Skip the dip-through-black on contemplative beats. */

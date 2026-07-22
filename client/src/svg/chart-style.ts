@@ -48,12 +48,14 @@ export const CHART_STYLE = {
   ghost: { outlineOpacity: 0.35, glyphOpacity: 0.4, dash: "2 4" },
 
   /** Active — the tappable invite: breathing halo + ring, both snapping to
-   *  full on hover. The ring is the clickability signal and must read against
-   *  the ambient blooms (playtesters missed it at medium weight), so it sits
-   *  at the heavy end of the stroke scale with a high opacity floor. */
+   *  full on hover. Resting brightness rides the shared --breath clock in
+   *  motion.css (one phase for every invite on every surface); only the hover
+   *  snap and stroke are set here. The ring is the clickability signal and
+   *  must read against the ambient blooms (playtesters missed it at medium
+   *  weight), so it sits at the heavy end of the stroke scale. */
   invite: {
-    halo: { rest: 0.35, hover: 1 },
-    ring: { rest: 0.85, hover: 1, stroke: STROKE_HEAVY },
+    halo: { hover: 1 },
+    ring: { hover: 1, stroke: STROKE_HEAVY },
   },
   /** Active — the select / opponent-acting ring. */
   selectRing: { opacity: 1, stroke: STROKE_MEDIUM },
