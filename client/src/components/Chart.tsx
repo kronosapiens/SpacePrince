@@ -496,7 +496,7 @@ function PlanetGlyph({
     );
   }
 
-  const fill = combusted ? "#3B2F2F" : c;
+  const fill = combusted ? NEUTRAL.char : c;
   const fillOpacity = combusted ? CHART_STYLE.planet.discCombustedOpacity : CHART_STYLE.planet.discOpacity;
   // Glyph in a deep shade of the planet's own color: colored and high-contrast
   // (via value), but on-palette — same hue family, so no complementary clash

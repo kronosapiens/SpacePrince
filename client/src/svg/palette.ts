@@ -1,5 +1,8 @@
 import type { PlanetName } from "@/game/types";
 
+// Note: style/*.css restates some of these hexes (CSS can't import TS
+// constants). If palette iteration starts crossing that boundary, migrate the
+// CSS to :root custom properties referencing these values once.
 export const NEUTRAL = {
   void: "#0B0A0F",
   smoke: "#2A2730",
@@ -7,6 +10,7 @@ export const NEUTRAL = {
   mist: "#9A95A0",
   gold: "#C9A96A",   // chart ring + tick accent
   goldHi: "#FFD24A", // ceremonial spiral / inspect ring
+  char: "#3B2F2F",   // combusted planet disc — burnt-out, off the live palette
 } as const;
 
 /**
@@ -40,6 +44,14 @@ export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction
   tension: "#E15555", // square, opposition — luminant red, not deep-saturated, so
                       // thin lines survive video chroma subsampling (a dark red artifacts)
+} as const;
+
+/** Brightened harmony/tension tints for the propagation pulse's traveling
+ *  head (PropagationLine) — pops out of the dim static web while keeping the
+ *  aspect's mood family. */
+export const ASPECT_HEAD_COLOR = {
+  harmony: "#E4FAD6",
+  tension: "#FFA89C",
 } as const;
 
 /** Action valence colors — afflict (amber) / testify (violet). Kept off the

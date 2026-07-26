@@ -97,6 +97,9 @@ The spec is divided by what kind of question each document answers.
 - **Previews show only what is determined.** Verb-dependent information appears once a verb is indicated (hovered or armed); verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
 - **Record rejections.** When a design alternative is tried and dropped, note it in the relevant spec with a `Rejected:` line so it isn't re-proposed.
+- **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke scale in `client/src/svg/viewbox.ts`, motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
+- **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
+- **Harvest upward.** When a session settles a design rule, write it into the relevant spec and add a one-line pointer here; code comments hold only what's local to the site.
 
 ## Tooling
 

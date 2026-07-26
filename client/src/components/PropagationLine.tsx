@@ -1,4 +1,4 @@
-import { ASPECT_COLOR } from "@/svg/palette";
+import { ASPECT_COLOR, ASPECT_HEAD_COLOR } from "@/svg/palette";
 import { STROKE_HEAVY } from "@/svg/viewbox";
 import type { PlanetName } from "@/game/types";
 
@@ -24,14 +24,11 @@ export interface PropagationLineProps {
   active: boolean;
 }
 
-// Brightened harmony/tension tints for the traveling head.
-const HEAD_COLOR = { harmony: "#E4FAD6", tension: "#FFA89C" } as const;
-
 export function PropagationLine(props: PropagationLineProps) {
   const { fromX, fromY, toX, toY, aspect, active } = props;
   if (!active) return null;
   const harmony = aspect === "Trine" || aspect === "Sextile" || aspect === "Conjunction";
-  const head = harmony ? HEAD_COLOR.harmony : HEAD_COLOR.tension;
+  const head = harmony ? ASPECT_HEAD_COLOR.harmony : ASPECT_HEAD_COLOR.tension;
   const glow = harmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
   return (
     <line
