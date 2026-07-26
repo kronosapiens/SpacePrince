@@ -649,7 +649,10 @@ function PlanetBadges({
   const epoch = animationEpoch ?? 0;
   const badgeClass = impact ? "anim-impact" : undefined;
 
-  const showAffliction = !hideAfflictionBadge && !combusted && affliction > 0;
+  // A combust warning surfaces the pill even at zero affliction — with ceilings
+  // at durability × 6, a top blow can cover the most fragile ceiling, so the
+  // warning can no longer assume an existing badge to ride (SCREENS.md).
+  const showAffliction = !hideAfflictionBadge && !combusted && (affliction > 0 || warning);
   // Show the projection badge whenever there's any projected effect —
   // including testimony at zero delta (planet already at 0 affliction).
   // The polarity tells the player "this would heal", even if the

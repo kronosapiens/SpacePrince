@@ -109,15 +109,23 @@ describe("Run loop integration", () => {
     expect(r.distance).toBe(7);
   });
 
-  it("combat is always 3 turns; the opponent fields the player's tier (mirror)", () => {
+  it("combat length equals the map number; the opponent fields the player's tier (mirror)", () => {
     const run = beginRun(42);
-    const begin = (lifetimeEncounterCount: number) =>
-      beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount });
+    const begin = (lifetimeEncounterCount: number, mapsCompleted = 0) =>
+      beginCombatEncounter({
+        run: { ...run, mapsCompleted },
+        opponentSeed: 99,
+        lifetimeEncounterCount,
+      });
 
-    // Fixed three turns regardless of unlock tier (MECHANICS §11.1).
+    // Length = mapsCompleted + 1 regardless of unlock tier (MECHANICS §11.1).
     for (const count of [0, 1, 2, 64]) {
-      expect(begin(count).sequence).toHaveLength(3);
-      expect(begin(count).opponentActions).toHaveLength(3);
+      expect(begin(count).sequence).toHaveLength(1);
+      expect(begin(count).opponentActions).toHaveLength(1);
+    }
+    for (const maps of [1, 3, MAPS_PER_RUN - 1]) {
+      expect(begin(64, maps).sequence).toHaveLength(maps + 1);
+      expect(begin(64, maps).opponentActions).toHaveLength(maps + 1);
     }
     // Mirrored roster: a tier-1 opponent fields only the Moon, sent on repeat.
     expect(begin(0).roster).toEqual(["Moon"]);

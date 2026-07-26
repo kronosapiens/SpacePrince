@@ -13,11 +13,12 @@ import type {
   SideState,
 } from "./types";
 
-/** Every encounter resolves in a fixed three turns, regardless of unlock tier
- *  (MECHANICS §11.1). Difficulty ramps through the opponent's roster — it fields
- *  exactly the planets the player has unlocked (Moon v Moon, then 2v2, …) — not
- *  through encounter length. */
-export const MAX_COMBAT_TURNS = 3;
+/** Combat length is the map number (MECHANICS §11.1): 1 turn on map 1, up to 7
+ *  on map 7. Difficulty ramps on two axes — roster via the unlock mirror,
+ *  length via the run's progress. */
+export function combatTurnCount(mapsCompleted: number): number {
+  return mapsCompleted + 1;
+}
 
 export interface BeginCombatInput {
   run: Run;
@@ -27,17 +28,18 @@ export interface BeginCombatInput {
   encounterIdSeed?: number;
 }
 
-/** Roll the opponent's three turns from a roster: a stat-weighted planet per
+/** Roll the opponent's turns from a roster: a stat-weighted planet per
  *  turn and its precommitted verb. Shared by encounter start and dev
  *  re-mirroring (when the unlock tier changes, the opponent re-fields to match). */
 export function rollOpponentTurns(
   opponentChart: Chart,
   roster: PlanetName[],
   rng: () => number,
+  turns: number,
 ): { sequence: PlanetName[]; opponentActions: Polarity[] } {
   const sequence: PlanetName[] = [];
   const opponentActions: Polarity[] = [];
-  for (let i = 0; i < MAX_COMBAT_TURNS; i++) {
+  for (let i = 0; i < turns; i++) {
     const planet = pickWeighted(roster, rng);
     sequence.push(planet);
     opponentActions.push(
@@ -48,7 +50,7 @@ export function rollOpponentTurns(
 }
 
 /** The opponent spawns already afflicted (MECHANICS §11): only resolution
- *  scores (§12), so a blank chart gives a 3-turn fight nothing to resolve.
+ *  scores (§12), so a blank chart gives a short fight nothing to resolve.
  *  Each fielded planet rolls uniformly across its range — an integer from 0
  *  to ceiling − 1, so no planet spawns combusted. */
 export function afflictedSideState(
@@ -68,11 +70,13 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
   // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
-  // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is a
-  // fixed three regardless, so a single planet is simply sent on repeat turns.
+  // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is
+  // the map number, so a single planet may simply be sent on repeat turns.
   const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
   const rng = mulberry32(encounterIdSeed ?? opponentSeed);
-  const { sequence, opponentActions } = rollOpponentTurns(opponentChart, roster, rng);
+  const { sequence, opponentActions } = rollOpponentTurns(
+    opponentChart, roster, rng, combatTurnCount(run.mapsCompleted),
+  );
   // Separate stream for the spawn affliction so its draws don't perturb the
   // turn-sequence rolls above.
   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? opponentSeed}_affliction`));

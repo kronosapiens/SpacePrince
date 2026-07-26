@@ -50,7 +50,7 @@ Encounter = Opponent | Narrative -- tagged union
 Opponent {
   placements: u32,               -- the adversary's chart; drawn by true RNG on arrival (same packing as Chart)
   state:      u64,               -- adversary per-planet state (same shape as Run.state)
-  turn:       u2,                -- turn counter, 0..2 (every encounter is exactly 3 turns, regardless of unlock)
+  turn:       u3,                -- turn counter, 0..6 (turns per encounter = map number = mapsCompleted + 1, MECHANICS §11)
   precommit:  u4,                -- the opponent's locked-in verb this turn: planet (u3) + action (u1); shown before the player chooses
 }
 

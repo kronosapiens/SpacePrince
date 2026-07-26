@@ -76,7 +76,10 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const roster = unlockedPlanets(tier);
-  const base = beginRun(seed);
+  // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
+  // random mid-run map so every length gets exercised.
+  const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
+  const base = { ...beginRun(seed), mapsCompleted };
   const fresh = beginCombatEncounter({ run: base, opponentSeed: seed, lifetimeEncounterCount: tier });
   // Mid-fight: a random turn and lived-in boards. Keep the opponent's acting
   // planet alive so the seam reads a real "their turn".
@@ -158,7 +161,9 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
 export function remirrorCombat(enc: CombatEncounter, tier: number, seed: number): CombatEncounter {
   const roster = unlockedPlanets(tier);
   const rng = mulberry32(hashString(`${seed}_remirror_${tier}`));
-  const { sequence, opponentActions } = rollOpponentTurns(enc.opponentChart, roster, rng);
+  const { sequence, opponentActions } = rollOpponentTurns(
+    enc.opponentChart, roster, rng, enc.sequence.length,
+  );
   return {
     ...enc,
     roster,

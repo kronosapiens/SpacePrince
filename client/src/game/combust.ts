@@ -2,7 +2,7 @@ import type { PlanetPlacement, PlanetState } from "./types";
 
 /** Resolve (the combustion ceiling) per point of durability. Kept as a named
  *  constant so the math, MECHANICS.md §10, and any UI copy stay in sync. */
-export const RESOLVE_PER_DURABILITY = 10;
+export const RESOLVE_PER_DURABILITY = 6;
 
 /**
  * Combustion ceiling (MECHANICS.md §10) — the affliction a planet absorbs

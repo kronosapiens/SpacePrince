@@ -175,14 +175,19 @@ Each planet takes **at most one** affliction application per turn — the direct
 
 Affliction accumulates toward a **combustion ceiling** set by durability alone. A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
 
-- `ceiling = durability * 10` (durability = core + sign buffs, per §4)
+- `ceiling = durability * 6` (durability = core + sign buffs, per §4; the even multiple keeps the half-ceiling uncombust return integer)
 - combust when `affliction >= ceiling`
 
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
 
-A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat. Two processes exist: the map-boundary fortune roll (§11.3) and the narrative uncombust rites (`HOUSES.md`). Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
+A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat.
+Two processes exist: the map-boundary fortune roll (§11.3) and the narrative uncombust rites (`HOUSES.md`).
+Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
+Combustion is tuned to be **frequent and recoverable** — a tide, not a rare catastrophe: at `durability × 6` a mid-durability planet falls to a few committed blows, and recovery capacity is sized to match.
+Content target: roughly a third to a half of narrative encounters offer an uncombust rite, alongside the boundary rolls.
+Combustion itself never scores — Distance is testimony only (§12) — so combusting an opponent planet is always a trade: denying its swing against forfeiting the harvest banked on it.
 
 **Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet's competence in its sign is expressed narratively rather than as a stat nudge. The chart still computes each planet's dignity; combat simply does not read it.
 
@@ -190,14 +195,14 @@ A combusted planet returns only by **uncombusting**, and uncombusting never happ
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative). Combat resolves in a **fixed 3 turns**, regardless of unlock tier (§11.1); narrative encounters are short decision trees (`HOUSES.md`).
+- **Encounter** — one node traversal (combat or narrative). Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters are short decision trees (`HOUSES.md`).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
 - **Run** — **up to seven maps.** After completing a map, the next is generated and begun. The structure is similar to FTL's sectors.
 - **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished). Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage. Either way, the run's **final Distance (§12)** is its permanent record, inscribed as a star in the NFT field (`NFT.md`).
 
 Per encounter:
 
-- The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a 3-turn fight to have anything to resolve.
+- The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a short fight to have anything to resolve; a 1-turn map-1 fight is pure harvest.
   Each fielded planet rolls its affliction uniformly across its range: an integer from `0` to `ceiling − 1`, rolled deterministically from the node's opponent seed.
   No planet spawns combusted.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
@@ -223,7 +228,14 @@ A Prince's chart is fixed at mint, but planets are unlocked progressively as a *
 
 The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart. Saturn arrives last as the final teacher.
 
-**Encounter length and the mirrored opponent.** Combat always resolves in a fixed **3 turns**, regardless of unlock tier. Difficulty ramps not through encounter length but through the opponent's *roster*: the adversary fields exactly the planets the player has unlocked — Moon vs Moon at the first encounter, two-vs-two at the next tier, up to a full seven-vs-seven. Both sides may send the same planet on more than one turn, so a one-planet player plays a full three-turn fight with the Moon alone. Mirroring keeps the early game fair and legible: the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
+**Encounter length and the mirrored opponent.** Combat length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
+Difficulty therefore ramps on two axes.
+The opponent's *roster* mirrors the player's unlock tier — Moon vs Moon at the first encounter, up to a full seven-vs-seven — so the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
+Encounter *length* rides the run instead: skirmishes while the chart is clean, full arcs on late maps, where the barrage (§11.3) has already raised the stakes before the first node is entered.
+The length ramp is also a curriculum for the two-beat (§12): map 1 teaches cashing spawn affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
+On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
+Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
+Rejected: fixed 3-turn encounters — the final turn made afflict-for-setup dead and the spawn pool was too deep to drain in three turns, so the first and last turns were near-forced and the build beat never became necessary; and three random draws could meet at most three planets of a seven-planet roster.
 
 Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.
 
