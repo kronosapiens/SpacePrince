@@ -8,6 +8,15 @@ The chart is the character sheet, the save file, and the NFT artifact, all the s
 See `README.md` for the design pitch.
 The full design lives in `spec/`; this file is a map.
 
+## Current phase
+
+*This section describes now, not the design — revise it as the phase moves.*
+
+- **Alpha.** Mechanics and screens are still settling; playtesting drives changes.
+- **Prioritize legibility of mechanics and debuggability over production polish.** Making game state readable beats making it pretty.
+- Visual tuning knobs are centralized in `client/src/svg/chart-style.ts` and `client/src/svg/palette.ts`; prefer turning knobs to restructuring.
+- Balance is deferred (`spec/mechanics/MECHANICS.md §14`); don't tune numbers for fairness yet.
+
 ## Architecture
 
 Space Prince is a **fully onchain game** with a thin presentation client.
@@ -83,6 +92,11 @@ The spec is divided by what kind of question each document answers.
 - **Don't add wallet, RPC, or contract calls to `client/`** unless explicitly asked — the client is presentation-only and currently a local prototype.
 - **Don't introduce new visual vocabulary or colors** outside the planetary palette without checking `spec/design/STYLE.md` first.
 - **The chart is never a corner HUD.** Surfaces flow through the chart, not on top of it (`spec/design/SCREENS.md`).
+- **Client honesty.** Never present derivable information as unknowable, and never frame a determined outcome as a gamble (`spec/design/SCREENS.md §1.1`).
+- **Interaction grammar is parity-first.** Tap-preview and tap-commit work identically on touch and desktop; hover is desktop-only and additive — never the sole carrier of information, never a commit (`spec/design/SCREENS.md §3.6`).
+- **Previews show only what is determined.** Verb-dependent information appears once a verb is indicated (hovered or armed); verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
+- **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
+- **Record rejections.** When a design alternative is tried and dropped, note it in the relevant spec with a `Rejected:` line so it isn't re-proposed.
 
 ## Tooling
 
