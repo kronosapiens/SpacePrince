@@ -4,8 +4,7 @@ import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { isOver } from "@/game/run";
 import { spawn, type SpawnKind } from "@/state/dev-spawn";
-import { cycleTheme } from "@/audio/engine";
-import type { PlanetName, Prince, Run } from "@/game/types";
+import type { Prince, Run } from "@/game/types";
 
 type Surface = "title" | "index" | "mint" | "map" | "combat" | "narrative" | "end";
 
@@ -37,9 +36,6 @@ export function PageDropdown() {
   const prince = usePrince();
   const run = useActiveRun();
   const [open, setOpen] = useState(false);
-  // Last theme hopped to via Change Track — labels the button so you know
-  // which of the seven you're hearing.
-  const [track, setTrack] = useState<PlanetName | null>(null);
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -58,12 +54,6 @@ export function PageDropdown() {
   // Carry the current unlock tier across re-rolls so you can pin it and spin.
   const tier = prince?.numEncounters;
   const surface = currentSurface(location.pathname, prince, run);
-  // Each surface points the score at its own planet (map → chart ruler,
-  // combat → opponent ruler, …), so a hopped-track label goes stale the
-  // moment the surface changes — drop it rather than mislabel what's sounding.
-  useEffect(() => {
-    setTrack(null);
-  }, [surface]);
 
   // Regenerate re-rolls the current surface when it's a spawnable game screen.
   const regenKind: SpawnKind | null =
@@ -95,7 +85,7 @@ export function PageDropdown() {
       >
         <span className="page-dropdown-eyebrow">Page</span>
         <span className="page-dropdown-current">{SURFACE_LABEL[surface]}</span>
-        <span className="page-dropdown-caret" aria-hidden>▾</span>
+        <span className={`page-dropdown-caret${open ? " is-open" : ""}`} aria-hidden>▾</span>
       </button>
       {open && (
         <ul className="page-dropdown-list" role="menu">
@@ -109,13 +99,10 @@ export function PageDropdown() {
         </ul>
       )}
       {regenKind && (
-        <button type="button" className="page-refresh-button" onClick={() => launch(regenKind)}>
+        <button type="button" className="dev-chrome-button" onClick={() => launch(regenKind)}>
           Regenerate
         </button>
       )}
-      <button type="button" className="page-refresh-button" onClick={() => setTrack(cycleTheme())}>
-        {track ? `Track · ${track}` : "Change Track"}
-      </button>
     </div>
   );
 }

@@ -10,7 +10,8 @@ import { SIGNATURES, gestureMidi, type Signature } from "./signatures";
  *
  * Module singleton, gesture-gated: Tone.js is imported and the AudioContext
  * started on the first pointer/key gesture (`installAudioUnlock`). Every
- * public call no-ops until then — and when muted — so callers never guard.
+ * public call no-ops until then — and when its gate (music/sound) is off —
+ * so callers never guard.
  */
 
 type ToneModule = typeof import("tone");
@@ -18,32 +19,51 @@ type ToneModule = typeof import("tone");
 let T: ToneModule | null = null;
 let initPromise: Promise<void> | null = null;
 
-const SOUND_KEY = "sp:sound:v1";
+// Two independent gates (dev-controllable from the DevConsole): `music` is the
+// score (planet themes); `sound` is everything else — propagation dings, verb
+// signatures, combustion, the star bell.
+const AUDIO_KEY = "sp:audio:v1";
 
-let muted = loadMuted();
-
-function loadMuted(): boolean {
-  try {
-    return localStorage.getItem(SOUND_KEY) === "muted";
-  } catch {
-    return false;
+let musicOn = true;
+let soundOn = true;
+try {
+  const raw = localStorage.getItem(AUDIO_KEY);
+  if (raw) {
+    const saved = JSON.parse(raw) as { music?: boolean; sound?: boolean };
+    musicOn = saved.music !== false;
+    soundOn = saved.sound !== false;
   }
+} catch {
+  /* storage unavailable — session-only defaults */
 }
 
-export function isMuted(): boolean {
-  return muted;
-}
-
-export function setMuted(next: boolean): void {
-  muted = next;
+function persistAudio(): void {
   try {
-    localStorage.setItem(SOUND_KEY, next ? "muted" : "on");
+    localStorage.setItem(AUDIO_KEY, JSON.stringify({ music: musicOn, sound: soundOn }));
   } catch {
     /* storage unavailable — session-only */
   }
-  if (T) T.getDestination().mute = next;
-  if (!next) applyTheme(); // re-establish the score on unmute
+}
+
+export function isMusicEnabled(): boolean {
+  return musicOn;
+}
+
+export function setMusicEnabled(next: boolean): void {
+  musicOn = next;
+  persistAudio();
+  if (!T) return;
+  if (next) applyTheme(); // re-establish the score where it's pointed
   else haltTheme(0.1);
+}
+
+export function isSoundEnabled(): boolean {
+  return soundOn;
+}
+
+export function setSoundEnabled(next: boolean): void {
+  soundOn = next;
+  persistAudio();
 }
 
 /** Install gesture listeners that boot the audio engine. They keep listening
@@ -86,7 +106,6 @@ async function init(): Promise<void> {
     await tone.start();
     T = tone;
     T.getDestination().volume.value = -4;
-    T.getDestination().mute = muted;
     // Kept on the dry side — a long wet reverb smears attack transients into
     // wash, which is half of what makes synth beds read as drone.
     reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).toDestination();
@@ -189,7 +208,7 @@ function fxSynth(): AnyInstrument | null {
 // ── Signature playback ──────────────────────────────────────────────────
 
 function playGesture(planet: PlanetName, sig: Signature, velScale: number, cutAt?: number) {
-  if (!T || muted) return;
+  if (!T || !soundOn) return;
   const inst = instrumentFor(planet);
   if (!inst) return;
   const now = T.now();
@@ -222,7 +241,7 @@ export function playVerb(planet: PlanetName, polarity: Polarity): void {
  * minor second that never settles.
  */
 export function playPropagation(inverted: boolean): void {
-  if (!T || muted) return;
+  if (!T || !soundOn) return;
   const fx = fxSynth();
   if (!fx) return;
   const now = T.now();
@@ -241,7 +260,7 @@ export function playPropagation(inverted: boolean): void {
  * short pink-noise breath.
  */
 export function playCombust(planet: PlanetName): void {
-  if (!T || muted) return;
+  if (!T || !soundOn) return;
   const cutAt = 0.4;
   playGesture(planet, SIGNATURES[planet], 0.95, cutAt);
   const noiseKey = "_combust_noise";
@@ -259,7 +278,7 @@ export function playCombust(planet: PlanetName): void {
 
 /** A run's star taking its place — a quiet high bell, far away. */
 export function playStar(): void {
-  if (!T || muted) return;
+  if (!T || !soundOn) return;
   const fx = fxSynth();
   if (!fx) return;
   const now = T.now();
@@ -460,22 +479,42 @@ function themeInstrument(
  */
 export function setTheme(planet: PlanetName | null, surface: ThemeSurface = "map"): void {
   desired = planet ? { planet, surface } : null;
-  if (!T || muted) return;
+  notifyThemeChange();
+  if (!T || !musicOn) return;
   applyTheme();
 }
 
-/** Dev affordance: hop the score to the next planet's theme (PLANETS order),
- *  keeping the current surface mix. Returns the planet now sounding, or null
- *  when no theme is playing (title / end screens). */
-export function cycleTheme(): PlanetName | null {
-  if (!desired) return null;
-  const next = PLANETS[(PLANETS.indexOf(desired.planet) + 1) % PLANETS.length]!;
-  setTheme(next, desired.surface);
-  return next;
+/** The planet whose theme the score is pointed at (what's sounding, or would
+ *  be with music on), or null on surfaces with no score (title / end). */
+export function currentTheme(): PlanetName | null {
+  return desired?.planet ?? null;
+}
+
+/** Subscribe to theme retargets (for useSyncExternalStore in dev chrome). */
+export function subscribeTheme(listener: () => void): () => void {
+  themeListeners.add(listener);
+  return () => themeListeners.delete(listener);
+}
+
+const themeListeners = new Set<() => void>();
+
+function notifyThemeChange(): void {
+  for (const listener of themeListeners) listener();
+}
+
+/** Dev affordance: hop the score to a random *other* planet's theme, keeping
+ *  the current surface mix — every press audibly changes the track. No-op on
+ *  surfaces with no score. */
+export function shuffleTheme(): void {
+  const cur = desired;
+  if (!cur) return;
+  const others = PLANETS.filter((p) => p !== cur.planet);
+  const next = others[Math.floor(Math.random() * others.length)]!;
+  setTheme(next, cur.surface);
 }
 
 function applyTheme(): void {
-  if (!T || !themeBus || muted) return;
+  if (!T || !themeBus || !musicOn) return;
   if (swapTimer !== null) {
     window.clearTimeout(swapTimer);
     swapTimer = null;

@@ -70,20 +70,6 @@
 }
 .begin-btn-ghost:hover { background: transparent; color: var(--bone); border-color: var(--bone); }
 
-/* The one player-facing sound control — functional chrome at whisper volume. */
-.sound-toggle {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--mist);
-  background: transparent;
-  border: none;
-  padding: 4px 8px;
-  cursor: pointer;
-  transition: color 220ms ease;
-}
-.sound-toggle:hover { color: var(--bone); }
-
 /* ── Title ─────────────────────────────────────────────────────────────── */
 
 /* Equal 1fr rows above and below the chart so the wordmark and the
@@ -1328,7 +1314,9 @@
   animation: chart-study-fade 280ms var(--ease-out) both;
 }
 
-/* ── Page dropdown (top-right) ────────────────────────────────────────── */
+/* ── Dev chrome: page dropdown (top-right) + dev console (top-left) ──────
+   One visual vocabulary for both: pill toggles, blurred near-black panels,
+   uppercase micro-type, mist → bone on hover. */
 
 .page-dropdown {
   position: fixed;
@@ -1356,10 +1344,10 @@
   transition: border-color 200ms ease;
 }
 .page-dropdown-button:hover { border-color: var(--mist); }
-.page-refresh-button {
+/* Shared pill for secondary dev-chrome actions (Regenerate, Change Track,
+   Delete Prince). */
+.dev-chrome-button {
   display: block;
-  width: calc(100% - 18px);
-  margin: 8px 9px 0 auto;
   padding: 7px 12px;
   background: rgba(11, 10, 15, 0.68);
   border: 1px solid var(--smoke);
@@ -1376,9 +1364,25 @@
   -webkit-backdrop-filter: blur(8px);
   transition: border-color 200ms ease, color 200ms ease;
 }
-.page-refresh-button:hover {
+.dev-chrome-button:hover:not(:disabled) {
   border-color: var(--mist);
   color: var(--bone);
+}
+.dev-chrome-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.page-dropdown .dev-chrome-button {
+  width: calc(100% - 18px);
+  margin: 8px 9px 0 auto;
+}
+.dev-chrome-button.is-danger {
+  color: #e88;
+  border-color: rgba(220, 90, 90, 0.5);
+}
+.dev-chrome-button.is-danger:hover:not(:disabled) {
+  color: #ffb3b3;
+  border-color: #e88;
 }
 .page-dropdown-eyebrow {
   color: var(--mist);
@@ -1389,15 +1393,22 @@
   color: var(--bone);
   font-weight: 500;
 }
+/* One ▾ glyph, rotated: points right when closed, down when open. */
 .page-dropdown-caret {
   color: var(--mist);
-  font-size: 10px;
-  transform: translateY(-1px);
+  font-size: 15px;
+  line-height: 1;
+  transform: translateY(-1px) rotate(-90deg);
+  transition: transform 200ms ease;
+}
+.page-dropdown-caret.is-open {
+  transform: translateY(-1px) rotate(0deg);
 }
 .page-dropdown-list {
   position: absolute;
   top: calc(100% + 6px);
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0;
   padding: 6px 0;
   background: rgba(11, 10, 15, 0.95);
@@ -1429,6 +1440,59 @@
   background: rgba(232, 226, 212, 0.04);
 }
 .page-dropdown-item.is-current { color: var(--bone); }
+
+.dev-console {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 100;
+  font-family: var(--sans);
+}
+/* Mirrors .page-dropdown-list — same surface, opposite corner. */
+.dev-console-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 232px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(11, 10, 15, 0.95);
+  border: 1px solid var(--smoke);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: var(--mist);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  accent-color: var(--gold); /* slider + checkboxes stay in-world */
+}
+.dev-console-panel strong {
+  color: var(--bone);
+  font-weight: 500;
+}
+.dev-console-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dev-console-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.dev-console-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.dev-console-divider { border-top: 1px solid var(--smoke); }
 
 /* ─── Animation console (dev) ─────────────────────────────────────────────
    Matches the Page-picker vocabulary: sans font, uppercase tracking, pill
