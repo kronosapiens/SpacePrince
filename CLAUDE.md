@@ -99,6 +99,7 @@ The spec is divided by what kind of question each document answers.
 - **Record rejections.** When a design alternative is tried and dropped, note it in the relevant spec with a `Rejected:` line so it isn't re-proposed.
 - **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke scale in `client/src/svg/viewbox.ts`, motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
 - **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
+- **The sexagesimal lattice.** Stats are multiples of 12, ceilings multiples of 60, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
 - **Harvest upward.** When a session settles a design rule, write it into the relevant spec and add a one-line pointer here; code comments hold only what's local to the site.
 
 ## Tooling

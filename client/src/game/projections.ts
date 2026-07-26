@@ -1,4 +1,5 @@
 import { PLANETS } from "./data";
+import { propagatedMagnitude } from "./aspects";
 import { getProjectedPair } from "./combat";
 import { wouldCombust } from "./combust";
 import type {
@@ -128,8 +129,8 @@ export function computeProjectedEffects(
     for (const a of opponentAspects) {
       if (a.from !== opponentPlanet) continue;
       if (opponentState[a.to].combusted) continue;
-      const mag = Math.abs(projected.playerToOpponent * a.multiplier);
-      const polarity = a.multiplier < 0 ? flipPolarity(playerValence) : playerValence;
+      const mag = propagatedMagnitude(projected.playerToOpponent, a);
+      const polarity = a.num < 0 ? flipPolarity(playerValence) : playerValence;
       applyMag(opponentState, otherFinal, a.to, polarity, mag);
     }
   }
@@ -147,8 +148,8 @@ export function computeProjectedEffects(
     for (const a of playerAspects) {
       if (a.from !== playerPlanet) continue;
       if (playerState[a.to].combusted) continue;
-      const mag = Math.abs(incoming * a.multiplier);
-      const polarity = a.multiplier < 0 ? flipPolarity(opponentValence) : opponentValence;
+      const mag = propagatedMagnitude(incoming, a);
+      const polarity = a.num < 0 ? flipPolarity(opponentValence) : opponentValence;
       applyMag(playerState, selfFinal, a.to, polarity, mag);
     }
   }

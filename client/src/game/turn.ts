@@ -1,5 +1,5 @@
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
-import { getAspects } from "./aspects";
+import { getAspects, propagatedMagnitude } from "./aspects";
 import { applyCombust, combustionCeiling } from "./combust";
 import { cloneSideState } from "./chart";
 import { turnScore } from "./score";
@@ -201,9 +201,9 @@ function propagate(
   for (const a of aspects) {
     const target = side[a.to];
     if (target.combusted) continue;
-    const magnitude = Math.max(0, Math.abs(amount * a.multiplier));
+    const magnitude = propagatedMagnitude(amount, a);
     if (magnitude <= 0) continue;
-    const inverted = a.multiplier < 0;
+    const inverted = a.num < 0;
     const effPolarity: Polarity = inverted
       ? polarity === "Testimony" ? "Affliction" : "Testimony"
       : polarity;

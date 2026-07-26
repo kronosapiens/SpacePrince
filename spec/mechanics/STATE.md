@@ -34,7 +34,7 @@ Chart {
 Run {
   seed:          felt252,        -- one true-RNG draw at run start; seeds all previewable map structure + gives between-run variety
   distance:      u64,            -- cumulative Distance; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
-  state:         u64,            -- per-planet run state: 7 × (u8 affliction + 1 combust bit) = 63 bits
+  state:         u128,           -- per-planet run state: 7 × (u9 affliction + 1 combust bit) = 70 bits (ceilings reach 360, MECHANICS §10)
   map:           Map,            -- the current map only; past maps are emitted as events, not stored
   mapsCompleted: u3,             -- maps finished this run, 0..7; the run ends at 7 (completion, MECHANICS §11)
   encounter:     Option<Encounter>,  -- the active encounter; None while routing on the map
@@ -49,7 +49,7 @@ Encounter = Opponent | Narrative -- tagged union
 
 Opponent {
   placements: u32,               -- the adversary's chart; drawn by true RNG on arrival (same packing as Chart)
-  state:      u64,               -- adversary per-planet state (same shape as Run.state)
+  state:      u128,              -- adversary per-planet state (same shape as Run.state)
   turn:       u3,                -- turn counter, 0..6 (turns per encounter = map number = mapsCompleted + 1, MECHANICS §11)
   precommit:  u4,                -- the opponent's locked-in verb this turn: planet (u3) + action (u1); shown before the player chooses
 }

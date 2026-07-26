@@ -11,8 +11,9 @@ import type { Chart, MapBoundary, MapState, NodeContent, PlanetName, Run, SideSt
 export const MAPS_PER_RUN = 7;
 
 /** Per map completed, the barrage's ceiling-fraction span grows by this much:
- *  entering map k+1 rolls up to `k × 5%` of each ceiling (MECHANICS §11.3). */
-export const BARRAGE_CEILING_FRACTION_PER_MAP = 0.05;
+ *  entering map k+1 rolls up to `k × 3/60` of each ceiling (MECHANICS §11.3).
+ *  The bound is exact — ceilings are multiples of 60. */
+export const BARRAGE_CEILING_FRACTION_PER_MAP = 3 / 60;
 
 export function newMapState(seed: number): MapState {
   const graph = buildMapGraph(seed);

@@ -17,11 +17,12 @@ export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
   return rng() < stats.damage / total ? "Affliction" : "Testimony";
 }
 
-/** The fortune roll (MECHANICS.md §7) — `luck × 0.05`. The shared chance at
- *  map boundaries: uncombusting a combusted planet, halving a barrage share.
- *  Surfaced in the UI as `Fortune` (fortunePct below). */
+/** The fortune roll (MECHANICS.md §7) — `luck / 120`, i.e. `(luck/2)` sixtieths
+ *  (10–60% at effective luck 12–72). The shared chance at map boundaries:
+ *  uncombusting a combusted planet, halving a barrage share. Surfaced in the
+ *  UI as `Fortune` (fortunePct below). */
 export function fortuneChance(luck: number): number {
-  return Math.max(0, Math.min(1, luck * 0.05));
+  return Math.max(0, Math.min(1, luck / 120));
 }
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {

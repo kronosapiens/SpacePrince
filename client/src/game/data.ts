@@ -27,17 +27,17 @@ export const MACROBIAN_ORDER: PlanetName[] = [
 // planet unlocks at 2^i encounters.
 export const MACROBIAN_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 
-// Even values on a roughly 1-10 scale (MECHANICS.md §2). Even base + even buffs
-// keeps every magnitude whole, so the ×0.5 aspect multipliers (§9) still land
-// on integers.
+// Multiples of 12 on a 12-48 scale (MECHANICS.md §2, the sexagesimal lattice).
+// 12-lattice base + 12-lattice buffs keeps every effective stat divisible by
+// every circle-fraction aspect denominator (§9), so magnitudes stay integer.
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun:     { damage: 6, healing: 4, durability: 6, luck: 4 },
-  Moon:    { damage: 2, healing: 8, durability: 2, luck: 4 },
-  Mercury: { damage: 4, healing: 4, durability: 4, luck: 8 },
-  Venus:   { damage: 2, healing: 8, durability: 4, luck: 6 },
-  Mars:    { damage: 8, healing: 2, durability: 4, luck: 2 },
-  Jupiter: { damage: 4, healing: 6, durability: 6, luck: 6 },
-  Saturn:  { damage: 4, healing: 2, durability: 8, luck: 2 },
+  Sun:     { damage: 36, healing: 24, durability: 36, luck: 24 },
+  Moon:    { damage: 12, healing: 48, durability: 12, luck: 24 },
+  Mercury: { damage: 24, healing: 24, durability: 24, luck: 48 },
+  Venus:   { damage: 12, healing: 48, durability: 24, luck: 36 },
+  Mars:    { damage: 48, healing: 12, durability: 24, luck: 12 },
+  Jupiter: { damage: 24, healing: 36, durability: 36, luck: 36 },
+  Saturn:  { damage: 24, healing: 12, durability: 48, luck: 12 },
 };
 
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
@@ -65,16 +65,16 @@ export const SIGN_MODALITY: Record<SignName, ModalityType> = {
 };
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {
-  Cardinal: { damage: 2, healing: 0, durability: 0, luck: 0 },
-  Fixed:    { damage: 0, healing: 0, durability: 2, luck: 0 },
-  Mutable:  { damage: 0, healing: 2, durability: 0, luck: 0 },
+  Cardinal: { damage: 12, healing: 0, durability: 0, luck: 0 },
+  Fixed:    { damage: 0, healing: 0, durability: 12, luck: 0 },
+  Mutable:  { damage: 0, healing: 12, durability: 0, luck: 0 },
 };
 
 export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
-  Fire:  { damage: 2, healing: 0, durability: 0, luck: 0 },
-  Earth: { damage: 0, healing: 0, durability: 2, luck: 0 },
-  Water: { damage: 0, healing: 2, durability: 0, luck: 0 },
-  Air:   { damage: 0, healing: 0, durability: 0, luck: 2 },
+  Fire:  { damage: 12, healing: 0, durability: 0, luck: 0 },
+  Earth: { damage: 0, healing: 0, durability: 12, luck: 0 },
+  Water: { damage: 0, healing: 12, durability: 0, luck: 0 },
+  Air:   { damage: 0, healing: 0, durability: 0, luck: 12 },
 };
 
 export const RULERSHIP: Record<SignName, PlanetName> = {
@@ -94,14 +94,17 @@ export const PLANET_SECT: Record<PlanetName, "Day" | "Night" | "Flexible"> = {
   Mercury: "Flexible",
 };
 
-export const IN_SECT_LUCK_BONUS = 2;
+export const IN_SECT_LUCK_BONUS = 12;
 
-export const ASPECT_BASE: Record<Exclude<AspectType, "None">, number> = {
-  Conjunction: 1,
-  Sextile: 0.5,
-  Trine: 0.5,
-  Square: -0.5,
-  Opposition: -1,
+// Circle fractions (MECHANICS.md §9): each aspect's share of the 360° circle,
+// negative where the aspect inverts valence. Exact rationals — every `den`
+// divides every effective stat, so propagation magnitudes are integers.
+export const ASPECT_BASE: Record<Exclude<AspectType, "None">, { num: number; den: number }> = {
+  Conjunction: { num: 1, den: 1 },
+  Sextile:     { num: 1, den: 6 },
+  Square:      { num: -1, den: 4 },
+  Trine:       { num: 1, den: 3 },
+  Opposition:  { num: -1, den: 2 },
 };
 
 export const TIME_BUCKET_MS = 5 * 60 * 1000;

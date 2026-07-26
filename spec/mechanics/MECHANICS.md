@@ -2,7 +2,14 @@
 
 The source of truth for the game's mechanics. Where an older design doc conflicts, this wins.
 
-**Number model.** Every magnitude an aspect can halve is even, so all values are whole numbers — no rounding anywhere. A single stat ranges in a roughly `1–10` band (8 is heavy). Affliction accumulates toward a deterministic combustion at a ceiling set by durability, and is capped there — a combusted planet holds `ceiling`, never more.
+**Number model — the sexagesimal lattice.** The mechanics use the arithmetic of their source material: the 360° circle.
+Every quantity the game divides lives on a lattice its divisions cannot break, so all values are whole numbers — no rounding anywhere.
+Effective stats are multiples of `12` — the smallest number every aspect fraction (§9) divides — so halves, thirds, quarters, and sixths of any stat are integers.
+Combustion ceilings are multiples of `60` (§10).
+Probabilities are stated in sixtieths (§7); percentages appear only as glosses.
+Lattice membership is an invariant: never introduce a buff, multiplier, or knob that steps off it.
+Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Distance totals, rite prices) — sums and payments, never divided.
+Affliction accumulates toward a deterministic combustion at a ceiling set by durability, and is capped there — a combusted planet holds `ceiling`, never more.
 
 ## 1. Entities
 
@@ -30,21 +37,21 @@ The short display label per planet (e.g., "the warrior") lives in `client/src/ga
 - **Jupiter** — balanced and generous across all stats; expansion, gift.
 - **Saturn** — top durability, slow elsewhere; limit, time, endurance.
 
-Base stats per planet, even values on a roughly `1–10` scale:
+Base stats per planet, multiples of `12` on a `12–48` scale:
 
 | Planet  | Damage | Healing | Durability | Luck | Total |
 |---------|-------:|--------:|-----------:|-----:|------:|
-| Sun     |      6 |       4 |          6 |    4 |    20 |
-| Moon    |      2 |       8 |          2 |    4 |    16 |
-| Mercury |      4 |       4 |          4 |    8 |    20 |
-| Venus   |      2 |       8 |          4 |    6 |    20 |
-| Mars    |      8 |       2 |          4 |    2 |    16 |
-| Jupiter |      4 |       6 |          6 |    6 |    22 |
-| Saturn  |      4 |       2 |          8 |    2 |    16 |
+| Sun     |     36 |      24 |         36 |   24 |   120 |
+| Moon    |     12 |      48 |         12 |   24 |    96 |
+| Mercury |     24 |      24 |         24 |   48 |   120 |
+| Venus   |     12 |      48 |         24 |   36 |   120 |
+| Mars    |     48 |      12 |         24 |   12 |    96 |
+| Jupiter |     24 |      36 |         36 |   36 |   132 |
+| Saturn  |     24 |      12 |         48 |   12 |    96 |
 
-Base values are even and buffs (§4) add `+2`, so every magnitude stays even — which means `×0.5` multipliers still yield integers (§9).
+Base values are multiples of `12` and buffs (§4) add `+12`, so every effective stat stays on the 12-lattice — every aspect fraction (§9) of every magnitude is an integer.
 
-**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~20–22) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 16) a higher single-stat peak (`8`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
+**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~120–132) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 96) a higher single-stat peak (`48`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
 
 ## 3. Chart Generation
 
@@ -63,27 +70,27 @@ Sign, dignity, element/modality, and buffs derive from longitude the same way re
 
 ## 4. Stat Buffs
 
-Buffs are additive at generation, and always evenly-valued.
+Buffs are additive at generation, always in `+12` steps, so effective stats stay on the 12-lattice.
 A planet's effective stat is base + buffs — the value used in combat.
 
 Element — each element buffs the one stat it expresses:
 
 | Element | Damage | Healing | Durability | Luck |
 |---------|:------:|:-------:|:----------:|:----:|
-| Fire    |   +2   |         |            |      |
-| Water   |        |   +2    |            |      |
-| Earth   |        |         |     +2     |      |
-| Air     |        |         |            |  +2  |
+| Fire    |  +12   |         |            |      |
+| Water   |        |  +12    |            |      |
+| Earth   |        |         |    +12     |      |
+| Air     |        |         |            | +12  |
 
 Modality — three of the four stats; modality does not touch luck:
 
 | Modality | Damage | Healing | Durability | Luck |
 |----------|:------:|:-------:|:----------:|:----:|
-| Cardinal |   +2   |         |            |      |
-| Mutable  |        |   +2    |            |      |
-| Fixed    |        |         |     +2     |      |
+| Cardinal |  +12   |         |            |      |
+| Mutable  |        |  +12    |            |      |
+| Fixed    |        |         |    +12     |      |
 
-Sect — a conditional `+2 luck`, the companion to Air.
+Sect — a conditional `+12 luck`, the companion to Air.
 A planet gains it when its sect matches the chart's.
 Chart sect is `Day` when the birth is diurnal, else `Night`; sect changes nothing but luck.
 
@@ -139,9 +146,9 @@ Fresh randomness enters only where the game is already pausing to reveal somethi
 
 - **Map creation.** The map seed is a VRF draw; from it derive node content (`MAP.md`) and, on rollover, the map-boundary uncombust rolls and barrage (§11.3) — all settled and fully displayed before the first node is entered.
 - **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5). By the time the resolution animation finishes, the next move has landed. Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
-- **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: `min(0.85, 0.4 + luck × 0.03)` on the conditioning planet's luck.
+- **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: `min(45, 20 + luck/2) / 60` on the conditioning planet's luck — a `20/60` (⅓) floor rising to a `45/60` (¾) cap.
 
-Luck is therefore not a combat stat. Damage, healing, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck × 0.05` (~10–60% at effective luck 2–12), is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
+Luck is therefore not a combat stat. Damage, healing, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` (10–60% at effective luck 12–72) — is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
 
 ## 8. Affliction Value Model
 
@@ -152,18 +159,22 @@ Affliction is integer-valued — every direct and propagated effect is a whole n
 
 ## 9. Aspects and Propagation
 
-Aspect multipliers:
+Aspect multipliers are **circle fractions** — each aspect's share of the 360° circle; hard aspects invert:
 
-- Conjunction: `+1`
-- Sextile: `+0.5`
-- Trine: `+0.5`
-- Square: `-0.5`
-- Opposition: `-1`
+- Conjunction (0°): `+1` — union; full conduction
+- Sextile (60°): `+1/6`
+- Square (90°): `-1/4`
+- Trine (120°): `+1/3`
+- Opposition (180°): `-1/2`
+
+The multiplier is readable off the chart itself: the wider the arc, the stronger the effect; soft aspects transmit, hard aspects invert.
+This restores the traditional strength ordering — trine over sextile, opposition over square.
+Rejected: flat multipliers (`±0.5`, `−1`) — they left sextile and trine mechanically identical and contradicted the tradition's aspect hierarchy.
 
 Rules:
 
 - one-hop propagation from active source to connected targets
-- magnitude: `abs(directAmount * aspectMultiplier)`
+- magnitude: `abs(directAmount * aspectMultiplier)` — exact, since every denominator divides every effective stat (§2)
 - negative multipliers invert the valence (`Affliction <-> Testimony`)
 - propagation applies the same integer effect model as direct effects
 - combusted targets are skipped
@@ -175,7 +186,7 @@ Each planet takes **at most one** affliction application per turn — the direct
 
 Affliction accumulates toward a **combustion ceiling** set by durability alone. A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
 
-- `ceiling = durability * 6` (durability = core + sign buffs, per §4; the even multiple keeps the half-ceiling uncombust return integer)
+- `ceiling = durability * 5` (durability = core + sign buffs, per §4; durability is a multiple of 12, so ceilings are multiples of 60 — every division the game takes lands on integers, and the maximum ceiling, a fixed earth-sign Saturn, is `360`: the full circle)
 - combust when `affliction >= ceiling`
 
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
@@ -185,7 +196,7 @@ Affliction is **capped at the ceiling** — a combusted planet holds `affliction
 A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat.
 Two processes exist: the map-boundary fortune roll (§11.3) and the narrative uncombust rites (`HOUSES.md`).
 Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
-Combustion is tuned to be **frequent and recoverable** — a tide, not a rare catastrophe: at `durability × 6` a mid-durability planet falls to a few committed blows, and recovery capacity is sized to match.
+Combustion is tuned to be **frequent and recoverable** — a tide, not a rare catastrophe: at `durability × 5` a mid-durability planet falls to a few committed blows, and recovery capacity is sized to match.
 Content target: roughly a third to a half of narrative encounters offer an uncombust rite, alongside the boundary rolls.
 Combustion itself never scores — Distance is testimony only (§12) — so combusting an opponent planet is always a trade: denying its swing against forfeiting the harvest banked on it.
 
@@ -251,10 +262,10 @@ The run-end-only structure suggests room for an achievements layer — recogniti
 
 Completing a map rolls the next one (§11), and the new map's seed also rolls what the crossing does to the player's chart — two steps, in order, both settled at map creation and shown on entry (§7):
 
-1. **Uncombust rolls.** Each combusted fielded planet rolls fortune (`luck × 0.05`, §7); on success it uncombusts at half ceiling (§10).
-2. **The barrage.** Each lit fielded planet — including any that just uncombusted — takes affliction: a uniform roll from `0` to `k × 5%` of its ceiling, where `k` is the number of maps completed this run. A successful fortune roll halves the planet's share. Amounts are integers, and a planet's resulting affliction is capped at `ceiling − 1` — like opponent spawns (§11), the barrage wounds but never combusts.
+1. **Uncombust rolls.** Each combusted fielded planet rolls fortune (`luck / 120`, §7); on success it uncombusts at half ceiling (§10).
+2. **The barrage.** Each lit fielded planet — including any that just uncombusted — takes affliction: a uniform roll from `0` to `k × 3/60` of its ceiling, where `k` is the number of maps completed this run. The bound is exact — ceilings are multiples of 60. A successful fortune roll halves the planet's share. Amounts are integers, and a planet's resulting affliction is capped at `ceiling − 1` — like opponent spawns (§11), the barrage wounds but never combusts.
 
-The first map of a run has no boundary: the chart enters clean. Each crossing after that opens closer to the edge — by the seventh map the barrage rolls up to 30% of every ceiling — so later maps are higher-stakes before their first node is entered. The barrage is also what makes combustion a tide rather than a one-way ratchet: pressure rises map over map, and the uncombust processes (§10) push back.
+The first map of a run has no boundary: the chart enters clean. Each crossing after that opens closer to the edge — by the seventh map the barrage rolls up to `18/60` (30%) of every ceiling — so later maps are higher-stakes before their first node is entered. The barrage is also what makes combustion a tide rather than a one-way ratchet: pressure rises map over map, and the uncombust processes (§10) push back.
 
 ## 12. Scoring (Distance)
 

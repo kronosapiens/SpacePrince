@@ -132,7 +132,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const wagerChance = useMemo(() => {
     const placement = prince.chart.planets[wagerLuckPlanet];
     const luck = placement.base.luck + placement.buffs.luck;
-    return Math.min(0.85, 0.4 + luck * 0.03);
+    // MECHANICS §7: a 20/60 (1/3) floor rising to a 45/60 (3/4) cap.
+    return Math.min(45, 20 + luck / 2) / 60;
   }, [prince.chart, wagerLuckPlanet]);
 
   const handleOption = (option: Option) => {

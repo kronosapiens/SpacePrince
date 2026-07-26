@@ -24,10 +24,17 @@ export function getAspects(chart: Chart): AspectConnection[] {
       const b = PLANETS[j]!;
       const aspect = getAspectType(chart.planets[a].sign, chart.planets[b].sign);
       if (aspect === "None") continue;
-      const multiplier = ASPECT_BASE[aspect];
-      out.push({ from: a, to: b, aspect, multiplier });
-      out.push({ from: b, to: a, aspect, multiplier });
+      const { num, den } = ASPECT_BASE[aspect];
+      out.push({ from: a, to: b, aspect, num, den });
+      out.push({ from: b, to: a, aspect, num, den });
     }
   }
   return out;
+}
+
+/** Propagated magnitude, exact by construction: `den` divides every effective
+ *  stat (MECHANICS §2/§9), so this is integer division, not float math —
+ *  mirroring what the Cairo contract will do. */
+export function propagatedMagnitude(amount: number, a: AspectConnection): number {
+  return Math.abs((amount / a.den) * a.num);
 }

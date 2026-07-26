@@ -52,7 +52,11 @@ export interface AspectConnection {
   from: PlanetName;
   to: PlanetName;
   aspect: Exclude<AspectType, "None">;
-  multiplier: number;
+  /** Circle-fraction multiplier as an exact rational (MECHANICS §9); `num < 0`
+   *  inverts valence. `den` divides every effective stat, so propagation
+   *  magnitudes are integers — no float multipliers anywhere. */
+  num: number;
+  den: number;
 }
 
 export interface PropagationEntry {

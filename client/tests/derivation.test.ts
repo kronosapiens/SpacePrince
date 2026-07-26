@@ -29,7 +29,8 @@ describe("deriveStatTable", () => {
           table.rows.find((r) => r.key === k)!.total;
         expect(table.afflict).toBe(byKey("damage"));
         expect(table.testify).toBe(byKey("healing"));
-        expect(table.fortunePct).toBe(byKey("luck") * 5);
+        // Fortune = luck/120 (MECHANICS §7); luck is even, so this is exact.
+        expect(table.fortunePct).toBe(Math.round((byKey("luck") / 120) * 100));
         expect(table.durability).toBe(combustionCeiling(placement));
       }
     }

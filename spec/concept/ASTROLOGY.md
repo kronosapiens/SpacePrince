@@ -66,6 +66,10 @@ The primary textual source is the *Enūma Anu Enlil*, a series of roughly 70 cun
 **Foundational.** The zodiac, planets, and cyclical logic originate here.
 Astrology's core grammar is already present.
 
+So is its arithmetic: the 360-degree circle is sexagesimal — built from a base-60 system whose divisibility (by 2, 3, 4, 5, 6, 10, 12…) is why halves, thirds, and quarters of the sky come out whole.
+Space Prince's mechanics adopt the same arithmetic: stats are multiples of 12, combustion ceilings multiples of 60, aspect multipliers circle fractions, probabilities sixtieths (`MECHANICS.md`, "Number model").
+The game's numbers work the way they do for the same reason the Babylonians' did.
+
 ---
 
 ## 2. Early Hellenistic Period (c. 200 BCE – 1st c. CE)
