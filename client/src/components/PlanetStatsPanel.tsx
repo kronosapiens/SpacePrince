@@ -17,6 +17,10 @@ export interface PlanetStatsActions {
   /** Clear the armed verb without dismissing the panel — fired when a click
    *  lands on the card but off the action buttons. */
   onClearPending: () => void;
+  /** The verb under the pointer (null on leave) — the free desktop preview of
+   *  what a click there would do. Touch-synthesized mouse events are harmless:
+   *  they converge on the verb the tap arms. */
+  onHoverAction?: (v: Polarity | null) => void;
 }
 
 interface PlanetStatsPanelProps {
@@ -215,6 +219,8 @@ export function PlanetStatsPanel({
                         e.stopPropagation();
                         actions.onChoose(a.v);
                       }}
+                      onMouseEnter={() => actions.onHoverAction?.(a.v)}
+                      onMouseLeave={() => actions.onHoverAction?.(null)}
                     >
                       {a.label} {a.value}
                     </button>

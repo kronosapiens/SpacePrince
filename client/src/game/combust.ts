@@ -26,6 +26,21 @@ export function shouldCombust(placement: PlanetPlacement, state: PlanetState): b
   return state.affliction >= combustionCeiling(placement);
 }
 
+/**
+ * Would a direct blow of `amount` combust this planet? Drives the ambient
+ * combust warning: choice-independent, so it can be shown before the player
+ * picks — on their own candidates against the incoming blow, and on the
+ * opponent's actor against the strongest answer.
+ */
+export function wouldCombust(
+  placement: PlanetPlacement,
+  state: PlanetState,
+  amount: number,
+): boolean {
+  if (state.combusted || amount <= 0) return false;
+  return state.affliction + amount >= combustionCeiling(placement);
+}
+
 /** Sets `state.combusted` when the ceiling is reached; returns whether it just did. */
 export function applyCombust(placement: PlanetPlacement, state: PlanetState): boolean {
   if (shouldCombust(placement, state)) {

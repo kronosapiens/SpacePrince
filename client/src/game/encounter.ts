@@ -49,21 +49,18 @@ export function rollOpponentTurns(
 
 /** The opponent spawns already afflicted (MECHANICS §11): only resolution
  *  scores (§12), so a blank chart gives a 3-turn fight nothing to resolve.
- *  One fielded planet rolls heavy — 40–65% of its combustion ceiling — and
- *  every other fielded planet rolls light (0–25%). Integer amounts, always
- *  below ceiling: no planet spawns combusted. */
+ *  Each fielded planet rolls uniformly across its range — an integer from 0
+ *  to ceiling − 1, so no planet spawns combusted. */
 export function afflictedSideState(
   chart: Chart,
   roster: PlanetName[],
   rng: () => number,
 ): SideState {
   const state = blankSideState();
-  const heavyIdx = Math.floor(rng() * roster.length);
-  roster.forEach((planet, i) => {
+  for (const planet of roster) {
     const ceiling = combustionCeiling(chart.planets[planet]);
-    const frac = i === heavyIdx ? 0.4 + rng() * 0.25 : rng() * 0.25;
-    state[planet].affliction = Math.round(ceiling * frac);
-  });
+    state[planet].affliction = Math.floor(rng() * ceiling);
+  }
   return state;
 }
 

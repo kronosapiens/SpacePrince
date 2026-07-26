@@ -49,3 +49,10 @@ export const VALENCE_COLOR = {
   Affliction: "#E8913A",
   Testimony: "#9D86D9",
 } as const;
+
+/** Combust warning — combustion is on the table for this planet this turn.
+ *  A dark ember red: its own channel, kept off the valence amber (harm in
+ *  flight), the luminant aspect red (edge language), and Mars vermillion
+ *  (identity). Dark-saturated is fine on a filled badge pill where STYLE.md
+ *  forbids it for hairline aspect lines. */
+export const COMBUST_WARNING = "#B03636";

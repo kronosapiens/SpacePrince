@@ -1,5 +1,6 @@
 import { PLANETS } from "./data";
 import { getProjectedPair } from "./combat";
+import { wouldCombust } from "./combust";
 import type {
   AspectConnection,
   Chart,
@@ -21,6 +22,12 @@ export interface ComputeProjectedEffectsInput {
   opponentState: SideState;
   playerAspects: AspectConnection[];
   opponentAspects: AspectConnection[];
+  /** Model the phase-order preemption (MECHANICS §6): an afflict that combusts
+   *  the opponent's actor zeroes its reply. Default true — the exact resolved
+   *  future, for the panel and the commit snapshot. Bare hover passes false:
+   *  with no verb chosen, the defensive read stays conservative and shows the
+   *  blow landing. */
+  modelPreemption?: boolean;
 }
 
 /** Per-planet projection: the polarity (so the badge can be colored even
@@ -93,6 +100,7 @@ export function computeProjectedEffects(
     playerChart, opponentChart, playerPlanet, opponentPlanet,
     playerValence, opponentValence,
     playerState, opponentState, playerAspects, opponentAspects,
+    modelPreemption = true,
   } = input;
   if (playerState[playerPlanet].combusted || opponentState[opponentPlanet].combusted) return EMPTY;
 
@@ -105,28 +113,43 @@ export function computeProjectedEffects(
   const selfFinal: Partial<Record<PlanetName, InProgress>> = {};
   const otherFinal: Partial<Record<PlanetName, InProgress>> = {};
 
-  // Player's planet takes the opponent's valence; opponent's planet takes the
-  // player's. Propagation ripples through each actor's own chart from there.
-  applyMag(playerState, selfFinal, playerPlanet, opponentValence, projected.opponentToPlayer);
+  // Phase 1 — the player's action on the opponent's chart. Combustion resolves
+  // before propagation (MECHANICS §9): a blow that combusts the actor it lands
+  // on conducts nothing onward through that actor's web.
+  const preempts =
+    playerValence === "Affliction" &&
+    wouldCombust(
+      opponentChart.planets[opponentPlanet],
+      opponentState[opponentPlanet],
+      projected.playerToOpponent,
+    );
   applyMag(opponentState, otherFinal, opponentPlanet, playerValence, projected.playerToOpponent);
-
-  if (!playerState[playerPlanet].combusted && projected.opponentToPlayer > 0) {
-    for (const a of playerAspects) {
-      if (a.from !== playerPlanet) continue;
-      if (playerState[a.to].combusted) continue;
-      const mag = Math.abs(projected.opponentToPlayer * a.multiplier);
-      const polarity = a.multiplier < 0 ? flipPolarity(opponentValence) : opponentValence;
-      applyMag(playerState, selfFinal, a.to, polarity, mag);
-    }
-  }
-
-  if (!opponentState[opponentPlanet].combusted && projected.playerToOpponent > 0) {
+  if (!preempts && projected.playerToOpponent > 0) {
     for (const a of opponentAspects) {
       if (a.from !== opponentPlanet) continue;
       if (opponentState[a.to].combusted) continue;
       const mag = Math.abs(projected.playerToOpponent * a.multiplier);
       const polarity = a.multiplier < 0 ? flipPolarity(playerValence) : playerValence;
       applyMag(opponentState, otherFinal, a.to, polarity, mag);
+    }
+  }
+
+  // Phase 2 — the opponent's reply on the player's chart, read after phase 1
+  // (MECHANICS §6): combusting the opponent's actor preempts it entirely.
+  // The same §9 short-circuit applies on this side — a catcher combusted by
+  // the blow spares its neighbours the ripple.
+  const incoming = modelPreemption && preempts ? 0 : projected.opponentToPlayer;
+  applyMag(playerState, selfFinal, playerPlanet, opponentValence, incoming);
+  const catcherCombusts =
+    opponentValence === "Affliction" &&
+    wouldCombust(playerChart.planets[playerPlanet], playerState[playerPlanet], incoming);
+  if (incoming > 0 && !catcherCombusts) {
+    for (const a of playerAspects) {
+      if (a.from !== playerPlanet) continue;
+      if (playerState[a.to].combusted) continue;
+      const mag = Math.abs(incoming * a.multiplier);
+      const polarity = a.multiplier < 0 ? flipPolarity(opponentValence) : opponentValence;
+      applyMag(playerState, selfFinal, a.to, polarity, mag);
     }
   }
 

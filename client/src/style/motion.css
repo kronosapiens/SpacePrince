@@ -195,6 +195,16 @@
 :root { animation: breath-clock 1s ease-in-out infinite; }
 
 .anim-invite-glow { opacity: calc(0.2 + 0.4 * var(--breath)); }
+
+/* Combust warning — the affliction badge of a planet for whom combustion is on
+   the table this turn (a candidate that dies catching the blow; the opponent's
+   actor when it can be silenced first). A blurred amber underlay smolders on
+   the shared clock: urgency comes from color and intensity, never a second
+   rhythm. */
+.anim-combust-warning {
+  filter: blur(4px);
+  opacity: calc(0.5 + 0.5 * var(--breath));
+}
 /* The drop-shadow glow lives on the base ring class so it persists when the
    pulse is removed on hover (the ring then sits solid at full brightness).
    fill-box/center keep the scale breath centered on the ring itself. */

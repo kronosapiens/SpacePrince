@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCombust, combustionCeiling, shouldCombust, uncombust } from "@/game/combust";
+import { applyCombust, combustionCeiling, shouldCombust, uncombust, wouldCombust } from "@/game/combust";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
 
 // Effective durability = base.durability (buffs are zero in these fixtures).
@@ -43,6 +43,18 @@ describe("shouldCombust", () => {
 
   it("an already-combusted planet does not re-trigger", () => {
     expect(shouldCombust(placement(8), state(120, true))).toBe(false);
+  });
+});
+
+describe("wouldCombust", () => {
+  it("true when the blow reaches the ceiling, false while margin remains", () => {
+    expect(wouldCombust(placement(2), state(12), 8)).toBe(true);  // 12+8 = 20
+    expect(wouldCombust(placement(2), state(11), 8)).toBe(false); // 11+8 = 19
+  });
+
+  it("a combusted planet or a zero blow never warns", () => {
+    expect(wouldCombust(placement(2), state(12, true), 8)).toBe(false);
+    expect(wouldCombust(placement(2), state(19), 0)).toBe(false);
   });
 });
 

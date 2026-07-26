@@ -15,7 +15,7 @@ import {
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
+import { ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import { CHART_STYLE } from "@/svg/chart-style";
 import type {
   AspectConnection,
@@ -133,6 +133,11 @@ export interface ChartProps {
   combustingPlanets?: ReadonlySet<PlanetName>;
   /** Planets whose projection badge is sliding into the affliction badge this beat. */
   mergingPlanets?: ReadonlySet<PlanetName>;
+  /** Ambient combust warning: planets for whom combustion is on the table this
+   *  turn — own candidates that would combust catching the incoming blow, or
+   *  the opponent's actor when a candidate could combust it first. The
+   *  affliction badge turns amber and breathes. */
+  warningPlanets?: ReadonlySet<PlanetName>;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
   /** When set, render the planet stats panel inside the chart at the
@@ -180,6 +185,7 @@ export function Chart(props: ChartProps) {
     impactPlanets,
     combustingPlanets,
     mergingPlanets,
+    warningPlanets,
     animationEpoch,
     statsPanelPlanet,
     statsPanelActions,
@@ -406,6 +412,7 @@ export function Chart(props: ChartProps) {
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}
             merging={mergingPlanets?.has(p.planet) ?? false}
+            warning={warningPlanets?.has(p.planet) ?? false}
             animationEpoch={animationEpoch}
           />
         );
@@ -608,7 +615,7 @@ function PlanetGlyph({
 function PlanetBadges({
   point, combusted, affliction,
   hideAfflictionBadge,
-  projection, impact, merging, animationEpoch,
+  projection, impact, merging, warning, animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
@@ -617,6 +624,7 @@ function PlanetBadges({
   projection?: ProjectionChip;
   merging: boolean;
   impact: boolean;
+  warning: boolean;
   animationEpoch?: number;
 }) {
   const r = point.glyphR;
@@ -709,6 +717,20 @@ function PlanetBadges({
             className={badgeClass}
             key={`badge-${epoch}-${impact ? 1 : 0}`}
           >
+            {/* Combust warning: blurred ember underlay breathing on the shared
+                clock, ember digits; the pill itself keeps its resting gold
+                border. Ember stays clear of the projection chip's amber, so
+                colored digits here can't read as a projected delta. */}
+            {warning && (
+              <rect
+                x={-wA / 2} y={-badgeR}
+                width={wA} height={2 * badgeR}
+                rx={badgeR} ry={badgeR}
+                className="anim-combust-warning"
+                fill="none"
+                stroke={COMBUST_WARNING}
+                strokeWidth={CHART_STYLE.badge.warningGlowStroke} />
+            )}
             <rect
               x={-wA / 2} y={-badgeR}
               width={wA} height={2 * badgeR}
@@ -726,7 +748,7 @@ function PlanetBadges({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: NEUTRAL.bone,
+                  color: warning ? COMBUST_WARNING : NEUTRAL.bone,
                   fontFamily: "'Inter', sans-serif",
                   fontWeight: 700,
                   fontSize: `${badgeFontSize}px`,

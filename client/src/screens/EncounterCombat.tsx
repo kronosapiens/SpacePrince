@@ -11,6 +11,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
 import { getEffectiveStats } from "@/game/combat";
+import { wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
@@ -64,10 +65,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Study mode (the inspect "i") — sticky across inspections, so a learner can
   // sweep the chart without re-toggling. Commit-safe: a pure display flag.
   const [study, setStudy] = useState(false);
-  // Desktop-only: which action button the pointer is over. Drives the live
-  // projection preview. Null on touch (no hover) — both buttons still render
-  // lit and the projection falls back to the planet's default verb.
+  // The armed verb — first click on an action button arms it, a second
+  // commits. Identical on pointer and touch.
   const [pendingAction, setPendingAction] = useState<Polarity | null>(null);
+  // The verb under the pointer in the panel — the free desktop preview while
+  // nothing is armed. Once a verb is armed it holds, matching the planet axis:
+  // commitment makes hover inert, and only a click switches. Never part of the
+  // commit gesture.
+  const [hoveredAction, setHoveredAction] = useState<Polarity | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
 
@@ -128,40 +133,82 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     setTheme(opponentRuler, "combat");
   }, [opponentRuler]);
 
-  // The panel (with its action buttons + live projection) is click-only:
-  // hovering the chart highlights a planet but no longer pops the panel, so it
-  // doesn't flicker as the mouse moves. Tap a planet to inspect, tap to commit.
+  // The panel (with its action buttons) is click-only: hovering the chart
+  // highlights a planet but never pops the panel, so nothing modal flickers as
+  // the mouse moves. Tap a planet to inspect, tap to commit.
   const inspected = selected;
 
-  // The valence the live projection reflects: the button being hovered, else
-  // the inspected planet's stronger verb (its natural default). The default
-  // keeps the projection meaningful on touch, where there's no hover.
-  const previewValence: Polarity | null = (() => {
-    if (!inspected) return null;
-    if (pendingAction) return pendingAction;
-    const eff = getEffectiveStats(prince.chart, inspected);
-    return eff.damage >= eff.healing ? "Affliction" : "Testimony";
-  })();
+  // The projection badges, though, are hover-free on desktop (SCREENS.md §3.6:
+  // hover is the tap-preview's information at no cost). Selection wins, and
+  // wholly: while the panel is up, hover is inert on both charts (the
+  // `hoveredPlanet` props gate on `selected`) — otherwise a stray hover paints
+  // one planet's aspect lines under another planet's projection chips, a false
+  // composite. Browsing previews freely; considering holds one candidate's
+  // complete truth until a tap switches or clears. Touch, with no hover, keeps
+  // the tap-only flow.
+  const previewPlanet = selected ?? hovered;
 
+  // One rule governs the preview: verb-dependent information appears only
+  // while a verb is indicated — armed in the panel, or hovered while nothing
+  // is armed (armed wins, like selection wins on the planet axis). The
+  // defensive read is verb-free and appears everywhere. With no verb the
+  // valence input is an inert placeholder — only the self side is displayed
+  // then, and with modelPreemption off that side doesn't depend on the
+  // player's verb: the blow is shown landing.
+  const indicatedVerb = pendingAction ?? hoveredAction;
   const projection = useMemo(() => {
     if (animation) return null;
-    if (!inspected || !opponentTurn || !previewValence) return null;
-    if (run.state[inspected].combusted) return null;
+    if (!previewPlanet || !opponentTurn) return null;
+    if (run.state[previewPlanet].combusted) return null;
     const playerAspects = getAspects(prince.chart);
     const opponentAspects = getAspects(encounter.opponentChart);
     return computeProjectedEffects({
       playerChart: prince.chart,
       opponentChart: encounter.opponentChart,
-      playerPlanet: inspected,
+      playerPlanet: previewPlanet,
       opponentPlanet: opponentTurn,
-      playerValence: previewValence,
+      playerValence: indicatedVerb ?? "Affliction",
       opponentValence: opponentAction,
       playerState: run.state,
       opponentState: encounter.opponentState,
       playerAspects,
       opponentAspects,
+      modelPreemption: !!indicatedVerb,
     });
-  }, [animation, inspected, previewValence, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, prince.chart]);
+  }, [animation, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, prince.chart]);
+
+  // Ambient combust warnings (choice-independent, afflict turns only):
+  // self — candidates that combust if they catch the incoming blow;
+  // other — the opponent's actor, when some candidate could combust it first.
+  // Both render as the amber badge treatment (Chart `warningPlanets`).
+  const combustWarnings = useMemo(() => {
+    if (animation || encounter.resolved || !opponentTurn) return null;
+    if (opponentAction !== "Affliction") return null;
+    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).damage;
+    const candidates = playerUnlocked.filter((p) => !run.state[p].combusted);
+    const self = new Set(
+      candidates.filter((p) => wouldCombust(prince.chart.planets[p], run.state[p], incoming)),
+    );
+    const maxAnswer = Math.max(
+      0,
+      ...candidates.map((p) => getEffectiveStats(prince.chart, p).damage),
+    );
+    const other = wouldCombust(
+      encounter.opponentChart.planets[opponentTurn],
+      encounter.opponentState[opponentTurn],
+      maxAnswer,
+    )
+      ? new Set([opponentTurn])
+      : null;
+    return { self: self.size > 0 ? self : null, other };
+  }, [animation, encounter, opponentTurn, opponentAction, playerUnlocked, run.state, prince.chart]);
+
+  // The warnings stay conservative under any preview — their meaning is "dies
+  // if the blow lands," which holds. An armed afflict that preempts tells its
+  // own story through the exact projection: their actor shows the kill and no
+  // incoming chips appear.
+  const selfWarnings = combustWarnings?.self ?? null;
+  const otherWarnings = combustWarnings?.other ?? null;
 
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection. Mid-animation: the snapshot captured at commit, with each
@@ -202,6 +249,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         skipAnimation();
         setSelected(null);
         setPendingAction(null);
+        setHoveredAction(null);
         return;
       }
       if (encounter.resolved) return;
@@ -209,6 +257,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       if (run.state[planet].combusted) return;
       setSelected(planet);
       setPendingAction(null);
+      setHoveredAction(null);
     },
     [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation],
   );
@@ -255,6 +304,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       setSelected(null);
       setHovered(null);
       setPendingAction(null);
+      setHoveredAction(null);
     },
     [animation, encounter, run, opponentTurn, opponentAction, prince.chart, onCommitTurn, startAnimation],
   );
@@ -310,6 +360,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           onChoose: (v) =>
             pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
           onClearPending: () => setPendingAction(null),
+          onHoverAction: setHoveredAction,
         }
       : undefined;
 
@@ -322,6 +373,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     if (selected !== null) {
       setSelected(null);
       setPendingAction(null);
+      setHoveredAction(null);
     }
   }, [animation, selected]);
 
@@ -339,7 +391,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           state={displayPlayerState}
           unlockedPlanets={playerUnlocked}
           selectedPlanet={selected}
-          hoveredPlanet={hovered}
+          hoveredPlanet={selected ? null : hovered}
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
@@ -351,6 +403,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           impactPlanets={impactPlayer}
           combustingPlanets={combustingPlayer}
           mergingPlanets={mergingPlayer}
+          warningPlanets={selfWarnings ?? undefined}
           animationEpoch={animationEpoch}
           statsPanelPlanet={inspected}
           statsPanelActions={playerActions}
@@ -440,17 +493,26 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           state={displayOpponentState}
           unlockedPlanets={encounter.roster}
           activePlanet={displayOpponentTurn}
-          hoveredPlanet={hoveredOpponent}
+          hoveredPlanet={selected ? null : hoveredOpponent}
           entrance="right"
           side="other"
           onPlanetHover={setHoveredOpponent}
-          projection={displayProjection.other ? { deltas: displayProjection.other } : undefined}
+          // Offense chips need an indicated verb (or committed playback) —
+          // selection alone hasn't chosen one, so this side would assert an
+          // outcome of a decision not yet made. Until then the preview is the
+          // defensive (self) side only.
+          projection={
+            (indicatedVerb || animation) && displayProjection.other
+              ? { deltas: displayProjection.other }
+              : undefined
+          }
           passive
           activePropagationKeys={activePropagationKeys.other}
           actionPulsePlanet={actionPulseOpponent}
           impactPlanets={impactOpponent}
           combustingPlanets={combustingOpponent}
           mergingPlanets={mergingOpponent}
+          warningPlanets={otherWarnings ?? undefined}
           animationEpoch={animationEpoch}
         />
         <div className="combat-side-label">OTHER</div>

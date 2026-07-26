@@ -121,15 +121,24 @@ An affliction badge appears only when a planet's affliction is **above zero** �
 
 (Earlier drafts kept badges visible at zero on gameplay surfaces for an always-on readout. That was reversed: now that combustion is deterministic, affliction reads as a damage meter, and a damage meter belongs only where there's damage. Discoverability of the affliction system is carried by the study panel, §3.6.1, not by ambient zeros.)
 
+**The combust warning.** On opponent-afflict turns, a badge carries a warning treatment when combustion is on the table for its planet this turn — on the player's side, any live candidate that would combust catching the incoming blow (`affliction + incoming ≥ ceiling`); on the opponent's side, the acting planet when some candidate's damage covers its remaining margin. Both facts are choice-independent, so the warning is ambient: shown before the player picks, absent on testify turns (the chart visibly relaxes on heal turns). The treatment is the badge's digits plus a blurred breathing underlay in the ember warning color (`STYLE.md §5`); the pill's gold border is unchanged, and the pulse rides the shared breath clock. The warning is conservative and never cleared by previews — its meaning is "combusts *if the blow lands*"; an armed preview that preempts the blow tells that story itself (§3.6). The stat ranges guarantee a flagged planet already carries a badge (minimum ceiling 20, maximum direct hit 12), so the warning is always a badge enhancement, never a new badge.
+
 ### 3.6 Interaction grammar
 
-The player's only per-turn action in combat is choosing which of their planets acts (the opponent's planet is system-selected). The grammar is the same on touch and desktop.
+The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per `MECHANICS.md §5`). The grammar is the same on touch and desktop.
 
-- **First tap on a planet:** preview. The chart highlights the aspects this planet would fire and the consequences the choice would carry. The inspected planet receives a thin gold selection ring.
-- **Second tap on the same planet:** commit. The turn resolves.
-- **Tap a different planet:** preview switches to that planet (not a commit).
+- **First tap on a planet:** inspect. The chart highlights the planet's aspect web, shows the defensive preview (below), and opens the inspect panel with its two actions. The inspected planet receives a thin gold selection ring.
+- **Tap an action (afflict / testify):** arm. The full preview appears for that verb. A second tap on the armed action commits; the turn resolves.
+- **Tap a different planet:** inspection switches to that planet (not a commit).
 - **Tap an opponent planet:** preview-only. Surfaces the same information as own planets. No commit; opponent planets are not actable.
-- **Hover (desktop only):** ambient preview. Same information as tap-preview, but free. Hover is additive — never a commit gesture and never a substitute for tap.
+- **Hover (desktop only):** ambient preview. Same information as tap-inspection, but free. Hover is additive — never a commit gesture and never a substitute for tap. While a planet is selected, hover is inert on both charts: the held preview doesn't compete with stray pointer movement.
+
+**Previews show only what is determined.**
+Verb-dependent information appears only while a verb is indicated — hovered (desktop) or armed; verb-free information is free everywhere.
+Inspecting a planet (hover or tap) shows the *defensive* read — the opponent's precommitted action landing on that planet and rippling through its web — which is fully determined before any choice is made.
+The *offensive* read (the effect on the opponent's chart) appears only while an action is indicated — armed, or hovered while nothing is armed: the client never asserts the outcome of a choice not yet made.
+Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
+Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
 
 In narrative encounters, the same grammar governs *inspecting* the chart. Decision options are committed by single-tap on the option — each option's text label is itself the commit affordance, no separate confirm step.
 

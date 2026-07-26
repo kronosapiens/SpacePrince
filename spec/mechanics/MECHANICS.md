@@ -198,9 +198,8 @@ The game's progression is layered:
 Per encounter:
 
 - The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a 3-turn fight to have anything to resolve.
-  One fielded planet rolls heavy: 40–65% of its combustion ceiling.
-  Every other fielded planet rolls light: 0–25% of its ceiling.
-  Amounts are integers, rolled deterministically from the node's opponent seed, and always below ceiling — no planet spawns combusted.
+  Each fielded planet rolls its affliction uniformly across its range: an integer from `0` to `ceiling − 1`, rolled deterministically from the node's opponent seed.
+  No planet spawns combusted.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.

@@ -127,14 +127,17 @@ The screen receives an ambient tint in the active planet's primary color at 8% o
 
 Transitions between tints take 2000ms, linear easing — slow enough to feel like the light changing in a room, fast enough that a player who looks away and back perceives the new state.
 
-### Aspect and valence color
+### Aspect, valence, and warning color
 
-Two orthogonal signals share the chart and must read apart:
+Three orthogonal signals share the chart and must read apart:
 
-- **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Medium when hovered, selected, or propagating (§3). The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
+- **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Heavy when hovered, selected, or propagating (§3), the same weight the propagation pulse rides. The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
 - **Effect polarity (heal/harm)** — afflict/testify and the projected-effect badge use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
+- **Combust warning** — combustion is on the table for this planet this turn. A dedicated **dark ember red** (`#B03636`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity). Dark-saturated is acceptable here where the aspect red forbids it — the warning marks a filled badge pill, not a hairline on Void. The treatment lives on the affliction badge (`SCREENS.md §3.5.1`).
 
 Rejected: coloring the lines by the two connected planets' own hues (primary for trine, secondary for square, a band traveling along the line). It was tried and read muddy — planet hues already carry identity on the glyphs, and doubling them onto the lines blurred mood. Mood lives in red/green; identity stays on the glyphs.
+
+Rejected for the combust warning: amber (tried — it reads as the valence channel, and amber digits mimic the projection chip) and gold (the ground and invitation color — gold plus the breath clock already means *tappable*, and gold is the Sun).
 
 ---
 

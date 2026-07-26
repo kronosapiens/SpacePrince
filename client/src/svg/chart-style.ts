@@ -1,4 +1,4 @@
-import { STROKE_HEAVY, STROKE_MEDIUM } from "@/svg/viewbox";
+import { STROKE_HEAVY } from "@/svg/viewbox";
 
 /**
  * Every opacity / stroke-weight knob the Chart draws with, gathered in one
@@ -32,7 +32,10 @@ export const CHART_STYLE = {
   aspect: {
     opacity: 1,
     restStroke: 0.9,
-    activeStroke: 2.4,
+    // Heavy, matching the propagation pulse (PropagationLine.tsx): a line
+    // under attention is one weight everywhere. Anything lighter reads too
+    // close to the thickened resting web.
+    activeStroke: STROKE_HEAVY,
   },
 
   /** Diagram — planet glyph disc + rim. Rim/ghost stroke scales with glyph
@@ -57,8 +60,9 @@ export const CHART_STYLE = {
     halo: { hover: 1 },
     ring: { hover: 1, stroke: STROKE_HEAVY },
   },
-  /** Active — the select / opponent-acting ring. */
-  selectRing: { opacity: 1, stroke: STROKE_MEDIUM },
+  /** Active — the select / opponent-acting ring. Same weight as the invite
+   *  ring: selection is the invite answered, not a lighter state of it. */
+  selectRing: { opacity: 1, stroke: STROKE_HEAVY },
   /** Active — combust: colored flare ripple + delayed bone shockwave. */
   combust: {
     ripple: { opacity: 0.95, stroke: 2.5 },
@@ -80,5 +84,9 @@ export const CHART_STYLE = {
     projectionBorder: 0.4,
     borderStroke: 1,
     signPrefixOpacity: 0.85,
+    /** Combust warning — ember digits plus a blurred ember underlay whose
+     *  opacity rides the shared --breath clock (motion.css); the pill border
+     *  stays resting gold. */
+    warningGlowStroke: 6,
   },
 } as const;
