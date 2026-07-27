@@ -34,9 +34,10 @@ export interface PlanetPlacement {
   buffs: PlanetBaseStats;
 }
 
+/** Per-planet mutable state. Combustion carries no flag — it is derived,
+ *  `affliction >= ceiling` (combust.ts `isCombusted`; STATE.md). */
 export interface PlanetState {
   affliction: number;
-  combusted: boolean;
 }
 
 export interface Chart {
@@ -197,8 +198,8 @@ export type RunEvent = { kind: "map-completed"; map: MapState };
 export interface Run {
   id: string;
   seed: number;
-  /** Per-planet affliction + combust; persists across encounters and maps,
-   *  resets only at run start. */
+  /** Per-planet affliction; persists across encounters and maps, resets only
+   *  at run start. Combustion is derived from it, never stored. */
   state: SideState;
   /** Cumulative Distance — this run's score, its permanent record. */
   distance: number;

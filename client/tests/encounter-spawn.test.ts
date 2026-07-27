@@ -14,7 +14,6 @@ describe("afflictedSideState — opponent spawn affliction (MECHANICS §11)", ()
       const state = afflictedSideState(chart, [...PLANETS], mulberry32(seed));
       for (const p of PLANETS) {
         const ceiling = combustionCeiling(chart.planets[p]);
-        expect(state[p].combusted).toBe(false);
         expect(Number.isInteger(state[p].affliction)).toBe(true);
         expect(state[p].affliction).toBeGreaterThanOrEqual(0);
         expect(state[p].affliction).toBeLessThan(ceiling);

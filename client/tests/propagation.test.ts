@@ -9,7 +9,8 @@ describe("propagation projections", () => {
     const chart = seededChart(42);
     const opp = seededChart(99);
     const playerState = blankSideState();
-    playerState.Sun.combusted = true;
+    // At the ceiling = combusted (derived, STATE.md).
+    playerState.Sun.affliction = combustionCeiling(chart.planets.Sun);
     const projected = computeProjectedEffects({
       playerChart: chart,
       opponentChart: opp,
@@ -33,7 +34,7 @@ describe("propagation projections", () => {
     // has nowhere to land: only Mars itself may project.
     const playerState = blankSideState();
     for (const p of Object.keys(playerState) as Array<keyof typeof playerState>) {
-      if (p !== "Mars") playerState[p].combusted = true;
+      if (p !== "Mars") playerState[p].affliction = combustionCeiling(chart.planets[p]);
     }
     const projected = computeProjectedEffects({
       playerChart: chart,

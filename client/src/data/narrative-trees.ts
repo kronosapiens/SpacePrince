@@ -1,4 +1,5 @@
-import type { Dignity, PlanetName } from "@/game/types";
+import { isCombusted } from "@/game/combust";
+import type { Dignity, PlanetName, PlanetPlacement, PlanetState } from "@/game/types";
 
 // ── Targeting (unlock-safe) ─────────────────────────────────────────────────
 // Outcomes never name a planet that may be locked. They address abstract roles
@@ -16,7 +17,6 @@ export type Target =
 
 export type Outcome =
   | { kind: "affliction"; target: Target; delta: number } // +harm / −heal (clamped at 0)
-  | { kind: "combust"; target: Target; value: boolean }
   | { kind: "uncombust"; target: Target }
   | { kind: "distance"; delta: number };
 
@@ -31,8 +31,9 @@ export interface NarrativeContext {
   joyPlanet: PlanetName | null;
   rulerPlanet: PlanetName;
   unlocked: PlanetName[];
-  perPlanetState: Record<PlanetName, { affliction: number; combusted: boolean }>;
-  dignities: Record<PlanetName, Dignity>;
+  perPlanetState: Record<PlanetName, PlanetState>;
+  /** Chart placements — dignity bands and the ceilings combusted-checks need. */
+  placements: Record<PlanetName, PlanetPlacement>;
 }
 
 /** Affliction at/above which a joy-planet's boon flattens (provisional, §6). */
@@ -46,6 +47,10 @@ function band(d: Dignity): "strong" | "neutral" | "weak" {
 
 const isUnlocked = (c: NarrativeContext, p: PlanetName) => c.unlocked.includes(p);
 
+// The one derived-combustion predicate (combust.ts), read through the context.
+const combusted = (c: NarrativeContext, p: PlanetName) =>
+  isCombusted(c.placements[p], c.perPlanetState[p]);
+
 export function joyUnlocked(c: NarrativeContext): boolean {
   return !!c.joyPlanet && isUnlocked(c, c.joyPlanet);
 }
@@ -53,20 +58,20 @@ export function joyUnlocked(c: NarrativeContext): boolean {
 /** Joy unlocked, lit, and not yet meaningfully harmed — the boon is live. */
 export function joyPresent(c: NarrativeContext): boolean {
   if (!joyUnlocked(c)) return false;
-  const s = c.perPlanetState[c.joyPlanet!];
-  return !s.combusted && s.affliction < JOY_AFFLICTED_THRESHOLD;
+  return !combusted(c, c.joyPlanet!) &&
+    c.perPlanetState[c.joyPlanet!].affliction < JOY_AFFLICTED_THRESHOLD;
 }
 
 /** Joy unlocked, lit, present, and dignified — the boon at its richest. */
 export function joyStrong(c: NarrativeContext): boolean {
-  return joyPresent(c) && band(c.dignities[c.joyPlanet!]) === "strong";
+  return joyPresent(c) && band(c.placements[c.joyPlanet!].dignity) === "strong";
 }
 
 /** Joy unlocked but harmed or out — boon flattens, containment fails. */
 export function joyAfflicted(c: NarrativeContext): boolean {
   if (!joyUnlocked(c)) return false;
-  const s = c.perPlanetState[c.joyPlanet!];
-  return s.combusted || s.affliction >= JOY_AFFLICTED_THRESHOLD;
+  return combusted(c, c.joyPlanet!) ||
+    c.perPlanetState[c.joyPlanet!].affliction >= JOY_AFFLICTED_THRESHOLD;
 }
 
 /** Joy-planet not yet unlocked — no joy lever this run (early game). */
@@ -75,11 +80,11 @@ export function joyLocked(c: NarrativeContext): boolean {
 }
 
 export function rulerStrong(c: NarrativeContext): boolean {
-  return isUnlocked(c, c.rulerPlanet) && band(c.dignities[c.rulerPlanet]) === "strong";
+  return isUnlocked(c, c.rulerPlanet) && band(c.placements[c.rulerPlanet].dignity) === "strong";
 }
 
 export function anyCombusted(c: NarrativeContext): boolean {
-  return c.unlocked.some((p) => c.perPlanetState[p].combusted);
+  return c.unlocked.some((p) => combusted(c, p));
 }
 
 // ── Tree shape ──────────────────────────────────────────────────────────────
@@ -114,10 +119,10 @@ export interface NarrativeTree {
   nodes: Record<string, TreeNode>;
 }
 
-// resolve target → concrete planets at apply-time (combust/uncombust handle
+// resolve target → concrete planets at apply-time (uncombust handles
 // explicit planets directly; this is for affliction effects)
 export function resolveTargets(target: Target, ctx: NarrativeContext): PlanetName[] {
-  const alive = ctx.unlocked.filter((p) => !ctx.perPlanetState[p].combusted);
+  const alive = ctx.unlocked.filter((p) => !combusted(ctx, p));
   const aff = (p: PlanetName) => ctx.perPlanetState[p].affliction;
   switch (target) {
     case "allUnlocked":
@@ -505,13 +510,13 @@ const transformation_rite: NarrativeTree = {
       id: "rite",
       text: "The rite asks for a name to bring back. Choose with care.",
       options: [
-        { id: "moon", text: "Call back the Moon.", visibleIf: (c) => c.perPlanetState.Moon.combusted, aside: "−7 Distance · uncombust the Moon", outcomes: [D(-7), UNC("Moon")] },
-        { id: "mercury", text: "Call back Mercury.", visibleIf: (c) => c.perPlanetState.Mercury.combusted, aside: "−7 Distance · uncombust Mercury", outcomes: [D(-7), UNC("Mercury")] },
-        { id: "venus", text: "Call back Venus.", visibleIf: (c) => c.perPlanetState.Venus.combusted, aside: "−7 Distance · uncombust Venus", outcomes: [D(-7), UNC("Venus")] },
-        { id: "sun", text: "Call back the Sun.", visibleIf: (c) => c.perPlanetState.Sun.combusted, aside: "−7 Distance · uncombust the Sun", outcomes: [D(-7), UNC("Sun")] },
-        { id: "mars", text: "Call back Mars.", visibleIf: (c) => c.perPlanetState.Mars.combusted, aside: "−7 Distance · uncombust Mars", outcomes: [D(-7), UNC("Mars")] },
-        { id: "jupiter", text: "Call back Jupiter.", visibleIf: (c) => c.perPlanetState.Jupiter.combusted, aside: "−7 Distance · uncombust Jupiter", outcomes: [D(-7), UNC("Jupiter")] },
-        { id: "saturn", text: "Call back Saturn.", visibleIf: (c) => c.perPlanetState.Saturn.combusted, aside: "−7 Distance · uncombust Saturn", outcomes: [D(-7), UNC("Saturn")] },
+        { id: "moon", text: "Call back the Moon.", visibleIf: (c) => combusted(c, "Moon"), aside: "−7 Distance · uncombust the Moon", outcomes: [D(-7), UNC("Moon")] },
+        { id: "mercury", text: "Call back Mercury.", visibleIf: (c) => combusted(c, "Mercury"), aside: "−7 Distance · uncombust Mercury", outcomes: [D(-7), UNC("Mercury")] },
+        { id: "venus", text: "Call back Venus.", visibleIf: (c) => combusted(c, "Venus"), aside: "−7 Distance · uncombust Venus", outcomes: [D(-7), UNC("Venus")] },
+        { id: "sun", text: "Call back the Sun.", visibleIf: (c) => combusted(c, "Sun"), aside: "−7 Distance · uncombust the Sun", outcomes: [D(-7), UNC("Sun")] },
+        { id: "mars", text: "Call back Mars.", visibleIf: (c) => combusted(c, "Mars"), aside: "−7 Distance · uncombust Mars", outcomes: [D(-7), UNC("Mars")] },
+        { id: "jupiter", text: "Call back Jupiter.", visibleIf: (c) => combusted(c, "Jupiter"), aside: "−7 Distance · uncombust Jupiter", outcomes: [D(-7), UNC("Jupiter")] },
+        { id: "saturn", text: "Call back Saturn.", visibleIf: (c) => combusted(c, "Saturn"), aside: "−7 Distance · uncombust Saturn", outcomes: [D(-7), UNC("Saturn")] },
         { id: "abandon", text: "Abandon the rite.", aside: "Nothing called.", outcomes: [] },
       ],
     },

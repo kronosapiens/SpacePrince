@@ -3,7 +3,7 @@ import { usePrinceDispatch } from "./PrinceStore";
 import { resolveTurn } from "@/game/turn";
 import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
 import { randomSeed } from "@/game/rng";
-import { PLANETS } from "@/game/data";
+import { newlyCombusted } from "@/game/combust";
 import type {
   Chart,
   CombatEncounter,
@@ -58,9 +58,7 @@ export function useCommitTurn() {
       if (!result) return null;
       let nextRun = result.run;
       if (result.encounterEnded && result.encounter.kind === "combat") {
-        const combusts = PLANETS.filter(
-          (p) => nextRun.state[p].combusted && !run.state[p].combusted,
-        );
+        const combusts = newlyCombusted(playerChart, run.state, nextRun.state);
         const outcome: NodeOutcome = {
           nodeId: nextRun.map.currentNodeId,
           kind: "combat",
@@ -95,12 +93,10 @@ export function useCommitTurn() {
 export function useCommitNarrative() {
   const dispatch = usePrinceDispatch();
   return useCallback(
-    (args: { run: Run; nextRun: Run; summary: string; resolved: boolean }) => {
+    (args: { run: Run; nextRun: Run; chart: Chart; summary: string; resolved: boolean }) => {
       let next = args.nextRun;
       if (args.resolved) {
-        const combusts = PLANETS.filter(
-          (p) => next.state[p].combusted && !args.run.state[p].combusted,
-        );
+        const combusts = newlyCombusted(args.chart, args.run.state, next.state);
         const outcome: NodeOutcome = {
           nodeId: next.map.currentNodeId,
           kind: "narrative",

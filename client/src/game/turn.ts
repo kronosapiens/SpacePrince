@@ -1,6 +1,6 @@
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects, propagatedMagnitude } from "./aspects";
-import { applyCombust, combustionCeiling } from "./combust";
+import { combustionCeiling, isCombusted } from "./combust";
 import { cloneSideState } from "./chart";
 import { turnScore } from "./score";
 import { pickWeighted } from "./rng";
@@ -54,7 +54,7 @@ export function resolveTurn(
   // chart first (phase 1), then the opponent's lands on yours (phase 2). Phase 2
   // reads the post-phase-1 state, so combusting the opponent's acting planet in
   // phase 1 preempts — zeroes — its phase-2 response.
-  const playerEff = playerStateMap[playerPlanet].combusted
+  const playerEff = isCombusted(playerPlacement, playerStateMap[playerPlanet])
     ? ZERO_STATS
     : getEffectiveStatsFromPlacement(playerPlacement);
   const phase1 = resolveAction(
@@ -62,7 +62,7 @@ export function resolveTurn(
     opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other",
   );
 
-  const opponentEff = opponentStateMap[opponentPlanet].combusted
+  const opponentEff = isCombusted(opponentPlacement, opponentStateMap[opponentPlanet])
     ? ZERO_STATS
     : getEffectiveStatsFromPlacement(opponentPlacement);
   const phase2 = resolveAction(
@@ -101,11 +101,15 @@ export function resolveTurn(
   // Only the fielded roster matters (mirrored matchup, MECHANICS §11.1): the
   // opponent re-draws from its roster, and the encounter/run end when those
   // planets are spent — never the unfielded ones.
-  const allOppCombusted = enc.roster.every((p) => opponentStateMap[p].combusted);
+  const allOppCombusted = enc.roster.every((p) =>
+    isCombusted(enc.opponentChart.planets[p], opponentStateMap[p]),
+  );
   const newSequence = [...enc.sequence];
   const newOpponentActions = [...enc.opponentActions];
   if (nextTurnIndex < newSequence.length && !allOppCombusted) {
-    const selectable = enc.roster.filter((p) => !opponentStateMap[p].combusted);
+    const selectable = enc.roster.filter(
+      (p) => !isCombusted(enc.opponentChart.planets[p], opponentStateMap[p]),
+    );
     if (selectable.length > 0) {
       const nextOpponent = pickWeighted(selectable, rng);
       newSequence[nextTurnIndex] = nextOpponent;
@@ -119,7 +123,9 @@ export function resolveTurn(
   const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted;
   // The run ends when every planet the player has *fielded* this run is combust;
   // unlocked tier == roster, so locked planets (never sent) don't keep it alive.
-  const runEnded = enc.roster.every((p) => playerStateMap[p].combusted);
+  const runEnded = enc.roster.every((p) =>
+    isCombusted(playerChart.planets[p], playerStateMap[p]),
+  );
 
   const updatedEnc: CombatEncounter = {
     ...enc,
@@ -161,20 +167,24 @@ function resolveAction(
   sideTag: "self" | "other",
 ) {
   const amount = Math.max(0, valence === "Testimony" ? attackerEff.healing : attackerEff.damage);
-  const delta = applyEffect(side[active], valence, amount, combustionCeiling(placement));
+  const wasCombusted = isCombusted(placement, side[active]);
+  const delta = wasCombusted
+    ? 0
+    : applyEffect(side[active], valence, amount, combustionCeiling(placement));
   // Combustion is resolved before propagation: a planet destroyed by the blow
-  // can't conduct it onward, so `propagate`'s `combusted` guard short-circuits.
-  const combust =
-    valence !== "Testimony" && delta > 0 ? applyCombust(placement, side[active]) : false;
+  // can't conduct it onward, so `propagate`'s combusted guard short-circuits.
+  const combust = !wasCombusted && isCombusted(placement, side[active]);
   const propagation = propagate(side, chart, active, valence, amount, sideTag);
   return { amount, delta, combust, propagation };
 }
 
 /** Affliction is bounded on both sides (MECHANICS §8, §10): testimony clamps
  *  at zero, affliction caps at the ceiling. Returns the amount that actually
- *  applied — a finishing blow reports only what it took to reach the line. */
+ *  applied — a finishing blow reports only what it took to reach the line.
+ *  Callers guard combusted targets; the ceiling check here is the backstop
+ *  (a combusted planet holds the ceiling and takes nothing, §10). */
 function applyEffect(state: PlanetState, polarity: Polarity, raw: number, ceiling: number): number {
-  if (raw <= 0 || state.combusted) return 0;
+  if (raw <= 0 || state.affliction >= ceiling) return 0;
   if (polarity === "Testimony") {
     const before = state.affliction;
     state.affliction = Math.max(0, state.affliction - raw);
@@ -194,24 +204,23 @@ function propagate(
   sideTag: "self" | "other",
 ): PropagationEntry[] {
   if (amount <= 0) return [];
-  if (side[active].combusted) return [];
+  if (isCombusted(chart.planets[active], side[active])) return [];
   const aspects = getAspects(chart).filter((a) => a.from === active);
   if (aspects.length === 0) return [];
   const out: PropagationEntry[] = [];
   for (const a of aspects) {
     const target = side[a.to];
-    if (target.combusted) continue;
+    const targetPlacement = chart.planets[a.to];
+    if (isCombusted(targetPlacement, target)) continue;
     const magnitude = propagatedMagnitude(amount, a);
     if (magnitude <= 0) continue;
     const inverted = a.num < 0;
     const effPolarity: Polarity = inverted
       ? polarity === "Testimony" ? "Affliction" : "Testimony"
       : polarity;
-    const targetPlacement = chart.planets[a.to];
     const delta = applyEffect(target, effPolarity, magnitude, combustionCeiling(targetPlacement));
-    const combust = effPolarity !== "Testimony" && delta > 0
-      ? applyCombust(targetPlacement, target)
-      : false;
+    // The target was live before the ripple, so at-ceiling now means it just went.
+    const combust = isCombusted(targetPlacement, target);
     out.push({
       side: sideTag,
       source: active,

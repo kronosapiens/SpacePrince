@@ -1,6 +1,7 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
+import { isCombusted } from "@/game/combust";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
@@ -70,7 +71,6 @@ interface PlanetPoint {
 }
 
 interface PlanetStatus {
-  combusted?: boolean;
   affliction?: number;
 }
 
@@ -216,7 +216,12 @@ export function Chart(props: ChartProps) {
   // allActive overrides unlock-gating: every planet renders in full state.
   const isUnlocked = (p: PlanetName) =>
     allActive || (unlockedPlanets ? unlockedPlanets.includes(p) : true);
-  const isCombusted = (p: PlanetName) => state?.[p]?.combusted ?? false;
+  // Combustion is derived from affliction against the placement's ceiling
+  // (combust.ts) — no flag arrives in `state`.
+  const planetCombusted = (p: PlanetName) => {
+    const affliction = state?.[p]?.affliction;
+    return affliction != null && isCombusted(chart.planets[p], { affliction });
+  };
 
   const entranceClass =
     entrance === "left" ? "anim-encounter-open-left" :
@@ -227,7 +232,7 @@ export function Chart(props: ChartProps) {
   const fieldBlooms = showColorField
     ? PLANETS.map((planet) => {
         if (!isUnlocked(planet)) return null;
-        if (state?.[planet]?.combusted) return null;
+        if (planetCombusted(planet)) return null;
         const pt = pointMap[planet];
         return (
           <circle key={`bloom-${planet}`} cx={pt.cx} cy={pt.cy} r={140} fill={`url(#v2-bloom-${planet})`} />
@@ -240,7 +245,7 @@ export function Chart(props: ChartProps) {
     ? aspects.map((a, i) => {
         if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
         // A combusted planet is dead — drop its aspect lines to others.
-        if (isCombusted(a.from) || isCombusted(a.to)) return null;
+        if (planetCombusted(a.from) || planetCombusted(a.to)) return null;
         if (a.from > a.to) return null; // dedupe pairs (getAspects emits both directions)
         const from = pointMap[a.from];
         const to = pointMap[a.to];
@@ -368,8 +373,7 @@ export function Chart(props: ChartProps) {
           so a selected/active planet's halo can't occlude a neighbouring
           planet's affliction badge (SVG paints in document order). */}
       {points.map((p) => {
-        const status = state?.[p.planet];
-        const combusted = status?.combusted ?? false;
+        const combusted = planetCombusted(p.planet);
         const unlocked = isUnlocked(p.planet);
         const isSelected = selectedPlanet === p.planet;
         const isActive = (allActive && !combusted) || activePlanet === p.planet;
@@ -401,13 +405,12 @@ export function Chart(props: ChartProps) {
       {/* Badge layer: above every planet's halo. */}
       {points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
-        const status = state?.[p.planet];
         return (
           <PlanetBadges
             key={p.planet}
             point={p}
-            combusted={status?.combusted ?? false}
-            affliction={status?.affliction ?? 0}
+            combusted={planetCombusted(p.planet)}
+            affliction={state?.[p.planet]?.affliction ?? 0}
             hideAfflictionBadge={hideAfflictionBadges}
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}

@@ -1,5 +1,5 @@
 import { seededChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
@@ -87,7 +87,11 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   const turnIndex = Math.floor(turnRng() * fresh.sequence.length);
   const opponentState = livedInState(seed, "opp", fresh.opponentChart, roster);
   const acting = fresh.sequence[turnIndex];
-  if (acting) opponentState[acting] = { affliction: opponentState[acting].affliction, combusted: false };
+  if (acting) {
+    // Clamp under the ceiling — at the ceiling it would read as combusted.
+    const ceiling = combustionCeiling(fresh.opponentChart.planets[acting]);
+    opponentState[acting] = { affliction: Math.min(opponentState[acting].affliction, ceiling - 1) };
+  }
   const encounter: CombatEncounter = { ...fresh, turnIndex, opponentState };
   const run: Run = {
     ...base,
@@ -206,15 +210,15 @@ function livedInState(
   for (const p of PLANETS) {
     const ceiling = combustionCeiling(chart.planets[p]);
     const r = rng();
-    if (r < 0.5) out[p] = { affliction: 0, combusted: false };
-    else if (r < 0.8) out[p] = { affliction: Math.round(ceiling * rng() * 0.4), combusted: false };
-    else if (r < 0.92) out[p] = { affliction: Math.round(ceiling * (0.4 + rng() * 0.55)), combusted: false };
-    else out[p] = { affliction: ceiling, combusted: true };
+    if (r < 0.5) out[p] = { affliction: 0 };
+    else if (r < 0.8) out[p] = { affliction: Math.round(ceiling * rng() * 0.4) };
+    else if (r < 0.92) out[p] = { affliction: Math.round(ceiling * (0.4 + rng() * 0.55)) };
+    else out[p] = { affliction: ceiling }; // at the ceiling = combusted (derived)
   }
-  if (keepAlive?.length && keepAlive.every((p) => out[p].combusted)) {
+  if (keepAlive?.length && keepAlive.every((p) => isCombusted(chart.planets[p], out[p]))) {
     const revived = keepAlive[0]!;
     const ceiling = combustionCeiling(chart.planets[revived]);
-    out[revived] = { affliction: Math.round(ceiling * rng() * 0.3), combusted: false };
+    out[revived] = { affliction: Math.round(ceiling * rng() * 0.3) };
   }
   return out;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
 import { beginCombatEncounter } from "@/game/encounter";
-import { combustionCeiling } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
 import type { CombatEncounter, Run } from "@/game/types";
@@ -31,7 +31,9 @@ describe("sequential resolution — preemption", () => {
 
     // Resolution is deterministic (§7) — rng only feeds the next-turn draw.
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0)!;
-    expect(result.encounter.opponentState[active].combusted).toBe(true);
+    expect(
+      isCombusted(enc.opponentChart.planets[active], result.encounter.opponentState[active]),
+    ).toBe(true);
     expect(result.log.opponentCombust).toBe(true);
     // Preempted: the opponent's action lands on a dead planet, so it does nothing.
     expect(result.log.playerDelta).toBe(0);
@@ -46,7 +48,9 @@ describe("sequential resolution — preemption", () => {
 
     // From zero affliction, one hit stays far below any ceiling — no combust.
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0.99)!;
-    expect(result.encounter.opponentState[active].combusted).toBe(false);
+    expect(
+      isCombusted(enc.opponentChart.planets[active], result.encounter.opponentState[active]),
+    ).toBe(false);
     expect(result.log.playerDelta).toBeGreaterThan(0);
   });
 
@@ -59,7 +63,9 @@ describe("sequential resolution — preemption", () => {
 
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0)!;
     expect(result.encounter.opponentState[active].affliction).toBe(ceiling);
-    expect(result.encounter.opponentState[active].combusted).toBe(true);
+    expect(
+      isCombusted(enc.opponentChart.planets[active], result.encounter.opponentState[active]),
+    ).toBe(true);
     // Mars swings for its full stat, but only the last point applies (§8, §10).
     expect(result.log.opponentDelta).toBe(1);
   });

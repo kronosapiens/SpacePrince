@@ -52,7 +52,7 @@ describe("narrative scenarios", () => {
             if (o.kind === "affliction") {
               expect(AFFLICTION_ROLES.has(o.target as string), `${s.scenarioId} affliction target ${o.target}`).toBe(true);
             }
-            if (o.kind === "uncombust" || o.kind === "combust") {
+            if (o.kind === "uncombust") {
               expect(PLANET_NAMES.has(o.target as string), `${s.scenarioId} ${o.kind} target ${o.target}`).toBe(true);
             }
           }

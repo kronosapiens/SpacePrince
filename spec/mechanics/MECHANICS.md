@@ -193,6 +193,8 @@ Ceilings read directly as how much affliction a planet absorbs before it goes ou
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
 
+The cap makes combustion **derived state**: a planet is combusted exactly when `affliction >= ceiling`, so no combust flag is stored anywhere (`STATE.md`) — affliction is the whole per-planet state.
+
 A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat.
 Two processes exist: the map-boundary fortune roll (§11.3) and the narrative uncombust rites (`HOUSES.md`).
 Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.

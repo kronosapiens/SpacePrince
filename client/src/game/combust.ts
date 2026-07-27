@@ -1,4 +1,5 @@
-import type { PlanetPlacement, PlanetState } from "./types";
+import { PLANETS } from "./data";
+import type { Chart, PlanetName, PlanetPlacement, PlanetState, SideState } from "./types";
 
 /** Resolve (the combustion ceiling) per point of durability. Durability is a
  *  multiple of 12, so ceilings are multiples of 60 — the sexagesimal lattice
@@ -18,13 +19,12 @@ export function combustionCeiling(placement: PlanetPlacement): number {
 }
 
 /**
- * Deterministic combustion (MECHANICS.md §10): a planet combusts the moment its
- * affliction reaches the ceiling — no roll. Affliction below the ceiling is a
- * readable, recoverable margin; at the line, the candle goes out.
+ * Combustion is derived, never stored (STATE.md): affliction caps at the
+ * ceiling and a planet combusts the moment it reaches it (MECHANICS.md §10),
+ * so a planet is combusted exactly when its affliction holds at the ceiling.
+ * The one predicate every combusted-check goes through.
  */
-export function shouldCombust(placement: PlanetPlacement, state: PlanetState): boolean {
-  if (state.combusted) return false;
-  if (state.affliction <= 0) return false;
+export function isCombusted(placement: PlanetPlacement, state: PlanetState): boolean {
   return state.affliction >= combustionCeiling(placement);
 }
 
@@ -39,17 +39,16 @@ export function wouldCombust(
   state: PlanetState,
   amount: number,
 ): boolean {
-  if (state.combusted || amount <= 0) return false;
+  if (amount <= 0 || isCombusted(placement, state)) return false;
   return state.affliction + amount >= combustionCeiling(placement);
 }
 
-/** Sets `state.combusted` when the ceiling is reached; returns whether it just did. */
-export function applyCombust(placement: PlanetPlacement, state: PlanetState): boolean {
-  if (shouldCombust(placement, state)) {
-    state.combusted = true;
-    return true;
-  }
-  return false;
+/** The planets combusted in `after` but not in `before` — the diff the
+ *  outcome records and the resolution flashes read. */
+export function newlyCombusted(chart: Chart, before: SideState, after: SideState): PlanetName[] {
+  return PLANETS.filter(
+    (p) => isCombusted(chart.planets[p], after[p]) && !isCombusted(chart.planets[p], before[p]),
+  );
 }
 
 /**
@@ -58,6 +57,5 @@ export function applyCombust(placement: PlanetPlacement, state: PlanetState): bo
  * land here: the planet returns at half its ceiling — back, but scarred.
  */
 export function uncombust(placement: PlanetPlacement, state: PlanetState): void {
-  state.combusted = false;
   state.affliction = combustionCeiling(placement) / 2;
 }

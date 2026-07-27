@@ -41,7 +41,7 @@ export function EncounterScreen() {
       prince={prince}
       encounter={enc}
       onCommit={(args) =>
-        commitNarrative({ run, nextRun: args.nextRun, summary: args.summary, resolved: args.resolved })
+        commitNarrative({ run, nextRun: args.nextRun, chart: prince.chart, summary: args.summary, resolved: args.resolved })
       }
       onClearEncounter={clearEncounter}
     />

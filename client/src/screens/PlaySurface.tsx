@@ -17,6 +17,6 @@ export function PlaySurface() {
   const run = useActiveRun();
   if (!prince || !run) return <StartScreen />;
   if (run.encounter) return <EncounterScreen />;
-  if (isOver(run, prince.numEncounters)) return <EndOfRunScreen />;
+  if (isOver(run, prince.chart, prince.numEncounters)) return <EndOfRunScreen />;
   return <MapScreen />;
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { beginRun, isOver, newMapState, rolloverMap, MAPS_PER_RUN } from "@/game/run";
-import { combustionCeiling } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
@@ -26,7 +26,7 @@ describe("Run loop integration", () => {
     let safety = 0;
     while (r.encounter && r.encounter.kind === "combat" && !r.encounter.resolved && safety++ < 30) {
       const playerPlanet = (unlockedPlanets(prince.numEncounters).filter(
-        (p) => !r.state[p].combusted,
+        (p) => !isCombusted(prince.chart.planets[p], r.state[p]),
       )[0] ?? "Sun") as PlanetName;
       const result = resolveTurn(r, prince.chart, playerPlanet, "Affliction", rng);
       if (!result) break;
@@ -90,7 +90,7 @@ describe("Run loop integration", () => {
     const sunCeiling = combustionCeiling(prince.chart.planets.Sun);
     let r = beginRun(5);
     r = { ...r, distance: 10, state: { ...r.state } };
-    r.state.Sun = { affliction: sunCeiling, combusted: true };
+    r.state.Sun = { affliction: sunCeiling }; // at the ceiling = combusted (derived)
 
     const ctx = buildNarrativeContext({
       prince,
@@ -104,7 +104,7 @@ describe("Run loop integration", () => {
       { kind: "distance", delta: -3 },
     ], ctx);
     // The rite returns the planet at half ceiling — back, but scarred (§10).
-    expect(r.state.Sun.combusted).toBe(false);
+    expect(isCombusted(prince.chart.planets.Sun, r.state.Sun)).toBe(false);
     expect(r.state.Sun.affliction).toBe(sunCeiling / 2);
     expect(r.distance).toBe(7);
   });
@@ -142,7 +142,7 @@ describe("Run loop integration", () => {
     // never ending the run.
     for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
       r = rolloverMap(r, prince.chart, roster, 100 + i);
-      expect(isOver(r, prince.numEncounters)).toBe(false);
+      expect(isOver(r, prince.chart, prince.numEncounters)).toBe(false);
       expect(r.events).toHaveLength(i + 1);
       expect(r.mapsCompleted).toBe(i + 1);
     }
@@ -150,7 +150,7 @@ describe("Run loop integration", () => {
     // completion: the final map stays current and is NOT archived.
     const finalMap = r.map;
     r = rolloverMap(r, prince.chart, roster, 999);
-    expect(isOver(r, prince.numEncounters)).toBe(true);
+    expect(isOver(r, prince.chart, prince.numEncounters)).toBe(true);
     expect(r.mapsCompleted).toBe(MAPS_PER_RUN);
     expect(r.events).toHaveLength(MAPS_PER_RUN - 1);
     expect(r.map).toBe(finalMap);
@@ -161,9 +161,11 @@ describe("Run loop integration", () => {
   it("isOver true iff every fielded player planet is combusted", () => {
     const prince = createStubPrince({ seed: 13 });
     const run = beginRun(1);
-    expect(isOver(run, prince.numEncounters)).toBe(false);
+    expect(isOver(run, prince.chart, prince.numEncounters)).toBe(false);
     const dead = { ...run, state: { ...run.state } };
-    for (const p of PLANETS) dead.state[p] = { affliction: 10, combusted: true };
-    expect(isOver(dead, prince.numEncounters)).toBe(true);
+    for (const p of PLANETS) {
+      dead.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
+    }
+    expect(isOver(dead, prince.chart, prince.numEncounters)).toBe(true);
   });
 });

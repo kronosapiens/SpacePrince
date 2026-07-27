@@ -5,6 +5,7 @@ import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
+import { newlyCombusted } from "@/game/combust";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
@@ -154,11 +155,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
     // a candle-out ripple for any combust, and a Distance pulse (SCREENS.md §3.5).
     const impact = new Map<PlanetName, Polarity>();
-    const combusting = new Set<PlanetName>();
+    const combusting = new Set<PlanetName>(newlyCombusted(prince.chart, run.state, nextRun.state));
     for (const p of PLANETS) {
       const before = run.state[p];
       const after = nextRun.state[p];
-      if (!before.combusted && after.combusted) combusting.add(p);
       if (after.affliction < before.affliction) impact.set(p, "Testimony");
       else if (after.affliction > before.affliction) impact.set(p, "Affliction");
     }
@@ -207,7 +207,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   };
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
-  const runEnded = isOver(run, prince.numEncounters);
+  const runEnded = isOver(run, prince.chart, prince.numEncounters);
 
   const continuedRef = useRef(false);
   const handleContinue = useCallback(() => {

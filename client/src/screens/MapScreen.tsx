@@ -134,7 +134,7 @@ export function MapScreen() {
 
   useEffect(() => {
     if (!run || !prince) return;
-    if (isOver(run, prince.numEncounters)) return; // ended (combust or completion)
+    if (isOver(run, prince.chart, prince.numEncounters)) return; // ended (combust or completion)
     if (run.encounter) return;
     if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
     // The chart + fielded roster cross the map boundary (MECHANICS §11.3):

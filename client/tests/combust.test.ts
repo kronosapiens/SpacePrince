@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { applyCombust, combustionCeiling, shouldCombust, uncombust, wouldCombust } from "@/game/combust";
+import { combustionCeiling, isCombusted, newlyCombusted, uncombust, wouldCombust } from "@/game/combust";
+import { seededChart } from "@/game/chart";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
 
 // Effective durability = base.durability (buffs are zero in these fixtures).
@@ -15,8 +16,8 @@ function placement(durability: number): PlanetPlacement {
   };
 }
 
-function state(affliction: number, combusted = false): PlanetState {
-  return { affliction, combusted };
+function state(affliction: number): PlanetState {
+  return { affliction };
 }
 
 describe("combustionCeiling", () => {
@@ -28,22 +29,17 @@ describe("combustionCeiling", () => {
   });
 });
 
-describe("shouldCombust", () => {
-  it("zero affliction never combusts", () => {
-    expect(shouldCombust(placement(48), state(0))).toBe(false);
+describe("isCombusted", () => {
+  // Combustion is derived, never stored (STATE.md): affliction caps at the
+  // ceiling, so at-the-ceiling *is* combusted.
+  it("false at zero and below the ceiling — a recoverable margin", () => {
+    expect(isCombusted(placement(48), state(0))).toBe(false);
+    expect(isCombusted(placement(48), state(239))).toBe(false);
   });
 
-  it("below the ceiling is a safe, recoverable margin", () => {
-    expect(shouldCombust(placement(48), state(239))).toBe(false);
-  });
-
-  it("combusts the moment affliction reaches the ceiling", () => {
-    expect(shouldCombust(placement(48), state(240))).toBe(true);
-    expect(shouldCombust(placement(48), state(300))).toBe(true);
-  });
-
-  it("an already-combusted planet does not re-trigger", () => {
-    expect(shouldCombust(placement(48), state(300, true))).toBe(false);
+  it("true the moment affliction reaches the ceiling", () => {
+    expect(isCombusted(placement(48), state(240))).toBe(true);
+    expect(isCombusted(placement(48), state(300))).toBe(true);
   });
 });
 
@@ -59,30 +55,35 @@ describe("wouldCombust", () => {
   });
 
   it("a combusted planet or a zero blow never warns", () => {
-    expect(wouldCombust(placement(12), state(12, true), 48)).toBe(false);
+    expect(wouldCombust(placement(12), state(60), 48)).toBe(false);
     expect(wouldCombust(placement(12), state(59), 0)).toBe(false);
   });
 });
 
-describe("applyCombust", () => {
-  it("commits combustion at/above the ceiling and reports it", () => {
-    const s = state(240);
-    expect(applyCombust(placement(48), s)).toBe(true);
-    expect(s.combusted).toBe(true);
-  });
-
-  it("leaves a sub-ceiling planet untouched", () => {
-    const s = state(239);
-    expect(applyCombust(placement(48), s)).toBe(false);
-    expect(s.combusted).toBe(false);
+describe("newlyCombusted", () => {
+  it("reports only planets that crossed the ceiling between the two states", () => {
+    const chart = seededChart(42);
+    const before = {} as Record<string, PlanetState>;
+    const after = {} as Record<string, PlanetState>;
+    for (const p of Object.keys(chart.planets)) {
+      before[p] = state(0);
+      after[p] = state(0);
+    }
+    const sunCeiling = combustionCeiling(chart.planets.Sun);
+    const moonCeiling = combustionCeiling(chart.planets.Moon);
+    after.Sun = state(sunCeiling);                       // crossed
+    before.Moon = state(moonCeiling);
+    after.Moon = state(moonCeiling);                     // already out
+    after.Mars = state(combustionCeiling(chart.planets.Mars) - 1); // wounded, live
+    expect(newlyCombusted(chart, before as never, after as never)).toEqual(["Sun"]);
   });
 });
 
 describe("uncombust", () => {
   it("returns the planet at half its ceiling — back, but scarred (§10)", () => {
-    const s = state(240, true);
+    const s = state(240);
     uncombust(placement(48), s);
-    expect(s.combusted).toBe(false);
+    expect(isCombusted(placement(48), s)).toBe(false);
     expect(s.affliction).toBe(120);
   });
 });

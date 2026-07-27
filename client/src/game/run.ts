@@ -1,6 +1,6 @@
 import { blankSideState, cloneSideState } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
-import { combustionCeiling, uncombust } from "./combust";
+import { combustionCeiling, isCombusted, uncombust } from "./combust";
 import { rollNodeContent } from "./map-content";
 import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
 import { hashString, mulberry32, randomSeed } from "./rng";
@@ -59,11 +59,12 @@ export function beginRun(seed = randomSeed()): Run {
 
 /** Whether a run has ended — derived, never stored (STATE.md). A run is over
  *  when the seventh map is finished (completion) or every planet the player has
- *  *fielded* (its unlock tier) is combust (full combustion). */
-export function isOver(run: Run, numEncounters: number): boolean {
+ *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
+ *  because combustion is itself derived — affliction against each ceiling. */
+export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
   if (run.mapsCompleted >= MAPS_PER_RUN) return true;
   const tier = unlockedPlanets(numEncounters);
-  return tier.length > 0 && tier.every((p) => run.state[p].combusted);
+  return tier.length > 0 && tier.every((p) => isCombusted(chart.planets[p], run.state[p]));
 }
 
 /**
@@ -83,7 +84,7 @@ export function rollMapBoundary(
   const uncombusts: MapBoundary["uncombusts"] = [];
   const barrage: MapBoundary["barrage"] = [];
   for (const planet of roster) {
-    if (!next[planet].combusted) continue;
+    if (!isCombusted(chart.planets[planet], next[planet])) continue;
     const chance = fortuneChance(getEffectiveStats(chart, planet).luck);
     const success = rng() < chance;
     if (success) uncombust(chart.planets[planet], next[planet]);
@@ -91,7 +92,7 @@ export function rollMapBoundary(
   }
   for (const planet of roster) {
     const ps = next[planet];
-    if (ps.combusted) continue;
+    if (isCombusted(chart.planets[planet], ps)) continue;
     const ceiling = combustionCeiling(chart.planets[planet]);
     const frac = rng() * mapsCompleted * BARRAGE_CEILING_FRACTION_PER_MAP;
     const halved = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);

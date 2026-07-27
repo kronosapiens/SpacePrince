@@ -386,7 +386,8 @@ function runScheduler(args: {
           const next = cloneAnimation(state);
           const targetState = isSelf ? next.selfState : next.otherState;
           if (step.note === "Combusts") {
-            targetState[step.target].combusted = true;
+            // The delta step already carried affliction to the ceiling, which
+            // *is* combustion (derived); this beat adds the ripple + sound.
             next.combustingPlanets = {
               ...next.combustingPlanets,
               [side]: addToFlag(next.combustingPlanets[side], step.target),
@@ -457,11 +458,6 @@ function runScheduler(args: {
         playCombust(actionPlanet);
         updateAnimation((state) => {
           const next = cloneAnimation(state);
-          if (isSelf) {
-            next.selfState[actionPlanet].combusted = true;
-          } else {
-            next.otherState[actionPlanet].combusted = true;
-          }
           next.combustingPlanets = {
             ...next.combustingPlanets,
             [side]: addToFlag(next.combustingPlanets[side], actionPlanet),

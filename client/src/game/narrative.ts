@@ -1,7 +1,6 @@
-import { PLANETS } from "./data";
 import { cloneSideState } from "./chart";
-import { applyCombust, combustionCeiling, uncombust } from "./combust";
-import type { Dignity, PlanetName, Prince, Run } from "./types";
+import { combustionCeiling, isCombusted, uncombust } from "./combust";
+import type { PlanetName, Prince, Run } from "./types";
 import {
   resolveTargets,
   type NarrativeContext,
@@ -18,14 +17,12 @@ export interface BuildContextInput {
 
 export function buildNarrativeContext(input: BuildContextInput): NarrativeContext {
   const { prince, run, joyPlanet, rulerPlanet, unlocked } = input;
-  const dignities = {} as Record<PlanetName, Dignity>;
-  for (const p of PLANETS) dignities[p] = prince.chart.planets[p].dignity;
   return {
     joyPlanet,
     rulerPlanet,
     unlocked,
     perPlanetState: run.state,
-    dignities,
+    placements: prince.chart.planets,
   };
 }
 
@@ -43,7 +40,6 @@ export function applyOutcomes(
 ): Run {
   const state = cloneSideState(run.state);
   let distance = run.distance;
-  const harmed = new Set<PlanetName>();
 
   // resolve targets against the state as it mutates
   const liveCtx: NarrativeContext = { ...ctx, perPlanetState: state };
@@ -56,19 +52,13 @@ export function applyOutcomes(
       case "affliction": {
         for (const p of resolveTargets(o.target, liveCtx)) {
           const ps = state[p];
-          if (ps.combusted) continue;
-          const ceiling = combustionCeiling(prince.chart.planets[p]);
+          const placement = prince.chart.planets[p];
+          if (isCombusted(placement, ps)) continue;
+          // Clamped to [0, ceiling]; landing at the ceiling *is* combustion —
+          // no flag to set, combusted is derived (§10, STATE.md).
+          const ceiling = combustionCeiling(placement);
           ps.affliction = Math.max(0, Math.min(ceiling, ps.affliction + o.delta));
-          if (o.delta > 0) harmed.add(p);
         }
-        break;
-      }
-      case "combust": {
-        // Authored combustion lands at the ceiling — affliction caps there and
-        // a combusted planet always holds it (MECHANICS §10).
-        const p = o.target as PlanetName;
-        state[p].combusted = o.value;
-        if (o.value) state[p].affliction = combustionCeiling(prince.chart.planets[p]);
         break;
       }
       case "uncombust": {
@@ -78,11 +68,6 @@ export function applyOutcomes(
         break;
       }
     }
-  }
-
-  // combust-check every planet that took fresh affliction (MECHANICS.md §10)
-  for (const p of harmed) {
-    applyCombust(prince.chart.planets[p], state[p]);
   }
 
   return { ...run, state, distance };

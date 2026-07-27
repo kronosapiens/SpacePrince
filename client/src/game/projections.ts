@@ -1,7 +1,7 @@
 import { PLANETS } from "./data";
 import { propagatedMagnitude } from "./aspects";
 import { getProjectedPair } from "./combat";
-import { wouldCombust } from "./combust";
+import { isCombusted, wouldCombust } from "./combust";
 import type {
   AspectConnection,
   Chart,
@@ -62,8 +62,9 @@ function applyMag(
   polarity: Polarity,
   magnitude: number,
 ) {
+  // Callers guard combusted targets (they hold the placements this check needs).
   const state = side[target];
-  if (!state || state.combusted || magnitude <= 0) return;
+  if (!state || magnitude <= 0) return;
   const existing = out[target];
   const current = existing?.finalValue ?? state.affliction;
   const next =
@@ -103,12 +104,15 @@ export function computeProjectedEffects(
     playerState, opponentState, playerAspects, opponentAspects,
     modelPreemption = true,
   } = input;
-  if (playerState[playerPlanet].combusted || opponentState[opponentPlanet].combusted) return EMPTY;
+  if (
+    isCombusted(playerChart.planets[playerPlanet], playerState[playerPlanet]) ||
+    isCombusted(opponentChart.planets[opponentPlanet], opponentState[opponentPlanet])
+  ) return EMPTY;
 
+  // Both actors are live (guarded above), so neither side's stats zero out.
   const projected = getProjectedPair(
     playerChart, opponentChart, playerPlanet, opponentPlanet,
     playerValence, opponentValence,
-    playerState[playerPlanet].combusted, opponentState[opponentPlanet].combusted,
   );
 
   const selfFinal: Partial<Record<PlanetName, InProgress>> = {};
@@ -128,7 +132,7 @@ export function computeProjectedEffects(
   if (!preempts && projected.playerToOpponent > 0) {
     for (const a of opponentAspects) {
       if (a.from !== opponentPlanet) continue;
-      if (opponentState[a.to].combusted) continue;
+      if (isCombusted(opponentChart.planets[a.to], opponentState[a.to])) continue;
       const mag = propagatedMagnitude(projected.playerToOpponent, a);
       const polarity = a.num < 0 ? flipPolarity(playerValence) : playerValence;
       applyMag(opponentState, otherFinal, a.to, polarity, mag);
@@ -147,7 +151,7 @@ export function computeProjectedEffects(
   if (incoming > 0 && !catcherCombusts) {
     for (const a of playerAspects) {
       if (a.from !== playerPlanet) continue;
-      if (playerState[a.to].combusted) continue;
+      if (isCombusted(playerChart.planets[a.to], playerState[a.to])) continue;
       const mag = propagatedMagnitude(incoming, a);
       const polarity = a.num < 0 ? flipPolarity(opponentValence) : opponentValence;
       applyMag(playerState, selfFinal, a.to, polarity, mag);

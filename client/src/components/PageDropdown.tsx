@@ -123,6 +123,6 @@ function currentSurface(pathname: string, prince: Prince | null, run: Run | null
   if (pathname !== ROUTES.play) return "title";
   if (!prince || !run) return "mint";
   if (run.encounter) return run.encounter.kind === "narrative" ? "narrative" : "combat";
-  if (isOver(run, prince.numEncounters)) return "end";
+  if (isOver(run, prince.chart, prince.numEncounters)) return "end";
   return "map";
 }

@@ -34,7 +34,7 @@ Chart {
 Run {
   seed:          felt252,        -- one true-RNG draw at run start; seeds all previewable map structure + gives between-run variety
   distance:      u64,            -- cumulative Distance; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
-  state:         u128,           -- per-planet run state: 7 × (u9 affliction + 1 combust bit) = 70 bits (ceilings reach 360, MECHANICS §10)
+  state:         u64,            -- per-planet run state: 7 × u9 affliction = 63 bits (ceilings reach 360, MECHANICS §10); combustion is derived, not stored
   map:           Map,            -- the current map only; past maps are emitted as events, not stored
   mapsCompleted: u3,             -- maps finished this run, 0..7; the run ends at 7 (completion, MECHANICS §11)
   encounter:     Option<Encounter>,  -- the active encounter; None while routing on the map
@@ -49,7 +49,7 @@ Encounter = Opponent | Narrative -- tagged union
 
 Opponent {
   placements: u32,               -- the adversary's chart; drawn by true RNG on arrival (same packing as Chart)
-  state:      u128,              -- adversary per-planet state (same shape as Run.state)
+  state:      u64,               -- adversary per-planet state (same shape as Run.state)
   turn:       u3,                -- turn counter, 0..6 (turns per encounter = map number = mapsCompleted + 1, MECHANICS §11)
   precommit:  u4,                -- the opponent's locked-in verb this turn: planet (u3) + action (u1); shown before the player chooses
 }
@@ -88,6 +88,8 @@ Three tiers, separated by who needs to read the data.
 **Derived** — computed at read time, never written:
 
 - `starField` = `runs.filter(over).map(r => r.distance)` — read by the NFT render; no separate array, since the distance already lives on each run.
+- A planet is **combusted** when `affliction >= ceiling` (MECHANICS §10): affliction caps at the ceiling and combustion triggers there, so the affliction lane carries the flag for free.
+  Rejected: a stored per-planet combust bit — it widened `state` lanes to 10 bits (u128) to duplicate what the cap already encodes.
 - A run is **over** when `mapsCompleted == 7` or all seven planets have combusted — a pure function of stored fields, so no status flag is stored.
   At most one run is not-over: the active one, always at the tail of `runs`.
 - Map `layout` and node types — `f(Run.seed, position)`.

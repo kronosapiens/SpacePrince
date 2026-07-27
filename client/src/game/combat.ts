@@ -89,8 +89,6 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
   };
 }
 
-const ZERO_STATS: PlanetStats = { damage: 0, healing: 0, durability: 0, luck: 0 };
-
 export function computeDirectExchange(
   playerValence: Polarity,
   opponentValence: Polarity,
@@ -114,11 +112,9 @@ export function getProjectedPair(
   opponentPlanet: PlanetName,
   playerValence: Polarity,
   opponentValence: Polarity,
-  playerCombusted = false,
-  opponentCombusted = false,
 ) {
-  const playerStats = playerCombusted ? ZERO_STATS : getEffectiveStats(playerChart, playerPlanet);
-  const opponentStats = opponentCombusted ? ZERO_STATS : getEffectiveStats(opponentChart, opponentPlanet);
+  const playerStats = getEffectiveStats(playerChart, playerPlanet);
+  const opponentStats = getEffectiveStats(opponentChart, opponentPlanet);
   const exchange = computeDirectExchange(playerValence, opponentValence, playerStats, opponentStats);
   const selfDelta = opponentValence === "Testimony" ? -exchange.opponentToPlayer : exchange.opponentToPlayer;
   const otherDelta = playerValence === "Testimony" ? -exchange.playerToOpponent : exchange.playerToOpponent;

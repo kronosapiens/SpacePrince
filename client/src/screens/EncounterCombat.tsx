@@ -11,7 +11,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
 import { getEffectiveStats } from "@/game/combat";
-import { wouldCombust } from "@/game/combust";
+import { isCombusted, wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
@@ -77,7 +77,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
 
   // `over` is derived (STATE.md): the run ended once every fielded planet combust.
-  const runEnded = isOver(run, prince.numEncounters);
+  const runEnded = isOver(run, prince.chart, prince.numEncounters);
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -159,7 +159,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const projection = useMemo(() => {
     if (animation) return null;
     if (!previewPlanet || !opponentTurn) return null;
-    if (run.state[previewPlanet].combusted) return null;
+    if (isCombusted(prince.chart.planets[previewPlanet], run.state[previewPlanet])) return null;
     const playerAspects = getAspects(prince.chart);
     const opponentAspects = getAspects(encounter.opponentChart);
     return computeProjectedEffects({
@@ -185,7 +185,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     if (animation || encounter.resolved || !opponentTurn) return null;
     if (opponentAction !== "Affliction") return null;
     const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).damage;
-    const candidates = playerUnlocked.filter((p) => !run.state[p].combusted);
+    const candidates = playerUnlocked.filter(
+      (p) => !isCombusted(prince.chart.planets[p], run.state[p]),
+    );
     const self = new Set(
       candidates.filter((p) => wouldCombust(prince.chart.planets[p], run.state[p], incoming)),
     );
@@ -254,7 +256,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       }
       if (encounter.resolved) return;
       if (!playerUnlocked.includes(planet)) return;
-      if (run.state[planet].combusted) return;
+      if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
       setSelected(planet);
       setPendingAction(null);
       setHoveredAction(null);
@@ -270,7 +272,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const handleCommit = useCallback(
     (planet: PlanetName, action: Polarity) => {
       if (animation || encounter.resolved || !opponentTurn) return;
-      if (run.state[planet].combusted) return;
+      if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
       // Deterministic per (run, encounter, turn) — same seed produces the
       // same fight every time, which is the point of `/encounter/<seed>`.
       const rng = mulberry32(
@@ -350,7 +352,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // The action fan-out rides the bottom of the stats panel — local to the
   // planet. Shown for the inspected planet (hover or select) when committable.
   const playerActions: PlanetStatsActions | undefined =
-    inspected && !animation && !encounter.resolved && !run.state[inspected].combusted
+    inspected && !animation && !encounter.resolved &&
+    !isCombusted(prince.chart.planets[inspected], run.state[inspected])
       ? {
           afflict: getEffectiveStats(prince.chart, inspected).damage,
           testify: getEffectiveStats(prince.chart, inspected).healing,
