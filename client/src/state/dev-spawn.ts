@@ -60,7 +60,10 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const fielded = unlockedPlanets(tier);
-  const base = beginRun(seed);
+  // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
+  // random mid-run map so encounters entered from here exercise every length.
+  const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
+  const base = { ...beginRun(seed), mapsCompleted };
   // Park the player partway through a rolled map (never on the terminal).
   const map = walkMap(seed, false);
   const run: Run = {
