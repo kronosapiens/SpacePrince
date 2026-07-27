@@ -159,17 +159,22 @@ Affliction is integer-valued — every direct and propagated effect is a whole n
 
 ## 9. Aspects and Propagation
 
-Aspect multipliers are **circle fractions** — each aspect's share of the 360° circle; hard aspects invert:
+The four aspects carry **circle-fraction** multipliers — each aspect's share of the 360° circle; hard aspects invert.
+The conjunction stands apart — union, not aspect:
 
-- Conjunction (0°): `+1` — union; full conduction
+- Conjunction (0°): `+1` — co-presence; full conduction
 - Sextile (60°): `+1/6`
 - Square (90°): `-1/4`
 - Trine (120°): `+1/3`
 - Opposition (180°): `-1/2`
 
-The multiplier is readable off the chart itself: the wider the arc, the stronger the effect; soft aspects transmit, hard aspects invert.
-This restores the traditional strength ordering — trine over sextile, opposition over square.
+An aspect is a transmission across distance — *aspectus*, beholding — so the multiplier is readable off the chart itself: the wider the arc, the stronger the effect; soft aspects transmit, hard aspects invert.
+The conjunction is classically not an aspect but **co-presence** (`ASTROLOGY.md`): planets in one sign do not behold each other across the circle — they share a place, so a blow that lands on one lands on the household.
+Its `+1` is the absence of transmission, not its maximum; "wider arc, stronger effect" governs the four aspects, and the conjunction sits outside it.
+The angle→effect mapping is piecewise by design: separations of 30° and 150° transmit nothing — signs that cannot see each other are in **aversion**.
+This preserves the traditional strength ordering — trine over sextile, opposition over square, the conjunction most powerful of all.
 Rejected: flat multipliers (`±0.5`, `−1`) — they left sextile and trine mechanically identical and contradicted the tradition's aspect hierarchy.
+Rejected: strict monotonicity in arc (conjunction on the same rule) — it would rank same-sign planets weakest, inverting the tradition and draining the intensity a same-sign cluster should carry.
 
 Rules:
 
