@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ActivePlanetProvider } from "@/state/ActivePlanetContext";
+import { InfoCardProvider } from "@/state/InfoCardContext";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { App } from "./App";
 import "./style/reset.css";
@@ -16,9 +17,11 @@ ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
     <BrowserRouter>
       <PrinceStoreProvider>
-        <ActivePlanetProvider>
-          <App />
-        </ActivePlanetProvider>
+        <InfoCardProvider>
+          <ActivePlanetProvider>
+            <App />
+          </ActivePlanetProvider>
+        </InfoCardProvider>
       </PrinceStoreProvider>
     </BrowserRouter>
   </React.StrictMode>,

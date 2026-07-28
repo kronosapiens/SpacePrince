@@ -1,9 +1,11 @@
 import { useCallback } from "react";
-import { usePrinceDispatch } from "./PrinceStore";
+import { usePrince, usePrinceDispatch } from "./PrinceStore";
+import { useInfoCards } from "./InfoCardContext";
 import { resolveTurn } from "@/game/turn";
 import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
 import { randomSeed } from "@/game/rng";
 import { newlyCombusted } from "@/game/combust";
+import { thresholdCrossedBy } from "@/game/unlocks";
 import type {
   Chart,
   CombatEncounter,
@@ -46,6 +48,8 @@ export function useStartRun() {
  *  records a NodeOutcome on the map when the encounter ends. */
 export function useCommitTurn() {
   const dispatch = usePrinceDispatch();
+  const prince = usePrince();
+  const { enqueueCard } = useInfoCards();
   return useCallback(
     (
       run: Run,
@@ -73,6 +77,10 @@ export function useCommitTurn() {
             outcomes: { ...nextRun.map.outcomes, [outcome.nodeId]: outcome },
           },
         };
+        // Crossing a Macrobian threshold queues the planet introduction —
+        // presented once the surface is stable again (InfoCardHost).
+        const crossed = prince && thresholdCrossedBy(prince.numEncounters, prince.numEncounters + 1);
+        if (crossed) enqueueCard({ kind: "planet-intro", planet: crossed });
         dispatch({ kind: "incrementEncounters" });
       }
       dispatch({ kind: "commitRun", run: nextRun });
@@ -84,7 +92,7 @@ export function useCommitTurn() {
         runEnded: result.runEnded,
       };
     },
-    [dispatch],
+    [dispatch, prince, enqueueCard],
   );
 }
 
@@ -92,6 +100,8 @@ export function useCommitTurn() {
  *  encounter resolves, bumps `numEncounters` + records a NodeOutcome. */
 export function useCommitNarrative() {
   const dispatch = usePrinceDispatch();
+  const prince = usePrince();
+  const { enqueueCard } = useInfoCards();
   return useCallback(
     (args: { run: Run; nextRun: Run; chart: Chart; summary: string; resolved: boolean }) => {
       let next = args.nextRun;
@@ -111,12 +121,14 @@ export function useCommitNarrative() {
             outcomes: { ...next.map.outcomes, [outcome.nodeId]: outcome },
           },
         };
+        const crossed = prince && thresholdCrossedBy(prince.numEncounters, prince.numEncounters + 1);
+        if (crossed) enqueueCard({ kind: "planet-intro", planet: crossed });
         dispatch({ kind: "incrementEncounters" });
       }
       dispatch({ kind: "commitRun", run: next });
       return next;
     },
-    [dispatch],
+    [dispatch, prince, enqueueCard],
   );
 }
 

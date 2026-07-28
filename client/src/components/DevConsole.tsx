@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore } from "react";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
 import { MACROBIAN_THRESHOLDS } from "@/game/data";
@@ -27,6 +28,7 @@ export function DevConsole() {
   const prince = usePrince();
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
+  const { enqueueCard } = useInfoCards();
   const [collapsed, setCollapsed] = useState(true);
   const [music, setMusic] = useState(isMusicEnabled());
   const [sound, setSound] = useState(isSoundEnabled());
@@ -80,6 +82,19 @@ export function DevConsole() {
                 onChange={(e) => setPlanets(Number(e.target.value))}
               />
               <div>{unlocked.join(" · ") || "(none)"}</div>
+              {/* Queues the top unlocked planet's introduction (shows on
+                  map/end — the stable surfaces). Scrub the slider to pick. */}
+              <button
+                type="button"
+                className="dev-chrome-button"
+                disabled={unlocked.length === 0}
+                onClick={() => {
+                  const planet = unlocked.at(-1);
+                  if (planet) enqueueCard({ kind: "planet-intro", planet });
+                }}
+              >
+                Intro Card{unlocked.length ? ` · ${unlocked.at(-1)}` : ""}
+              </button>
             </div>
           ) : (
             <div>No Prince — mint one from the Title.</div>

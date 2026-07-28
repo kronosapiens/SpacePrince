@@ -174,6 +174,20 @@ Signs, houses, and the Afflict/Testify verbs extend the same mechanism later.
 **Relationship to Chart Study (§7).** Same teaching impulse, different moment: study annotations serve the player mid-encounter at the point of decision, while Chart Study stays the between-runs contemplative surface.
 They share a register; §7.4's deferred annotation path should reuse this vocabulary.
 
+### 3.6.2 The info card (summoned and queued)
+
+One modal frame — full-viewport backdrop, bordered square stage, close button (`InfoCard`) — hosts standalone study content: chart inspection from the map, planet introductions, and future tooltip/tutorial cards.
+Content differs; the frame, entrance, and dismissal grammar (backdrop tap, ✕, or ESC) never do.
+The primer keeps its own gated flow (§9.6) for now; whether it ever presents inside this frame is an open question.
+
+A card opens one of two ways:
+
+- **Summoned** — the player asks for it (the map's chart anchor opens chart study inside the card).
+- **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents at the next **stable surface** (map or end screen), one at a time, never over a running encounter.
+
+The first queued card is the **planet introduction**: crossing a Macrobian threshold (`MECHANICS.md §11.1`) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
+The introduction celebrates the **position, not a person**: no voice, no chorus fragment — the concept/PRIMER.md accessibility decision (planets stay an ambient chorus) applies here with full force.
+
 ### 3.7 Chrome
 
 The encounter screen is allowed restrained, functional chrome where it does necessary work — telling the player whose turn it is, what the run state is, and how to leave. The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.
@@ -216,7 +230,7 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 ### 4.1 Layout
 
 - **Centered diagram** with breathing room — at least 15% margin on each side, per `STYLE.md §10`.
-- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** happen here: when the player surfaces back from a completed encounter that crosses a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per `MECHANICS.md §11.1`), the newly unlocked planet appears in its computed sign on the anchor with a small ceremony — the ghost emerges into full visual treatment.
+- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per `MECHANICS.md §11.1`) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the anchor.
 - **Distance readout** in the same position and treatment as the encounter screen (per §3.7).
 
 ### 4.2 Nodes

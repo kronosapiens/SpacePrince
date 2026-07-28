@@ -1244,10 +1244,11 @@
   border-radius: 50%;
 }
 
-/* Chart study overlay — full-viewport modal opened from the chart anchor.
-   Backdrop dismisses on click; the chart stage stops propagation so its
-   own clicks don't close the overlay. */
-.chart-study-overlay {
+/* Info card — the general-purpose full-viewport modal: backdrop + framed
+   square stage + close button. Hosts chart study, planet introductions, and
+   future tooltip/tutorial content. Backdrop dismisses on click; the stage
+   stops propagation so its own clicks don't close the card. */
+.info-card-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -1258,7 +1259,7 @@
   justify-content: center;
   padding: 24px;
 }
-.chart-study-stage {
+.info-card-stage {
   position: relative;
   width: min(720px, 88vmin);
   aspect-ratio: 1 / 1;
@@ -1275,7 +1276,7 @@
   width: 100%;
   height: 100%;
 }
-.chart-study-close {
+.info-card-close {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -1296,22 +1297,72 @@
   padding: 0;
   transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
 }
-.chart-study-close:hover {
+.info-card-close:hover {
   background: var(--bone);
   color: var(--void);
   border-color: var(--bone);
 }
-.chart-study-close:focus-visible {
+.info-card-close:focus-visible {
   outline: 1px solid var(--gold);
   outline-offset: 2px;
 }
 
-@keyframes chart-study-fade {
+@keyframes info-card-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-.anim-chart-study-fade {
-  animation: chart-study-fade 280ms var(--ease-out) both;
+.anim-info-card-fade {
+  animation: info-card-fade 280ms var(--ease-out) both;
+}
+
+/* Planet introduction — the unlock ceremony's card content. */
+.planet-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  font-family: var(--sans);
+  color: var(--mist);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+}
+.planet-intro-eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+.planet-intro-disc {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 48px rgba(255, 255, 255, 0.12);
+  margin-bottom: 8px;
+}
+.planet-intro-glyph {
+  font-size: 52px;
+  line-height: 1;
+  color: var(--void);
+}
+.planet-intro-name {
+  color: var(--bone);
+  font-size: 22px;
+  letter-spacing: 0.22em;
+}
+.planet-intro-role {
+  color: var(--gold);
+}
+.planet-intro-stats {
+  margin-top: 10px;
+}
+.planet-intro-footer {
+  margin-top: 18px;
+  font-size: 10px;
+  opacity: 0.7;
 }
 
 /* ── Dev chrome: page dropdown (top-right) + dev console (top-left) ──────

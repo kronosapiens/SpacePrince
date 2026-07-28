@@ -1,5 +1,6 @@
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { isOver } from "@/game/run";
+import { InfoCardHost } from "@/components/InfoCardHost";
 import { StartScreen } from "./StartScreen";
 import { MapScreen } from "./MapScreen";
 import { EncounterScreen } from "./EncounterScreen";
@@ -17,6 +18,12 @@ export function PlaySurface() {
   const run = useActiveRun();
   if (!prince || !run) return <StartScreen />;
   if (run.encounter) return <EncounterScreen />;
-  if (isOver(run, prince.chart, prince.numEncounters)) return <EndOfRunScreen />;
-  return <MapScreen />;
+  // Map and End are the stable surfaces — queued info cards (e.g. a planet
+  // introduction earned by the encounter just cleared) present here.
+  return (
+    <>
+      {isOver(run, prince.chart, prince.numEncounters) ? <EndOfRunScreen /> : <MapScreen />}
+      <InfoCardHost />
+    </>
+  );
 }
