@@ -321,7 +321,7 @@ export function Chart(props: ChartProps) {
       className={["chart-svg", entranceClass, className ?? ""].filter(Boolean).join(" ")}
       style={style}
       role="img"
-      aria-label={`${chart.name} natal chart${side === "other" ? " (opponent)" : ""}`}
+      aria-label={`${chart.name} natal chart${side === "other" ? " (other)" : ""}`}
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>

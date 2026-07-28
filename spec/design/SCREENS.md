@@ -38,6 +38,27 @@ The rule bites only where the player is asked to *decide*.
 
 When a design genuinely needs hidden information, it must be hidden onchain — entropy that doesn't exist yet (the per-map VRF draw, `MAP.md §4`) or a commitment scheme — never client-side concealment.
 
+### 1.2 Player-facing register: no martial language
+
+The game is about creating and relieving tension — being *with* others — and the player-facing vocabulary carries that.
+The surfaces are **Map**, **Encounter**, and **Narrative**; the encounter shows **self** and **other**.
+Affliction builds tension, testimony relieves it; planets combust and return; nothing fights, wounds, or wins.
+Generated other-charts are named `Other N`, never `Adversary`.
+
+**Combat, adversary, and opponent are internal vocabulary only** — the developers' easy metaphor for the interaction (`MECHANICS.md`, code identifiers, this spec's internals).
+They never reach a player surface: not in copy, labels, summaries, or aria text.
+The mechanical terms the player does see are register-safe by construction: the verbs Afflict/Testify, the operational readouts Resolve and Fortune, Distance, and the stats **Impact / Witness / Durability / Luck** — impact and witness replaced the RPG-inherited damage and healing (witness is the Hellenistic term behind testimony: planets bear witness to one another).
+
+**Casing.** Named quantities are capitalized in prose — **Resolve, Fortune, Distance** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").
+Substances and processes stay lowercase — affliction, testimony, tension, combustion, aspects, and the four stats (impact, witness, durability, luck) in flowing text; the fortune roll is a process and stays lowercase.
+Verbs follow mention vs use: named as actions they are capped ("choose Afflict or Testify"); used as English they are not ("afflict their actor before it swings").
+Display labels — table headers, stat lines, the uppercase micro-type (SELF, OTHER) — take title or upper case as chrome styling, independent of prose casing.
+Personification rides the capitalized form ("Fortune turns at the crossing").
+
+On player surfaces the named terms render in **gold** (`--gold`) — accent color replaces bold, the game-vernacular form of emphasis, and gold is already the attention color (selection rings, card titles, the chart ring).
+Gold marks terms of art only, never free emphasis; the wrapping is mechanical (`TermText`), keyed off the capitalized forms, so copy stays plain strings.
+Rejected: coloring Afflict/Testify by their valence colors in prose — running text becomes confetti, and amber/violet stay reserved for live action on the board.
+
 ---
 
 ## 2. The Screen Set

@@ -1,6 +1,8 @@
 /** Screen-help copy — the "?" info card for each gameplay surface. Chrome
  *  register: plain second-person help, accurate to MECHANICS.md; no chorus
- *  voice. Drafted for iteration. */
+ *  voice. Player-facing vocabulary is encounter / self / other — tension
+ *  held and relieved; combat and adversary are internal dev metaphors and
+ *  never appear here (SCREENS.md). Drafted for iteration. */
 
 export type HelpScreen = "map" | "combat" | "narrative";
 
@@ -9,16 +11,16 @@ export const SCREEN_HELP: Record<HelpScreen, { title: string; paragraphs: string
     title: "The Map",
     paragraphs: [
       "Each map is a small constellation of encounters. Tap a node to consider it, tap it again to travel — paths lead onward, never back. Nothing is hidden: every node shows what it holds before you commit.",
-      "Combat nodes hold an adversary. The rest open a scene in one of the twelve houses. Your chart stands beside the map — inspect it to study your planets between encounters.",
-      "The far node crosses into the next map. Fortune turns at the crossing: each combusted planet rolls to return, and the barrage wounds the lit ones. A run is seven maps at most; Distance is its lasting record.",
+      "Some nodes hold an encounter — self and other, two charts face to face. The rest open a scene in one of the twelve houses. Your chart stands beside the map — inspect it to study your planets between encounters.",
+      "The far node crosses into the next map. Fortune turns at the crossing: each combusted planet rolls to return, and the lit ones take on fresh affliction. A run is seven maps at most; Distance is its lasting record.",
     ],
   },
   combat: {
-    title: "Combat",
+    title: "The Encounter",
     paragraphs: [
-      "The adversary commits first: its planet and its verb are locked and revealed before you choose. Answer by tapping one of your planets, choosing Afflict or Testify, then tapping the verb again to commit.",
-      "Affliction wounds. When it reaches a planet's Resolve, the planet combusts and falls silent. Testimony heals affliction away — and only testimony landed on the adversary's chart earns Distance. Combusting their planet is a trade: it can no longer act, but what afflicts it can no longer be resolved.",
-      "Effects ripple along aspect lines — soft aspects carry them onward, hard aspects invert them. Nothing here is rolled: the numbers you preview are the numbers that land. The fight runs as many turns as the map you are on.",
+      "The other commits first: its planet and its verb are shown before you choose. Answer with a planet of your own — tap it, choose Afflict or Testify, then tap the verb again to commit.",
+      "Affliction builds tension. When it reaches a planet's Resolve, the planet combusts and goes quiet. Testimony relieves tension — and only testimony landed on the other's chart earns Distance. Combusting one of their planets is a trade: it acts no more, but what it carries can no longer be resolved.",
+      "Effects ripple along aspect lines — soft aspects carry them onward, hard aspects invert them. Nothing here is rolled: the numbers you preview are the numbers that land. The encounter runs as many turns as the map you are on.",
     ],
   },
   narrative: {

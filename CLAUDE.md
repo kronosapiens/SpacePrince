@@ -92,6 +92,7 @@ The spec is divided by what kind of question each document answers.
 - **Don't add wallet, RPC, or contract calls to `client/`** unless explicitly asked — the client is presentation-only and currently a local prototype.
 - **Don't introduce new visual vocabulary or colors** outside the planetary palette without checking `spec/design/STYLE.md` first.
 - **The chart is never a corner HUD.** Surfaces flow through the chart, not on top of it (`spec/design/SCREENS.md`).
+- **No martial language on player surfaces.** Players see encounter / self / other — tension held and relieved; combat, adversary, opponent are internal vocabulary only (`spec/design/SCREENS.md §1.2`).
 - **Client honesty.** Never present derivable information as unknowable, and never frame a determined outcome as a gamble (`spec/design/SCREENS.md §1.1`).
 - **Interaction grammar is parity-first.** Tap-preview and tap-commit work identically on touch and desktop; hover is desktop-only and additive — never the sole carrier of information, never a commit (`spec/design/SCREENS.md §3.6`).
 - **Previews show only what is determined.** Verb-dependent information appears once a verb is indicated (hovered or armed); verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).

@@ -64,7 +64,7 @@ export function useCommitTurn() {
         const outcome: NodeOutcome = {
           nodeId: nextRun.map.currentNodeId,
           kind: "combat",
-          summary: `Combat · ${result.encounter.opponentChart.name}`,
+          summary: `Encounter · ${result.encounter.opponentChart.name}`,
           distanceDelta: nextRun.distance - run.distance,
           combusts,
         };

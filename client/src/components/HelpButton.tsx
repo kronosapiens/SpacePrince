@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { InfoCard } from "@/components/InfoCard";
+import { TermText } from "@/components/TermText";
 import { SCREEN_HELP, type HelpScreen } from "@/data/screen-help";
 
 /** The "?" affordance in the top-right corner: summons this screen's help
@@ -24,7 +25,7 @@ export function HelpButton({ screen }: { screen: HelpScreen }) {
           <div className="screen-help">
             <div className="screen-help-title">{help.title}</div>
             {help.paragraphs.map((p, i) => (
-              <p key={i} className="screen-help-p">{p}</p>
+              <p key={i} className="screen-help-p"><TermText text={p} /></p>
             ))}
           </div>
         </InfoCard>

@@ -267,7 +267,7 @@ function walkMap(seed: number, toTerminal: boolean): MapState {
     outcomes[nodeId] = {
       nodeId,
       kind: content.kind,
-      summary: content.kind === "combat" ? "Combat" : `House ${content.house}`,
+      summary: content.kind === "combat" ? "Encounter" : `House ${content.house}`,
       distanceDelta: 6 + Math.floor(outRng() * 10),
       combusts: [],
     };

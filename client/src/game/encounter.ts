@@ -68,7 +68,8 @@ export function afflictedSideState(
 
 export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
-  const opponentChart = seededChart(opponentSeed, `Adversary ${opponentSeed % 9999}`);
+  // Player-facing name: the self/other axis, never adversary (SCREENS.md).
+  const opponentChart = seededChart(opponentSeed, `Other ${opponentSeed % 9999}`);
   // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
   // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is
   // the map number, so a single planet may simply be sent on repeat turns.
