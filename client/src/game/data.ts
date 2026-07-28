@@ -31,13 +31,13 @@ export const MACROBIAN_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 // 12-lattice base + 12-lattice buffs keeps every effective stat divisible by
 // every circle-fraction aspect denominator (§9), so magnitudes stay integer.
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun:     { damage: 36, healing: 24, durability: 36, luck: 24 },
-  Moon:    { damage: 12, healing: 48, durability: 12, luck: 24 },
-  Mercury: { damage: 24, healing: 24, durability: 24, luck: 48 },
-  Venus:   { damage: 12, healing: 48, durability: 24, luck: 36 },
-  Mars:    { damage: 48, healing: 12, durability: 24, luck: 12 },
-  Jupiter: { damage: 24, healing: 36, durability: 36, luck: 36 },
-  Saturn:  { damage: 24, healing: 12, durability: 48, luck: 12 },
+  Sun:     { impact: 36, witness: 24, durability: 36, luck: 24 },
+  Moon:    { impact: 12, witness: 48, durability: 12, luck: 24 },
+  Mercury: { impact: 24, witness: 24, durability: 24, luck: 48 },
+  Venus:   { impact: 12, witness: 48, durability: 24, luck: 36 },
+  Mars:    { impact: 48, witness: 12, durability: 24, luck: 12 },
+  Jupiter: { impact: 24, witness: 36, durability: 36, luck: 36 },
+  Saturn:  { impact: 24, witness: 12, durability: 48, luck: 12 },
 };
 
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
@@ -65,16 +65,16 @@ export const SIGN_MODALITY: Record<SignName, ModalityType> = {
 };
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {
-  Cardinal: { damage: 12, healing: 0, durability: 0, luck: 0 },
-  Fixed:    { damage: 0, healing: 0, durability: 12, luck: 0 },
-  Mutable:  { damage: 0, healing: 12, durability: 0, luck: 0 },
+  Cardinal: { impact: 12, witness: 0, durability: 0, luck: 0 },
+  Fixed:    { impact: 0, witness: 0, durability: 12, luck: 0 },
+  Mutable:  { impact: 0, witness: 12, durability: 0, luck: 0 },
 };
 
 export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
-  Fire:  { damage: 12, healing: 0, durability: 0, luck: 0 },
-  Earth: { damage: 0, healing: 0, durability: 12, luck: 0 },
-  Water: { damage: 0, healing: 12, durability: 0, luck: 0 },
-  Air:   { damage: 0, healing: 0, durability: 0, luck: 12 },
+  Fire:  { impact: 12, witness: 0, durability: 0, luck: 0 },
+  Earth: { impact: 0, witness: 0, durability: 12, luck: 0 },
+  Water: { impact: 0, witness: 12, durability: 0, luck: 0 },
+  Air:   { impact: 0, witness: 0, durability: 0, luck: 12 },
 };
 
 export const RULERSHIP: Record<SignName, PlanetName> = {

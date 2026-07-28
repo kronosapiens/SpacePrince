@@ -25,10 +25,10 @@ describe("deriveStatTable", () => {
       for (const planet of PLANETS) {
         const placement = chart.planets[planet];
         const table = deriveStatTable(placement);
-        const byKey = (k: "damage" | "healing" | "luck") =>
+        const byKey = (k: "impact" | "witness" | "luck") =>
           table.rows.find((r) => r.key === k)!.total;
-        expect(table.afflict).toBe(byKey("damage"));
-        expect(table.testify).toBe(byKey("healing"));
+        expect(table.afflict).toBe(byKey("impact"));
+        expect(table.testify).toBe(byKey("witness"));
         // Fortune = luck/120 (MECHANICS §7); luck is even, so this is exact.
         expect(table.fortunePct).toBe(Math.round((byKey("luck") / 120) * 100));
         expect(table.durability).toBe(combustionCeiling(placement));

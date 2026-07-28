@@ -30,16 +30,16 @@ The role is the player's first read on the planet; the stats are the role's mech
 The short display label per planet (e.g., "the warrior") lives in `client/src/game/data.ts` as `PLANET_ROLE`.
 
 - **Sun** — balanced presence in every stat; the centered self.
-- **Moon** — top healing, fragile elsewhere; the reflective interior.
+- **Moon** — top witness, fragile elsewhere; the reflective interior.
 - **Mercury** — top luck, average elsewhere; paradox, the turn.
-- **Venus** — strong healing and luck; beauty, relation, the sensed world.
-- **Mars** — top damage, brittle elsewhere; the decisive cut.
+- **Venus** — strong witness and luck; beauty, relation, the sensed world.
+- **Mars** — top impact, brittle elsewhere; the decisive cut.
 - **Jupiter** — balanced and generous across all stats; expansion, gift.
 - **Saturn** — top durability, slow elsewhere; limit, time, endurance.
 
 Base stats per planet, multiples of `12` on a `12–48` scale:
 
-| Planet  | Damage | Healing | Durability | Luck | Total |
+| Planet  | Impact | Witness | Durability | Luck | Total |
 |---------|-------:|--------:|-----------:|-----:|------:|
 | Sun     |     36 |      24 |         36 |   24 |   120 |
 | Moon    |     12 |      48 |         12 |   24 |    96 |
@@ -51,7 +51,7 @@ Base stats per planet, multiples of `12` on a `12–48` scale:
 
 Base values are multiples of `12` and buffs (§4) add `+12`, so every effective stat stays on the 12-lattice — every aspect fraction (§9) of every magnitude is an integer.
 
-**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~120–132) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 96) a higher single-stat peak (`48`) at a lower total. No planet tops both `damage` and `healing`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
+**Balance (open).** Stat totals are not equalized: generalists (Jupiter, Sun, Mercury, Venus; ~120–132) carry a higher total at a lower peak, specialists (Mars, Moon, Saturn; 96) a higher single-stat peak (`48`) at a lower total. No planet tops both `impact` and `witness`, and none is strictly dominated by another, so neither a dominant nor a dead pick results — but whether to equalize the totals or tier them deliberately (e.g. along the benefic/malefic ladder) is left to playtest.
 
 ## 3. Chart Generation
 
@@ -75,7 +75,7 @@ A planet's effective stat is base + buffs — the value used in combat.
 
 Element — each element buffs the one stat it expresses:
 
-| Element | Damage | Healing | Durability | Luck |
+| Element | Impact | Witness | Durability | Luck |
 |---------|:------:|:-------:|:----------:|:----:|
 | Fire    |  +12   |         |            |      |
 | Water   |        |  +12    |            |      |
@@ -84,7 +84,7 @@ Element — each element buffs the one stat it expresses:
 
 Modality — three of the four stats; modality does not touch luck:
 
-| Modality | Damage | Healing | Durability | Luck |
+| Modality | Impact | Witness | Durability | Luck |
 |----------|:------:|:-------:|:----------:|:----:|
 | Cardinal |  +12   |         |            |      |
 | Mutable  |        |  +12    |            |      |
@@ -105,15 +105,15 @@ Mercury has no fixed sect — it takes `Day` or `Night` from its solar phase (ec
 
 Each turn, both sides commit one planet to one of two actions.
 
-- **Afflict** — uses the planet's `damage` stat.
-- **Testify** — uses the planet's `healing` stat.
+- **Afflict** — uses the planet's `impact` stat.
+- **Testify** — uses the planet's `witness` stat.
 
 Action is set per side:
 
 - **Player side:** explictly chosen.
   Selecting a planet fans out the two actions; the player picks one.
 - **Opponent side:** randomly drawn and precommitted.
-  The verb is a stat-weighted random draw — `P(afflict) = damage / (damage + healing)`, `P(testify) = 1 - P(afflict)`.
+  The verb is a stat-weighted random draw — `P(afflict) = impact / (impact + witness)`, `P(testify) = 1 - P(afflict)`.
   It is locked at turn start and surfaced to the player — alongside the already-revealed opponent planet — before the player chooses, so the player always acts with full information.
 
 ## 6. Direct Resolution
@@ -123,12 +123,12 @@ Resolution is **sequential**, in two phases — the intent → act → response 
 1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is resolved there.
 2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
 
-The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free healing — longevity, not Distance (§12) — that combusting it would deny.
+The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free relief — longevity, not Distance (§12) — that combusting it would deny.
 
 Base amount is the stat for the action:
 
-- `Afflict`: `damage`
-- `Testify`: `healing`
+- `Afflict`: `impact`
+- `Testify`: `witness`
 
 Raw direct amount:
 
@@ -148,14 +148,14 @@ Fresh randomness enters only where the game is already pausing to reveal somethi
 - **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5). By the time the resolution animation finishes, the next move has landed. Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
 - **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: `min(45, 20 + luck/2) / 60` on the conditioning planet's luck — a `20/60` (⅓) floor rising to a `45/60` (¾) cap.
 
-Luck is therefore not a combat stat. Damage, healing, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` (10–60% at effective luck 12–72) — is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
+Luck is therefore not a combat stat. Impact, witness, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` (10–60% at effective luck 12–72) — is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
 
 ## 8. Affliction Value Model
 
 Affliction is integer-valued — every direct and propagated effect is a whole number.
 
 - direct and propagated effects apply their full amounts
-- healing (testimony) clamps affliction at zero
+- testimony clamps affliction at zero
 
 ## 9. Aspects and Propagation
 
@@ -194,7 +194,7 @@ Affliction accumulates toward a **combustion ceiling** set by durability alone. 
 - `ceiling = durability * 5` (durability = core + sign buffs, per §4; durability is a multiple of 12, so ceilings are multiples of 60 — every division the game takes lands on integers, and the maximum ceiling, a fixed earth-sign Saturn, is `360`: the full circle)
 - combust when `affliction >= ceiling`
 
-Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and healing affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
+Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
 
@@ -283,7 +283,7 @@ Distance accrues from testimony — affliction healed — not from affliction cr
 Affliction is the setup; resolving it is the payoff.
 
 The player's own chart never scores: personal chart management is about survival, opponent chart management is about scoring.
-The opponent healing your chart is a gift of longevity, not Distance.
+The opponent's testimony on your chart is a gift of longevity, not Distance.
 Every point of Distance therefore traces to the player's own action.
 
 Per turn:
@@ -313,7 +313,7 @@ Action display:
 
 Impact display:
 
-- the direct output for the action's stat (`damage` for `Afflict`, `healing` for `Testify`)
+- the direct output for the action's stat (`impact` for `Afflict`, `witness` for `Testify`)
 
 ## 14. Prototype Scope
 

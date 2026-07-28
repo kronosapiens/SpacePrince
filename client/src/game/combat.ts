@@ -8,13 +8,13 @@ import type {
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 import { combustionCeiling } from "./combust";
 
-/** Stat-weighted action draw — `P(afflict) = damage / (damage + healing)`.
+/** Stat-weighted action draw — `P(afflict) = impact / (impact + witness)`.
  *  Used to precommit the opponent's verb each turn (the player chooses theirs).
  *  No planet has a zero in either stat, so no draw is fully deterministic. */
 export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
-  const total = stats.damage + stats.healing;
+  const total = stats.impact + stats.witness;
   if (total <= 0) return "Affliction";
-  return rng() < stats.damage / total ? "Affliction" : "Testimony";
+  return rng() < stats.impact / total ? "Affliction" : "Testimony";
 }
 
 /** The fortune roll (MECHANICS.md §7) — `luck / 120`, i.e. `(luck/2)` sixtieths
@@ -27,8 +27,8 @@ export function fortuneChance(luck: number): number {
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
   return {
-    damage: Math.max(0, p.base.damage + p.buffs.damage),
-    healing: Math.max(0, p.base.healing + p.buffs.healing),
+    impact: Math.max(0, p.base.impact + p.buffs.impact),
+    witness: Math.max(0, p.base.witness + p.buffs.witness),
     durability: Math.max(0, p.base.durability + p.buffs.durability),
     luck: Math.max(0, p.base.luck + p.buffs.luck),
   };
@@ -38,10 +38,10 @@ export function getEffectiveStats(chart: Chart, planet: PlanetName): PlanetStats
   return getEffectiveStatsFromPlacement(chart.planets[planet]);
 }
 
-const STAT_KEYS = ["damage", "healing", "durability", "luck"] as const;
+const STAT_KEYS = ["impact", "witness", "durability", "luck"] as const;
 const STAT_LABEL: Record<keyof PlanetStats, string> = {
-  damage: "Dmg",
-  healing: "Heal",
+  impact: "Impact",
+  witness: "Witness",
   durability: "Dur",
   luck: "Luck",
 };
@@ -61,8 +61,8 @@ export interface StatTable {
   /** Operational read-outs for the closed modal, derived from the totals. */
   durability: number; // combustion ceiling = HP
   fortunePct: number; // the fortune roll as a percentage (luck total × 5, §7)
-  afflict: number; // damage total
-  testify: number; // healing total
+  afflict: number; // impact total
+  testify: number; // witness total
 }
 
 /** The underlying-stat table behind the operational numbers (the study drop-down,
@@ -84,8 +84,8 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
     rows,
     durability: combustionCeiling(p),
     fortunePct: Math.round(fortuneChance(total("luck")) * 100),
-    afflict: Math.max(0, total("damage")),
-    testify: Math.max(0, total("healing")),
+    afflict: Math.max(0, total("impact")),
+    testify: Math.max(0, total("witness")),
   };
 }
 
@@ -96,9 +96,9 @@ export function computeDirectExchange(
   opponentStats: PlanetStats,
 ) {
   const playerToOpponent =
-    playerValence === "Testimony" ? playerStats.healing : playerStats.damage;
+    playerValence === "Testimony" ? playerStats.witness : playerStats.impact;
   const opponentToPlayer =
-    opponentValence === "Testimony" ? opponentStats.healing : opponentStats.damage;
+    opponentValence === "Testimony" ? opponentStats.witness : opponentStats.impact;
   return {
     playerToOpponent: Math.max(0, playerToOpponent),
     opponentToPlayer: Math.max(0, opponentToPlayer),

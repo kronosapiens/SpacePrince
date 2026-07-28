@@ -11,8 +11,8 @@ function placement(durability: number): PlanetPlacement {
     element: "Fire",
     modality: "Fixed",
     dignity: "Neutral",
-    base: { damage: 0, healing: 0, durability, luck: 0 },
-    buffs: { damage: 0, healing: 0, durability: 0, luck: 0 },
+    base: { impact: 0, witness: 0, durability, luck: 0 },
+    buffs: { impact: 0, witness: 0, durability: 0, luck: 0 },
   };
 }
 

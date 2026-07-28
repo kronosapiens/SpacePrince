@@ -89,12 +89,12 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // both pre-commit and mid-playback.
   const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
   const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
-  // Magnitude of the opponent's precommitted verb (its effective damage/healing),
+  // Magnitude of the opponent's precommitted verb (its effective impact/witness),
   // shown next to the verb in the seam — e.g. "AFFLICTS 5".
   const displayOpponentAmount =
     displayOpponentTurn && displayOpponentAction
       ? getEffectiveStats(encounter.opponentChart, displayOpponentTurn)[
-          displayOpponentAction === "Testimony" ? "healing" : "damage"
+          displayOpponentAction === "Testimony" ? "witness" : "impact"
         ]
       : null;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
@@ -185,7 +185,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const combustWarnings = useMemo(() => {
     if (animation || encounter.resolved || !opponentTurn) return null;
     if (opponentAction !== "Affliction") return null;
-    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).damage;
+    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).impact;
     const candidates = playerUnlocked.filter(
       (p) => !isCombusted(prince.chart.planets[p], run.state[p]),
     );
@@ -194,7 +194,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     );
     const maxAnswer = Math.max(
       0,
-      ...candidates.map((p) => getEffectiveStats(prince.chart, p).damage),
+      ...candidates.map((p) => getEffectiveStats(prince.chart, p).impact),
     );
     const other = wouldCombust(
       encounter.opponentChart.planets[opponentTurn],
@@ -356,8 +356,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     inspected && !animation && !encounter.resolved &&
     !isCombusted(prince.chart.planets[inspected], run.state[inspected])
       ? {
-          afflict: getEffectiveStats(prince.chart, inspected).damage,
-          testify: getEffectiveStats(prince.chart, inspected).healing,
+          afflict: getEffectiveStats(prince.chart, inspected).impact,
+          testify: getEffectiveStats(prince.chart, inspected).witness,
           pending: pendingAction,
           // First click/tap arms the action (and previews its spread); a second
           // on the same action confirms. Uniform across pointer and touch.

@@ -39,8 +39,8 @@ function oppositeSign(s: SignName): SignName {
 
 function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {
   return {
-    damage: a.damage + b.damage,
-    healing: a.healing + b.healing,
+    impact: a.impact + b.impact,
+    witness: a.witness + b.witness,
     durability: a.durability + b.durability,
     luck: a.luck + b.luck,
   };

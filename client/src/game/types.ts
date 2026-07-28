@@ -16,8 +16,8 @@ export type AspectType =
 export type Polarity = "Testimony" | "Affliction";
 
 export interface PlanetBaseStats {
-  damage: number;
-  healing: number;
+  impact: number;
+  witness: number;
   durability: number;
   luck: number;
 }
@@ -104,7 +104,7 @@ export interface CombatEncounter {
   roster: PlanetName[];
   sequence: PlanetName[]; // opponent's planet per turn; length is always 3
   /** Opponent's precommitted action per turn, parallel to `sequence`. Drawn
-   *  stat-weighted (P(afflict) = damage / (damage + healing)) and locked at
+   *  stat-weighted (P(afflict) = impact / (impact + witness)) and locked at
    *  turn start, so the player always chooses with full information. */
   opponentActions: Polarity[];
   turnIndex: number;

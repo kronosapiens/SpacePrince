@@ -29,7 +29,7 @@ describe("turnScore — resolution on the opponent's chart only", () => {
   });
 
   it("ignores self-side testimony — personal chart is survival, not score", () => {
-    // The opponent healing the player (or an inversion rippling testimony
+    // The opponent witness the player (or an inversion rippling testimony
     // through the player's own web) extends the run; it earns no Distance.
     expect(turnScore(0, "Affliction", [prop("self", "Testimony", -3)])).toBe(0);
   });

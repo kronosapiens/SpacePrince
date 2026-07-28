@@ -35,7 +35,7 @@ export function PlanetIntroCard({ chart, planet }: PlanetIntroCardProps) {
         {placement.dignity !== "Neutral" && ` · ${placement.dignity}`}
       </div>
       <div className="planet-intro-stats">
-        Damage {stats.damage} · Healing {stats.healing} · Durability {stats.durability} · Luck {stats.luck}
+        Impact {stats.impact} · Witness {stats.witness} · Durability {stats.durability} · Luck {stats.luck}
       </div>
       <div className="planet-intro-footer">
         {threshold === 0 ? "From the first encounter" : `Encounter ${threshold}`}

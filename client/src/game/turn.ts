@@ -18,7 +18,7 @@ import type {
   TurnLogEntry,
 } from "./types";
 
-const ZERO_STATS = { damage: 0, healing: 0, durability: 0, luck: 0 };
+const ZERO_STATS = { impact: 0, witness: 0, durability: 0, luck: 0 };
 
 interface TurnResult {
   run: Run;
@@ -166,7 +166,7 @@ function resolveAction(
   placement: PlanetPlacement,
   sideTag: "self" | "other",
 ) {
-  const amount = Math.max(0, valence === "Testimony" ? attackerEff.healing : attackerEff.damage);
+  const amount = Math.max(0, valence === "Testimony" ? attackerEff.witness : attackerEff.impact);
   const wasCombusted = isCombusted(placement, side[active]);
   const delta = wasCombusted
     ? 0

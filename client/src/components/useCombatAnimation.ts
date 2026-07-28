@@ -492,8 +492,8 @@ function runScheduler(args: {
   // Direct distance resolved: only your action landing on the opponent's chart
   // scores (opponent-chart-only Distance, MECHANICS §12; mirrors `turnScore`'s
   // directResolved so the ticked total lands exactly on the committed run
-  // distance). The opponent healing your chart is survival, not score — phase 2
-  // ticks nothing.
+  // distance). The opponent's testimony on your chart is survival, not score —
+  // phase 2 ticks nothing.
   const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
 
   // Phase 1: your action lands on the opponent's chart; the attacker is your

@@ -29,8 +29,8 @@ export const COLUMN_GLOSS: Record<"core" | "placement", string> = {
 // teaches which sign quality lifts a stat (MECHANICS.md §4: each element/
 // modality "expresses" one stat). Composed, never hand-authored per combination.
 const STAT_WORD: Record<keyof PlanetStats, string> = {
-  damage: "damage",
-  healing: "healing",
+  impact: "impact",
+  witness: "witness",
   durability: "durability",
   luck: "luck",
 };
@@ -40,8 +40,8 @@ const article = (s: string) => (/^[aeiou]/i.test(s) ? "an" : "a");
 // The combat metric each stat surfaces as, in the panel's own labels — closes
 // the blurb with a plain "Expressed as …".
 const STAT_METRIC: Record<keyof PlanetStats, string> = {
-  damage: "Afflict",
-  healing: "Testify",
+  impact: "Afflict",
+  witness: "Testify",
   durability: "Resolve",
   luck: "Fortune",
 };
@@ -51,7 +51,8 @@ const STAT_METRIC: Record<keyof PlanetStats, string> = {
 export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string {
   const word = STAT_WORD[key];
   const core = p.base[key];
-  const coreQual = core >= 6 ? "strong" : core <= 2 ? "slight" : "modest";
+  // Base stats live on the 12–48 lattice (MECHANICS §2).
+  const coreQual = core >= 36 ? "strong" : core <= 12 ? "slight" : "modest";
   // Qualitative only — the numbers sit in the table right above this prose.
   const parts = [`${p.planet}'s ${word} is ${coreQual} by nature.`];
 
