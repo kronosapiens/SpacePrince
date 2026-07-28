@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
+import { HelpButton } from "@/components/HelpButton";
 import { MapDiagram } from "@/components/MapDiagram";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { setTheme } from "@/audio/engine";
@@ -156,6 +157,7 @@ export function MapScreen() {
 
   return (
     <div className="map-screen">
+      <HelpButton screen="map" />
       <div className="map-anchor">
         <ChartAnchor
           chart={prince.chart}

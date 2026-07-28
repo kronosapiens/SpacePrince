@@ -1,5 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import { Chart } from "@/components/Chart";
+import { HelpButton } from "@/components/HelpButton";
 import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
@@ -388,6 +389,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   return (
     <div className="combat" onClick={handleClearSelection}>
+      <HelpButton screen="combat" />
       <div className="combat-side">
         <Chart
           chart={prince.chart}

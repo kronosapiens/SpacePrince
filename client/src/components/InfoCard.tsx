@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface InfoCardProps {
   /** Dialog label for assistive tech. */
@@ -20,8 +21,19 @@ export function InfoCard({ ariaLabel, onClose, children }: InfoCardProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
-    <div className="info-card-overlay anim-info-card-fade" onClick={onClose} role="dialog" aria-label={ariaLabel}>
+  // Portaled to <body>: host screens carry transforms/animations that trap
+  // z-index in their own stacking contexts — the card must sit above all
+  // surface chrome regardless of where it was summoned from.
+  return createPortal(
+    <div
+      className="info-card-overlay anim-info-card-fade"
+      role="dialog"
+      aria-label={ariaLabel}
+      // Dismiss on backdrop tap — and swallow it: the card may be mounted
+      // inside a screen whose root has its own click handler (e.g. the
+      // narrative continue), and a modal's events end at the modal.
+      onClick={(e) => { e.stopPropagation(); onClose(); }}
+    >
       {/* The stage stops propagation so its own clicks don't dismiss. */}
       <div className="info-card-stage" onClick={(e) => e.stopPropagation()}>
         <button
@@ -34,6 +46,7 @@ export function InfoCard({ ariaLabel, onClose, children }: InfoCardProps) {
         </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

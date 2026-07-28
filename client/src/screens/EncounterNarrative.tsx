@@ -1,5 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
+import { HelpButton } from "@/components/HelpButton";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
@@ -234,6 +235,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       className={`narrative ${resolved ? "is-resolved" : ""}`}
       onClick={resolved ? handleContinue : () => setSelectedOptionId(null)}
     >
+      <HelpButton screen="narrative" />
       <div className="narrative-chart">
         <Chart
           chart={prince.chart}
