@@ -1331,22 +1331,11 @@
 .planet-intro-eyebrow {
   color: var(--gold);
   font-size: 11px;
-  margin-bottom: 12px;
 }
-.planet-intro-disc {
-  width: 108px;
-  height: 108px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 48px rgba(255, 255, 255, 0.12);
-  margin-bottom: 8px;
-}
-.planet-intro-glyph {
-  font-size: 52px;
-  line-height: 1;
-  color: var(--void);
+/* The Kandinsky piece carries generous internal margin (its art sits well
+   inside the viewBox); pull the neighbors in so the column reads as one. */
+.planet-intro-figure {
+  margin: -36px 0 -44px;
 }
 .planet-intro-name {
   color: var(--bone);
