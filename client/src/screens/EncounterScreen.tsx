@@ -1,6 +1,8 @@
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { useCommitNarrative, useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
+import { thresholdCrossedBy } from "@/game/unlocks";
 import { EncounterCombatScreen } from "./EncounterCombat";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
 
@@ -12,6 +14,7 @@ export function EncounterScreen() {
   const dispatch = usePrinceDispatch();
   const commitTurn = useCommitTurn();
   const commitNarrative = useCommitNarrative();
+  const { enqueueCard } = useInfoCards();
   const settings = loadDevSettings();
 
   // PlaySurface only renders this for a run with a live encounter.
@@ -19,9 +22,19 @@ export function EncounterScreen() {
   const enc = run.encounter;
 
   // Clearing the encounter returns the surface to Map — or to End if the run
-  // ended (PlaySurface derives that from `isOver`).
-  const clearEncounter = () =>
+  // ended (PlaySurface derives that from `isOver`). The lifetime layer
+  // advances HERE, on leaving a resolved encounter — never mid-surface, so a
+  // new planet can't pop in un-ghosted during the final turn's playback.
+  // Crossing a Macrobian threshold queues the planet introduction, which
+  // presents over the next stable surface (InfoCardHost).
+  const clearEncounter = () => {
+    if (enc.resolved) {
+      const crossed = thresholdCrossedBy(prince.numEncounters, prince.numEncounters + 1);
+      if (crossed) enqueueCard({ kind: "planet-intro", planet: crossed });
+      dispatch({ kind: "incrementEncounters" });
+    }
     dispatch({ kind: "commitRun", run: { ...run, encounter: null } });
+  };
 
   if (enc.kind === "combat") {
     return (
