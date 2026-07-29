@@ -27,13 +27,13 @@ Space Prince is a game about astrology. But it's unlike others you've played.
 
 Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by **creating and relieving tension.**
 
+Tension held and relieved, over and over, carries you forward. Every game measures one thing: **how far you can go.**
+
 The goal isn't to win, but to better understand yourself.
 
 To begin, **cast your chart** and create a globally unique token: your Space Prince. Nobody else can play as you, because **nobody else is you.**
 
 All of your games will be permanently recorded and reflected in your Prince's visual appearance. The video game save file turned art object.
-
-Are you ready?
 ```
 
 ---

@@ -189,6 +189,10 @@ export function StartScreen() {
               <strong>creating and relieving tension.</strong> {" "}
             </p>
             <p>
+              Tension held and relieved, over and over, carries you forward.
+              Every game measures one thing: <strong>how far you can go.</strong>
+            </p>
+            <p>
               The goal isn't to win, but to better understand yourself.
             </p>
             <p>
@@ -201,7 +205,6 @@ export function StartScreen() {
               your Prince's visual appearance.
               The video game save file turned art object.
             </p>
-            <p>Are you ready?</p>
             <button
               className="begin-btn"
               type="button"
