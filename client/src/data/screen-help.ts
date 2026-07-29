@@ -1,34 +1,50 @@
-/** Screen-help copy — the "?" info card for each gameplay surface. Chrome
- *  register: plain second-person help, accurate to MECHANICS.md; no chorus
- *  voice. Player-facing vocabulary is encounter / self / other — tension
- *  held and relieved; combat and adversary are internal dev metaphors and
- *  never appear here (SCREENS.md). Drafted for iteration. */
+/** Screen-help copy — the "?" info card for each gameplay surface.
+ *  Every card runs three beats:
+ *    1. one sentence — the screen's purpose in the run, carrying stakes
+ *       (the test: it should survive with the title deleted);
+ *    2. two-three sentences — goals and affordances in one breath;
+ *    3. a slightly longer close — the concepts that change decisions,
+ *       never a systems manual (previews teach the numbers).
+ *  Chrome register: plain second-person help, accurate to MECHANICS.md; no
+ *  chorus voice. Player-facing vocabulary is encounter / self / other —
+ *  tension held and relieved; combat and adversary are internal dev
+ *  metaphors and never appear here. Casing per SCREENS.md §1.2: named
+ *  quantities capped (Resolve, Fortune, Distance — TermText golds these);
+ *  substances, processes, and stats lowercase in prose. */
 
-export type HelpScreen = "map" | "combat" | "narrative";
+export type HelpScreen = "map" | "combat" | "narrative" | "chart";
 
 export const SCREEN_HELP: Record<HelpScreen, { title: string; paragraphs: string[] }> = {
   map: {
     title: "The Map",
     paragraphs: [
-      "Each map is a small constellation of encounters. Tap a node to consider it, tap it again to travel — paths lead onward, never back. Nothing is hidden: every node shows what it holds before you commit.",
-      "Some nodes hold an encounter — self and other, two charts face to face. The rest open a scene in one of the twelve houses. Your chart stands beside the map — inspect it to study your planets between encounters.",
-      "The far node crosses into the next map. Fortune turns at the crossing: each combusted planet rolls to return, and the lit ones take on fresh affliction. A run is seven maps at most; Distance is its lasting record.",
+      "The run is this crossing: a small constellation of encounters, traveled one way, with Distance as its lasting record.",
+      "Choose your path node by node — tap a node to consider it, tap it again to travel. Nothing is hidden: every node shows what it holds before you commit. Your chart stands beside the map; inspect it to study your planets between encounters.",
+      "Some nodes hold an encounter, self and other face to face; the rest open a scene in one of the twelve houses. The far node crosses into the next map, and Fortune turns at the crossing: each combusted planet rolls to return, and the lit ones take on fresh affliction. A run is seven maps at most, and encounters run one turn longer with each map.",
     ],
   },
   combat: {
     title: "The Encounter",
     paragraphs: [
-      "The other commits first: its planet and its verb are shown before you choose. Answer with a planet of your own — tap it, choose Afflict or Testify, then tap the verb again to commit.",
-      "Affliction builds tension. When it reaches a planet's Resolve, the planet combusts and goes quiet. Testimony relieves tension — and only testimony landed on the other's chart earns Distance. Combusting one of their planets is a trade: it acts no more, but what it carries can no longer be resolved.",
-      "Effects ripple along aspect lines — soft aspects carry them onward, hard aspects invert them. Nothing here is rolled: the numbers you preview are the numbers that land. The encounter runs as many turns as the map you are on.",
+      "This is where Distance is earned: self and other, two charts face to face, holding and relieving tension.",
+      "Your goal is to land testimony on the other's chart — only testimony landed there earns Distance — while keeping your own planets from combusting. The other commits first, its planet and verb shown before you choose; answer by tapping a planet of your own, choosing Afflict or Testify, then tapping the verb again to commit.",
+      "Affliction builds tension; when it reaches a planet's Resolve, the planet combusts and goes quiet. Combusting one of the other's planets is a trade — it acts no more, but what it carries can no longer be relieved. Effects ripple along aspect lines, soft aspects carrying them onward, hard aspects inverting them. Nothing is rolled: the numbers you preview are the numbers that land, and the encounter runs as many turns as the map you are on.",
+    ],
+  },
+  chart: {
+    title: "The Chart",
+    paragraphs: [
+      "Your chart is the character sheet, the save file, and the artifact you keep — one object, and everything in the game reads from it.",
+      "Tap a planet to read it: the panel names its sign, its dignity there, and its stats — the small i opens fuller study notes. The pill beside each planet counts its affliction. Planets drawn as faint outlines have not yet unlocked.",
+      "Twelve signs ring the wheel; your seven planets hold the places the sky gave them at minting, and those places never change. The lines between them are aspects, and effects travel along them — green lines are soft and carry part of what lands onward in kind, red lines are hard and carry it inverted. When a planet's affliction reaches its Resolve it combusts and goes dark, dropping out of the web until it returns.",
     ],
   },
   narrative: {
     title: "The Houses",
     paragraphs: [
-      "A scene from one of the twelve houses. Read it, then choose: tap an option to arm it, tap again to commit. Each option's aside names its price and its effect before you decide.",
-      "Outcomes land on the chart itself — affliction taken or healed, Distance spent or earned, and sometimes a rite that calls a combusted planet back. Some doors open only under the right sky: the house's joy-planet, its ruler, or a planet already lost.",
-      "A few choices are wagers, rolled against a planet's luck, the odds shown before you commit. Everything else resolves exactly as written.",
+      "Between encounters the run passes through the twelve houses, where the chart is tended — or taxed.",
+      "Read the scene, then choose: tap an option to arm it, tap again to commit. Each option's aside names its price and its effect before you decide.",
+      "Outcomes land on the chart itself — affliction taken or relieved, Distance spent or earned, and sometimes a rite that calls a combusted planet back. Some doors open only under the right sky: the house's joy-planet, its ruler, or a planet already lost. A few choices are wagers rolled against a planet's Fortune, the odds shown before you commit; everything else lands exactly as written.",
     ],
   },
 };

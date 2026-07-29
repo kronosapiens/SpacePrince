@@ -209,6 +209,10 @@ A card opens one of two ways:
 The first queued card is the **planet introduction**: crossing a Macrobian threshold (`MECHANICS.md §11.1`) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
 The introduction celebrates the **position, not a person**: no voice, no chorus fragment — the concept/PRIMER.md accessibility decision (planets stay an ambient chorus) applies here with full force.
 
+**Screen-help cards** — the corner "?" on each gameplay surface, plus the chart study's in-card "?" — run three beats: one sentence of purpose carrying the screen's stakes (the test: it survives with the title deleted); two-three sentences of goals and affordances in one breath; a slightly longer close holding only the concepts that change decisions.
+Previews teach the numbers (§1.1); the card holds the frame the numbers sit in.
+Copy lives in `client/src/data/screen-help.ts` and follows the §1.2 register and casing.
+
 ### 3.7 Chrome
 
 The encounter screen is allowed restrained, functional chrome where it does necessary work — telling the player whose turn it is, what the run state is, and how to leave. The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Chart } from "@/components/Chart";
 import { InfoCard } from "@/components/InfoCard";
+import { ScreenHelp } from "@/components/HelpButton";
 import type { Chart as ChartType, PlanetName, SideState } from "@/game/types";
 
 interface ChartStudyOverlayProps {
@@ -19,6 +20,9 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   // Study mode — sticky across inspections, same as combat's inspect "i".
   const [study, setStudy] = useState(false);
+  // Help swaps the card's content in place (no stacked second modal);
+  // ✕ / ESC / backdrop still dismiss the whole card either way.
+  const [help, setHelp] = useState(false);
   const inspected = selected ?? hovered;
 
   // Clicks on the chart bubble up to the backdrop unless we stop them.
@@ -28,21 +32,34 @@ export function ChartStudyOverlay({ chart, state, unlockedPlanets, onClose }: Ch
 
   return (
     <InfoCard ariaLabel="Chart inspection" onClose={onClose}>
-      <div className="chart-study-chart" onClick={onChartClick}>
-        <Chart
-          chart={chart}
-          state={state}
-          unlockedPlanets={unlockedPlanets}
-          selectedPlanet={selected}
-          hoveredPlanet={hovered}
-          onPlanetClick={(p) => setSelected((cur) => (cur === p ? null : p))}
-          onPlanetHover={setHovered}
-          inviteInteraction={!selected}
-          statsPanelPlanet={inspected}
-          statsPanelStudy={study}
-          onToggleStudy={() => setStudy((s) => !s)}
-        />
-      </div>
+      <button
+        type="button"
+        className="info-card-help"
+        aria-pressed={help}
+        aria-label={help ? "Back to the chart" : "About the chart"}
+        onClick={() => setHelp((h) => !h)}
+      >
+        ?
+      </button>
+      {help ? (
+        <ScreenHelp screen="chart" />
+      ) : (
+        <div className="chart-study-chart" onClick={onChartClick}>
+          <Chart
+            chart={chart}
+            state={state}
+            unlockedPlanets={unlockedPlanets}
+            selectedPlanet={selected}
+            hoveredPlanet={hovered}
+            onPlanetClick={(p) => setSelected((cur) => (cur === p ? null : p))}
+            onPlanetHover={setHovered}
+            inviteInteraction={!selected}
+            statsPanelPlanet={inspected}
+            statsPanelStudy={study}
+            onToggleStudy={() => setStudy((s) => !s)}
+          />
+        </div>
+      )}
     </InfoCard>
   );
 }

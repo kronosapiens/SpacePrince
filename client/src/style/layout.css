@@ -1276,7 +1276,8 @@
   width: 100%;
   height: 100%;
 }
-.info-card-close {
+.info-card-close,
+.info-card-help {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -1297,14 +1298,24 @@
   padding: 0;
   transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
 }
-.info-card-close:hover {
+.info-card-close:hover,
+.info-card-help:hover {
   background: var(--bone);
   color: var(--void);
   border-color: var(--bone);
 }
-.info-card-close:focus-visible {
+.info-card-close:focus-visible,
+.info-card-help:focus-visible {
   outline: 1px solid var(--gold);
   outline-offset: 2px;
+}
+/* In-card help toggle — sits beside the ✕; gold while the help is showing. */
+.info-card-help {
+  right: 52px;
+}
+.info-card-help[aria-pressed="true"] {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 @keyframes info-card-fade {
@@ -1319,7 +1330,7 @@
 .screen-help-button {
   position: fixed;
   top: 20px;
-  right: 24px;
+  left: 24px;
   z-index: 100;
   width: 34px;
   height: 34px;
@@ -1362,7 +1373,8 @@
   color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-size: 13px;
+  /* A proper heading against the 18px body, not a micro-label. */
+  font-size: 24px;
   text-align: center;
   margin-bottom: 6px;
 }
@@ -1421,8 +1433,7 @@
 .page-dropdown {
   position: fixed;
   top: 20px;
-  /* Leaves the true corner to the screen-help "?" (production chrome). */
-  right: 74px;
+  right: 24px;
   z-index: 100;
   font-family: var(--sans);
 }
@@ -1545,7 +1556,8 @@
 .dev-console {
   position: fixed;
   top: 20px;
-  left: 24px;
+  /* Leaves the true corner to the screen-help "?" (production chrome). */
+  left: 74px;
   z-index: 100;
   font-family: var(--sans);
 }
