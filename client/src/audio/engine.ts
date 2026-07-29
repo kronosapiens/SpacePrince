@@ -24,13 +24,15 @@ let initPromise: Promise<void> | null = null;
 // signatures, combustion, the star bell.
 const AUDIO_KEY = "sp:audio:v1";
 
-let musicOn = true;
+// Music opt-in, sound opt-out: a fresh visitor gets the reactive layer
+// (propagation, combustion, the bell) but chooses the score deliberately.
+let musicOn = false;
 let soundOn = true;
 try {
   const raw = localStorage.getItem(AUDIO_KEY);
   if (raw) {
     const saved = JSON.parse(raw) as { music?: boolean; sound?: boolean };
-    musicOn = saved.music !== false;
+    musicOn = saved.music === true;
     soundOn = saved.sound !== false;
   }
 } catch {
