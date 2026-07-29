@@ -125,7 +125,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const shownOptions = resolved ? (frozenOptions ?? options) : options;
 
   // The wager resolves against the conditioning planet's luck (ENCOUNTERS §5.3).
-  // Luck runs ~2–12 on the even-stat scale; ~0.46 at luck 2, ~0.76 at luck 12.
+  // Luck runs ~12–60 on the stat lattice; ~0.43 at luck 12, ~0.75 at the 45/60 cap.
   // One value feeds both the roll and the displayed odds — the probability is
   // derivable from public chart data, so hiding it would frame a readable bet
   // as pretend-mystery (client honesty, SCREENS §1.1). The roll itself stays

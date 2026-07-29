@@ -203,12 +203,12 @@ Boon branches, containment branches, and the uncombust rite are **offered** — 
 
 Numbers are **bands to author within**, not final balance (`HOUSES.md §1` scopes exact curves out). Hold the *relationships*; tune the values in playtest.
 
-- **Affliction magnitudes:** 1–5 per node (chip scale — small against combustion ceilings, which are set by durability alone once dignity leaves combat, so narrative chips, combat swings).
+- **Affliction magnitudes:** 12–60 per node, on the stat lattice (chip scale — small against combustion ceilings, which are set by durability alone once dignity leaves combat, so narrative chips, combat swings).
 - **Press rate:** ~1 Distance per 2 affliction baseline; good place better (~1:1.5), bad place worse (~1:3). Sub-1:1 so press-then-heal isn't a printer.
 - **Tend rate:** ~2 Distance per affliction healed; good place cheaper. Above 1:1 because combat heals "for free" via scoring — narrative Tend is the between-combat / emergency heal.
 - **Dignity nudge:** a Strong / Weak conditioning planet shifts Press and Tend one band more / less favorable (§1.4), stacking with valence. Keep each notch ≈ the good-place/bad-place gap, so dignity colors the trade without dominating it.
-- **Uncombust:** ~6–8 Distance, rite-gated (house 8, secondarily 4). The run-saver, deliberately steep.
-- **Per-encounter Press ceiling:** ~+6 Distance, so no single node dominates a turn-score's worth.
+- **Uncombust:** ~72–96 Distance, rite-gated (house 8, secondarily 4). The run-saver, deliberately steep.
+- **Per-encounter Press ceiling:** ~+72 Distance, so no single node dominates a turn-score's worth.
 - **Wager:** safe option ≈ baseline; risky option ≈ 2× payoff on success vs proportional affliction on fail; two-rung ≈ 3× at rung 2.
 
 A full encounter's net Distance should sit in the range of a single combat turn-score, so neither node type dominates run scoring.
