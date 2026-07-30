@@ -604,8 +604,8 @@ function DevAnimationPanel({
           <div className="anim-console-row">
             <span className="anim-console-label">Verb</span>
             <div className="anim-console-segs">
-              <button className={`anim-console-seg${valence === "Affliction" ? " is-on" : ""}`} onClick={() => setValence("Affliction")}>Afflict</button>
               <button className={`anim-console-seg${valence === "Testimony" ? " is-on" : ""}`} onClick={() => setValence("Testimony")}>Testify</button>
+              <button className={`anim-console-seg${valence === "Affliction" ? " is-on" : ""}`} onClick={() => setValence("Affliction")}>Afflict</button>
             </div>
           </div>
           <div className="anim-console-checks">

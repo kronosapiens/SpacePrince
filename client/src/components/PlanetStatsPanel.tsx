@@ -204,10 +204,13 @@ export function PlanetStatsPanel({
               </div>
               {actions && (
                 <div className="ps-actions">
+                  {/* Testify leads: it is the scoring verb (`turnScore` counts only
+                      testimony landed on the other's chart), so it reads as the
+                      default and afflict as the deviation. */}
                   {(
                     [
-                      { v: "Affliction" as Polarity, label: "Afflict", value: actions.afflict },
                       { v: "Testimony" as Polarity, label: "Testify", value: actions.testify },
+                      { v: "Affliction" as Polarity, label: "Afflict", value: actions.afflict },
                     ]
                   ).map((a) => (
                     <button

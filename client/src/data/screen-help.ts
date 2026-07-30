@@ -27,7 +27,7 @@ export const SCREEN_HELP: Record<HelpScreen, { title: string; paragraphs: string
     title: "The Encounter",
     paragraphs: [
       "This is where Distance is earned: self and other, two charts face to face, holding and relieving tension.",
-      "Your goal is to land testimony on the other's chart — only testimony landed there earns Distance — while keeping your own planets from combusting. The other commits first, its planet and verb shown before you choose; answer by tapping a planet of your own, choosing Afflict or Testify, then tapping the verb again to commit.",
+      "Your goal is to land testimony on the other's chart — only testimony landed there earns Distance — while keeping your own planets from combusting. The other commits first, its planet and verb shown before you choose; answer by tapping a planet of your own, choosing Testify or Afflict, then tapping the verb again to commit.",
       "Affliction builds tension; when it reaches a planet's Resolve, the planet combusts and goes quiet. Combusting one of the other's planets is a trade — it acts no more, but what it carries can no longer be relieved. Effects ripple along aspect lines, soft aspects carrying them onward, hard aspects inverting them. Nothing is rolled: the numbers you preview are the numbers that land, and the encounter runs as many turns as the map you are on.",
     ],
   },
