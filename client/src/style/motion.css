@@ -157,28 +157,30 @@
   transform-box: fill-box;
 }
 
-/* Active (opponent-of-turn) planet halo — a breathing glow so the turn's
-   focal planet is unmistakable. */
-@keyframes active-halo-breath {
-  0%, 100% { opacity: 0.6; transform: scale(0.95); }
-  50%      { opacity: 1;   transform: scale(1.07); }
-}
+/* Active (opponent-of-turn) planet halo — a breathing glow so the turn's focal
+   planet is unmistakable. Rides the shared --breath clock below rather than its
+   own keyframes: the two charts sit side by side, so the opponent's halo and the
+   player's invites have to be one rhythm, not two that drift. Its old 3s
+   animation was the last surface still keeping its own time. */
 .anim-active-halo {
-  animation: active-halo-breath 3s ease-in-out infinite;
+  opacity: calc(0.6 + 0.4 * var(--breath));
+  transform: scale(calc(0.95 + 0.12 * var(--breath)));
   transform-origin: center;
   transform-box: fill-box;
 }
 
 /* Invite — everything tappable carries a glowing halo (the element's own
    radial gradient) plus a bright ring, both breathing in sync, so the eye
-   lands on the choices without hunting. On hover the bright ring gives way to
-   the shared selection ring.
+   lands on the choices without hunting. On hover the same ring stops breathing
+   and sits steady — one ring, a resting state and an answered one.
    The ring breathes in *size* as well as brightness: the ambient blooms are
    static, so motion is what marks the ring as an affordance rather than more
-   glow (playtesters couldn't find the clickables by brightness alone).
+   glow (playtesters couldn't find the clickables by brightness alone). The
+   swing stays small — the halo is what carries reach, the ring only needs to
+   register as alive.
 
    One clock, many breathers: a registered custom property (--breath, 0→1→0
-   over 1s) animates on :root and never restarts, and every invite element
+   over 3s) animates on :root and never restarts, and every invite element
    derives its opacity/scale from it via calc(). Hovers, tap-previews, and
    remounts therefore can't knock an element out of phase — the whole surface
    breathes together. Browsers without @property (Safari <16.4, Firefox <128)
@@ -192,9 +194,23 @@
   0%, 100% { --breath: 0; }
   50%      { --breath: 1; }
 }
-:root { animation: breath-clock 1s ease-in-out infinite; }
+/* The invite's four tunable values. Declared here rather than in a token module
+   because their consumers are the CSS animations below; the dev console
+   overrides them inline on :root and clearing the override falls back to these.
+   Period was 1s, which read as panting; 1.5s is where it settled under the live
+   tuner. It is now the only period on the encounter screen — the opponent's
+   halo above derives from this same clock. */
+:root {
+  --breath-period: 1.5s;
+  --invite-glow-min: 0.28;
+  --invite-glow-range: 0.22;
+  --invite-ring-swing: 0.05;
+}
+:root { animation: breath-clock var(--breath-period) ease-in-out infinite; }
 
-.anim-invite-glow { opacity: calc(0.2 + 0.4 * var(--breath)); }
+.anim-invite-glow {
+  opacity: calc(var(--invite-glow-min) + var(--invite-glow-range) * var(--breath));
+}
 
 /* Combust warning — the affliction badge of a planet for whom combustion is on
    the table this turn (a candidate that dies catching the blow; the opponent's
@@ -218,7 +234,7 @@
 }
 .anim-invite-ring {
   opacity: calc(0.75 + 0.25 * var(--breath));
-  transform: scale(calc(1 + 0.1 * var(--breath)));
+  transform: scale(calc(1 + var(--invite-ring-swing) * var(--breath)));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -231,10 +247,11 @@
   .anim-distance-flash,
   .anim-distance-pop,
   .anim-map-current-halo,
-  .anim-active-halo,
   .anim-surface-in { animation: none; }
-  /* Still the breath clock, holding it mid-inhale so the invite affordances
-     keep their tuned still-state brightness (glow 0.35, ring ~0.84). */
+  /* Still the breath clock, holding it mid-inhale so everything deriving from it
+     keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
+     ~0.75). .anim-active-halo isn't listed above because it no longer runs an
+     animation of its own — freezing the clock is what stills it. */
   :root { animation: none; --breath: 0.375; }
   /* Show the propagation line solid (no travel) rather than frozen mid-sweep. */
   .anim-prop-travel { animation: none; stroke-dasharray: none; }

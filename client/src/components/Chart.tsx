@@ -10,15 +10,16 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import {
-  AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
+  AFFLICTION_ARC_ANCHOR_DEG,
   CHART_CENTER, CHART_SIZE,
-  INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
-  PLANET_R_REST, PLANET_R_ACTIVE,
+  INNER_RING_R, OUTER_RING_R,
+  PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import { CHART_STYLE } from "@/svg/chart-style";
+import { useTuning, type ChartTuning } from "@/svg/tuning";
 import type {
   AspectConnection,
   Chart as ChartType,
@@ -197,7 +198,8 @@ export function Chart(props: ChartProps) {
     onToggleStudy,
   } = props;
 
-  const points = useMemo(() => buildPlanetPoints(chart), [chart]);
+  const tuning = useTuning();
+  const points = useMemo(() => buildPlanetPoints(chart, tuning.discR), [chart, tuning.discR]);
   // Place the panel in the emptiest interior wedge — the wheel's middle isn't
   // reliably clear (same-sign planets cluster toward the center). Reserve the
   // taller action height so the spot doesn't shift when buttons appear.
@@ -387,6 +389,7 @@ export function Chart(props: ChartProps) {
         return (
           <PlanetGlyph
             key={p.planet}
+            tuning={tuning}
             point={p}
             combusted={combusted}
             ghost={!unlocked}
@@ -413,6 +416,7 @@ export function Chart(props: ChartProps) {
         return (
           <PlanetArc
             key={p.planet}
+            tuning={tuning}
             point={p}
             ceiling={combustionCeiling(chart.planets[p.planet])}
             affliction={state?.[p.planet]?.affliction ?? 0}
@@ -421,8 +425,10 @@ export function Chart(props: ChartProps) {
         );
       })}
 
-      {/* Badge layer: above every planet's halo. */}
-      {points.map((p) => {
+      {/* Badge layer: above every planet's halo. Off by default — the arc
+          carries this now — and kept only so the dev console can put the
+          numbers back while the arc is still being trusted. */}
+      {tuning.showBadges && points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
         return (
           <PlanetBadges
@@ -465,6 +471,7 @@ export function aspectKey(from: PlanetName, to: PlanetName): string {
 // ─── Internal pieces ────────────────────────────────────────────────────
 
 function PlanetGlyph({
+  tuning,
   point, combusted, ghost,
   selected, active, hovered,
   onClick, onHover, passive, invite,
@@ -472,6 +479,7 @@ function PlanetGlyph({
   impactPolarity,
   animationEpoch,
 }: {
+  tuning: ChartTuning;
   point: PlanetPoint;
   combusted: boolean;
   ghost: boolean;
@@ -508,7 +516,7 @@ function PlanetGlyph({
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, point.glyphR * CHART_STYLE.planet.rimStrokeRatio)}
           strokeDasharray={CHART_STYLE.ghost.dash} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(point.glyphR * CHART_STYLE.planet.symbolRatio)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
+          fontSize={Math.round(point.glyphR * tuning.symbolRatio)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
           style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -547,7 +555,7 @@ function PlanetGlyph({
       {active && (
         <circle
           className="anim-active-halo"
-          r={point.glyphR * 2.5}
+          r={tuning.activeHaloR}
           fill={`url(#v2-halo-${point.planet})`}
           style={{ pointerEvents: "none" }}
         />
@@ -560,14 +568,14 @@ function PlanetGlyph({
           because only selection opens the action fan-out. The halo goes steady
           with it, so a committed choice can't read dimmer than a hovered one. */}
       {ringShown && !active && (
-        <circle r={r * 1.8}
+        <circle r={tuning.inviteHaloR}
           fill={`url(#v2-halo-${point.planet})`}
           className={ringSteady ? undefined : "anim-invite-glow"}
           style={{ opacity: ringSteady ? CHART_STYLE.invite.halo.steady : undefined, pointerEvents: "none" }} />
       )}
       {ringShown && (
-        <circle r={INTERACTION_RING_R} fill="none"
-          stroke={c} strokeWidth={CHART_STYLE.interactionRing.stroke}
+        <circle r={tuning.ringR} fill="none"
+          stroke={c} strokeWidth={tuning.ringStroke}
           className={ringSteady ? "invite-ring" : "invite-ring anim-invite-ring"}
           style={{ opacity: ringSteady ? CHART_STYLE.interactionRing.steady : undefined, pointerEvents: "none" }} />
       )}
@@ -590,7 +598,7 @@ function PlanetGlyph({
           stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(r * CHART_STYLE.planet.symbolRatio)}
+          fontSize={Math.round(r * tuning.symbolRatio)}
           fill={glyphFill}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
@@ -648,16 +656,17 @@ function PlanetGlyph({
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  point, ceiling, affliction, projection,
+  tuning, point, ceiling, affliction, projection,
 }: {
+  tuning: ChartTuning;
   point: PlanetPoint;
   ceiling: number;
   affliction: number;
   projection?: ProjectionChip;
 }) {
   if (ceiling <= 0) return null;
-  const r = AFFLICTION_ARC_R;
-  const stroke = CHART_STYLE.afflictionArc.stroke;
+  const r = tuning.arcR;
+  const stroke = tuning.arcStroke;
   // Position `a` on the track sits `ceiling - a` degrees back from the anchor.
   const at = (a: number) => AFFLICTION_ARC_ANCHOR_DEG - ceiling + clamp(a, 0, ceiling);
   const spent = clamp(affliction, 0, ceiling);
@@ -684,10 +693,10 @@ function PlanetArc({
       {/* The whole ceiling, faint. What shows through is the affliction already
           spent, and the full extent is the planet's Resolve. */}
       <ArcStroke r={r} from={at(0)} to={at(ceiling)} full={ceiling >= 360}
-        stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
+        stroke={NEUTRAL.bone} opacity={tuning.arcTrack} width={stroke} />
       {spent < ceiling && (
         <ArcStroke r={r} from={at(spent)} to={at(ceiling)} full={spent <= 0 && ceiling >= 360}
-          stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.remainingOpacity} width={stroke} />
+          stroke={NEUTRAL.bone} opacity={tuning.arcRemaining} width={stroke} />
       )}
       {diff && (
         <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
@@ -1101,7 +1110,7 @@ function signMidDeg(signIdx: number, ascSignIdx: number): number {
 }
 
 
-function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
+function buildPlanetPoints(chart: ChartType, discR: number): PlanetPoint[] {
   const ascIdx = SIGNS.indexOf(chart.ascendantSign);
   const bySign = new Map<SignName, PlanetName[]>();
   for (const planet of PLANETS) {
@@ -1131,7 +1140,7 @@ function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
         sign,
         cx: cart.x,
         cy: cart.y,
-        glyphR: PLANET_R_REST,
+        glyphR: discR,
         glyphRActive: PLANET_R_ACTIVE,
       });
     });

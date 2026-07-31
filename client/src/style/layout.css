@@ -1567,6 +1567,8 @@
   top: calc(100% + 6px);
   left: 0;
   width: 232px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -1606,6 +1608,37 @@
   cursor: pointer;
 }
 .dev-console-divider { border-top: 1px solid var(--smoke); }
+
+/* Chart tuner — a stack of compact slider rows. The panel scrolls rather than
+   growing, so the chart it's tuning stays visible behind it. */
+.dev-tuner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--bone);
+}
+.dev-tuner-reset {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--mist);
+  background: transparent;
+  border: 1px solid var(--smoke);
+  border-radius: 999px;
+  padding: 1px 8px;
+  cursor: pointer;
+}
+.dev-tuner-reset:hover { color: var(--bone); }
+.dev-tuner-knob {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.dev-tuner-knob input[type="range"] {
+  width: 100%;
+  height: 12px;
+  margin: 0;
+}
 
 /* ─── Animation console (dev) ─────────────────────────────────────────────
    Matches the Page-picker vocabulary: sans font, uppercase tracking, pill

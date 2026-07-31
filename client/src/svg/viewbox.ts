@@ -24,23 +24,42 @@ export const PLANET_HALO_R = 100;
 // patterns sit ±13.91° apart at radius 320, which is 77.5 units center-to-
 // center. That spread can't be widened — a sign wedge is 30° and ±13.91 already
 // fills it — so anything always-on wants to stay inside r≈38.75 to never touch
-// a neighbour. The ring's 38 (41.8 at the peak of its breath) exceeds that in a
-// 5+ stack, where the two rings cross; every 2–4 stack clears at 43.8.
+// a neighbour. The ring's 36 reaches 37.8 at the peak of its breath, which
+// clears that, so nothing collides at any stack size.
 // Rejected: arc outside the ring at 42, which keeps the disc at its old 30 and
 // buys the arc a third more circumference — but arcs are drawn on every planet
 // at once, so at that radius they touch in a 4-stack and it stops being clear
 // which arc belongs to which planet.
-export const AFFLICTION_ARC_R = 31;
-export const INTERACTION_RING_R = 38;
+export const AFFLICTION_ARC_R = 30;
+export const INTERACTION_RING_R = 36;
+// Halos bloom *past* the ring — the ring wants a soft falloff outside it, not a
+// hard bright edge as the outermost thing. So they key off the ring rather than
+// the disc: keyed off the disc, shrinking it for the arc collapsed the invite
+// halo onto the ring and left the ring with nothing softening it.
+// Ratios are halves, which are exact in binary floating point — 1.45 lands on
+// 52.199999999999996 and that reaches the DOM as the literal `r` attribute.
+export const INVITE_HALO_R = INTERACTION_RING_R * 1.5;
+export const ACTIVE_HALO_R = INTERACTION_RING_R * 2;
 /** Screen angle of the combustion line — 6 o'clock, so every planet's arc
  *  descends into the same point as it dies. Degrees are math-convention
  *  (0 = 3 o'clock, increasing counterclockwise), matching `polar` in Chart.tsx
  *  and the wheel's own sense: signs advance counterclockwise from the ASC. */
 export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 
-// Stroke scale (in viewBox units)
-export const STROKE_HAIRLINE = 0.5;
+/**
+ * Stroke schedule, in chart viewBox units. Three rungs carrying three roles:
+ * LIGHT is ground, MEDIUM is structure, HEAVY is a thing under attention.
+ *
+ * Three rather than more because the chart renders ~550px wide, so a unit is
+ * about half a pixel and a half-unit step is invisible — the five-rung scale
+ * this replaces (0.5 / 1 / 1.5 / 2.5 / 4, arrived whole in the v2 design port)
+ * was drawing distinctions the surface can't express, and four of its five
+ * rungs had no clients at all.
+ *
+ * Chart units only. The run map and the seam render at different unit scales
+ * (~1.4px and 1px per unit), so the same number is a different line there;
+ * MapDiagram's TIER is tuned in its own units and stays that way.
+ */
 export const STROKE_LIGHT = 1;
-export const STROKE_REGULAR = 1.5;
-export const STROKE_MEDIUM = 2.5;
-export const STROKE_HEAVY = 4;
+export const STROKE_MEDIUM = 2;
+export const STROKE_HEAVY = 3;

@@ -13,6 +13,7 @@ import {
   shuffleTheme,
   subscribeTheme,
 } from "@/audio/engine";
+import { ChartTuner } from "@/components/ChartTuner";
 
 /**
  * Dev-only console (rendered only under `import.meta.env.DEV`). Three zones:
@@ -99,6 +100,8 @@ export function DevConsole() {
           ) : (
             <div>No Prince — mint one from the Title.</div>
           )}
+          <div className="dev-console-divider" />
+          <ChartTuner />
           <div className="dev-console-divider" />
           <div className="dev-console-row">
             <label className="dev-console-check">
