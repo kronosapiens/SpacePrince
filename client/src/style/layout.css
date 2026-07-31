@@ -512,7 +512,8 @@
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 36px;
+  flex-wrap: wrap;
+  gap: 6px 36px;
 }
 .combat-turns {
   display: flex;
@@ -576,34 +577,57 @@
   gap: 10px;
   z-index: 3;
 }
-.combat-distance-v {
+/* Doublings banked, then the run at the current one. Centred rather than
+   baseline-aligned for the same reason as the turn pips — neither the ticks nor
+   the bar has a baseline to share with the type. */
+.combat-distance-track {
   position: relative;
-  font-family: var(--serif);
-  font-size: 30px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--bone);
-  letter-spacing: 0.02em;
-  font-feature-settings: "tnum";
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  align-self: center;
 }
-.combat-distance-n {
+.combat-distance-ticks {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.combat-distance-tick {
+  width: 2px;
+  height: 11px;
+  border-radius: 1px;
+  background: var(--bone);
+}
+/* Fixed width: the bar spans one doubling, whatever that doubling is worth, so
+   it can never imply a ceiling. */
+.combat-distance-bar {
   position: relative;
-  z-index: 1;
-  display: inline-block;
+  width: 88px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--smoke);
+  overflow: hidden;
 }
-/* Violet pulse behind the number, replayed per resolution as affliction clears. */
+.combat-distance-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--mist);
+  transition: width 420ms var(--ease-out);
+}
+/* Gain pulse — a soft wash across the whole track, replayed per resolution beat
+   and tinted by the planet resolving on it. */
 .combat-distance-flash {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 1.8em;
-  height: 1.8em;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--flash-color, var(--testimony)) 0%, transparent 68%);
+  width: 100%;
+  height: 26px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse, var(--flash-color, var(--testimony)) 0%, transparent 70%);
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
-  z-index: 0;
 }
 .continue-prompt {
   position: fixed;
@@ -833,10 +857,12 @@
     padding: 12px 12px;
     gap: 8px;
   }
-  .combat-topbar { gap: 18px; }
+  /* Narrow enough to force the two groups onto separate rows: at full width
+     the strip reaches the fixed help button in the corner, and each row alone
+     clears it. */
+  .combat-topbar { gap: 4px 18px; max-width: 62vw; margin: 0 auto; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
-  .combat-distance-v { font-size: clamp(18px, 5vw, 22px); }
   .combat-distance { margin-top: 4px; gap: 2px; }
 }
 

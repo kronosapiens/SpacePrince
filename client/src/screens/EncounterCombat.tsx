@@ -4,6 +4,7 @@ import { HelpButton } from "@/components/HelpButton";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
+import { distanceBands } from "@/game/distance";
 import { PLANETS, RULERSHIP } from "@/game/data";
 import { setTheme } from "@/audio/engine";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -88,6 +89,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
   const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
+  const bands = distanceBands(displayedRunDistance);
   const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
   // Tint each distance flash with the color of the planet resolving on that
   // beat, so the number flashes through the wave's planets rather than one hue.
@@ -433,32 +435,48 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             </div>
           </div>
         )}
-        <div className="combat-distance">
-          <span className="eyebrow">DISTANCE</span>
+        {/* The track is the readout, so the group carries the value as its
+            accessible name — the numeral it replaced was the only thing saying
+            the number aloud. */}
+        <div
+          className="combat-distance"
+          role="group"
+          aria-label={`Distance ${Math.round(displayedRunDistance)}`}
+        >
+          <span className="eyebrow" aria-hidden>DISTANCE</span>
+          {/* Distance has no ceiling to fill against, so it reads as doublings:
+              a tick per doubling banked, and a fixed-width bar for the run at
+              the current one. The bar is relative by construction — it measures
+              the same span of *log*, not of score — so late points move it as
+              far as early ones, and the track grows by gaining ticks rather
+              than by any mark getting longer (`game/distance.ts`). */}
           <span
-            className="combat-distance-v"
+            className="combat-distance-track"
+            aria-hidden
             style={
               distanceFlashColor
                 ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
                 : undefined
             }
           >
+            {/* The gain pulse rode the numeral; with the numeral gone the track
+                is what represents Distance, so it hosts the beat instead. */}
             {distanceFlashEpoch > 0 && (
               <span
                 key={distanceFlashEpoch}
                 className="combat-distance-flash anim-distance-flash"
-                aria-hidden
               />
             )}
-            <span
-              key={`n-${distanceFlashEpoch}`}
-              className={
-                distanceFlashEpoch > 0
-                  ? "combat-distance-n anim-distance-pop"
-                  : "combat-distance-n"
-              }
-            >
-              {Math.round(displayedRunDistance)}
+            <span className="combat-distance-ticks">
+              {Array.from({ length: bands.ticks }).map((_, i) => (
+                <span key={i} className="combat-distance-tick" />
+              ))}
+            </span>
+            <span className="combat-distance-bar">
+              <span
+                className="combat-distance-fill"
+                style={{ width: `${bands.fraction * 100}%` }}
+              />
             </span>
           </span>
         </div>

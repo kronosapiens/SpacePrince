@@ -253,7 +253,14 @@ The encounter screen is allowed restrained, functional chrome where it does nece
 
 **Allowed:**
 
-- **Distance readout.** The run's accumulating score (per `MECHANICS.md §12`). Visible during encounters. Functional type at small size.
+- **Distance track.** The run's accumulating score (per `MECHANICS.md §12`), read as doublings rather than as a number.
+  A tick per doubling banked, then a fixed-width bar for the run at the current one.
+  Distance is an unbounded sum with no ceiling anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
+  Reading it logarithmically gives it shape without a denominator: the bar always spans exactly one doubling, so it measures the same span of *log* whatever that doubling is worth, a late point moves it as far as an early one, and the track grows by gaining ticks rather than by any mark getting longer.
+  Base 2 rather than 10 because it is already the game's own base — the Macrobian unlock schedule is `2^i` — and because base 10 gives only two or three bands across a realistic score range where base 2 gives six.
+  The same `log2` places the run's star in the NFT field (`NFT.md`, Star-Field), so the readout a player watches accumulate and the mark it leaves are one idea rather than two.
+  **No numeral.** The track is the readout; the score survives as the group's accessible name, since the digits were the only thing saying it aloud.
+  The per-beat gain pulse — tinted by whichever planet is resolving — rides the track.
 - **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position. When the encounter resolves the dots are spent, so the same slot carries the outcome word instead.
 
 Both are labelled and live together in a top strip spanning the two charts.
@@ -270,6 +277,7 @@ The opponent planet's *name* was lost in that move and has no home on the board;
 - The wordmark "SPACE PRINCE" inside the encounter — it lives on the title screen.
 - Instructional hints ("Hover a planet to inspect. Click a planet to act.") — the grammar should be discoverable; if it isn't, that's a structural failure to fix, not to paper over with copy.
 - HP bars, "+N attack" registers, blockbuster game-UI flourishes.
+  The Distance bar above is not one of these, and the distinction is the point: an HP bar is a fraction of a ceiling, and neither the bar nor the affliction arc fills against an invented maximum. The arc's track is a real ceiling the game already has (`MECHANICS.md §10`); the Distance bar is one doubling, which is a span rather than a limit.
 - Always-visible logs of past turns (those are dev-only).
 - Run-management affordances inside an active run. There is no in-game "abandon" or "new voyage" while a run is in progress; runs continue until full combust regardless of session breaks. The prototype's "New Voyage" button is a development artifact.
 
