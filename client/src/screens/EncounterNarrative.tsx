@@ -7,6 +7,7 @@ import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { newlyCombusted } from "@/game/combust";
+import { fortuneChance, fortuneSixtieths } from "@/game/combat";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
@@ -124,19 +125,18 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
   const shownOptions = resolved ? (frozenOptions ?? options) : options;
 
-  // The wager resolves against the conditioning planet's luck (ENCOUNTERS §5.3).
-  // Luck runs ~12–60 on the stat lattice; ~0.43 at luck 12, ~0.75 at the 45/60 cap.
-  // One value feeds both the roll and the displayed odds — the probability is
-  // derivable from public chart data, so hiding it would frame a readable bet
-  // as pretend-mystery (client honesty, SCREENS §1.1). The roll itself stays
+  // The wager resolves on the conditioning planet's Fortune (ENCOUNTERS §5.3) —
+  // the same roll fate uses everywhere else, not a second formula. One value
+  // feeds both the roll and the displayed odds; the probability is derivable
+  // from public chart data, so hiding it would frame a readable bet as
+  // pretend-mystery (client honesty, SCREENS §1.1). The roll itself stays
   // genuinely random at commit.
   const wagerLuckPlanet = joyPlanet ?? house.ruler;
-  const wagerChance = useMemo(() => {
+  const wagerLuck = useMemo(() => {
     const placement = prince.chart.planets[wagerLuckPlanet];
-    const luck = placement.base.luck + placement.buffs.luck;
-    // MECHANICS §7: a 20/60 (1/3) floor rising to a 45/60 (3/4) cap.
-    return Math.min(45, 20 + luck / 2) / 60;
+    return placement.base.luck + placement.buffs.luck;
   }, [prince.chart, wagerLuckPlanet]);
+  const wagerChance = fortuneChance(wagerLuck);
 
   const handleOption = (option: Option) => {
     if (resolved) return;
@@ -291,8 +291,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
             // Wagers show their odds — the roll's probability is derivable, so
             // it's shown (SCREENS §1.1).
             if (o.outcomesOnSuccess || o.outcomesOnFail) {
-              const pct = `${Math.round(wagerChance * 100)}%`;
-              baseAside = baseAside ? `${baseAside} · ${pct}` : pct;
+              // Sixtieths, the unit every probability is stated in (MECHANICS
+              // §7) — and exact here, since the odds are already n/60.
+              const odds = `${fortuneSixtieths(wagerLuck)}/60`;
+              baseAside = baseAside ? `${baseAside} · ${odds}` : odds;
             }
             const aside = o.next && baseAside ? `${baseAside} →` : baseAside;
             return (

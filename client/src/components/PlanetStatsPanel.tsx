@@ -4,6 +4,7 @@ import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
 import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
+import { TermText } from "@/components/TermText";
 import { VALENCE_COLOR } from "@/svg/palette";
 
 /** When present, the panel grows the combat fan-out: two action buttons under
@@ -191,16 +192,22 @@ export function PlanetStatsPanel({
               </table>
               {openKey && (
                 <div className="ps-blurb">
-                  {openKey === "core" || openKey === "placement"
-                    ? COLUMN_GLOSS[openKey]
-                    : describeStat(chart.planets[planet], openKey)}
+                  {/* The blurb now leads with a named term ("Mars's Resolve is
+                      …"), so it takes the same gold accent the help copy uses. */}
+                  <TermText
+                    text={
+                      openKey === "core" || openKey === "placement"
+                        ? COLUMN_GLOSS[openKey]
+                        : describeStat(chart.planets[planet], openKey)
+                    }
+                  />
                 </div>
               )}
             </div>
           ) : (
             <div className="ps-ops">
               <div className="ps-opline">
-                Resolve {table.durability} · Fortune {table.fortunePct}%
+                Resolve {table.resolve} · Fortune {table.fortune}/60
               </div>
               {actions && (
                 <div className="ps-actions">

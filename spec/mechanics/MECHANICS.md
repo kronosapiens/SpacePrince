@@ -146,9 +146,16 @@ Fresh randomness enters only where the game is already pausing to reveal somethi
 
 - **Map creation.** The map seed is a VRF draw; from it derive node content (`MAP.md`) and, on rollover, the map-boundary uncombust rolls and barrage (§11.3) — all settled and fully displayed before the first node is entered.
 - **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5). By the time the resolution animation finishes, the next move has landed. Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
-- **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: `min(45, 20 + luck/2) / 60` on the conditioning planet's luck — a `20/60` (⅓) floor rising to a `45/60` (¾) cap.
+- **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: the fortune roll on the conditioning planet's luck.
 
-Luck is therefore not a combat stat. Impact, witness, and durability decide what a planet does inside an encounter; luck decides how fate treats it between encounters — wager odds, uncombust rolls, and the barrage. The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` (10–60% at effective luck 12–72) — is the shared formula at map boundaries: the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3). The UI surfaces it as `Fortune`.
+Luck is therefore not a combat stat.
+Impact, witness, and durability decide what a planet does inside an encounter; luck decides how fate treats it — wager odds, uncombust rolls, and the barrage.
+The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` (10–60% at effective luck 12–72) — is the *only* formula fate is ever consulted through: a narrative wager's odds, the chance a combusted planet uncombusts, and the chance a lit planet's barrage share is halved (§11.3).
+One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fortune is its odds wherever fate is asked.
+
+*Rejected:* a separate wager curve, `min(45, 20 + luck/2) / 60` — a `20/60` (⅓) floor rising to a `45/60` (¾) cap.
+It gave wagers a gentler spread and kept a low-luck wager from being hopeless, but it made `Fortune` name two different numbers: the panel would read `12/60` on a planet whose wager showed `32/60`.
+The floor is the part worth missing — if low-luck wagers read as traps in playtest, restore the idea as a floor on the fortune roll itself rather than a second curve.
 
 ## 8. Affliction Value Model
 

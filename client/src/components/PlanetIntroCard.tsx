@@ -1,7 +1,7 @@
 import type { Chart, PlanetName } from "@/game/types";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { MACROBIAN_ORDER, MACROBIAN_THRESHOLDS, PLANET_ROLE } from "@/game/data";
-import { getEffectiveStats } from "@/game/combat";
+import { deriveStatTable } from "@/game/combat";
 import { SIGN_GLYPH } from "@/svg/glyphs";
 
 interface PlanetIntroCardProps {
@@ -15,7 +15,7 @@ interface PlanetIntroCardProps {
  *  (the Macrobian thresholds are deterministic, so the next unlock is shown). */
 export function PlanetIntroCard({ chart, planet }: PlanetIntroCardProps) {
   const placement = chart.planets[planet];
-  const stats = getEffectiveStats(chart, planet);
+  const table = deriveStatTable(placement);
   const i = MACROBIAN_ORDER.indexOf(planet);
   const threshold = MACROBIAN_THRESHOLDS[i]!;
   const next = MACROBIAN_ORDER[i + 1];
@@ -35,7 +35,7 @@ export function PlanetIntroCard({ chart, planet }: PlanetIntroCardProps) {
         {placement.dignity !== "Neutral" && ` · ${placement.dignity}`}
       </div>
       <div className="planet-intro-stats">
-        Impact {stats.impact} · Witness {stats.witness} · Durability {stats.durability} · Luck {stats.luck}
+        Testify {table.testify} · Afflict {table.afflict} · Resolve {table.resolve} · Fortune {table.fortune}/60
       </div>
       <div className="planet-intro-footer">
         {threshold === 0 ? "From the first encounter" : `Encounter ${threshold}`}

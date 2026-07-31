@@ -1,5 +1,6 @@
 import type { PlanetName, PlanetPlacement, PlanetStats } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
+import { STAT_LABEL } from "./combat";
 
 // Study-mode copy — the opt-in foothold for a player new to astrology
 // (spec/design/SCREENS.md §3.6.1). Authored, never generated. These are study
@@ -28,28 +29,14 @@ export const COLUMN_GLOSS: Record<"core" | "placement", string> = {
 // Per-stat provenance copy — the astrology behind a single number, so a tap
 // teaches which sign quality lifts a stat (MECHANICS.md §4: each element/
 // modality "expresses" one stat). Composed, never hand-authored per combination.
-const STAT_WORD: Record<keyof PlanetStats, string> = {
-  impact: "impact",
-  witness: "witness",
-  durability: "durability",
-  luck: "luck",
-};
 
 const article = (s: string) => (/^[aeiou]/i.test(s) ? "an" : "a");
 
-// The combat metric each stat surfaces as, in the panel's own labels — closes
-// the blurb with a plain "Expressed as …".
-const STAT_METRIC: Record<keyof PlanetStats, string> = {
-  impact: "Afflict",
-  witness: "Testify",
-  durability: "Resolve",
-  luck: "Fortune",
-};
-
-/** Prose for the per-stat drop-down: the planet's innate level, the sign
- *  qualities that lift this stat, and the combat metric the stat drives. */
+/** Prose for the per-stat drop-down: the planet's innate level and the sign
+ *  qualities that lift it. The stat's name is the metric's name, so there is no
+ *  "expressed as" translation left to state. */
 export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string {
-  const word = STAT_WORD[key];
+  const word = STAT_LABEL[key];
   const core = p.base[key];
   // Base stats live on the 12–48 lattice (MECHANICS §2).
   const coreQual = core >= 36 ? "strong" : core <= 12 ? "slight" : "modest";
@@ -70,6 +57,5 @@ export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string
   if (sect > 0) {
     parts.push(el + mod > 0 ? "Sect lifts it further." : "Sect lifts it.");
   }
-  parts.push(`Expressed as ${STAT_METRIC[key]}.`);
   return parts.join(" ");
 }

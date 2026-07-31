@@ -205,7 +205,7 @@ const livelihood_coin: NarrativeTree = {
       text: "The deeper you go, the more it costs your back. There may be nothing more down there.",
       options: [
         { id: "stop", text: "Stop while you're ahead.", aside: "+36 Distance", outcomes: [D(36)] },
-        { id: "keep", text: "Keep digging.", aside: "Luck (Venus): +72 Distance, or +48 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 48)] },
+        { id: "keep", text: "Keep digging.", aside: "Fortune (Venus): +72 Distance, or +48 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 48)] },
       ],
     },
   },
@@ -252,7 +252,7 @@ const communication_letter: NarrativeTree = {
       text: "Someone asks you to pass a message to a man you'll meet ahead.",
       options: [
         { id: "exact", text: "Repeat it word for word.", aside: "+24 Distance", outcomes: [D(24)] },
-        { id: "own", text: "Tell it the way you'd say it.", aside: "Luck (Moon): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
+        { id: "own", text: "Tell it the way you'd say it.", aside: "Fortune (Moon): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
       ],
     },
   },
@@ -269,7 +269,7 @@ const communication_bridge: NarrativeTree = {
       text: "A traveler going the other way says the bridge ahead is washed out. He might be lying.",
       options: [
         { id: "trust", text: "Trust him; take the long way around.", aside: "+12 Distance", outcomes: [D(12)] },
-        { id: "press", text: "Press on to the bridge anyway.", aside: "Luck (Moon): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
+        { id: "press", text: "Press on to the bridge anyway.", aside: "Fortune (Moon): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
         { id: "send", text: "Ask him to carry word back the way you came.", visibleIf: joyPresent, aside: "+12 Distance · heal 24 on the Moon", outcomes: [D(12), A("joy", -24)] },
       ],
     },
@@ -316,7 +316,7 @@ const home_buried: NarrativeTree = {
       text: "The boards come up one by one. There's more down there than you were left.",
       options: [
         { id: "enough", text: "Take what you uncovered and stop.", aside: "+36 Distance", outcomes: [D(36)] },
-        { id: "all", text: "Take all of it.", aside: "Luck (Moon): +72 Distance, or +48 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 48)] },
+        { id: "all", text: "Take all of it.", aside: "Fortune (Moon): +72 Distance, or +48 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 48)] },
       ],
     },
   },
@@ -352,7 +352,7 @@ const creativity_dice: NarrativeTree = {
       id: "bet2",
       text: "Everything on one roll. The children go quiet.",
       options: [
-        { id: "throw", text: "Throw.", aside: "Luck (Venus): +96 Distance, or +72 affliction on Venus", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("joy", 72)] },
+        { id: "throw", text: "Throw.", aside: "Fortune (Venus): +96 Distance, or +72 affliction on Venus", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("joy", 72)] },
       ],
     },
   },
@@ -438,7 +438,7 @@ const relationships_stranger: NarrativeTree = {
       text: "Guards up, both of you. The road narrows.",
       options: [
         { id: "back", text: "Step back from it.", aside: "−12 Distance", outcomes: [D(-12)] },
-        { id: "through", text: "See it through.", aside: "Luck (Venus): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
+        { id: "through", text: "See it through.", aside: "Fortune (Venus): +60 Distance, or +36 affliction", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("healthiest", 36)] },
       ],
     },
   },
@@ -485,7 +485,7 @@ const transformation_inheritance: NarrativeTree = {
       text: "There's more, but it's bound up with what they owed.",
       options: [
         { id: "clean", text: "Take the clean part.", aside: "+36 Distance", outcomes: [D(36)] },
-        { id: "debts", text: "Take all of it, debts and all.", aside: "Luck (Mars): +96 Distance, or +72 affliction", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("healthiest", 72)] },
+        { id: "debts", text: "Take all of it, debts and all.", aside: "Fortune (Mars): +96 Distance, or +72 affliction", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("healthiest", 72)] },
       ],
     },
   },
@@ -564,7 +564,7 @@ const pilgrimage_vow: NarrativeTree = {
       text: "The road ahead will test it. It always does.",
       options: [
         { id: "hold", text: "Hold to it.", aside: "+36 Distance", outcomes: [D(36)] },
-        { id: "break", text: "Break it when it suits you.", aside: "Luck (Sun): +60 Distance, or +48 affliction on the Sun", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("joy", 48)] },
+        { id: "break", text: "Break it when it suits you.", aside: "Fortune (Sun): +60 Distance, or +48 affliction on the Sun", outcomesOnSuccess: [D(60)], outcomesOnFail: [A("joy", 48)] },
       ],
     },
   },
@@ -610,7 +610,7 @@ const achievement_monument: NarrativeTree = {
       text: "What stands at noon throws the longest shadow.",
       options: [
         { id: "finish", text: "Finish it as planned.", aside: "+48 Distance", outcomes: [D(48)] },
-        { id: "greater", text: "Make it greater still.", aside: "Luck (Saturn): +96 Distance, or +72 affliction", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("healthiest", 72)] },
+        { id: "greater", text: "Make it greater still.", aside: "Fortune (Saturn): +96 Distance, or +72 affliction", outcomesOnSuccess: [D(96)], outcomesOnFail: [A("healthiest", 72)] },
       ],
     },
   },
@@ -698,7 +698,7 @@ const hidden_door: NarrativeTree = {
       text: "The unseen keeps its own accounting, and it is not in your favor.",
       options: [
         { id: "what", text: "Take what you came for.", aside: "+36 Distance", outcomes: [D(36)] },
-        { id: "deeper", text: "Go deeper.", aside: "Luck (Saturn): +72 Distance, or +60 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 60)] },
+        { id: "deeper", text: "Go deeper.", aside: "Fortune (Saturn): +72 Distance, or +60 affliction", outcomesOnSuccess: [D(72)], outcomesOnFail: [A("healthiest", 60)] },
       ],
     },
   },

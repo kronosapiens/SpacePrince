@@ -6,7 +6,7 @@ import type {
   Polarity,
 } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
-import { combustionCeiling } from "./combust";
+import { RESOLVE_PER_DURABILITY, combustionCeiling } from "./combust";
 
 /** Stat-weighted action draw — `P(afflict) = impact / (impact + witness)`.
  *  Used to precommit the opponent's verb each turn (the player chooses theirs).
@@ -20,9 +20,16 @@ export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
 /** The fortune roll (MECHANICS.md §7) — `luck / 120`, i.e. `(luck/2)` sixtieths
  *  (10–60% at effective luck 12–72). The shared chance at map boundaries:
  *  uncombusting a combusted planet, halving a barrage share. Surfaced in the
- *  UI as `Fortune` (fortunePct below). */
+ *  UI as `Fortune` (fortuneSixtieths below). */
 export function fortuneChance(luck: number): number {
   return Math.max(0, Math.min(1, luck / 120));
+}
+
+/** The same roll in the unit the player reads it in — sixtieths, the spec's
+ *  own statement of it (`(luck/2) / 60`). Luck is a multiple of 12, so this is
+ *  always a whole number of sixtieths. */
+export function fortuneSixtieths(luck: number): number {
+  return Math.max(0, Math.min(60, luck / 2));
 }
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
@@ -38,12 +45,28 @@ export function getEffectiveStats(chart: Chart, planet: PlanetName): PlanetStats
   return getEffectiveStatsFromPlacement(chart.planets[planet]);
 }
 
-const STAT_KEYS = ["impact", "witness", "durability", "luck"] as const;
-const STAT_LABEL: Record<keyof PlanetStats, string> = {
-  impact: "Impact",
-  witness: "Witness",
-  durability: "Dur",
-  luck: "Luck",
+// Testify leads, matching the verb pair in the panel's action buttons.
+const STAT_KEYS = ["witness", "impact", "durability", "luck"] as const;
+
+/** The one player-facing name per stat — there is no second, "inner" vocabulary.
+ *  These are the words on the buttons, the headline, and the table alike. */
+export const STAT_LABEL: Record<keyof PlanetStats, string> = {
+  impact: "Afflict",
+  witness: "Testify",
+  durability: "Resolve",
+  luck: "Fortune",
+};
+
+/** Display units per point of raw stat. Both transforms are linear, so scaling
+ *  every column — rather than just the total — keeps `core + placement = total`
+ *  exact while making each row's total the operational number the panel
+ *  headlines. Resolve is the combustion ceiling (×5); Fortune is the roll in
+ *  sixtieths (÷2). Stats are multiples of 12, so both stay whole. */
+const STAT_DISPLAY_SCALE: Record<keyof PlanetStats, number> = {
+  impact: 1,
+  witness: 1,
+  durability: RESOLVE_PER_DURABILITY,
+  luck: 1 / 2,
 };
 
 export interface StatRow {
@@ -58,34 +81,40 @@ export interface StatRow {
 
 export interface StatTable {
   rows: StatRow[];
-  /** Operational read-outs for the closed modal, derived from the totals. */
-  durability: number; // combustion ceiling = HP
-  fortunePct: number; // the fortune roll as a percentage (luck total × 5, §7)
-  afflict: number; // impact total
-  testify: number; // witness total
+  /** Operational read-outs for the closed modal — the same numbers, and the
+   *  same units, as the matching row totals. */
+  resolve: number; // combustion ceiling
+  fortune: number; // the fortune roll, in sixtieths
+  afflict: number; // impact
+  testify: number; // witness
 }
 
-/** The underlying-stat table behind the operational numbers (the study drop-down,
+/** The stat table behind the operational numbers (the study drop-down,
  *  spec/design/SCREENS.md §3.6.1). `placement` bundles every sign/position buff
- *  (element + modality + in-sect luck). Core + placement = total. */
+ *  (element + modality + in-sect luck). Every column is already in the stat's
+ *  display unit, so core + placement = total and each total is the headline
+ *  number — the player never meets a raw stat or has to apply a transform. */
 export function deriveStatTable(p: PlanetPlacement): StatTable {
   const element = ELEMENT_BUFFS[p.element];
   const modality = MODALITY_BUFFS[p.modality];
   const sectLuck = p.buffs.luck - element.luck - modality.luck;
 
   const rows = STAT_KEYS.map((key): StatRow => {
-    const core = p.base[key];
-    const placement = element[key] + modality[key] + (key === "luck" ? sectLuck : 0);
+    const scale = STAT_DISPLAY_SCALE[key];
+    const core = p.base[key] * scale;
+    const placement =
+      (element[key] + modality[key] + (key === "luck" ? sectLuck : 0)) * scale;
     return { key, label: STAT_LABEL[key], core, placement, total: core + placement };
   });
 
-  const total = (k: keyof PlanetStats) => rows.find((r) => r.key === k)!.total;
+  // The resolver's own effective stats, so the panel can't drift from combat.
+  const eff = getEffectiveStatsFromPlacement(p);
   return {
     rows,
-    durability: combustionCeiling(p),
-    fortunePct: Math.round(fortuneChance(total("luck")) * 100),
-    afflict: Math.max(0, total("impact")),
-    testify: Math.max(0, total("witness")),
+    resolve: combustionCeiling(p),
+    fortune: fortuneSixtieths(eff.luck),
+    afflict: eff.impact,
+    testify: eff.witness,
   };
 }
 
