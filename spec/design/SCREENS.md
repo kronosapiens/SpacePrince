@@ -93,9 +93,17 @@ The two configurations are different layouts, not modes of one layout. An earlie
 
 - **Left half:** the player's chart, drawn per `STYLE.md §11`.
 - **Right half:** the opposing NPC chart, drawn with the same chart visual language. See §3.4.
-- **Center seam:** narrow chrome region carrying turn cadence and opponent-of-the-turn indicator. Chrome rules per §3.7.
+- **Top strip:** run and encounter state — Distance and the turn cadence — spanning both charts. Chrome rules per §3.7.
 
 The two charts face each other as equals. There is no visual differentiation between "yours" and "theirs" beyond their position.
+
+There is no centre seam.
+Everything it used to carry moved onto the charts themselves: the acting planet is the one wearing a ring on the opponent's side, its verb is that ring's colour, and its magnitude is the length of the bite drawn on each of the player's candidates (§3.5.1).
+Deleting it bought the wheels about 22% more radius at 1440px, which was most of the point — the crit that started this work was that everything on screen read too small.
+
+Rejected: a dividing rule between the charts.
+Two complete gold rings, two planet arrangements and two labels already state the separation, and a divider is the one kind of mark this world has no place for — it exists only to partition a screen, where every other mark is something the game is made of.
+Nothing bleeds across the gutter either: the outermost cluster radius is 320u, so the furthest planet sits 180u inside its own box, and the widest thing a planet emits is its colour-field bloom at 140u.
 
 ### 3.2 Narrative layout (asymmetric)
 
@@ -111,7 +119,7 @@ The aria does not re-pulse on node transitions; only the middle and bottom bands
 
 Both layouts stack vertically.
 
-- **Combat:** player's chart on top, opponent's chart below. Center-seam chrome relocates to a horizontal band between them.
+- **Combat:** player's chart on top, opponent's chart below. The top strip stays above both.
 - **Narrative:** player's chart on top, then aria, narrative text, options.
 
 In both cases the vertical stacking preserves the semantic relationship between the chart and what it faces. See `STYLE.md §13`.
@@ -136,19 +144,44 @@ The total turn animation budget is roughly **3–4 seconds**, intentionally long
 
 **Narrative.** During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per `HOUSES.md §4.3` chart-conditioning) carry a soft Field-layer halo so the player can see *why* the option exists. On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied). No propagation through aspect lines — propagation is a combat-only language. The aria does not animate during resolution; it remains the steady framing presence.
 
-### 3.5.1 Affliction badges
+### 3.5.1 The affliction arc
 
-An affliction badge appears only when a planet's affliction is **above zero** — so the badge's presence is itself the signal ("this planet is hurt"), and a chart of unharmed planets stays clean rather than littered with zeros. Combusted planets show no badge (their grayed-out state carries the meaning). This holds on every surface; the badge is never shown at zero.
+Affliction is drawn as an arc around each planet, at **1 point = 1°**.
+Ceilings are multiples of 60 with a maximum of 360 (`MECHANICS.md §10`), so the mapping is exact and needs no scale factor.
 
-(Earlier drafts kept badges visible at zero on gameplay surfaces for an always-on readout. That was reversed: now that combustion is deterministic, affliction reads as a damage meter, and a damage meter belongs only where there's damage. Discoverability of the affliction system is carried by the study panel, §3.6.1, not by ambient zeros.)
+- The **faint track** is the planet's whole ceiling. Its length is therefore its Resolve, which means a resting chart shows which planets are sturdy without a number.
+- The **bright span** is what the planet can still absorb.
+- The **combustion end is pinned at 6 o'clock**, and affliction accumulates toward it, so the bright span shortens by its free end descending into the anchor and every planet dies at the same point on the dial.
+- The **projected span** is the change the declared blow would make to the boundary — amber for harm, violet for heal, ember when it would close the span (`STYLE.md §5`).
 
-**The combust warning.** On opponent-afflict turns, a badge carries a warning treatment when combustion is on the table for its planet this turn — on the player's side, any live candidate that would combust catching the incoming blow (`affliction + incoming ≥ ceiling`); on the opponent's side, the acting planet when some candidate's impact covers its remaining margin. Both facts are choice-independent, so the warning is ambient: shown before the player picks, absent on testify turns (the chart visibly relaxes on heal turns). The treatment is the badge's digits plus a blurred breathing underlay in the ember warning color (`STYLE.md §5`); the pill's gold border is unchanged, and the pulse rides the shared breath clock. The warning is conservative and never cleared by previews — its meaning is "combusts *if the blow lands*"; an armed preview that preempts the blow tells that story itself (§3.6). With ceilings at durability × 5 (`MECHANICS.md §10`), a top blow can cover the most fragile ceiling, so a flagged planet may carry no affliction badge; the warning then surfaces the badge itself — the pill appears at `0` with the ember treatment — so the warning always has a body to ride.
+Absolute rather than normalized.
+A normalized arc reads as a fraction, which needs a complete-circle track to read against — and complete circles are the interaction ring's signal (§3.6).
+It also flattens the resting chart, since every undamaged planet would look identical, and the chart is the character sheet and the NFT as well as the board.
 
-### 3.6 Interaction grammar
+**The precommit, at rest.**
+The opponent has declared before the player chooses, and the magnitude does not depend on which planet catches it, so every live candidate wears the incoming bite before the player reaches for one.
+This is the scan the arc exists for: one bite length against seven gaps.
+A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (which of these dies) rather than a comparison of lengths.
+Only the direct hit is shown at rest; propagation is left to the focused preview, because seven planets' worth of ripples at once is noise and would put two arcs meaning different things on the same planet.
+Inspecting a planet clears the others and shows that one candidate's whole truth (§3.6).
+
+**Badges are retired.**
+Affliction and projection were numeric pills on the chart; the arc replaced both.
+The problem they had was that every number on screen was a numerator whose denominator was somewhere else — a raw affliction count means nothing without the ceiling it runs against, and that ceiling lived in the panel.
+
+This reverses an earlier principle worth naming.
+Badges were shown only above zero, so that a chart of unharmed planets stayed clean rather than littered with zeros — a damage meter belongs only where there is damage.
+The arc is always on, on every planet, because it is not a damage meter: its length is capacity, which is part of what the planet *is*.
+A capacity gauge belongs everywhere; a damage readout did not.### 3.6 Interaction grammar
 
 The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per `MECHANICS.md §5`). The grammar is the same on touch and desktop.
 
-- **First tap on a planet:** inspect. The chart highlights the planet's aspect web, shows the defensive preview (below), and opens the inspect panel with its two actions. The inspected planet receives a thin gold selection ring.
+- **First tap on a planet:** inspect. The chart highlights the planet's aspect web, narrows the defensive preview to that planet (below), and opens the inspect panel with its two actions. The inspected planet's ring goes steady.
+
+There is one interaction ring per planet, not two.
+It breathes while the planet is merely tappable and sits steady once hovered, selected, or acting — selection is the invite answered, not a different ring.
+Its colour is **mist** until a verb is determined for that planet, and the verb's colour then (`STYLE.md §5`); it never carries the planet's own hue, which the disc, glyph and halo already state three times over.
+Rejected: separate invite and select rings at different radii. They were already mutually exclusive — selecting clears the invite on every planet and suppresses hover — so the second radius bought nothing and spent room the arc needed.
 - **Tap an action (afflict / testify):** arm. The full preview appears for that verb. A second tap on the armed action commits; the turn resolves.
 - **Tap a different planet:** inspection switches to that planet (not a commit).
 - **Tap an opponent planet:** preview-only. Surfaces the same information as own planets. No commit; opponent planets are not actable.
@@ -156,7 +189,8 @@ The player's per-turn action in combat is choosing which of their planets acts, 
 
 **Previews show only what is determined.**
 Verb-dependent information appears only while a verb is indicated — hovered (desktop) or armed; verb-free information is free everywhere.
-Inspecting a planet (hover or tap) shows the *defensive* read — the opponent's precommitted action landing on that planet and rippling through its web — which is fully determined before any choice is made.
+The *defensive* read — the opponent's precommitted action — is fully determined before any choice is made, so it is shown on every live candidate at rest, not only on the planet under inspection (§3.5.1).
+Inspecting a planet narrows that read to one candidate's complete truth, propagation included, and clears it from the rest: the board shows either the menu or one choice, never both.
 The *offensive* read (the effect on the opponent's chart) appears only while an action is indicated — armed, or hovered while nothing is armed: the client never asserts the outcome of a choice not yet made.
 Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
 Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
@@ -220,8 +254,15 @@ The encounter screen is allowed restrained, functional chrome where it does nece
 **Allowed:**
 
 - **Distance readout.** The run's accumulating score (per `MECHANICS.md §12`). Visible during encounters. Functional type at small size.
-- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position.
-- **Opponent-of-the-turn indicator.** Text + glyph identifying which opponent planet is acting this turn (e.g. "ANSWER MERCURY ☿"). Lives in the center seam between charts in combat.
+- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position. When the encounter resolves the dots are spent, so the same slot carries the outcome word instead.
+
+Both are labelled and live together in a top strip spanning the two charts.
+Neither is chart data — Distance is the run's score and the pips are position within this encounter — so the strip reads as chrome without becoming a HUD sitting over the wheels.
+
+**Not chrome:** which opponent planet is acting, and with which verb.
+An earlier draft gave this a text-and-glyph indicator in the centre seam.
+It now reads off the opponent's chart directly — the acting planet is the only one wearing a ring, and that ring's colour is the verb — with the magnitude carried by the bites on the player's own candidates.
+The opponent planet's *name* was lost in that move and has no home on the board; whether the glyph alone is enough for a player with no astrology is open (§3.9).
 
 **Out:**
 
@@ -243,6 +284,8 @@ Transitions between major surfaces fade through the Void canvas with an active-p
 ### 3.9 Open questions
 
 - Whether the player's chart should pulse, idle, or stay completely still during the *fragment fade-in* moment specifically (distinct from the broader decision phase, which is settled — gating planets pulse).
+- Whether the opponent's acting planet needs its **name** on the board, now that the centre seam is gone and only its glyph identifies it (§3.7). The accessibility premise is a player with no astrology, for whom the word is what makes the glyph mean anything.
+- How a **zero-effect ripple** should read. On an afflict turn a hard aspect inverts to testimony, and a target already at zero affliction has nothing to heal — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence. The retired projection badge covered this by showing a violet zero.
 - Map traversal interaction model (separate from encounter interaction — see §4).
 - Accessibility (color-channel parallel signal).
 

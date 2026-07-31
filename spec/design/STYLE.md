@@ -123,7 +123,7 @@ The screen receives an ambient tint in the active planet's primary color at 8% o
 
 **What counts as "the active planet" depends on the configuration:**
 
-- **Combat:** the **opponent's** acting planet — the one selected by the system at turn start. The opponent's planet is the constant of the turn (it doesn't change as the player explores their own options); the player's planet is in flux during exploration. Tinting by the constant gives the turn a stable mood. This also matches the "ANSWER MERCURY" framing in `SCREENS.md §3.7` — the world is in Mercury's mood; the player's task is to reply.
+- **Combat:** the **opponent's** acting planet — the one selected by the system at turn start. The opponent's planet is the constant of the turn (it doesn't change as the player explores their own options); the player's planet is in flux during exploration. Tinting by the constant gives the turn a stable mood. The world is in that planet's mood; the player's task is to reply. (An earlier draft said this matched an "ANSWER MERCURY" chrome label in `SCREENS.md §3.7`; that label is gone — the acting planet now reads off the opponent's chart directly — but the tinting rationale is unchanged.)
 - **Narrative:** the house's **ruling planet** (per `SCREENS.md §3.2`). The aria's planet tints the world.
 - **Map / between encounters:** fades to neutral — no active planet, the map is a contemplative between-surface. See `SCREENS.md §4.6`.
 
@@ -184,7 +184,7 @@ For chrome that must read as legible at small sizes — turn indicators, subtle 
 - No all-caps display type. The chorus speaks in sentences.
 - No drop caps. Affectation that doesn't earn its weight.
 - No text on a planetary color. Text rests on neutral.
-- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn dots, an opponent indicator) is permitted where it does necessary work; see `SCREENS.md §3.7`.
+- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn dots) is permitted where it does necessary work; see `SCREENS.md §3.7`.
 
 ---
 

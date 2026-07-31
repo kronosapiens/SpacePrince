@@ -97,8 +97,10 @@ The spec is divided by what kind of question each document answers.
 - **Interaction grammar is parity-first.** Tap-preview and tap-commit work identically on touch and desktop; hover is desktop-only and additive — never the sole carrier of information, never a commit (`spec/design/SCREENS.md §3.6`).
 - **Previews show only what is determined.** Verb-dependent information appears once a verb is indicated (hovered or armed); verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
+- **The affliction arc is the chart's primary channel.** Affliction is an arc at 1 point = 1°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock. Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
+- **One interaction ring, and its colour is the verb.** Breathing = tappable, steady = hovered/selected/acting. Mist until a verb is determined for that planet, the verb's colour then — never the planet's own hue, which the disc, glyph and halo already carry (`spec/design/SCREENS.md §3.6`).
 - **Record rejections.** When a design alternative is tried and dropped, note it in the relevant spec with a `Rejected:` line so it isn't re-proposed.
-- **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke scale in `client/src/svg/viewbox.ts`, motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
+- **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (four rungs, **chart viewBox units only** — the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
 - **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
 - **The sexagesimal lattice.** Stats are multiples of 12, ceilings multiples of 60, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
 - **Harvest upward.** When a session settles a design rule, write it into the relevant spec and add a one-line pointer here; code comments hold only what's local to the site.
@@ -106,4 +108,5 @@ The spec is divided by what kind of question each document answers.
 ## Tooling
 
 - Client package manager: **pnpm**. Dev: `pnpm dev` in `client/`.
+- **Chart tuner** (dev only): `DEV → CHART` in the running client drives the concentric radii, the arc, and the invite's breath live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth — settled values get written back by hand.
 - Cairo: standard `scarb` workflow inside `cairo/crates/star_chart`. Build expects the sibling `astronomy-engine` workspace to resolve the path dependency.
