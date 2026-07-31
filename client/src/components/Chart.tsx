@@ -1,7 +1,7 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
-import { isCombusted } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
@@ -10,8 +10,9 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import {
+  AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_SIZE,
-  INNER_RING_R, OUTER_RING_R,
+  INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
   PLANET_R_REST, PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
@@ -104,8 +105,10 @@ export interface ChartProps {
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
-  /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
-  hideAfflictionBadges?: boolean;
+  /** Hide the affliction display — arc and badge both. For charts shown for
+   *  their form rather than their state (Title, the map's chart anchor);
+   *  gameplay screens don't set it. */
+  hideAffliction?: boolean;
   scale?: number;
   entrance?: "left" | "right" | "none";
   side?: "self" | "other";
@@ -169,7 +172,7 @@ export function Chart(props: ChartProps) {
     showColorField = true,
     showSubstrate = true,
     showAspects = true,
-    hideAfflictionBadges = false,
+    hideAffliction = false,
     entrance = "none",
     side,
     onPlanetClick,
@@ -402,6 +405,22 @@ export function Chart(props: ChartProps) {
         );
       })}
 
+      {/* Arc layer: above every planet's halo, same as the badges — the arc is
+          the primary read of how much a planet can still absorb, so a
+          neighbour's bloom must not sit on top of it. */}
+      {!hideAffliction && points.map((p) => {
+        if (!isUnlocked(p.planet)) return null;
+        return (
+          <PlanetArc
+            key={p.planet}
+            point={p}
+            ceiling={combustionCeiling(chart.planets[p.planet])}
+            affliction={state?.[p.planet]?.affliction ?? 0}
+            projection={projection?.deltas[p.planet]}
+          />
+        );
+      })}
+
       {/* Badge layer: above every planet's halo. */}
       {points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
@@ -411,7 +430,7 @@ export function Chart(props: ChartProps) {
             point={p}
             combusted={planetCombusted(p.planet)}
             affliction={state?.[p.planet]?.affliction ?? 0}
-            hideAfflictionBadge={hideAfflictionBadges}
+            hideAfflictionBadge={hideAffliction}
             projection={projection?.deltas[p.planet]}
             impact={impactPlanets?.has(p.planet) ?? false}
             merging={mergingPlanets?.has(p.planet) ?? false}
@@ -489,7 +508,7 @@ function PlanetGlyph({
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, point.glyphR * CHART_STYLE.planet.rimStrokeRatio)}
           strokeDasharray={CHART_STYLE.ghost.dash} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(point.glyphR * 0.85)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
+          fontSize={Math.round(point.glyphR * CHART_STYLE.planet.symbolRatio)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
           style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -513,6 +532,9 @@ function PlanetGlyph({
   const outerClass = actionPulse ? "anim-action-glow" : undefined;
   const glyphClass = combusted || combusting ? "anim-combust" : undefined;
 
+  const ringShown = active || selected || (invite && interactive);
+  const ringSteady = active || selected || hovered;
+
   return (
     <g
       transform={`translate(${point.cx}, ${point.cy})`}
@@ -530,28 +552,24 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {/* Invite: a pulsing halo + bright ring in the planet's own color on every
-          tappable planet this turn, so the eye lands on the choices. On hover both
-          the halo and the ring snap to full, steady brightness (no pulse) — a
-          bright focus state. All of it clears once a planet is selected, or while
-          active. */}
-      {invite && interactive && !selected && !active && (
+      {/* One ring, three readings. It breathes in the planet's own color while
+          the planet is merely tappable, so the eye lands on the choices; it goes
+          steady under hover, under selection, and on the opponent's acting
+          planet. Hover and selection can share it because they never coexist —
+          selecting clears the invite on every planet and suppresses hover — and
+          because only selection opens the action fan-out. The halo goes steady
+          with it, so a committed choice can't read dimmer than a hovered one. */}
+      {ringShown && !active && (
         <circle r={r * 1.8}
           fill={`url(#v2-halo-${point.planet})`}
-          className={hovered ? undefined : "anim-invite-glow"}
-          style={{ opacity: hovered ? CHART_STYLE.invite.halo.hover : undefined, pointerEvents: "none" }} />
+          className={ringSteady ? undefined : "anim-invite-glow"}
+          style={{ opacity: ringSteady ? CHART_STYLE.invite.halo.steady : undefined, pointerEvents: "none" }} />
       )}
-      {invite && interactive && !selected && !active && (
-        <circle r={r + 6} fill="none"
-          stroke={c} strokeWidth={CHART_STYLE.invite.ring.stroke}
-          className={hovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-          style={{ opacity: hovered ? CHART_STYLE.invite.ring.hover : undefined, pointerEvents: "none" }} />
-      )}
-      {/* The distinctive ring is select-only (plus the opponent's acting planet)
-          — hover is carried by the solid halo + bright ring, not this ring. */}
-      {(active || selected) && (
-        <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity={CHART_STYLE.selectRing.opacity} strokeWidth={CHART_STYLE.selectRing.stroke} />
+      {ringShown && (
+        <circle r={INTERACTION_RING_R} fill="none"
+          stroke={c} strokeWidth={CHART_STYLE.interactionRing.stroke}
+          className={ringSteady ? "invite-ring" : "invite-ring anim-invite-ring"}
+          style={{ opacity: ringSteady ? CHART_STYLE.interactionRing.steady : undefined, pointerEvents: "none" }} />
       )}
       {/* Receive-pulse: soft in-place valence glow behind the glyph when this
           planet takes testimony (heal) or affliction (harm) this beat. Behind
@@ -572,7 +590,7 @@ function PlanetGlyph({
           stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(r * 0.85)}
+          fontSize={Math.round(r * CHART_STYLE.planet.symbolRatio)}
           fill={glyphFill}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
@@ -607,6 +625,102 @@ function PlanetGlyph({
         </>
       )}
     </g>
+  );
+}
+
+/**
+ * Affliction arc — the planet's Resolve drawn at 1 point of affliction = 1°.
+ * Ceilings are multiples of 60 with a maximum of 360 (combust.ts), so the
+ * mapping is exact and needs no scale factor. Absolute rather than normalized:
+ * arc length *is* durability, so a resting chart shows which planets are sturdy
+ * without a number, and one incoming magnitude draws the same sweep on every
+ * planet — the player learns what 48 looks like once and can then scan seven
+ * gaps against it.
+ *
+ * The ceiling end is pinned at 6 o'clock and affliction accumulates toward it,
+ * so the bright span — what the planet can still absorb — shortens by its free
+ * end descending into the anchor, and combustion is that span closing. Every
+ * planet dies at the same point on the dial.
+ *
+ * Rejected: normalized (every ceiling sweeping a full 360°). It reads as a
+ * fraction, which needs a complete-circle track to read against — and complete
+ * circles are the interaction ring's signal. It also flattens the resting
+ * chart, since every undamaged planet would look identical.
+ */
+function PlanetArc({
+  point, ceiling, affliction, projection,
+}: {
+  point: PlanetPoint;
+  ceiling: number;
+  affliction: number;
+  projection?: ProjectionChip;
+}) {
+  if (ceiling <= 0) return null;
+  const r = AFFLICTION_ARC_R;
+  const stroke = CHART_STYLE.afflictionArc.stroke;
+  // Position `a` on the track sits `ceiling - a` degrees back from the anchor.
+  const at = (a: number) => AFFLICTION_ARC_ANCHOR_DEG - ceiling + clamp(a, 0, ceiling);
+  const spent = clamp(affliction, 0, ceiling);
+
+  // The projected span runs between the current boundary and where the blow
+  // would put it — one segment either way, since testimony just moves it back.
+  let diff: { from: number; to: number; color: string } | null = null;
+  if (projection) {
+    const signed = projection.polarity === "Testimony"
+      ? -Math.abs(projection.delta)
+      : Math.abs(projection.delta);
+    const projected = clamp(spent + signed, 0, ceiling);
+    if (projected !== spent) {
+      diff = {
+        from: Math.min(spent, projected),
+        to: Math.max(spent, projected),
+        color: signed > 0 ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
+      };
+    }
+  }
+
+  return (
+    <g transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
+      {/* The whole ceiling, faint. What shows through is the affliction already
+          spent, and the full extent is the planet's Resolve. */}
+      <ArcStroke r={r} from={at(0)} to={at(ceiling)} full={ceiling >= 360}
+        stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
+      {spent < ceiling && (
+        <ArcStroke r={r} from={at(spent)} to={at(ceiling)} full={spent <= 0 && ceiling >= 360}
+          stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.remainingOpacity} width={stroke} />
+      )}
+      {diff && (
+        <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
+          stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity} width={stroke} />
+      )}
+    </g>
+  );
+}
+
+/** One arc of a circle centered on the local origin, `from`→`to` in the same
+ *  degree convention as `polar` (0 = 3 o'clock, increasing counterclockwise on
+ *  screen). A 360° sweep has no arc path — both endpoints coincide — so the one
+ *  placement that reaches it (a fixed-earth Saturn) draws a circle instead. */
+function ArcStroke({
+  r, from, to, full, stroke, opacity, width,
+}: {
+  r: number; from: number; to: number; full: boolean;
+  stroke: string; opacity: number; width: number;
+}) {
+  const shared = {
+    fill: "none" as const,
+    stroke,
+    strokeOpacity: opacity,
+    strokeWidth: width,
+  };
+  if (full) return <circle r={r} {...shared} />;
+  const a = polar(0, 0, r, from);
+  const b = polar(0, 0, r, to);
+  const large = to - from > 180 ? 1 : 0;
+  // sweep-flag 0 draws counterclockwise on screen (SVG's y axis points down).
+  return (
+    <path d={`M ${a.x} ${a.y} A ${r} ${r} 0 ${large} 0 ${b.x} ${b.y}`}
+      strokeLinecap="round" {...shared} />
   );
 }
 

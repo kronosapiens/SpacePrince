@@ -11,10 +11,32 @@ export const SIGN_LABEL_R = 430;     // sign labels sit between inner and outer 
 export const TICK_INNER_R = 410;     // tick marks straddle the gap between rings
 export const TICK_OUTER_R = 450;
 
-// Planet glyph sizing (uniform global; cluster shape is what changes per stack)
-export const PLANET_R_REST = 30;
+// Planet glyph sizing (uniform global; cluster shape is what changes per stack).
+// The disc gave up 6 units when the affliction arc arrived — three concentric
+// things now share the budget below, and the arc is unreadable pressed against
+// the disc rim.
+export const PLANET_R_REST = 24;
 export const PLANET_R_ACTIVE = 36;
 export const PLANET_HALO_R = 100;
+
+// Concentric budget around a planet. Both of these are drawn on every visible
+// planet at once, so they're bounded by the tightest cluster: the 5/6/7-stack
+// patterns sit ±13.91° apart at radius 320, which is 77.5 units center-to-
+// center. That spread can't be widened — a sign wedge is 30° and ±13.91 already
+// fills it — so anything always-on wants to stay inside r≈38.75 to never touch
+// a neighbour. The ring's 38 (41.8 at the peak of its breath) exceeds that in a
+// 5+ stack, where the two rings cross; every 2–4 stack clears at 43.8.
+// Rejected: arc outside the ring at 42, which keeps the disc at its old 30 and
+// buys the arc a third more circumference — but arcs are drawn on every planet
+// at once, so at that radius they touch in a 4-stack and it stops being clear
+// which arc belongs to which planet.
+export const AFFLICTION_ARC_R = 31;
+export const INTERACTION_RING_R = 38;
+/** Screen angle of the combustion line — 6 o'clock, so every planet's arc
+ *  descends into the same point as it dies. Degrees are math-convention
+ *  (0 = 3 o'clock, increasing counterclockwise), matching `polar` in Chart.tsx
+ *  and the wheel's own sense: signs advance counterclockwise from the ASC. */
+export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 
 // Stroke scale (in viewBox units)
 export const STROKE_HAIRLINE = 0.5;

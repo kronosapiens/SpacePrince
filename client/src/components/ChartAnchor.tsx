@@ -33,7 +33,7 @@ export function ChartAnchor({ chart, state, unlockedPlanets, ceremonyPlanet, siz
       activePlanet={ceremonyPlanet ?? null}
       showColorField={false}
       showAspects={false}
-      hideAfflictionBadges
+      hideAffliction
       passive
     />
   );

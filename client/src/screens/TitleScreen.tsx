@@ -69,7 +69,7 @@ export function TitleScreen() {
             unlockedPlanets={PLANETS}
             hoveredPlanet={hovered}
             onPlanetHover={setHovered}
-            hideAfflictionBadges
+            hideAffliction
             showColorField
           />
         </div>

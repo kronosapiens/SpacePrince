@@ -206,7 +206,10 @@
   opacity: calc(0.5 + 0.5 * var(--breath));
 }
 /* The drop-shadow glow lives on the base ring class so it persists when the
-   pulse is removed on hover (the ring then sits solid at full brightness).
+   pulse is removed on hover or selection (the ring then sits solid at full
+   brightness). Shared by the chart's planets and the map's nodes; on a planet
+   it carries selection too, since selection is the invite answered rather than
+   a second ring.
    fill-box/center keep the scale breath centered on the ring itself. */
 .invite-ring {
   filter: drop-shadow(0 0 8px currentColor);

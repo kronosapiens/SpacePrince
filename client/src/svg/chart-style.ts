@@ -39,30 +39,51 @@ export const CHART_STYLE = {
   },
 
   /** Diagram — planet glyph disc + rim. Rim/ghost stroke scales with glyph
-   *  radius: max(rimStrokeMin, glyphR * rimStrokeRatio). */
+   *  radius: max(rimStrokeMin, glyphR * rimStrokeRatio); the symbol scales as
+   *  glyphR * symbolRatio. The symbol ratio rose when the disc shrank to make
+   *  room for the affliction arc, so the symbol itself stayed roughly the size
+   *  it had always been — the disc is what gave up space, not the reading. */
   planet: {
     discOpacity: 0.92,
     discCombustedOpacity: 0.4,
     rimOpacity: 0.9,
     rimStrokeRatio: 0.05,
     rimStrokeMin: 1,
+    symbolRatio: 1.08,
   },
   /** Diagram — ghost (un-revealed) planet: dashed outline + faded glyph. */
   ghost: { outlineOpacity: 0.35, glyphOpacity: 0.4, dash: "2 4" },
 
-  /** Active — the tappable invite: breathing halo + ring, both snapping to
-   *  full on hover. Resting brightness rides the shared --breath clock in
-   *  motion.css (one phase for every invite on every surface); only the hover
-   *  snap and stroke are set here. The ring is the clickability signal and
-   *  must read against the ambient blooms (playtesters missed it at medium
-   *  weight), so it sits at the heavy end of the stroke scale. */
+  /** Active — the tappable invite's halo, breathing on the shared --breath
+   *  clock in motion.css (one phase for every invite on every surface) and
+   *  snapping to full when the planet is hovered or selected. */
   invite: {
-    halo: { hover: 1 },
-    ring: { hover: 1, stroke: STROKE_HEAVY },
+    halo: { steady: 1 },
   },
-  /** Active — the select / opponent-acting ring. Same weight as the invite
-   *  ring: selection is the invite answered, not a lighter state of it. */
-  selectRing: { opacity: 1, stroke: STROKE_HEAVY },
+  /** Active — the one interaction ring, in the planet's own color. It breathes
+   *  while the planet is merely tappable and sits steady once hovered or
+   *  selected (and on the opponent's acting planet): selection is the invite
+   *  answered, not a different ring. It's the clickability signal and must read
+   *  against the ambient blooms (playtesters missed it at medium weight), so it
+   *  sits at the heavy end of the stroke scale.
+   *  Rejected: separate invite and select rings at different radii — they were
+   *  already mutually exclusive (selecting clears the invite on every planet),
+   *  so the second radius bought nothing and spent room the affliction arc
+   *  needs. */
+  interactionRing: { steady: 1, stroke: STROKE_HEAVY },
+  /** Diagram — the affliction arc: a planet's Resolve at 1 point = 1°, drawn
+   *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
+   *  two apart — data is an arc, interaction is a complete circle — so the arc
+   *  can stay quiet and still never read as tappable. `track` is the whole
+   *  ceiling (so arc length is durability, visible with no number);
+   *  `remaining` is what the planet can still absorb; `diff` is the projected
+   *  change to that span. */
+  afflictionArc: {
+    stroke: 3.5,
+    trackOpacity: 0.3,
+    remainingOpacity: 0.85,
+    diffOpacity: 0.95,
+  },
   /** Active — combust: colored flare ripple + delayed bone shockwave. */
   combust: {
     ripple: { opacity: 0.95, stroke: 2.5 },
