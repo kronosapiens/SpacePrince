@@ -63,8 +63,13 @@ export const VALENCE_COLOR = {
 } as const;
 
 /** Combust warning — combustion is on the table for this planet this turn.
- *  A dark ember red: its own channel, kept off the valence amber (harm in
+ *  A luminant ember red: its own channel, kept off the valence amber (harm in
  *  flight), the luminant aspect red (edge language), and Mars vermillion
- *  (identity). Dark-saturated is fine on a filled badge pill where STYLE.md
- *  forbids it for hairline aspect lines. */
-export const COMBUST_WARNING = "#B03636";
+ *  (identity), which weight and kind separate it from besides.
+ *
+ *  Luminance is the constraint, not saturation. The mark rides the affliction
+ *  arc, whose whole vocabulary is bright = still yours, dark = already spent —
+ *  so a dark ember (this was #B03636) reads as *more spent*, receding into the
+ *  track exactly where it should alarm. It has to sit in the same value band as
+ *  the amber and violet it escalates from (L* ~60-68), never below them. */
+export const COMBUST_WARNING = "#FF5C33";

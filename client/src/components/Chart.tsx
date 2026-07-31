@@ -1,7 +1,7 @@
 import { useMemo, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { combustionCeiling, isCombusted, wouldCombust } from "@/game/combust";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
@@ -24,6 +24,7 @@ import type {
   AspectConnection,
   Chart as ChartType,
   PlanetName,
+  PlanetPlacement,
   Polarity,
   SignName,
 } from "@/game/types";
@@ -118,6 +119,12 @@ export interface ChartProps {
   /** When true, the player's tappable planets carry a quiet breathing ring
    *  inviting a choice — the combat decision phase. Off everywhere else. */
   inviteInteraction?: boolean;
+  /** The verb determined for whichever planet is wearing the ring — the
+   *  opponent's precommit, or the player's armed/indicated choice. Colours the
+   *  ring; without one it stays neutral. Only ever one planet at a time wears a
+   *  steady ring, and an inviting planet has no verb yet, so a single value
+   *  covers the chart. */
+  ringVerb?: Polarity | null;
   style?: CSSProperties;
   className?: string;
   passive?: boolean;
@@ -179,6 +186,7 @@ export function Chart(props: ChartProps) {
     onPlanetClick,
     onPlanetHover,
     inviteInteraction = false,
+    ringVerb,
     style,
     className,
     passive = false,
@@ -400,6 +408,7 @@ export function Chart(props: ChartProps) {
             onHover={handleHover}
             passive={passive}
             invite={inviteInteraction}
+            ringVerb={ringVerb}
             actionPulse={isActionPulse}
             combusting={isCombusting}
             impactPolarity={impactPolarity}
@@ -418,7 +427,7 @@ export function Chart(props: ChartProps) {
             key={p.planet}
             tuning={tuning}
             point={p}
-            ceiling={combustionCeiling(chart.planets[p.planet])}
+            placement={chart.planets[p.planet]}
             affliction={state?.[p.planet]?.affliction ?? 0}
             projection={projection?.deltas[p.planet]}
           />
@@ -474,7 +483,7 @@ function PlanetGlyph({
   tuning,
   point, combusted, ghost,
   selected, active, hovered,
-  onClick, onHover, passive, invite,
+  onClick, onHover, passive, invite, ringVerb,
   actionPulse, combusting,
   impactPolarity,
   animationEpoch,
@@ -490,6 +499,7 @@ function PlanetGlyph({
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
   invite: boolean;
+  ringVerb?: Polarity | null;
   actionPulse: boolean;
   combusting: boolean;
   impactPolarity?: Polarity;
@@ -542,6 +552,20 @@ function PlanetGlyph({
 
   const ringShown = active || selected || (invite && interactive);
   const ringSteady = active || selected || hovered;
+  // Neutral at rest, the verb once one is determined — the same grammar as the
+  // affliction arc inside it. The ring used to restate the planet's own colour,
+  // which the disc, the glyph and the halo already carry three times over, so
+  // the hue was decoration; spending it on the verb is what lets a precommit
+  // read at its source rather than only through its consequences on the other
+  // chart.
+  //
+  // Mist, not bone: the arc is bone, and a bone ring six units outside it was
+  // perceptually the same colour (ΔE 0). Mist separates them (ΔE 31) and matches
+  // what the neutral scale is for — bone is state, mist is affordance. Testify
+  // is the pair this costs (ΔE 61 → 41, still far past the threshold where two
+  // colours read apart); afflict slightly gains. The ring stays legible as an
+  // invite because the breath marks the tappable, not the brightness.
+  const ringColor = ringVerb ? VALENCE_COLOR[ringVerb] : NEUTRAL.mist;
 
   return (
     <g
@@ -575,9 +599,15 @@ function PlanetGlyph({
       )}
       {ringShown && (
         <circle r={tuning.ringR} fill="none"
-          stroke={c} strokeWidth={tuning.ringStroke}
+          stroke={ringColor} strokeWidth={tuning.ringStroke}
           className={ringSteady ? "invite-ring" : "invite-ring anim-invite-ring"}
-          style={{ opacity: ringSteady ? CHART_STYLE.interactionRing.steady : undefined, pointerEvents: "none" }} />
+          style={{
+            // The class's drop-shadow is currentColor, so the glow follows the
+            // stroke rather than staying on the planet's hue.
+            color: ringColor,
+            opacity: ringSteady ? CHART_STYLE.interactionRing.steady : undefined,
+            pointerEvents: "none",
+          }} />
       )}
       {/* Receive-pulse: soft in-place valence glow behind the glyph when this
           planet takes testimony (heal) or affliction (harm) this beat. Behind
@@ -656,14 +686,15 @@ function PlanetGlyph({
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  tuning, point, ceiling, affliction, projection,
+  tuning, point, placement, affliction, projection,
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
-  ceiling: number;
+  placement: PlanetPlacement;
   affliction: number;
   projection?: ProjectionChip;
 }) {
+  const ceiling = combustionCeiling(placement);
   if (ceiling <= 0) return null;
   const r = tuning.arcR;
   const stroke = tuning.arcStroke;
@@ -673,17 +704,26 @@ function PlanetArc({
 
   // The projected span runs between the current boundary and where the blow
   // would put it — one segment either way, since testimony just moves it back.
+  //
+  // A blow that closes the span turns ember instead of amber. Length cannot
+  // carry this: the span clamps at the ceiling, so a planet that dies shows a
+  // *shorter* mark than one that survives, and "more amber is worse" reads
+  // exactly backwards. Colour makes it categorical — which of these dies —
+  // rather than a comparison of two lengths. The predicate is `wouldCombust`
+  // itself, not a second reading of the same arithmetic.
   let diff: { from: number; to: number; color: string } | null = null;
   if (projection) {
-    const signed = projection.polarity === "Testimony"
-      ? -Math.abs(projection.delta)
-      : Math.abs(projection.delta);
+    const harm = projection.polarity !== "Testimony";
+    const signed = harm ? Math.abs(projection.delta) : -Math.abs(projection.delta);
     const projected = clamp(spent + signed, 0, ceiling);
     if (projected !== spent) {
+      const fatal = harm && wouldCombust(placement, { affliction }, Math.abs(projection.delta));
       diff = {
         from: Math.min(spent, projected),
         to: Math.max(spent, projected),
-        color: signed > 0 ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
+        color: fatal ? COMBUST_WARNING
+          : harm ? VALENCE_COLOR.Affliction
+          : VALENCE_COLOR.Testimony,
       };
     }
   }

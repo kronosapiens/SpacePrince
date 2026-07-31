@@ -1,12 +1,12 @@
-import { STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@/svg/viewbox";
+import { STROKE_EXTRA_HEAVY, STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@/svg/viewbox";
 
 /**
  * Every opacity / stroke-weight knob the Chart draws with, gathered in one
  * place so a brightness pass edits here instead of hunting through ~900 lines
  * of JSX. Grouped by element; values are chart viewBox units (1000×1000).
  * Elements that change on interaction carry rest/active (or rest/hover) pairs.
- * Every stroke is a rung of the three-step schedule in viewbox.ts — ground,
- * structure, under attention — never a loose number.
+ * Every stroke is a rung of the four-step schedule in viewbox.ts — ground,
+ * structure, under attention, the affliction arc — never a loose number.
  *
  * Tuning note: the faint layers are deliberately kept above the threshold where
  * social-media video re-encoding (H.264/VP9 quantization on the near-black
@@ -64,13 +64,14 @@ export const CHART_STYLE = {
   invite: {
     halo: { steady: 1 },
   },
-  /** Active — the one interaction ring, in the planet's own color. It breathes
-   *  while the planet is merely tappable and sits steady once hovered or
-   *  selected (and on the opponent's acting planet): selection is the invite
-   *  answered, not a different ring. It's the clickability signal and must read
-   *  against the ambient blooms (playtesters missed it at the middle rung), so
-   *  it takes the heavy one — shared with the arc inside it and the aspect line
-   *  under attention, all of which are things asking to be looked at.
+  /** Active — the one interaction ring. It breathes while the planet is merely
+   *  tappable and sits steady once hovered or selected (and on the opponent's
+   *  acting planet): selection is the invite answered, not a different ring.
+   *  Its colour is mist until a verb is determined for its planet and the verb's
+   *  colour then (see `ringColor` in Chart.tsx) — never the planet's own hue,
+   *  which the disc, glyph and halo already carry. Weight has to read against
+   *  the ambient blooms (playtesters missed it at the middle rung), so it takes
+   *  the heavy rung, shared with the aspect line under attention.
    *  Rejected: separate invite and select rings at different radii — they were
    *  already mutually exclusive (selecting clears the invite on every planet),
    *  so the second radius bought nothing and spent room the affliction arc
@@ -84,7 +85,7 @@ export const CHART_STYLE = {
    *  `remaining` is what the planet can still absorb; `diff` is the projected
    *  change to that span. */
   afflictionArc: {
-    stroke: STROKE_HEAVY,
+    stroke: STROKE_EXTRA_HEAVY,
     trackOpacity: 0.3,
     remainingOpacity: 0.85,
     diffOpacity: 0.95,

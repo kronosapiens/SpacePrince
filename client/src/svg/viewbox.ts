@@ -47,14 +47,15 @@ export const ACTIVE_HALO_R = INTERACTION_RING_R * 2;
 export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 
 /**
- * Stroke schedule, in chart viewBox units. Three rungs carrying three roles:
- * LIGHT is ground, MEDIUM is structure, HEAVY is a thing under attention.
+ * Stroke schedule, in chart viewBox units. Four rungs, four roles: LIGHT is
+ * ground, MEDIUM is structure, HEAVY is a thing under attention, EXTRA_HEAVY is
+ * the affliction arc.
  *
- * Three rather than more because the chart renders ~550px wide, so a unit is
- * about half a pixel and a half-unit step is invisible — the five-rung scale
- * this replaces (0.5 / 1 / 1.5 / 2.5 / 4, arrived whole in the v2 design port)
- * was drawing distinctions the surface can't express, and four of its five
- * rungs had no clients at all.
+ * A whole unit apart rather than finer. The chart renders ~672px wide, so a
+ * unit is about two thirds of a pixel and a half-unit step is invisible — the
+ * five-rung scale this replaced (0.5 / 1 / 1.5 / 2.5 / 4, arrived whole in the
+ * v2 design port) was drawing distinctions the surface can't express, and four
+ * of its five rungs had no clients at all.
  *
  * Chart units only. The run map and the seam render at different unit scales
  * (~1.4px and 1px per unit), so the same number is a different line there;
@@ -63,3 +64,10 @@ export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 export const STROKE_LIGHT = 1;
 export const STROKE_MEDIUM = 2;
 export const STROKE_HEAVY = 3;
+/** The affliction arc alone. Named on the same axis as the rungs below it —
+ *  weight, not width — since they grade one property. It sits above HEAVY
+ *  because the arc carries more than any mark that is merely under attention:
+ *  a planet's ceiling, what it can still absorb, and what the declared blow
+ *  takes. One client is deliberate, but it is also how the five-rung scale
+ *  this replaced rotted, so if nothing joins it, fold it back into HEAVY. */
+export const STROKE_EXTRA_HEAVY = 4;

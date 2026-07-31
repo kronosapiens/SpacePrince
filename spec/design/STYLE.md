@@ -53,21 +53,23 @@ The vocabulary should feel like a Hilma af Klint plate or a Renaissance armillar
 
 ## 3. Stroke Scale
 
-Stroke weights are defined relative to the unit grid, not in absolute pixels. This keeps the line work coherent across the chart wheel, the map, and the encounter, all of which sit in different viewBox sizes.
+Stroke weights are units on the **chart's** 1000x1000 viewBox, and only that.
+They do not travel: the run map and the encounter seam render at their own unit scales (~1.4px and 1px per unit against the chart's ~0.67), so the same number is a different line there.
+`MapDiagram`'s `TIER` is tuned in its own units and stays that way.
 
-Let `u` = 1 unit on the active viewBox, where the canonical chart wheel uses a 1000×1000 viewBox.
+| Name        | Weight | Role               | Carries                                                                    |
+|-------------|--------|--------------------|-----------------------------------------------------------------------------|
+| Light       | `1u`   | ground             | Substrate, aspect web at rest, chart inner ring, badge border, planet rim.   |
+| Medium      | `2u`   | structure          | Chart outer ring, sign ticks, combust shockwave.                             |
+| Heavy       | `3u`   | under attention    | Interaction ring, active aspect line, propagation pulse, combust ripple.     |
+| Extra heavy | `4u`   | the affliction arc | The arc alone.                                                              |
 
-| Name      | Weight   | Use                                                            |
-|-----------|----------|----------------------------------------------------------------|
-| Hairline  | `0.5u`   | Sign boundaries, faint background grid, distant aspects.       |
-| Light     | `1u`     | Aspect lines at rest, chart inner ring.                        |
-| Regular   | `1.5u`   | Map paths, planet glyph strokes, chart outer ring.             |
-| Medium    | `2.5u`   | Active aspect line, active planet halo.                        |
-| Heavy     | `4u`     | The rare emphatic mark. Used sparingly.                        |
+Four rungs, a unit apart, which at the chart's render size is about 0.67px per step.
+The scale this replaced had five rungs at 0.5 / 1 / 1.5 / 2.5 / 4 and arrived whole in the v2 design port; it was never adopted, four of its five rungs had no clients, and at half-unit steps it was drawing distinctions the surface cannot express.
 
-Weights scale the same way across viewBoxes — a 500-unit map uses the same five weights, just with `u = 0.5px` at default zoom.
-
-The ratio between adjacent weights is roughly 1.6 (golden-ratio-adjacent, not an accident — af Klint's plates do this).
+Extra heavy has exactly one client on purpose.
+The affliction arc carries more than any other single mark on the chart — a planet's whole ceiling, what it can still absorb, and what the declared blow will take from it — so it outranks even the marks that are merely under attention.
+A rung with one client is how the previous scale rotted, so if this one stays alone indefinitely it is worth folding back into Heavy rather than keeping a gradation nothing uses.
 
 Mixing weights inside a single drawn element is forbidden. A node ring is one weight. A glyph is one weight. Variation across elements builds the hierarchy; variation within an element makes the work look amateur.
 
@@ -132,8 +134,22 @@ Transitions between tints take 2000ms, linear easing — slow enough to feel lik
 Three orthogonal signals share the chart and must read apart:
 
 - **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Heavy when hovered, selected, or propagating (§3), the same weight the propagation pulse rides. The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
-- **Effect polarity (heal/harm)** — afflict/testify and the projected-effect badge use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
-- **Combust warning** — combustion is on the table for this planet this turn. A dedicated **dark ember red** (`#B03636`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity). Dark-saturated is acceptable here where the aspect red forbids it — the warning marks a filled badge pill, not a hairline on Void. The treatment lives on the affliction badge (`SCREENS.md §3.5.1`).
+- **Effect polarity (heal/harm)** — afflict/testify, the projected span on the affliction arc, and the interaction ring use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
+The ring is **mist** until a verb is determined for its planet — the opponent's precommit, or the player's armed choice — and takes the verb's colour then, the same grammar as the arc inside it.
+Mist rather than bone because the arc is bone, and a bone ring six units outside a bone arc is perceptually the same colour (ΔE 0 — they read as one double ring on an undamaged planet).
+Mist separates them at ΔE 31 and puts the two neutrals where the scale already defines them: bone is state, mist is affordance.
+The cost is testify, which drops from ΔE 61 to 41 against the resting ring — still far past where two colours read apart, but no longer symmetric with afflict, which gains slightly.
+A dimmer ring does not weaken the invite, because the breath is what marks the tappable (§ Motion), not the brightness.
+It does not carry the planet's own colour: the disc, the glyph and the halo already state identity three times, so the ring's hue was decoration, and spending it on the verb is what lets a precommit read at its source rather than only through its consequences on the other chart.
+Rejected: colouring the acting planet's *halo* by verb instead. Identity has to live somewhere, and recolouring the bloom takes it away at the moment the planet is most prominent — and it fails outright where the verb and the planet share a hue (Saturn with violet is 16° apart, Sun with amber 15°).
+- **Combust warning** — combustion is on the table for this planet this turn. A dedicated **luminant ember red** (`#FF5C33`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity), which weight and kind separate it from besides.
+Luminance is the constraint here, not saturation — the opposite of the aspect red, where thin-line artifacting is what governs.
+The mark rides the affliction arc, whose whole vocabulary is *bright = still yours, dark = already spent*, so a dark ember (this was `#B03636`) reads as more spent and recedes into the track exactly where it should alarm.
+It has to sit in the same value band as the amber and violet it escalates from (L\* ~60–68), never below them.
+The treatment lives on the affliction arc: when the projected blow would close a planet's remaining span, that span renders ember instead of the valence amber.
+A doomed planet therefore shows no bone at all — the ember covers everything it had left — where a survivor keeps bone with an amber bite at the end.
+Colour carries this rather than length, because length cannot: the projected span clamps at the ceiling, so a planet that dies draws a *shorter* mark than one that survives, and "more amber is worse" reads backwards.
+Ember makes the read categorical — which of these dies — instead of a comparison of two lengths at seven different clock positions.
 
 Rejected: coloring the lines by the two connected planets' own hues (primary for trine, secondary for square, a band traveling along the line). It was tried and read muddy — planet hues already carry identity on the glyphs, and doubling them onto the lines blurred mood. Mood lives in red/green; identity stays on the glyphs.
 
@@ -189,7 +205,7 @@ Animation is part of the symbolic vocabulary. Every named motion has a duration,
 | Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |
 | Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
 | Badge merge               | 200ms    | ease-out                    | The incoming Δ badge slides into the affliction total and fades — the addition is seen, not inferred. |
-| Invite breath             | 1100ms   | ease-in-out, looping        | Everything tappable right now breathes — a ring, node, or verb swelling slightly in its own color. |
+| Invite breath             | 1100ms   | ease-in-out, looping        | Everything tappable right now breathes — a ring, node, or verb swelling slightly. Chart rings breathe in bone (their colour is reserved for the verb); map nodes and verbs breathe in their own colour. |
 | Armed pulse               | 1100ms   | ease-in-out, looping        | The armed verb pulses harder, filled; its alternatives fall still. The confirm is the only thing asking. |
 
 ### The next click is always legible
