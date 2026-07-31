@@ -43,17 +43,17 @@ export const CHART_STYLE = {
   /** Diagram — planet glyph disc + rim. Rim/ghost stroke scales with glyph
    *  radius: max(rimStrokeMin, glyphR * rimStrokeRatio); the symbol scales as
    *  glyphR * symbolRatio. The ratio rose well past its old 0.85 when the disc
-   *  shrank to make room for the affliction arc — the symbol now overruns the
-   *  disc rather than sitting inside it, which is the point: what identifies a
-   *  planet is its sign, not the size of the circle it sits on. Tuned live
-   *  against the arc and ring (`svg/tuning.ts`). */
+   *  shrank to make room for the affliction arc, so the symbol kept its size
+   *  while the circle under it gave up radius — what identifies a planet is its
+   *  sign, not how big a disc it sits on. Tuned live against the arc and ring
+   *  (`svg/tuning.ts`). */
   planet: {
     discOpacity: 0.92,
     discCombustedOpacity: 0.4,
     rimOpacity: 0.9,
     rimStrokeRatio: 0.05,
     rimStrokeMin: STROKE_LIGHT,
-    symbolRatio: 1.3,
+    symbolRatio: 1.2,
   },
   /** Diagram — ghost (un-revealed) planet: dashed outline + faded glyph. */
   ghost: { outlineOpacity: 0.35, glyphOpacity: 0.4, dash: "2 4" },

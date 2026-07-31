@@ -1,7 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { HelpButton } from "@/components/HelpButton";
-import { VesicaSeam } from "@/components/VesicaSeam";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
@@ -13,8 +12,7 @@ import { computeProjectedEffects, type ProjectedEffect } from "@/game/projection
 import { getAspects } from "@/game/aspects";
 import { getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
-import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
-import { PLANET_GLYPH } from "@/svg/glyphs";
+import { PLANET_PRIMARY } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_IMPACT_MAP,
@@ -89,14 +87,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // both pre-commit and mid-playback.
   const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
   const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
-  // Magnitude of the opponent's precommitted verb (its effective impact/witness),
-  // shown next to the verb in the seam — e.g. "AFFLICTS 5".
-  const displayOpponentAmount =
-    displayOpponentTurn && displayOpponentAction
-      ? getEffectiveStats(encounter.opponentChart, displayOpponentTurn)[
-          displayOpponentAction === "Testimony" ? "witness" : "impact"
-        ]
-      : null;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
   const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
   // Tint each distance flash with the color of the planet resolving on that
@@ -247,8 +237,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   ]);
 
   // Projection-deltas to actually display, per side. Pre-commit: the live
-  // projection, or the resting precommit when nothing is being considered. Mid-animation: the snapshot captured at commit, with each
-  // planet filtered out as its impact pulse fires (see useCombatAnimation).
+  // projection, or the resting precommit when nothing is being considered.
+  // Mid-animation: the snapshot captured at commit, with each planet filtered
+  // out as its impact pulse fires (see useCombatAnimation).
   const displayProjection = useMemo(() => {
     const filterConsumed = (
       deltas: Partial<Record<PlanetName, ProjectedEffect>>,
@@ -423,78 +414,25 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   return (
     <div className="combat" onClick={handleClearSelection}>
       <HelpButton screen="combat" />
-      <div className="combat-side">
-        <Chart
-          chart={prince.chart}
-          state={displayPlayerState}
-          unlockedPlanets={playerUnlocked}
-          selectedPlanet={selected}
-          hoveredPlanet={selected ? null : hovered}
-          entrance="left"
-          side="self"
-          onPlanetClick={handlePlayerClick}
-          onPlanetHover={handlePlayerHover}
-          projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
-          activePlanet={animation?.playerPlanet ?? null}
-          activePropagationKeys={activePropagationKeys.self}
-          actionPulsePlanet={actionPulsePlayer}
-          impactPlanets={impactPlayer}
-          combustingPlanets={combustingPlayer}
-          mergingPlanets={mergingPlayer}
-          warningPlanets={selfWarnings ?? undefined}
-          animationEpoch={animationEpoch}
-          statsPanelPlanet={inspected}
-          statsPanelActions={playerActions}
-          statsPanelReserveActions
-          statsPanelStudy={study}
-          onToggleStudy={() => setStudy((s) => !s)}
-          inviteInteraction={!animation && !encounter.resolved && !selected}
-          ringVerb={selected ? indicatedVerb : null}
-        />
-        <div className="combat-side-label">SELF</div>
-      </div>
-
-      <div className="combat-seam">
-        {(!encounter.resolved || animation) && displayOpponentTurn && (
-          <div className="combat-opp-of-turn">
-            <span
-              className="combat-opp-glyph"
-              style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}
-            >
-              {PLANET_GLYPH[displayOpponentTurn]}
-            </span>
-            <SeamName>{displayOpponentTurn.toUpperCase()}</SeamName>
-            {displayOpponentAction && (
-              <span
-                className="combat-opp-action"
-                style={{ color: VALENCE_COLOR[displayOpponentAction] }}
-              >
-                {displayOpponentAction === "Testimony" ? "TESTIFIES" : "AFFLICTS"}
-                {displayOpponentAmount != null && (
-                  <span className="combat-opp-amount">{displayOpponentAmount}</span>
-                )}
-              </span>
-            )}
+      {/* Run- and encounter-level state, lifted out of the centre column so the
+          two charts can have the room. Nothing here is chart data — Distance is
+          the run's score, the pips are where we are in this encounter — so it
+          reads as chrome without becoming a HUD sitting over the wheels. */}
+      <div className="combat-topbar">
+        {encounter.resolved && !animation ? (
+          <span className="combat-outcome">{runEnded ? "COMBUST" : "SETTLED"}</span>
+        ) : (
+          <div className="combat-turns">
+            <span className="eyebrow">TURNS</span>
+            <div className="combat-turn-dots">
+              {Array.from({ length: encounter.sequence.length }).map((_, i) => {
+                const cls = i < displayTurnIndex ? "is-on" :
+                            i === displayTurnIndex ? "is-current" : "";
+                return <span key={i} className={`combat-dot ${cls}`} />;
+              })}
+            </div>
           </div>
         )}
-        {encounter.resolved && !animation && (
-          <div className="combat-opp-of-turn is-dim">
-            <SeamName>{runEnded ? "COMBUST" : "SETTLED"}</SeamName>
-          </div>
-        )}
-
-        <div className="combat-vesica">
-          <VesicaSeam planet={displayOpponentTurn ?? "Mars"} />
-        </div>
-
-        <div className="combat-turn-dots">
-          {Array.from({ length: encounter.sequence.length }).map((_, i) => {
-            const cls = i < displayTurnIndex ? "is-on" :
-                        i === displayTurnIndex ? "is-current" : "";
-            return <span key={i} className={`combat-dot ${cls}`} />;
-          })}
-        </div>
-
         <div className="combat-distance">
           <span className="eyebrow">DISTANCE</span>
           <span
@@ -524,6 +462,37 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             </span>
           </span>
         </div>
+      </div>
+
+      <div className="combat-side">
+        <Chart
+          chart={prince.chart}
+          state={displayPlayerState}
+          unlockedPlanets={playerUnlocked}
+          selectedPlanet={selected}
+          hoveredPlanet={selected ? null : hovered}
+          entrance="left"
+          side="self"
+          onPlanetClick={handlePlayerClick}
+          onPlanetHover={handlePlayerHover}
+          projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
+          activePlanet={animation?.playerPlanet ?? null}
+          activePropagationKeys={activePropagationKeys.self}
+          actionPulsePlanet={actionPulsePlayer}
+          impactPlanets={impactPlayer}
+          combustingPlanets={combustingPlayer}
+          mergingPlanets={mergingPlayer}
+          warningPlanets={selfWarnings ?? undefined}
+          animationEpoch={animationEpoch}
+          statsPanelPlanet={inspected}
+          statsPanelActions={playerActions}
+          statsPanelReserveActions
+          statsPanelStudy={study}
+          onToggleStudy={() => setStudy((s) => !s)}
+          inviteInteraction={!animation && !encounter.resolved && !selected}
+          ringVerb={selected ? indicatedVerb : null}
+        />
+        <div className="combat-side-label">SELF</div>
       </div>
 
       <div className="combat-side">
@@ -576,21 +545,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         />
       )}
     </div>
-  );
-}
-
-/** Opponent label at constant width. An invisible "MERCURY" sizer reserves the
- *  widest planet name's width so the seam — and thus the two wheels — never
- *  shifts horizontally as the name changes each turn. The visible label centres
- *  over the reserved space. */
-function SeamName({ children }: { children: string }) {
-  return (
-    <span className="combat-opp-name">
-      <span className="combat-opp-name-sizer" aria-hidden>
-        MERCURY
-      </span>
-      <span className="combat-opp-name-text">{children}</span>
-    </span>
   );
 }
 
