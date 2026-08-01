@@ -108,8 +108,14 @@ export const CHART_STYLE = {
   afflictionArc: {
     stroke: STROKE_EXTRA_HEAVY,
     trackOpacity: 0.3,
-    remainingOpacity: 0.85,
-    diffOpacity: 0.95,
+    // Full, matching the interaction ring's steady opacity. The arc is state and
+    // the ring is affordance, so the arc should never be the dimmer of the two —
+    // and since it is bone against the ring's mist, equal opacity leaves it the
+    // brighter mark, which is the hierarchy we want. The track stays faint: it
+    // is the spent span, and at full it would erase the boundary it exists to
+    // show.
+    remainingOpacity: 1,
+    diffOpacity: 1,
   },
   /** Active — combust: colored flare ripple + delayed bone shockwave. */
   combust: {
