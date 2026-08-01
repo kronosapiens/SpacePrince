@@ -523,12 +523,6 @@
 /* The pips carry no baseline of their own, so they ride the eyebrow's centre
    rather than sitting on its baseline. */
 .combat-turn-dots { align-self: center; }
-.combat-outcome {
-  font-family: var(--sans);
-  font-size: 12px;
-  letter-spacing: 0.32em;
-  color: var(--mist);
-}
 .combat-side {
   display: flex;
   flex-direction: column;

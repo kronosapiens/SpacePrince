@@ -88,6 +88,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // both pre-commit and mid-playback.
   const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
   const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
+  const settled = encounter.resolved && !animation;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
   const bands = distanceBands(displayedRunDistance);
   const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
@@ -421,20 +422,20 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           the run's score, the pips are where we are in this encounter — so it
           reads as chrome without becoming a HUD sitting over the wheels. */}
       <div className="combat-topbar">
-        {encounter.resolved && !animation ? (
-          <span className="combat-outcome">{runEnded ? "COMBUST" : "SETTLED"}</span>
-        ) : (
-          <div className="combat-turns">
-            <span className="eyebrow">TURNS</span>
-            <div className="combat-turn-dots">
-              {Array.from({ length: encounter.sequence.length }).map((_, i) => {
-                const cls = i < displayTurnIndex ? "is-on" :
-                            i === displayTurnIndex ? "is-current" : "";
-                return <span key={i} className={`combat-dot ${cls}`} />;
-              })}
-            </div>
+        <div className="combat-turns">
+          <span className="eyebrow">TURNS</span>
+          <div className="combat-turn-dots">
+            {Array.from({ length: encounter.sequence.length }).map((_, i) => {
+              // Spent turns fill; the current one is marked only while there is
+              // one. A settled encounter drops the marker rather than swapping
+              // the row for a word — the Continue button already says it is over.
+              const cls = i < displayTurnIndex ? "is-on"
+                : !settled && i === displayTurnIndex ? "is-current"
+                : "";
+              return <span key={i} className={`combat-dot ${cls}`} />;
+            })}
           </div>
-        )}
+        </div>
         {/* The track is the readout, so the group carries the value as its
             accessible name — the numeral it replaced was the only thing saying
             the number aloud. */}

@@ -261,7 +261,9 @@ The encounter screen is allowed restrained, functional chrome where it does nece
   The same `log2` places the run's star in the NFT field (`NFT.md`, Star-Field), so the readout a player watches accumulate and the mark it leaves are one idea rather than two.
   **No numeral.** The track is the readout; the score survives as the group's accessible name, since the digits were the only thing saying it aloud.
   The per-beat gain pulse — tinted by whichever planet is resolving — rides the track.
-- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position. When the encounter resolves the dots are spent, so the same slot carries the outcome word instead.
+- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position.
+  A settled encounter simply drops the current-position marker; the row is not swapped for an outcome word, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
+  Dots left unfilled after a settle are honest rather than a bug: an encounter that ends early — every opposing planet combust before the sequence runs out — really did take fewer turns than it had.
 
 Both are labelled and live together in a top strip spanning the two charts.
 Neither is chart data — Distance is the run's score and the pips are position within this encounter — so the strip reads as chrome without becoming a HUD sitting over the wheels.
