@@ -717,14 +717,6 @@
 /* Closed: operational read-outs (Resolve · Fortune + the action fan-out). No
    entrance fade here — this is the panel's initial state on click, which should
    simply appear; the fade is reserved for the study drop-down below. */
-.ps-opline {
-  font-family: var(--sans);
-  font-size: 23px;
-  color: var(--bone);
-  letter-spacing: 0.02em;
-  text-align: center;
-  margin-top: 16px;
-}
 .ps-actions {
   display: flex;
   justify-content: center;
@@ -792,7 +784,29 @@
 .ps-table th,
 .ps-table td {
   text-align: center;
-  padding: 5px 0;
+  padding: 6px 6px;
+}
+/* Four columns holding four different things, so an even split is the wrong
+   default — it starved the labels while TOTAL, the column needing least (no
+   triangle), hoarded the surplus. Widths come from each column's measured
+   natural width, with a few units of slack each:
+     label 91.5u ("Resolve" + triangle) · core 71.1u · place 79u ("PLACE" +
+     triangle, wider than any value beneath it) · total 65u.
+   Whole units rather than percentages: inside the foreignObject a CSS pixel is a
+   chart viewBox unit, so these are the real widths and they sum to the 330u the
+   panel leaves after its border and padding. Fixed layout scales them
+   proportionally if the panel ever changes width, so they still behave as ratios
+   without having to be written as any.
+   Layout stays `fixed` so columns don't shift as values change between planets;
+   `nowrap` makes a future overrun show as overflow rather than silently wrapping
+   onto a second line, which is what hid the first version of this bug. */
+.ps-table col.c-label { width: 99px; }
+.ps-table col.c-core { width: 76px; }
+.ps-table col.c-place { width: 84px; }
+.ps-table col.c-total { width: 71px; }
+.ps-table thead th,
+.ps-table td.ps-rowlabel {
+  white-space: nowrap;
 }
 /* Hairline inner grid — quieter than the header underline. */
 .ps-table th:not(:last-child),
@@ -804,7 +818,7 @@
 }
 .ps-table thead th {
   font-family: var(--sans);
-  font-size: 17px;
+  font-size: 15px;
   color: var(--gold);
   opacity: 0.8;
   letter-spacing: 0.06em;
@@ -821,6 +835,10 @@
   color: var(--gold);
   opacity: 0.78;
 }
+/* Labels sit a step below the values they label — correct typography for a
+   stats table, and the reason the panel could shrink at all: the headers and
+   row labels are what set its minimum width, not the numbers. */
+.ps-table tbody td.ps-rowlabel { font-size: 18px; }
 /* Open rows / column heads brighten their label; the toggle itself lives on
    the .ps-tri-tap triangle (see above), not the row. */
 .ps-statrow.is-open .ps-rowlabel { opacity: 1; }

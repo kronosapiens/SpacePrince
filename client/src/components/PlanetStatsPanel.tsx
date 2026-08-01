@@ -43,9 +43,21 @@ interface PlanetStatsPanelProps {
 
 // Exported so Chart.tsx's anti-centroid placement can size its rect-vs-planet
 // collision search and reserve the box's top.
-export const PLANET_STATS_PANEL_W = 420;
-export const PLANET_STATS_PANEL_H = 120;
-export const PLANET_STATS_PANEL_ACTION_H = 196;
+// The panel is in chart viewBox units, so it scaled up with the wheels when the
+// centre seam was deleted — it rendered ~231px wide before, ~282px after,
+// without ever needing the growth, so this brings it back toward its old
+// rendered size without chasing the smallest number that fits.
+//
+// The hard floor is 361: the study table's max-content width is 307u at the type
+// in layout.css, plus 54u of card border and padding. Sitting on that floor left
+// the table exactly filling its content box, where a fallback font on first
+// paint or one word of new copy tips a column into the card's `overflow:
+// hidden`. 384 keeps ~23u of slack instead, and is still 8.6% narrower than the
+// 420 it started at. Less 54u of border and padding it leaves a 330u table,
+// which is the budget the column widths in layout.css divide.
+export const PLANET_STATS_PANEL_W = 384;
+export const PLANET_STATS_PANEL_H = 76;
+export const PLANET_STATS_PANEL_ACTION_H = 152;
 const W = PLANET_STATS_PANEL_W;
 const ACTION_EXTRA = PLANET_STATS_PANEL_ACTION_H - PLANET_STATS_PANEL_H;
 
@@ -147,6 +159,14 @@ export function PlanetStatsPanel({
             <div className="ps-study">
               <div className="ps-gloss">{PLANET_GLOSS[planet]}</div>
               <table className="ps-table">
+                {/* Named columns so the widths in layout.css can follow each
+                    column's own content rather than splitting evenly. */}
+                <colgroup>
+                  <col className="c-label" />
+                  <col className="c-core" />
+                  <col className="c-place" />
+                  <col className="c-total" />
+                </colgroup>
                 <thead>
                   <tr>
                     <th aria-hidden />
@@ -206,9 +226,6 @@ export function PlanetStatsPanel({
             </div>
           ) : (
             <div className="ps-ops">
-              <div className="ps-opline">
-                Resolve {table.resolve} · Fortune {table.fortune}/60
-              </div>
               {actions && (
                 <div className="ps-actions">
                   {/* Testify leads: it is the scoring verb (`turnScore` counts only
