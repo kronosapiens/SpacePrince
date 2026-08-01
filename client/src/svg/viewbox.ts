@@ -40,6 +40,10 @@ export const INTERACTION_RING_R = 36;
 // 52.199999999999996 and that reaches the DOM as the literal `r` attribute.
 export const INVITE_HALO_R = INTERACTION_RING_R * 1.5;
 export const ACTIVE_HALO_R = INTERACTION_RING_R * 2;
+/** Where the corona's streamers begin — clear of the interaction ring's outer
+ *  edge. Only one planet is ever acting, so unlike the arc and the ring the
+ *  corona is exempt from the cluster budget above and may overlap neighbours. */
+export const CORONA_INNER_R = INTERACTION_RING_R + 6;
 /** Screen angle of the combustion line — 6 o'clock, so every planet's arc
  *  descends into the same point as it dies. Degrees are math-convention
  *  (0 = 3 o'clock, increasing counterclockwise), matching `polar` in Chart.tsx

@@ -169,6 +169,25 @@
   transform-box: fill-box;
 }
 
+/* Corona — an acting planet's verb as streamers. It turns rather than breathes:
+   the breath is the invite's language (§ below), and an acting planet has
+   already been committed to. Period and direction come from the per-verb token
+   in chart-style.ts, so the two verbs turn opposite ways at different speeds.
+   Symmetry is no obstacle: a wheel with evenly spaced spokes is plainly
+   rotating, because motion is perceived directly and not by comparing one
+   configuration with the next. */
+@keyframes corona-turn {
+  to { transform: rotate(360deg); }
+}
+.planet-corona {
+  animation-name: corona-turn;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+  pointer-events: none;
+}
+
 /* Invite — everything tappable carries a glowing halo (the element's own
    radial gradient) plus a bright ring, both breathing in sync, so the eye
    lands on the choices without hunting. On hover the same ring stops breathing
@@ -247,6 +266,7 @@
   .anim-distance-flash,
   .anim-distance-pop,
   .anim-map-current-halo,
+  .planet-corona,
   .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo

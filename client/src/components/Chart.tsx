@@ -12,6 +12,7 @@ import { PropagationLine } from "@/components/PropagationLine";
 import {
   AFFLICTION_ARC_ANCHOR_DEG,
   CHART_CENTER, CHART_SIZE,
+  CORONA_INNER_R,
   INNER_RING_R, OUTER_RING_R,
   PLANET_R_ACTIVE,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
@@ -584,6 +585,7 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
+      {ringVerb && ringShown && <PlanetCorona verb={ringVerb} />}
       {/* One ring, three readings. It breathes in the planet's own color while
           the planet is merely tappable, so the eye lands on the choices; it goes
           steady under hover, under selection, and on the opponent's acting
@@ -770,6 +772,44 @@ function ArcStroke({
   return (
     <path d={`M ${a.x} ${a.y} A ${r} ${r} 0 ${large} 0 ${b.x} ${b.y}`}
       strokeLinecap="round" {...shared} />
+  );
+}
+
+/**
+ * The corona — an acting planet's verb, drawn as streamers radiating past the
+ * interaction ring. Colour already carries the verb on the ring; this carries it
+ * in silhouette too, so "which planet is acting, and how" reads as one shape
+ * rather than as a hue the player has to recall.
+ *
+ * Radial line segments are the one primitive still free around a planet: the
+ * filled circle is the disc, a complete circle is the interaction ring, a partial
+ * arc is affliction, a gradient bloom is identity, and an expanding circle is
+ * combustion. Rays terminate in empty space, so they can't be read as aspect
+ * lines, which always span planet to planet.
+ */
+function PlanetCorona({ verb }: { verb: Polarity }) {
+  const spec = CHART_STYLE.corona[verb];
+  const span = spec.reach - CORONA_INNER_R;
+  const rays = Array.from({ length: spec.rays }, (_, i) => {
+    // Every other ray falls short on an afflict corona, which is what breaks the
+    // outline into a flare. `flare: 1` leaves testify's fringe even.
+    const reach = CORONA_INNER_R + span * (i % 2 === 0 ? 1 : spec.flare);
+    const deg = (360 / spec.rays) * i;
+    const a = polar(0, 0, CORONA_INNER_R, deg);
+    const b = polar(0, 0, reach, deg);
+    return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />;
+  });
+  return (
+    <g
+      className="planet-corona"
+      style={{ animationDuration: spec.turn, animationDirection: spec.spin }}
+      stroke={VALENCE_COLOR[verb]}
+      strokeWidth={spec.stroke}
+      strokeOpacity={spec.opacity}
+      strokeLinecap={spec.cap}
+    >
+      {rays}
+    </g>
   );
 }
 

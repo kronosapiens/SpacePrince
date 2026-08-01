@@ -77,6 +77,27 @@ export const CHART_STYLE = {
    *  so the second radius bought nothing and spent room the affliction arc
    *  needs. */
   interactionRing: { steady: 1, stroke: STROKE_HEAVY },
+  /** Active — the corona on an acting planet: its verb, drawn as streamers.
+   *  Colour alone wasn't enough to separate the two verbs, so they differ in
+   *  silhouette as well, on the reference's own logic — a real corona is
+   *  irregular and long-streamered at solar maximum, smooth and symmetric at
+   *  minimum. Afflict flares: fewer rays, reaching past the halo, every other
+   *  one short so the outline breaks up. Testify gathers: twice as many, half
+   *  as far, even, hugging the rim.
+   *
+   *  The corona turns rather than breathes — `turn` and `spin` give the two
+   *  verbs different periods and opposite directions, a channel that costs
+   *  nothing. Symmetry is no obstacle to that: a wheel with evenly spaced
+   *  spokes is plainly rotating, since motion is perceived directly rather than
+   *  by comparing configurations.
+   *
+   *  `reach` is a radius but lives here rather than in viewbox.ts because the
+   *  pair of them *is* the distinction — splitting the two verbs across files
+   *  would hide the one thing worth reading. */
+  corona: {
+    Affliction: { rays: 12, reach: 78, flare: 0.55, stroke: STROKE_HEAVY, opacity: 0.85, cap: "butt", turn: "48s", spin: "normal" },
+    Testimony: { rays: 24, reach: 54, flare: 1, stroke: STROKE_MEDIUM, opacity: 0.8, cap: "round", turn: "84s", spin: "reverse" },
+  },
   /** Diagram — the affliction arc: a planet's Resolve at 1 point = 1°, drawn
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc

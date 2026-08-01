@@ -33,7 +33,7 @@ Anything not on this list requires a deliberate exception.
 ### Allowed primitives
 
 - **Circle.** The dominant form. Planets, nodes, orbits, halos, the outer chart ring. Hilma af Klint's vocabulary almost entirely.
-- **Line segment.** Aspect lines, pillar paths. Always straight.
+- **Line segment.** Aspect lines, pillar paths, corona streamers (§5). Always straight.
 - **Arc.** Sign boundaries on the chart wheel, partial halos around active planets, sweep transitions.
 - **Polygon — regular only.** Triangles (trines), squares (squares), hexagons (sextiles), dodecagons (the zodiac itself). Irregular polygons are forbidden.
 - **Spiral.** Reserved. One spiral per screen, maximum. Used for emanation cues and rare cosmic moments.
@@ -113,7 +113,8 @@ Neutrals are warm-cool balanced toward the cool side so they sit cleanly against
 ### Solid vs gradient
 
 - **Solid fills** are the default. Most marks are solid.
-- **Radial gradients** are permitted only on planet halos and on the ambient screen tint. The gradient runs from the planet's primary color at the center to transparent at the edge. Never from one palette color to another.
+- **Radial gradients** are permitted only on planet halos and on the ambient screen tint, and run from a single color at the center to transparent at the edge — never from one palette color to another.
+That color is the planet's primary in the identity halo, and the valence amber or violet in the receive-pulse behind a planet taking a hit.
 - **Linear gradients** are forbidden. They read as digital and break the painterly register.
 - **Mesh gradients** (SVG2) are forbidden until SVG2 support is universal. Approximate with layered radial gradients if needed.
 
@@ -141,6 +142,25 @@ Mist separates them at ΔE 31 and puts the two neutrals where the scale already 
 The cost is testify, which drops from ΔE 61 to 41 against the resting ring — still far past where two colours read apart, but no longer symmetric with afflict, which gains slightly.
 A dimmer ring does not weaken the invite, because the breath is what marks the tappable (§ Motion), not the brightness.
 It does not carry the planet's own colour: the disc, the glyph and the halo already state identity three times, so the ring's hue was decoration, and spending it on the verb is what lets a precommit read at its source rather than only through its consequences on the other chart.
+**The corona.** An acting planet — the opponent's precommitted actor, or the player's own once a verb is armed — carries its verb as streamers: radial line segments beginning just outside the interaction ring, in the verb's colour.
+Colour alone was not enough to separate the two verbs at a glance, so they differ in silhouette as well, on the reference's own logic — a real corona is irregular and long-streamered at solar maximum, smooth and symmetric at minimum.
+**Afflict flares:** twelve rays at Heavy weight reaching well past the halo, every other one falling short so the outline breaks up, butt caps.
+**Testify gathers:** twenty-four rays at Medium weight, half as far, all equal, round caps, hugging the rim.
+One rung apart, so the weight difference survives while both stay present — and it is the lighter of the two that needed it, since a streamer is the first thing to vanish at small sizes.
+Radial segments were the one primitive still free around a planet — the filled circle is the disc, a complete circle is the interaction ring, a partial arc is affliction, a gradient bloom is identity, an expanding circle is combustion.
+They cannot be misread as aspect lines, which always span planet to planet; a streamer terminates in empty space.
+Unlike the arc and the ring the corona is exempt from the cluster radius budget, because only one planet per chart is ever acting — it may overlap a neighbour, since there is only ever one.
+
+**The corona turns; it does not breathe.** The breath is the invite's language (§ Motion: a slow breath is what marks the tappable), and an acting planet has already been committed to — a breathing corona would ask for a tap on a decision already made.
+It rotates instead, the two verbs in opposite directions at different periods (afflict 48s, testify 84s), which is a channel that costs nothing.
+Symmetry is no obstacle to that, and it is worth saying because the opposite seems intuitive: a wheel with evenly spaced spokes is plainly rotating.
+Motion is perceived directly, not by comparing one configuration with the next — symmetry only defeats rotation under stroboscopic sampling, the wagon-wheel effect, which needs rates orders of magnitude faster than these.
+So testify's fringe can stay perfectly even and still visibly turn, and the even-versus-ragged silhouette survives as the verb distinction.
+
+Rejected: breathing it on the shared clock, the first attempt.
+Rejected: varying every ray's length to make the rotation legible — it was built on the mistaken premise above, and it cost the even/ragged distinction to solve a problem that did not exist.
+Rejected: an annular **wash** under the streamers — a gradient ring, transparent at the centre, which is what a corona physically is. It read well and degraded better than the rays do (a streamer is a third of a pixel wide on a phone; a gradient has no minimum feature size), but it was a second glow around a planet that already has one, and the streamers alone are the more distinctive mark. If the corona ever proves too faint at small sizes, this is the thing to bring back.
+
 Rejected: colouring the acting planet's *halo* by verb instead. Identity has to live somewhere, and recolouring the bloom takes it away at the moment the planet is most prominent — and it fails outright where the verb and the planet share a hue (Saturn with violet is 16° apart, Sun with amber 15°).
 - **Combust warning** — combustion is on the table for this planet this turn. A dedicated **luminant ember red** (`#FF5C33`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity), which weight and kind separate it from besides.
 Luminance is the constraint here, not saturation — the opposite of the aspect red, where thin-line artifacting is what governs.
