@@ -510,6 +510,33 @@
 .combat-topbar {
   grid-column: 1 / -1;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+/* One slot, two occupants — the turn's precommit, then the way out. Its height
+   is reserved for the taller of them (the button) so the charts don't shift
+   when the encounter settles. */
+.combat-announce {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Reserved at the button's own height, not the sentence's — the slot swaps
+     contents on settle, and anything shorter nudges both charts down when it
+     does. */
+  min-height: 66px;
+}
+.combat-announce-line {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 26px;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  text-align: center;
+}
+.combat-readouts {
+  display: flex;
   align-items: baseline;
   justify-content: center;
   flex-wrap: wrap;
@@ -622,15 +649,6 @@
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
-}
-.continue-prompt {
-  position: fixed;
-  bottom: 28px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 5;
 }
 
 /* Stats panel — an HTML card inside an SVG <foreignObject> (client study chrome,
@@ -872,7 +890,9 @@
   /* Narrow enough to force the two groups onto separate rows: at full width
      the strip reaches the fixed help button in the corner, and each row alone
      clears it. */
-  .combat-topbar { gap: 4px 18px; max-width: 62vw; margin: 0 auto; }
+  .combat-topbar { gap: 8px; }
+  .combat-readouts { gap: 4px 18px; max-width: 62vw; }
+  .combat-announce-line { font-size: 19px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
   .combat-distance { margin-top: 4px; gap: 2px; }

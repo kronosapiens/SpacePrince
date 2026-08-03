@@ -13,7 +13,7 @@ import { computeProjectedEffects, type ProjectedEffect } from "@/game/projection
 import { getAspects } from "@/game/aspects";
 import { getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_IMPACT_MAP,
@@ -88,6 +88,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // both pre-commit and mid-playback.
   const opponentAction: Polarity = encounter.opponentActions[encounter.turnIndex] ?? "Affliction";
   const displayOpponentAction = encounter.opponentActions[displayTurnIndex] ?? null;
+  // Magnitude of the precommitted verb, for the announce line.
+  const displayOpponentAmount =
+    displayOpponentTurn && displayOpponentAction
+      ? getEffectiveStats(encounter.opponentChart, displayOpponentTurn)[
+          displayOpponentAction === "Testimony" ? "witness" : "impact"
+        ]
+      : null;
   const settled = encounter.resolved && !animation;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
   const bands = distanceBands(displayedRunDistance);
@@ -422,64 +429,90 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           the run's score, the pips are where we are in this encounter — so it
           reads as chrome without becoming a HUD sitting over the wheels. */}
       <div className="combat-topbar">
-        <div className="combat-turns">
-          <span className="eyebrow">TURNS</span>
-          <div className="combat-turn-dots">
-            {Array.from({ length: encounter.sequence.length }).map((_, i) => {
-              // Spent turns fill; the current one is marked only while there is
-              // one. A settled encounter drops the marker rather than swapping
-              // the row for a word — the Continue button already says it is over.
-              const cls = i < displayTurnIndex ? "is-on"
-                : !settled && i === displayTurnIndex ? "is-current"
-                : "";
-              return <span key={i} className={`combat-dot ${cls}`} />;
-            })}
+        <div className="combat-readouts">
+          <div className="combat-turns">
+            <span className="eyebrow">TURNS</span>
+            <div className="combat-turn-dots">
+              {Array.from({ length: encounter.sequence.length }).map((_, i) => {
+                // Spent turns fill; the current one is marked only while there is
+                // one. A settled encounter drops the marker rather than swapping
+                // the row for a word — the Continue button already says it is over.
+                const cls = i < displayTurnIndex ? "is-on"
+                  : !settled && i === displayTurnIndex ? "is-current"
+                  : "";
+                return <span key={i} className={`combat-dot ${cls}`} />;
+              })}
+            </div>
+          </div>
+          {/* The track is the readout, so the group carries the value as its
+              accessible name — the numeral it replaced was the only thing saying
+              the number aloud. */}
+          <div
+            className="combat-distance"
+            role="group"
+            aria-label={`Distance ${Math.round(displayedRunDistance)}`}
+          >
+            <span className="eyebrow" aria-hidden>DISTANCE</span>
+            {/* Distance has no ceiling to fill against, so it reads as doublings:
+                a tick per doubling banked, and a fixed-width bar for the run at
+                the current one. The bar is relative by construction — it measures
+                the same span of *log*, not of score — so late points move it as
+                far as early ones, and the track grows by gaining ticks rather
+                than by any mark getting longer (`game/distance.ts`). */}
+            <span
+              className="combat-distance-track"
+              aria-hidden
+              style={
+                distanceFlashColor
+                  ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
+                  : undefined
+              }
+            >
+              {/* The gain pulse rode the numeral; with the numeral gone the track
+                  is what represents Distance, so it hosts the beat instead. */}
+              {distanceFlashEpoch > 0 && (
+                <span
+                  key={distanceFlashEpoch}
+                  className="combat-distance-flash anim-distance-flash"
+                />
+              )}
+              <span className="combat-distance-ticks">
+                {Array.from({ length: bands.ticks }).map((_, i) => (
+                  <span key={i} className="combat-distance-tick" />
+                ))}
+              </span>
+              <span className="combat-distance-bar">
+                <span
+                  className="combat-distance-fill"
+                  style={{ width: `${bands.fraction * 100}%` }}
+                />
+              </span>
+            </span>
           </div>
         </div>
-        {/* The track is the readout, so the group carries the value as its
-            accessible name — the numeral it replaced was the only thing saying
-            the number aloud. */}
-        <div
-          className="combat-distance"
-          role="group"
-          aria-label={`Distance ${Math.round(displayedRunDistance)}`}
-        >
-          <span className="eyebrow" aria-hidden>DISTANCE</span>
-          {/* Distance has no ceiling to fill against, so it reads as doublings:
-              a tick per doubling banked, and a fixed-width bar for the run at
-              the current one. The bar is relative by construction — it measures
-              the same span of *log*, not of score — so late points move it as
-              far as early ones, and the track grows by gaining ticks rather
-              than by any mark getting longer (`game/distance.ts`). */}
-          <span
-            className="combat-distance-track"
-            aria-hidden
-            style={
-              distanceFlashColor
-                ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
-                : undefined
-            }
-          >
-            {/* The gain pulse rode the numeral; with the numeral gone the track
-                is what represents Distance, so it hosts the beat instead. */}
-            {distanceFlashEpoch > 0 && (
-              <span
-                key={distanceFlashEpoch}
-                className="combat-distance-flash anim-distance-flash"
-              />
-            )}
-            <span className="combat-distance-ticks">
-              {Array.from({ length: bands.ticks }).map((_, i) => (
-                <span key={i} className="combat-distance-tick" />
-              ))}
-            </span>
-            <span className="combat-distance-bar">
-              <span
-                className="combat-distance-fill"
-                style={{ width: `${bands.fraction * 100}%` }}
-              />
-            </span>
-          </span>
+        {/* One slot for what is happening and what is next: the turn's
+            precommit while it is being answered, the way out once it is not.
+            The sentence is the caption that teaches the marks — the ring's
+            colour and the bites on the candidates say the same thing wordlessly,
+            and nothing else says which of them is Saturn. */}
+        <div className="combat-announce">
+          {settled ? (
+            <button className="begin-btn" onClick={handleContinue}>
+              {runEnded ? "Walk back" : "Continue"}
+            </button>
+          ) : (
+            displayOpponentTurn && displayOpponentAction && (
+              <p className="combat-announce-line">
+                <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
+                  {displayOpponentTurn}
+                </span>{" "}
+                <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
+                  {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
+                </span>
+                {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
+              </p>
+            )
+          )}
         </div>
       </div>
 
@@ -545,14 +578,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         />
         <div className="combat-side-label">OTHER</div>
       </div>
-
-      {encounter.resolved && !animation && (
-        <div className="continue-prompt">
-          <button className="begin-btn" onClick={handleContinue}>
-            {runEnded ? "Walk back" : "Continue"}
-          </button>
-        </div>
-      )}
 
       {devAnimationControls && (
         <DevAnimationPanel
