@@ -1,28 +1,25 @@
-import { useMemo, type CSSProperties, type MouseEvent } from "react";
+import { useMemo, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
-import { PropagationLine } from "@/components/PropagationLine";
 import {
   CHART_CENTER, CHART_SIZE,
-  INNER_RING_R, OUTER_RING_R,
-  PLANET_R_REST, PLANET_R_ACTIVE,
+  INNER_RING_R, INVITE_HALO_R, INTERACTION_RING_R, OUTER_RING_R,
+  PLANET_R_REST,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
-  STROKE_LIGHT,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
-import type {
-  AspectConnection,
-  Chart as ChartType,
-  PlanetName,
-  Polarity,
-  SignName,
-} from "@/game/types";
+import { CHART_STYLE } from "@/svg/chart-style";
+import type { Chart as ChartType, PlanetName, SignName } from "@/game/types";
 
-// Sign-label tints used to surface combat polarity around the chart rim.
-// Match v1's values so the affordance reads the same.
-const SIGN_AFFLICTION_COLOR = "#FF8C6B";
-const SIGN_TESTIMONY_COLOR = "#8FBC8F";
+/**
+ * The natal wheel, as the game draws it. This is a showcase copy of the client's
+ * Chart (client/src/components/Chart.tsx) carrying only what a resting,
+ * hover-only chart needs — no combat state, so no affliction arc, badges,
+ * corona, or propagation. Styling values live in svg/chart-style.ts and mirror
+ * the client's tokens, so the chart here and the chart in the game read as the
+ * same object.
+ */
 
 const SIGN_LABELS: Record<SignName, string> = {
   Aries: "ARI", Taurus: "TAU", Gemini: "GEM", Cancer: "CAN",
@@ -51,120 +48,17 @@ interface PlanetPoint {
   cx: number;
   cy: number;
   glyphR: number;
-  glyphRActive: number;
-}
-
-interface PlanetStatus {
-  combusted?: boolean;
-  affliction?: number;
-}
-
-export interface ProjectionChip {
-  delta: number;
-  polarity: Polarity;
-}
-
-export interface ProjectionChips {
-  deltas: Partial<Record<PlanetName, ProjectionChip>>;
 }
 
 export interface ChartProps {
   chart: ChartType;
-  state?: Partial<Record<PlanetName, PlanetStatus>>;
-  /** Planets the player has not yet revealed. Render as ghost (dashed outline, faded glyph). */
-  unlockedPlanets?: PlanetName[];
-  /** Tap-preview selection. Highlights planet with gold inspect ring, brightens its aspects. */
-  selectedPlanet?: PlanetName | null;
-  /** Always-active planet (e.g. opponent-of-the-turn). Pulses with full halo. */
-  activePlanet?: PlanetName | null;
-  /** When true, every visible planet renders in active state (full halo + larger glyph).
-   *  Used for ceremonial / hero stages like the Title screen. */
-  allActive?: boolean;
-  /** Hover preview state. */
   hoveredPlanet?: PlanetName | null;
-  /** Sustained inspection (Chart Study). Brighter aspects, gold ring. */
-  inspectPlanet?: PlanetName | null;
-  /** Show the af Klint color-field blooms behind each visible planet. Default true. */
-  showColorField?: boolean;
-  /** Show the sacred-geometry ground (hexagram + vesica). On by default; pass
-   *  false to suppress it on a given chart. */
-  showSubstrate?: boolean;
-  /** Subtle aspect-graph: hairline at rest. */
-  showAspects?: boolean;
-  /** Render the resting aspect web at full opacity (Title / Landing showcase). */
-  aspectsFull?: boolean;
-  /** Hide affliction count badges. Title / Mint use this; gameplay screens don't. */
-  hideAfflictionBadges?: boolean;
-  /** Show affliction badges even when value is zero. Used on gameplay surfaces. */
-  alwaysShowAfflictionBadges?: boolean;
-  scale?: number;
-  entrance?: "left" | "right" | "none";
-  side?: "self" | "other";
-  onPlanetClick?: (p: PlanetName) => void;
   onPlanetHover?: (p: PlanetName | null) => void;
-  style?: CSSProperties;
-  className?: string;
-  passive?: boolean;
-  aspects?: AspectConnection[];
-  projection?: ProjectionChips;
-  /** Directed aspect keys (`Source->Target`) currently propagating. The
-   *  pulse just brightens the existing aspect-line color; heal/harm signal
-   *  lives on the projection badge and the planet's impact pulse. */
-  activePropagationKeys?: ReadonlySet<string>;
-  /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
-  actionPulsePlanet?: PlanetName | null;
-  /** Planets whose affliction badge should pulse (took a hit this beat). */
-  impactPlanets?: ReadonlySet<PlanetName>;
-  /** Planets whose direct hit was a crit — fires a radial burst. */
-  critPlanets?: ReadonlySet<PlanetName>;
-  /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
-  combustingPlanets?: ReadonlySet<PlanetName>;
-  /** Per-turn key — bumped each turn so animation classes replay reliably. */
-  animationEpoch?: number;
-  /** Per-sign polarity coloring — used during combat to indicate, for each
-   *  zodiac sign on the rim, what the polarity outcome would be against the
-   *  reference planet (opponent-of-turn for the player chart, player's
-   *  hovered/selected for the opponent chart). Affliction = red, Testimony
-   *  = green, absent = neutral. */
-  signPolarities?: Partial<Record<SignName, Polarity>>;
 }
 
-export function Chart(props: ChartProps) {
-  const {
-    chart,
-    state,
-    unlockedPlanets,
-    selectedPlanet,
-    activePlanet,
-    allActive = false,
-    hoveredPlanet,
-    inspectPlanet,
-    showColorField = true,
-    showSubstrate = true,
-    showAspects = true,
-    aspectsFull = false,
-    hideAfflictionBadges = false,
-    alwaysShowAfflictionBadges = false,
-    entrance = "none",
-    side,
-    onPlanetClick,
-    onPlanetHover,
-    style,
-    className,
-    passive = false,
-    aspects: aspectsProp,
-    projection,
-    activePropagationKeys,
-    actionPulsePlanet,
-    impactPlanets,
-    critPlanets,
-    combustingPlanets,
-    animationEpoch,
-    signPolarities,
-  } = props;
-
+export function Chart({ chart, hoveredPlanet, onPlanetHover }: ChartProps) {
   const points = useMemo(() => buildPlanetPoints(chart), [chart]);
-  const aspects = useMemo(() => aspectsProp ?? getAspects(chart), [chart, aspectsProp]);
+  const aspects = useMemo(() => getAspects(chart), [chart]);
   const pointMap = useMemo(() => {
     const m: Record<PlanetName, PlanetPoint> = {} as Record<PlanetName, PlanetPoint>;
     for (const p of points) m[p.planet] = p;
@@ -172,113 +66,48 @@ export function Chart(props: ChartProps) {
   }, [points]);
   const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
 
-  // allActive overrides unlock-gating: every planet renders in full state.
-  const isUnlocked = (p: PlanetName) =>
-    allActive || (unlockedPlanets ? unlockedPlanets.includes(p) : true);
+  // Color-field blooms — one radial gradient per planet.
+  const fieldBlooms = PLANETS.map((planet) => {
+    const pt = pointMap[planet];
+    return (
+      <circle key={`bloom-${planet}`} cx={pt.cx} cy={pt.cy} r={140} fill={`url(#v2-bloom-${planet})`} />
+    );
+  });
 
-  const entranceClass =
-    entrance === "left" ? "anim-encounter-open-left" :
-    entrance === "right" ? "anim-encounter-open-right" :
-    "";
-
-  // Color-field blooms — one radial gradient per visible non-combust planet.
-  const fieldBlooms = showColorField
-    ? PLANETS.map((planet) => {
-        if (!isUnlocked(planet)) return null;
-        if (state?.[planet]?.combusted) return null;
-        const pt = pointMap[planet];
-        return (
-          <circle key={`bloom-${planet}`} cx={pt.cx} cy={pt.cy} r={140} fill={`url(#v2-bloom-${planet})`} />
-        );
-    })
-    : null;
-
-  // Aspect lines, colored by source planet's harmony.
-  const aspectLines = showAspects
-    ? aspects.map((a, i) => {
-        if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
-        if (a.from > a.to) return null; // dedupe pairs (getAspects emits both directions)
-        const from = pointMap[a.from];
-        const to = pointMap[a.to];
-        if (!from || !to) return null;
-        // Aspect highlights only follow hover/select/active. Dimmed by default
-        // even when allActive is true — keeps the resting Title chart calm.
-        const isPropagating =
-          activePropagationKeys?.has(aspectKey(a.from, a.to)) ||
-          activePropagationKeys?.has(aspectKey(a.to, a.from));
-        const isActive = isPropagating ||
-                         activePlanet === a.from || activePlanet === a.to ||
-                         hoveredPlanet === a.from || hoveredPlanet === a.to ||
-                         selectedPlanet === a.from || selectedPlanet === a.to;
-        const isInspect = inspectPlanet === a.from || inspectPlanet === a.to;
-        // The chart has two orthogonal signals to communicate: aspect mood
-        // (harmony/tension) and effect polarity (heal/harm). Aspects own
-        // red/green per astrological convention; polarity lives on the
-        // projection badge so the two channels don't fight. Fallback if
-        // red/green ever feels too noisy: bone (harmony) / mist (tension)
-        // — achromatic, doesn't compete, but loses the mood affordance.
-        const isHarmony =
-          a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
-        const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
-        // Active lines (hovered / selected / combat-active / propagating) render
-        // at full strength; the rest stay at the legible resting baseline.
-        // Parity with the main client.
-        const opacity = isActive || aspectsFull ? 1 : isInspect ? 0.7 : 0.5;
-        const sw = isActive ? 1.6 : isInspect ? 1.2 : 0.6;
-        const dx = to.cx - from.cx;
-        const dy = to.cy - from.cy;
-        const len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len;
-        const uy = dy / len;
-        const ra = from.glyphR + 4;
-        const rb = to.glyphR + 4;
-        return (
-          <line key={`aspect_${i}`}
-            x1={from.cx + ux * ra} y1={from.cy + uy * ra}
-            x2={to.cx - ux * rb} y2={to.cy - uy * rb}
-            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-            strokeLinecap="round" />
-        );
-      })
-    : null;
-
-  const propagationLines = activePropagationKeys
-    ? aspects.map((a) => {
-        const key = aspectKey(a.from, a.to);
-        if (!activePropagationKeys.has(key)) return null;
-        if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
-        const from = pointMap[a.from];
-        const to = pointMap[a.to];
-        if (!from || !to) return null;
-        return (
-          <PropagationLine
-            key={`prop-${key}`}
-            fromX={from.cx}
-            fromY={from.cy}
-            toX={to.cx}
-            toY={to.cy}
-            fromPlanet={a.from}
-            toPlanet={a.to}
-            aspect={a.aspect}
-            active
-          />
-        );
-      })
-    : null;
-
-  const handleClick = onPlanetClick && !passive ? onPlanetClick : undefined;
-  const handleHover = onPlanetHover && !passive ? onPlanetHover : undefined;
-
-  // Substrate (hexagram + vesica) — only when explicitly requested.
-  const substrate = showSubstrate ? renderSubstrate() : null;
+  // Aspect lines, colored by the pair's harmony. Hovering a planet thickens the
+  // lines it owns; nothing else changes, so the web stays legible at rest.
+  const aspectLines = aspects.map((a, i) => {
+    if (a.from > a.to) return null; // dedupe pairs (getAspects emits both directions)
+    const from = pointMap[a.from];
+    const to = pointMap[a.to];
+    if (!from || !to) return null;
+    const isActive = hoveredPlanet === a.from || hoveredPlanet === a.to;
+    const isHarmony =
+      a.aspect === "Trine" || a.aspect === "Sextile" || a.aspect === "Conjunction";
+    const stroke = isHarmony ? ASPECT_COLOR.harmony : ASPECT_COLOR.tension;
+    const sw = isActive ? CHART_STYLE.aspect.activeStroke : CHART_STYLE.aspect.restStroke;
+    const dx = to.cx - from.cx;
+    const dy = to.cy - from.cy;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const ra = from.glyphR + 4;
+    const rb = to.glyphR + 4;
+    return (
+      <line key={`aspect_${i}`}
+        x1={from.cx + ux * ra} y1={from.cy + uy * ra}
+        x2={to.cx - ux * rb} y2={to.cy - uy * rb}
+        stroke={stroke} strokeWidth={sw} strokeOpacity={CHART_STYLE.aspect.opacity}
+        strokeLinecap="round" />
+    );
+  });
 
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-      className={[entranceClass, className ?? ""].filter(Boolean).join(" ")}
-      style={{ display: "block", width: "100%", ...style }}
+      className="chart-svg"
       role="img"
-      aria-label={`${chart.name} natal chart${side === "other" ? " (opponent)" : ""}`}
+      aria-label={`${chart.name} natal chart`}
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -286,8 +115,8 @@ export function Chart(props: ChartProps) {
           const c = PLANET_PRIMARY[p];
           return (
             <radialGradient key={`b-${p}`} id={`v2-bloom-${p}`}>
-              <stop offset="0%" stopColor={c} stopOpacity="0.32" />
-              <stop offset="60%" stopColor={c} stopOpacity="0.08" />
+              <stop offset="0%" stopColor={c} stopOpacity={CHART_STYLE.glow.colorField.core} />
+              <stop offset="60%" stopColor={c} stopOpacity={CHART_STYLE.glow.colorField.mid} />
               <stop offset="100%" stopColor={c} stopOpacity="0" />
             </radialGradient>
           );
@@ -296,8 +125,8 @@ export function Chart(props: ChartProps) {
           const c = PLANET_PRIMARY[p];
           return (
             <radialGradient key={`h-${p}`} id={`v2-halo-${p}`}>
-              <stop offset="0%" stopColor={c} stopOpacity="0.7" />
-              <stop offset="50%" stopColor={c} stopOpacity="0.18" />
+              <stop offset="0%" stopColor={c} stopOpacity={CHART_STYLE.glow.halo.core} />
+              <stop offset="50%" stopColor={c} stopOpacity={CHART_STYLE.glow.halo.mid} />
               <stop offset="100%" stopColor={c} stopOpacity="0" />
             </radialGradient>
           );
@@ -306,161 +135,53 @@ export function Chart(props: ChartProps) {
 
       {/* Field layer */}
       {fieldBlooms}
-      {substrate}
+      {renderSubstrate()}
 
       {/* Diagram layer: rings + ticks + sign labels + aspect web */}
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={OUTER_RING_R}
-        fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1.5} />
+        fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.outer.opacity} strokeWidth={CHART_STYLE.ring.outer.stroke} />
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
-        fill="none" stroke={NEUTRAL.gold} strokeOpacity="0.45" strokeWidth={1} />
+        fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.inner.opacity} strokeWidth={CHART_STYLE.ring.inner.stroke} />
       <SignTicks />
-      <SignLabels ascSignIdx={ascSignIdx} signPolarities={signPolarities} />
+      <SignLabels ascSignIdx={ascSignIdx} />
       {aspectLines}
-      {propagationLines}
 
-      {/* Active + Word layer: planets + halos + glyphs + badges */}
-      {points.map((p) => {
-        const status = state?.[p.planet];
-        const combusted = status?.combusted ?? false;
-        const unlocked = isUnlocked(p.planet);
-        const isSelected = selectedPlanet === p.planet;
-        const isActive = (allActive && !combusted) || activePlanet === p.planet;
-        const isHovered = hoveredPlanet === p.planet;
-        const isInspect = inspectPlanet === p.planet;
-        const projectionChip = projection?.deltas[p.planet];
-        const isActionPulse = actionPulsePlanet === p.planet;
-        const isImpacting = impactPlanets?.has(p.planet) ?? false;
-        const isCritting = critPlanets?.has(p.planet) ?? false;
-        const isCombusting = combustingPlanets?.has(p.planet) ?? false;
-        return (
-          <PlanetGlyph
-            key={p.planet}
-            point={p}
-            combusted={combusted}
-            affliction={status?.affliction ?? 0}
-            hideAfflictionBadge={hideAfflictionBadges}
-            alwaysShowAfflictionBadge={alwaysShowAfflictionBadges}
-            ghost={!unlocked}
-            selected={isSelected}
-            active={isActive}
-            hovered={isHovered}
-            inspect={isInspect}
-            onClick={handleClick}
-            onHover={handleHover}
-            passive={passive}
-            projection={projectionChip}
-            actionPulse={isActionPulse}
-            impact={isImpacting}
-            crit={isCritting}
-            combusting={isCombusting}
-            animationEpoch={animationEpoch}
-          />
-        );
-      })}
+      {/* Planet layer: halos + glyphs */}
+      {points.map((p) => (
+        <PlanetGlyph
+          key={p.planet}
+          point={p}
+          hovered={hoveredPlanet === p.planet}
+          onHover={onPlanetHover}
+        />
+      ))}
     </svg>
   );
-}
-
-export function aspectKey(from: PlanetName, to: PlanetName): string {
-  return `${from}->${to}`;
 }
 
 // ─── Internal pieces ────────────────────────────────────────────────────
 
 function PlanetGlyph({
-  point, combusted, affliction, hideAfflictionBadge, ghost,
-  alwaysShowAfflictionBadge,
-  selected, active, hovered, inspect,
-  onClick, onHover, passive,
-  projection,
-  actionPulse, impact, crit, combusting,
-  animationEpoch,
+  point, hovered, onHover,
 }: {
   point: PlanetPoint;
-  combusted: boolean;
-  affliction: number;
-  hideAfflictionBadge: boolean;
-  alwaysShowAfflictionBadge: boolean;
-  ghost: boolean;
-  selected: boolean;
-  active: boolean;
   hovered: boolean;
-  inspect: boolean;
-  onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
-  passive: boolean;
-  projection?: ProjectionChip;
-  actionPulse: boolean;
-  impact: boolean;
-  crit: boolean;
-  combusting: boolean;
-  animationEpoch?: number;
 }) {
   const c = PLANET_PRIMARY[point.planet];
   const sec = PLANET_SECONDARY[point.planet];
-  // Active no longer enlarges the glyph — the ring carries the state,
-  // matches the on-hover treatment.
   const r = point.glyphR;
-  const interactive = !passive && (!!onClick || !!onHover) && !combusted && !ghost;
 
-  const handleClick = onClick && interactive
-    ? (e: MouseEvent) => { e.stopPropagation(); onClick(point.planet); }
+  const handleEnter = onHover ? () => onHover(point.planet) : undefined;
+  const handleLeave = onHover ? () => onHover(null) : undefined;
+  const handleClick = onHover
+    ? (e: MouseEvent) => { e.stopPropagation(); onHover(point.planet); }
     : undefined;
-  const handleEnter = onHover && interactive ? () => onHover(point.planet) : undefined;
-  const handleLeave = onHover && interactive ? () => onHover(null) : undefined;
 
-  if (ghost) {
-    // Same shape, ghostly.
-    return (
-      <g transform={`translate(${point.cx}, ${point.cy})`}>
-        <circle r={point.glyphR} fill="none"
-          stroke={c} strokeOpacity={0.35} strokeWidth={Math.max(1, point.glyphR * 0.05)}
-          strokeDasharray="2 4" />
-        <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(point.glyphR * 0.85)} fill={c} fillOpacity={0.4}
-          fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
-          fontWeight={600}
-          style={{ pointerEvents: "none", userSelect: "none" }}>
-          {PLANET_GLYPH[point.planet]}
-        </text>
-      </g>
-    );
-  }
-
-  const fill = combusted ? "#3B2F2F" : c;
-  const fillOpacity = combusted ? 0.4 : 0.92;
-  // Glyph reads as a deep shade of the planet's own hue (mirrors the client).
-  const glyphFill = combusted ? NEUTRAL.mist : deepShade(c);
-
-  // Affliction + projection badges — pill-shaped, gold border, drop shadow,
-  // matching the v1 treatment. Pills sit on the chart-facing side of the
-  // planet; projection sits beside the affliction along the perpendicular.
-  const dx = CHART_CENTER - point.cx;
-  const dy = CHART_CENTER - point.cy;
-  const d = Math.hypot(dx, dy) || 1;
-  const ux = dx / d;
-  const uy = dy / d;
-  const badgeOffset = r;
-  const badgeR = Math.max(12, r * 0.5);
-  const badgeFontSize = Math.max(12, Math.round(r * 0.48));
-  // Projection badge is ~20% smaller — only ever a single digit, doesn't
-  // need to fit two-digit values like the persistent affliction badge.
-  const projBadgeR = Math.max(10, r * 0.4);
-  const projFontSize = Math.max(10, Math.round(r * 0.38));
-  // Pill width grows with text length. Floor at 2*r (square-ish).
-  // Per-char factor 0.7 (vs the natural ~0.55 for Inter digits) bakes in
-  // visual padding so multi-char content like "2.5" doesn't get crowded
-  // against the rounded ends.
-  const widthFor = (text: string, fontSize: number, pillR: number) =>
-    Math.max(2 * pillR, text.length * fontSize * 0.7 + pillR * 0.7);
-
-  // Outer wrapper carries the optional action-glow pulse. The desaturation
-  // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
-  // ripple overlays don't desaturate with it.
-  const epoch = animationEpoch ?? 0;
-  const outerClass = actionPulse ? "anim-action-glow" : undefined;
-  const glyphClass = combusted || combusting ? "anim-combust" : undefined;
-  const badgeClass = impact ? "anim-impact" : undefined;
+  // Glyph in a deep shade of the planet's own color: colored and high-contrast
+  // (via value), but on-palette — same hue family, so no complementary clash
+  // and the rainbow corona stays coherent.
+  const glyphFill = deepShade(c);
 
   return (
     <g
@@ -468,194 +189,41 @@ function PlanetGlyph({
       onClick={handleClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      style={{ cursor: interactive ? "pointer" : "default", color: c }}
-      className={outerClass}
+      style={{ cursor: onHover ? "pointer" : "default", color: c }}
     >
-      {active && (
-        <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
+      {/* Hover = the interaction ring, steady, in mist rather than the planet's
+          own hue — which the disc, glyph and halo already carry. The client
+          breathes this same ring while a planet is merely tappable; here there
+          is only ever the answered reading. */}
+      {hovered && (
+        <>
+          <circle r={INVITE_HALO_R}
+            fill={`url(#v2-halo-${point.planet})`}
+            style={{ opacity: CHART_STYLE.invite.halo.steady, pointerEvents: "none" }} />
+          <circle r={INTERACTION_RING_R} fill="none"
+            stroke={NEUTRAL.mist} strokeWidth={CHART_STYLE.interactionRing.stroke}
+            className="invite-ring"
+            style={{
+              // The class's drop-shadow is currentColor, so the glow follows the
+              // stroke rather than staying on the planet's hue.
+              color: NEUTRAL.mist,
+              opacity: CHART_STYLE.interactionRing.steady,
+              pointerEvents: "none",
+            }} />
+        </>
       )}
-      {(inspect || selected) && !active && (
-        <circle r={point.glyphR + 10} fill="none"
-          stroke={c} strokeOpacity="0.95" strokeWidth={1.8} />
-      )}
-      {hovered && !selected && !inspect && (
-        <circle r={point.glyphR + 6} fill="none"
-          stroke={NEUTRAL.bone} strokeOpacity="0.6" strokeWidth={STROKE_LIGHT} />
-      )}
-      <g className={glyphClass}>
-        <circle r={r}
-          fill={fill} fillOpacity={fillOpacity}
-          stroke={sec} strokeOpacity="0.9" strokeWidth={Math.max(1, r * 0.05)} />
-        <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(r * 0.85)}
-          fill={glyphFill}
-          fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
-          fontWeight={600}
-          style={{ pointerEvents: "none", userSelect: "none" }}>
-          {PLANET_GLYPH[point.planet]}
-        </text>
-      </g>
-      {crit && (
-        <circle
-          key={`crit-${epoch}`}
-          r={r + 4}
-          fill="none"
-          stroke={c}
-          strokeOpacity={0.8}
-          strokeWidth={2}
-          className="anim-crit-burst"
-          style={{ pointerEvents: "none" }}
-        />
-      )}
-      {combusting && (
-        <circle
-          key={`ripple-${epoch}`}
-          r={r + 2}
-          fill="none"
-          stroke={c}
-          strokeOpacity={0.85}
-          strokeWidth={1.5}
-          className="anim-combust-ripple"
-          style={{ pointerEvents: "none" }}
-        />
-      )}
-      {(() => {
-        const showAffliction =
-          !hideAfflictionBadge && !combusted &&
-          (alwaysShowAfflictionBadge || affliction > 0);
-        // Show the projection badge whenever there's any projected effect —
-        // including testimony at zero delta (planet already at 0 affliction).
-        // The polarity tells the player "this would heal", even if the
-        // numeric outcome is the same as standing still.
-        const showProjection = !combusted && projection !== undefined;
-        if (!showAffliction && !showProjection) return null;
-
-        const afflictionText = String(Math.round(affliction));
-        const wA = widthFor(afflictionText, badgeFontSize, badgeR);
-        const aX = ux * badgeOffset;
-        const aY = uy * badgeOffset;
-
-        let projBadge: { wP: number; pX: number; pY: number; text: string; col: string } | null = null;
-        if (showProjection && projection) {
-          const isHarm = projection.polarity !== "Testimony";
-          // Sign carried by color alone (soft pink-red = damage, sage green
-          // = heal); drop the "+" / "−" prefix so the digits read cleanly.
-          const text = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
-          const wP = widthFor(text, projFontSize, projBadgeR);
-          // Both centers sit on the planet rim. Projection is rotated around
-          // the rim from the affliction by the angle at which the two badges
-          // just clear each other — chord = sum of their (approximated
-          // circular) radii plus a small visual gap so the strokes don't
-          // fuse at the tangent point.
-          const chord = wA / 2 + wP / 2 + 2;
-          const projAngle = 2 * Math.asin(Math.min(1, chord / (2 * badgeOffset)));
-          const cos = Math.cos(projAngle);
-          const sin = Math.sin(projAngle);
-          const projDirX = ux * cos - uy * sin;
-          const projDirY = uy * cos + ux * sin;
-          projBadge = {
-            wP,
-            pX: projDirX * badgeOffset,
-            pY: projDirY * badgeOffset,
-            text,
-            // Softer than ASPECT_COLOR.tension (#CD2626) — the saturated red
-            // felt aggressive on the small preview badge. Salmon-coral reads
-            // as "incoming damage" without screaming.
-            col: isHarm ? "#FF9F90" : ASPECT_COLOR.harmony,
-          };
-        }
-
-        const shadow: CSSProperties = {
-          filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))",
-          pointerEvents: "none",
-          userSelect: "none",
-        };
-
-        return (
-          <>
-            {showAffliction && (
-              // Outer g positions; inner g animates. Splitting prevents the
-              // CSS keyframe `transform` from clobbering the SVG translate
-              // attribute mid-animation (which would snap the badge to (0,0)
-              // = planet center for one frame).
-              <g
-                transform={`translate(${aX}, ${aY})`}
-                style={shadow}
-              >
-                <g
-                  className={badgeClass}
-                  key={`badge-${epoch}-${impact ? 1 : 0}`}
-                >
-                  <rect
-                    x={-wA / 2} y={-badgeR}
-                    width={wA} height={2 * badgeR}
-                    rx={badgeR} ry={badgeR}
-                    fill={NEUTRAL.void} fillOpacity="0.92"
-                    stroke={NEUTRAL.gold} strokeOpacity="0.55" strokeWidth={1} />
-                  <foreignObject
-                    x={-wA / 2} y={-badgeR}
-                    width={wA} height={2 * badgeR}
-                  >
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: NEUTRAL.bone,
-                        fontFamily: "'Inter', sans-serif",
-                        fontWeight: 700,
-                        fontSize: `${badgeFontSize}px`,
-                        lineHeight: 1,
-                        userSelect: "none",
-                      }}
-                    >
-                      {afflictionText}
-                    </div>
-                  </foreignObject>
-                </g>
-              </g>
-            )}
-            {projBadge && (
-              <g
-                transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
-                style={shadow}
-              >
-                <rect
-                  x={-projBadge.wP / 2} y={-projBadgeR}
-                  width={projBadge.wP} height={2 * projBadgeR}
-                  rx={projBadgeR} ry={projBadgeR}
-                  fill={NEUTRAL.void} fillOpacity="0.84"
-                  stroke={NEUTRAL.gold} strokeOpacity="0.4" strokeWidth={1} />
-                <foreignObject
-                  x={-projBadge.wP / 2} y={-projBadgeR}
-                  width={projBadge.wP} height={2 * projBadgeR}
-                >
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: projBadge.col,
-                      fontFamily: "'Inter', sans-serif",
-                      fontWeight: 700,
-                      fontSize: `${projFontSize}px`,
-                      lineHeight: 1,
-                      userSelect: "none",
-                    }}
-                  >
-                    {projBadge.text}
-                  </div>
-                </foreignObject>
-              </g>
-            )}
-          </>
-        );
-      })()}
+      <circle r={r}
+        fill={c} fillOpacity={CHART_STYLE.planet.discOpacity}
+        stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
+        strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
+      <text textAnchor="middle" dominantBaseline="central"
+        fontSize={Math.round(r * CHART_STYLE.planet.symbolRatio)}
+        fill={glyphFill}
+        fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
+        fontWeight={600}
+        style={{ pointerEvents: "none", userSelect: "none" }}>
+        {PLANET_GLYPH[point.planet]}
+      </text>
     </g>
   );
 }
@@ -669,42 +237,30 @@ function SignTicks() {
     lines.push(
       <line key={`tick_${i}`}
         x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-        stroke={NEUTRAL.gold} strokeOpacity="0.85" strokeWidth={2.5} strokeLinecap="round" />,
+        stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.tick.opacity} strokeWidth={CHART_STYLE.tick.stroke} strokeLinecap="round" />,
     );
   }
   return <g>{lines}</g>;
 }
 
-function SignLabels({
-  ascSignIdx,
-  signPolarities,
-}: {
-  ascSignIdx: number;
-  signPolarities?: Partial<Record<SignName, Polarity>>;
-}) {
+function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
   const out = [];
   for (let i = 0; i < 12; i++) {
     const sign = SIGNS[i]!;
     const offset = (i - ascSignIdx + 12) % 12;
     const ang = 180 + offset * 30 + 15;
     const p = polar(CHART_CENTER, CHART_CENTER, SIGN_LABEL_R, ang);
-    const polarity = signPolarities?.[sign];
-    const tint =
-      polarity === "Affliction" ? SIGN_AFFLICTION_COLOR :
-      polarity === "Testimony" ? SIGN_TESTIMONY_COLOR :
-      NEUTRAL.bone;
-    const opacity = polarity === "Affliction" || polarity === "Testimony" ? 0.95 : 0.7;
     out.push(
       <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={tint} fillOpacity={opacity}
+          fontSize={20} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={tint} fillOpacity={opacity}
+          fontSize={22} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}
@@ -726,7 +282,7 @@ function renderSubstrate() {
     [0, 120, 240].map((step) => polar(cx, cy, hexR, base + step)),
   );
   return (
-    <g opacity={0.12}>
+    <g opacity={CHART_STYLE.substrate.opacity}>
       {/* Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
           itself — exactly what the on-chain NFT SVG will emit. Omitted under
           prefers-reduced-motion (the still figure reads fine at any angle). */}
@@ -737,13 +293,13 @@ function renderSubstrate() {
         )}
         {triangles.map((tri, i) => (
           <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+            fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
         {/* Four-fold vesica: left/right + top/bottom. */}
-        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
-        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={0.5} />
+        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
       </g>
     </g>
   );
@@ -859,7 +415,6 @@ function buildPlanetPoints(chart: ChartType): PlanetPoint[] {
         cx: cart.x,
         cy: cart.y,
         glyphR: PLANET_R_REST,
-        glyphRActive: PLANET_R_ACTIVE,
       });
     });
   }

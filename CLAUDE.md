@@ -43,6 +43,7 @@ Space Prince is a **fully onchain game** with a thin presentation client.
 ```
 cairo/        Cairo crates — onchain backend
 client/       React/Vite/TS — browser client (current prototype, v2)
+landing/      React/Vite/TS — the public landing page (spaceprince.xyz)
 spec/         Design spec (see outline below)
 planets/      Per-planet YAML reference notes
 img/          Chart and prototype screenshots
@@ -101,6 +102,7 @@ The spec is divided by what kind of question each document answers.
 - **One interaction ring, and its colour is the verb.** Breathing = tappable, steady = hovered/selected/acting. Mist until a verb is determined for that planet, the verb's colour then — never the planet's own hue, which the disc, glyph and halo already carry (`spec/design/SCREENS.md §3.6`).
 - **Record rejections.** When a design alternative is tried and dropped, note it in the relevant spec with a `Rejected:` line so it isn't re-proposed.
 - **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (four rungs, **chart viewBox units only** — the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
+- **The landing chart follows the client's.** `landing/` carries its own trimmed copy of the chart (resting + hover only — no combat state, so no arc, badges, corona, or propagation), and `landing/src/svg/chart-style.ts` mirrors the client's token values. The client is the source; when its chart styling moves, re-sync the landing.
 - **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
 - **The sexagesimal lattice.** Stats are multiples of 12, ceilings multiples of 60, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
 - **Harvest upward.** When a session settles a design rule, write it into the relevant spec and add a one-line pointer here; code comments hold only what's local to the site.

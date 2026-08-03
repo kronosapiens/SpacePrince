@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
-import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
 import type { Chart as ChartType } from "@/game/types";
 import "@/style/og.css";
@@ -27,14 +26,7 @@ export function OGCard() {
         </div>
       </div>
       <div className="og-card-chart">
-        <Chart
-          chart={chart}
-          unlockedPlanets={PLANETS}
-          hoveredPlanet={null}
-          onPlanetHover={() => {}}
-          hideAfflictionBadges
-          showColorField
-        />
+        <Chart chart={chart} />
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { EmailSignup } from "@/EmailSignup";
-import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
@@ -40,12 +39,8 @@ export function LandingScreen() {
         <div className="title-chart">
           <Chart
             chart={chart}
-            unlockedPlanets={PLANETS}
             hoveredPlanet={hovered}
             onPlanetHover={setHovered}
-            hideAfflictionBadges
-            showColorField
-            aspectsFull
           />
         </div>
       </div>

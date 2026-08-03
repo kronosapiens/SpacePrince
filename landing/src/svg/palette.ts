@@ -34,8 +34,10 @@ export const PLANET_SECONDARY: Record<PlanetName, string> = {
   Saturn: "#C5A8D8",
 };
 
-/** Aspect-line colors per v1: green for harmonious, red for tense. */
+/** Aspect-line colors: green for harmonious, red for tense (astrological
+ *  convention). */
 export const ASPECT_COLOR = {
   harmony: "#8FBC8F", // trine, sextile, conjunction
-  tension: "#CD2626", // square, opposition
+  tension: "#E15555", // square, opposition — luminant red, not deep-saturated, so
+                      // thin lines survive video chroma subsampling (a dark red artifacts)
 } as const;

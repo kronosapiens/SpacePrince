@@ -30,6 +30,10 @@
   }
 }
 
+/* Default chart sizing. Chart.tsx renders <svg class="chart-svg">; consumers
+   override via more-specific selectors (`.title-chart > svg`, `.og-card-chart > svg`). */
+.chart-svg { display: block; width: 100%; height: auto; }
+
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 .begin-btn {

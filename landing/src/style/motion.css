@@ -1,6 +1,6 @@
 /* Motion vocabulary used by the landing page (subset of client/style/motion.css).
-   Keep: tint-breath (page background), begin-breath (button), propagation-pulse
-   + .anim-propagation-pulse (Chart aspect lines), reduced-motion guard. */
+   Keep: tint-breath (page background), begin-breath (button), .invite-ring
+   (Chart hover ring), reduced-motion guard. */
 
 @keyframes begin-breath {
   0%, 100% { opacity: 0.78; }
@@ -18,16 +18,11 @@
   }
 }
 
-@keyframes propagation-pulse {
-  0%   { opacity: 0; }
-  35%  { opacity: 1; }
-  65%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-.anim-propagation-pulse {
-  animation: propagation-pulse 360ms var(--ease-out) forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .anim-propagation-pulse { animation: none; }
+/* The chart's interaction ring. In the client it breathes while a planet is
+   merely tappable and sits steady once hovered; the landing chart only ever has
+   the steady reading, so all that carries over is the glow. */
+.invite-ring {
+  filter: drop-shadow(0 0 8px currentColor);
+  transform-box: fill-box;
+  transform-origin: center;
 }
