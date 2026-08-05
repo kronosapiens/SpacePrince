@@ -265,13 +265,20 @@ The encounter screen is allowed restrained, functional chrome where it does nece
   A settled encounter simply drops the current-position marker; the row is not swapped for an outcome word, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
   Dots left unfilled after a settle are honest rather than a bug: an encounter that ends early — every opposing planet combust before the sequence runs out — really did take fewer turns than it had.
 
-Both are labelled and live together in a top strip spanning the two charts.
-Neither is chart data — Distance is the run's score and the pips are position within this encounter — so the strip reads as chrome without becoming a HUD sitting over the wheels.
+- **The announce line.** One sentence beneath the readouts naming the turn's precommit — *"Jupiter afflicts 24"* — the planet in its own colour, the verb in its valence.
+  The board already says all three wordlessly: the acting planet is the only one on its chart wearing a ring, that ring's colour is the verb, and the bites on the player's candidates are the magnitude.
+  The sentence is the caption that teaches those marks, and the colour split is what makes it one — the name matches the disc on the other chart, the verb matches the corona around it.
+  A glyph is not a name, and the audience premise is a player with no astrology, so this is also the only place the opponent's planet is named at all.
+  It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words (badges, seam, the Distance numeral) until the board carried none.
 
-**Not chrome:** which opponent planet is acting, and with which verb.
-An earlier draft gave this a text-and-glyph indicator in the centre seam.
-It now reads off the opponent's chart directly — the acting planet is the only one wearing a ring, and that ring's colour is the verb — with the magnitude carried by the bites on the player's own candidates.
-The opponent planet's *name* was lost in that move and has no home on the board; whether the glyph alone is enough for a player with no astrology is open (§3.9).
+The **Continue** button occupies the same slot on settle, replacing the sentence rather than appearing elsewhere: one place says what is happening, then what is next.
+The slot reserves the button's height rather than the sentence's, so the charts do not shift when an encounter ends.
+
+Rejected: a second line, *"How do you respond?"*.
+It brushes the ban on instructional copy below, and being identical every turn it would stop being read within three turns — the invite rings already say it is the player's move.
+
+All three live together in a top strip spanning the two charts, the readouts on one line and the announce slot beneath them.
+None of it is chart data — Distance is the run's score, the pips are position within this encounter, and the sentence names a turn — so the strip reads as chrome without becoming a HUD sitting over the wheels.
 
 **Out:**
 
@@ -294,7 +301,6 @@ Transitions between major surfaces fade through the Void canvas with an active-p
 ### 3.9 Open questions
 
 - Whether the player's chart should pulse, idle, or stay completely still during the *fragment fade-in* moment specifically (distinct from the broader decision phase, which is settled — gating planets pulse).
-- Whether the opponent's acting planet needs its **name** on the board, now that the centre seam is gone and only its glyph identifies it (§3.7). The accessibility premise is a player with no astrology, for whom the word is what makes the glyph mean anything.
 - How a **zero-effect ripple** should read. On an afflict turn a hard aspect inverts to testimony, and a target already at zero affliction has nothing to heal — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence. The retired projection badge covered this by showing a violet zero.
 - Map traversal interaction model (separate from encounter interaction — see §4).
 - Accessibility (color-channel parallel signal).
