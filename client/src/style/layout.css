@@ -490,15 +490,19 @@
 
 /* ── Combat ────────────────────────────────────────────────────────────── */
 
-/* `--pad` is the border around the composition and the only spacing declared on
-   this screen — there is no grid gap. Each wheel already holds 2% of its box
-   clear on every side (the outer ring sits at r=480 of 500, and the labels and
-   ticks are inside it), so the charts separate themselves, and a gutter on top
-   of that read wider than the border even with the two set to the same value:
-   the wheel contributes its inset twice in the middle against once on the
-   outside. Once the wheel is height-bound the leftover column width becomes the
-   gutter by itself, which from 1920 wide up lands ring-to-ring within a few px
-   of ring-to-edge. Below that the middle runs well under the border — 26px
+/* `--combat-pad` is the border around the composition and the only spacing
+   declared on this screen — there is no grid gap. Scoped rather than reusing the
+   global `--pad` (tokens.css), which is the page padding `.screen` reads and a
+   different quantity at a different value; naming it `--pad` here shadowed that
+   token inside `.combat` and read as an override of it.
+
+   Each wheel already holds 2% of its box clear on every side (the outer ring
+   sits at r=480 of 500, and the labels and ticks are inside it), so the charts
+   separate themselves, and a gutter on top of that read wider than the border
+   even with the two set to the same value: the wheel contributes its inset
+   twice in the middle against once on the outside. Once the wheel is
+   height-bound the leftover column width becomes the gutter by itself, which
+   from 1920 wide up lands ring-to-ring within a few px of ring-to-edge. Below that the middle runs well under the border — 26px
    against 61px at 1396 wide — and `column-gap` is the lever if it ever needs
    opening, never a row gap.
 
@@ -519,7 +523,7 @@
    when the content is taller than the viewport, so nothing is clipped off the
    top edge. */
 .combat {
-  --pad: 48px;
+  --combat-pad: 48px;
   position: relative;
   z-index: 1;
   min-height: 100vh;
@@ -528,7 +532,7 @@
   grid-template-rows: auto auto;
   align-content: safe center;
   align-items: center;
-  padding: var(--pad);
+  padding: var(--combat-pad);
   gap: 0;
 }
 /* Run + encounter state, spanning both wheels. A row rather than an absolute
@@ -591,8 +595,8 @@
 /* Fill the available real estate — everything inside the wheel scales with this,
    so bigger = more legible, which is most of why the centre column was worth
    deleting. A square in a landscape viewport is height-governed, and the height
-   budget is the viewport less the two `--pad`s (top and bottom border) less the
-   chrome the wheel shares its column with:
+   budget is the viewport less the two `--combat-pad`s (top and bottom border)
+   less the chrome the wheel shares its column with:
 
      93  the TURNS/DISTANCE strip
      24  the SELF/OTHER label
@@ -610,7 +614,7 @@
    and derived from nothing. It was also the only reason the wheel could ever
    come in under its row, which is what stranded the strip above it. */
 .combat-side > svg {
-  width: min(100%, calc(100vh - 125px - 2 * var(--pad)));
+  width: min(100%, calc(100vh - 125px - 2 * var(--combat-pad)));
   height: auto;
 }
 .combat-side-label {

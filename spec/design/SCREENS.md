@@ -108,9 +108,9 @@ Nothing bleeds across the gutter either: the outermost cluster radius is 320u, s
 ### 3.1.1 Spacing and wheel size
 
 The wheels are sized from the viewport with no upper bound — bigger is more legible, and the limit should be the screen rather than a chosen maximum.
-`--pad` on `.combat` (currently 48px) is the border around the composition and the only spacing the screen declares; there is no grid gap.
+`--combat-pad` on `.combat` (currently 48px) is the border around the composition and the only spacing the screen declares; there is no grid gap.
 Each wheel already holds 2% of its own box clear on every side — the outer ring sits at `OUTER_RING_R = 480` of a 500-unit radius, with the sign labels and tick marks inside it — so the two charts separate themselves.
-A square in a landscape viewport is governed by height, so the wheel takes the viewport less the two `--pad`s, less the top strip and the side label.
+A square in a landscape viewport is governed by height, so the wheel takes the viewport less the two `--combat-pad`s, less the top strip and the side label.
 
 Rejected: a fixed maximum width.
 One stood at 760px, inherited from the pre-seam layout and derived from nothing.
