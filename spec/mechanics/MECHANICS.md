@@ -228,8 +228,12 @@ The game's progression is layered:
 Per encounter:
 
 - The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a short fight to have anything to resolve; a 1-turn map-1 fight is pure harvest.
-  Each fielded planet rolls its affliction uniformly across its range: an integer from `0` to `ceiling − 1`, rolled deterministically from the node's opponent seed.
-  No planet spawns combusted.
+  Each fielded planet draws uniformly from three tiers — `12`, `24`, `36` — deterministically from the node's opponent seed.
+  The tiers are **absolute, not a fraction of the ceiling** — the spawn pool is a harvest quantity, not a durability one, so a fragile Moon and a durable Saturn bank the same tribute.
+  They are sized at roughly one planet's testimony: enough that a map-1 turn is never wasted, not enough to live on — a seven-planet pool of about `168` drains a few turns into a long encounter, after which the build beat of the two-beat (§12) is necessary rather than optional.
+  Three tiers rather than a continuous band, so the spawn state reads off the affliction arc (1 point = 1°) as a legible tier rather than an arbitrary number.
+  The floor of `12` keeps every planet worth testifying; `36` sits below the smallest ceiling (`60`, at durability `12`), so no planet spawns combusted — structurally, without a clamp.
+  Rejected: a uniform draw from `0` to `ceiling − 1` — it banked roughly `510` across a full roster, more than seven turns of testimony can drain, so testify-always dominated and afflict-to-set-up stayed optional; and its floor of `0` let a map-1 opponent spawn nearly clean, making the run's single first turn score almost nothing.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
