@@ -71,12 +71,6 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 ## Phase 3 — The run's shape
 
-- [x] **Map-over-map ramp.**
-  Opponent spawn-affliction bands tighten and the opponent verb draw skews toward afflict as `mapsCompleted` rises.
-  Map 1 is generous, map 7 austere; no stat inflation (opponents stay real charts).
-  Also counter-pressures the testify-spam thread late in the run.
-- [x] **L7 gate beat.**
-  The terminal node guarantees combat with the heavy spawn band at its top end, so each map ends with weight.
 - [x] **Run journal** (`SCREENS.md §6.4`).
   One quiet line per run — maps completed, final Distance — on End-of-run and Chart Study.
 - [ ] **Map-as-strategy legibility.**
@@ -114,5 +108,6 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 - **Accessibility color channel** (`STYLE.md §14`) and the mobile portrait pass — audit that nothing bakes in horizontal-only assumptions.
 - **House wedges on the chart** (`STYLE.md §11` describes them; not yet drawn) — prerequisite for the houses-encountered flourish above.
 - **Testify-spam watch** (combat model, pending playtest).
-  Levers in order: narrow/lower seed bands, raise opponent aggression.
-  The Phase 3 ramp implements both as map-indexed rather than global changes.
+  The first lever is pulled: opponent spawn affliction is three absolute tiers of `12`/`24`/`36` (`MECHANICS.md` §11), shallow enough that the pool drains mid-encounter and afflict-to-set-up becomes necessary rather than optional.
+  If playtest says that isn't enough, the next lever is raising opponent aggression, and either lever could ride `mapsCompleted` instead of applying globally — generous on map 1, austere on map 7.
+  The run already ramps on turn count and the map-boundary barrage, so reach for a third axis only if those two prove insufficient.
