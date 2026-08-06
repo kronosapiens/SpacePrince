@@ -490,28 +490,36 @@
 
 /* ── Combat ────────────────────────────────────────────────────────────── */
 
-/* One spacing unit for the screen: `--gap` is both the border around the whole
-   composition and the gutter between the wheels, so every space in it is the
-   same size and there is a single number to tune. A 5vh/5vw border was tried
-   first and grew the margins faster than the wheels, costing the charts most of
-   a large display.
+/* `--pad` is the border around the composition and the only spacing declared on
+   this screen — there is no grid gap. Each wheel already holds 2% of its box
+   clear on every side (the outer ring sits at r=480 of 500, and the labels and
+   ticks are inside it), so the charts separate themselves, and a gutter on top
+   of that read wider than the border even with the two set to the same value:
+   the wheel contributes its inset twice in the middle against once on the
+   outside. Once the wheel is height-bound the leftover column width becomes the
+   gutter by itself, which from 1920 wide up lands ring-to-ring within a few px
+   of ring-to-edge. Below that the middle runs well under the border — 26px
+   against 61px at 1396 wide — and `column-gap` is the lever if it ever needs
+   opening, never a row gap.
 
-   Rejected: dropping the border and the gutter in favour of padding on the
-   wheels themselves. Left and right it is the same pixels either way, but the
-   gutter is then two paddings wide against the outer margin's one — the wheels
-   sit twice as far from each other as from the screen edge, inverting the
-   relationship — and with the chart height-bound there is no centring slack, so
-   the strip lands flush against the top edge.
+   A 5vh/5vw border was tried before this and grew the margins faster than the
+   wheels, costing the charts most of a large display.
 
-   Both rows are content-sized and the pair centers as one block, so the strip
-   always sits exactly one gap above the wheels. A `1fr` chart row instead
-   stretched to the viewport, and whenever the wheel came in under that height
-   the surplus split evenly above and below it — with the old fixed 760px width
-   cap that stranded the strip ~170px clear of the charts. `safe center`
-   degrades to top-aligned when the content is taller than the viewport, so
-   nothing is clipped off the top edge. */
+   Rejected: dropping the border too and padding the wheels themselves instead.
+   Left and right it is the same pixels either way, but the gutter is then two
+   paddings wide against the outer margin's one — the wheels sit twice as far
+   from each other as from the screen edge — and with the chart height-bound
+   there is no centring slack, so the strip lands flush against the top edge.
+
+   Both rows are content-sized and the pair centers as one block, which puts the
+   strip directly above the wheels. A `1fr` chart row instead stretched to the
+   viewport, and whenever the wheel came in under that height the surplus split
+   evenly above and below it — with the old fixed 760px width cap that stranded
+   the strip ~170px clear of the charts. `safe center` degrades to top-aligned
+   when the content is taller than the viewport, so nothing is clipped off the
+   top edge. */
 .combat {
-  --gap: 32px;
+  --pad: 48px;
   position: relative;
   z-index: 1;
   min-height: 100vh;
@@ -520,8 +528,8 @@
   grid-template-rows: auto auto;
   align-content: safe center;
   align-items: center;
-  padding: var(--gap);
-  gap: var(--gap);
+  padding: var(--pad);
+  gap: 0;
 }
 /* Run + encounter state, spanning both wheels. A row rather than an absolute
    overlay, so the mobile stack needs no separate positioning. */
@@ -583,15 +591,15 @@
 /* Fill the available real estate — everything inside the wheel scales with this,
    so bigger = more legible, which is most of why the centre column was worth
    deleting. A square in a landscape viewport is height-governed, and the height
-   budget is the viewport less the three `--gap`s stacked down the screen
-   (border, row gutter, border) less the chrome the wheel shares its column with:
+   budget is the viewport less the two `--pad`s (top and bottom border) less the
+   chrome the wheel shares its column with:
 
      93  the TURNS/DISTANCE strip
      24  the SELF/OTHER label
       8  the label's gap above     = 125px
 
    Horizontally there is nothing to compute: `100%` is the grid column, which has
-   already had the border and the gutter taken out of it.
+   already had the border taken out of it.
 
    Rejected: sizing the wheel off the grid itself (`minmax(0, 1fr)` row + the svg
    on `flex: 1` and `aspect-ratio: 1`), which would drop the 125 too. It is right
@@ -602,7 +610,7 @@
    and derived from nothing. It was also the only reason the wheel could ever
    come in under its row, which is what stranded the strip above it. */
 .combat-side > svg {
-  width: min(100%, calc(100vh - 125px - 3 * var(--gap)));
+  width: min(100%, calc(100vh - 125px - 2 * var(--pad)));
   height: auto;
 }
 .combat-side-label {

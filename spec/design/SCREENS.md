@@ -108,8 +108,9 @@ Nothing bleeds across the gutter either: the outermost cluster radius is 320u, s
 ### 3.1.1 Spacing and wheel size
 
 The wheels are sized from the viewport with no upper bound — bigger is more legible, and the limit should be the screen rather than a chosen maximum.
-One spacing unit (`--gap` on `.combat`, currently 32px) is both the border around the composition and the gutter between the wheels, so every space on the screen is the same size and there is a single number to tune.
-A square in a landscape viewport is governed by height, so the wheel takes the viewport less three `--gap`s stacked down the screen, less the top strip and the side label.
+`--pad` on `.combat` (currently 48px) is the border around the composition and the only spacing the screen declares; there is no grid gap.
+Each wheel already holds 2% of its own box clear on every side — the outer ring sits at `OUTER_RING_R = 480` of a 500-unit radius, with the sign labels and tick marks inside it — so the two charts separate themselves.
+A square in a landscape viewport is governed by height, so the wheel takes the viewport less the two `--pad`s, less the top strip and the side label.
 
 Rejected: a fixed maximum width.
 One stood at 760px, inherited from the pre-seam layout and derived from nothing.
@@ -117,6 +118,11 @@ It was also what let the wheel come in shorter than its grid row, and the surplu
 
 Rejected: a percentage border (5% of each axis).
 The margins grow faster than the wheels do and cost the charts most of a large display.
+
+Rejected: one value serving as both the border and the gutter.
+It is symmetric in the box model and not symmetric to the eye, because the wheel contributes its 2% inset twice in the middle against once on the outside — so the gutter reads wider than the border at the same value.
+Once the wheel is height-bound the leftover column width becomes the gutter on its own, which above 1920px wide lands ring-to-ring within a few pixels of ring-to-edge.
+Below that the middle runs well under the border, and the lever for opening it is `column-gap` — never a row gap, which is what stranded the top strip to begin with.
 
 Rejected: dropping the border and the gutter in favour of padding on the wheels themselves.
 Left and right it is the same pixels either way, but the gutter is then two paddings wide against the outer margin's one, so the wheels sit twice as far from each other as from the screen edge.
