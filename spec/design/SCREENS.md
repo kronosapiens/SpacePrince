@@ -105,6 +105,23 @@ Rejected: a dividing rule between the charts.
 Two complete gold rings, two planet arrangements and two labels already state the separation, and a divider is the one kind of mark this world has no place for — it exists only to partition a screen, where every other mark is something the game is made of.
 Nothing bleeds across the gutter either: the outermost cluster radius is 320u, so the furthest planet sits 180u inside its own box, and the widest thing a planet emits is its colour-field bloom at 140u.
 
+### 3.1.1 Spacing and wheel size
+
+The wheels are sized from the viewport with no upper bound — bigger is more legible, and the limit should be the screen rather than a chosen maximum.
+One spacing unit (`--gap` on `.combat`, currently 32px) is both the border around the composition and the gutter between the wheels, so every space on the screen is the same size and there is a single number to tune.
+A square in a landscape viewport is governed by height, so the wheel takes the viewport less three `--gap`s stacked down the screen, less the top strip and the side label.
+
+Rejected: a fixed maximum width.
+One stood at 760px, inherited from the pre-seam layout and derived from nothing.
+It was also what let the wheel come in shorter than its grid row, and the surplus then split evenly above and below — stranding the top strip well clear of the charts on any tall screen.
+
+Rejected: a percentage border (5% of each axis).
+The margins grow faster than the wheels do and cost the charts most of a large display.
+
+Rejected: dropping the border and the gutter in favour of padding on the wheels themselves.
+Left and right it is the same pixels either way, but the gutter is then two paddings wide against the outer margin's one, so the wheels sit twice as far from each other as from the screen edge.
+With the wheel height-bound there is also no centring slack left, so the top strip lands flush against the top edge.
+
 ### 3.2 Narrative layout (asymmetric)
 
 - **Left half:** the player's chart, drawn per `STYLE.md §11`.
