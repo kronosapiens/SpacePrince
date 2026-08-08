@@ -8,14 +8,18 @@ import { STAT_LABEL } from "./combat";
 // name the symbol plainly (spec/concept/PLANETS.md §1).
 
 /** One grounded line per planet — its core astrological significations in a
- *  plain, textbook register (drawn from spec/concept/PLANETS.md archetypes). */
+ *  plain, textbook register (drawn from spec/concept/PLANETS.md archetypes).
+ *
+ *  Two lines in the panel, so keep each under ~68 characters: the gloss sits
+ *  above a fixed table in a card whose width is set by that table, and a third
+ *  line pushes everything below it down. */
 export const PLANET_GLOSS: Record<PlanetName, string> = {
   Sun: "Identity and vitality — the self, the will, and the urge to lead.",
-  Moon: "The emotional inner life — instinct, memory, comfort, and changing moods.",
+  Moon: "The emotional inner life — instinct, memory, comfort, and mood.",
   Mercury: "The thinking mind — reason, language, and the exchange of ideas.",
-  Venus: "Love and harmony — beauty, pleasure, relationship, and what one values.",
+  Venus: "Love and harmony — beauty, pleasure, and what one values.",
   Mars: "Drive and assertion — energy, courage, desire, and the force to act.",
-  Jupiter: "Expansion and fortune — growth, abundance, faith, and the search for meaning.",
+  Jupiter: "Expansion and fortune — growth, abundance, faith, and meaning.",
   Saturn: "Limit and structure — time, discipline, boundaries, and endurance.",
 };
 
