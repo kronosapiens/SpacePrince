@@ -98,7 +98,7 @@ The two configurations are different layouts, not modes of one layout. An earlie
 The two charts face each other as equals. There is no visual differentiation between "yours" and "theirs" beyond their position.
 
 There is no centre seam.
-Everything it used to carry moved onto the charts themselves: the acting planet is the one wearing a ring on the opponent's side, its verb is that ring's colour, and its magnitude is the length of the bite drawn on each of the player's candidates (§3.5.1).
+Everything it used to carry moved onto the charts themselves and into the announce line: the acting planet is the one wearing a ring on the opponent's side, its verb is that ring's colour, and its magnitude is the length of the bite drawn on whichever of the player's candidates is under consideration (§3.5.1).
 Deleting it bought the wheels about 22% more radius at 1440px, which was most of the point — the crit that started this work was that everything on screen read too small.
 
 Rejected: a dividing rule between the charts.
@@ -182,12 +182,18 @@ Absolute rather than normalized.
 A normalized arc reads as a fraction, which needs a complete-circle track to read against — and complete circles are the interaction ring's signal (§3.6).
 It also flattens the resting chart, since every undamaged planet would look identical, and the chart is the character sheet and the NFT as well as the board.
 
-**The precommit, at rest.**
-The opponent has declared before the player chooses, and the magnitude does not depend on which planet catches it, so every live candidate wears the incoming bite before the player reaches for one.
-This is the scan the arc exists for: one bite length against seven gaps.
-A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (which of these dies) rather than a comparison of lengths.
-Only the direct hit is shown at rest; propagation is left to the focused preview, because seven planets' worth of ripples at once is noise and would put two arcs meaning different things on the same planet.
-Inspecting a planet clears the others and shows that one candidate's whole truth (§3.6).
+**The projected span is focused only.**
+It appears on the planet under consideration — hovered, inspected, or armed — and nowhere else.
+A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (this one dies) rather than a comparison of lengths.
+
+Rejected: the precommit drawn on every live candidate at rest.
+The opponent declares before the player chooses and the magnitude does not depend on which planet catches it, so the bite was determined for all seven, and showing it made the comparison parallel — one bite length against seven gaps — rather than something the player had to probe for planet by planet.
+It was dropped because the resting menu and the focused preview were the same mark answering different questions: *what each planet would absorb if sent*, versus *what happens if I send this one*.
+Focusing therefore read as six threats disappearing rather than as the question narrowing.
+Rejected with it: keeping both at once, which puts two mutually exclusive futures on one arc (the ripple a planet takes if its neighbour is sent, and the blow it takes if it is), and separating the two registers by opacity, which was built and did not fix the misread.
+
+The cost is that no danger read remains on the board at rest.
+The `warningPlanets` treatment that once carried it lives only on the retired badges, so "which of my planets dies catching this" is now visible one planet at a time.
 
 **Badges are retired.**
 Affliction and projection were numeric pills on the chart; the arc replaced both.
@@ -215,8 +221,8 @@ Rejected: separate invite and select rings at different radii. They were already
 
 **Previews show only what is determined.**
 Verb-dependent information appears only while a verb is indicated — hovered (desktop) or armed; verb-free information is free everywhere.
-The *defensive* read — the opponent's precommitted action — is fully determined before any choice is made, so it is shown on every live candidate at rest, not only on the planet under inspection (§3.5.1).
-Inspecting a planet narrows that read to one candidate's complete truth, propagation included, and clears it from the rest: the board shows either the menu or one choice, never both.
+The *defensive* read — the opponent's precommitted action — is verb-free, so it needs no verb indicated; it still needs a planet, and appears only on the one under consideration, propagation included (§3.5.1).
+The announce line carries the part of it that is planet-free: which of the opponent's planets acts, with which verb, and for how much.
 The *offensive* read (the effect on the opponent's chart) appears only while an action is indicated — armed, or hovered while nothing is armed: the client never asserts the outcome of a choice not yet made.
 Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
 Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).

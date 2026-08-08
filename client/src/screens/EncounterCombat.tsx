@@ -213,43 +213,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const selfWarnings = combustWarnings?.self ?? null;
   const otherWarnings = combustWarnings?.other ?? null;
 
-  // The precommit, on every candidate at rest. The opponent has declared, and
-  // the magnitude doesn't depend on which planet catches it — `computeDirect-
-  // Exchange` reads only the actor's stats — so the board can show what each
-  // planet would absorb before the player reaches for one. This is the scan the
-  // arcs exist for: one bite length against seven gaps, and a planet that can't
-  // survive has its whole remaining span go amber (the arc clamps at the
-  // ceiling), so combustion reads as geometry rather than a warned number.
-  //
-  // Direct hit only. Seven planets' worth of propagation at once is noise, and
-  // it would put two arcs meaning different things on the same planet — the
-  // ripple it takes if its neighbour is sent, and the blow it takes if it is.
-  // Which is also why this clears the moment anything is previewed: the board
-  // shows either the menu or one candidate's whole truth, never both.
-  const restingIncoming = useMemo(() => {
-    if (animation || encounter.resolved || !opponentTurn) return null;
-    if (previewPlanet) return null;
-    const eff = getEffectiveStats(encounter.opponentChart, opponentTurn);
-    const amount = opponentAction === "Testimony" ? eff.witness : eff.impact;
-    if (amount <= 0) return null;
-    const deltas: Partial<Record<PlanetName, ProjectedEffect>> = {};
-    for (const planet of playerUnlocked) {
-      if (isCombusted(prince.chart.planets[planet], run.state[planet])) continue;
-      deltas[planet] = {
-        delta: opponentAction === "Testimony" ? -amount : amount,
-        polarity: opponentAction,
-      };
-    }
-    return Object.keys(deltas).length > 0 ? deltas : null;
-  }, [
-    animation, encounter.resolved, encounter.opponentChart, opponentTurn, opponentAction,
-    previewPlanet, playerUnlocked, prince.chart, run.state,
-  ]);
-
   // Projection-deltas to actually display, per side. Pre-commit: the live
-  // projection, or the resting precommit when nothing is being considered.
+  // projection, and nothing at all until a planet is under consideration.
   // Mid-animation: the snapshot captured at commit, with each planet filtered
   // out as its impact pulse fires (see useCombatAnimation).
+  //
+  // Rejected: the precommit drawn on every candidate at rest (SCREENS.md
+  // §3.5.1). It is determined information and it made the seven-way comparison
+  // parallel, but the resting menu and the focused preview were the same mark
+  // answering different questions, so focusing read as six threats vanishing.
   const displayProjection = useMemo(() => {
     const filterConsumed = (
       deltas: Partial<Record<PlanetName, ProjectedEffect>>,
@@ -273,10 +245,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       };
     }
     return {
-      self: projection?.self ?? restingIncoming ?? undefined,
+      self: projection?.self,
       other: projection?.other,
     };
-  }, [animation, projection, restingIncoming]);
+  }, [animation, projection]);
 
   // Click/tap a planet to select it — this is the only way the panel opens, and
   // it stays put (the commit path) until commit or another planet is clicked.
