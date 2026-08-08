@@ -420,9 +420,11 @@ export function Chart(props: ChartProps) {
 
       {/* Arc layer: above every planet's halo, same as the badges — the arc is
           the primary read of how much a planet can still absorb, so a
-          neighbour's bloom must not sit on top of it. */}
+          neighbour's bloom must not sit on top of it. A combusted planet has
+          nothing left to absorb, so it drops the arc entirely rather than
+          showing a spent track. */}
       {!hideAffliction && points.map((p) => {
-        if (!isUnlocked(p.planet)) return null;
+        if (!isUnlocked(p.planet) || planetCombusted(p.planet)) return null;
         return (
           <PlanetArc
             key={p.planet}

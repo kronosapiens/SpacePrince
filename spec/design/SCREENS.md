@@ -176,6 +176,7 @@ Ceilings are multiples of 60 with a maximum of 360 (`MECHANICS.md §10`), so the
 - The **bright span** is what the planet can still absorb.
 - The **combustion end is pinned at 6 o'clock**, and affliction accumulates toward it, so the bright span shortens by its free end descending into the anchor and every planet dies at the same point on the dial.
 - The **projected span** is the change the declared blow would make to the boundary — amber for harm, violet for heal, ember when it would close the span (`STYLE.md §5`).
+- A **combusted planet drops the arc.** All that is left of it is the spent track, which gauges a capacity the planet no longer has; the dimmed disc and glyph already say it is out.
 
 Absolute rather than normalized.
 A normalized arc reads as a fraction, which needs a complete-circle track to read against — and complete circles are the interaction ring's signal (§3.6).
@@ -194,8 +195,10 @@ The problem they had was that every number on screen was a numerator whose denom
 
 This reverses an earlier principle worth naming.
 Badges were shown only above zero, so that a chart of unharmed planets stayed clean rather than littered with zeros — a damage meter belongs only where there is damage.
-The arc is always on, on every planet, because it is not a damage meter: its length is capacity, which is part of what the planet *is*.
-A capacity gauge belongs everywhere; a damage readout did not.### 3.6 Interaction grammar
+The arc is always on, on every live planet, because it is not a damage meter: its length is capacity, which is part of what the planet *is*.
+A capacity gauge belongs everywhere there is capacity; a damage readout did not.
+
+### 3.6 Interaction grammar
 
 The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per `MECHANICS.md §5`). The grammar is the same on touch and desktop.
 
