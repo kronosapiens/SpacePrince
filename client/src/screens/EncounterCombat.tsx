@@ -4,7 +4,6 @@ import { HelpButton } from "@/components/HelpButton";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
-import { distanceBands } from "@/game/distance";
 import { PLANETS, RULERSHIP } from "@/game/data";
 import { setTheme } from "@/audio/engine";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -97,7 +96,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       : null;
   const settled = encounter.resolved && !animation;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
-  const bands = distanceBands(displayedRunDistance);
   const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
   // Tint each distance flash with the color of the planet resolving on that
   // beat, so the number flashes through the wave's planets rather than one hue.
@@ -402,62 +400,66 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           reads as chrome without becoming a HUD sitting over the wheels. */}
       <div className="combat-topbar">
         <div className="combat-readouts">
+          {/* Position in the encounter's turn sequence. Unlike Distance this has
+              a real denominator — the sequence length — so a fraction states it
+              exactly rather than inventing a ceiling. Live, the numerator is the
+              turn being answered; settled, it is the turns actually taken, so an
+              encounter that ended early (every opposing planet combust before
+              the sequence ran out) reads 2 of 3 rather than 3 of 3.
+              Rejected: a row of pips, filled per turn spent and ringed on the
+              current one. They separated spent / current / remaining, which a
+              fraction cannot, but at three turns that distinction bought little
+              and cost the strip a second visual language — the pips carried no
+              baseline of their own, so they could not sit with the type beside
+              them. */}
           <div className="combat-turns">
             <span className="eyebrow">TURNS</span>
-            <div className="combat-turn-dots">
-              {Array.from({ length: encounter.sequence.length }).map((_, i) => {
-                // Spent turns fill; the current one is marked only while there is
-                // one. A settled encounter drops the marker rather than swapping
-                // the row for a word — the Continue button already says it is over.
-                const cls = i < displayTurnIndex ? "is-on"
-                  : !settled && i === displayTurnIndex ? "is-current"
-                  : "";
-                return <span key={i} className={`combat-dot ${cls}`} />;
-              })}
-            </div>
+            <span className="combat-turns-v">
+              {settled
+                ? displayTurnIndex
+                : Math.min(displayTurnIndex + 1, encounter.sequence.length)}
+              <span className="combat-turns-sep">/</span>
+              {encounter.sequence.length}
+            </span>
           </div>
-          {/* The track is the readout, so the group carries the value as its
-              accessible name — the numeral it replaced was the only thing saying
-              the number aloud. */}
-          <div
-            className="combat-distance"
-            role="group"
-            aria-label={`Distance ${Math.round(displayedRunDistance)}`}
-          >
-            <span className="eyebrow" aria-hidden>DISTANCE</span>
-            {/* Distance has no ceiling to fill against, so it reads as doublings:
-                a tick per doubling banked, and a fixed-width bar for the run at
-                the current one. The bar is relative by construction — it measures
-                the same span of *log*, not of score — so late points move it as
-                far as early ones, and the track grows by gaining ticks rather
-                than by any mark getting longer (`game/distance.ts`). */}
+          {/* The score, plainly. Distance is an unbounded sum, so the numeral is
+              the one rendering that invents nothing: no denominator, no ceiling,
+              nothing to decode. It reads the same here as on the narrative
+              screen and as the star it becomes at end of run.
+              Rejected: the doublings track (a tick per doubling banked plus a
+              bar for the run at the current one, `game/distance.ts`). It also
+              implied no ceiling, but it stated the score in a code that had to
+              be learned before it said anything, and the bar read as progress
+              toward a maximum regardless — the exact misread it was built to
+              avoid. */}
+          <div className="combat-distance">
+            <span className="eyebrow">DISTANCE</span>
             <span
-              className="combat-distance-track"
-              aria-hidden
+              className="combat-distance-v"
               style={
                 distanceFlashColor
                   ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
                   : undefined
               }
             >
-              {/* The gain pulse rode the numeral; with the numeral gone the track
-                  is what represents Distance, so it hosts the beat instead. */}
+              {/* The per-beat gain pulse — the only feedback that Distance moved
+                  during resolution, tinted by the planet resolving on it. */}
               {distanceFlashEpoch > 0 && (
                 <span
                   key={distanceFlashEpoch}
                   className="combat-distance-flash anim-distance-flash"
+                  aria-hidden
                 />
               )}
-              <span className="combat-distance-ticks">
-                {Array.from({ length: bands.ticks }).map((_, i) => (
-                  <span key={i} className="combat-distance-tick" />
-                ))}
-              </span>
-              <span className="combat-distance-bar">
-                <span
-                  className="combat-distance-fill"
-                  style={{ width: `${bands.fraction * 100}%` }}
-                />
+              <span
+                key={`n-${distanceFlashEpoch}`}
+                className={
+                  distanceFlashEpoch > 0
+                    ? "combat-distance-n anim-distance-pop"
+                    : "combat-distance-n"
+                }
+              >
+                {Math.round(displayedRunDistance)}
               </span>
             </span>
           </div>

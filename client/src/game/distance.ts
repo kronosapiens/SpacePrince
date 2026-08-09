@@ -1,6 +1,10 @@
 /**
  * Distance as doublings (`spec/concept/NFT.md`, Star-Field placement).
  *
+ * Not a live readout: the combat strip shows the score as a plain numeral
+ * (`SCREENS.md §3.7`). This is kept for the star field, which places a run's
+ * star by `log2` of its final Distance and will need mirroring in Cairo.
+ *
  * Distance is an unbounded sum with no ceiling anywhere in the design, so it
  * can't be drawn as a fraction of anything without inventing one. Reading it
  * logarithmically gives it shape without a denominator: a tick per doubling

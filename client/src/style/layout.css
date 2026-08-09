@@ -581,9 +581,6 @@
   align-items: baseline;
   gap: 12px;
 }
-/* The pips carry no baseline of their own, so they ride the eyebrow's centre
-   rather than sitting on its baseline. */
-.combat-turn-dots { align-self: center; }
 .combat-side {
   display: flex;
   flex-direction: column;
@@ -624,81 +621,52 @@
   color: var(--mist);
   font-weight: 500;
 }
-.combat-turn-dots {
-  display: flex;
-  gap: 10px;
-  z-index: 2;
-}
-.combat-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 1px solid var(--mist);
-  background: transparent;
-  transition:
-    box-shadow 220ms var(--ease-out),
-    background-color 220ms var(--ease-out),
-    border-color 220ms var(--ease-out);
-}
-.combat-dot.is-on { background: var(--bone); border-color: var(--bone); }
-.combat-dot.is-current { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); }
 .combat-distance {
   display: flex;
   align-items: baseline;
   gap: 10px;
   z-index: 3;
 }
-/* Doublings banked, then the run at the current one. Centred rather than
-   baseline-aligned for the same reason as the turn pips — neither the ticks nor
-   the bar has a baseline to share with the type. */
-.combat-distance-track {
+/* Both readouts are the same type on the same baseline — the turn pips were the
+   odd one out, and shape beside numerals in a two-item strip read as two
+   languages. Tabular figures so the digits don't jitter as Distance ticks up
+   through a resolution wave. */
+.combat-turns-v,
+.combat-distance-v {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--bone);
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+}
+/* Anchors the gain pulse, which is absolutely positioned behind the digits. */
+.combat-distance-v { position: relative; }
+/* The denominator is context, not the reading — the turn you are on is. */
+.combat-turns-sep {
+  color: var(--mist);
+  margin: 0 0.12em;
+}
+.combat-distance-n {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  align-self: center;
+  z-index: 1;
+  display: inline-block;
 }
-.combat-distance-ticks {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.combat-distance-tick {
-  width: 2px;
-  height: 11px;
-  border-radius: 1px;
-  background: var(--bone);
-}
-/* Fixed width: the bar spans one doubling, whatever that doubling is worth, so
-   it can never imply a ceiling. */
-.combat-distance-bar {
-  position: relative;
-  width: 88px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--smoke);
-  overflow: hidden;
-}
-.combat-distance-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: 999px;
-  background: var(--mist);
-  transition: width 420ms var(--ease-out);
-}
-/* Gain pulse — a soft wash across the whole track, replayed per resolution beat
-   and tinted by the planet resolving on it. */
+/* Gain pulse — a wash behind the number, replayed per resolution beat and
+   tinted by the planet resolving on it. */
 .combat-distance-flash {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;
-  height: 26px;
-  border-radius: 999px;
-  background: radial-gradient(ellipse, var(--flash-color, var(--testimony)) 0%, transparent 70%);
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--flash-color, var(--testimony)) 0%, transparent 68%);
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
+  z-index: 0;
 }
 
 /* Stats panel — an HTML card inside an SVG <foreignObject> (client study chrome,
@@ -937,15 +905,16 @@
     padding: 12px 12px;
     gap: 8px;
   }
-  /* Narrow enough to force the two groups onto separate rows: at full width
-     the strip reaches the fixed help button in the corner, and each row alone
-     clears it. */
+  /* The row-gap only matters if the two groups wrap, which the numeral is
+     narrow enough to avoid — the doublings track was what needed the width. */
   .combat-topbar { gap: 8px; }
-  .combat-readouts { gap: 4px 18px; max-width: 62vw; }
+  .combat-readouts { gap: 4px 18px; }
   .combat-announce-line { font-size: 19px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
   .combat-distance { margin-top: 4px; gap: 2px; }
+  .combat-turns-v,
+  .combat-distance-v { font-size: clamp(18px, 5vw, 22px); }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */

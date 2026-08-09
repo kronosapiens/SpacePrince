@@ -285,17 +285,24 @@ The encounter screen is allowed restrained, functional chrome where it does nece
 
 **Allowed:**
 
-- **Distance track.** The run's accumulating score (per `MECHANICS.md §12`), read as doublings rather than as a number.
-  A tick per doubling banked, then a fixed-width bar for the run at the current one.
+- **Distance.** The run's accumulating score (per `MECHANICS.md §12`), shown as a numeral.
   Distance is an unbounded sum with no ceiling anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
-  Reading it logarithmically gives it shape without a denominator: the bar always spans exactly one doubling, so it measures the same span of *log* whatever that doubling is worth, a late point moves it as far as an early one, and the track grows by gaining ticks rather than by any mark getting longer.
-  Base 2 rather than 10 because it is already the game's own base — the Macrobian unlock schedule is `2^i` — and because base 10 gives only two or three bands across a realistic score range where base 2 gives six.
-  The same `log2` places the run's star in the NFT field (`NFT.md`, Star-Field), so the readout a player watches accumulate and the mark it leaves are one idea rather than two.
-  **No numeral.** The track is the readout; the score survives as the group's accessible name, since the digits were the only thing saying it aloud.
-  The per-beat gain pulse — tinted by whichever planet is resolving — rides the track.
-- **Turn cadence indicator.** A row of dots showing position in the encounter's turn sequence — one dot per turn, filled to the current position.
-  A settled encounter simply drops the current-position marker; the row is not swapped for an outcome word, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
-  Dots left unfilled after a settle are honest rather than a bug: an encounter that ends early — every opposing planet combust before the sequence runs out — really did take fewer turns than it had.
+  A numeral invents nothing: it has no denominator to imply and nothing to decode.
+  It reads the same here, on the narrative screen, and as the star it becomes at end of run.
+  The per-beat gain pulse — a wash behind the digits, tinted by whichever planet is resolving — is the only feedback that Distance moved during a resolution wave.
+
+  Rejected: the doublings track (a tick per doubling banked, then a fixed-width bar for the run at the current one).
+  It was honest about the ceiling in the same way — the bar always spanned exactly one doubling, so it measured a span of *log* rather than a fraction of any maximum — but it stated the score in a code the player had to learn before it said anything, and a partial bar reads as progress toward a maximum whatever it actually measures, which is the misread it was built to avoid.
+  Its second justification, keeping the encounter surface free of digits, had already lapsed: the announce line prints the incoming magnitude.
+  The `log2` derivation survives in `client/src/game/distance.ts` because it still places the run's star in the NFT field (`NFT.md`, Star-Field); it is simply no longer a live readout.
+- **Turn cadence.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
+  Unlike Distance this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
+  While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early — every opposing planet combust before the sequence runs out — reads *2 / 3* rather than *3 / 3*.
+  It is not swapped for an outcome word at the settle, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
+  Set in the same face and size as the Distance numeral beside it, on the same baseline.
+
+  Rejected: a row of dots, one per turn, filled to the current position and ringed on it.
+  They separated three states where the fraction has two — spent, current, remaining — but at three turns that bought little, and it cost the strip a second visual language: pips carry no baseline of their own, so they could not sit with the type beside them and needed their own alignment rule.
 
 - **The announce line.** One sentence beneath the readouts naming the turn's precommit — *"Jupiter afflicts 24"* — the planet in its own colour, the verb in its valence.
   The board already says all three wordlessly: the acting planet is the only one on its chart wearing a ring, that ring's colour is the verb, and the bites on the player's candidates are the magnitude.
@@ -310,7 +317,7 @@ Rejected: a second line, *"How do you respond?"*.
 It brushes the ban on instructional copy below, and being identical every turn it would stop being read within three turns — the invite rings already say it is the player's move.
 
 All three live together in a top strip spanning the two charts, the readouts on one line and the announce slot beneath them.
-None of it is chart data — Distance is the run's score, the pips are position within this encounter, and the sentence names a turn — so the strip reads as chrome without becoming a HUD sitting over the wheels.
+None of it is chart data — Distance is the run's score, the fraction is position within this encounter, and the sentence names a turn — so the strip reads as chrome without becoming a HUD sitting over the wheels.
 
 **Out:**
 
@@ -318,7 +325,8 @@ None of it is chart data — Distance is the run's score, the pips are position 
 - The wordmark "SPACE PRINCE" inside the encounter — it lives on the title screen.
 - Instructional hints ("Hover a planet to inspect. Click a planet to act.") — the grammar should be discoverable; if it isn't, that's a structural failure to fix, not to paper over with copy.
 - HP bars, "+N attack" registers, blockbuster game-UI flourishes.
-  The Distance bar above is not one of these, and the distinction is the point: an HP bar is a fraction of a ceiling, and neither the bar nor the affliction arc fills against an invented maximum. The arc's track is a real ceiling the game already has (`MECHANICS.md §10`); the Distance bar is one doubling, which is a span rather than a limit.
+  The affliction arc is not one of these, and the distinction is the point: an HP bar fills against an invented maximum, while the arc's track is a real ceiling the game already has (`MECHANICS.md §10`).
+  Distance, which has no ceiling to fill against, is a numeral rather than any kind of bar.
 - Always-visible logs of past turns (those are dev-only).
 - Run-management affordances inside an active run. There is no in-game "abandon" or "new voyage" while a run is in progress; runs continue until full combust regardless of session breaks. The prototype's "New Voyage" button is a development artifact.
 
