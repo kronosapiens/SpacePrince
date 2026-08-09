@@ -162,6 +162,13 @@ Rejected: varying every ray's length to make the rotation legible — it was bui
 Rejected: an annular **wash** under the streamers — a gradient ring, transparent at the centre, which is what a corona physically is. It read well and degraded better than the rays do (a streamer is a third of a pixel wide on a phone; a gradient has no minimum feature size), but it was a second glow around a planet that already has one, and the streamers alone are the more distinctive mark. If the corona ever proves too faint at small sizes, this is the thing to bring back.
 
 Rejected: colouring the acting planet's *halo* by verb instead. Identity has to live somewhere, and recolouring the bloom takes it away at the moment the planet is most prominent — and it fails outright where the verb and the planet share a hue (Saturn with violet is 16° apart, Sun with amber 15°).
+
+**The incoming mark.** The same corona again, at the wheel's centre, around the magnitude arriving rather than around a planet, with the interaction ring but no halo.
+It sits at the centre because until the player commits the blow has no target — `resolveTurn` lands it on whichever planet is sent — so "60 of testimony is coming" is a fact about the whole chart and not about anything in it.
+That is one rule rather than two: the corona is the verb wherever it appears, the source when it surrounds a disc and the destination when it surrounds nothing, and no planet ever sits at the centre for the two readings to collide.
+Both charts carry it, on different clocks.
+Yours is live from the top of the turn, since their precommit is already drawn and its magnitude already fixed; theirs waits for an indicated verb, because until then your own outgoing amount is not determined and a number would assert a decision you have not made.
+Both ride through resolution rather than clearing at commit, and the stats panel is allowed to cover it.
 - **Combust warning** — combustion is on the table for this planet this turn. A dedicated **luminant ember red** (`#FF5C33`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity), which weight and kind separate it from besides.
 Luminance is the constraint here, not saturation — the opposite of the aspect red, where thin-line artifacting is what governs.
 The mark rides the affliction arc, whose whole vocabulary is *bright = still yours, dark = already spent*, so a dark ember (this was `#B03636`) reads as more spent and recedes into the track exactly where it should alarm.

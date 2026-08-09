@@ -139,6 +139,15 @@ export const CHART_STYLE = {
     Affliction: { rays: 12, reach: 78, flare: 0.55, stroke: STROKE_HEAVY, opacity: 0.85, cap: "butt", turn: "48s", spin: "normal" },
     Testimony: { rays: 24, reach: 54, flare: 1, stroke: STROKE_MEDIUM, opacity: 0.8, cap: "round", turn: "84s", spin: "reverse" },
   },
+  /** Active — what is arriving at this chart: the same corona, at the wheel's
+   *  centre, around the magnitude rather than around a planet. The number sits
+   *  in the hole the corona's rays leave inside CORONA_INNER_R, and fits the
+   *  interaction ring at every value the game can produce — stats cap at
+   *  48 + 12 + 12, so it is never more than two digits. */
+  incoming: {
+    fontSize: 36,
+    opacity: 0.9,
+  },
   /** Diagram — the affliction arc: a planet's Resolve at 1 point = 1°, drawn
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc

@@ -56,6 +56,10 @@ export interface CombatAnimationState {
   otherState: SideState;
   playerPlanet: PlanetName;
   opponentPlanet: PlanetName;
+  /** The verb the player committed. Constant for the whole playback, like
+   *  `playerPlanet`. The opponent's needs no equivalent — its precommit sits in
+   *  `encounter.opponentActions[turnIndex]` and that slot isn't overwritten. */
+  playerValence: Polarity;
   turnIndex: number;
   /** Distance shown right now — starts at the pre-turn total and ticks up as
    *  each planet's affliction resolves, in step with the resolution beats. */
@@ -232,6 +236,7 @@ function runScheduler(args: {
     otherState: cloneSide(previousEncounter.opponentState),
     playerPlanet: entry.playerPlanet,
     opponentPlanet: entry.opponentPlanet,
+    playerValence: entry.playerValence,
     turnIndex: previousEncounter.turnIndex,
     runningDistance: previousRun.distance,
     distanceFlashEpoch: 0,

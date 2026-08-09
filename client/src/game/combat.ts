@@ -118,19 +118,24 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
   };
 }
 
+/** What a verb sends, in one direction: the acting planet's witness for
+ *  testimony, its impact for affliction, floored at zero. The single expression
+ *  of that mapping — the resolver (`turn.ts` `resolveAction`), the exchange
+ *  preview below, and the encounter's readouts all call it, so no display can
+ *  drift from the outcome. */
+export function directAmount(stats: PlanetStats, valence: Polarity): number {
+  return Math.max(0, valence === "Testimony" ? stats.witness : stats.impact);
+}
+
 export function computeDirectExchange(
   playerValence: Polarity,
   opponentValence: Polarity,
   playerStats: PlanetStats,
   opponentStats: PlanetStats,
 ) {
-  const playerToOpponent =
-    playerValence === "Testimony" ? playerStats.witness : playerStats.impact;
-  const opponentToPlayer =
-    opponentValence === "Testimony" ? opponentStats.witness : opponentStats.impact;
   return {
-    playerToOpponent: Math.max(0, playerToOpponent),
-    opponentToPlayer: Math.max(0, opponentToPlayer),
+    playerToOpponent: directAmount(playerStats, playerValence),
+    opponentToPlayer: directAmount(opponentStats, opponentValence),
   };
 }
 

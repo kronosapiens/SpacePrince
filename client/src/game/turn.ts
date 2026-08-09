@@ -1,4 +1,4 @@
-import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
+import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects, propagatedMagnitude } from "./aspects";
 import { combustionCeiling, isCombusted } from "./combust";
 import { cloneSideState } from "./chart";
@@ -166,7 +166,7 @@ function resolveAction(
   placement: PlanetPlacement,
   sideTag: "self" | "other",
 ) {
-  const amount = Math.max(0, valence === "Testimony" ? attackerEff.witness : attackerEff.impact);
+  const amount = directAmount(attackerEff, valence);
   const wasCombusted = isCombusted(placement, side[active]);
   const delta = wasCombusted
     ? 0

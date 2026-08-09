@@ -10,7 +10,7 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
-import { getEffectiveStats } from "@/game/combat";
+import { directAmount, getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
@@ -90,9 +90,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Magnitude of the precommitted verb, for the announce line.
   const displayOpponentAmount =
     displayOpponentTurn && displayOpponentAction
-      ? getEffectiveStats(encounter.opponentChart, displayOpponentTurn)[
-          displayOpponentAction === "Testimony" ? "witness" : "impact"
-        ]
+      ? directAmount(
+          getEffectiveStats(encounter.opponentChart, displayOpponentTurn),
+          displayOpponentAction,
+        )
       : null;
   const settled = encounter.resolved && !animation;
   const displayedRunDistance = animation?.runningDistance ?? run.distance;
@@ -247,6 +248,27 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       other: projection?.other,
     };
   }, [animation, projection]);
+
+  // What each chart is about to take, drawn at its own centre (Chart
+  // `incoming`). Yours is live from the top of the turn: their precommit is
+  // drawn and its magnitude already fixed. Theirs waits for an indicated verb —
+  // the same gate the projection above uses, and for the same reason, since
+  // until you indicate one your outgoing amount isn't determined and a number
+  // would assert a decision you haven't made. Both follow the animation rather
+  // than clearing at commit, so the mark rides its own resolution.
+  const incomingSelf =
+    !settled && displayOpponentAction && displayOpponentAmount != null
+      ? { verb: displayOpponentAction, amount: displayOpponentAmount }
+      : null;
+  const outgoingPlanet = animation?.playerPlanet ?? previewPlanet;
+  const outgoingVerb = animation?.playerValence ?? indicatedVerb;
+  const incomingOther =
+    !settled && outgoingPlanet && outgoingVerb
+      ? {
+          verb: outgoingVerb,
+          amount: directAmount(getEffectiveStats(prince.chart, outgoingPlanet), outgoingVerb),
+        }
+      : null;
 
   // Click/tap a planet to select it — this is the only way the panel opens, and
   // it stays put (the commit path) until commit or another planet is clicked.
@@ -482,8 +504,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 </span>{" "}
                 <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
                   {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
+                  {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
                 </span>
-                {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
               </p>
             )
           )}
@@ -509,6 +531,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           combustingPlanets={combustingPlayer}
           mergingPlanets={mergingPlayer}
           warningPlanets={selfWarnings ?? undefined}
+          incoming={incomingSelf}
           animationEpoch={animationEpoch}
           statsPanelPlanet={inspected}
           statsPanelActions={playerActions}
@@ -548,6 +571,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           combustingPlanets={combustingOpponent}
           mergingPlanets={mergingOpponent}
           warningPlanets={otherWarnings ?? undefined}
+          incoming={incomingOther}
           animationEpoch={animationEpoch}
         />
         <div className="combat-side-label">OTHER</div>
