@@ -8,14 +8,55 @@ import { STROKE_EXTRA_HEAVY, STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@
  * Every stroke is a rung of the four-step schedule in viewbox.ts — ground,
  * structure, under attention, the affliction arc — never a loose number.
  *
+ * Geometry lives in viewbox.ts, with one exception: the substrate's radii sit
+ * here, beside the rest of that figure's knobs, because nothing else in the
+ * chart measures against them.
+ *
  * Tuning note: the faint layers are deliberately kept above the threshold where
  * social-media video re-encoding (H.264/VP9 quantization on the near-black
  * ground) would crush them to solid black. The run map's sibling scale is the
  * TIER constant in MapDiagram.tsx; the aspect-propagation pulse is PropagationLine.tsx.
  */
 export const CHART_STYLE = {
-  /** Field — sacred-geometry ground (rotating hexagram + vesica). */
-  substrate: { opacity: 0.16, stroke: STROKE_LIGHT },
+  /** Field — sacred-geometry ground (rotating hexagram + vesica). The two halves
+   *  sit at different scales on purpose, so the figure reads as a wide soft echo
+   *  of the inner ring with a tight rosette inside it.
+   *
+   *  The hexagram is the half that had to come in. It began at 360, which put
+   *  its twelve points through the one band where disc, arc, interaction ring
+   *  and aspect endpoints already compete — and it is straight chords at the
+   *  same scale as the aspect web, so only opacity told the two apart. It is
+   *  also the half that moves: a vertex at that radius travels the whole
+   *  circumference every turn, and motion at the edge of a reading zone is what
+   *  pulls the eye. Where it lands is a judgement, not a derivation: the vesica
+   *  offers no landmark below 220 (`vesicaR - vesicaOffset`, its closest
+   *  approach to centre), so past that the star is simply small enough to read
+   *  as a mark at the middle of the wheel rather than as structure spanning it.
+   *  It clears the planet band with room to spare — that band starts around 270,
+   *  the tightest rim cluster sitting at 308 with its interaction ring reaching
+   *  37.8 at the peak of its breath. Stacked signs place planets inward, and at
+   *  this size the second tier (236–246) clears the star where it did not
+   *  before; the third and fourth (176, 162, 98) still sit inside it, which is
+   *  accepted — those appear only at 4+ in one sign, and a planet that deep is
+   *  in open space anyway.
+   *
+   *  The vesica keeps its original radius. Nothing else in the chart is drawn as
+   *  arcs, so it can't be mistaken for the aspect web, and offset only 60 from
+   *  centre it is nearly rotation-invariant — a full turn moves each arc ~120
+   *  units, against the hexagram vertex's ~2,260. It is the quiet half, and it
+   *  keeps the band between the rosette and the inner ring from going flat.
+   *
+   *  Rejected: collapsing both together, which left that band dead. Rejected:
+   *  one star vertex per sign tick, which is what the hexagram's full radius
+   *  bought — the rotation already spends it, the alignment holding for an
+   *  instant every ten seconds and false through the rest of the turn. */
+  substrate: {
+    opacity: 0.16,
+    stroke: STROKE_LIGHT,
+    hexagramR: 180,
+    vesicaR: 280,
+    vesicaOffset: 60,
+  },
 
   /** Diagram — structural rings of the wheel. */
   ring: {

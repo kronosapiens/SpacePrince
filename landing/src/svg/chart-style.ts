@@ -11,8 +11,16 @@ import { STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@/svg/viewbox";
  * ground) would crush them to solid black.
  */
 export const CHART_STYLE = {
-  /** Field — sacred-geometry ground (rotating hexagram + vesica). */
-  substrate: { opacity: 0.16, stroke: STROKE_LIGHT },
+  /** Field — sacred-geometry ground (rotating hexagram + vesica). The hexagram
+   *  is a small mark at the middle of the wheel; the vesica keeps its original
+   *  radius — see the client's file for why the two halves differ. */
+  substrate: {
+    opacity: 0.16,
+    stroke: STROKE_LIGHT,
+    hexagramR: 180,
+    vesicaR: 280,
+    vesicaOffset: 60,
+  },
 
   /** Diagram — structural rings of the wheel. */
   ring: {

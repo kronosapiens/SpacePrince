@@ -314,6 +314,18 @@ The natal chart is the game's central drawing.
 - Aspect lines are drawn between planet glyph edges, never planet centers. This keeps the central area clear.
 - The ascendant is marked by a single radial line from inner ring to outer ring at the rising sign's leading edge. Light weight.
 - The chart has no "front" — it does not rotate to put any sign at the top. The conventional 1st-house-on-the-left orientation is preserved.
+- The Field substrate's two halves sit at different scales: the slowly rotating hexagram stops short of the band where planets sit, while the vesica keeps its full radius as a soft echo of the inner ring.
+  The hexagram is straight chords, the same primitive the aspect web is made of, so at rim scale only opacity separated the two; pulled inward, scale does.
+  It is also the half that moves — a vertex at full radius travels the whole circumference each turn, and motion at the edge of a reading zone is what pulls the eye.
+  The vesica has neither problem: nothing else in the chart is drawn as arcs, and its circles are offset only slightly from centre, so rotating them barely moves them.
+  How far in the hexagram comes is a judgement rather than a derivation — the vesica offers no landmark inside its own closest approach to centre — and it is set small enough that the star reads as a mark at the middle of the wheel rather than as structure spanning it.
+  Planets stacked deep in one sign are placed inward, and the innermost of those do cross the hexagram; that is accepted, since a planet placed that deep sits in open space anyway.
+  The two halves turn in opposite directions, so the ground reads as layers rather than as one rigid object.
+  They share a single period: two periods would beat against each other, and a beat is a second rhythm however it is labelled.
+  This is affordable only because the halves no longer intersect — at any size where they crossed, opposing them would set the star's points sweeping through the arcs at double the relative rate, which shimmers.
+  *Rejected:* collapsing the vesica along with the hexagram, which leaves the band between the two dead.
+  *Rejected:* sizing the hexagram so one star vertex lands on each sign tick, which is what full radius bought.
+  The rotation already spends that alignment — it is true for an instant every ten seconds and false through the rest of the turn.
 
 A chart that is rendered at rest, with no encounter active, should feel like a Hilma af Klint diagram — symmetrical enough to read as a complete object, asymmetric enough in its planet placements to read as *this player's* chart and no one else's.
 

@@ -1080,33 +1080,42 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
 
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
-  const hexR = INNER_RING_R - 20;
-  const circR = INNER_RING_R - 100;
-  const off = 60;
-  // Two interlaced hexagrams (four triangles) → a twelve-point star with one
-  // vertex on each sign tick (ticks sit on every 30°).
+  const { hexagramR, vesicaR, vesicaOffset } = CHART_STYLE.substrate;
+  // Two interlaced hexagrams (four triangles) → a twelve-point star.
   const triangles = [0, 30, 60, 90].map((base) =>
-    [0, 120, 240].map((step) => polar(cx, cy, hexR, base + step)),
+    [0, 120, 240].map((step) => polar(cx, cy, hexagramR, base + step)),
   );
+  // Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
+  // itself — exactly what the on-chain NFT SVG will emit. Omitted under
+  // prefers-reduced-motion (the still figure reads fine at any angle).
+  //
+  // The two halves take the same period and opposite signs, so the ground reads
+  // as layers rather than one rigid object. They can afford to: the star's reach
+  // is inside the vesica's closest approach to centre, so the figures never
+  // intersect and opposing them creates no crossings to shimmer. One period,
+  // deliberately — two would beat against each other, and a beat is a second
+  // rhythm however it is labelled (`spec/design/STYLE.md §11`).
+  const turn = (deg: number) =>
+    prefersReducedMotion() ? null : (
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+        from={`0 ${cx} ${cy}`} to={`${deg} ${cx} ${cy}`} dur="120s" repeatCount="indefinite" />
+    );
   return (
     <g opacity={CHART_STYLE.substrate.opacity}>
-      {/* Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
-          itself — exactly what the on-chain NFT SVG will emit. Omitted under
-          prefers-reduced-motion (the still figure reads fine at any angle). */}
       <g>
-        {!prefersReducedMotion() && (
-          <animateTransform attributeName="transform" attributeType="XML" type="rotate"
-            from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="120s" repeatCount="indefinite" />
-        )}
+        {turn(-360)}
         {triangles.map((tri, i) => (
           <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
             fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
-        {/* Four-fold vesica: left/right + top/bottom. */}
-        <circle cx={cx - off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx + off} cy={cy} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy - off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy + off} r={circR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+      </g>
+      {/* Four-fold vesica: left/right + top/bottom. */}
+      <g>
+        {turn(360)}
+        <circle cx={cx - vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx + vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy - vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <circle cx={cx} cy={cy + vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
       </g>
     </g>
   );
