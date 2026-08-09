@@ -311,6 +311,18 @@ The natal chart is the game's central drawing.
 - Sign glyphs at the outer edge, sized at one-half the planet glyph radius.
 - Whole-sign houses indicated by faint Field-layer wedges, never by lines crossing the chart center.
 - Planets sit at their sign's mid-point on the inner ring, not at degree-precise positions (per `CHART.md §2` — we don't persist longitudes for gameplay).
+- Where planets sit inside a sign follows three rules, not per-case tuning.
+  **One pitch:** no two planets in the chart sit closer than the interaction ring's real footprint at the peak of its breath, stroke included — the spacing floor is set by what is drawn, not by the disc.
+  **One rim:** every arrangement puts its outermost planet at the same radius, so the band reads as one ring whatever each sign happens to hold, and that radius is the largest the inner ring allows.
+  **Two planets to an angular tier:** a third on the same arc consumes almost the whole 30° wedge and leaves nothing for the gap to the next sign, so the cap is structural rather than a tuned number.
+  Tiers are spaced one pitch apart radially, so radial neighbours are spaced like angular ones.
+- Arrangements are regular wherever a regular shape exists — three planets form an equilateral triangle, four a rhombus of two equilateral triangles — and the shapes are solved for rather than eyeballed.
+  The angular offset and the inner radii are one relationship: move either and the other has to be re-solved, or the shape goes lopsided.
+- Planets sharing a sign must sit closer to each other than to a planet in the next sign.
+  A wedge is 30° and a same-sign pair straddles its mid-point symmetrically, so the offset that separates the pair is the same offset that closes the gap to the neighbouring sign: it has to stay under a quarter of the wedge, or the chart groups planets across a boundary more tightly than within one, which is backwards from what the chart exists to show.
+  The ordering is what the rule guarantees; the margin it can buy is under a fifth either way, which is not enough to read as grouping on its own.
+  *Deferred:* drawing the twelve boundaries inward across the planet band at Field weight, which is what would actually carry the read — the ticks mark the same divisions but sit out at the label band, far from where planets are placed.
+  Built once and set aside; the spacing rules hold the ordering in the meantime.
 - Aspect lines are drawn between planet glyph edges, never planet centers. This keeps the central area clear.
 - The ascendant is marked by a single radial line from inner ring to outer ring at the rising sign's leading edge. Light weight.
 - The chart has no "front" — it does not rotate to put any sign at the top. The conventional 1st-house-on-the-left orientation is preserved.

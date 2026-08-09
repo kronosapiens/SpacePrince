@@ -50,16 +50,50 @@ function measureBadgeText(text: string, fontPx: number): number {
   return badgeMeasureCtx.measureText(text).width;
 }
 
-/** Hand-tuned cluster patterns per stack size (from Claude Design v2).
- *  Each entry is [radius, angle-offset-deg]. Sized to read at 1-7 stack. */
+/** Planet placement inside a sign, per stack size. Each entry is
+ *  [radius, angle-offset-deg] from the sign's mid-point.
+ *
+ *  Three rules generate every pattern.
+ *
+ *  One pitch. No two planets in the chart sit closer than 80 units apart. That
+ *  is the interaction ring's real footprint plus a little: radius 36 with a
+ *  3-unit stroke, both scaled by the breath's 1.05 peak, reaches 39.375, so two
+ *  rings need 78.75 between centres. (viewbox.ts budgets 38.75 a planet, which
+ *  counts the ring's radius at peak but not its stroke — that shortfall is why
+ *  the tightest placements have always just touched.)
+ *
+ *  One rim. Every pattern's outermost planet sits at 335, so the band of planets
+ *  reads as one ring whatever each sign happens to hold. 335 is the ceiling
+ *  rather than a preference: 335 + 39.375 lands 5.6 short of the inner ring.
+ *
+ *  Two planets to an angular tier, at ±asin(pitch / 2r). A third on the same arc
+ *  wants 27.8° of a 30° wedge and leaves nothing for the gap to the next sign —
+ *  that is what used to drive five-in-a-sign into two next door hard enough to
+ *  overlap their discs, so the cap is structural, not a tuned number.
+ *
+ *  Tiers fall at 335 / 255 / 175 / 95, one pitch apart, so radial neighbours are
+ *  spaced like angular ones. Capacity is 2+2+2+1, which is exactly seven.
+ *
+ *  Shapes are regular wherever a regular shape exists: n=3 is equilateral, n=4 a
+ *  rhombus of two equilateral triangles whose long diagonal is exactly 80√3.
+ *  Both are solved for, not eyeballed, so their inner radii sit off the tier
+ *  grid — and the offset and those radii are one relationship, so moving either
+ *  means re-solving the other or the shape goes lopsided.
+ *
+ *  The offset also settles how neighbouring signs read. A wedge is 30° and a
+ *  same-sign pair straddles its mid-point symmetrically, so an offset of `a`
+ *  leaves `15 - a` to the next sign: the two distances swap at 7.5°, and past it
+ *  a chart groups planets across a boundary more tightly than within one, which
+ *  is backwards from what the chart exists to show. Every offset here is under
+ *  that line, and no reachable pair of neighbouring signs inverts or collides. */
 const CLUSTER_PATTERNS: Record<number, Array<[number, number]>> = {
-  1: [[308, 0]],
-  2: [[315, 8], [315, -8]],
-  3: [[315, 8], [315, -8], [236, 0]],
-  4: [[315, 0], [243, 10.45], [243, -10.45], [162, 0]],
-  5: [[320, 13.91], [320, 0], [320, -13.91], [246.26, 9.05], [246.26, -9.05]],
-  6: [[320, 13.91], [320, 0], [320, -13.91], [246.26, 9.05], [246.26, -9.05], [175.76, 0]],
-  7: [[320, 13.91], [320, 0], [320, -13.91], [246.26, 9.05], [246.26, -9.05], [175.76, 0], [98.26, 0]],
+  1: [[335, 0]],
+  2: [[335, 6.86], [335, -6.86]],
+  3: [[335, 6.86], [335, -6.86], [263.3, 0]],
+  4: [[335, 0], [268.7, 8.56], [268.7, -8.56], [196.4, 0]],
+  5: [[335, 6.86], [335, -6.86], [255, 9.02], [255, -9.02], [175, 0]],
+  6: [[335, 6.86], [335, -6.86], [255, 9.02], [255, -9.02], [175, 13.21], [175, -13.21]],
+  7: [[335, 6.86], [335, -6.86], [255, 9.02], [255, -9.02], [175, 13.21], [175, -13.21], [95, 0]],
 };
 
 /** Slow planets (Saturn) on the rim, fast personal planets (Moon) toward center. */

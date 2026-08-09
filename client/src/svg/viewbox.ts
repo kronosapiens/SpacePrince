@@ -3,13 +3,20 @@
 export const CHART_SIZE = 1000;
 export const CHART_CENTER = 500;
 
-// v2 ring radii: outer carries labels, inner is the chart proper.
-// Planets sit just inside the inner ring at radii ~308–320 (per cluster patterns).
+// Ring radii: outer carries labels, inner is the chart proper.
+// Every sign's outermost planet sits at 335 (CLUSTER_PATTERNS) and its
+// interaction ring reaches 39.375 past that at the peak of its breath, so the
+// planet band ends at 374.4. The inner ring stands at 390 to leave that a
+// visible margin rather than the 5.6 units it had at 380 — the ring is what the
+// planets read as sitting inside, and pressed against it they read as sitting
+// on it. The label band gives up the same 10 units, so its contents step out
+// and in by half that to stay centred on 435, and the ticks shorten from 40 to
+// 36 in proportion.
 export const OUTER_RING_R = 480;
-export const INNER_RING_R = 380;
-export const SIGN_LABEL_R = 430;     // sign labels sit between inner and outer rings
-export const TICK_INNER_R = 410;     // tick marks straddle the gap between rings
-export const TICK_OUTER_R = 450;
+export const INNER_RING_R = 390;
+export const SIGN_LABEL_R = 435;     // sign labels sit between inner and outer rings
+export const TICK_INNER_R = 417;     // tick marks straddle the gap between rings
+export const TICK_OUTER_R = 453;
 
 // Planet glyph sizing (uniform global; cluster shape is what changes per stack).
 // The disc gave up 6 units when the affliction arc arrived — three concentric
@@ -20,12 +27,12 @@ export const PLANET_R_ACTIVE = 36;
 export const PLANET_HALO_R = 100;
 
 // Concentric budget around a planet. Both of these are drawn on every visible
-// planet at once, so they're bounded by the tightest cluster: the 5/6/7-stack
-// patterns sit ±13.91° apart at radius 320, which is 77.5 units center-to-
-// center. That spread can't be widened — a sign wedge is 30° and ±13.91 already
-// fills it — so anything always-on wants to stay inside r≈38.75 to never touch
-// a neighbour. The ring's 36 reaches 37.8 at the peak of its breath, which
-// clears that, so nothing collides at any stack size.
+// planet at once, so the ring is what sets the chart's spacing floor rather than
+// the other way round: 36 with a 3-unit stroke, both scaled by the breath's 1.05
+// peak, reaches 39.375, so two rings want 78.75 between centres. CLUSTER_PATTERNS
+// holds every pair at 80 to clear it. Counting the radius at peak and forgetting
+// the stroke is the arithmetic that let the old patterns sit 76.8 apart and
+// touch — if either number here moves, that pitch has to move with it.
 // Rejected: arc outside the ring at 42, which keeps the disc at its old 30 and
 // buys the arc a third more circumference — but arcs are drawn on every planet
 // at once, so at that radius they touch in a 4-stack and it stops being clear
