@@ -249,16 +249,28 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     };
   }, [animation, projection]);
 
-  // Which verb each chart is about to take, drawn at its own centre (Chart
-  // `incoming`). Yours is live from the top of the turn — their precommit is
-  // drawn. Theirs waits for an indicated verb, the same gate the projection
-  // above uses and for the same reason: until you indicate one there is no
-  // verb to show. Both follow the animation rather than clearing at commit, so
-  // the mark rides its own resolution.
-  const incomingSelf = !settled ? displayOpponentAction : null;
+  // What each chart is about to take, drawn at its own centre (Chart
+  // `incoming`). Yours is live from the top of the turn: their precommit is
+  // drawn and its magnitude already fixed. Theirs waits for an indicated verb —
+  // the same gate the projection above uses, and for the same reason, since
+  // until you indicate one your outgoing amount isn't determined and a number
+  // would assert a decision you haven't made. Both follow the animation rather
+  // than clearing at commit, so the mark rides its own resolution — and that is
+  // the phase the number earns its place in, since the panel closed at commit
+  // and took the only other statement of your outgoing figure with it.
+  const incomingSelf =
+    !settled && displayOpponentAction && displayOpponentAmount != null
+      ? { verb: displayOpponentAction, amount: displayOpponentAmount }
+      : null;
   const outgoingPlanet = animation?.playerPlanet ?? previewPlanet;
   const outgoingVerb = animation?.playerValence ?? indicatedVerb;
-  const incomingOther = !settled && outgoingPlanet ? outgoingVerb : null;
+  const incomingOther =
+    !settled && outgoingPlanet && outgoingVerb
+      ? {
+          verb: outgoingVerb,
+          amount: directAmount(getEffectiveStats(prince.chart, outgoingPlanet), outgoingVerb),
+        }
+      : null;
 
   // Click/tap a planet to select it — this is the only way the panel opens, and
   // it stays put (the commit path) until commit or another planet is clicked.

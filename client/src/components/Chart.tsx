@@ -184,11 +184,11 @@ export interface ChartProps {
    *  the opponent's actor when a candidate could combust it first. The
    *  affliction badge turns amber and breathes. */
   warningPlanets?: ReadonlySet<PlanetName>;
-  /** The verb arriving at this chart, drawn at the centre. It sits there rather
-   *  than on a planet because until the player commits, the blow has no target:
-   *  `resolveTurn` lands it on whichever planet is sent, so "testimony is
-   *  coming" is a fact about the whole chart. */
-  incoming?: Polarity | null;
+  /** The verb and magnitude arriving at this chart, drawn at the centre. It sits
+   *  there rather than on a planet because until the player commits, the blow
+   *  has no target: `resolveTurn` lands it on whichever planet is sent, so
+   *  "60 of testimony is coming" is a fact about the whole chart. */
+  incoming?: { verb: Polarity; amount: number } | null;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
   /** When set, render the planet stats panel inside the chart at the
@@ -501,7 +501,7 @@ export function Chart(props: ChartProps) {
       {/* What is arriving here, at the centre. Above the aspect web — a line
           between opposite planets runs straight through the middle — and below
           the panel, which is allowed to cover it. */}
-      {incoming && <IncomingMark tuning={tuning} verb={incoming} />}
+      {incoming && <IncomingMark tuning={tuning} verb={incoming.verb} amount={incoming.amount} />}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
           chart, the panel sits on top — it's the focused read. */}
@@ -862,14 +862,19 @@ function PlanetCorona({ verb }: { verb: Polarity }) {
 }
 
 /**
- * The incoming mark — the corona again, at the wheel's centre: the corona is the
- * verb wherever it is, the source around a disc and the destination around
- * nothing. Verb only, no magnitude — numbers live in the panel and the announce
- * line, and the chart stays geometric. Exempt from the cluster budget for the
- * same reason the corona is: only one blow is in flight, and the nearest planets
- * are at radius 95.
+ * The incoming mark — the corona again, at the wheel's centre, with the
+ * magnitude inside it: the corona is the verb wherever it is, the source around
+ * a disc and the destination around nothing. Exempt from the cluster budget for
+ * the same reason the corona is — only one blow is in flight, and the nearest
+ * planets are at radius 95.
+ *
+ * The number is Word layer (STYLE.md §9), the same layer the sign labels around
+ * the rim sit on. It carries the magnitude through resolution, when the panel
+ * has closed at commit and its Testify/Afflict button — the only other place
+ * your own outgoing figure is written — has gone with it.
  */
-function IncomingMark({ tuning, verb }: { tuning: ChartTuning; verb: Polarity }) {
+function IncomingMark({ tuning, verb, amount }: { tuning: ChartTuning; verb: Polarity; amount: number }) {
+  const { fontSize, opacity } = CHART_STYLE.incoming;
   const c = VALENCE_COLOR[verb];
   return (
     <g transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} style={{ pointerEvents: "none" }}>
@@ -880,6 +885,16 @@ function IncomingMark({ tuning, verb }: { tuning: ChartTuning; verb: Polarity })
         stroke={c} strokeWidth={tuning.ringStroke}
         className="invite-ring"
         style={{ color: c, opacity: CHART_STYLE.interactionRing.steady }} />
+      {/* `middle`, not `central`: the chart's serif (from tokens.css) has
+          old-style figures, whose digits sit on the x-height rather than
+          filling the em box — `central` centres the box and drops them 6–12
+          units low. `middle` is defined as half the x-height above the
+          baseline, which is where they actually are. */}
+      <text textAnchor="middle" dominantBaseline="middle"
+        fontSize={fontSize} fill={c} fillOpacity={opacity} fontWeight={600}
+        style={{ userSelect: "none" }}>
+        {amount}
+      </text>
     </g>
   );
 }
