@@ -745,10 +745,49 @@
   text-align: center;
   line-height: 1.12;
 }
+/* Name over epithet as one column, with remaining-of-Resolve set apart beside
+   it and centred against the pair. The name and its epithet are a unit and have
+   to move together — beside each other on one baseline they read as two
+   unrelated items, and the epithet drifts off the name it belongs to.
+
+   Centred as a group rather than justified to the panel's edges: everything
+   else here (actions, table) is centred, so a justified row was the lone
+   exception, and its gap swung from 24u to 126u across the roster.
+
+   Widths, measured in panel units (inside the foreignObject a CSS px is a chart
+   viewBox unit). The column takes the wider of name-plus-triangle and epithet,
+   which is the Sun's THE SOVEREIGN; the right column takes the wider of its two
+   lines, 360/360 at 90u, since Resolve caps at (48 + 12 + 12) x 5. At a 24u
+   epithet and a 28u gap that came to 334u against 330u of content box, with
+   Saturn landing on exactly 330 — so the Sun wrapped and every other planet sat
+   one word from wrapping. A 22u epithet and a 20u gap leave every planet at
+   least 17u of slack, Mercury being the tightest since its own name, not its
+   epithet, sets its column. */
+.ps-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+/* An overrun has to show as overflow, not as a silent second line: the header
+   is two columns of two lines each, and a wrap turns that into three lines that
+   still look deliberate. Same reasoning as the study table below. */
+.ps-name,
+.ps-epithet { white-space: nowrap; }
+.ps-ratio { font-size: 24px; font-style: italic; white-space: nowrap; }
+/* Names the number, so the ratio isn't a bare pair of figures. Sentence case,
+   reading as one of the card's verbs alongside Testify and Afflict — the study
+   table's sans column heads do the same job, but nothing else inside this card
+   is sans, so borrowing that treatment left the one upright sans word in a serif
+   panel. Nothing but `display: block` here: the label and the figures above it
+   are one readout and take one style, which the italic on `.ps-ratio` sets for
+   both. Dimming the label or tracking it apart made it read as the lighter of
+   the two rather than the same thing on a second line. */
+.ps-ratio-label { display: block; }
 /* Epithet on its own line — the name + role together overrun the panel for the
    longest planets (Saturn, Mercury) once the disclosure triangle is added.
    Stacking reads as a name/title pair and is immune to label length. */
-.ps-epithet { display: block; font-size: 24px; }
+.ps-epithet { display: block; font-size: 22px; }
 
 /* Closed: operational read-outs (Resolve · Fortune + the action fan-out). No
    entrance fade here — this is the panel's initial state on click, which should

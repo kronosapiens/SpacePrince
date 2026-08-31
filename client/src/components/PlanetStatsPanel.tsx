@@ -27,6 +27,10 @@ export interface PlanetStatsActions {
 interface PlanetStatsPanelProps {
   chart: Chart;
   planet: PlanetName;
+  /** Affliction taken so far. The title line shows what's left of Resolve
+   *  rather than this directly, so it reads as the arc's bright span — the
+   *  chart carries that geometrically and nothing else states it as a number. */
+  affliction: number;
   /** Panel center, in chart viewBox units. */
   cx: number;
   cy: number;
@@ -83,6 +87,7 @@ type BlurbKey = keyof PlanetStats | "core" | "placement";
 export function PlanetStatsPanel({
   chart,
   planet,
+  affliction,
   cx,
   cy,
   height,
@@ -144,15 +149,30 @@ export function PlanetStatsPanel({
               rows/column heads below) — the surrounding text stays inert so
               stray clicks fall through to the card's un-arm/deselect swallow. */}
           <div className={`ps-title ${study ? "is-open" : ""}`}>
-            {onToggleStudy && (
-              <span
-                className="ps-tri ps-tri-tap"
-                aria-hidden
-                onClick={(e) => { e.stopPropagation(); onToggleStudy(); }}
-              >▶</span>
-            )}
-            {planet.toUpperCase()}
-            <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
+            {/* Name and remaining-of-Resolve share the line. The panel is where
+                numbers live, so this is the one place the arc's quantity is
+                stated outright, next to the Testify/Afflict figures below.
+                Remaining, not affliction taken: the arc's bright span is what
+                the planet can still absorb, so the number has to count the same
+                way or it captions the dark half of the mark. Floored like the
+                arc's own clamp, so the two can't disagree. */}
+            <div className="ps-head">
+              <span className="ps-name">
+                {onToggleStudy && (
+                  <span
+                    className="ps-tri ps-tri-tap"
+                    aria-hidden
+                    onClick={(e) => { e.stopPropagation(); onToggleStudy(); }}
+                  >▶</span>
+                )}
+                {planet.toUpperCase()}
+                <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
+              </span>
+              <span className="ps-ratio">
+                {Math.max(0, table.resolve - affliction)}/{table.resolve}
+                <span className="ps-ratio-label">Resolve</span>
+              </span>
+            </div>
           </div>
 
           {study ? (
