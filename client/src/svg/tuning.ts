@@ -1,12 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { CHART_STYLE } from "@/svg/chart-style";
-import {
-  ACTIVE_HALO_R,
-  AFFLICTION_ARC_R,
-  INTERACTION_RING_R,
-  INVITE_HALO_R,
-  PLANET_R_REST,
-} from "@/svg/viewbox";
+import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
 
 /**
  * Live overrides for the chart knobs that can only be judged in motion —
@@ -19,27 +13,29 @@ import {
  * a second source of truth. Nothing outside the dev console calls `setTuning`,
  * so production renders the defaults and the store never notifies.
  *
+ * A knob earns its place by being unsettled. The concentric radii (disc 24, arc
+ * 30, ring 36), the two stroke widths (arc 4, ring 3), the symbol ratio, the
+ * breath period and the ring swing all came off this list once their values
+ * stopped moving — their consumers read the tokens directly now, which is also
+ * how you can tell at the call site that a number is decided. Put one back the
+ * moment it is in question again; that costs a field, a default and a row.
+ *
+ * What is left is the light: the two halo radii, the arc's three opacities, and
+ * the invite glow's floor and swing.
+ *
  * The motion knobs aren't here: their consumers are CSS animations, so
  * `motion.css` stays authoritative and the console overrides them as inline
  * custom properties on :root (see `MOTION_KNOBS`).
  */
 export interface ChartTuning {
-  /** Planet disc radius. */
-  discR: number;
-  /** Affliction arc radius — inside the ring. */
-  arcR: number;
-  /** Interaction ring radius — invite / hover / select. */
-  ringR: number;
   inviteHaloR: number;
   activeHaloR: number;
-  arcStroke: number;
   /** The whole-ceiling track behind the arc. */
   arcTrack: number;
   /** The span the planet can still absorb. */
   arcRemaining: number;
-  ringStroke: number;
-  /** Planet symbol size as a multiple of the disc radius. */
-  symbolRatio: number;
+  /** Drop-shadow radius on the projection diff — how hard a preview burns. */
+  arcDiffGlow: number;
   /** The numeric affliction / projection badges. Off — the arc replaced them.
    *  Scaffolding: the toggle exists to put them back for a moment while the
    *  arc is still being trusted. Deleting the badges deletes this too. */
@@ -52,16 +48,11 @@ type NumericKey = {
 }[keyof ChartTuning];
 
 export const TUNING_DEFAULTS: ChartTuning = {
-  discR: PLANET_R_REST,
-  arcR: AFFLICTION_ARC_R,
-  ringR: INTERACTION_RING_R,
   inviteHaloR: INVITE_HALO_R,
   activeHaloR: ACTIVE_HALO_R,
-  arcStroke: CHART_STYLE.afflictionArc.stroke,
   arcTrack: CHART_STYLE.afflictionArc.trackOpacity,
   arcRemaining: CHART_STYLE.afflictionArc.remainingOpacity,
-  ringStroke: CHART_STYLE.interactionRing.stroke,
-  symbolRatio: CHART_STYLE.planet.symbolRatio,
+  arcDiffGlow: CHART_STYLE.afflictionArc.diffGlow,
   showBadges: false,
 };
 
@@ -75,16 +66,11 @@ export const TUNING_KNOBS: ReadonlyArray<{
   max: number;
   step: number;
 }> = [
-  { key: "discR", label: "Disc r", min: 12, max: 40, step: 1 },
-  { key: "arcR", label: "Arc r", min: 16, max: 52, step: 1 },
-  { key: "ringR", label: "Ring r", min: 20, max: 60, step: 1 },
   { key: "inviteHaloR", label: "Invite halo r", min: 24, max: 120, step: 1 },
   { key: "activeHaloR", label: "Active halo r", min: 30, max: 160, step: 1 },
-  { key: "arcStroke", label: "Arc stroke", min: 1, max: 10, step: 0.5 },
   { key: "arcTrack", label: "Arc track", min: 0, max: 1, step: 0.02 },
   { key: "arcRemaining", label: "Arc remaining", min: 0, max: 1, step: 0.02 },
-  { key: "ringStroke", label: "Ring stroke", min: 0.5, max: 10, step: 0.5 },
-  { key: "symbolRatio", label: "Symbol ratio", min: 0.5, max: 1.6, step: 0.02 },
+  { key: "arcDiffGlow", label: "Arc diff glow", min: 0, max: 16, step: 0.5 },
 ];
 
 /** The `motion.css` custom properties the console can override. `suffix` is
@@ -97,10 +83,8 @@ export const MOTION_KNOBS: ReadonlyArray<{
   step: number;
   suffix: string;
 }> = [
-  { prop: "--breath-period", label: "Breath period", min: 0.5, max: 8, step: 0.1, suffix: "s" },
   { prop: "--invite-glow-min", label: "Glow floor", min: 0, max: 1, step: 0.02, suffix: "" },
   { prop: "--invite-glow-range", label: "Glow swing", min: 0, max: 1, step: 0.02, suffix: "" },
-  { prop: "--invite-ring-swing", label: "Ring swing", min: 0, max: 0.3, step: 0.01, suffix: "" },
 ];
 
 /** The value `motion.css` declares, before any console override. */

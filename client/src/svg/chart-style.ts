@@ -158,14 +158,28 @@ export const CHART_STYLE = {
   afflictionArc: {
     stroke: STROKE_EXTRA_HEAVY,
     trackOpacity: 0.3,
-    // Full, matching the interaction ring's steady opacity. The arc is state and
-    // the ring is affordance, so the arc should never be the dimmer of the two —
-    // and since it is bone against the ring's mist, equal opacity leaves it the
-    // brighter mark, which is the hierarchy we want. The track stays faint: it
-    // is the spent span, and at full it would erase the boundary it exists to
+    // Down from full, and unconditionally — the span reads the same whether or
+    // not anything is being previewed, because a mark that changes brightness
+    // with hover reads as a second piece of state rather than as itself.
+    //
+    // Full was chosen to match the interaction ring's steady opacity, on the
+    // reasoning that the arc is state and the ring is affordance, so the arc
+    // should never be the dimmer of the two. That held while they were the only
+    // two marks in the band. The diff makes three, and it is the one the eye has
+    // to reach first while a blow is in flight, so the bone gives up a little
+    // headroom for it. Still well clear of the track, which stays faint because
+    // it is the spent span and at full would erase the boundary it exists to
     // show.
-    remainingOpacity: 1,
+    remainingOpacity: 0.8,
     diffOpacity: 1,
+    /** The diff is the one mark that says what a blow will do, and it is short
+     *  by construction — 1 point = 1°, so a 12-point blow is 12° of a radius-30
+     *  arc, about 6 units of line. It cannot win on length against a lit aspect
+     *  that crosses the whole wheel, so it wins on light: the same drop-shadow
+     *  the interaction ring carries, in the diff's own colour. Kept well under
+     *  that ring's 8, since the diff already has the brighter tint under it and
+     *  the two together tipped into a smear. */
+    diffGlow: 3,
   },
   /** Active — combust: colored flare ripple + delayed bone shockwave. */
   combust: {

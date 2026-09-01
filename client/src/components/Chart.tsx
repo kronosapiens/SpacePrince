@@ -10,15 +10,15 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import {
-  AFFLICTION_ARC_ANCHOR_DEG,
+  AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_SIZE,
   CORONA_INNER_R,
-  INNER_RING_R, OUTER_RING_R,
-  PLANET_R_ACTIVE,
+  INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
+  PLANET_R_ACTIVE, PLANET_R_REST,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
+import { ARC_DIFF_COLOR, ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import { CHART_STYLE } from "@/svg/chart-style";
 import { useTuning, type ChartTuning } from "@/svg/tuning";
 import type {
@@ -248,7 +248,7 @@ export function Chart(props: ChartProps) {
   } = props;
 
   const tuning = useTuning();
-  const points = useMemo(() => buildPlanetPoints(chart, tuning.discR), [chart, tuning.discR]);
+  const points = useMemo(() => buildPlanetPoints(chart, PLANET_R_REST), [chart]);
   // Place the panel in the emptiest interior wedge — the wheel's middle isn't
   // reliably clear (same-sign planets cluster toward the center). Reserve the
   // taller action height so the spot doesn't shift when buttons appear.
@@ -501,7 +501,7 @@ export function Chart(props: ChartProps) {
       {/* What is arriving here, at the centre. Above the aspect web — a line
           between opposite planets runs straight through the middle — and below
           the panel, which is allowed to cover it. */}
-      {incoming && <IncomingMark tuning={tuning} verb={incoming.verb} amount={incoming.amount} />}
+      {incoming && <IncomingMark verb={incoming.verb} amount={incoming.amount} />}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
           chart, the panel sits on top — it's the focused read. */}
@@ -575,7 +575,7 @@ function PlanetGlyph({
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, point.glyphR * CHART_STYLE.planet.rimStrokeRatio)}
           strokeDasharray={CHART_STYLE.ghost.dash} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(point.glyphR * tuning.symbolRatio)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
+          fontSize={Math.round(point.glyphR * CHART_STYLE.planet.symbolRatio)} fill={c} fillOpacity={CHART_STYLE.ghost.glyphOpacity}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
           style={{ pointerEvents: "none", userSelect: "none" }}>
@@ -648,8 +648,8 @@ function PlanetGlyph({
           style={{ opacity: ringSteady ? CHART_STYLE.invite.halo.steady : undefined, pointerEvents: "none" }} />
       )}
       {ringShown && (
-        <circle r={tuning.ringR} fill="none"
-          stroke={ringColor} strokeWidth={tuning.ringStroke}
+        <circle r={INTERACTION_RING_R} fill="none"
+          stroke={ringColor} strokeWidth={CHART_STYLE.interactionRing.stroke}
           className={ringSteady ? "invite-ring" : "invite-ring anim-invite-ring"}
           style={{
             // The class's drop-shadow is currentColor, so the glow follows the
@@ -678,7 +678,7 @@ function PlanetGlyph({
           stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
         <text textAnchor="middle" dominantBaseline="central"
-          fontSize={Math.round(r * tuning.symbolRatio)}
+          fontSize={Math.round(r * CHART_STYLE.planet.symbolRatio)}
           fill={glyphFill}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           fontWeight={600}
@@ -746,8 +746,8 @@ function PlanetArc({
 }) {
   const ceiling = combustionCeiling(placement);
   if (ceiling <= 0) return null;
-  const r = tuning.arcR;
-  const stroke = tuning.arcStroke;
+  const r = AFFLICTION_ARC_R;
+  const stroke = CHART_STYLE.afflictionArc.stroke;
   // Position `a` on the track sits `ceiling - a` degrees back from the anchor.
   const at = (a: number) => AFFLICTION_ARC_ANCHOR_DEG - ceiling + clamp(a, 0, ceiling);
   const spent = clamp(affliction, 0, ceiling);
@@ -772,8 +772,8 @@ function PlanetArc({
         from: Math.min(spent, projected),
         to: Math.max(spent, projected),
         color: fatal ? COMBUST_WARNING
-          : harm ? VALENCE_COLOR.Affliction
-          : VALENCE_COLOR.Testimony,
+          : harm ? ARC_DIFF_COLOR.Affliction
+          : ARC_DIFF_COLOR.Testimony,
       };
     }
   }
@@ -789,8 +789,18 @@ function PlanetArc({
           stroke={NEUTRAL.bone} opacity={tuning.arcRemaining} width={stroke} />
       )}
       {diff && (
-        <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
-          stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity} width={stroke} />
+        // `color` feeds the class's currentColor drop-shadow, so the glow
+        // follows the verb — and the ember, when the blow is fatal.
+        <g
+          className="arc-diff"
+          style={{
+            color: diff.color,
+            "--arc-diff-glow": `${tuning.arcDiffGlow}px`,
+          } as CSSProperties}
+        >
+          <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
+            stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity} width={stroke} />
+        </g>
       )}
     </g>
   );
@@ -873,7 +883,7 @@ function PlanetCorona({ verb }: { verb: Polarity }) {
  * has closed at commit and its Testify/Afflict button — the only other place
  * your own outgoing figure is written — has gone with it.
  */
-function IncomingMark({ tuning, verb, amount }: { tuning: ChartTuning; verb: Polarity; amount: number }) {
+function IncomingMark({ verb, amount }: { verb: Polarity; amount: number }) {
   const { fontSize, opacity } = CHART_STYLE.incoming;
   const c = VALENCE_COLOR[verb];
   return (
@@ -881,8 +891,8 @@ function IncomingMark({ tuning, verb, amount }: { tuning: ChartTuning; verb: Pol
       <PlanetCorona verb={verb} />
       {/* Steady, never breathing: the mark is not tappable and never will be,
           and steady is already the ring's reading for a settled thing. */}
-      <circle r={tuning.ringR} fill="none"
-        stroke={c} strokeWidth={tuning.ringStroke}
+      <circle r={INTERACTION_RING_R} fill="none"
+        stroke={c} strokeWidth={CHART_STYLE.interactionRing.stroke}
         className="invite-ring"
         style={{ color: c, opacity: CHART_STYLE.interactionRing.steady }} />
       {/* `middle`, not `central`: the chart's serif (from tokens.css) has

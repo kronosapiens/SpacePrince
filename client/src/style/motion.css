@@ -256,6 +256,15 @@
   transform: scale(calc(1 + var(--invite-ring-swing) * var(--breath)));
 }
 
+/* The projection diff on an affliction arc. Not motion — it sits here because
+   it is the same drop-shadow the interaction ring above carries, and the two
+   glows are worth reading together. Radius comes from `afflictionArc.diffGlow`;
+   currentColor is set inline per diff, so the glow is the verb's colour, or
+   ember when the blow is fatal. */
+.arc-diff {
+  filter: drop-shadow(0 0 var(--arc-diff-glow, 6px) currentColor);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
   .anim-impact,

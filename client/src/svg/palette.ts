@@ -62,6 +62,18 @@ export const VALENCE_COLOR = {
   Testimony: "#9D86D9",
 } as const;
 
+/** Brightened valence tints for the projection diff on an affliction arc — the
+ *  same move `ASPECT_HEAD_COLOR` makes above, and for the same reason. The diff
+ *  is short by construction (1 point = 1°) and shares the bone arc's radius and
+ *  width, so at the base valence colors it reads as one more segment of the
+ *  ring; lifting lightness while holding the hue makes it the lit one. Used
+ *  only here — the buttons, the announce line, the ring and the corona keep the
+ *  base pair, so the family still reads as one. */
+export const ARC_DIFF_COLOR = {
+  Affliction: "#F9B176",
+  Testimony: "#B9A6F2",
+} as const;
+
 /** Combust warning — combustion is on the table for this planet this turn.
  *  A luminant ember red: its own channel, kept off the valence amber (harm in
  *  flight), the luminant aspect red (edge language), and Mars vermillion
