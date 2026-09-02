@@ -20,8 +20,9 @@ import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
  * how you can tell at the call site that a number is decided. Put one back the
  * moment it is in question again; that costs a field, a default and a row.
  *
- * What is left is the light: the two halo radii, the arc's three opacities, and
- * the invite glow's floor and swing.
+ * What is left is the light: the two halo radii, the arc's opacities, and the
+ * invite glow's floor and swing — plus the diff's own glow and stroke, which
+ * are the two channels still being pushed to make a preview read.
  *
  * The motion knobs aren't here: their consumers are CSS animations, so
  * `motion.css` stays authoritative and the console overrides them as inline
@@ -36,10 +37,18 @@ export interface ChartTuning {
   arcRemaining: number;
   /** Drop-shadow radius on the projection diff — how hard a preview burns. */
   arcDiffGlow: number;
+  /** The diff's own stroke, wider than the arc's so it gains area. */
+  arcDiffStroke: number;
   /** The numeric affliction / projection badges. Off — the arc replaced them.
    *  Scaffolding: the toggle exists to put them back for a moment while the
    *  arc is still being trusted. Deleting the badges deletes this too. */
   showBadges: boolean;
+  /** Every soft light on the surface at once — the colour-field blooms, both
+   *  planet halos, the drop-shadows under the interaction ring and the arc's
+   *  diff, and the screen's active-planet tint. Off puts the whole UI on pure
+   *  void, which is the only way to see what the line work is doing on its own.
+   *  Scaffolding, like the badges above. */
+  showGlow: boolean;
 }
 
 /** The keys the slider list can drive — every knob whose value is a number. */
@@ -53,7 +62,9 @@ export const TUNING_DEFAULTS: ChartTuning = {
   arcTrack: CHART_STYLE.afflictionArc.trackOpacity,
   arcRemaining: CHART_STYLE.afflictionArc.remainingOpacity,
   arcDiffGlow: CHART_STYLE.afflictionArc.diffGlow,
+  arcDiffStroke: CHART_STYLE.afflictionArc.diffStroke,
   showBadges: false,
+  showGlow: true,
 };
 
 /** Slider ranges for the console. Bounds are generous rather than safe — the
@@ -71,6 +82,7 @@ export const TUNING_KNOBS: ReadonlyArray<{
   { key: "arcTrack", label: "Arc track", min: 0, max: 1, step: 0.02 },
   { key: "arcRemaining", label: "Arc remaining", min: 0, max: 1, step: 0.02 },
   { key: "arcDiffGlow", label: "Arc diff glow", min: 0, max: 16, step: 0.5 },
+  { key: "arcDiffStroke", label: "Arc diff stroke", min: 1, max: 10, step: 0.5 },
 ];
 
 /** The `motion.css` custom properties the console can override. `suffix` is

@@ -18,7 +18,7 @@ import {
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
-import { ARC_DIFF_COLOR, ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
+import { ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import { CHART_STYLE } from "@/svg/chart-style";
 import { useTuning, type ChartTuning } from "@/svg/tuning";
 import type {
@@ -283,7 +283,7 @@ export function Chart(props: ChartProps) {
     "";
 
   // Color-field blooms — one radial gradient per visible non-combust planet.
-  const fieldBlooms = showColorField
+  const fieldBlooms = showColorField && tuning.showGlow
     ? PLANETS.map((planet) => {
         if (!isUnlocked(planet)) return null;
         if (planetCombusted(planet)) return null;
@@ -372,7 +372,7 @@ export function Chart(props: ChartProps) {
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-      className={["chart-svg", entranceClass, className ?? ""].filter(Boolean).join(" ")}
+      className={["chart-svg", tuning.showGlow ? "" : "no-glow", entranceClass, className ?? ""].filter(Boolean).join(" ")}
       style={style}
       role="img"
       aria-label={`${chart.name} natal chart${side === "other" ? " (other)" : ""}`}
@@ -625,7 +625,7 @@ function PlanetGlyph({
       style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}
     >
-      {active && (
+      {active && tuning.showGlow && (
         <circle
           className="anim-active-halo"
           r={tuning.activeHaloR}
@@ -641,7 +641,7 @@ function PlanetGlyph({
           selecting clears the invite on every planet and suppresses hover — and
           because only selection opens the action fan-out. The halo goes steady
           with it, so a committed choice can't read dimmer than a hovered one. */}
-      {ringShown && !active && (
+      {ringShown && !active && tuning.showGlow && (
         <circle r={tuning.inviteHaloR}
           fill={`url(#v2-halo-${point.planet})`}
           className={ringSteady ? undefined : "anim-invite-glow"}
@@ -772,8 +772,8 @@ function PlanetArc({
         from: Math.min(spent, projected),
         to: Math.max(spent, projected),
         color: fatal ? COMBUST_WARNING
-          : harm ? ARC_DIFF_COLOR.Affliction
-          : ARC_DIFF_COLOR.Testimony,
+          : harm ? VALENCE_COLOR.Affliction
+          : VALENCE_COLOR.Testimony,
       };
     }
   }
@@ -799,7 +799,8 @@ function PlanetArc({
           } as CSSProperties}
         >
           <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
-            stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity} width={stroke} />
+            stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity}
+            width={tuning.arcDiffStroke} />
         </g>
       )}
     </g>

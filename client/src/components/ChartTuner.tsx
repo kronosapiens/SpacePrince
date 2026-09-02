@@ -53,6 +53,15 @@ export function ChartTuner() {
         Badges
       </label>
 
+      <label className="dev-console-check">
+        <input
+          type="checkbox"
+          checked={tuning.showGlow}
+          onChange={(e) => setTuning({ showGlow: e.target.checked })}
+        />
+        Glow
+      </label>
+
       {TUNING_KNOBS.map((knob) => (
         <label key={knob.key} className="dev-tuner-knob">
           <span>

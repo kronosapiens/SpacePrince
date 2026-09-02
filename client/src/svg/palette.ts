@@ -62,17 +62,14 @@ export const VALENCE_COLOR = {
   Testimony: "#9D86D9",
 } as const;
 
-/** Brightened valence tints for the projection diff on an affliction arc — the
- *  same move `ASPECT_HEAD_COLOR` makes above, and for the same reason. The diff
- *  is short by construction (1 point = 1°) and shares the bone arc's radius and
- *  width, so at the base valence colors it reads as one more segment of the
- *  ring; lifting lightness while holding the hue makes it the lit one. Used
- *  only here — the buttons, the announce line, the ring and the corona keep the
- *  base pair, so the family still reads as one. */
-export const ARC_DIFF_COLOR = {
-  Affliction: "#F9B176",
-  Testimony: "#B9A6F2",
-} as const;
+/** Rejected: a brightened pair for the projection diff on an affliction arc,
+ *  by analogy with `ASPECT_HEAD_COLOR` above. It reads backwards there. The
+ *  aspect head is brightened against a *dim* static web, but the diff abuts the
+ *  bone remaining span, which is the brightest mark on the wheel — so lifting
+ *  its lightness moved it toward what it has to separate from. Measured in L*
+ *  against bone: the brightened amber landed 4.6 away, the base amber 14.6, and
+ *  the ember that never needed fixing sits at 21.5. The diff separates by being
+ *  darker than bone, which the base pair already is. */
 
 /** Combust warning — combustion is on the table for this planet this turn.
  *  A luminant ember red: its own channel, kept off the valence amber (harm in

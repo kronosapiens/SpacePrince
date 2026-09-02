@@ -75,10 +75,17 @@ export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 export const STROKE_LIGHT = 1;
 export const STROKE_MEDIUM = 2;
 export const STROKE_HEAVY = 3;
-/** The affliction arc alone. Named on the same axis as the rungs below it —
- *  weight, not width — since they grade one property. It sits above HEAVY
- *  because the arc carries more than any mark that is merely under attention:
- *  a planet's ceiling, what it can still absorb, and what the declared blow
- *  takes. One client is deliberate, but it is also how the five-rung scale
- *  this replaced rotted, so if nothing joins it, fold it back into HEAVY. */
+/** The projection diff on an affliction arc, alone. Named on the same axis as
+ *  the rungs below it — weight, not width — since they grade one property. It
+ *  sits above HEAVY because a blow in flight outranks anything merely under
+ *  attention, including the arc it is drawn on: the arc says what a planet can
+ *  absorb, the diff says what is about to be taken from it.
+ *
+ *  The arc itself held this rung until the diff needed to out-weigh it. HEAVY
+ *  suits the arc better anyway — it is a thing under attention, and it shares
+ *  that rung with the interaction ring without confusion, since kind separates
+ *  those two (an arc is data, a complete circle is interaction).
+ *
+ *  One client is deliberate, but it is also how the five-rung scale this
+ *  replaced rotted, so if nothing joins it, fold it back into HEAVY. */
 export const STROKE_EXTRA_HEAVY = 4;

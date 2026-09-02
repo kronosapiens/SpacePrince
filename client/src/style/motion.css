@@ -265,6 +265,14 @@
   filter: drop-shadow(0 0 var(--arc-diff-glow, 6px) currentColor);
 }
 
+/* Dev scaffolding (`showGlow`): strip every soft light so the line work can be
+   judged on pure void. The blooms, halos and screen tint are gated in TSX; the
+   two drop-shadows live in CSS, so they come off here. */
+.no-glow .invite-ring,
+.no-glow .arc-diff {
+  filter: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-action-glow,
   .anim-impact,

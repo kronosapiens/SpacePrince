@@ -1,5 +1,6 @@
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { PLANET_PRIMARY } from "@/svg/palette";
+import { useTuning } from "@/svg/tuning";
 
 /** Single full-viewport radial gradient overlay. Color shifts to the
  *  active planet when one is set; falls back to a warm bone neutral so
@@ -7,6 +8,8 @@ import { PLANET_PRIMARY } from "@/svg/palette";
  *  of-run, etc. don't go flat-black). */
 export function ActivePlanetTint() {
   const { active } = useActivePlanet();
+  const { showGlow } = useTuning();
+  if (!showGlow) return null;
   const tintColor = active ? PLANET_PRIMARY[active] : "var(--bone)";
   return <div className="tint-overlay" style={{ ["--tint-color" as any]: tintColor }} aria-hidden="true" />;
 }
