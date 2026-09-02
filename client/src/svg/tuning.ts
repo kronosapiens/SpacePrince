@@ -14,15 +14,16 @@ import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
  * so production renders the defaults and the store never notifies.
  *
  * A knob earns its place by being unsettled. The concentric radii (disc 24, arc
- * 30, ring 36), the two stroke widths (arc 4, ring 3), the symbol ratio, the
- * breath period and the ring swing all came off this list once their values
- * stopped moving — their consumers read the tokens directly now, which is also
- * how you can tell at the call site that a number is decided. Put one back the
- * moment it is in question again; that costs a field, a default and a row.
+ * 30, ring 36), the stroke widths, the symbol ratio, the arc's track and
+ * remaining opacities, the breath period and the ring swing have all come off
+ * this list as their values stopped moving — their consumers read the tokens
+ * directly now, which is also how you can tell at the call site that a number
+ * is decided. Put one back the moment it is in question again; that costs a
+ * field, a default and a row.
  *
- * What is left is the light: the two halo radii, the arc's opacities, and the
- * invite glow's floor and swing — plus the diff's own glow and stroke, which
- * are the two channels still being pushed to make a preview read.
+ * What is left is the two halo radii, the invite glow's floor and swing, and
+ * the diff's own glow and stroke — the channels still being pushed to make a
+ * preview read.
  *
  * The motion knobs aren't here: their consumers are CSS animations, so
  * `motion.css` stays authoritative and the console overrides them as inline
@@ -31,10 +32,6 @@ import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
 export interface ChartTuning {
   inviteHaloR: number;
   activeHaloR: number;
-  /** The whole-ceiling track behind the arc. */
-  arcTrack: number;
-  /** The span the planet can still absorb. */
-  arcRemaining: number;
   /** Drop-shadow radius on the projection diff — how hard a preview burns. */
   arcDiffGlow: number;
   /** The diff's own stroke, wider than the arc's so it gains area. */
@@ -59,8 +56,6 @@ type NumericKey = {
 export const TUNING_DEFAULTS: ChartTuning = {
   inviteHaloR: INVITE_HALO_R,
   activeHaloR: ACTIVE_HALO_R,
-  arcTrack: CHART_STYLE.afflictionArc.trackOpacity,
-  arcRemaining: CHART_STYLE.afflictionArc.remainingOpacity,
   arcDiffGlow: CHART_STYLE.afflictionArc.diffGlow,
   arcDiffStroke: CHART_STYLE.afflictionArc.diffStroke,
   showBadges: false,
@@ -79,8 +74,6 @@ export const TUNING_KNOBS: ReadonlyArray<{
 }> = [
   { key: "inviteHaloR", label: "Invite halo r", min: 24, max: 120, step: 1 },
   { key: "activeHaloR", label: "Active halo r", min: 30, max: 160, step: 1 },
-  { key: "arcTrack", label: "Arc track", min: 0, max: 1, step: 0.02 },
-  { key: "arcRemaining", label: "Arc remaining", min: 0, max: 1, step: 0.02 },
   { key: "arcDiffGlow", label: "Arc diff glow", min: 0, max: 16, step: 0.5 },
   { key: "arcDiffStroke", label: "Arc diff stroke", min: 1, max: 10, step: 0.5 },
 ];

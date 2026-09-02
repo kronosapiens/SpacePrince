@@ -783,10 +783,10 @@ function PlanetArc({
       {/* The whole ceiling, faint. What shows through is the affliction already
           spent, and the full extent is the planet's Resolve. */}
       <ArcStroke r={r} from={at(0)} to={at(ceiling)} full={ceiling >= 360}
-        stroke={NEUTRAL.bone} opacity={tuning.arcTrack} width={stroke} />
+        stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
       {spent < ceiling && (
         <ArcStroke r={r} from={at(spent)} to={at(ceiling)} full={spent <= 0 && ceiling >= 360}
-          stroke={NEUTRAL.bone} opacity={tuning.arcRemaining} width={stroke} />
+          stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.remainingOpacity} width={stroke} />
       )}
       {diff && (
         // `color` feeds the class's currentColor drop-shadow, so the glow
