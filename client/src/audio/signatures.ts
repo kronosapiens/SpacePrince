@@ -129,6 +129,28 @@ export const SIGNATURES: Record<PlanetName, Signature> = {
   },
 };
 
+/**
+ * Degree per planet — where that planet's mode starts in the shared collection.
+ * The seven modes are the seven rotations of one set of notes (Ionian from the
+ * first, Dorian from the second, through Locrian from the seventh), so the
+ * degree comes with the mode rather than being chosen.
+ */
+export const PLANET_DEGREE: Record<PlanetName, number> = {
+  Sun: 0,
+  Mercury: 1,
+  Mars: 2,
+  Jupiter: 3,
+  Venus: 4,
+  Moon: 5,
+  Saturn: 6,
+};
+
+/** The note a struck planet rings: its degree in the ruler's mode, sounded in
+ *  the octave its own signature owns (Saturn on the floor, Mercury on top). */
+export function strikeMidi(ruler: PlanetName, target: PlanetName): number {
+  return SIGNATURES[target].root + PLANET_MODE[ruler][PLANET_DEGREE[target]]!;
+}
+
 /** Resolve a gesture degree to a MIDI note for the planet. */
 export function gestureMidi(planet: PlanetName, deg: number): number {
   const mode = PLANET_MODE[planet];

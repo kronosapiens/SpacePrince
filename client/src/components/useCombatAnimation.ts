@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
-import { playCombust, playPropagation, playVerb } from "@/audio/engine";
+import { playCombust, playStrike, playVerb } from "@/audio/engine";
 import { encounterRuler } from "@/game/encounter";
 import { beatScore, type ScoreCharts, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
@@ -318,8 +318,9 @@ function runScheduler(args: {
     // Primary direct phase — apply delta, light action-glow, impact.
     schedule(() => {
       // The acting planet speaks its verb (VIBES.md — "encounter turns produce
-      // sound from the active planets").
+      // sound from the active planets"), over the struck planet's note.
       playVerb(attackerPlanet, receivedPolarity);
+      playStrike(ruler, actionPlanet, "landing");
       updateAnimation((state) => {
         const next = cloneAnimation(state);
         if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
@@ -405,11 +406,16 @@ function runScheduler(args: {
       }
 
       schedule(() => {
-        // Propagation is audible: a harmonious hop resolves, an inverted hop
-        // (square/opposition — the polarity flipped) hangs. A combust marker
-        // instead cuts the target's own signature mid-phrase.
-        if (step.note === "Combusts") playCombust(step.target);
-        else playPropagation(step.polarity !== receivedPolarity);
+        // The hop rings the target's degree in the ruler's mode: harmonious it
+        // approaches from a fourth below, inverted (square/opposition — the
+        // polarity flipped) it hangs a minor second against the note. A combust
+        // marker rings the same note under the target's own signature, cut.
+        if (step.note === "Combusts") {
+          playCombust(step.target);
+          playStrike(ruler, step.target, "landing");
+        } else {
+          playStrike(ruler, step.target, step.polarity !== receivedPolarity ? "inverts" : "flows");
+        }
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           const targetState = isSelf ? next.selfState : next.otherState;
@@ -485,6 +491,7 @@ function runScheduler(args: {
     if (actionCombust) {
       schedule(() => {
         playCombust(actionPlanet);
+        playStrike(ruler, actionPlanet, "landing");
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           next.combustingPlanets = {

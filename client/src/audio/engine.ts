@@ -1,7 +1,7 @@
 import type { PlanetName } from "@/game/types";
 import type { Polarity } from "@/game/types";
 import { PLANETS } from "@/game/data";
-import { SIGNATURES, gestureMidi, type Signature } from "./signatures";
+import { SIGNATURES, gestureMidi, strikeMidi, type Signature } from "./signatures";
 
 /**
  * The sound layer (VIBES.md §Sound Design): per-planet tonal signatures,
@@ -237,10 +237,36 @@ export function playVerb(planet: PlanetName, polarity: Polarity): void {
   playGesture(planet, SIGNATURES[planet], polarity === "Testimony" ? 0.8 : 1);
 }
 
+export type StrikeShape = "landing" | "flows" | "inverts";
+
 /**
- * Propagation is audible (VIBES.md): a harmonious hop resolves — a rising
- * fourth landing home — while an inverted hop (square/opposition) hangs on a
- * minor second that never settles.
+ * A strike is audible (MUSIC.md, "The strike grid"): the struck planet rings
+ * its degree in the ruler's mode, in the octave its own signature owns, so the
+ * whole encounter sounds in one mode. A harmonious hop approaches that note
+ * from a fourth below and lands; an inverted hop (square/opposition) hangs a
+ * minor second against it that never settles.
+ */
+export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeShape): void {
+  if (!T || !soundOn) return;
+  const fx = fxSynth();
+  if (!fx) return;
+  const now = T.now();
+  const n = strikeMidi(ruler, target);
+  if (shape === "inverts") {
+    fx.triggerAttackRelease(midiToFreq(n), 0.5, now, 0.24);
+    fx.triggerAttackRelease(midiToFreq(n + 1), 0.55, now + 0.02, 0.2); // ♭2 against it, held
+  } else if (shape === "flows") {
+    fx.triggerAttackRelease(midiToFreq(n - 5), 0.15, now, 0.24); // a fourth below
+    fx.triggerAttackRelease(midiToFreq(n), 0.35, now + 0.12, 0.22); // → home
+  } else {
+    fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
+  }
+}
+
+/**
+ * A narrative outcome landing (EncounterNarrative): relief resolves — a rising fourth
+ * home — while harm hangs on a minor second. No ruler out here, so it sounds on
+ * the shared D rather than at a degree.
  */
 export function playPropagation(inverted: boolean): void {
   if (!T || !soundOn) return;
