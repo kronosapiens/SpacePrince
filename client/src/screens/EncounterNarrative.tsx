@@ -13,7 +13,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
-import { playCombust, playPropagation, setTheme } from "@/audio/engine";
+import { playCombust, playStrike, setTheme } from "@/audio/engine";
 import { mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
@@ -170,13 +170,17 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       combusting,
       distance: nextRun.distance - run.distance,
     });
-    // Plain state-change sounds (SCREENS §3.5 — no propagation language here):
-    // a combust cuts that planet's signature; otherwise heal resolves, harm hangs.
-    if (combusting.size > 0) {
-      for (const p of combusting) playCombust(p);
-    } else if (impact.size > 0) {
-      const harmed = [...impact.values()].some((pol) => pol === "Affliction");
-      playPropagation(harmed);
+    // Each planet the outcome touches rings its degree in the house ruler's
+    // mode (MUSIC.md, "The strike grid") — relief lands, harm hangs — so an
+    // outcome that touches several sounds as a chord. A combust cuts that
+    // planet's signature over its note, as in combat.
+    for (const [p, polarity] of impact) {
+      if (combusting.has(p)) continue;
+      playStrike(house.ruler, p, polarity === "Affliction" ? "inverts" : "flows");
+    }
+    for (const p of combusting) {
+      playCombust(p);
+      playStrike(house.ruler, p, "landing");
     }
 
     if (option.next) {

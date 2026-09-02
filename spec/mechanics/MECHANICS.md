@@ -213,7 +213,7 @@ Two processes exist: the map-boundary fortune roll (§11.3) and the narrative un
 Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
 Combustion is tuned to be **frequent and recoverable** — a tide, not a rare catastrophe: at `durability × 5` a mid-durability planet falls to a few committed blows, and recovery capacity is sized to match.
 Content target: roughly a third to a half of narrative encounters offer an uncombust rite, alongside the boundary rolls.
-Combustion itself never scores — Distance is testimony only (§12) — so combusting an opponent planet is always a trade: denying its swing against forfeiting the harvest banked on it.
+Combustion scores only under Saturn's rule (§12); under every other ruler, combusting an opponent planet is a trade: denying its swing against forfeiting the harvest banked on it.
 
 **Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet's competence in its sign is expressed narratively rather than as a stat nudge. The chart still computes each planet's dignity; combat simply does not read it.
 
@@ -228,7 +228,10 @@ The game's progression is layered:
 
 Per encounter:
 
-- The opponent spawns **already afflicted** — only resolution scores (§12), so the tension must predate the player for a short fight to have anything to resolve; a 1-turn map-1 fight is pure harvest.
+- Every combat encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP`, `CHART.md`).
+  It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the combat theme (`MUSIC.md`), and the encounter's scoring rule (§12).
+  Narrative encounters carry their house's natural ruler the same way (`HOUSES.md`).
+- The opponent spawns **already afflicted** — under the Moon's rule only resolution scores (§12), so the tension must predate the player for a short fight to have anything to resolve; a 1-turn map-1 fight is pure harvest.
   Each fielded planet draws uniformly from three tiers — `12`, `24`, `36` — deterministically from the node's opponent seed.
   The tiers are **absolute, not a fraction of the ceiling** — the spawn pool is a harvest quantity, not a durability one, so a fragile Moon and a durable Saturn bank the same tribute.
   They are sized at roughly one planet's testimony: enough that a map-1 turn is never wasted, not enough to live on — a seven-planet pool of about `168` drains a few turns into a long encounter, after which the build beat of the two-beat (§12) is necessary rather than optional.
@@ -291,24 +294,34 @@ The first map of a run has no boundary: the chart enters clean. Each crossing af
 
 UI label: `Distance`.
 
-Only **resolution on the opponent's chart** scores.
-Distance accrues from testimony — affliction healed — not from affliction created.
-Affliction is the setup; resolving it is the payoff.
+Distance is one additive number on the lattice: every rule below sums magnitudes the turn log already carries, or ceilings, which are multiples of `60`.
+What earns it is decided by the encounter's **ruler** (§11): each ruler pays for what that planet values.
 
-The player's own chart never scores: personal chart management is about survival, opponent chart management is about scoring.
-The opponent's testimony on your chart is a gift of longevity, not Distance.
-Every point of Distance therefore traces to the player's own action.
+| Ruler | Polarity | Chart | Channel |
+|---|---|---|---|
+| Moon | Testimony | Theirs | All |
+| Venus | Testimony | Both | All |
+| Mars | Affliction | Theirs | All |
+| Saturn | Affliction | Both | Combust only — each combust pays the dying planet's ceiling |
+| Sun | Either | Theirs | Direct hit only |
+| Mercury | Either | Theirs | Propagation only |
+| Jupiter | Either | Theirs | All |
 
-Per turn:
+The luminary and the warrior pay for your action (Moon, Mars); the benefic and the malefic pay for the encounter, on both charts (Venus, Saturn); the remaining three split by channel — the Sun the direct hit, Mercury the hops, Jupiter everything.
+Combust is affliction taken to its limit, so Mars and Saturn mirror Moon and Venus: harm dealt and harm completed, relief given and relief anywhere.
 
-- `turnScore`: sum of testimony magnitudes (affliction reduced) on the opponent's chart — the direct hit and its propagation, including afflictions inverted to testimony across squares and oppositions (§9).
-- Affliction created contributes nothing.
-- Phase 2 — the opponent's action on your chart (§6) — contributes nothing.
-
+Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `turnScore` is the sum of the beats the ruler admits.
+The projection preview produces the same beats, so a previewed Distance and an awarded one are one function.
 Run score accumulates `turnScore`.
 
-Because only real reductions count, testifying a planet already at zero affliction scores nothing — affliction must exist before it can be resolved.
-This makes each turn a two-beat: afflict to set up, testify to cash.
+Under the Moon only real reductions count — testifying a planet already at zero affliction scores nothing — so each turn is a two-beat: afflict to set up, testify to cash.
+Under Mars the two-beat inverts.
+Under Venus and Saturn the opponent's reply on your chart pays you, so the choice becomes which planet stands in the way.
+The rule is stated on the encounter screen for the whole encounter, and the node's colour on the map is the same ruler, so a route is chosen with the rotation in view.
+
+Open (balance, deferred): Jupiter's rule contains the Moon's, Mars's, Sun's and Mercury's outright, so Jupiter nodes dominate on route choice — the non-dominating alternative is the single largest beat per turn.
+Rulership fixes the rotation's frequencies — the luminaries rule one sign each, the others two — so luminary nodes are half as common, and Moon-ruled openings, which the map-1 curriculum (§11.1) leans on, are the least likely roll.
+Saturn's ceilings dwarf per-turn magnitudes, so late-run Saturn nodes are cash-outs.
 
 A run's **final accumulated Distance** is its permanent output. When the run ends — combustion or completion (§11) — that value is inscribed as a star in the Prince's NFT field (`NFT.md`, "The Star-Field"). Nothing else about the run is recorded: not how it ended, not which planets combust. Only the Distance, and the star it earns.
 

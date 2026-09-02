@@ -2,11 +2,14 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "r
 import { Chart } from "@/components/Chart";
 import { HelpButton } from "@/components/HelpButton";
 import { PlanetBands } from "@/components/PlanetBands";
+import { TermText } from "@/components/TermText";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
-import { PLANETS, RULERSHIP } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { setTheme } from "@/audio/engine";
+import { encounterRuler } from "@/game/encounter";
+import { RULER_RULES, scoreBeats } from "@/game/score";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
@@ -136,13 +139,18 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [prince.numEncounters, devUnlockAll],
   );
 
-  // The score (MUSIC.md): combat plays the opponent's theme at the up mix —
-  // the theme follows the encounter's identity (its chart ruler), stable for
-  // the whole fight, not the per-turn active planet.
-  const opponentRuler = RULERSHIP[encounter.opponentChart.ascendantSign];
+  // The encounter's ruler: the planet whose colour the node carried on the map,
+  // and the one that says what earns Distance here (`score.ts` `RULER_RULES`).
+  // The score (MUSIC.md) follows it too — combat plays the ruler's theme at the
+  // up mix, stable for the whole fight, not the per-turn active planet.
+  const ruler = encounterRuler(encounter);
   useEffect(() => {
-    setTheme(opponentRuler, "combat");
-  }, [opponentRuler]);
+    setTheme(ruler, "combat");
+  }, [ruler]);
+  const scoreCharts = useMemo(
+    () => ({ self: prince.chart, other: encounter.opponentChart }),
+    [prince.chart, encounter.opponentChart],
+  );
 
   // The panel (with its action buttons) is click-only: hovering the chart
   // highlights a planet but never pops the panel, so nothing modal flickers as
@@ -188,6 +196,18 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       modelPreemption: !!indicatedVerb,
     });
   }, [animation, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, encounter.roster, prince.chart]);
+
+  // What this gesture would move Distance by, under the ruler's rule. Gated
+  // like the other verb-dependent previews — nothing until a verb is indicated
+  // — and shown at zero too: that a planet cannot score on this node is
+  // determined information, not a blank.
+  const projectedScore =
+    !settled && indicatedVerb && previewPlanet && projection
+      ? {
+          value: scoreBeats(ruler, projection.beats, scoreCharts),
+          color: VALENCE_COLOR[indicatedVerb],
+        }
+      : null;
 
   // Ambient combust warnings (choice-independent, afflict turns only):
   // self — candidates that combust if they catch the incoming blow;
@@ -343,6 +363,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         entry: committed.log,
         previousRun,
         previousEncounter,
+        playerChart: prince.chart,
         projectedDeltas: projectionSnapshot,
       });
       setSelected(null);
@@ -385,6 +406,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         entry,
         previousRun: devRun,
         previousEncounter: devEncounter,
+        playerChart: prince.chart,
         projectedDeltas: null,
       });
     },
@@ -502,9 +524,28 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               >
                 {Math.round(displayedRunDistance)}
               </span>
+              {/* What the indicated gesture would add. */}
+              {projectedScore && (
+                <span className="combat-distance-delta" style={{ color: projectedScore.color }}>
+                  +{projectedScore.value}
+                </span>
+              )}
+            </span>
+          </div>
+          {/* The planet that rules this encounter — the colour its node carried
+              on the map, named here because it now also sets the rule below. */}
+          <div className="combat-ruler">
+            <span className="eyebrow">RULER</span>
+            <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
+              {ruler}
             </span>
           </div>
         </div>
+        {/* The rule, constant for the whole encounter: a caption on the numbers
+            above rather than a second announce line. */}
+        <p className="combat-rule">
+          <TermText text={`Distance is ${RULER_RULES[ruler].label}.`} />
+        </p>
         {/* One slot for what is happening and what is next: the turn's
             precommit while it is being answered, the way out once it is not.
             The sentence is the caption that teaches the marks — the ring's

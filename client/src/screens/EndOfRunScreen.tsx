@@ -4,9 +4,8 @@ import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { setTheme } from "@/audio/engine";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { RULERSHIP } from "@/game/data";
 import { HOUSES } from "@/data/houses";
-import { seededChart } from "@/game/chart";
+import { chartRuler, seededChart } from "@/game/chart";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
@@ -181,8 +180,7 @@ function terminalRuler(map: MapState): PlanetName | null {
   const content = map.rolledNodes[TERMINAL_NODE_ID];
   if (!content) return null;
   if (content.kind === "narrative") return HOUSES[content.house - 1]!.ruler;
-  const chart = seededChart(content.opponentSeed, "");
-  return RULERSHIP[chart.ascendantSign];
+  return chartRuler(seededChart(content.opponentSeed, ""));
 }
 
 function romanNumeral(n: number): string {

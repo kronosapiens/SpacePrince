@@ -248,9 +248,9 @@ export function PlanetStatsPanel({
             <div className="ps-ops">
               {actions && (
                 <div className="ps-actions">
-                  {/* Testify leads: it is the scoring verb (`turnScore` counts only
-                      testimony landed on the other's chart), so it reads as the
-                      default and afflict as the deviation. */}
+                  {/* Testify leads: it is the resolving verb, and the Moon's rule,
+                      so it reads as the default and afflict as the deviation.
+                      Which verb scores is the encounter ruler's to say. */}
                   {(
                     [
                       { v: "Testimony" as Polarity, label: "Testify", value: actions.testify },

@@ -1,7 +1,8 @@
 import { PLANETS } from "./data";
 import { propagatedMagnitude } from "./aspects";
 import { getProjectedPair } from "./combat";
-import { isCombusted, wouldCombust } from "./combust";
+import { combustionCeiling, isCombusted, wouldCombust } from "./combust";
+import type { ScoredBeat } from "./score";
 import type {
   AspectConnection,
   Chart,
@@ -46,9 +47,13 @@ export interface ProjectedEffect {
 export interface ProjectedEffectsBySide {
   self: Partial<Record<PlanetName, ProjectedEffect>>;
   other: Partial<Record<PlanetName, ProjectedEffect>>;
+  /** The same projected turn as scoring beats, in the order `logToBeats` would
+   *  produce for the resolved turn — so the previewed Distance and the awarded
+   *  one are one function (`score.ts` `scoreBeats`). */
+  beats: ScoredBeat[];
 }
 
-const EMPTY: ProjectedEffectsBySide = { self: {}, other: {} };
+const EMPTY: ProjectedEffectsBySide = { self: {}, other: {}, beats: [] };
 
 function flipPolarity(p: Polarity): Polarity {
   return p === "Testimony" ? "Affliction" : "Testimony";
@@ -59,21 +64,30 @@ interface InProgress {
   polarity: Polarity;
 }
 
+/** Applies one blow and returns the magnitude that actually landed. Bounded on
+ *  both sides, as the resolver's `applyEffect` is (MECHANICS §8, §10): testimony
+ *  clamps at zero, affliction caps at the ceiling — so a finishing blow projects
+ *  only the remainder, and a projected beat pays what the turn will award. */
 function applyMag(
   side: SideState,
+  chart: Chart,
   out: Partial<Record<PlanetName, InProgress>>,
   target: PlanetName,
   polarity: Polarity,
   magnitude: number,
-) {
+): number {
   // Callers guard combusted targets (they hold the placements this check needs).
   const state = side[target];
-  if (!state || magnitude <= 0) return;
+  if (!state || magnitude <= 0) return 0;
+  const ceiling = combustionCeiling(chart.planets[target]);
   const existing = out[target];
   const current = existing?.finalValue ?? state.affliction;
   const next =
-    polarity === "Testimony" ? Math.max(0, current - magnitude) : current + magnitude;
+    polarity === "Testimony"
+      ? Math.max(0, current - magnitude)
+      : Math.min(ceiling, current + magnitude);
   out[target] = { finalValue: next, polarity };
+  return Math.abs(next - current);
 }
 
 function round2(v: number): number {
@@ -121,6 +135,23 @@ export function computeProjectedEffects(
 
   const selfFinal: Partial<Record<PlanetName, InProgress>> = {};
   const otherFinal: Partial<Record<PlanetName, InProgress>> = {};
+  const beats: ScoredBeat[] = [];
+
+  // A hop that carries its target to the ceiling combusts it, and the combust
+  // beat follows its hit — the order `propagate` logs the pair in (`turn.ts`).
+  const hopBeats = (
+    side: "self" | "other",
+    chart: Chart,
+    final: Partial<Record<PlanetName, InProgress>>,
+    target: PlanetName,
+    polarity: Polarity,
+    magnitude: number,
+  ) => {
+    beats.push({ kind: "hit", side, target, polarity, magnitude, channel: "propagated" });
+    if ((final[target]?.finalValue ?? 0) >= combustionCeiling(chart.planets[target])) {
+      beats.push({ kind: "combust", side, target });
+    }
+  };
 
   // Phase 1 — the player's action on the opponent's chart. Combustion resolves
   // before propagation (MECHANICS §9): a blow that combusts the actor it lands
@@ -132,24 +163,41 @@ export function computeProjectedEffects(
       opponentState[opponentPlanet],
       projected.playerToOpponent,
     );
-  applyMag(opponentState, otherFinal, opponentPlanet, playerValence, projected.playerToOpponent);
+  const direct = applyMag(
+    opponentState, opponentChart, otherFinal,
+    opponentPlanet, playerValence, projected.playerToOpponent,
+  );
+  beats.push({
+    kind: "hit", side: "other", target: opponentPlanet,
+    polarity: playerValence, magnitude: direct, channel: "direct",
+  });
   if (!preempts && projected.playerToOpponent > 0) {
     for (const a of opponentAspects) {
       if (a.from !== opponentPlanet) continue;
       if (!roster.includes(a.to)) continue;
       if (isCombusted(opponentChart.planets[a.to], opponentState[a.to])) continue;
       const mag = propagatedMagnitude(projected.playerToOpponent, a);
+      if (mag <= 0) continue;
       const polarity = a.num < 0 ? flipPolarity(playerValence) : playerValence;
-      applyMag(opponentState, otherFinal, a.to, polarity, mag);
+      const applied = applyMag(opponentState, opponentChart, otherFinal, a.to, polarity, mag);
+      hopBeats("other", opponentChart, otherFinal, a.to, polarity, applied);
     }
   }
+  // The actor's own ripple plays after the hops, as the resolver logs it.
+  if (preempts) beats.push({ kind: "combust", side: "other", target: opponentPlanet });
 
   // Phase 2 — the opponent's reply on the player's chart, read after phase 1
   // (MECHANICS §6): combusting the opponent's actor preempts it entirely.
   // The same §9 short-circuit applies on this side — a catcher combusted by
   // the blow spares its neighbours the ripple.
   const incoming = modelPreemption && preempts ? 0 : projected.opponentToPlayer;
-  applyMag(playerState, selfFinal, playerPlanet, opponentValence, incoming);
+  const caught = applyMag(
+    playerState, playerChart, selfFinal, playerPlanet, opponentValence, incoming,
+  );
+  beats.push({
+    kind: "hit", side: "self", target: playerPlanet,
+    polarity: opponentValence, magnitude: caught, channel: "direct",
+  });
   const catcherCombusts =
     opponentValence === "Affliction" &&
     wouldCombust(playerChart.planets[playerPlanet], playerState[playerPlanet], incoming);
@@ -159,10 +207,17 @@ export function computeProjectedEffects(
       if (!roster.includes(a.to)) continue;
       if (isCombusted(playerChart.planets[a.to], playerState[a.to])) continue;
       const mag = propagatedMagnitude(incoming, a);
+      if (mag <= 0) continue;
       const polarity = a.num < 0 ? flipPolarity(opponentValence) : opponentValence;
-      applyMag(playerState, selfFinal, a.to, polarity, mag);
+      const applied = applyMag(playerState, playerChart, selfFinal, a.to, polarity, mag);
+      hopBeats("self", playerChart, selfFinal, a.to, polarity, applied);
     }
   }
+  if (catcherCombusts) beats.push({ kind: "combust", side: "self", target: playerPlanet });
 
-  return { self: toEffects(selfFinal, playerState), other: toEffects(otherFinal, opponentState) };
+  return {
+    self: toEffects(selfFinal, playerState),
+    other: toEffects(otherFinal, opponentState),
+    beats,
+  };
 }

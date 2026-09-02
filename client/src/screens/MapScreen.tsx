@@ -13,14 +13,13 @@ import { mulberry32, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
 import { ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { RULERSHIP } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
 import { pickScenario } from "@/data/narrative-trees";
-import { seededChart } from "@/game/chart";
+import { chartRuler, seededChart } from "@/game/chart";
 import type {
   EncounterState,
   MapState,
@@ -47,10 +46,10 @@ export function MapScreen() {
 
   // The score: on the map you hear yourself — the Prince's own chart ruler,
   // at the down mix (MUSIC.md: theme by planet, variant by surface).
-  const chartRuler = prince ? RULERSHIP[prince.chart.ascendantSign] : null;
+  const princeRuler = prince ? chartRuler(prince.chart) : null;
   useEffect(() => {
-    if (chartRuler) setTheme(chartRuler, "map");
-  }, [chartRuler]);
+    if (princeRuler) setTheme(princeRuler, "map");
+  }, [princeRuler]);
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(
@@ -222,6 +221,5 @@ function rulerOf(map: MapState, nodeId: string | undefined): PlanetName | null {
   const content = map.rolledNodes[nodeId];
   if (!content) return null;
   if (content.kind === "narrative") return HOUSES[content.house - 1]!.ruler;
-  const chart = seededChart(content.opponentSeed, "");
-  return RULERSHIP[chart.ascendantSign];
+  return chartRuler(seededChart(content.opponentSeed, ""));
 }
