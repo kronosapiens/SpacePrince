@@ -190,6 +190,7 @@ Rules:
 - negative multipliers invert the valence (`Affliction <-> Testimony`)
 - propagation applies the same integer effect model as direct effects
 - combusted targets are skipped
+- unfielded targets are skipped — only the roster conducts (§11.1)
 - combustion resolves before propagation: if the blow combusts the planet it lands on, that planet conducts nothing onward — propagation is short-circuited, not computed then negated
 
 ## 10. Combustion
@@ -264,6 +265,7 @@ Encounter *length* rides the run instead: skirmishes while the chart is clean, f
 The length ramp is also a curriculum for the two-beat (§12): map 1 teaches cashing spawn affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
 On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
 Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
+Only fielded planets conduct: propagation (§9) ripples through the roster's aspect web alone, so an unfielded planet takes nothing, passes nothing on, and scores nothing — the web the game resolves is the web the chart draws.
 Rejected: fixed 3-turn encounters — the final turn made afflict-for-setup dead and the spawn pool was too deep to drain in three turns, so the first and last turns were near-forced and the build beat never became necessary; and three random draws could meet at most three planets of a seven-planet roster.
 
 Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.

@@ -23,6 +23,10 @@ export interface ComputeProjectedEffectsInput {
   opponentState: SideState;
   playerAspects: AspectConnection[];
   opponentAspects: AspectConnection[];
+  /** The fielded planets — one roster serves both charts, since the opponent's
+   *  mirrors the player's unlock tier (MECHANICS §11.1). Only these conduct
+   *  propagation, as in the resolver (`turn.ts`). */
+  roster: PlanetName[];
   /** Model the phase-order preemption (MECHANICS §6): an afflict that combusts
    *  the opponent's actor zeroes its reply. Default true — the exact resolved
    *  future, for the panel and the commit snapshot. Bare hover passes false:
@@ -101,7 +105,7 @@ export function computeProjectedEffects(
   const {
     playerChart, opponentChart, playerPlanet, opponentPlanet,
     playerValence, opponentValence,
-    playerState, opponentState, playerAspects, opponentAspects,
+    playerState, opponentState, playerAspects, opponentAspects, roster,
     modelPreemption = true,
   } = input;
   if (
@@ -132,6 +136,7 @@ export function computeProjectedEffects(
   if (!preempts && projected.playerToOpponent > 0) {
     for (const a of opponentAspects) {
       if (a.from !== opponentPlanet) continue;
+      if (!roster.includes(a.to)) continue;
       if (isCombusted(opponentChart.planets[a.to], opponentState[a.to])) continue;
       const mag = propagatedMagnitude(projected.playerToOpponent, a);
       const polarity = a.num < 0 ? flipPolarity(playerValence) : playerValence;
@@ -151,6 +156,7 @@ export function computeProjectedEffects(
   if (incoming > 0 && !catcherCombusts) {
     for (const a of playerAspects) {
       if (a.from !== playerPlanet) continue;
+      if (!roster.includes(a.to)) continue;
       if (isCombusted(playerChart.planets[a.to], playerState[a.to])) continue;
       const mag = propagatedMagnitude(incoming, a);
       const polarity = a.num < 0 ? flipPolarity(opponentValence) : opponentValence;

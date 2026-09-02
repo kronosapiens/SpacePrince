@@ -184,9 +184,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       opponentState: encounter.opponentState,
       playerAspects,
       opponentAspects,
+      roster: encounter.roster,
       modelPreemption: !!indicatedVerb,
     });
-  }, [animation, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, prince.chart]);
+  }, [animation, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, encounter.roster, prince.chart]);
 
   // Ambient combust warnings (choice-independent, afflict turns only):
   // self — candidates that combust if they catch the incoming blow;
@@ -334,6 +335,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         opponentState: encounter.opponentState,
         playerAspects: getAspects(prince.chart),
         opponentAspects: getAspects(encounter.opponentChart),
+        roster: encounter.roster,
       });
       const committed = onCommitTurn(planet, action, rng);
       if (!committed) return;

@@ -59,7 +59,7 @@ export function resolveTurn(
     : getEffectiveStatsFromPlacement(playerPlacement);
   const phase1 = resolveAction(
     playerEff, playerValence,
-    opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other",
+    opponentStateMap, enc.opponentChart, opponentPlanet, opponentPlacement, "other", enc.roster,
   );
 
   const opponentEff = isCombusted(opponentPlacement, opponentStateMap[opponentPlanet])
@@ -67,7 +67,7 @@ export function resolveTurn(
     : getEffectiveStatsFromPlacement(opponentPlacement);
   const phase2 = resolveAction(
     opponentEff, opponentValence,
-    playerStateMap, playerChart, playerPlanet, playerPlacement, "self",
+    playerStateMap, playerChart, playerPlanet, playerPlacement, "self", enc.roster,
   );
 
   const opponentDelta = phase1.delta;
@@ -152,7 +152,9 @@ export function resolveTurn(
 /**
  * Resolves one side's action against the other. Fully deterministic — no rolls
  * (MECHANICS §7). The acting planet's stats (`attackerEff`) set the magnitude;
- * the effect lands on `side`'s active planet and propagates through `chart`.
+ * the effect lands on `side`'s active planet and propagates through the fielded
+ * planets of `chart` — one `roster` serves both charts, since the opponent's
+ * mirrors the player's unlock tier (MECHANICS §11.1).
  * The same per-direction base stat the projection preview uses (combat.ts
  * `computeDirectExchange`), so they don't drift. Sequenced by the caller —
  * phase 1 (your action) before phase 2 (theirs).
@@ -165,6 +167,7 @@ function resolveAction(
   active: PlanetName,
   placement: PlanetPlacement,
   sideTag: "self" | "other",
+  roster: PlanetName[],
 ) {
   const amount = directAmount(attackerEff, valence);
   const wasCombusted = isCombusted(placement, side[active]);
@@ -174,7 +177,7 @@ function resolveAction(
   // Combustion is resolved before propagation: a planet destroyed by the blow
   // can't conduct it onward, so `propagate`'s combusted guard short-circuits.
   const combust = !wasCombusted && isCombusted(placement, side[active]);
-  const propagation = propagate(side, chart, active, valence, amount, sideTag);
+  const propagation = propagate(side, chart, active, valence, amount, sideTag, roster);
   return { amount, delta, combust, propagation };
 }
 
@@ -202,6 +205,7 @@ function propagate(
   polarity: Polarity,
   amount: number,
   sideTag: "self" | "other",
+  roster: PlanetName[],
 ): PropagationEntry[] {
   if (amount <= 0) return [];
   if (isCombusted(chart.planets[active], side[active])) return [];
@@ -209,6 +213,10 @@ function propagate(
   if (aspects.length === 0) return [];
   const out: PropagationEntry[] = [];
   for (const a of aspects) {
+    // Only fielded planets conduct (MECHANICS §11.1): the roster is what is
+    // sent and drawn solid, and the chart draws its aspect web among the
+    // roster alone. A ghost takes nothing and passes nothing on.
+    if (!roster.includes(a.to)) continue;
     const target = side[a.to];
     const targetPlacement = chart.planets[a.to];
     if (isCombusted(targetPlacement, target)) continue;
