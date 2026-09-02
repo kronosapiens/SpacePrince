@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
 import { playCombust, playPropagation, playVerb } from "@/audio/engine";
+import { encounterRuler } from "@/game/encounter";
+import { beatScore, type ScoreCharts, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
 import type {
+  Chart,
   CombatEncounter,
   PlanetName,
   Polarity,
@@ -107,6 +110,9 @@ export interface CombatAnimationApi {
     entry: TurnLogEntry;
     previousRun: Run;
     previousEncounter: CombatEncounter;
+    /** The player's chart — the scorer needs both charts, since a ruler whose
+     *  rule reaches your side pays a combust its ceiling (`score.ts`). */
+    playerChart: Chart;
     projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   }): void;
   /** Snap to final state and clear all scheduled timeouts. */
@@ -136,12 +142,14 @@ export function useCombatAnimation(): CombatAnimationApi {
       entry: TurnLogEntry;
       previousRun: Run;
       previousEncounter: CombatEncounter;
+      playerChart: Chart;
       projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
     }) => {
       runScheduler({
         entry: args.entry,
         previousRun: args.previousRun,
         previousEncounter: args.previousEncounter,
+        playerChart: args.playerChart,
         projectedDeltas: args.projectedDeltas ?? null,
         setAnimation,
         timeoutIds,
@@ -208,6 +216,7 @@ function runScheduler(args: {
   entry: TurnLogEntry;
   previousRun: Run;
   previousEncounter: CombatEncounter;
+  playerChart: Chart;
   projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   setAnimation: (
     update:
@@ -217,9 +226,23 @@ function runScheduler(args: {
   ) => void;
   timeoutIds: { current: number[] };
 }) {
-  const { entry, previousRun, previousEncounter, projectedDeltas, setAnimation, timeoutIds } = args;
+  const { entry, previousRun, previousEncounter, playerChart, projectedDeltas, setAnimation, timeoutIds } = args;
   timeoutIds.current.forEach((id) => window.clearTimeout(id));
   timeoutIds.current = [];
+
+  // Distance ticks per beat under the encounter's ruler, so the running number
+  // climbs by exactly what the turn awards and never snaps at the end. The
+  // beats ticked below are the ones `logToBeats` walks — same fields, same
+  // order, which is the order of record — so they sum to `entry.turnScore`.
+  const ruler = encounterRuler(previousEncounter);
+  const charts: ScoreCharts = { self: playerChart, other: previousEncounter.opponentChart };
+  const tick = (state: CombatAnimationState, beat: ScoredBeat) => {
+    const gain = beatScore(ruler, beat, charts);
+    if (gain <= 0) return;
+    state.runningDistance += gain;
+    state.distanceFlashEpoch += 1;
+    state.distanceFlashPlanet = beat.target;
+  };
 
   const updateAnimation = (
     fn: (state: CombatAnimationState) => CombatAnimationState,
@@ -272,12 +295,9 @@ function runScheduler(args: {
     attackerPlanet: PlanetName;
     actionCombust: boolean;
     sign: number;
-    /** Distance resolved by this phase's direct hit (only testimony scores).
-     *  Added when the primary lands, so the number ticks with the impact. */
-    actionScore: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, attackerPlanet, actionCombust, sign, actionScore, steps } = args;
+    const { base, side, actionPlanet, actionDelta, attackerPlanet, actionCombust, sign, steps } = args;
     const isSelf = side === "self";
     // The action planet receives the opposing valence: sign < 0 means the hit
     // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
@@ -304,11 +324,14 @@ function runScheduler(args: {
         const next = cloneAnimation(state);
         if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
         else applyDelta(next.otherState, actionPlanet, actionDelta * sign);
-        if (actionScore > 0) {
-          next.runningDistance += actionScore;
-          next.distanceFlashEpoch += 1;
-          next.distanceFlashPlanet = actionPlanet;
-        }
+        tick(next, {
+          kind: "hit",
+          side,
+          target: actionPlanet,
+          polarity: receivedPolarity,
+          magnitude: actionDelta,
+          channel: "direct",
+        });
         next.actionPulse = isSelf
           ? { ...next.actionPulse, player: actionPlanet }
           : { ...next.actionPulse, opponent: actionPlanet };
@@ -397,16 +420,17 @@ function runScheduler(args: {
               ...next.combustingPlanets,
               [side]: addToFlag(next.combustingPlanets[side], step.target),
             };
+            tick(next, { kind: "combust", side, target: step.target });
           } else {
             applyDelta(targetState, step.target, step.delta);
-            // Propagated testimony resolves affliction (delta stored negative) —
-            // tick the distance with this planet's resolution beat. Only the
-            // opponent's chart scores (§12): self-side heals are survival.
-            if (step.polarity === "Testimony" && !isSelf) {
-              next.runningDistance += Math.abs(step.delta);
-              next.distanceFlashEpoch += 1;
-              next.distanceFlashPlanet = step.target;
-            }
+            tick(next, {
+              kind: "hit",
+              side,
+              target: step.target,
+              polarity: step.polarity,
+              magnitude: Math.abs(step.delta),
+              channel: "propagated",
+            });
             // Bloom only on non-combust hits — a combusting planet gets the
             // ripple instead, not a heal/harm pulse.
             next.impactPlanets = {
@@ -467,6 +491,7 @@ function runScheduler(args: {
             ...next.combustingPlanets,
             [side]: addToFlag(next.combustingPlanets[side], actionPlanet),
           };
+          tick(next, { kind: "combust", side, target: actionPlanet });
           return next;
         });
       }, finalPropagationDelay);
@@ -494,12 +519,6 @@ function runScheduler(args: {
   // action landing on it — then your chart, the opponent's reply. Watching the
   // opponent before yourself keeps the two readable and lets a phase-1 combust
   // visibly preempt the phase-2 response.
-  // Direct distance resolved: only your action landing on the opponent's chart
-  // scores (opponent-chart-only Distance, MECHANICS §12; mirrors `turnScore`'s
-  // directResolved so the ticked total lands exactly on the committed run
-  // distance). The opponent's testimony on your chart is survival, not score —
-  // phase 2 ticks nothing.
-  const otherActionScore = entry.playerValence === "Testimony" ? entry.opponentDelta : 0;
 
   // Phase 1: your action lands on the opponent's chart; the attacker is your
   // planet, which lives on the self chart.
@@ -511,7 +530,6 @@ function runScheduler(args: {
     attackerPlanet: entry.playerPlanet,
     actionCombust: entry.opponentCombust ?? false,
     sign: otherSign,
-    actionScore: otherActionScore,
     steps: opponentSteps,
   });
   const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
@@ -525,7 +543,6 @@ function runScheduler(args: {
     attackerPlanet: entry.opponentPlanet,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,
-    actionScore: 0,
     steps: playerSteps,
   });
 

@@ -39,13 +39,13 @@ export interface ScoringRule {
  * Jupiter everything.
  */
 export const RULER_RULES: Record<PlanetName, ScoringRule> = {
-  Moon:    { polarity: "Testimony",  chart: "theirs", channel: "all",        label: "testimony on their chart" },
+  Moon:    { polarity: "Testimony",  chart: "theirs", channel: "all",        label: "testimony on the other's chart" },
   Venus:   { polarity: "Testimony",  chart: "both",   channel: "all",        label: "testimony on both charts" },
-  Mars:    { polarity: "Affliction", chart: "theirs", channel: "all",        label: "affliction on their chart" },
+  Mars:    { polarity: "Affliction", chart: "theirs", channel: "all",        label: "affliction on the other's chart" },
   Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust",    label: "combustion on both charts" },
-  Sun:     { polarity: "either",     chart: "theirs", channel: "direct",     label: "direct hits on their chart" },
-  Mercury: { polarity: "either",     chart: "theirs", channel: "propagated", label: "propagation on their chart" },
-  Jupiter: { polarity: "either",     chart: "theirs", channel: "all",        label: "everything on their chart" },
+  Sun:     { polarity: "either",     chart: "theirs", channel: "direct",     label: "direct hits on the other's chart" },
+  Mercury: { polarity: "either",     chart: "theirs", channel: "propagated", label: "propagation on the other's chart" },
+  Jupiter: { polarity: "either",     chart: "theirs", channel: "all",        label: "everything on the other's chart" },
 };
 
 export interface ScoreCharts {

@@ -596,10 +596,23 @@
   flex-wrap: wrap;
   gap: 6px 36px;
 }
-.combat-turns {
+.combat-turns,
+.combat-ruler {
   display: flex;
   align-items: baseline;
   gap: 12px;
+}
+/* What the number above means here, stated once and constant for the whole
+   encounter — a caption on the readouts, pulled up under them, not a second
+   announce line. */
+.combat-rule {
+  margin: -4px 0 0;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--mist);
+  text-align: center;
 }
 .combat-side {
   display: flex;
@@ -615,15 +628,16 @@
    budget is the viewport less the two `--combat-pad`s (top and bottom border)
    less the chrome the wheel shares its column with:
 
-     93  the TURNS/DISTANCE strip
+     93  the TURNS/DISTANCE/RULER strip
+     26  the rule caption + its gap
      24  the SELF/OTHER label
-      8  the label's gap above     = 125px
+      8  the label's gap above     = 151px
 
    Horizontally there is nothing to compute: `100%` is the grid column, which has
    already had the border taken out of it.
 
    Rejected: sizing the wheel off the grid itself (`minmax(0, 1fr)` row + the svg
-   on `flex: 1` and `aspect-ratio: 1`), which would drop the 125 too. It is right
+   on `flex: 1` and `aspect-ratio: 1`), which would drop the 151 too. It is right
    at every landscape size but the flex height beats the aspect ratio when the
    column is narrower than it is tall — at 1024x1366 the box goes 445x1072.
 
@@ -631,7 +645,7 @@
    and derived from nothing. It was also the only reason the wheel could ever
    come in under its row, which is what stranded the strip above it. */
 .combat-side > svg {
-  width: min(100%, calc(100vh - 125px - 2 * var(--combat-pad)));
+  width: min(100%, calc(100vh - 151px - 2 * var(--combat-pad)));
   height: auto;
 }
 .combat-side-label {
@@ -652,7 +666,8 @@
    languages. Tabular figures so the digits don't jitter as Distance ticks up
    through a resolution wave. */
 .combat-turns-v,
-.combat-distance-v {
+.combat-distance-v,
+.combat-ruler-v {
   font-family: var(--serif);
   font-size: 30px;
   font-weight: 500;
@@ -672,6 +687,14 @@
   position: relative;
   z-index: 1;
   display: inline-block;
+}
+/* The previewed gain, beside the number it would move — verb-coloured, and
+   small enough to read as an annotation on the total rather than a rival to it. */
+.combat-distance-delta {
+  position: relative;
+  z-index: 1;
+  font-size: 0.6em;
+  margin-left: 0.34em;
 }
 /* Gain pulse — a wash behind the number, replayed per resolution beat and
    tinted by the planet resolving on it. */
@@ -972,9 +995,12 @@
   .combat-announce-line { font-size: 19px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
-  .combat-distance { margin-top: 4px; gap: 2px; }
+  .combat-distance,
+  .combat-ruler { margin-top: 4px; gap: 2px; }
   .combat-turns-v,
-  .combat-distance-v { font-size: clamp(18px, 5vw, 22px); }
+  .combat-distance-v,
+  .combat-ruler-v { font-size: clamp(18px, 5vw, 22px); }
+  .combat-rule { font-size: 13px; }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */
