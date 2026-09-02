@@ -1,4 +1,4 @@
-import { blankSideState, seededChart } from "./chart";
+import { blankSideState, chartRuler, seededChart } from "./chart";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { pickWeighted, mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
@@ -11,6 +11,14 @@ import type {
   Run,
   SideState,
 } from "./types";
+
+/** The encounter's ruler — the planet ruling the opponent chart's Ascendant.
+ *  Derived, never stored, and one planet drives three surfaces: the node's
+ *  colour on the map, the combat theme, and the encounter's scoring rule
+ *  (`score.ts` `RULER_RULES`). */
+export function encounterRuler(enc: CombatEncounter): PlanetName {
+  return chartRuler(enc.opponentChart);
+}
 
 /** Combat length is the map number (MECHANICS §11.1): 1 turn on map 1, up to 7
  *  on map 7. Difficulty ramps on two axes — roster via the unlock mirror,

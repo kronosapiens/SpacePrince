@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties, type MouseEvent } from "react";
 import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
-import { seededChart } from "@/game/chart";
-import { RULERSHIP } from "@/game/data";
+import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import type { MapState, PlanetName } from "@/game/types";
@@ -82,8 +81,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const out: Record<string, PlanetName> = {};
     for (const [id, content] of Object.entries(map.rolledNodes)) {
       if (content.kind !== "combat") continue;
-      const chart = seededChart(content.opponentSeed, "");
-      out[id] = RULERSHIP[chart.ascendantSign];
+      out[id] = chartRuler(seededChart(content.opponentSeed, ""));
     }
     return out;
   }, [map.rolledNodes]);

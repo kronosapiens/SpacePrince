@@ -2,6 +2,7 @@ import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./com
 import { getAspects, propagatedMagnitude } from "./aspects";
 import { combustionCeiling, isCombusted } from "./combust";
 import { cloneSideState } from "./chart";
+import { encounterRuler } from "./encounter";
 import { turnScore } from "./score";
 import { pickWeighted } from "./rng";
 import type {
@@ -77,8 +78,6 @@ export function resolveTurn(
   // Opponent's chart (phase 1) before yours (phase 2) — the order the UI replays.
   const propagation = [...phase1.propagation, ...phase2.propagation];
 
-  const score = turnScore(opponentDelta, playerValence, propagation);
-
   const log: TurnLogEntry = {
     id: `turn_${enc.id}_${enc.turnIndex}_${Date.now()}`,
     turnIndex: enc.turnIndex,
@@ -91,8 +90,15 @@ export function resolveTurn(
     playerCombust,
     opponentCombust,
     propagation,
-    turnScore: score,
+    turnScore: 0,
   };
+  // Scored after the log is built: the rule is keyed on the encounter's ruler
+  // and reads the whole turn as beats (`score.ts`), charts included for the
+  // ceilings a combust pays.
+  log.turnScore = turnScore(log, encounterRuler(enc), {
+    self: playerChart,
+    other: enc.opponentChart,
+  });
 
   // Draw the next turn's precommit — planet + verb. This is combat's only
   // randomness (MECHANICS §7): the resolution above is deterministic, and the
@@ -142,7 +148,7 @@ export function resolveTurn(
   const updatedRun: Run = {
     ...run,
     state: playerStateMap,
-    distance: run.distance + score,
+    distance: run.distance + log.turnScore,
     encounter: updatedEnc,
   };
 

@@ -5,8 +5,9 @@ import { PlanetBands } from "@/components/PlanetBands";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
-import { PLANETS, RULERSHIP } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { setTheme } from "@/audio/engine";
+import { encounterRuler } from "@/game/encounter";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
@@ -139,7 +140,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // The score (MUSIC.md): combat plays the opponent's theme at the up mix —
   // the theme follows the encounter's identity (its chart ruler), stable for
   // the whole fight, not the per-turn active planet.
-  const opponentRuler = RULERSHIP[encounter.opponentChart.ascendantSign];
+  const opponentRuler = encounterRuler(encounter);
   useEffect(() => {
     setTheme(opponentRuler, "combat");
   }, [opponentRuler]);

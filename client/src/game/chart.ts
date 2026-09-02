@@ -22,6 +22,11 @@ import type {
   SignName,
 } from "./types";
 
+/** The chart's ruler — the planet ruling its Ascendant sign. */
+export function chartRuler(chart: Chart): PlanetName {
+  return RULERSHIP[chart.ascendantSign];
+}
+
 export function getDignity(planet: PlanetName, sign: SignName): Dignity {
   if (RULERSHIP[sign] === planet) return "Domicile";
   const exalted = EXALTATIONS[planet];
