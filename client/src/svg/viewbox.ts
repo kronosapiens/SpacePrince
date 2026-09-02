@@ -51,6 +51,11 @@ export const ACTIVE_HALO_R = INTERACTION_RING_R * 2;
  *  edge. Only one planet is ever acting, so unlike the arc and the ring the
  *  corona is exempt from the cluster budget above and may overlap neighbours. */
 export const CORONA_INNER_R = INTERACTION_RING_R + 6;
+/** Ring spacing of the incoming mark — the magnitude arriving at the chart,
+ *  one ring per 12 points filling inward from the interaction ring. The direct
+ *  amount is a stat, so it is on the 12-lattice and caps at 48 + 12 + 12 = 72:
+ *  six rings, the sixth one pitch from the centre. */
+export const INCOMING_RING_PITCH = INTERACTION_RING_R / 6;
 /** Screen angle of the combustion line — 6 o'clock, so every planet's arc
  *  descends into the same point as it dies. Degrees are math-convention
  *  (0 = 3 o'clock, increasing counterclockwise), matching `polar` in Chart.tsx

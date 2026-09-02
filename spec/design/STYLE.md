@@ -163,7 +163,9 @@ Rejected: an annular **wash** under the streamers — a gradient ring, transpare
 
 Rejected: colouring the acting planet's *halo* by verb instead. Identity has to live somewhere, and recolouring the bloom takes it away at the moment the planet is most prominent — and it fails outright where the verb and the planet share a hue (Saturn with violet is 16° apart, Sun with amber 15°).
 
-**The incoming mark.** The same corona again, at the wheel's centre, around the magnitude arriving rather than around a planet, with the interaction ring but no halo.
+**The incoming mark.** The same corona again, at the wheel's centre, around the magnitude arriving rather than around a planet, with no halo.
+The magnitude is a count of rings, one per 12 points, filling inward from the interaction ring's radius: a 12 is the bare ring and a 72 fills the disc.
+The outer ring is fixed, so the mark keeps one footprint whatever arrives and its density is the magnitude.
 It sits at the centre because until the player commits the blow has no target — `resolveTurn` lands it on whichever planet is sent — so "60 of testimony is coming" is a fact about the whole chart and not about anything in it.
 That is one rule rather than two: the corona is the verb wherever it appears, the source when it surrounds a disc and the destination when it surrounds nothing, and no planet ever sits at the centre for the two readings to collide.
 Both charts carry it, on different clocks.

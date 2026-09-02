@@ -12,7 +12,7 @@ import { PropagationLine } from "@/components/PropagationLine";
 import {
   AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_SIZE,
-  CORONA_INNER_R,
+  CORONA_INNER_R, INCOMING_RING_PITCH,
   INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
   PLANET_R_ACTIVE, PLANET_R_REST,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
@@ -873,39 +873,39 @@ function PlanetCorona({ verb }: { verb: Polarity }) {
 }
 
 /**
- * The incoming mark — the corona again, at the wheel's centre, with the
- * magnitude inside it: the corona is the verb wherever it is, the source around
- * a disc and the destination around nothing. Exempt from the cluster budget for
- * the same reason the corona is — only one blow is in flight, and the nearest
- * planets are at radius 95.
+ * The incoming mark — the corona again, at the wheel's centre, around the
+ * magnitude rather than around a planet: the corona is the verb wherever it is,
+ * the source around a disc and the destination around nothing. Exempt from the
+ * cluster budget for the same reason the corona is — only one blow is in
+ * flight, and the nearest planets are at radius 95.
  *
- * The number is Word layer (STYLE.md §9), the same layer the sign labels around
- * the rim sit on. It carries the magnitude through resolution, when the panel
- * has closed at commit and its Testify/Afflict button — the only other place
- * your own outgoing figure is written — has gone with it.
+ * The magnitude is a count of rings, one per 12 points, filling inward from
+ * the interaction ring's radius: a 12 is the bare ring, a 72 fills the disc.
+ * The outer ring is fixed, so the mark keeps one footprint and the corona one
+ * seat whatever arrives — density is the magnitude, not size. Rejected: a
+ * fixed pitch, rings growing outward with the corona riding the outermost. It
+ * counts more cleanly past four rings, but a 72 afflict reaches the planet
+ * band.
+ *
+ * It carries the magnitude through resolution, when the panel has closed at
+ * commit and its Testify/Afflict button — the only other place your own
+ * outgoing figure is stated — has gone with it.
  */
 function IncomingMark({ verb, amount }: { verb: Polarity; amount: number }) {
-  const { fontSize, opacity } = CHART_STYLE.incoming;
   const c = VALENCE_COLOR[verb];
+  const rings = amount / 12;
   return (
     <g transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} style={{ pointerEvents: "none" }}>
       <PlanetCorona verb={verb} />
       {/* Steady, never breathing: the mark is not tappable and never will be,
           and steady is already the ring's reading for a settled thing. */}
-      <circle r={INTERACTION_RING_R} fill="none"
-        stroke={c} strokeWidth={CHART_STYLE.interactionRing.stroke}
+      <g fill="none" stroke={c} strokeWidth={CHART_STYLE.interactionRing.stroke}
         className="invite-ring"
-        style={{ color: c, opacity: CHART_STYLE.interactionRing.steady }} />
-      {/* `middle`, not `central`: the chart's serif (from tokens.css) has
-          old-style figures, whose digits sit on the x-height rather than
-          filling the em box — `central` centres the box and drops them 6–12
-          units low. `middle` is defined as half the x-height above the
-          baseline, which is where they actually are. */}
-      <text textAnchor="middle" dominantBaseline="middle"
-        fontSize={fontSize} fill={c} fillOpacity={opacity} fontWeight={600}
-        style={{ userSelect: "none" }}>
-        {amount}
-      </text>
+        style={{ color: c, opacity: CHART_STYLE.interactionRing.steady }}>
+        {Array.from({ length: rings }, (_, i) => (
+          <circle key={i} r={INTERACTION_RING_R - i * INCOMING_RING_PITCH} />
+        ))}
+      </g>
     </g>
   );
 }
