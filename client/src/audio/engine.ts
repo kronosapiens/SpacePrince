@@ -264,25 +264,6 @@ export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeS
 }
 
 /**
- * A narrative outcome landing (EncounterNarrative): relief resolves — a rising fourth
- * home — while harm hangs on a minor second. No ruler out here, so it sounds on
- * the shared D rather than at a degree.
- */
-export function playPropagation(inverted: boolean): void {
-  if (!T || !soundOn) return;
-  const fx = fxSynth();
-  if (!fx) return;
-  const now = T.now();
-  if (inverted) {
-    fx.triggerAttackRelease(midiToFreq(74), 0.5, now, 0.24); // D5
-    fx.triggerAttackRelease(midiToFreq(75), 0.55, now + 0.02, 0.2); // E♭5 against it, held
-  } else {
-    fx.triggerAttackRelease(midiToFreq(69), 0.15, now, 0.24); // A4
-    fx.triggerAttackRelease(midiToFreq(74), 0.35, now + 0.12, 0.22); // → D5, home
-  }
-}
-
-/**
  * Combustion: the planet's signature cut off mid-phrase (VIBES.md — "its tonal
  * signature cuts off mid-phrase... like a candle going out"), masked by a
  * short pink-noise breath.
