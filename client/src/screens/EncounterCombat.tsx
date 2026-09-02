@@ -1,6 +1,7 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { HelpButton } from "@/components/HelpButton";
+import { PlanetBands } from "@/components/PlanetBands";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
@@ -115,6 +116,16 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const mergingPlayer = animation?.mergingPlanets.self ?? EMPTY_PLANET_SET;
   const mergingOpponent = animation?.mergingPlanets.other ?? EMPTY_PLANET_SET;
   const animationEpoch = animation?.epoch ?? encounter.turnIndex;
+  // The edge bands' bright level: every planet taking an effect on this beat,
+  // whether it blooms (impact) or combusts (ripple).
+  const struckSelf = useMemo(
+    () => new Set([...impactPlayer.keys(), ...combustingPlayer]),
+    [impactPlayer, combustingPlayer],
+  );
+  const struckOther = useMemo(
+    () => new Set([...impactOpponent.keys(), ...combustingOpponent]),
+    [impactOpponent, combustingOpponent],
+  );
 
   useEffect(() => {
     setActive(displayOpponentTurn);
@@ -417,6 +428,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   return (
     <div className="combat" onClick={handleClearSelection}>
+      {/* The mint's bands, struck per resolution beat — self down the left edge,
+          other down the right, matching the two charts. */}
+      <PlanetBands className="combat-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
+      <PlanetBands className="combat-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
       <HelpButton screen="combat" />
       {/* Run- and encounter-level state, lifted out of the centre column so the
           two charts can have the room. Nothing here is chart data — Distance is

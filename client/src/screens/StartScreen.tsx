@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { CityPicker } from "@/components/CityPicker";
+import { PlanetBands } from "@/components/PlanetBands";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
@@ -155,22 +156,20 @@ export function StartScreen() {
 
   const showCeremony = stage === "revealing" || stage === "settled";
 
+  // The bands fill in step with the reveal: everything painted so far rests
+  // dim, the planet arriving sits bright.
+  const bandsOn = useMemo(
+    () => new Set(showCeremony ? MACROBIAN_ORDER.slice(0, revealedCount) : []),
+    [showCeremony, revealedCount],
+  );
+  const bandsCurrent = useMemo(
+    () => new Set(stage === "revealing" && currentRevealing ? [currentRevealing] : []),
+    [stage, currentRevealing],
+  );
+
   return (
     <div className="mint-screen">
-      {/* Macrobian rainbow bands on the left edge */}
-      <div className="mint-bands">
-        {MACROBIAN_ORDER.map((p, i) => {
-          const isOn = stage === "revealing" || stage === "settled" ? i < revealedCount : false;
-          const isCurrent = stage === "revealing" && i === revealedCount - 1;
-          return (
-            <div
-              key={p}
-              className={`mint-band ${isOn ? "is-on" : ""} ${isCurrent ? "is-current" : ""}`}
-              style={{ background: PLANET_PRIMARY[p] }}
-            />
-          );
-        })}
-      </div>
+      <PlanetBands on={bandsOn} current={bandsCurrent} />
 
       <div className="mint-center">
         {stage === "framing" && (

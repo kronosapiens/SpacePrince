@@ -153,6 +153,24 @@
   text-align: center;
 }
 
+/* ── Planet bands ──────────────────────────────────────────────────────── */
+
+/* Shared by the mint (in flow, down the left edge) and the encounter (fixed on
+   both edges — see `.combat-bands`). `.is-current` follows `.is-on` so the
+   bright level wins at equal specificity. */
+.planet-bands {
+  width: 22px;
+  display: flex;
+  flex-direction: column;
+}
+.planet-band {
+  flex: 1;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+.planet-band.is-on { opacity: 0.35; }
+.planet-band.is-current { opacity: 0.85; }
+
 /* ── Mint ──────────────────────────────────────────────────────────────── */
 
 .mint-screen {
@@ -161,18 +179,6 @@
   min-height: 100vh;
   display: flex;
 }
-.mint-bands {
-  width: 22px;
-  display: flex;
-  flex-direction: column;
-}
-.mint-band {
-  flex: 1;
-  opacity: 0;
-  transition: opacity 1200ms ease;
-}
-.mint-band.is-on { opacity: 0.35; }
-.mint-band.is-current { opacity: 0.85; }
 
 .mint-center {
   flex: 1;
@@ -535,6 +541,20 @@
   padding: var(--combat-pad);
   gap: 0;
 }
+/* The mint's bands, struck as piano keys: one column per chart on its own
+   viewport edge (self left, other right). Each planet's band lights the beat
+   it takes an effect and settles dim for the rest of the wave. A key strike
+   wants a near-instant attack; the release is the shared 1200ms fade. Fixed
+   inside the border, so nothing in the grid moves. */
+.combat-bands {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.combat-bands.is-self  { left: 0; }
+.combat-bands.is-other { right: 0; }
+.combat-bands .planet-band.is-current { transition-duration: 80ms; }
 /* Run + encounter state, spanning both wheels. A row rather than an absolute
    overlay, so the mobile stack needs no separate positioning. */
 /* Baseline-aligned: both groups lead with an eyebrow, and those two words are
@@ -944,6 +964,7 @@
     padding: 12px 12px;
     gap: 8px;
   }
+  .combat-bands { width: 8px; }
   /* The row-gap only matters if the two groups wrap, which the numeral is
      narrow enough to avoid — the doublings track was what needed the width. */
   .combat-topbar { gap: 8px; }
