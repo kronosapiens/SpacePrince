@@ -209,11 +209,14 @@ export const CHART_STYLE = {
     shockwave: { opacity: 0.7, stroke: STROKE_MEDIUM },
   },
 
-  /** Radial-gradient glow ramps (core → mid → transparent edge). */
+  /** Radial-gradient glow ramps (core → mid → transparent edge). Taken down by
+   *  roughly a fifth in one pass, along with the screen tint in tokens.css —
+   *  the ramps were competing with the marks drawn on top of them, the
+   *  affliction arc most of all. */
   glow: {
-    colorField: { core: 0.32, mid: 0.08 },
-    halo: { core: 0.7, mid: 0.18 },
-    valence: { core: 0.9, mid: 0.34 },
+    colorField: { core: 0.25, mid: 0.06 },
+    halo: { core: 0.55, mid: 0.15 },
+    valence: { core: 0.7, mid: 0.28 },
   },
 
   /** Word — affliction / projection badge pills (gold border on Void fill). */
