@@ -93,7 +93,7 @@ The two configurations are different layouts, not modes of one layout. An earlie
 
 - **Left half:** the player's chart, drawn per `STYLE.md §11`.
 - **Right half:** the opposing NPC chart, drawn with the same chart visual language. See §3.4.
-- **Top strip:** run and encounter state — Distance and the turn cadence — spanning both charts. Chrome rules per §3.7.
+- **Top strip:** run and encounter state — Distance, the turn cadence, and the encounter's ruler with its scoring rule — spanning both charts. Chrome rules per §3.7.
 
 The two charts face each other as equals. There is no visual differentiation between "yours" and "theirs" beyond their position.
 
@@ -300,6 +300,9 @@ The encounter screen is allowed restrained, functional chrome where it does nece
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early — every opposing planet combust before the sequence runs out — reads *2 / 3* rather than *3 / 3*.
   It is not swapped for an outcome word at the settle, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
   Set in the same face and size as the Distance numeral beside it, on the same baseline.
+- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in the strip in its own colour — the colour its node had on the map — with one caption beneath the readouts stating what earns Distance here (*Distance is affliction on the other's chart.*).
+  The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
+  While a verb is indicated for a previewed planet, the Distance numeral carries the projected gain for that move in the verb's colour, computed by the same function that will award it (`MECHANICS.md §12`) — verb-dependent information, so it appears only once a verb is indicated (§3.6), and it shows `+0` plainly on a node the planet cannot score on.
 
   Rejected: a row of dots, one per turn, filled to the current position and ringed on it.
   They separated three states where the fraction has two — spent, current, remaining — but at three turns that bought little, and it cost the strip a second visual language: pips carry no baseline of their own, so they could not sit with the type beside them and needed their own alignment rule.

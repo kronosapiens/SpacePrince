@@ -121,6 +121,40 @@ The music's emotional arc as the chart fills in is built into the unlock schedul
 
 ---
 
+## The strike grid — one mode per encounter, a degree per planet
+
+Every combat encounter has a ruler (`MECHANICS.md §11`), and the combat score already plays the ruler's theme, so the encounter sits in one mode from its first turn to its last.
+The resolution strikes ring in that same mode: every beat that strikes a planet — the direct hit, each propagation hop, each combust — sounds that planet's **degree** in the ruler's mode, on the shared D.
+It is the same set of beats that lights the edge bands, so band and note are one event, the key struck.
+
+Each planet's degree is where its mode starts in the shared collection — the seven modes are the seven rotations of one set of notes, Ionian from the first, Dorian from the second, through Locrian from the seventh.
+So the degree comes with the mode, chosen by nobody: Sun 1, Mercury 2, Mars 3, Jupiter 4, Venus 5, Moon 6, Saturn 7.
+This reads the cohesion model column-wise: the parallel modes on D give the rows, the relative rotation gives the columns.
+
+| Ruler's mode | Sun | Mercury | Mars | Jupiter | Venus | Moon | Saturn |
+|---|---|---|---|---|---|---|---|
+| Jupiter, Lydian | D | E | F♯ | G♯ | A | B | C♯ |
+| Sun, Ionian | D | E | F♯ | G | A | B | C♯ |
+| Venus, Mixolydian | D | E | F♯ | G | A | B | C |
+| Mercury, Dorian | D | E | F | G | A | B | C |
+| Moon, Aeolian | D | E | F | G | A | B♭ | C |
+| Mars, Phrygian | D | E♭ | F | G | A | B♭ | C |
+| Saturn, Locrian | D | E♭ | F | G | A♭ | B♭ | C |
+
+Each row down the brightness ladder flattens one more degree, and the astrology falls out unforced: the Sun never bends; Venus's fifth holds under every mode but Saturn's; Jupiter's fourth is raised only in his own row; Mars's third is major under the three bright rulers and minor under the four dark; Saturn sits on the seventh, the degree that wants to resolve to the Sun.
+A propagation wave sounds as a chord inside the ruler's mode, chosen by the aspect web.
+
+The hop grammar survives around the target's note: a harmonious hop approaches it from a fourth below and lands; an inverted hop holds a minor second against it.
+The acting planet's signature still speaks at the verb landing, on top of the target's note, so striker and struck are both audible.
+Combust keeps the cut signature and the breath.
+Register follows the signature plan above — each planet's degree sounds in the octave its signature owns, Saturn on the floor, Mercury on top.
+Music is opt-in while sound is on by default, so the strikes must read alone, and a melody of degrees over silence does.
+
+Caveat: the column assignment assumes the diatonic set.
+If a planet ever takes harmonic minor, its row still works — any seven-note scale has seven degrees — but its degree can no longer be derived and is kept by choice.
+
+---
+
 ## Architecture — jukebox now, layered later
 
 There are two sonic layers, and this doc has so far described only one.
