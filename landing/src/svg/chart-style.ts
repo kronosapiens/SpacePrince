@@ -63,7 +63,7 @@ export const CHART_STYLE = {
 
   /** Radial-gradient glow ramps (core → mid → transparent edge). */
   glow: {
-    colorField: { core: 0.32, mid: 0.08 },
-    halo: { core: 0.7, mid: 0.18 },
+    colorField: { core: 0.16, mid: 0.04 },
+    halo: { core: 0.35, mid: 0.09 },
   },
 } as const;
