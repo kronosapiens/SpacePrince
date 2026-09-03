@@ -530,12 +530,16 @@
    top edge. */
 .combat {
   --combat-pad: 48px;
+  /* How far the strip reaches down into the wheels' boxes: the sentence's
+     slot and its gap (66 + 12), so the sentence sits in the V between the two
+     rings and the readouts sit on the boxes' top edge, above the ring tops. */
+  --combat-overlap: 78px;
   position: relative;
   z-index: 1;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   align-content: safe center;
   align-items: center;
   padding: var(--combat-pad);
@@ -561,29 +565,36 @@
    what the eye lines up. Centring instead drifts them apart, because the
    Distance group is as tall as its numeral while the Turns group is only as
    tall as its label. */
+/* The wheel's box is square but the chart is round, so the box's top corners
+   are empty: the strip reaches down into them by `--combat-overlap`, and the
+   sentence sits in the V between the two rings instead of in a band above
+   the boxes. On top of the wheels for the button's sake, but only its
+   children take the pointer — content-sized and centred in the column, they
+   never shadow a planet near the top of a chart. */
 .combat-topbar {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  margin-bottom: calc(-1 * var(--combat-overlap));
+  z-index: 2;
+  pointer-events: none;
 }
+.combat-topbar > * { pointer-events: auto; }
 /* One slot, two occupants — the turn's precommit, then the way out. Its height
    is reserved for the taller of them (the button) so the charts don't shift
-   when the encounter settles. */
+   when the encounter settles; `--combat-overlap` counts it and its gap. */
 .combat-announce {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Reserved at the button's own height, not the sentence's — the slot swaps
-     contents on settle, and anything shorter nudges both charts down when it
-     does. */
   min-height: 66px;
 }
 .combat-announce-line {
   margin: 0;
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: 32px;
   font-style: italic;
   letter-spacing: 0.01em;
   color: var(--bone);
@@ -602,13 +613,44 @@
   align-items: baseline;
   gap: 12px;
 }
-/* What the number above means here, stated once and constant for the whole
-   encounter — a caption on the readouts, pulled up under them, not a second
-   announce line. */
+/* The ruler and its rule — fixed for the whole encounter — under the wheels,
+   the strip's mirror. Pulled up between the SELF/OTHER labels and into the
+   wheels' bottom corners, where the two lower arcs leave a gap: the caption
+   sits a little above the labels' line (its 36px line box 13px above their
+   centre), the readout stacks above it. The 81px is the label row (8 + 24)
+   plus 49 of the box. Aligned to its row's start so the margin moves it
+   one-for-one — centred in the zero-height track the margin leaves, half of
+   the lift would be given back. Only its children take the pointer: the
+   group's full-width box reaches over the bottom of both charts. */
+.combat-foot {
+  grid-column: 1 / -1;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: -81px;
+  z-index: 2;
+  pointer-events: none;
+}
+.combat-foot > * { pointer-events: auto; }
+/* The planet's mark before its name, wherever a planet is named in words
+   (the sentence, the ruler readout): the same character the disc carries, so
+   the name and the mark on the chart are read together. Upright even in the
+   italic sentence — the symbols have no italic and would be slanted. The
+   serif draws the symbols a third taller than its capitals (Venus's cross
+   hangs under the baseline too), so they are sized down to the cap height
+   and lifted a hair to centre on it — every one lands within a pixel. */
+.planet-glyph {
+  font-style: normal;
+  font-size: 0.78em;
+  position: relative;
+  top: -0.03em;
+}
 .combat-rule {
-  margin: -4px 0 0;
+  margin: 0;
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: 26px;
   font-style: italic;
   letter-spacing: 0.01em;
   color: var(--mist);
@@ -628,16 +670,17 @@
    budget is the viewport less the two `--combat-pad`s (top and bottom border)
    less the chrome the wheel shares its column with:
 
-     93  the TURNS/DISTANCE/RULER strip
-     26  the rule caption + its gap
+     30  the strip (readouts, sentence slot, their gap: 108) less
+         `--combat-overlap`, the part of it inside the wheel's box
+      8  the label's gap above
      24  the SELF/OTHER label
-      8  the label's gap above     = 151px
+      0  the ruler and rule, pulled up wholly onto the label row = 62px
 
    Horizontally there is nothing to compute: `100%` is the grid column, which has
    already had the border taken out of it.
 
    Rejected: sizing the wheel off the grid itself (`minmax(0, 1fr)` row + the svg
-   on `flex: 1` and `aspect-ratio: 1`), which would drop the 151 too. It is right
+   on `flex: 1` and `aspect-ratio: 1`), which would drop the 62 too. It is right
    at every landscape size but the flex height beats the aspect ratio when the
    column is narrower than it is tall — at 1024x1366 the box goes 445x1072.
 
@@ -645,7 +688,7 @@
    and derived from nothing. It was also the only reason the wheel could ever
    come in under its row, which is what stranded the strip above it. */
 .combat-side > svg {
-  width: min(100%, calc(100vh - 151px - 2 * var(--combat-pad)));
+  width: min(100%, calc(100vh - 62px - 2 * var(--combat-pad)));
   height: auto;
 }
 .combat-side-label {
@@ -982,7 +1025,7 @@
 @media (max-width: 899px) {
   .combat {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
     align-items: start;
     padding: 12px 12px;
     gap: 8px;
@@ -990,9 +1033,13 @@
   .combat-bands { width: 8px; }
   /* The row-gap only matters if the two groups wrap, which the numeral is
      narrow enough to avoid — the doublings track was what needed the width. */
-  .combat-topbar { gap: 8px; }
+  .combat-topbar { gap: 8px; margin-bottom: 0; }
   .combat-readouts { gap: 4px 18px; }
-  .combat-announce-line { font-size: 19px; }
+  /* Stacked there is no row of labels to share: the ruler and rule go back
+     under the strip, read before the charts rather than after scrolling past
+     both. */
+  .combat-foot { grid-row: 2; margin-top: 0; gap: 4px; }
+  .combat-announce-line { font-size: 23px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
   .combat-distance,
@@ -1000,7 +1047,7 @@
   .combat-turns-v,
   .combat-distance-v,
   .combat-ruler-v { font-size: clamp(18px, 5vw, 22px); }
-  .combat-rule { font-size: 13px; }
+  .combat-rule { font-size: 19px; }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */

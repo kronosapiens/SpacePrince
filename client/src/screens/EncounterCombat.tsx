@@ -2,7 +2,6 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "r
 import { Chart } from "@/components/Chart";
 import { HelpButton } from "@/components/HelpButton";
 import { PlanetBands } from "@/components/PlanetBands";
-import { TermText } from "@/components/TermText";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
@@ -17,6 +16,7 @@ import { getAspects } from "@/game/aspects";
 import { directAmount, getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
+import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_IMPACT_MAP,
@@ -130,10 +130,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [impactOpponent, combustingOpponent],
   );
 
-  useEffect(() => {
-    setActive(displayOpponentTurn);
-  }, [displayOpponentTurn, setActive]);
-
   const playerUnlocked = useMemo(
     () => unlockedPlanets(prince.numEncounters, devUnlockAll),
     [prince.numEncounters, devUnlockAll],
@@ -141,12 +137,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
   // and the one that says what earns Distance here (`score.ts` `RULER_RULES`).
-  // The score (MUSIC.md) follows it too — combat plays the ruler's theme at the
-  // up mix, stable for the whole fight, not the per-turn active planet.
+  // The score (MUSIC.md) and the screen tint follow it too — combat plays the
+  // ruler's theme at the up mix and glows the ruler's colour, both stable for
+  // the whole fight. The per-turn actor is not repeated in the ambient layer:
+  // the sentence, the corona and the resolution flashes already carry it.
   const ruler = encounterRuler(encounter);
   useEffect(() => {
     setTheme(ruler, "combat");
-  }, [ruler]);
+    setActive(ruler);
+  }, [ruler, setActive]);
   const scoreCharts = useMemo(
     () => ({ self: prince.chart, other: encounter.opponentChart }),
     [prince.chart, encounter.opponentChart],
@@ -476,7 +475,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               baseline of their own, so they could not sit with the type beside
               them. */}
           <div className="combat-turns">
-            <span className="eyebrow">TURNS</span>
+            <span className="eyebrow">TURN</span>
             <span className="combat-turns-v">
               {settled
                 ? displayTurnIndex
@@ -532,20 +531,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               )}
             </span>
           </div>
-          {/* The planet that rules this encounter — the colour its node carried
-              on the map, named here because it now also sets the rule below. */}
-          <div className="combat-ruler">
-            <span className="eyebrow">RULER</span>
-            <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
-              {ruler}
-            </span>
-          </div>
         </div>
-        {/* The rule, constant for the whole encounter: a caption on the numbers
-            above rather than a second announce line. */}
-        <p className="combat-rule">
-          <TermText text={`Distance is ${RULER_RULES[ruler].label}.`} />
-        </p>
         {/* One slot for what is happening and what is next: the turn's
             precommit while it is being answered, the way out once it is not.
             The sentence is the caption that teaches the marks — the ring's
@@ -560,6 +546,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             displayOpponentTurn && displayOpponentAction && (
               <p className="combat-announce-line">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
+                  <span className="planet-glyph">{PLANET_GLYPH[displayOpponentTurn]}</span>{" "}
                   {displayOpponentTurn}
                 </span>{" "}
                 <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
@@ -636,6 +623,26 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         />
         <div className="combat-side-label">OTHER</div>
       </div>
+
+      {/* What is fixed for the whole encounter, under the wheels between the
+          SELF and OTHER labels: the planet that rules it — the colour its node
+          carried on the map — and the rule it sets. What moves (the turn, the
+          score, the other's move) reads above the charts; this reads below. */}
+      <div className="combat-foot">
+        <div className="combat-ruler">
+          <span className="eyebrow">RULER</span>
+          <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
+            <span className="planet-glyph">{PLANET_GLYPH[ruler]}</span> {ruler}
+          </span>
+        </div>
+        <p className="combat-rule">
+          {/* The rule in the ruler's colour, under the name in the same colour.
+              Distance itself stays neutral — no colour stands for it anywhere
+              else. */}
+          Distance is <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>
+        </p>
+      </div>
+
 
       {devAnimationControls && (
         <DevAnimationPanel
