@@ -3,7 +3,9 @@
 *The vocabulary the client draws with.*
 
 `VIBES.md` describes how the game should feel.
-This document defines what it should look like — the geometry, the strokes, the type, the timing — so that two engineers and one illustrator working in different rooms produce a coherent object.
+This document defines what it is drawn with — the primitives, the stroke scale, the palette, the two faces, the motion grammar — so that two engineers and one illustrator working in different rooms produce a coherent object, and so the client and the onchain renderer draw the same one.
+It holds the vocabulary and its rules, not the tuned values.
+Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `palette.ts`, `viewbox.ts`, and `client/src/style/tokens.css` and `motion.css`.
 
 The guiding principle:
 
@@ -20,7 +22,7 @@ These are not negotiable inside this document — they come from elsewhere in th
 - **SVG-native.** The NFT chart is generated entirely on-chain as SVG (see `spec/concept/NFT.md`). The rest of the client renders in the same medium so the artifact a player owns is visually continuous with the world they play in. No raster art, no 3D, no canvas-rendered scenes.
   - *Exception — UI chrome.* Client-only readout chrome (e.g. the study stats panel) may embed HTML via `<foreignObject>` when a real layout engine earns its keep — tables, wrapping prose, auto-sizing. This is **not** for the chart art or anything that is or resembles the on-chain artifact; those stay pure SVG. The line is: chart/world = SVG, data readouts = HTML-in-SVG, both still inside the chart's coordinate space and palette.
 - **Planetary palette.** The seven palettes in `VIBES.md §Color` are the entire color universe. New colors are not introduced. Backgrounds, text, line work, and chrome are all derived from the palette plus a small neutral scale (§5).
-- **Active-planet tint.** The screen's ambient color reflects the active planet (`VIBES.md §Color`). The tint is global; the chart, map, and chrome all sit inside it.
+- **One planet tints each surface.** The screen's ambient color is the planet that owns the surface — the encounter's ruler, the map node the player stands on (§5). The tint is global; the chart, map, and chrome all sit inside it.
 - **Diagram as world.** The chart is the visual ground (`VIBES.md §The Chart as Visual Center`). It is never a corner HUD. The map is a diagram of emanation, not a level select. The encounter is two charts speaking, not a battle screen.
 
 ---
@@ -65,7 +67,7 @@ They do not travel: the run map and the encounter seam render at their own unit 
 | Extra heavy | `4u`   | the affliction arc | The arc alone.                                                              |
 
 Four rungs, a unit apart, which at the chart's render size is about 0.67px per step.
-The scale this replaced had five rungs at 0.5 / 1 / 1.5 / 2.5 / 4 and arrived whole in the v2 design port; it was never adopted, four of its five rungs had no clients, and at half-unit steps it was drawing distinctions the surface cannot express.
+Half-unit steps were tried and draw distinctions the surface cannot express.
 
 Extra heavy has exactly one client on purpose.
 The affliction arc carries more than any other single mark on the chart — a planet's whole ceiling, what it can still absorb, and what the declared blow will take from it — so it outranks even the marks that are merely under attention.
@@ -77,17 +79,10 @@ Mixing weights inside a single drawn element is forbidden. A node ring is one we
 
 ## 4. Proportion Scale
 
-The drawn forms relate to each other through a small set of ratios. Like the stroke scale, this exists so that two engineers drawing different parts of the same artifact don't drift.
+The drawn forms relate to each other through a small set of ratios. Like the stroke scale, this exists so that two renderers drawing the same artifact — the client and the onchain SVG — don't drift.
 
-For the canonical 1000×1000 chart wheel:
-
-- **Outer ring radius:** 480u
-- **Inner ring radius:** 360u
-- **Planet glyph radius (resting):** 24u
-- **Planet glyph radius (active):** 32u
-- **Planet halo radius (active):** 56u
-- **Aspect line stroke origin/terminus:** at the planet glyph radius, not the planet center
-- **Sign division marks:** from inner ring radius to outer ring radius, hairline weight
+The ratios live in `client/src/svg/viewbox.ts`, in units of the chart's 1000×1000 viewBox, and the onchain renderer mirrors them.
+Aspect lines begin and end at the planet's edge, not its center.
 
 The map and encounter screens use proportionally derived versions of the same ratios. A node on the map is the same visual object as a planet on the chart, sized for its container.
 
@@ -118,17 +113,20 @@ That color is the planet's primary in the identity halo, and the valence amber o
 - **Linear gradients** are forbidden. They read as digital and break the painterly register.
 - **Mesh gradients** (SVG2) are forbidden until SVG2 support is universal. Approximate with layered radial gradients if needed.
 
-### Active-planet tinting
+### The surface's planet (ambient tint)
 
-The screen receives an ambient tint in the active planet's primary color at 8% opacity, applied as a full-canvas radial gradient centered behind the active element. The tint composites over `Void`, not under it.
+The screen receives an ambient tint in one planet's primary color, a full-canvas radial gradient composited over `Void`, not under it.
+The tint is the place, not the event: it belongs to whichever planet owns the surface, and it does not follow the turn.
 
-**What counts as "the active planet" depends on the configuration:**
+- **Encounter, combat and narrative alike:** the encounter's **ruler** (`MECHANICS.md §11`) — the planet whose colour the node carried on the map and whose theme the score plays.
+  The other's acting planet is not repeated here; the sentence, the corona and the resolution flashes already carry it (`SCREENS.md §3.7`).
+- **Map:** the ruler of the node the player stands on, so walking into an encounter continues the light.
+- **Title and end of run:** neutral.
 
-- **Combat:** the **opponent's** acting planet — the one selected by the system at turn start. The opponent's planet is the constant of the turn (it doesn't change as the player explores their own options); the player's planet is in flux during exploration. Tinting by the constant gives the turn a stable mood. The world is in that planet's mood; the player's task is to reply. (An earlier draft said this matched an "ANSWER MERCURY" chrome label in `SCREENS.md §3.7`; that label is gone — the acting planet now reads off the opponent's chart directly — but the tinting rationale is unchanged.)
-- **Narrative:** the house's **ruling planet** (per `SCREENS.md §3.2`). The aria's planet tints the world.
-- **Map / between encounters:** fades to neutral — no active planet, the map is a contemplative between-surface. See `SCREENS.md §4.6`.
+The opacity and the shift between tints live in `tokens.css` and `motion.css`; the shift is slow enough to feel like the light changing in a room.
 
-Transitions between tints take 2000ms, linear easing — slow enough to feel like the light changing in a room, fast enough that a player who looks away and back perceives the new state.
+Rejected: tinting combat by the other's acting planet, which was the rule until the ruler existed.
+It gave each turn a mood, but it set the room's colour against the score's theme and re-stated a fact the chart already carries three times.
 
 ### Aspect, valence, and warning color
 
@@ -137,28 +135,24 @@ Three orthogonal signals share the chart and must read apart:
 - **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Heavy when hovered, selected, or propagating (§3), the same weight the propagation pulse rides. The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
 - **Effect polarity (heal/harm)** — afflict/testify, the projected span on the affliction arc, and the interaction ring use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
 The ring is **mist** until a verb is determined for its planet — the opponent's precommit, or the player's armed choice — and takes the verb's colour then, the same grammar as the arc inside it.
-Mist rather than bone because the arc is bone, and a bone ring six units outside a bone arc is perceptually the same colour (ΔE 0 — they read as one double ring on an undamaged planet).
-Mist separates them at ΔE 31 and puts the two neutrals where the scale already defines them: bone is state, mist is affordance.
-The cost is testify, which drops from ΔE 61 to 41 against the resting ring — still far past where two colours read apart, but no longer symmetric with afflict, which gains slightly.
-A dimmer ring does not weaken the invite, because the breath is what marks the tappable (§ Motion), not the brightness.
+Mist rather than bone because the arc is bone, and a bone ring just outside a bone arc reads as one double ring on an undamaged planet.
+Mist separates them and puts the two neutrals where the scale already defines them: bone is state, mist is affordance.
+A dimmer ring does not weaken the invite, because the breath is what marks the tappable (§7), not the brightness.
 It does not carry the planet's own colour: the disc, the glyph and the halo already state identity three times, so the ring's hue was decoration, and spending it on the verb is what lets a precommit read at its source rather than only through its consequences on the other chart.
 **The corona.** An acting planet — the opponent's precommitted actor, or the player's own once a verb is armed — carries its verb as streamers: radial line segments beginning just outside the interaction ring, in the verb's colour.
 Colour alone was not enough to separate the two verbs at a glance, so they differ in silhouette as well, on the reference's own logic — a real corona is irregular and long-streamered at solar maximum, smooth and symmetric at minimum.
-**Afflict flares:** twelve rays at Heavy weight reaching well past the halo, every other one falling short so the outline breaks up, butt caps.
-**Testify gathers:** twenty-four rays at Medium weight, half as far, all equal, round caps, hugging the rim.
-One rung apart, so the weight difference survives while both stay present — and it is the lighter of the two that needed it, since a streamer is the first thing to vanish at small sizes.
+**Afflict flares:** fewer rays, reaching well past the halo, alternate ones falling short so the outline breaks up.
+**Testify gathers:** more rays, all equal, hugging the rim.
+The two sit one stroke rung apart, so the weight difference survives while both stay present; the counts, reach and caps live in `chart-style.ts`.
 Radial segments were the one primitive still free around a planet — the filled circle is the disc, a complete circle is the interaction ring, a partial arc is affliction, a gradient bloom is identity, an expanding circle is combustion.
 They cannot be misread as aspect lines, which always span planet to planet; a streamer terminates in empty space.
 Unlike the arc and the ring the corona is exempt from the cluster radius budget, because only one planet per chart is ever acting — it may overlap a neighbour, since there is only ever one.
 
-**The corona turns; it does not breathe.** The breath is the invite's language (§ Motion: a slow breath is what marks the tappable), and an acting planet has already been committed to — a breathing corona would ask for a tap on a decision already made.
-It rotates instead, the two verbs in opposite directions at different periods (afflict 48s, testify 84s), which is a channel that costs nothing.
-Symmetry is no obstacle to that, and it is worth saying because the opposite seems intuitive: a wheel with evenly spaced spokes is plainly rotating.
-Motion is perceived directly, not by comparing one configuration with the next — symmetry only defeats rotation under stroboscopic sampling, the wagon-wheel effect, which needs rates orders of magnitude faster than these.
+**The corona turns; it does not breathe.** The breath is the invite's language (§7: a slow breath is what marks the tappable), and an acting planet has already been committed to — a breathing corona would ask for a tap on a decision already made.
+It rotates instead, the two verbs in opposite directions at different periods, which is a channel that costs nothing.
+Symmetry is no obstacle to that: a wheel with evenly spaced spokes is plainly rotating, since motion is perceived directly rather than by comparing one configuration with the next.
 So testify's fringe can stay perfectly even and still visibly turn, and the even-versus-ragged silhouette survives as the verb distinction.
 
-Rejected: breathing it on the shared clock, the first attempt.
-Rejected: varying every ray's length to make the rotation legible — it was built on the mistaken premise above, and it cost the even/ragged distinction to solve a problem that did not exist.
 Rejected: an annular **wash** under the streamers — a gradient ring, transparent at the centre, which is what a corona physically is. It read well and degraded better than the rays do (a streamer is a third of a pixel wide on a phone; a gradient has no minimum feature size), but it was a second glow around a planet that already has one, and the streamers alone are the more distinctive mark. If the corona ever proves too faint at small sizes, this is the thing to bring back.
 
 Rejected: colouring the acting planet's *halo* by verb instead. Identity has to live somewhere, and recolouring the bloom takes it away at the moment the planet is most prominent — and it fails outright where the verb and the planet share a hue (Saturn with violet is 16° apart, Sun with amber 15°).
@@ -195,17 +189,15 @@ Two faces. No more.
 For planetary fragments, encounter openings, and any moment where the world is speaking. A high-contrast Garamond revival with Italian Renaissance bones — appropriate for material drawn from Marcus Aurelius, Sappho, the Upanishads, and the rest of the chorus.
 
 - **Weight:** 400 (Regular) for body fragments; 500 (Medium) for emphasis; 600 (SemiBold) for titles when needed. Italics are permitted and earn their place in this face.
-- **Sizes:** Fragment body 24px / 1.45 line-height; fragment attribution 14px / 1.3; encounter title 36px / 1.2.
-- **Letter-spacing:** -0.01em on body, 0 on titles, +0.04em on attribution (small caps territory).
-- **Color:** `Bone` on dark; `Smoke` on light. Never on a planetary color directly — fragments rest in a tinted but neutral field.
+- **Color:** `Bone` on dark; `Smoke` on light. Never on a planetary color directly — fragments rest in a tinted but neutral field. A planet's name may take the planet's colour where it stands for the planet (the sentence, the ruler readout).
+- Sizes and tracking are set per surface in the client's stylesheets.
 
 ### Functional: Inter
 
 For chrome that must read as legible at small sizes — turn indicators, subtle annotations, accessibility text. Used minimally. If Inter is showing up on a screen, ask whether it needs to.
 
 - **Weight:** 400 (Regular) for body; 500 (Medium) for state indicators.
-- **Sizes:** 13px / 1.4 for chrome; 11px / 1.3 for fine annotation.
-- **Letter-spacing:** +0.02em at small sizes.
+- Tracked small caps for the eyebrows (SELF, OTHER, TURN, DISTANCE, RULER); sizes in the stylesheets.
 
 ### Forbidden moves
 
@@ -213,29 +205,18 @@ For chrome that must read as legible at small sizes — turn indicators, subtle 
 - No all-caps display type. The chorus speaks in sentences.
 - No drop caps. Affectation that doesn't earn its weight.
 - No text on a planetary color. Text rests on neutral.
-- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn dots) is permitted where it does necessary work; see `SCREENS.md §3.7`.
+- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, the turn fraction) is permitted where it does necessary work; see `SCREENS.md §3.7`.
 
 ---
 
 ## 7. Motion Language
 
-Animation is part of the symbolic vocabulary. Every named motion has a duration, an easing, and a one-line brief.
+Animation is part of the symbolic vocabulary.
 
-### Named motions
+### One clock
 
-| Motion                    | Duration | Easing                      | Brief                                                              |
-|---------------------------|----------|-----------------------------|--------------------------------------------------------------------|
-| Encounter open            | 1200ms   | ease-out                    | Two charts arrive into facing position. Ceremonial, unhurried.     |
-| Planet activate           | 600ms    | ease-in-out, looping        | The active planet pulses — a slow heartbeat at the planet's tone.  |
-| Aspect propagation (trine)| 1000ms   | ease-out                    | The green line flares brighter, then clears into the target.       |
-| Aspect propagation (square)| 1400ms  | ease-in, hold, ease-out     | The red line flares, holds just short of terminus, then clears. Dissonant. |
-| Combust                   | 1800ms   | cubic-bezier(.7,.0,.85,.0)  | The planet glyph desaturates to gray. Slow, then sudden.           |
-| Tint shift                | 2000ms   | linear                      | Ambient color changes between planetary registers. Light shifting. |
-| Map node arrival          | 400ms    | ease-out                    | The next node materializes. Modest, not theatrical.                |
-| Fragment fade-in          | 800ms    | ease-out                    | Text appears one line at a time, lines staggered by 200ms.         |
-| Badge merge               | 200ms    | ease-out                    | The incoming Δ badge slides into the affliction total and fades — the addition is seen, not inferred. |
-| Invite breath             | 1100ms   | ease-in-out, looping        | Everything tappable right now breathes — a ring, node, or verb swelling slightly. Chart rings breathe in bone (their colour is reserved for the verb); map nodes and verbs breathe in their own colour. |
-| Armed pulse               | 1100ms   | ease-in-out, looping        | The armed verb pulses harder, filled; its alternatives fall still. The confirm is the only thing asking. |
+Every ambient pulse rides one shared breath (`--breath` in `client/src/style/motion.css`); there is never a second rhythm.
+The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath, the armed pulse — and their durations and easings live in that file beside their keyframes, each with a line on what it is for.
 
 ### The next click is always legible
 
@@ -267,7 +248,7 @@ The cursor does not pulse. Chrome that merely informs does not glow. Inactive pl
 - Particle effects. No drifting dust, no sparkles, no ambient glitter.
 - Camera shake.
 - Spring-overshoot easing. No bouncy UI. The motion register is meditative, not playful.
-- Any motion that loops faster than the active-planet pulse. The pulse is the fastest sustained beat in the game. Anything faster reads as digital.
+- Any motion that loops faster than the breath. The breath is the fastest sustained beat in the game. Anything faster reads as digital.
 
 ---
 
@@ -276,7 +257,7 @@ The cursor does not pulse. Chrome that merely informs does not glow. Inactive pl
 The frame is mostly empty. This is a design rule, not an aesthetic preference.
 
 - At least 50% of the encounter screen is `Void` (or tinted Void) at rest.
-- The chart wheel sits in the center with its own breathing room — a margin of at least 80u between the outer ring and any other drawn element.
+- The chart wheel has its own breathing room: chrome may enter the empty corners of the wheel's square box, never the ring.
 - Fragments are always set against empty ground, never overlaid on the chart.
 - The map screen reads as a diagram with air around it. Pillar columns do not extend to the edges.
 
@@ -288,7 +269,7 @@ When in doubt, remove something. The af Klint and Jodorowsky references derive m
 
 There are five visual layers. Anything drawn must declare which one it lives on.
 
-1. **Void.** The background. Often tinted by active planet.
+1. **Void.** The background. Tinted by the surface's planet.
 2. **Field.** Faint background structure — sign divisions, distant pillar lines, grid hairlines. Hairline weight, low opacity.
 3. **Diagram.** The chart, the map, the aspect graph. Light to Regular weight. The game's primary visual layer.
 4. **Active.** The currently activating elements — pulsing planet, propagating aspect, glowing node. Medium weight. Carries the player's attention.
@@ -383,7 +364,7 @@ The principle: *don't lock in desktop assumptions that mobile can't escape.* Two
 
 - The encounter screen stacks vertically: player's chart on top, the right-hand slot below. The "two charts face each other" framing translates from horizontal to vertical without semantic change.
 - The map retains its diagrammatic shape but reduces in scale to fit the available width. Vertical scrolling is acceptable on the map; not in encounters.
-- Final-game chrome that lives in a bottom rail on desktop relocates to collapsible sheets or drawers on mobile.
+- Chrome that sits above and below the wheels on desktop stacks with them on mobile, the live chrome first.
 
 ### Switching rule
 
@@ -406,13 +387,6 @@ The mobile layout doesn't have to be polished yet. It has to be possible.
 Things this document deliberately does not yet answer, listed so they don't get lost:
 
 - **Accessibility.** Color is doing a lot of work in this style. A planet's identity is communicated by color before glyph. We need a parallel channel — probably texture-on-glyph or ARIA labels — so the game is playable without color discrimination.
-
-Recently resolved (see referenced sections):
-
-- *Aspect graph at rest* — the web renders at a uniform opacity; **stroke weight** carries the rest→active step (Light → Medium), not opacity. Earlier passes dimmed resting lines and lifted the Title web to full via an `aspectsFull` flag; that opacity split was removed as an unnecessary layer — stroke alone reads cleanly and keeps the combat web legible for planning propagation. Confirmed by prototype (`img/chart-v3.png`).
-- *Touch interaction model* — see `SCREENS.md §3.6`. Double-tap to commit, universal tap-to-inspect across both charts.
-- *Sign and planet glyphs* — standard Unicode in v1 (replace prototype's text labels like "LIB" with `♎` etc.). Authored SVG alternatives reserved for later.
-- *Loading and transition states between scenes* — fade through Void with active-planet tint shift, ~1000ms each direction. Map → Encounter inherits the "Encounter open" 1200ms ease-out from `§7`; Encounter → Map is a faster ~600ms fade.
 
 ---
 

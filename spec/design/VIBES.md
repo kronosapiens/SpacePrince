@@ -69,7 +69,7 @@ These drive the visual palette dynamically based on what's happening in the game
 | **Jupiter** | ![](swatches/jupiter-deepblue.svg) Deep Blue `#1B3F8B` | ![](swatches/jupiter-royalpurple.svg) Royal Purple `#4B0082` | |
 | **Saturn** | ![](swatches/saturn-leadgrey.svg) Lead Grey `#6B6B6B` | ![](swatches/saturn-darkearth.svg) Dark Earth `#3B2F2F` | ![](swatches/saturn-black.svg) Black `#1A1A1A` |
 
-The screen's ambient color reflects the **active planet**.
+The screen's ambient color reflects the **surface's planet** — the encounter's ruler, or the map node the player stands on (`STYLE.md §5`).
 When Mars is in play, the world tilts red.
 When Saturn dominates, things go grey and heavy.
 Transitions between planets should feel like shifts in light — dawn to dusk, season to season.

@@ -2,9 +2,12 @@
 
 *The set of surfaces a player passes through, and the rules that hold them together.*
 
-The chart is the player's anchor. Most of the game happens on a single screen — the encounter — that morphs between modes without losing visual continuity. Outside the encounter, the player navigates a small number of supporting surfaces.
+The chart is the player's anchor. Most of the game happens on the encounter screen, in one of two configurations that share the player's chart. Outside the encounter, the player navigates a small number of supporting surfaces.
 
-This document specifies the screen architecture: which screens exist, what each one does, and how they relate. Visual treatment lives in `STYLE.md`. Felt qualities live in `VIBES.md`. Mechanical resolution lives in `MECHANICS.md` and `HOUSES.md`.
+This document holds the screen architecture: which screens exist, what each one does, and the rules that hold them together.
+It records intent and constraints, not composition.
+Where a surface puts things, how large, how far apart, and how fast is decided in the running client, and each value lives beside the code that uses it (`client/src/style/layout.css` and the token files named in `CLAUDE.md`).
+Visual vocabulary lives in `STYLE.md`. Felt qualities live in `VIBES.md`. Mechanical resolution lives in `MECHANICS.md` and `HOUSES.md`.
 
 The guiding principle:
 
@@ -79,7 +82,9 @@ Dev-only:
 
 - **Index.** Navigation between screens during development. Not part of the shipped game.
 
-The current `client/` is a prototype. Nothing in it is canonical against this document. Where the prototype and this spec diverge, this spec wins, but neither is sacred — both can move.
+The `client/` prototype is where composition is decided; this document is where intent and constraints are kept.
+Where the two diverge on a placement, a size, or a timing, the client is current and this document is stale.
+Where they diverge on a rule stated here, the rule holds until it is revised here.
 
 ---
 
@@ -91,42 +96,20 @@ The two configurations are different layouts, not modes of one layout. An earlie
 
 ### 3.1 Combat layout (symmetric)
 
-- **Left half:** the player's chart, drawn per `STYLE.md §11`.
-- **Right half:** the opposing NPC chart, drawn with the same chart visual language. See §3.4.
-- **Top strip:** run and encounter state — Distance, the turn cadence, and the encounter's ruler with its scoring rule — spanning both charts. Chrome rules per §3.7.
-
-The two charts face each other as equals. There is no visual differentiation between "yours" and "theirs" beyond their position.
-
-There is no centre seam.
-Everything it used to carry moved onto the charts themselves and into the announce line: the acting planet is the one wearing a ring on the opponent's side, its verb is that ring's colour, and its magnitude is the length of the bite drawn on whichever of the player's candidates is under consideration (§3.5.1).
-Deleting it bought the wheels about 22% more radius at 1440px, which was most of the point — the crit that started this work was that everything on screen read too small.
+The player's chart and the other's chart, side by side as equals, drawn in one visual language (§3.4).
+There is no visual differentiation between yours and theirs beyond position.
+Nothing sits between them: no seam, no divider, no centre column.
+The acting planet, its verb, and its magnitude are all drawn on the charts themselves (§3.5.1) and named once in the sentence (§3.7).
+The chrome sits above and below the wheels rather than beside them, so the charts have the width.
 
 Rejected: a dividing rule between the charts.
 Two complete gold rings, two planet arrangements and two labels already state the separation, and a divider is the one kind of mark this world has no place for — it exists only to partition a screen, where every other mark is something the game is made of.
-Nothing bleeds across the gutter either: the outermost cluster radius is 320u, so the furthest planet sits 180u inside its own box, and the widest thing a planet emits is its colour-field bloom at 140u.
 
-### 3.1.1 Spacing and wheel size
+### 3.1.1 Wheel size
 
 The wheels are sized from the viewport with no upper bound — bigger is more legible, and the limit should be the screen rather than a chosen maximum.
-`--combat-pad` on `.combat` (currently 48px) is the border around the composition and the only spacing the screen declares; there is no grid gap.
-Each wheel already holds 2% of its own box clear on every side — the outer ring sits at `OUTER_RING_R = 480` of a 500-unit radius, with the sign labels and tick marks inside it — so the two charts separate themselves.
-A square in a landscape viewport is governed by height, so the wheel takes the viewport less the two `--combat-pad`s, less the top strip and the side label.
-
-Rejected: a fixed maximum width.
-One stood at 760px, inherited from the pre-seam layout and derived from nothing.
-It was also what let the wheel come in shorter than its grid row, and the surplus then split evenly above and below — stranding the top strip well clear of the charts on any tall screen.
-
-Rejected: a percentage border (5% of each axis).
-The margins grow faster than the wheels do and cost the charts most of a large display.
-
-Rejected: one value serving as both the border and the gutter.
-It is symmetric in the box model and not symmetric to the eye, because the wheel contributes its 2% inset twice in the middle against once on the outside — so the gutter reads wider than the border at the same value.
-Once the wheel is height-bound the leftover column width becomes the gutter on its own, which above 1920px wide lands ring-to-ring within a few pixels of ring-to-edge.
-Below that the middle runs well under the border, and the lever for opening it is `column-gap` — never a row gap, which is what stranded the top strip to begin with.
-
-Rejected: dropping the border and the gutter in favour of padding on the wheels themselves.
-Left and right it is the same pixels either way, but the gutter is then two paddings wide against the outer margin's one, so the wheels sit twice as far from each other as from the screen edge.
-With the wheel height-bound there is also no centring slack left, so the top strip lands flush against the top edge.
+The chart is round and its box is square, so the box's corners are empty; the chrome above and below reaches into them rather than reserving bands of its own, and the charts keep the height too.
+The border, the overlap, and the height budget the wheel is sized from are decided in `client/src/style/layout.css`, beside the values, with the reasoning as comments.
 
 ### 3.2 Narrative layout (asymmetric)
 
@@ -142,7 +125,7 @@ The aria does not re-pulse on node transitions; only the middle and bottom bands
 
 Both layouts stack vertically.
 
-- **Combat:** player's chart on top, opponent's chart below. The top strip stays above both.
+- **Combat:** player's chart on top, the other's chart below. The chrome stays above both, so the turn and the encounter's rule are read before scrolling.
 - **Narrative:** player's chart on top, then aria, narrative text, options.
 
 In both cases the vertical stacking preserves the semantic relationship between the chart and what it faces. See `STYLE.md §13`.
@@ -163,7 +146,7 @@ This means:
 
 **Combat.** Both charts' propagations animate **simultaneously** — when a turn resolves, the player-chart and opponent-chart both light up their internal aspect webs at the same time. Activation propagates within each chart along that chart's own aspect lines; there is no line drawn between the two charts. The connection between them is conceptual (your planet faces theirs this turn), not visual.
 
-The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy. See `STYLE.md §7` for the per-motion durations.
+The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy. The per-motion durations live in `client/src/style/motion.css`.
 
 **Narrative.** During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per `HOUSES.md §4.3` chart-conditioning) carry a soft Field-layer halo so the player can see *why* the option exists. On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied). No propagation through aspect lines — propagation is a combat-only language. The aria does not animate during resolution; it remains the steady framing presence.
 
@@ -186,23 +169,14 @@ It also flattens the resting chart, since every undamaged planet would look iden
 It appears on the planet under consideration — hovered, inspected, or armed — and nowhere else.
 A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (this one dies) rather than a comparison of lengths.
 
-Rejected: the precommit drawn on every live candidate at rest.
-The opponent declares before the player chooses and the magnitude does not depend on which planet catches it, so the bite was determined for all seven, and showing it made the comparison parallel — one bite length against seven gaps — rather than something the player had to probe for planet by planet.
-It was dropped because the resting menu and the focused preview were the same mark answering different questions: *what each planet would absorb if sent*, versus *what happens if I send this one*.
-Focusing therefore read as six threats disappearing rather than as the question narrowing.
-Rejected with it: keeping both at once, which puts two mutually exclusive futures on one arc (the ripple a planet takes if its neighbour is sent, and the blow it takes if it is), and separating the two registers by opacity, which was built and did not fix the misread.
-
-The cost is that no danger read remains on the board at rest.
-The `warningPlanets` treatment that once carried it lives only on the retired badges, so "which of my planets dies catching this" is now visible one planet at a time.
+Rejected: the precommit's bite drawn on every live candidate at rest.
+The magnitude does not depend on which planet catches it, so the resting menu and the focused preview were the same mark answering different questions — *what each planet would absorb*, against *what happens if I send this one* — and focusing read as six threats disappearing rather than as the question narrowing.
+Keeping both at once, or separating them by opacity, was built and did not fix the misread.
+The cost is that no danger read remains on the board at rest; which of your planets dies catching this is visible one planet at a time.
 
 **Badges are retired.**
-Affliction and projection were numeric pills on the chart; the arc replaced both.
-The problem they had was that every number on screen was a numerator whose denominator was somewhere else — a raw affliction count means nothing without the ceiling it runs against, and that ceiling lived in the panel.
-
-This reverses an earlier principle worth naming.
-Badges were shown only above zero, so that a chart of unharmed planets stayed clean rather than littered with zeros — a damage meter belongs only where there is damage.
-The arc is always on, on every live planet, because it is not a damage meter: its length is capacity, which is part of what the planet *is*.
-A capacity gauge belongs everywhere there is capacity; a damage readout did not.
+Affliction and projection were numeric pills on the chart; the arc replaced both, because every number on the chart was a numerator whose denominator lived in the panel.
+The arc is always on, on every live planet, where badges showed only above zero: its length is capacity, which is part of what the planet *is*, not a damage meter that belongs only where there is damage.
 
 ### 3.6 Interaction grammar
 
@@ -222,7 +196,7 @@ Rejected: separate invite and select rings at different radii. They were already
 **Previews show only what is determined.**
 Verb-dependent information appears only while a verb is indicated — hovered (desktop) or armed; verb-free information is free everywhere.
 The *defensive* read — the opponent's precommitted action — is verb-free, so it needs no verb indicated; it still needs a planet, and appears only on the one under consideration, propagation included (§3.5.1).
-The announce line carries the part of it that is planet-free: which of the opponent's planets acts, with which verb, and for how much.
+The sentence (§3.7) carries the part of it that is planet-free: which of the other's planets acts, with which verb, and for how much.
 The *offensive* read (the effect on the opponent's chart) appears only while an action is indicated — armed, or hovered while nothing is armed: the client never asserts the outcome of a choice not yet made.
 Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
 Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
@@ -281,7 +255,13 @@ Copy lives in `client/src/data/screen-help.ts` and follows the §1.2 register an
 
 ### 3.7 Chrome
 
-The encounter screen is allowed restrained, functional chrome where it does necessary work — telling the player whose turn it is, what the run state is, and how to leave. The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.
+The encounter screen is allowed restrained, functional chrome where it does necessary work — what is happening this turn, what the run state is, what this encounter pays for, and how to leave.
+The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aesthetic provocation, not a hard ban on UI text.
+None of it is chart data, so it reads as chrome without becoming a HUD sitting over the wheels.
+
+**What moves sits above the charts; what is fixed sits below.**
+Above: the turn, Distance, and the sentence naming the other's move — the three things that change during play.
+Below, between the SELF and OTHER labels: the encounter's ruler and its rule, constant from the first turn to the last.
 
 **Allowed:**
 
@@ -289,38 +269,30 @@ The encounter screen is allowed restrained, functional chrome where it does nece
   Distance is an unbounded sum with no ceiling anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
   A numeral invents nothing: it has no denominator to imply and nothing to decode.
   It reads the same here, on the narrative screen, and as the star it becomes at end of run.
-  The per-beat gain pulse — a wash behind the digits, tinted by whichever planet is resolving — is the only feedback that Distance moved during a resolution wave.
+  While a verb is indicated for a previewed planet, the numeral carries the projected gain for that move in the verb's colour, computed by the same function that will award it — verb-dependent information, so it appears only once a verb is indicated (§3.6), and it shows `+0` plainly on a node the planet cannot score on.
+  A pulse behind the digits, tinted by whichever planet is resolving, is the only feedback that Distance moved during a resolution wave.
 
-  Rejected: the doublings track (a tick per doubling banked, then a fixed-width bar for the run at the current one).
-  It was honest about the ceiling in the same way — the bar always spanned exactly one doubling, so it measured a span of *log* rather than a fraction of any maximum — but it stated the score in a code the player had to learn before it said anything, and a partial bar reads as progress toward a maximum whatever it actually measures, which is the misread it was built to avoid.
-  Its second justification, keeping the encounter surface free of digits, had already lapsed: the announce line prints the incoming magnitude.
-  The `log2` derivation survives in `client/src/game/distance.ts` because it still places the run's star in the NFT field (`NFT.md`, Star-Field); it is simply no longer a live readout.
-- **Turn cadence.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
+  Rejected: a bar for the current doubling.
+  It measured a span of *log* rather than a fraction of any maximum, but a partial bar reads as progress toward a maximum whatever it measures, which is the misread it was built to avoid.
+  The `log2` derivation survives in `client/src/game/distance.ts` because it still places the run's star in the NFT field (`NFT.md`); it is simply no longer a live readout.
+- **Turn.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Distance this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
-  While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early — every opposing planet combust before the sequence runs out — reads *2 / 3* rather than *3 / 3*.
-  It is not swapped for an outcome word at the settle, because the Continue button's presence already says the encounter is over and its label (*Continue* / *Walk back*) already says whether the run survived.
-  Set in the same face and size as the Distance numeral beside it, on the same baseline.
-- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in the strip in its own colour — the colour its node had on the map — with one caption beneath the readouts stating what earns Distance here (*Distance is affliction on the other's chart.*).
-  The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
-  While a verb is indicated for a previewed planet, the Distance numeral carries the projected gain for that move in the verb's colour, computed by the same function that will award it (`MECHANICS.md §12`) — verb-dependent information, so it appears only once a verb is indicated (§3.6), and it shows `+0` plainly on a node the planet cannot score on.
+  While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
+  It is not swapped for an outcome word at the settle: the Continue button already says the encounter is over, and its label (*Continue* / *Walk back*) already says whether the run survived.
 
-  Rejected: a row of dots, one per turn, filled to the current position and ringed on it.
-  They separated three states where the fraction has two — spent, current, remaining — but at three turns that bought little, and it cost the strip a second visual language: pips carry no baseline of their own, so they could not sit with the type beside them and needed their own alignment rule.
-
-- **The announce line.** One sentence beneath the readouts naming the turn's precommit — *"Jupiter afflicts 24"* — the planet in its own colour, the verb in its valence.
+  Rejected: a row of pips, filled to the current turn.
+  They separated three states where the fraction has two, and cost the strip a second visual language that could not share a baseline with the type beside it.
+- **The sentence.** One line naming the turn's precommit — *"♃ Jupiter afflicts 24"* — the planet's glyph and name in its own colour, the verb in its valence.
   The board already says all three wordlessly: the acting planet is the only one on its chart wearing a ring, that ring's colour is the verb, and the bites on the player's candidates are the magnitude.
   The sentence is the caption that teaches those marks, and the colour split is what makes it one — the name matches the disc on the other chart, the verb matches the corona around it.
-  A glyph is not a name, and the audience premise is a player with no astrology, so this is also the only place the opponent's planet is named at all.
-  It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words (badges, seam, the Distance numeral) until the board carried none.
+  A glyph is not a name, and the audience premise is a player with no astrology, so the glyph and the name travel together wherever a planet is named in words — and this is the only place the other's planet is named at all.
+  It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words until the board carried none.
+  The **Continue** button takes the sentence's place on settle: one place says what is happening, then what is next.
 
-The **Continue** button occupies the same slot on settle, replacing the sentence rather than appearing elsewhere: one place says what is happening, then what is next.
-The slot reserves the button's height rather than the sentence's, so the charts do not shift when an encounter ends.
-
-Rejected: a second line, *"How do you respond?"*.
-It brushes the ban on instructional copy below, and being identical every turn it would stop being read within three turns — the invite rings already say it is the player's move.
-
-All three live together in a top strip spanning the two charts, the readouts on one line and the announce slot beneath them.
-None of it is chart data — Distance is the run's score, the fraction is position within this encounter, and the sentence names a turn — so the strip reads as chrome without becoming a HUD sitting over the wheels.
+  Rejected: a second line, *"How do you respond?"*.
+  Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.
+- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), glyph and name in its own colour — the colour its node had on the map — over one line stating what earns Distance here (*Distance is affliction on the other's chart*), the rule in the same colour and Distance itself neutral.
+  The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
 
 **Out:**
 
@@ -335,11 +307,9 @@ None of it is chart data — Distance is the run's score, the fraction is positi
 
 ### 3.8 Mode and scene transitions
 
-Transitions between major surfaces fade through the Void canvas with an active-planet tint shift, ~1000ms in each direction:
-
-- **Map → Encounter** inherits the "Encounter open" 1200ms ease-out from `STYLE.md §7`.
-- **Encounter → Map** is a faster ~600ms fade (the player is leaving, not arriving).
-- **Encounter → End-of-run** (on run end — full combust or completion): a slower fade, ~1800ms; on a combust-out it matches the combust motion's weight.
+Transitions between major surfaces fade through the Void canvas as the tint shifts to the next surface's planet (`STYLE.md §5`).
+Arriving is slower than leaving; a run's end is slower still, and on a combust-out it matches the combust motion's weight.
+The durations live in `client/src/style/motion.css`.
 
 ### 3.9 Open questions
 
@@ -357,8 +327,7 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 ### 4.1 Layout
 
 - **Centered diagram** with breathing room — at least 15% margin on each side, per `STYLE.md §10`.
-- **Chart anchor:** a small inset of the player's chart in the **top-left corner**, ~15–18% of viewport width. Shows current state (combust grayed, afflicted with numeric badges per the chart-rendering rules in `STYLE.md §11`). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per `MECHANICS.md §11.1`) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the anchor.
-- **Distance readout** in the same position and treatment as the encounter screen (per §3.7).
+- **Chart anchor:** a small inset of the player's chart in a corner, in its current state — combusts dimmed, affliction on the arc (§3.5.1). The "chart is always present" principle (§1) made literal on this surface. **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per `MECHANICS.md §11.1`) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the anchor.
 
 ### 4.2 Nodes
 
@@ -371,8 +340,8 @@ The color rule is the same on both axes: a single principled astrological lookup
 
 Each node also has one of four **temporal states** relative to the player's current position. Together with content type, the state determines what's rendered:
 
-- **Current** — the player's standing position. Node radius stays the same as every other state — emphasis comes from the active-planet halo (planet-color radial gradient), a colored ring around the disc, and a slightly heavier disc stroke. There is exactly one current node per map.
-- **Eligible-next** — every node **one edge away** from current that the player hasn't already visited and isn't behind them in the topology. Includes forward-layer neighbors *and* same-layer (horizontal) siblings, so a "sidestep" along the current layer is allowed. Rendered with full content at full saturation. The eligible set surfaces a soft pulse on entry per the "Map node arrival" motion in `STYLE.md §7`. Backtracking is still impossible — once visited, a node is locked out, so a sidestep is a one-way street.
+- **Current** — the player's standing position. Node radius stays the same as every other state — emphasis comes from the node's planet halo (planet-color radial gradient), a colored ring around the disc, and a slightly heavier disc stroke. There is exactly one current node per map.
+- **Eligible-next** — every node **one edge away** from current that the player hasn't already visited and isn't behind them in the topology. Includes forward-layer neighbors *and* same-layer (horizontal) siblings, so a "sidestep" along the current layer is allowed. Rendered with full content at full saturation. The eligible set surfaces a soft pulse on entry (the map-node arrival motion, `client/src/style/motion.css`). Backtracking is still impossible — once visited, a node is locked out, so a sidestep is a one-way street.
 - **Traversed (past)** — nodes on the player's walk-path so far, excluding current.
 Full content at **full opacity** — the solid, committed past.
 What marks it as memory rather than action is stillness: no halo, no ring, no pulse.
@@ -440,7 +409,7 @@ This is the **rulership** axis, distinct from the **joys** axis used mechanicall
 
 ### 4.6 Map ambient tint
 
-Between encounters, the map's ambient tint **fades to neutral** — no active planet to color the world. The map is a contemplative between-surface; let it breathe.
+The map takes the colour of the node the player stands on — its ruler, the planet the node itself is coloured by (§4.2) — so walking into an encounter continues the light rather than changing it (`STYLE.md §5`).
 
 ### 4.7 Open questions
 
@@ -673,7 +642,7 @@ The world does not need a wayfinding overlay. The player knows where they are be
 
 ## 11. Relationship to Other Specs
 
-- `STYLE.md` — visual treatment and layout rules. This document specifies *which surfaces exist*; STYLE.md specifies *how they look*.
+- `STYLE.md` — the visual vocabulary and its rules. This document specifies *which surfaces exist* and what they are for; STYLE.md specifies *what they are drawn with*.
 - `VIBES.md` — felt qualities, voice register, sound design. Drives the tone each screen should hit.
 - `MAP.md` — map topology (rendered on the Map screen).
 - `CHART.md` — chart computation (rendered on the Encounter screen and Chart Study).

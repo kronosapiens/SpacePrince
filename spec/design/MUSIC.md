@@ -71,7 +71,7 @@ The decisive reason is **simultaneity**, not transitions.
 A shared tonic is the precondition for planets to *sound at once*: the chart-as-chord north-star (below) is coherent only if placements share a root, as is any combat texture carrying more than the active planet (the layered model in *Architecture*).
 Different keys would be polytonal mush; one tonic lets the chart be voiced as a single chord.
 Seamless **transitions** are a real but secondary benefit — the drone holds while only the upper structure moves, so explore↔battle crossfades and between-encounter planet swaps don't lurch.
-And it rhymes with the visuals: the active-planet tint in `STYLE.md` is one global ground the current planet recolors; parallel modes are that structure in sound.
+And it rhymes with the visuals: the ambient tint in `STYLE.md` is one global ground the surface's planet recolors; parallel modes are that structure in sound.
 
 *Caveat.*
 Shared *root* is not automatically shared *consonance* — full Lydian and full Phrygian on one tonic still clash chromatically.
