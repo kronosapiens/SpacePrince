@@ -718,13 +718,16 @@
   z-index: 1;
   display: inline-block;
 }
-/* The previewed gain, beside the number it would move — verb-coloured, and
-   small enough to read as an annotation on the total rather than a rival to it. */
+/* The previewed gain appends beside the centered total without participating
+   in its width, so appearing and disappearing never recenter the readout. */
 .combat-distance-delta {
-  position: relative;
+  position: absolute;
+  left: 100%;
+  bottom: 0;
   z-index: 1;
   font-size: 0.6em;
   margin-left: 0.34em;
+  white-space: nowrap;
 }
 /* Gain pulse — a wash behind the number, replayed per resolution beat and
    tinted by the planet resolving on it. */
