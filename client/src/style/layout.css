@@ -634,19 +634,6 @@
   pointer-events: none;
 }
 .combat-foot > * { pointer-events: auto; }
-/* The planet's mark before its name, wherever a planet is named in words
-   (the sentence, the ruler readout): the same character the disc carries, so
-   the name and the mark on the chart are read together. Upright even in the
-   italic sentence — the symbols have no italic and would be slanted. The
-   serif draws the symbols a third taller than its capitals (Venus's cross
-   hangs under the baseline too), so they are sized down to the cap height
-   and lifted a hair to centre on it — every one lands within a pixel. */
-.planet-glyph {
-  font-style: normal;
-  font-size: 0.78em;
-  position: relative;
-  top: -0.03em;
-}
 .combat-rule {
   margin: 0;
   font-family: var(--serif);

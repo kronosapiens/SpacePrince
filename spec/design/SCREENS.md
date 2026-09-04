@@ -282,16 +282,16 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 
   Rejected: a row of pips, filled to the current turn.
   They separated three states where the fraction has two, and cost the strip a second visual language that could not share a baseline with the type beside it.
-- **The sentence.** One line naming the turn's precommit — *"♃ Jupiter afflicts 24"* — the planet's glyph and name in its own colour, the verb in its valence.
+- **The sentence.** One line naming the turn's precommit — *"Jupiter afflicts 24"* — the planet in its own colour, the verb in its valence.
   The board already says all three wordlessly: the acting planet is the only one on its chart wearing a ring, that ring's colour is the verb, and the bites on the player's candidates are the magnitude.
   The sentence is the caption that teaches those marks, and the colour split is what makes it one — the name matches the disc on the other chart, the verb matches the corona around it.
-  A glyph is not a name, and the audience premise is a player with no astrology, so the glyph and the name travel together wherever a planet is named in words — and this is the only place the other's planet is named at all.
+  A glyph is not a name, and the audience premise is a player with no astrology, so this is the only place the other's planet is named at all.
   It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words until the board carried none.
   The **Continue** button takes the sentence's place on settle: one place says what is happening, then what is next.
 
   Rejected: a second line, *"How do you respond?"*.
   Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.
-- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), glyph and name in its own colour — the colour its node had on the map — over one line stating what earns Distance here (*Distance is affliction on the other's chart*), the rule in the same colour and Distance itself neutral.
+- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating what earns Distance here (*Distance is affliction on the other's chart*), the rule in the same colour and Distance itself neutral.
   The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
 
 **Out:**

@@ -16,7 +16,6 @@ import { getAspects } from "@/game/aspects";
 import { directAmount, getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
-import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_IMPACT_MAP,
@@ -546,7 +545,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             displayOpponentTurn && displayOpponentAction && (
               <p className="combat-announce-line">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
-                  <span className="planet-glyph">{PLANET_GLYPH[displayOpponentTurn]}</span>{" "}
                   {displayOpponentTurn}
                 </span>{" "}
                 <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
@@ -632,7 +630,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         <div className="combat-ruler">
           <span className="eyebrow">RULER</span>
           <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
-            <span className="planet-glyph">{PLANET_GLYPH[ruler]}</span> {ruler}
+            {ruler}
           </span>
         </div>
         <p className="combat-rule">
