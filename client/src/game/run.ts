@@ -15,7 +15,10 @@ export const MAPS_PER_RUN = 7;
  *  The bound is exact — ceilings are multiples of 60. */
 export const BARRAGE_CEILING_FRACTION_PER_MAP = 3 / 60;
 
-export function newMapState(seed: number): MapState {
+export function newMapState(
+  seed: number,
+  combatRulers: readonly PlanetName[] = unlockedPlanets(0),
+): MapState {
   const graph = buildMapGraph(seed);
   // Every node's content is fixed at map creation, seeded on (map seed, node
   // id). Onchain the map seed itself is a VRF draw at creation — a map is
@@ -27,6 +30,7 @@ export function newMapState(seed: number): MapState {
     if (node.id === ROOT_NODE_ID) continue;
     rolledNodes[node.id] = rollNodeContent({
       rng: mulberry32(hashString(`${seed}_${node.id}`)),
+      combatRulers,
     });
   }
   return {
@@ -40,15 +44,20 @@ export function newMapState(seed: number): MapState {
   };
 }
 
-export function beginRun(seed = randomSeed()): Run {
+export function beginRun(
+  seed = randomSeed(),
+  lifetimeEncounterCount = 0,
+  devUnlockAll = false,
+): Run {
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
+  const combatRulers = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
   return {
     id: `run_${seed}`,
     seed,
     state: blankSideState(),
     distance: 0,
-    map: newMapState(mapSeed),
+    map: newMapState(mapSeed, combatRulers),
     mapsCompleted: 0,
     encounter: null,
     seenFragmentIds: [],
@@ -129,6 +138,6 @@ export function rolloverMap(
     chart, run.state, roster, mapsCompleted,
     mulberry32(hashString(`${seed}_boundary`)),
   );
-  const map: MapState = { ...newMapState(seed), boundary: crossed.boundary };
+  const map: MapState = { ...newMapState(seed, roster), boundary: crossed.boundary };
   return { ...run, map, state: crossed.state, mapsCompleted, encounter: null, events };
 }

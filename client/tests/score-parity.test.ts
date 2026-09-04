@@ -35,6 +35,7 @@ function compare(
   const playerPlanet = getAspects(prince.chart)[0]?.from ?? "Moon";
   prepare?.({ run, enc, playerPlanet });
   const opponentPlanet = enc.sequence[enc.turnIndex]!;
+  const opponentAction = enc.opponentActions[enc.turnIndex]!;
   const charts: ScoreCharts = { self: prince.chart, other: enc.opponentChart };
 
   const projection = computeProjectedEffects({
@@ -43,7 +44,7 @@ function compare(
     playerPlanet,
     opponentPlanet,
     playerValence,
-    opponentValence: enc.opponentActions[enc.turnIndex]!,
+    opponentValence: opponentAction,
     playerState: run.state,
     opponentState: enc.opponentState,
     playerAspects: getAspects(prince.chart),
@@ -54,9 +55,9 @@ function compare(
 
   for (const ruler of PLANETS) {
     expect(
-      scoreBeats(ruler, projection.beats, charts),
+      scoreBeats(ruler, projection.beats, charts, opponentAction),
       `${ruler} @ seed ${opponentSeed}/${playerValence}`,
-    ).toBe(scoreBeats(ruler, logToBeats(result.log), charts));
+    ).toBe(scoreBeats(ruler, logToBeats(result.log), charts, opponentAction));
   }
 
   // Stronger than the score alone: the two lists are the same beats, in the
@@ -65,7 +66,7 @@ function compare(
 
   // Non-vacuity: every turn lands a direct hit on their chart, which Jupiter's
   // rule always admits — so the parity above is never 0 === 0 throughout.
-  expect(scoreBeats("Jupiter", projection.beats, charts)).toBeGreaterThan(0);
+  expect(scoreBeats("Jupiter", projection.beats, charts, opponentAction)).toBeGreaterThan(0);
 
   const ruler = encounterRuler(enc);
   expect(result.log.turnScore).toBe(turnScore(result.log, ruler, charts));
@@ -113,11 +114,13 @@ describe("preview and outcome score the same beats", () => {
     expect(result.log.playerCombust).toBe(true);
     expect(projection.beats).toContainEqual({ kind: "combust", side: "self", target: playerPlanet });
     // Saturn is the one rule that pays for it — and it pays the ceiling.
-    expect(scoreBeats("Saturn", projection.beats, charts)).toBeGreaterThanOrEqual(
+    expect(
+      scoreBeats("Saturn", projection.beats, charts, result.log.opponentValence),
+    ).toBeGreaterThanOrEqual(
       combustionCeiling(charts.self.planets[playerPlanet]),
     );
-    expect(scoreBeats("Moon", projection.beats, charts)).toBe(
-      scoreBeats("Moon", logToBeats(result.log), charts),
+    expect(scoreBeats("Moon", projection.beats, charts, result.log.opponentValence)).toBe(
+      scoreBeats("Moon", logToBeats(result.log), charts, result.log.opponentValence),
     );
   });
 });

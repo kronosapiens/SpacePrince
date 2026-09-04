@@ -273,6 +273,12 @@ Rejected: fixed 3-turn encounters — the final turn made afflict-for-setup dead
 
 Each unlock happens **between encounters**, on the Map screen — when the player surfaces back from a completed encounter and sees their chart anchor (per `SCREENS.md §4.1`), the new planet appears in its computed sign with a small ceremony.
 
+A planet enters the **combat-encounter ruler rotation** when it unlocks.
+Before that threshold, no combat encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
+Each map samples its combat rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
+The client prototype enforces this with deterministic rejection sampling: it generates Other charts until the Ascendant ruler belongs to that tier.
+The eventual onchain sampling mechanism remains unspecified.
+
 The Prince NFT artifact reveals planets on the same cumulative-encounter schedule: an unrevealed planet renders as a **ghost** at hairline weight (per `STYLE.md`), present as potential but not yet awakened. See `spec/concept/NFT.md`.
 
 **Dev mode** overrides this schedule and unlocks all seven planets immediately. Dev mode is for development and is never active in production.
@@ -297,30 +303,43 @@ UI label: `Distance`.
 Distance is one additive number on the lattice: every rule below sums magnitudes the turn log already carries, or ceilings, which are multiples of `60`.
 What earns it is decided by the encounter's **ruler** (§11): each ruler pays for what that planet values.
 
-| Ruler | Polarity | Chart | Channel |
-|---|---|---|---|
-| Moon | Testimony | Theirs | All |
-| Venus | Testimony | Both | All |
-| Mars | Affliction | Theirs | All |
-| Saturn | Affliction | Both | Combust only — each combust pays the dying planet's ceiling |
-| Sun | Either | Theirs | Direct hit only |
-| Mercury | Either | Theirs | Propagation only |
-| Jupiter | Either | Theirs | All |
+| Ruler | Polarity condition | Chart | Channel | Payout |
+|---|---|---|---|---|
+| Moon | Testimony | Other | All | Applied magnitude |
+| Mercury | Contrary | Other | All | Applied magnitude |
+| Venus | Testimony | Both | Direct | Applied magnitude |
+| Sun | Accord | Other | All | Applied magnitude |
+| Mars | Affliction | Other | All | Applied magnitude |
+| Jupiter | Either | Both | Direct | Applied magnitude |
+| Saturn | Affliction | Both | Combustion | Target's ceiling |
 
-The luminary and the warrior pay for your action (Moon, Mars); the benefic and the malefic pay for the encounter, on both charts (Venus, Saturn); the remaining three split by channel — the Sun the direct hit, Mercury the hops, Jupiter everything.
-Combust is affliction taken to its limit, so Mars and Saturn mirror Moon and Venus: harm dealt and harm completed, relief given and relief anywhere.
+`Other` means the Other's chart, while `Both` includes the Prince's chart and the Other's chart.
+`All` includes direct and propagated applied effects, while `Direct` includes only the initial effect on each chart.
+`Accord` means that a resolved beat has the same polarity as the Other's announced action.
+`Contrary` means that it has the opposite polarity.
+Each beat is checked after any aspect inversion, so one action can produce both Accord and Contrary beats.
+The announced action remains the reference if the Other is preempted, and its zero-magnitude response still pays zero.
 
 Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `turnScore` is the sum of the beats the ruler admits.
 The projection preview produces the same beats, so a previewed Distance and an awarded one are one function.
 Run score accumulates `turnScore`.
 
+Applied-magnitude rules pay the actual magnitude after clamping, not the attempted magnitude.
+A hit that causes combustion remains an applied-effect beat and also emits a separate combust marker.
+Only Saturn admits the marker, and Saturn pays the target's ceiling rather than the hit magnitude.
+
 Under the Moon only real reductions count — testifying a planet already at zero affliction scores nothing — so each turn is a two-beat: afflict to set up, testify to cash.
 Under Mars the two-beat inverts.
-Under Venus and Saturn the opponent's reply on your chart pays you, so the choice becomes which planet stands in the way.
+Mercury and the Sun instead ask whether each effect runs contrary to or in accord with the Other's announced action.
+Under Venus, Jupiter, and Saturn, the Other's reply on the Prince's chart can pay, so the choice includes which planet stands in the way.
 The rule is stated on the encounter screen for the whole encounter, and the node's colour on the map is the same ruler, so a route is chosen with the rotation in view.
 
-Open (balance, deferred): Jupiter's rule contains the Moon's, Mars's, Sun's and Mercury's outright, so Jupiter nodes dominate on route choice — the non-dominating alternative is the single largest beat per turn.
-Rulership fixes the rotation's frequencies — the luminaries rule one sign each, the others two — so luminary nodes are half as common, and Moon-ruled openings, which the map-1 curriculum (§11.1) leans on, are the least likely roll.
+Moon and Mars partition effects on the Other's chart by absolute polarity.
+Mercury and the Sun partition them by polarity relative to the Other's announced action.
+Venus and Jupiter govern the direct exchange on both charts, with Jupiter intentionally containing Venus as the greater benefic contains the lesser.
+No other ordinary rule strictly contains another.
+Within the unlocked rotation, rulership fixes relative frequencies: the luminaries rule one sign each, while the other planets rule two.
+Before Mercury unlocks, every combat encounter is necessarily Moon-ruled.
 Saturn's ceilings dwarf per-turn magnitudes, so late-run Saturn nodes are cash-outs.
 
 A run's **final accumulated Distance** is its permanent output. When the run ends — combustion or completion (§11) — that value is inscribed as a star in the Prince's NFT field (`NFT.md`, "The Star-Field"). Nothing else about the run is recorded: not how it ended, not which planets combust. Only the Distance, and the star it earns.

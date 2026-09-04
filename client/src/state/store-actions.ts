@@ -1,9 +1,10 @@
 import { useCallback } from "react";
-import { usePrinceDispatch } from "./PrinceStore";
+import { usePrince, usePrinceDispatch } from "./PrinceStore";
 import { resolveTurn } from "@/game/turn";
 import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
 import { randomSeed } from "@/game/rng";
 import { newlyCombusted } from "@/game/combust";
+import { loadDevSettings } from "./settings";
 import type {
   Chart,
   CombatEncounter,
@@ -31,14 +32,17 @@ export interface CommitTurnResult {
 
 /** Append a fresh run to the Prince. Returns the run that was dispatched. */
 export function useStartRun() {
+  const prince = usePrince();
   const dispatch = usePrinceDispatch();
+  const devUnlockAll = loadDevSettings().unlockAll;
+  const lifetimeEncounterCount = prince?.numEncounters ?? 0;
   return useCallback(
     (seed: number = randomSeed()): Run => {
-      const run = beginRun(seed);
+      const run = beginRun(seed, lifetimeEncounterCount, devUnlockAll);
       dispatch({ kind: "startRun", run });
       return run;
     },
-    [dispatch],
+    [dispatch, lifetimeEncounterCount, devUnlockAll],
   );
 }
 
@@ -121,8 +125,8 @@ export function useCommitNarrative() {
   );
 }
 
-/** Roll over to a fresh map (terminal node reached). The chart + fielded
- *  roster feed the map boundary — uncombust rolls and the barrage (§11.3). */
+/** Roll over to a fresh map (terminal node reached). The fielded roster gates
+ *  its combat rulers and feeds the boundary's uncombust rolls and barrage. */
 export function useRolloverMap() {
   const dispatch = usePrinceDispatch();
   return useCallback(

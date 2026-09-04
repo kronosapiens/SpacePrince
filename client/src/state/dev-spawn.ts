@@ -63,9 +63,9 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so encounters entered from here exercise every length.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
-  const base = { ...beginRun(seed), mapsCompleted };
+  const base = { ...beginRun(seed, tier), mapsCompleted };
   // Park the player partway through a rolled map (never on the terminal).
-  const map = walkMap(seed, false);
+  const map = walkMap(seed, false, tier);
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), fielded),
@@ -82,7 +82,7 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so every length gets exercised.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
-  const base = { ...beginRun(seed), mapsCompleted };
+  const base = { ...beginRun(seed, tier), mapsCompleted };
   const fresh = beginCombatEncounter({ run: base, opponentSeed: seed, lifetimeEncounterCount: tier });
   // Mid-fight: a random turn and lived-in boards. Keep the opponent's acting
   // planet alive so the seam reads a real "their turn".
@@ -109,7 +109,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const fielded = unlockedPlanets(tier);
-  const base = beginRun(seed);
+  const base = beginRun(seed, tier);
   const rng = mulberry32(seed);
   const house = opts.house ?? 1 + Math.floor(rng() * 12);
   const houseDef = HOUSES[house - 1]!;
@@ -135,13 +135,14 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
 
 export function spawnEnd(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
+  const tier = opts.tier ?? DEFAULT_TIER;
   // A valid completed run: six archived maps + a seventh current, each fully
   // walked with synthesized per-node outcomes (so the encounter count is real).
   const events = [];
   for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
-    events.push({ kind: "map-completed" as const, map: walkMap(hashString(`${seed}_end_${i}`), true) });
+    events.push({ kind: "map-completed" as const, map: walkMap(hashString(`${seed}_end_${i}`), true, tier) });
   }
-  const finalMap = walkMap(hashString(`${seed}_end_${MAPS_PER_RUN - 1}`), true);
+  const finalMap = walkMap(hashString(`${seed}_end_${MAPS_PER_RUN - 1}`), true, tier);
   const distance = [...events.map((e) => e.map), finalMap].reduce(
     (sum, m) => sum + Object.values(m.outcomes).reduce((d, o) => d + o.distanceDelta, 0),
     0,
@@ -158,7 +159,7 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
     seenScenarioIds: [],
     events,
   };
-  return devPrince(seed, opts.tier, run);
+  return devPrince(seed, tier, run);
 }
 
 /** Re-mirror a live combat to a new unlock tier (dev console). Rebuilds the
@@ -236,8 +237,8 @@ function livedInDistance(seed: number): number {
  *  End rainbow); otherwise stops partway so the player sits at a mid-map node.
  *  Visited non-root nodes get a synthesized outcome (drives the End counts +
  *  visited styling). */
-function walkMap(seed: number, toTerminal: boolean): MapState {
-  const base = newMapState(seed);
+function walkMap(seed: number, toTerminal: boolean, tier: number): MapState {
+  const base = newMapState(seed, unlockedPlanets(tier));
   const rolled = base.rolledNodes;
   const walkRng = mulberry32(hashString(`${seed}_walk`));
   const path: string[] = [base.currentNodeId];

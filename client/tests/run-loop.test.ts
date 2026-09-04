@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { beginRun, isOver, newMapState, rolloverMap, MAPS_PER_RUN } from "@/game/run";
+import { chartRuler, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
@@ -51,7 +52,8 @@ describe("Run loop integration", () => {
   });
 
   it("a new map pre-rolls content for every node except the root, deterministically", () => {
-    const map = newMapState(123);
+    const combatRulers = unlockedPlanets(0);
+    const map = newMapState(123, combatRulers);
     for (const node of map.graph.nodes) {
       if (node.id === ROOT_NODE_ID) {
         expect(map.rolledNodes[node.id]).toBeUndefined();
@@ -59,7 +61,37 @@ describe("Run loop integration", () => {
         expect(map.rolledNodes[node.id]).toBeDefined();
       }
     }
-    expect(newMapState(123).rolledNodes).toEqual(map.rolledNodes);
+    expect(newMapState(123, combatRulers).rolledNodes).toEqual(map.rolledNodes);
+  });
+
+  it("rejects combat charts whose rulers are not unlocked", () => {
+    for (const count of [0, 1, 2, 4, 8, 16, 32]) {
+      const eligible = unlockedPlanets(count);
+      const map = newMapState(1_000 + count, eligible);
+      const combatNodes = Object.values(map.rolledNodes).filter(
+        (content) => content.kind === "combat",
+      );
+      expect(combatNodes.length).toBeGreaterThan(0);
+      for (const content of combatNodes) {
+        if (content.kind !== "combat") continue;
+        expect(eligible).toContain(
+          chartRuler(seededChart(content.opponentSeed, "Other")),
+        );
+      }
+    }
+  });
+
+  it("rejection-samples direct encounter seeds against the current tier", () => {
+    const rejectedSeed = Array.from({ length: 20 }, (_, seed) => seed).find(
+      (seed) => chartRuler(seededChart(seed, "Other")) !== "Moon",
+    )!;
+    const encounter = beginCombatEncounter({
+      run: beginRun(42, 0),
+      opponentSeed: rejectedSeed,
+      lifetimeEncounterCount: 0,
+    });
+    expect(encounterRuler(encounter)).toBe("Moon");
+    expect(encounter.opponentChart.id).not.toBe(`chart_${rejectedSeed}`);
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {

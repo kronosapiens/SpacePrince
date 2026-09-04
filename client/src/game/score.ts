@@ -24,28 +24,31 @@ export type ScoredBeat =
     }
   | { kind: "combust"; side: "self" | "other"; target: PlanetName };
 
+export type PolarityCondition = Polarity | "Either" | "Contrary" | "Accord";
+
 export interface ScoringRule {
-  polarity: Polarity | "either";
-  chart: "theirs" | "both"; // "theirs" = side "other" only
-  channel: "all" | "direct" | "propagated" | "combust";
+  polarity: PolarityCondition;
+  chart: "other" | "both";
+  channel: "all" | "direct" | "combust";
+  payout: "magnitude" | "ceiling";
   /** Player-facing phrase completing "Distance is …". */
   label: string;
 }
 
 /**
- * The luminary and the warrior pay for your action (Moon, Mars); the benefic and
- * the malefic pay for the encounter on both charts (Venus, Saturn); the
- * remaining three split by channel — Sun the direct hit, Mercury the hops,
- * Jupiter everything.
+ * Moon and Mars partition effects on the Other by absolute polarity; Mercury
+ * and Sun partition them relative to the Other's announced action. Venus and
+ * Jupiter score the direct exchange on both charts, while Saturn scores the
+ * terminal combust markers on both charts.
  */
 export const RULER_RULES: Record<PlanetName, ScoringRule> = {
-  Moon:    { polarity: "Testimony",  chart: "theirs", channel: "all",        label: "testimony on the other's chart" },
-  Venus:   { polarity: "Testimony",  chart: "both",   channel: "all",        label: "testimony on both charts" },
-  Mars:    { polarity: "Affliction", chart: "theirs", channel: "all",        label: "affliction on the other's chart" },
-  Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust",    label: "combustion on both charts" },
-  Sun:     { polarity: "either",     chart: "theirs", channel: "direct",     label: "direct hits on the other's chart" },
-  Mercury: { polarity: "either",     chart: "theirs", channel: "propagated", label: "propagation on the other's chart" },
-  Jupiter: { polarity: "either",     chart: "theirs", channel: "all",        label: "everything on the other's chart" },
+  Moon:    { polarity: "Testimony",  chart: "other", channel: "all",     payout: "magnitude", label: "testimony on the Other's chart" },
+  Mercury: { polarity: "Contrary",   chart: "other", channel: "all",     payout: "magnitude", label: "effects contrary to the Other's action on their chart" },
+  Venus:   { polarity: "Testimony",  chart: "both",   channel: "direct",  payout: "magnitude", label: "direct testimony on both charts" },
+  Sun:     { polarity: "Accord",     chart: "other", channel: "all",     payout: "magnitude", label: "effects in accord with the Other's action on their chart" },
+  Mars:    { polarity: "Affliction", chart: "other", channel: "all",     payout: "magnitude", label: "affliction on the Other's chart" },
+  Jupiter: { polarity: "Either",     chart: "both",   channel: "direct",  payout: "magnitude", label: "direct effects on both charts" },
+  Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust", payout: "ceiling",   label: "combustion on both charts" },
 };
 
 export interface ScoreCharts {
@@ -54,31 +57,56 @@ export interface ScoreCharts {
 }
 
 /**
- * One beat's contribution under a ruler. A hit pays its magnitude when the
- * rule's polarity, chart and channel admit it; a combust pays the dying
- * planet's ceiling. The two are exclusive: channel "combust" admits no hits,
- * and every other channel admits no combusts.
+ * One beat's contribution under a ruler. Accord and Contrary compare the
+ * beat's resolved polarity with the Other's precommitted action. Applied-effect
+ * channels admit hits only; the combust channel admits markers only.
  */
-export function beatScore(ruler: PlanetName, beat: ScoredBeat, charts: ScoreCharts): number {
+export function beatScore(
+  ruler: PlanetName,
+  beat: ScoredBeat,
+  charts: ScoreCharts,
+  opponentAction: Polarity,
+): number {
   const rule = RULER_RULES[ruler];
-  if (rule.chart === "theirs" && beat.side !== "other") return 0;
-  if (beat.kind === "combust") {
-    if (rule.channel !== "combust") return 0;
+  if (rule.chart === "other" && beat.side !== "other") return 0;
+  if (!channelMatches(rule.channel, beat)) return 0;
+  const beatPolarity = beat.kind === "combust" ? "Affliction" : beat.polarity;
+  if (!polarityMatches(rule.polarity, beatPolarity, opponentAction)) return 0;
+  if (rule.payout === "ceiling") {
+    if (beat.kind !== "combust") return 0;
     const chart = beat.side === "self" ? charts.self : charts.other;
     return combustionCeiling(chart.planets[beat.target]);
   }
-  if (rule.channel === "combust") return 0;
-  if (rule.polarity !== "either" && beat.polarity !== rule.polarity) return 0;
-  if (rule.channel !== "all" && beat.channel !== rule.channel) return 0;
-  return beat.magnitude;
+  return beat.kind === "hit" ? beat.magnitude : 0;
+}
+
+function channelMatches(channel: ScoringRule["channel"], beat: ScoredBeat): boolean {
+  if (channel === "combust") return beat.kind === "combust";
+  if (beat.kind === "combust") return false;
+  return channel === "all" || beat.channel === channel;
+}
+
+function polarityMatches(
+  condition: PolarityCondition,
+  beatPolarity: Polarity,
+  opponentAction: Polarity,
+): boolean {
+  if (condition === "Either") return true;
+  if (condition === "Accord") return beatPolarity === opponentAction;
+  if (condition === "Contrary") return beatPolarity !== opponentAction;
+  return beatPolarity === condition;
 }
 
 export function scoreBeats(
   ruler: PlanetName,
   beats: ScoredBeat[],
   charts: ScoreCharts,
+  opponentAction: Polarity,
 ): number {
-  return beats.reduce((sum, beat) => sum + beatScore(ruler, beat, charts), 0);
+  return beats.reduce(
+    (sum, beat) => sum + beatScore(ruler, beat, charts, opponentAction),
+    0,
+  );
 }
 
 /**
@@ -129,5 +157,5 @@ export function turnScore(
   ruler: PlanetName,
   charts: ScoreCharts,
 ): number {
-  return scoreBeats(ruler, logToBeats(entry), charts);
+  return scoreBeats(ruler, logToBeats(entry), charts, entry.opponentValence);
 }

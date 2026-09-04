@@ -237,7 +237,7 @@ function runScheduler(args: {
   const ruler = encounterRuler(previousEncounter);
   const charts: ScoreCharts = { self: playerChart, other: previousEncounter.opponentChart };
   const tick = (state: CombatAnimationState, beat: ScoredBeat) => {
-    const gain = beatScore(ruler, beat, charts);
+    const gain = beatScore(ruler, beat, charts, entry.opponentValence);
     if (gain <= 0) return;
     state.runningDistance += gain;
     state.distanceFlashEpoch += 1;

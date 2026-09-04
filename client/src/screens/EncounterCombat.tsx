@@ -202,7 +202,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const projectedScore =
     !settled && indicatedVerb && previewPlanet && projection
       ? {
-          value: scoreBeats(ruler, projection.beats, scoreCharts),
+          value: scoreBeats(ruler, projection.beats, scoreCharts, opponentAction),
           color: VALENCE_COLOR[indicatedVerb],
         }
       : null;

@@ -15,53 +15,68 @@ const hit = (
   magnitude: number,
 ): ScoredBeat => ({ kind: "hit", side, target: "Moon", polarity, magnitude, channel });
 
-// One beat list covering every axis a rule can key on: both sides, both
-// polarities, both channels, and a combust on each chart.
+// One beat list covering every combination of side, polarity, and channel,
+// plus a combust on each chart. Powers of two make each admitted set unique.
 const BEATS: ScoredBeat[] = [
-  hit("other", "Testimony", "direct", 5),
-  hit("other", "Affliction", "propagated", 6),
-  hit("self", "Affliction", "direct", 3),
-  hit("self", "Testimony", "propagated", 4),
+  hit("other", "Testimony", "direct", 1),
+  hit("other", "Testimony", "propagated", 2),
+  hit("other", "Affliction", "direct", 4),
+  hit("other", "Affliction", "propagated", 8),
+  hit("self", "Testimony", "direct", 16),
+  hit("self", "Testimony", "propagated", 32),
+  hit("self", "Affliction", "direct", 64),
+  hit("self", "Affliction", "propagated", 128),
   { kind: "combust", side: "other", target: "Mars" },
   { kind: "combust", side: "self", target: "Saturn" },
 ];
 
 const otherMarsCeiling = combustionCeiling(charts.other.planets.Mars);
 const selfSaturnCeiling = combustionCeiling(charts.self.planets.Saturn);
+const opponentAction = "Testimony" as const;
 
 describe("RULER_RULES — each ruler pays for what that planet values", () => {
   const expected: Record<string, number> = {
-    // Your action on their chart, relief given.
-    Moon: 5,
-    // Relief anywhere — their chart and yours.
-    Venus: 5 + 4,
-    // Your action on their chart, harm dealt.
-    Mars: 6,
+    // Applied testimony on the Other's chart.
+    Moon: 1 + 2,
+    // Applied effects on the Other contrary to its announced testimony.
+    Mercury: 4 + 8,
+    // Direct testimony on either chart.
+    Venus: 1 + 16,
+    // Applied effects on the Other in accord with its announced testimony.
+    Sun: 1 + 2,
+    // Applied affliction on the Other's chart.
+    Mars: 4 + 8,
+    // Both direct effects, regardless of polarity.
+    Jupiter: 1 + 4 + 16 + 64,
     // Harm completed, on both charts, each worth the dying planet's ceiling.
     Saturn: otherMarsCeiling + selfSaturnCeiling,
-    // Either polarity on their chart, split by channel.
-    Sun: 5,
-    Mercury: 6,
-    // The superset of Moon, Mars, Sun and Mercury.
-    Jupiter: 5 + 6,
   };
 
   for (const ruler of PLANETS) {
     it(`${ruler} scores ${RULER_RULES[ruler].label}`, () => {
-      expect(scoreBeats(ruler, BEATS, charts)).toBe(expected[ruler]);
+      expect(scoreBeats(ruler, BEATS, charts, opponentAction)).toBe(expected[ruler]);
     });
   }
+
+  it("Accord and Contrary follow the Other's announced action", () => {
+    expect(scoreBeats("Mercury", BEATS, charts, "Affliction")).toBe(1 + 2);
+    expect(scoreBeats("Sun", BEATS, charts, "Affliction")).toBe(4 + 8);
+  });
 
   it("every rule has a label completing \"Distance is …\"", () => {
     for (const ruler of PLANETS) expect(RULER_RULES[ruler].label.length).toBeGreaterThan(0);
   });
 
   it("an empty turn scores nothing under any ruler", () => {
-    for (const ruler of PLANETS) expect(scoreBeats(ruler, [], charts)).toBe(0);
+    for (const ruler of PLANETS) {
+      expect(scoreBeats(ruler, [], charts, opponentAction)).toBe(0);
+    }
   });
 
   it("Saturn pays ceilings, not magnitudes", () => {
-    expect(scoreBeats("Saturn", BEATS.filter((b) => b.kind === "hit"), charts)).toBe(0);
+    expect(
+      scoreBeats("Saturn", BEATS.filter((b) => b.kind === "hit"), charts, opponentAction),
+    ).toBe(0);
     expect(otherMarsCeiling % 60).toBe(0);
     expect(selfSaturnCeiling % 60).toBe(0);
   });
@@ -103,13 +118,13 @@ describe("logToBeats — the order the UI replays", () => {
     // Their chart takes 5 affliction direct + 2 propagated; yours takes 3
     // testimony direct + 1 propagated. Venus and Moon combust on theirs, the
     // Sun on yours.
-    expect(scoreBeats("Moon", logToBeats(entry), charts)).toBe(0);
-    expect(scoreBeats("Venus", logToBeats(entry), charts)).toBe(4);
-    expect(scoreBeats("Mars", logToBeats(entry), charts)).toBe(7);
-    expect(scoreBeats("Sun", logToBeats(entry), charts)).toBe(5);
-    expect(scoreBeats("Mercury", logToBeats(entry), charts)).toBe(2);
-    expect(scoreBeats("Jupiter", logToBeats(entry), charts)).toBe(7);
-    expect(scoreBeats("Saturn", logToBeats(entry), charts)).toBe(
+    expect(scoreBeats("Moon", logToBeats(entry), charts, entry.opponentValence)).toBe(0);
+    expect(scoreBeats("Mercury", logToBeats(entry), charts, entry.opponentValence)).toBe(7);
+    expect(scoreBeats("Venus", logToBeats(entry), charts, entry.opponentValence)).toBe(3);
+    expect(scoreBeats("Sun", logToBeats(entry), charts, entry.opponentValence)).toBe(0);
+    expect(scoreBeats("Mars", logToBeats(entry), charts, entry.opponentValence)).toBe(7);
+    expect(scoreBeats("Jupiter", logToBeats(entry), charts, entry.opponentValence)).toBe(8);
+    expect(scoreBeats("Saturn", logToBeats(entry), charts, entry.opponentValence)).toBe(
       combustionCeiling(charts.other.planets.Venus)
         + combustionCeiling(charts.other.planets.Moon)
         + combustionCeiling(charts.self.planets.Sun),

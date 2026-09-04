@@ -72,6 +72,7 @@ export function MapScreen() {
           rng,
           forceNarrativeHouse: settings.forceNarrativeHouse,
           forceCombat: settings.forceCombat,
+          combatRulers: playerUnlocked,
         });
         nextRun = {
           ...nextRun,

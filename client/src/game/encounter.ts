@@ -1,5 +1,6 @@
 import { blankSideState, chartRuler, seededChart } from "./chart";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
+import { eligibleOpponentSeed } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
@@ -73,22 +74,25 @@ export function afflictedSideState(roster: PlanetName[], rng: () => number): Sid
 
 export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
+  // Maps normally store an already-eligible seed. Recheck here so direct dev
+  // encounters and old local maps obey the same ruler gate.
+  const acceptedSeed = eligibleOpponentSeed(opponentSeed, roster);
   // Player-facing name: the self/other axis, never adversary (SCREENS.md).
-  const opponentChart = seededChart(opponentSeed, `Other ${opponentSeed % 9999}`);
+  const opponentChart = seededChart(acceptedSeed, `Other ${acceptedSeed % 9999}`);
   // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
   // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is
   // the map number, so a single planet may simply be sent on repeat turns.
-  const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
-  const rng = mulberry32(encounterIdSeed ?? opponentSeed);
+  const rng = mulberry32(encounterIdSeed ?? acceptedSeed);
   const { sequence, opponentActions } = rollOpponentTurns(
     opponentChart, roster, rng, combatTurnCount(run.mapsCompleted),
   );
   // Separate stream for the spawn affliction so its draws don't perturb the
   // turn-sequence rolls above.
-  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? opponentSeed}_affliction`));
+  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
   return {
     kind: "combat",
-    id: `enc_combat_${run.id}_${opponentSeed}`,
+    id: `enc_combat_${run.id}_${acceptedSeed}`,
     opponentChart,
     opponentState: afflictedSideState(roster, stateRng),
     roster,
@@ -121,4 +125,3 @@ export function beginNarrativeEncounter(input: BeginNarrativeInput): NarrativeEn
     resolved: false,
   };
 }
-
