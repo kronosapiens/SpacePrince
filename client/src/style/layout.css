@@ -855,7 +855,7 @@
    reading as one of the card's verbs alongside Testify and Afflict — the study
    table's sans column heads do the same job, but nothing else inside this card
    is sans, so borrowing that treatment left the one upright sans word in a serif
-   panel. Nothing but `display: block` here: the label and the figures above it
+   panel. Nothing but `display: block` here: the label and the figures below it
    are one readout and take one style, which the italic on `.ps-ratio` sets for
    both. Dimming the label or tracking it apart made it read as the lighter of
    the two rather than the same thing on a second line. */

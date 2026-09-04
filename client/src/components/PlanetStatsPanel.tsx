@@ -169,8 +169,8 @@ export function PlanetStatsPanel({
                 <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
               </span>
               <span className="ps-ratio">
-                {Math.max(0, table.resolve - affliction)}/{table.resolve}
                 <span className="ps-ratio-label">Resolve</span>
+                {Math.max(0, table.resolve - affliction)}/{table.resolve}
               </span>
             </div>
           </div>
