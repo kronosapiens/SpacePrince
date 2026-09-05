@@ -63,7 +63,7 @@ describe("RULER_RULES — each ruler pays for what that planet values", () => {
     expect(scoreBeats("Sun", BEATS, charts, "Affliction")).toBe(4 + 8);
   });
 
-  it("every rule has a label completing \"Distance is …\"", () => {
+  it("every rule has a label completing \"Light gathers from …\"", () => {
     for (const ruler of PLANETS) expect(RULER_RULES[ruler].label.length).toBeGreaterThan(0);
   });
 
@@ -99,7 +99,7 @@ describe("logToBeats — the order the UI replays", () => {
       { side: "other", source: "Moon", target: "Venus", delta: 0, polarity: "Affliction", note: "Combusts" },
       { side: "self", source: "Sun", target: "Mars", delta: -1, polarity: "Testimony", note: "Trine flows" },
     ],
-    turnScore: 0,
+    lightGain: 0,
   };
 
   it("runs phase 1 then phase 2, each direct hit → hops → the actor's own ripple", () => {

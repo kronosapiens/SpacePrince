@@ -8,7 +8,7 @@ Effective stats are multiples of `12` — the smallest number every aspect fract
 Combustion ceilings are multiples of `60` (§10).
 Probabilities are stated in sixtieths (§7); percentages appear only as glosses.
 Lattice membership is an invariant: never introduce a buff, multiplier, or knob that steps off it.
-Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Distance totals, rite prices) — sums and payments, never divided.
+Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Light totals, rite prices) — sums and payments, never divided.
 Affliction accumulates toward a deterministic combustion at a ceiling set by durability, and is capped there — a combusted planet holds `ceiling`, never more.
 
 ## 1. Entities
@@ -123,7 +123,10 @@ Resolution is **sequential**, in two phases — the intent → act → response 
 1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is resolved there.
 2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
 
-The opponent's verb is precommitted (§5), so you choose with full information and you always act first. This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings. Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate. Conversely, letting a *testifying* opponent planet resolve is free relief — longevity, not Distance (§12) — that combusting it would deny.
+The opponent's verb is precommitted (§5), so you choose with full information and you always act first.
+This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings.
+Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate.
+Conversely, letting a *testifying* opponent planet resolve is free relief — longevity, not Light (§12) — that combusting it would deny.
 
 Base amount is the stat for the action:
 
@@ -140,7 +143,9 @@ Magnitude is the planet's own stat; sect and element/modality buffs (§4) are th
 
 Randomness never decides how a committed action resolves; it only decides what is revealed next.
 
-When the player commits an action, its full outcome — affliction, testimony, propagation, combustion, Distance — is computable from state the client already holds. The client renders the resolution immediately; the transaction confirms the same result behind the animation. There are no crits and no hidden rolls: anything derivable before commitment is shown (client honesty, `SCREENS.md` §1.1), and anything not derivable is genuinely unknown to everyone — including the contract — until the transaction lands.
+When the player commits an action, its full outcome — affliction, testimony, propagation, combustion, Light — is computable from state the client already holds.
+The client renders the resolution immediately; the transaction confirms the same result behind the animation.
+There are no crits and no hidden rolls: anything derivable before commitment is shown (client honesty, `SCREENS.md` §1.1), and anything not derivable is genuinely unknown to everyone — including the contract — until the transaction lands.
 
 Fresh randomness enters only where the game is already pausing to reveal something new, and every reveal rides a transaction the player is already waiting on:
 
@@ -224,7 +229,9 @@ The game's progression is layered:
 - **Encounter** — one node traversal (combat or narrative). Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters are short decision trees (`HOUSES.md`).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
 - **Run** — **up to seven maps.** After completing a map, the next is generated and begun. The structure is similar to FTL's sectors.
-- **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished). Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage. Either way, the run's **final Distance (§12)** is its permanent record, inscribed as a star in the NFT field (`NFT.md`).
+- **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished).
+  Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage.
+  Either way, the run's **final Light (§12)** is its permanent record, inscribed as a star in the NFT field (`NFT.md`).
 
 Per encounter:
 
@@ -296,12 +303,12 @@ Completing a map rolls the next one (§11), and the new map's seed also rolls wh
 
 The first map of a run has no boundary: the chart enters clean. Each crossing after that opens closer to the edge — by the seventh map the barrage rolls up to `18/60` (30%) of every ceiling — so later maps are higher-stakes before their first node is entered. The barrage is also what makes combustion a tide rather than a one-way ratchet: pressure rises map over map, and the uncombust processes (§10) push back.
 
-## 12. Scoring (Distance)
+## 12. Scoring (Light)
 
-UI label: `Distance`.
+UI label: `Light`.
 
-Distance is one additive number on the lattice: every rule below sums magnitudes the turn log already carries, or ceilings, which are multiples of `60`.
-What earns it is decided by the encounter's **ruler** (§11): each ruler pays for what that planet values.
+Light is one additive number on the lattice: every rule below sums magnitudes the turn log already carries, or ceilings, which are multiples of `60`.
+What gathers it is decided by the encounter's **ruler** (§11): each ruler admits a different set of beats.
 
 | Ruler | Polarity condition | Chart | Channel | Payout |
 |---|---|---|---|---|
@@ -320,9 +327,9 @@ What earns it is decided by the encounter's **ruler** (§11): each ruler pays fo
 Each beat is checked after any aspect inversion, so one action can produce both Accord and Contrary beats.
 The announced action remains the reference if the Other is preempted, and its zero-magnitude response still pays zero.
 
-Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `turnScore` is the sum of the beats the ruler admits.
-The projection preview produces the same beats, so a previewed Distance and an awarded one are one function.
-Run score accumulates `turnScore`.
+Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `lightGain` is the sum of the beats the ruler admits.
+The projection preview produces the same beats, so a previewed Light and an awarded one are one function.
+The run's `light` accumulates `lightGain`.
 
 Applied-magnitude rules pay the actual magnitude after clamping, not the attempted magnitude.
 A hit that causes combustion remains an applied-effect beat and also emits a separate combust marker.
@@ -342,7 +349,10 @@ Within the unlocked rotation, rulership fixes relative frequencies: the luminari
 Before Mercury unlocks, every combat encounter is necessarily Moon-ruled.
 Saturn's ceilings dwarf per-turn magnitudes, so late-run Saturn nodes are cash-outs.
 
-A run's **final accumulated Distance** is its permanent output. When the run ends — combustion or completion (§11) — that value is inscribed as a star in the Prince's NFT field (`NFT.md`, "The Star-Field"). Nothing else about the run is recorded: not how it ended, not which planets combust. Only the Distance, and the star it earns.
+A run's remaining **Light** is its permanent output.
+When the run ends — combustion or completion (§11) — that value shapes a star in the Prince's NFT field (`NFT.md`, "The Star-Field").
+Nothing else about the run is recorded: not how it ended, not which planets combust.
+Only the Light, and the star it shapes.
 
 ## 13. Interaction Chart Semantics
 

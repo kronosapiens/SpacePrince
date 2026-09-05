@@ -5,7 +5,7 @@ import { getAspects } from "@/game/aspects";
 import { combustionCeiling } from "@/game/combust";
 import { computeProjectedEffects } from "@/game/projections";
 import { PLANETS } from "@/game/data";
-import { logToBeats, scoreBeats, turnScore, type ScoreCharts } from "@/game/score";
+import { logToBeats, scoreBeats, turnLight, type ScoreCharts } from "@/game/score";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
 import type { CombatEncounter, PlanetName, Polarity, Run } from "@/game/types";
@@ -69,8 +69,8 @@ function compare(
   expect(scoreBeats("Jupiter", projection.beats, charts, opponentAction)).toBeGreaterThan(0);
 
   const ruler = encounterRuler(enc);
-  expect(result.log.turnScore).toBe(turnScore(result.log, ruler, charts));
-  expect(result.run.distance - run.distance).toBe(result.log.turnScore);
+  expect(result.log.lightGain).toBe(turnLight(result.log, ruler, charts));
+  expect(result.run.light - run.light).toBe(result.log.lightGain);
   return { projection, result, charts, playerPlanet, opponentPlanet, ruler };
 }
 

@@ -99,12 +99,12 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         )
       : null;
   const settled = encounter.resolved && !animation;
-  const displayedRunDistance = animation?.runningDistance ?? run.distance;
-  const distanceFlashEpoch = animation?.distanceFlashEpoch ?? 0;
-  // Tint each distance flash with the color of the planet resolving on that
+  const displayedRunLight = animation?.runningLight ?? run.light;
+  const lightFlashEpoch = animation?.lightFlashEpoch ?? 0;
+  // Tint each Light flash with the color of the planet resolving on that
   // beat, so the number flashes through the wave's planets rather than one hue.
-  const distanceFlashColor = animation?.distanceFlashPlanet
-    ? PLANET_PRIMARY[animation.distanceFlashPlanet]
+  const lightFlashColor = animation?.lightFlashPlanet
+    ? PLANET_PRIMARY[animation.lightFlashPlanet]
     : null;
   const displayPlayerState = animation?.selfState ?? run.state;
   const displayOpponentState = animation?.otherState ?? encounter.opponentState;
@@ -135,7 +135,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   );
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
-  // and the one that says what earns Distance here (`score.ts` `RULER_RULES`).
+  // and the one that says what gathers Light here (`score.ts` `RULER_RULES`).
   // The score (MUSIC.md) and the screen tint follow it too — combat plays the
   // ruler's theme at the up mix and glows the ruler's colour, both stable for
   // the whole fight. The per-turn actor is not repeated in the ambient layer:
@@ -195,11 +195,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     });
   }, [animation, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, encounter.roster, prince.chart]);
 
-  // What this gesture would move Distance by, under the ruler's rule. Gated
+  // What this gesture would add to Light, under the ruler's rule. Gated
   // like the other verb-dependent previews — nothing until a verb is indicated
   // — and shown at zero too: that a planet cannot score on this node is
   // determined information, not a blank.
-  const projectedScore =
+  const projectedLight =
     !settled && indicatedVerb && previewPlanet && projection
       ? {
           value: scoreBeats(ruler, projection.beats, scoreCharts, opponentAction),
@@ -456,12 +456,12 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       <PlanetBands className="combat-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
       <HelpButton screen="combat" />
       {/* Run- and encounter-level state, lifted out of the centre column so the
-          two charts can have the room. Nothing here is chart data — Distance is
+          two charts can have the room. Nothing here is chart data — Light is
           the run's score, the pips are where we are in this encounter — so it
           reads as chrome without becoming a HUD sitting over the wheels. */}
       <div className="combat-topbar">
         <div className="combat-readouts">
-          {/* Position in the encounter's turn sequence. Unlike Distance this has
+          {/* Position in the encounter's turn sequence. Unlike Light this has
               a real denominator — the sequence length — so a fraction states it
               exactly rather than inventing a ceiling. Live, the numerator is the
               turn being answered; settled, it is the turns actually taken, so an
@@ -483,49 +483,49 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               {encounter.sequence.length}
             </span>
           </div>
-          {/* The score, plainly. Distance is an unbounded sum, so the numeral is
+          {/* The score, plainly. Light has no upper bound, so the numeral is
               the one rendering that invents nothing: no denominator, no ceiling,
               nothing to decode. It reads the same here as on the narrative
               screen and as the star it becomes at end of run.
               Rejected: the doublings track (a tick per doubling banked plus a
-              bar for the run at the current one, `game/distance.ts`). It also
+              bar for the run at the current one, `game/light-scale.ts`). It also
               implied no ceiling, but it stated the score in a code that had to
               be learned before it said anything, and the bar read as progress
               toward a maximum regardless — the exact misread it was built to
               avoid. */}
-          <div className="combat-distance">
-            <span className="eyebrow">DISTANCE</span>
+          <div className="combat-light">
+            <span className="eyebrow">LIGHT</span>
             <span
-              className="combat-distance-v"
+              className="combat-light-v"
               style={
-                distanceFlashColor
-                  ? ({ "--flash-color": distanceFlashColor } as CSSProperties)
+                lightFlashColor
+                  ? ({ "--flash-color": lightFlashColor } as CSSProperties)
                   : undefined
               }
             >
-              {/* The per-beat gain pulse — the only feedback that Distance moved
+              {/* The per-beat gain pulse — the only feedback that Light moved
                   during resolution, tinted by the planet resolving on it. */}
-              {distanceFlashEpoch > 0 && (
+              {lightFlashEpoch > 0 && (
                 <span
-                  key={distanceFlashEpoch}
-                  className="combat-distance-flash anim-distance-flash"
+                  key={lightFlashEpoch}
+                  className="combat-light-flash anim-light-flash"
                   aria-hidden
                 />
               )}
               <span
-                key={`n-${distanceFlashEpoch}`}
+                key={`n-${lightFlashEpoch}`}
                 className={
-                  distanceFlashEpoch > 0
-                    ? "combat-distance-n anim-distance-pop"
-                    : "combat-distance-n"
+                  lightFlashEpoch > 0
+                    ? "combat-light-n anim-light-pop"
+                    : "combat-light-n"
                 }
               >
-                {Math.round(displayedRunDistance)}
+                {Math.round(displayedRunLight)}
               </span>
               {/* What the indicated gesture would add. */}
-              {projectedScore && (
-                <span className="combat-distance-delta" style={{ color: projectedScore.color }}>
-                  +{projectedScore.value}
+              {projectedLight && (
+                <span className="combat-light-delta" style={{ color: projectedLight.color }}>
+                  +{projectedLight.value}
                 </span>
               )}
             </span>
@@ -635,9 +635,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         </div>
         <p className="combat-rule">
           {/* The rule in the ruler's colour, under the name in the same colour.
-              Distance itself stays neutral — no colour stands for it anywhere
+              Light itself stays neutral — no colour stands for it anywhere
               else. */}
-          Distance is <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>
+          Light gathers from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
         </p>
       </div>
 

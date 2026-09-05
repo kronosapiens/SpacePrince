@@ -115,7 +115,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     epoch: number;
     impact: Map<PlanetName, Polarity>;
     combusting: Set<PlanetName>;
-    distance: number; // signed delta; 0 = unchanged
+    light: number; // signed delta; 0 = unchanged
   } | null>(null);
   const epochRef = useRef(0);
   // Freeze the option list at decision time so it stays put after resolution
@@ -154,7 +154,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     }
 
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
-    // a candle-out ripple for any combust, and a Distance pulse (SCREENS.md §3.5).
+    // a candle-out ripple for any combust, and a Light pulse (SCREENS.md §3.5).
     const impact = new Map<PlanetName, Polarity>();
     const combusting = new Set<PlanetName>(newlyCombusted(prince.chart, run.state, nextRun.state));
     for (const p of PLANETS) {
@@ -168,7 +168,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       epoch: epochRef.current,
       impact,
       combusting,
-      distance: nextRun.distance - run.distance,
+      light: nextRun.light - run.light,
     });
     // Each planet the outcome touches rings its degree in the house ruler's
     // mode (MUSIC.md, "The strike grid") — relief lands, harm hangs — so an
@@ -319,18 +319,18 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           })}
         </div>
 
-        <div className="narrative-distance">
-          <span className="eyebrow">DISTANCE</span>
+        <div className="narrative-light">
+          <span className="eyebrow">LIGHT</span>
           <span
-            key={flash?.distance ? flash.epoch : "d"}
-            className={`narrative-distance-v ${flash?.distance ? "anim-distance-pop" : ""}`}
+            key={flash?.light ? flash.epoch : "l"}
+            className={`narrative-light-v ${flash?.light ? "anim-light-pop" : ""}`}
             style={
-              flash?.distance
-                ? ({ "--flash-color": flash.distance > 0 ? "var(--testimony)" : "var(--affliction)" } as CSSProperties)
+              flash?.light
+                ? ({ "--flash-color": flash.light > 0 ? "var(--testimony)" : "var(--affliction)" } as CSSProperties)
                 : undefined
             }
           >
-            {Math.round(run.distance)}
+            {Math.round(run.light)}
           </span>
         </div>
       </div>

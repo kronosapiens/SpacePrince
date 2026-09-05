@@ -41,16 +41,17 @@ It increases specificity.
   Each turn, the player chooses which planet to send against the opponent.
   Sign relationships determine the outcome. Everything else emerges from chart structure.
 
-- **Affliction is the only resource.**
-  No HP, gold, energy, or inventory. A Prince's run state is 7 integers.
-  Affliction accumulates, testimony relieves, combustion silences.
+- **The chart is the economy.**
+  No HP, gold, energy, or inventory.
+  A Prince holds only seven affliction values and the Light gathered by the run.
+  Affliction accumulates, testimony relieves, combustion silences; Light is what remains.
 
 - **Aspects propagate with polarity.**
   Internal aspects carry effects between planets — trines attenuate, squares invert, conjunctions fuse, oppositions flip.
   A chart full of squares is harder to play and rewards mastery.
 
 - **Failure is canonical.**
-  A run ends in combustion as readily as in completion — either way, the world records the Distance it reached.
+  A run ends in combustion as readily as in completion — either way, the world records the Light that remains.
   The chart was always complete — the player is catching up.
 
 ---

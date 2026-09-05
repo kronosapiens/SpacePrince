@@ -187,27 +187,34 @@ The visual system mirrors the mechanical structure of the game.
 
 Every run inscribes a **star** into the field behind the chart.
 
-When a run ends — whether by completing its seven maps or by full combustion before then (`MECHANICS.md §11`) — its **final Distance** (`MECHANICS.md §12`) is recorded as a single permanent point of light, its position and color derived deterministically from the score. A run of greater care leaves a brighter, differently-placed star; a run that combusts out early leaves a fainter one. Completion and failure are recorded the same way, on one axis — the star the run made.
+When a run ends — whether by completing its seven maps or by full combustion before then (`MECHANICS.md §11`) — its remaining **Light** (`MECHANICS.md §12`) determines one permanent star, with position and color derived deterministically from the score.
+More Light leaves a brighter, differently placed star; less leaves a fainter one.
+Completion and failure are recorded the same way, on one axis — the star the run made.
 
 The points accumulate. Over a Prince's life the field fills from a dark sky into a populated one: a visible, non-comparative record of every passage. Reputation without ranking — a sky to read, not a scoreboard to top.
 
-There are **no scars and no entropy-darkening.** The only thing a run leaves behind is the star its Distance earned.
+There are **no scars and no entropy-darkening.**
+The only thing a run leaves behind is the star shaped by the Light it carried out.
 
 #### Placement (working model, not settled)
 
-The field is a grid **100 stars wide by 12 tall**, and a run's final Distance places its star in it.
+The field is a grid **100 stars wide by 12 tall**, and a run's final Light places its star in it.
 
-- **Height is `log2(Distance)`** — one row per doubling, so the twelfth row is 4096.
+- **Height is `log2(Light)`** — one row per doubling, so the twelfth row is 4096.
   Height is therefore countable rather than merely comparative: two rows apart is two doublings, not a vague "better".
-- **Horizontal is `Distance % 100`.**
+- **Horizontal is `Light % 100`.**
   This decorrelates from the score above 100 — 60, 71, 84, 99, 116, 137, 162 land at 60, 71, 84, 99, 16, 37, 62 — so the field reads as a sky rather than as a graph of the scoring function.
 
-The two axes are the same number at two resolutions, which is the point: the same `log2` is what the Distance track renders during a run (`SCREENS.md §3.7`), so the readout a player watches accumulate and the mark it leaves are one idea.
+The two axes use the same number at two resolutions: exact Light scatters stars horizontally, while `log2(Light)` places their vertical band.
+The live readout remains a numeral; `client/src/game/light-scale.ts` retains the `log2` derivation for the future star-field (`SCREENS.md §3.7`).
 Base 2 rather than 10 because it is already the game's own base — the Macrobian unlock schedule is `2^i` (`MECHANICS.md §11.1`) — and because base 10 gives only two or three bands across a realistic score range where base 2 gives six.
 
 Three things are deliberately unresolved:
 
-- **Exact ties collide.** Two runs with identical final Distance land on the same point and stack, so the field would show one star for two passages — which contradicts "a record of every passage" above. Over fifty runs a tie is likelier than not. The cheap fix is breaking ties by run index, already onchain as the star count, at the cost of making position a function of score *and* ordinal rather than score alone.
+- **Exact ties collide.**
+  Two runs with identical final Light land on the same point and stack, so the field would show one star for two passages — which contradicts "a record of every passage" above.
+  Over fifty runs a tie is likelier than not.
+  The cheap fix is breaking ties by run index, already onchain as the star count, at the cost of making position a function of score *and* ordinal rather than score alone.
 - **The top row.** `log2` never stops growing (100,000 is row 16.6), so a run past 4096 either pins at the top or the field grows. Pinning is honest while it stays rare.
 - **The bottom is degenerate.** Below 100 the horizontal is the score itself, and the lowest rows are only a few points apart, so a Prince's first passages cluster low and left in a way later ones never do. Possibly correct — early runs *should* look tentative — but it is a property to choose, not to discover.
 
@@ -218,7 +225,7 @@ Rejected: deriving the horizontal from the position *within* the current doublin
 The NFT only evolves on **meaningful state changes**:
 - House unlocks
 - Planetary expression unlocks
-- A run's final Distance (a new star)
+- A run's final Light (a new star)
 - Major world thresholds
 
 It does not evolve on individual actions, minor choices, or time passage alone.

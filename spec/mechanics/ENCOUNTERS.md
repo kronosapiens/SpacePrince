@@ -17,33 +17,36 @@ It is the **trade surface** between the run's two currencies; combat remains the
 
 ### 1.1 Two currencies
 
-- **Distance** — the run's score (`MECHANICS.md §12`). Run-wide, banked.
+- **Light** — the run's score (`MECHANICS.md §12`).
+  Run-wide, banked.
 - **Chart-health** — low affliction and lit (un-combust) planets. Per-planet, the substrate of survival.
 
-Combat is the only positive-sum engine: healing affliction *both* scores Distance *and* restores chart-health (`MECHANICS.md §12`).
+Combat is the primary positive-sum engine: under the encounter ruler, one resolution can gather Light while also restoring chart-health (`MECHANICS.md §12`).
 Narrative does not add a second engine — it lets the player **trade one currency for the other**, in either direction, at moments combat can't reach.
 
 ### 1.2 Two trade directions
 
 Every encounter is built from two moves and a gamble.
 
-- **Press** — take affliction (now) to gain Distance (now). Spend chart-health for score.
-- **Tend** — spend Distance to heal affliction or call back a combusted planet. Buy chart-health with score.
+- **Press** — take affliction (now) to gain Light (now).
+  Spend chart-health for score.
+- **Tend** — spend Light to heal affliction or call back a combusted planet.
+  Buy chart-health with score.
 - **Wager** — a push-your-luck branch (see §5.3) that resolves Press-or-nothing on a luck roll.
 
 A root node typically offers one of each, plus conditional branches that the chart reveals or hides (§4).
 
 ### 1.3 Why this is bounded (the anti-faucet)
 
-Pressing looks like free Distance, because affliction taken can later be healed in combat for more Distance.
+Pressing looks like free Light, because affliction taken can later be healed in combat for more Light.
 The bound is not an arbitrary cap — it is **run-length**.
 
 A run ends on full combustion, or on completing its seventh map (`MECHANICS.md §11`).
-Affliction taken in narrative pushes planets toward their combustion ceiling, raising the risk of combusting out before the seventh map — forfeiting the encounters you'd otherwise have scored, which lowers the run's final Distance.
-So Press trades run-length for Distance-now; Tend spends Distance to buy run-length back.
+Affliction taken in narrative pushes planets toward their combustion ceiling, raising the risk of combusting out before the seventh map — forfeiting the encounters you'd otherwise have scored, which lowers the run's final Light.
+So Press trades run-length for immediate Light; Tend spends Light to buy run-length back.
 The master loop:
 
-| Move | Distance | Chart-health (run-length) |
+| Move | Light | Chart-health (run-length) |
 |---|---|---|
 | Combat (heal) | **+** | **+** | (the engine: scores *and* survives) |
 | Narrative Press | **+** | **−** | (cash durability for score) |
@@ -58,7 +61,7 @@ Two modifiers compose on every rate.
 
 **House valence** (`HOUSES.md §3.2`) — the fixed character of the place, the same for every chart:
 
-- **Good place** — favorable: Press yields more Distance per affliction; Tend heals more per Distance.
+- **Good place** — favorable: Press yields more Light per affliction; Tend heals more per Light.
 - **Bad place** — unfavorable: Press yields less; Tend costs more.
 
 **Dignity of the conditioning planet** (§4.2) — how well the planet carrying the house sits, by sign:
@@ -82,7 +85,7 @@ Narrative outcomes are restricted to the **combat-shared resources** only.
 | `affliction { planet, delta }` | `delta > 0` harms, `< 0` heals. Clamped at 0. |
 | `combust { planet, value }` | Force combust on/off. |
 | `uncombust { planet }` | Call a combusted planet back (Tend; expensive). |
-| `distance { delta }` | Earn / spend score. Clamped at 0. |
+| `light { delta }` | Gather or spend score, clamped at 0. |
 
 Omen/Lore can return in v2 once combat consumes Omen and Lore unlocks real content; the `Outcome` union keeps room for them but no v1 tree emits them.
 
@@ -161,7 +164,7 @@ Keep each encounter to 2–3 gated branches — do not enumerate all combination
 
 `HOUSES.md §5.0`: benefic joys *add good*, malefic joys *remove bad*. Preserve the asymmetry — a clean benefic is a **bonus**, a clean malefic is a **mitigation**; they must not collapse into one mechanic.
 
-- **Benefic joy (3, 5, 9, 11), well-conditioned:** reveal a **boon** branch — a free or discounted heal / Distance the option list wouldn't otherwise carry.
+- **Benefic joy (3, 5, 9, 11), well-conditioned:** reveal a **boon** branch — a free or discounted heal / Light the option list wouldn't otherwise carry.
 - **Benefic joy, afflicted:** boon branch hidden; replaced by a flattened option ("the pleasure is dimmer than you remember") at the plain rate.
 - **Contained malefic (6, 12), well-conditioned:** affliction taken is **scoped** — bounded magnitude, contained to the joy-planet ("the malefic is honestly employed").
 - **Contained malefic, afflicted:** containment fails — affliction **spills** to other unlocked planets and/or larger magnitude.
@@ -204,14 +207,17 @@ Boon branches, containment branches, and the uncombust rite are **offered** — 
 Numbers are **bands to author within**, not final balance (`HOUSES.md §1` scopes exact curves out). Hold the *relationships*; tune the values in playtest.
 
 - **Affliction magnitudes:** 12–60 per node, on the stat lattice (chip scale — small against combustion ceilings, which are set by durability alone once dignity leaves combat, so narrative chips, combat swings).
-- **Press rate:** ~1 Distance per 2 affliction baseline; good place better (~1:1.5), bad place worse (~1:3). Sub-1:1 so press-then-heal isn't a printer.
-- **Tend rate:** ~2 Distance per affliction healed; good place cheaper. Above 1:1 because combat heals "for free" via scoring — narrative Tend is the between-combat / emergency heal.
+- **Press rate:** ~1 Light per 2 affliction baseline; good place better (~1:1.5), bad place worse (~1:3).
+  Sub-1:1 so press-then-heal isn't a printer.
+- **Tend rate:** ~2 Light per affliction healed; good place cheaper.
+  Above 1:1 because combat heals "for free" via scoring — narrative Tend is the between-combat / emergency heal.
 - **Dignity nudge:** a Strong / Weak conditioning planet shifts Press and Tend one band more / less favorable (§1.4), stacking with valence. Keep each notch ≈ the good-place/bad-place gap, so dignity colors the trade without dominating it.
-- **Uncombust:** ~72–96 Distance, rite-gated (house 8, secondarily 4). The run-saver, deliberately steep.
-- **Per-encounter Press ceiling:** ~+72 Distance, so no single node dominates a turn-score's worth.
+- **Uncombust:** ~72–96 Light, rite-gated (house 8, secondarily 4).
+  The run-saver, deliberately steep.
+- **Per-encounter Press ceiling:** ~+72 Light, so no single node dominates a turn-score's worth.
 - **Wager:** safe option ≈ baseline; risky option ≈ 2× payoff on success vs proportional affliction on fail; two-rung ≈ 3× at rung 2.
 
-A full encounter's net Distance should sit in the range of a single combat turn-score, so neither node type dominates run scoring.
+A full encounter's net Light should sit in the range of a single combat turn-score, so neither node type dominates run scoring.
 
 ---
 
@@ -223,9 +229,9 @@ The five kinds (`HOUSES.md §5.0`) are the generation backbone: each house's 2�
 
 Mercury joy + ASC. The origin; recovery-leaning, gentle rates.
 
-- **Tend (signature):** "return to yourself" — small broad heal across `allUnlocked` at a low Distance cost.
-- **Press:** "stake your name" — Distance for affliction on the conditioning planet.
-- **Boon (`joyStrong`/`joyPresent`, Mercury unlocked):** the strongest line speaks — discounted heal + small Distance.
+- **Tend (signature):** "return to yourself" — small broad heal across `allUnlocked` at a low Light cost.
+- **Press:** "stake your name" — Light for affliction on the conditioning planet.
+- **Boon (`joyStrong`/`joyPresent`, Mercury unlocked):** the strongest line speaks — discounted heal + small Light.
 - Voice: Mercury (the turn, paradox, the new beginning one is always arriving at).
 
 ### 7.2 Pure angular — Houses 4 (Home/IC), 7 (Relationships/DSC), 10 (Achievement/MC)
@@ -234,7 +240,7 @@ No joy → conditioned by **ruler dignity** (`rulerStrong`/`rulerWeak`) + diurna
 
 - **4 (IC, interior):** Tend-heavy — rest and heal; `rulerStrong` deepens the rest. The recovery house.
 - **7 (DSC, the other):** relational Wager — ally (mutual heal) vs duel (push-your-luck on relating). Balanced.
-- **10 (MC, summit):** Press/Wager-heavy — the visible monument, the two-rung gamble for big Distance and big variance.
+- **10 (MC, summit):** Press/Wager-heavy — the visible monument, the two-rung gamble for big Light and big variance.
 
 ### 7.3 Benefic joy — Houses 3 (Moon), 5 (Venus), 9 (Sun), 11 (Jupiter)
 
@@ -242,22 +248,23 @@ Good place + benefic joy. Asymmetric rule: well-conditioned joy **adds a boon** 
 
 - **3 (Moon):** reflective heal — listen, recover; afflicted Moon flattens to "letters arrive folded."
 - **5 (Venus):** play / creative Wager — the boon is a strong heal; the gamble is "games of chance" (two-rung).
-- **9 (Sun):** illumination — study for Distance + heal; the far country, vows.
-- **11 (Jupiter):** the gift — unearned Distance + heal when Jupiter is clean; "no one at the door" when afflicted.
+- **9 (Sun):** illumination — study for Light + heal; the far country, vows.
+- **11 (Jupiter):** the gift — unearned Light + heal when Jupiter is clean; "no one at the door" when afflicted.
 
 ### 7.4 Contained malefic — Houses 6 (Mars/Labor), 12 (Saturn/Hidden)
 
 Bad place + malefic joy. Asymmetric rule: well-conditioned joy **caps the downside** (§4.4: scoped vs spill). Unfavorable rates, but legible when contained.
 
-- **6 (Mars):** toil — Press for Distance; contained Mars absorbs the cut; uncontained Mars spills to other unlocked planets.
+- **6 (Mars):** toil — Press for Light; contained Mars absorbs the cut; uncontained Mars spills to other unlocked planets.
 - **12 (Saturn):** concealment — hidden costs; contained Saturn keeps them scoped and legible; uncontained = unseen spill arriving late.
 
 ### 7.5 Pure bad place — Houses 2 (Livelihood), 8 (Transformation)
 
 Averse, no joy, not angular → **identical for every chart** (the two gates). Flat unfavorable rates. The heaviest, most final trades; conditioned only by whole-chart run-state.
 
-- **2 (Gate of Hades):** scarcity — the **debt** mechanic: big Distance now for big affliction later (borrow against tomorrow).
-- **8 (death-house):** zero-sum — inheritance (Distance at a steep affliction/combust cost) and the home of the **uncombust rite** (`anyCombusted` → spend Distance to call a planet back). Two-rung Wager fits the crisis theme.
+- **2 (Gate of Hades):** scarcity — the **debt** mechanic: big Light now for big affliction later (borrow against tomorrow).
+- **8 (death-house):** zero-sum — inheritance (Light at a steep affliction/combust cost) and the home of the **uncombust rite** (`anyCombusted` → spend Light to call a planet back).
+  Two-rung Wager fits the crisis theme.
 
 ---
 
@@ -298,7 +305,8 @@ The only elevated register is the **aria** (the curated fragment floating above)
 - **Aria** — one curated, public-domain chorus fragment in the **ruler's** voice (`fragmentMood` per tree). One per *encounter*, not per node. Never explains the mechanic.
 - **Node text** — 1–2 sentences, present tense, second person, concrete and grounded (a thing happens; a choice is offered). Sets the dilemma, not the numbers.
 - **Option label** — imperative, second person, short. The *choice* ("Take the one coin and go."), never the mechanic.
-- **Aside** — the plain mechanical summary, utilitarian register, explicit ("+2 Distance · heal 2 where it's needed most"). All numbers live here.
+- **Aside** — the plain mechanical summary, utilitarian register, explicit ("+2 Light · heal 2 where it's needed most").
+  All numbers live here.
 - **Resolution line** — one short consequence sentence.
 
 The aria carries the planet's voice; the body stays plain.

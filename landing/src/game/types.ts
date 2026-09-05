@@ -81,7 +81,7 @@ export interface TurnLogEntry {
   playerCombust?: boolean;
   opponentCombust?: boolean;
   propagation: PropagationEntry[];
-  turnScore: number;
+  lightGain: number;
   directBreakdown: {
     playerBase: number;
     friction: number;
@@ -162,7 +162,7 @@ export interface NodeOutcome {
   kind: "combat" | "narrative";
   // free-form summary for End-of-Run inspection
   summary: string;
-  distanceDelta: number;
+  lightDelta: number;
   combusts: PlanetName[];
 }
 
@@ -191,7 +191,7 @@ export interface RunState {
   seed: number;
   startedAt: number;
   perPlanetState: SideState;
-  runDistance: number;
+  runLight: number;
   runOmens: Omen[];
   currentMap: MapState;
   mapHistory: MapState[];

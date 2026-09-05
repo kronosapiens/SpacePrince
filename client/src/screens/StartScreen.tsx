@@ -188,8 +188,8 @@ export function StartScreen() {
               <strong>creating and relieving tension.</strong> {" "}
             </p>
             <p>
-              Tension held and relieved, over and over, carries you forward.
-              Every game measures one thing: <strong>how far you can go.</strong>
+              Tension held and relieved, over and over, gathers into <strong>Light.</strong>
+              When the passage ends, that Light becomes a star.
             </p>
             <p>
               The goal isn't to win, but to better understand yourself.

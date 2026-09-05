@@ -48,7 +48,7 @@ export interface ProjectedEffectsBySide {
   self: Partial<Record<PlanetName, ProjectedEffect>>;
   other: Partial<Record<PlanetName, ProjectedEffect>>;
   /** The same projected turn as scoring beats, in the order `logToBeats` would
-   *  produce for the resolved turn — so the previewed Distance and the awarded
+   *  produce for the resolved turn — so the previewed Light and the awarded
    *  one are one function (`score.ts` `scoreBeats`). */
   beats: ScoredBeat[];
 }

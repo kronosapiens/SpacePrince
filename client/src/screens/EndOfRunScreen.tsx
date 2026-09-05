@@ -46,7 +46,7 @@ export function EndOfRunScreen() {
 
   return (
     <EndOfRunView
-      runDistance={run.distance}
+      runLight={run.light}
       numMaps={allMaps.length}
       totalEncounters={totalEncounters}
       allMaps={allMaps}
@@ -57,7 +57,7 @@ export function EndOfRunScreen() {
 }
 
 interface EndOfRunViewProps {
-  runDistance: number;
+  runLight: number;
   numMaps: number;
   totalEncounters: number;
   allMaps: MapState[];
@@ -70,7 +70,7 @@ interface EndOfRunViewProps {
 const CROSSFADE_MS = 200;
 
 function EndOfRunView({
-  runDistance,
+  runLight,
   numMaps,
   totalEncounters,
   allMaps,
@@ -122,8 +122,8 @@ function EndOfRunView({
     <div className="eor">
       <div className="eor-counts">
         <div>
-          <span className="eor-big">{Math.round(runDistance).toLocaleString()}</span>
-          <span className="eyebrow">DISTANCE</span>
+          <span className="eor-big">{Math.round(runLight).toLocaleString()}</span>
+          <span className="eyebrow">LIGHT</span>
         </div>
         <div>
           <span className="eor-big">{numMaps}</span>

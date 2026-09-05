@@ -45,7 +45,7 @@ describe("princeReducer", () => {
     const b = beginRun(2);
     let state = princeReducer(p, { kind: "startRun", run: a })!;
     state = princeReducer(state, { kind: "startRun", run: b })!;
-    const bMoved = { ...b, distance: 42 };
+    const bMoved = { ...b, light: 42 };
     const after = princeReducer(state, { kind: "commitRun", run: bMoved })!;
     expect(after.runs).toEqual([a, bMoved]);
   });

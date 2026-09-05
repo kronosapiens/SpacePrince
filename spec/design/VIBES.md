@@ -172,6 +172,10 @@ It emerges from the accumulation of fragments, visuals, and sounds across many r
 
 - **Offer a foothold; never force a lesson.** No mandatory tutorial, no didactic interruption, no lesson on what a trine is that a fluent player must read past — the symbolic language is still learned through encounter, not imposed by instruction. But a newcomer with no astrology cannot form intent, and must be able to *summon* understanding: an opt-in, dismissible study layer (the inspect "i" — `SCREENS.md §3.6.1`) that explains mechanics plainly and keeps symbols evocative. The accommodation is summoned, never always-on — a fluent player who never invokes it sees no instruction at all.
 - **Never generate text.** All fragments are authored and curated. Quality over quantity.
-- **Avoid blockbuster game-UI registers.** No "Level Up!", "+3 Attack", or HP-bar flourishes. Restrained functional chrome (a Distance readout, turn cadence) is permitted where it does necessary work — see `SCREENS.md §3.7`. Which opponent planet acts, and with which verb, is not chrome: it reads off the opponent's chart itself. The aesthetic remains sparse and ethereal; treat it as provocation, not a strict ban on UI text.
+- **Avoid blockbuster game-UI registers.**
+  No "Level Up!", "+3 Attack", or HP-bar flourishes.
+  Restrained functional chrome (a Light readout, turn cadence) is permitted where it does necessary work — see `SCREENS.md §3.7`.
+  Which opponent planet acts, and with which verb, is not chrome: it reads off the opponent's chart itself.
+  The aesthetic remains sparse and ethereal; treat it as provocation, not a strict ban on UI text.
 - **Never rush.** Animations, transitions, and text should have pacing. Silence is a design tool. The game respects the player's time by not filling every moment.
 - **Never flatten the mystery.** The player should always feel there is more to understand. Even at maximum progression, the chart should feel partially opaque — not because information is hidden, but because symbolic meaning is inexhaustible.

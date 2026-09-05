@@ -56,7 +56,7 @@ export function beginRun(
     id: `run_${seed}`,
     seed,
     state: blankSideState(),
-    distance: 0,
+    light: 0,
     map: newMapState(mapSeed, combatRulers),
     mapsCompleted: 0,
     encounter: null,

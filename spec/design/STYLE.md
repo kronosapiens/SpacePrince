@@ -197,7 +197,7 @@ For planetary fragments, encounter openings, and any moment where the world is s
 For chrome that must read as legible at small sizes — turn indicators, subtle annotations, accessibility text. Used minimally. If Inter is showing up on a screen, ask whether it needs to.
 
 - **Weight:** 400 (Regular) for body; 500 (Medium) for state indicators.
-- Tracked small caps for the eyebrows (SELF, OTHER, TURN, DISTANCE, RULER); sizes in the stylesheets.
+- Tracked small caps for the eyebrows (SELF, OTHER, TURN, LIGHT, RULER); sizes in the stylesheets.
 
 ### Forbidden moves
 
@@ -205,7 +205,8 @@ For chrome that must read as legible at small sizes — turn indicators, subtle 
 - No all-caps display type. The chorus speaks in sentences.
 - No drop caps. Affectation that doesn't earn its weight.
 - No text on a planetary color. Text rests on neutral.
-- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes. Restrained functional chrome (a Distance readout, the turn fraction) is permitted where it does necessary work; see `SCREENS.md §3.7`.
+- Avoid blockbuster game-UI text registers — no "+3 PERMISSION", "Level Up!", or HP-bar flourishes.
+  Restrained functional chrome (a Light readout, the turn fraction) is permitted where it does necessary work; see `SCREENS.md §3.7`.
 
 ---
 

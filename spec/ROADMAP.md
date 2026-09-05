@@ -44,7 +44,7 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 - [x] **Unlock ceremony** (`SCREENS.md §4.1`).
   The newly unlocked planet emerges from ghost on the map chart anchor when a Macrobian threshold is crossed.
 - [x] **Star-field rendering** (`NFT.md`).
-  Derive from `runs[].distance`: deterministic position and brightness per star; render behind the chart on Title and Chart Study.
+  Derive from `runs[].light`: deterministic position and brightness per star; render behind the chart on Title and Chart Study.
 - [x] **Star inscription** (`SCREENS.md §6.1`).
   At End-of-run the player watches the new star take its place in the field.
 - [x] **Run-ending differentiation.**
@@ -57,7 +57,7 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 - [x] **Dignity wiring** (`ENCOUNTERS.md §1.4, §4.2`).
   Exchange-rate nudges from the conditioning planet's dignity band, applied identically at display and apply time.
-  Shipped shape: dignity surfaces in the option aside at the decision point ("Mercury exalted: +1 Distance"), not in the combat stats panel — `MECHANICS.md §10` deliberately keeps dignity out of combat surfaces.
+  Shipped shape: dignity surfaces in the option aside at the decision point ("Mercury exalted: +1 Light"), not in the combat stats panel — `MECHANICS.md §10` deliberately keeps dignity out of combat surfaces.
 - [x] **House-tenant targeting.**
   Add a targeting-vocabulary entry for the planet standing in the player's own whole-sign house matching the encounter's house.
   This makes the Prince's houses mechanically real — the classical meaning of houses — and shifts the decision space per chart (`HOUSES.md §3.4`) without touching combat.
@@ -72,7 +72,7 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 ## Phase 3 — The run's shape
 
 - [x] **Run journal** (`SCREENS.md §6.4`).
-  One quiet line per run — maps completed, final Distance — on End-of-run and Chart Study.
+  One quiet line per run — maps completed, final Light — on End-of-run and Chart Study.
 - [ ] **Map-as-strategy legibility.**
   A glance at a narrative node should answer "a place to earn or a place to heal" (house valence is fixed and public).
   Partially served by the existing map study drop-downs; a valence-at-a-glance cue on the node itself remains open.

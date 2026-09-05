@@ -45,12 +45,12 @@ Open question: should new resources be introduced to make these mechanics richer
 |---|---|---|
 | **Affliction** | Per-planet, real-valued | Same units as combat. Can be added or healed. |
 | **Combustion** | Per-planet, binary | Can be applied *or removed*. Uncombust is allowed (see §4). |
-| **Distance** | Run-wide, integer-ish | The run's score metric. Can be earned or spent. |
+| **Light** | Run-wide, integer-ish | The run's gathered or spent score metric. |
 | **Omen** (new) | Run-scoped, temporary | Buff/debuff active until end of run or trigger condition. |
 | **Lore** (new) | Persistent on Prince | Unlocks copy, hidden chart annotations, future content. |
 
 Encounters cost and reward in these terms.
-A decision tree might offer: "lose 3 distance, heal 2 affliction on Mars" or "combust Venus, unlock a lore entry, gain a +1 luck omen for the rest of the run."
+A decision tree might offer: "spend 3 Light, heal 2 affliction on Mars" or "combust Venus, unlock a lore entry, gain a +1 luck omen for the rest of the run."
 
 ---
 

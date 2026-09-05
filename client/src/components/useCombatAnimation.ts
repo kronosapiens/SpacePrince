@@ -64,15 +64,15 @@ export interface CombatAnimationState {
    *  `encounter.opponentActions[turnIndex]` and that slot isn't overwritten. */
   playerValence: Polarity;
   turnIndex: number;
-  /** Distance shown right now — starts at the pre-turn total and ticks up as
+  /** Light shown right now — starts at the pre-turn total and ticks up as
    *  each planet's affliction resolves, in step with the resolution beats. */
-  runningDistance: number;
-  /** Bumps once per distance increase; used as a React key so the flash
+  runningLight: number;
+  /** Bumps once per Light increase; used as a React key so the flash
    *  behind the number re-triggers on every resolution. */
-  distanceFlashEpoch: number;
+  lightFlashEpoch: number;
   /** The planet whose affliction resolved on the latest beat — its color tints
    *  that beat's flash, so the number flashes through the wave's planets. */
-  distanceFlashPlanet: PlanetName | null;
+  lightFlashPlanet: PlanetName | null;
   activePropagationKeys: FlagPair<string>;
   actionPulse: { player: PlanetName | null; opponent: PlanetName | null };
   impactPlanets: { self: ImpactMap; other: ImpactMap };
@@ -230,18 +230,18 @@ function runScheduler(args: {
   timeoutIds.current.forEach((id) => window.clearTimeout(id));
   timeoutIds.current = [];
 
-  // Distance ticks per beat under the encounter's ruler, so the running number
+  // Light ticks per beat under the encounter's ruler, so the running number
   // climbs by exactly what the turn awards and never snaps at the end. The
   // beats ticked below are the ones `logToBeats` walks — same fields, same
-  // order, which is the order of record — so they sum to `entry.turnScore`.
+  // order, which is the order of record — so they sum to `entry.lightGain`.
   const ruler = encounterRuler(previousEncounter);
   const charts: ScoreCharts = { self: playerChart, other: previousEncounter.opponentChart };
   const tick = (state: CombatAnimationState, beat: ScoredBeat) => {
     const gain = beatScore(ruler, beat, charts, entry.opponentValence);
     if (gain <= 0) return;
-    state.runningDistance += gain;
-    state.distanceFlashEpoch += 1;
-    state.distanceFlashPlanet = beat.target;
+    state.runningLight += gain;
+    state.lightFlashEpoch += 1;
+    state.lightFlashPlanet = beat.target;
   };
 
   const updateAnimation = (
@@ -261,9 +261,9 @@ function runScheduler(args: {
     opponentPlanet: entry.opponentPlanet,
     playerValence: entry.playerValence,
     turnIndex: previousEncounter.turnIndex,
-    runningDistance: previousRun.distance,
-    distanceFlashEpoch: 0,
-    distanceFlashPlanet: null,
+    runningLight: previousRun.light,
+    lightFlashEpoch: 0,
+    lightFlashPlanet: null,
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,
     actionPulse: { player: null, opponent: null },
     impactPlanets: { self: EMPTY_IMPACT_MAP, other: EMPTY_IMPACT_MAP },

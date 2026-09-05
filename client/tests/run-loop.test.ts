@@ -117,11 +117,11 @@ describe("Run loop integration", () => {
     expect(next).not.toContain(firstNeighbor);
   });
 
-  it("narrative outcomes can heal / harm / spend distance and uncombust", () => {
+  it("narrative outcomes can heal / harm / spend Light and uncombust", () => {
     const prince = createStubPrince({ seed: 11 });
     const sunCeiling = combustionCeiling(prince.chart.planets.Sun);
     let r = beginRun(5);
-    r = { ...r, distance: 10, state: { ...r.state } };
+    r = { ...r, light: 10, state: { ...r.state } };
     r.state.Sun = { affliction: sunCeiling }; // at the ceiling = combusted (derived)
 
     const ctx = buildNarrativeContext({
@@ -133,12 +133,33 @@ describe("Run loop integration", () => {
     });
     r = applyOutcomes(r, prince, [
       { kind: "uncombust", target: "Sun" },
-      { kind: "distance", delta: -3 },
+      { kind: "light", delta: -3 },
     ], ctx);
     // The rite returns the planet at half ceiling — back, but scarred (§10).
     expect(isCombusted(prince.chart.planets.Sun, r.state.Sun)).toBe(false);
     expect(r.state.Sun.affliction).toBe(sunCeiling / 2);
-    expect(r.distance).toBe(7);
+    expect(r.light).toBe(7);
+  });
+
+  it("narrative Light gathers, spends, and clamps at zero", () => {
+    const prince = createStubPrince({ seed: 12 });
+    const run = { ...beginRun(6), light: 10 };
+    const ctx = buildNarrativeContext({
+      prince,
+      run,
+      joyPlanet: null,
+      rulerPlanet: "Moon",
+      unlocked: [...PLANETS],
+    });
+
+    const gathered = applyOutcomes(run, prince, [{ kind: "light", delta: 12 }], ctx);
+    expect(gathered.light).toBe(22);
+
+    const spent = applyOutcomes(gathered, prince, [{ kind: "light", delta: -7 }], ctx);
+    expect(spent.light).toBe(15);
+
+    const depleted = applyOutcomes(spent, prince, [{ kind: "light", delta: -99 }], ctx);
+    expect(depleted.light).toBe(0);
   });
 
   it("combat length equals the map number; the opponent fields the player's tier (mirror)", () => {

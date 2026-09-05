@@ -2,11 +2,11 @@ import { combustionCeiling } from "./combust";
 import type { Chart, PlanetName, Polarity, TurnLogEntry } from "./types";
 
 /**
- * Distance is one additive number on the lattice (MECHANICS §12), and each
+ * Light is one additive number on the lattice (MECHANICS §12), and each
  * ruler pays for what that planet values: the encounter's scoring rule is keyed
  * on the ruler of the opponent's chart. "Your own chart never scores" is now the
  * Moon's rule, not the game's. The star canon is unchanged — a run's final
- * Distance is still the permanent mark it leaves on the NFT.
+ * Light is still the permanent mark it leaves on the NFT.
  *
  * Scoring runs over normalized beats, which both the resolver's turn log
  * (`logToBeats`) and the projection preview (`projections.ts`) produce, so a
@@ -31,7 +31,7 @@ export interface ScoringRule {
   chart: "other" | "both";
   channel: "all" | "direct" | "combust";
   payout: "magnitude" | "ceiling";
-  /** Player-facing phrase completing "Distance is …". */
+  /** Player-facing phrase completing "Light gathers from …". */
   label: string;
 }
 
@@ -152,7 +152,7 @@ export function logToBeats(entry: TurnLogEntry): ScoredBeat[] {
   return beats;
 }
 
-export function turnScore(
+export function turnLight(
   entry: TurnLogEntry,
   ruler: PlanetName,
   charts: ScoreCharts,

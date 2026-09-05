@@ -127,13 +127,13 @@
   100% { transform: scale(1.9); opacity: 0; }
 }
 
-/* Distance gain — flash behind the number + a brief pop, per resolution beat. */
-@keyframes distance-flash {
+/* Light gain — flash behind the number + a brief pop, per resolution beat. */
+@keyframes light-flash {
   0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0.5); }
   25%  { opacity: 0.85; }
   100% { opacity: 0;    transform: translate(-50%, -50%) scale(1.7); }
 }
-@keyframes distance-pop {
+@keyframes light-pop {
   0%   { transform: scale(1);    color: var(--bone); }
   35%  { transform: scale(1.22); color: var(--flash-color, var(--testimony)); }
   100% { transform: scale(1);    color: var(--bone); }
@@ -149,8 +149,8 @@
 .anim-impact-bloom     { animation: impact-bloom 460ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
 .anim-combust-ripple-2 { animation: combust-ripple-2 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
-.anim-distance-flash { animation: distance-flash 520ms var(--ease-out) both; }
-.anim-distance-pop   { animation: distance-pop 420ms var(--ease-out) both; }
+.anim-light-flash { animation: light-flash 520ms var(--ease-out) both; }
+.anim-light-pop   { animation: light-pop 420ms var(--ease-out) both; }
 .anim-map-current-halo {
   animation: map-current-halo-breath 4s ease-in-out infinite;
   transform-origin: center;
@@ -280,8 +280,8 @@
   .anim-impact-bloom,
   .anim-combust-ripple,
   .anim-combust-ripple-2,
-  .anim-distance-flash,
-  .anim-distance-pop,
+  .anim-light-flash,
+  .anim-light-pop,
   .anim-map-current-halo,
   .planet-corona,
   .anim-surface-in { animation: none; }

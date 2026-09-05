@@ -39,15 +39,15 @@ export function applyOutcomes(
   ctx: NarrativeContext,
 ): Run {
   const state = cloneSideState(run.state);
-  let distance = run.distance;
+  let light = run.light;
 
   // resolve targets against the state as it mutates
   const liveCtx: NarrativeContext = { ...ctx, perPlanetState: state };
 
   for (const o of outcomes) {
     switch (o.kind) {
-      case "distance":
-        distance = Math.max(0, distance + o.delta);
+      case "light":
+        light = Math.max(0, light + o.delta);
         break;
       case "affliction": {
         for (const p of resolveTargets(o.target, liveCtx)) {
@@ -70,5 +70,5 @@ export function applyOutcomes(
     }
   }
 
-  return { ...run, state, distance };
+  return { ...run, state, light };
 }

@@ -17,7 +17,7 @@ Prince {
   chart:         Chart,          -- memoized at mint: f(position) via compute_chart, stored to avoid re-running the ephemeris
   numEncounters: u8,             -- cumulative lifetime encounters (saturating; only needs to reach 32); gates planet unlock (MECHANICS §11.1)
   achievements:  u64,            -- bitmap of unlocked achievements (reserved; §11.2 deferred)
-  runs:          Array<Run>,     -- every run this Prince has played; the star-field derives from runs[].distance
+  runs:          Array<Run>,     -- every run this Prince has played; the star-field derives from runs[].light
   -- ERC-721 standard fields (token id, ownerOf, approvals) come from the token base and are not re-listed here.
 }
 
@@ -33,7 +33,7 @@ Chart {
 
 Run {
   seed:          felt252,        -- one true-RNG draw at run start; seeds all previewable map structure + gives between-run variety
-  distance:      u64,            -- cumulative Distance; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
+  light:         u64,            -- cumulative Light; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
   state:         u64,            -- per-planet run state: 7 × u9 affliction = 63 bits (ceilings reach 360, MECHANICS §10); combustion is derived, not stored
   map:           Map,            -- the current map only; past maps are emitted as events, not stored
   mapsCompleted: u3,             -- maps finished this run, 0..7; the run ends at 7 (completion, MECHANICS §11)
@@ -83,11 +83,11 @@ With a fixed seed the map is knowable, but each encounter's adversary and its tu
 Three tiers, separated by who needs to read the data.
 
 **Stored** — contract-readable, needed by gameplay logic and the onchain SVG render:
-`Prince`, `Position`, `Chart`, and the current `Run` (including its `seed` and `distance`).
+`Prince`, `Position`, `Chart`, and the current `Run` (including its `seed` and `light`).
 
 **Derived** — computed at read time, never written:
 
-- `starField` = `runs.filter(over).map(r => r.distance)` — read by the NFT render; no separate array, since the distance already lives on each run.
+- `starField` = `runs.filter(over).map(r => r.light)` — read by the NFT render; no separate array, since the Light already lives on each run.
 - A planet is **combusted** when `affliction >= ceiling` (MECHANICS §10): affliction caps at the ceiling and combustion triggers there, so the affliction lane carries the flag for free.
   Rejected: a stored per-planet combust bit — it widened `state` lanes to 10 bits (u128) to duplicate what the cap already encodes.
 - A run is **over** when `mapsCompleted == 7` or all seven planets have combusted — a pure function of stored fields, so no status flag is stored.
@@ -96,15 +96,15 @@ Three tiers, separated by who needs to read the data.
 
 **Evented** — client/indexer-readable only, never contract-readable:
 past maps and run history, so the client can render a run's provenance.
-Events cannot be read onchain, which is exactly why each run's `distance` must stay in storage rather than being evented away with its maps.
+Events cannot be read onchain, which is exactly why each run's `light` must stay in storage rather than being evented away with its maps.
 
 ## Notes
 
 `numEncounters` is materialized on the Prince rather than derived, because per-run encounter counts are not recoverable from stored state once a run's maps are evented.
 It is the planet-unlock counter; a saturating `u8` is plenty, since unlock completes at 32.
 
-Only the tail run carries live state; earlier runs are inert apart from `distance`.
-Whether to physically prune a finished run's other fields or keep the full struct is an implementation choice — conceptually the array's payload is the distances.
+Only the tail run carries live state; earlier runs are inert apart from `light`.
+Whether to physically prune a finished run's other fields or keep the full struct is an implementation choice — conceptually the array's payload is the Light values.
 
 Narrative gating (joy/ruler options, uncombust-rites gated on planet state) must live in the contract so it can validate a client-submitted outcome; the multi-step tree-walk itself is presentation only.
 

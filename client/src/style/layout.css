@@ -563,7 +563,7 @@
    overlay, so the mobile stack needs no separate positioning. */
 /* Baseline-aligned: both groups lead with an eyebrow, and those two words are
    what the eye lines up. Centring instead drifts them apart, because the
-   Distance group is as tall as its numeral while the Turns group is only as
+   Light group is as tall as its numeral while the Turns group is only as
    tall as its label. */
 /* The wheel's box is square but the chart is round, so the box's top corners
    are empty: the strip reaches down into them by `--combat-overlap`, and the
@@ -685,7 +685,7 @@
   color: var(--mist);
   font-weight: 500;
 }
-.combat-distance {
+.combat-light {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -693,10 +693,10 @@
 }
 /* Both readouts are the same type on the same baseline — the turn pips were the
    odd one out, and shape beside numerals in a two-item strip read as two
-   languages. Tabular figures so the digits don't jitter as Distance ticks up
+   languages. Tabular figures so the digits don't jitter as Light ticks up
    through a resolution wave. */
 .combat-turns-v,
-.combat-distance-v,
+.combat-light-v,
 .combat-ruler-v {
   font-family: var(--serif);
   font-size: 30px;
@@ -707,20 +707,20 @@
   font-feature-settings: "tnum";
 }
 /* Anchors the gain pulse, which is absolutely positioned behind the digits. */
-.combat-distance-v { position: relative; }
+.combat-light-v { position: relative; }
 /* The denominator is context, not the reading — the turn you are on is. */
 .combat-turns-sep {
   color: var(--mist);
   margin: 0 0.12em;
 }
-.combat-distance-n {
+.combat-light-n {
   position: relative;
   z-index: 1;
   display: inline-block;
 }
 /* The previewed gain appends beside the centered total without participating
    in its width, so appearing and disappearing never recenter the readout. */
-.combat-distance-delta {
+.combat-light-delta {
   position: absolute;
   left: 100%;
   bottom: 0;
@@ -731,7 +731,7 @@
 }
 /* Gain pulse — a wash behind the number, replayed per resolution beat and
    tinted by the planet resolving on it. */
-.combat-distance-flash {
+.combat-light-flash {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1032,10 +1032,10 @@
   .combat-announce-line { font-size: 23px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
-  .combat-distance,
+  .combat-light,
   .combat-ruler { margin-top: 4px; gap: 2px; }
   .combat-turns-v,
-  .combat-distance-v,
+  .combat-light-v,
   .combat-ruler-v { font-size: clamp(18px, 5vw, 22px); }
   .combat-rule { font-size: 19px; }
 }
@@ -1060,7 +1060,7 @@
   gap: 24px;
 }
 .narrative-chart > svg { width: min(560px, 40vw); height: auto; }
-.narrative-distance {
+.narrative-light {
   grid-column: 1 / 3;
   display: flex;
   flex-direction: row;
@@ -1069,7 +1069,7 @@
   gap: 12px;
   margin-top: 18px;
 }
-.narrative-distance-v {
+.narrative-light-v {
   font-family: var(--serif);
   font-size: 22px;
   font-weight: 500;

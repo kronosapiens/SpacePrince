@@ -112,7 +112,7 @@ export function IndexScreen() {
         {run ? (
           <>
             <div className="index-row">Run id: <span className="muted">{run.id}</span></div>
-            <div className="index-row">Distance: {run.distance.toFixed(1)}</div>
+            <div className="index-row">Light: {run.light.toFixed(1)}</div>
             <div className="index-row">Maps completed: {run.mapsCompleted}</div>
           </>
         ) : (

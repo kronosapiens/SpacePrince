@@ -50,9 +50,9 @@ Generated other-charts are named `Other N`, never `Adversary`.
 
 **Combat, adversary, and opponent are internal vocabulary only** — the developers' easy metaphor for the interaction (`MECHANICS.md`, code identifiers, this spec's internals).
 They never reach a player surface: not in copy, labels, summaries, or aria text.
-The mechanical terms the player does see are register-safe by construction: the verbs Afflict/Testify, the operational readouts Resolve and Fortune, Distance, and the stats **Impact / Witness / Durability / Luck** — impact and witness replaced the RPG-inherited damage and healing (witness is the Hellenistic term behind testimony: planets bear witness to one another).
+The mechanical terms the player does see are register-safe by construction: the verbs Afflict/Testify, the operational readouts Resolve and Fortune, Light, and the stats **Impact / Witness / Durability / Luck** — impact and witness replaced the RPG-inherited damage and healing (witness is the Hellenistic term behind testimony: planets bear witness to one another).
 
-**Casing.** Named quantities are capitalized in prose — **Resolve, Fortune, Distance** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").
+**Casing.** Named quantities are capitalized in prose — **Resolve, Fortune, Light** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").
 Substances and processes stay lowercase — affliction, testimony, tension, combustion, aspects, and the four stats (impact, witness, durability, luck) in flowing text; the fortune roll is a process and stays lowercase.
 Verbs follow mention vs use: named as actions they are capped ("choose Afflict or Testify"); used as English they are not ("afflict their actor before it swings").
 Display labels — table headers, stat lines, the uppercase micro-type (SELF, OTHER) — take title or upper case as chrome styling, independent of prose casing.
@@ -214,7 +214,9 @@ A player who never touches it sees the plain panel; the annotations exist only w
 
 With study **off**, the panel shows only **operational numbers** — what matters this turn:
 
-- **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out. Now that combustion is deterministic, this is literally its HP. "Resolve" stays in a bespoke, character register (the operational sibling of Afflict/Testify, not the generic "HP") and maps cleanly to its underlying stat, Durability — more legible than the earlier, too-abstract "Light."
+- **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out.
+  Now that combustion is deterministic, this is literally its HP.
+  "Resolve" stays in a bespoke, character register (the operational sibling of Afflict/Testify, not the generic "HP") and maps cleanly to its underlying stat, Durability.
 - **Fortune %** — the fortune roll, `luck / 120` (`MECHANICS.md §7`): the planet's odds at map boundaries (uncombusting, or halving its barrage share). Not a combat number — combat is deterministic — but shown here so luck stays a legible stat.
 - **Afflict / Testify** — the planet's impact and witness, carried by the two action buttons.
 
@@ -260,23 +262,23 @@ The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aes
 None of it is chart data, so it reads as chrome without becoming a HUD sitting over the wheels.
 
 **What moves sits above the charts; what is fixed sits below.**
-Above: the turn, Distance, and the sentence naming the other's move — the three things that change during play.
+Above: the turn, Light, and the sentence naming the other's move — the three things that change during play.
 Below, between the SELF and OTHER labels: the encounter's ruler and its rule, constant from the first turn to the last.
 
 **Allowed:**
 
-- **Distance.** The run's accumulating score (per `MECHANICS.md §12`), shown as a numeral.
-  Distance is an unbounded sum with no ceiling anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
+- **Light.** The run's accumulating score (per `MECHANICS.md §12`), shown as a numeral.
+  Light has no upper bound anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
   A numeral invents nothing: it has no denominator to imply and nothing to decode.
   It reads the same here, on the narrative screen, and as the star it becomes at end of run.
   While a verb is indicated for a previewed planet, the numeral carries the projected gain for that move in the verb's colour, computed by the same function that will award it — verb-dependent information, so it appears only once a verb is indicated (§3.6), and it shows `+0` plainly on a node the planet cannot score on.
-  A pulse behind the digits, tinted by whichever planet is resolving, is the only feedback that Distance moved during a resolution wave.
+  A pulse behind the digits, tinted by whichever planet is resolving, is the only feedback that Light moved during a resolution wave.
 
   Rejected: a bar for the current doubling.
   It measured a span of *log* rather than a fraction of any maximum, but a partial bar reads as progress toward a maximum whatever it measures, which is the misread it was built to avoid.
-  The `log2` derivation survives in `client/src/game/distance.ts` because it still places the run's star in the NFT field (`NFT.md`); it is simply no longer a live readout.
+  The `log2` derivation survives in `client/src/game/light-scale.ts` because it still places the run's star in the NFT field (`NFT.md`); it is simply no longer a live readout.
 - **Turn.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
-  Unlike Distance this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
+  Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
   It is not swapped for an outcome word at the settle: the Continue button already says the encounter is over, and its label (*Continue* / *Walk back*) already says whether the run survived.
 
@@ -291,7 +293,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 
   Rejected: a second line, *"How do you respond?"*.
   Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.
-- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating what earns Distance here (*Distance is affliction on the other's chart*), the rule in the same colour and Distance itself neutral.
+- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating what gathers Light here (*Light gathers from affliction on the other's chart*), the rule in the same colour and Light itself neutral.
   The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
 
 **Out:**
@@ -301,7 +303,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 - Instructional hints ("Hover a planet to inspect. Click a planet to act.") — the grammar should be discoverable; if it isn't, that's a structural failure to fix, not to paper over with copy.
 - HP bars, "+N attack" registers, blockbuster game-UI flourishes.
   The affliction arc is not one of these, and the distinction is the point: an HP bar fills against an invented maximum, while the arc's track is a real ceiling the game already has (`MECHANICS.md §10`).
-  Distance, which has no ceiling to fill against, is a numeral rather than any kind of bar.
+  Light, which has no ceiling to fill against, is a numeral rather than any kind of bar.
 - Always-visible logs of past turns (those are dev-only).
 - Run-management affordances inside an active run. There is no in-game "abandon" or "new voyage" while a run is in progress; runs continue until full combust regardless of session breaks. The prototype's "New Voyage" button is a development artifact.
 
@@ -471,7 +473,8 @@ A run spans up to seven maps. End-of-run is the wrap of the entire arc, not the 
 
 ### 6.1 The star, and the map browser
 
-The run's permanent output is its **final Distance**, inscribed as a new **star** in the Prince's NFT field (`NFT.md`, "The Star-Field"). End-of-run is where the player watches that star take its place — the quiet payoff of the passage, whether the run completed or combusted out.
+The run's permanent output is its remaining **Light**, inscribed as a new **star** in the Prince's NFT field (`NFT.md`, "The Star-Field").
+End-of-run is where the player watches that star take its place — the quiet payoff of the passage, whether the run completed or combusted out.
 
 Beneath that, end-of-run is **the run's map history, browsable**. The player can page through every map they walked, in order, with the path-trace and outcomes preserved on each.
 
@@ -486,7 +489,8 @@ Reads as: *here is what you walked. Walk it again, in your mind.*
 ### 6.2 Constraints
 
 - Quiet, not theatrical. No "GAME OVER" register.
-- The map browser is the dominant register. Small chrome can carry Distance final and achievements (per `§3.7`), but they don't earn their own zone.
+- The map browser is the dominant register.
+  Small chrome can carry final Light and achievements (per `§3.7`), but they don't earn their own zone.
 
 ### 6.3 Affordances
 
@@ -497,7 +501,9 @@ There is no "restart this run" or "abandon run" affordance — at end-of-run, th
 
 ### 6.4 Open questions
 
-- **Run journal.** A visible record of past runs (one line each: # maps completed, Distance final, etc.)? Candidate lifetime-progression surface. Out of scope for v1; flagged.
+- **Run journal.** A visible record of past runs (one line each: # maps completed, final Light, etc.)?
+  Candidate lifetime-progression surface.
+  Out of scope for v1; flagged.
 - **Chorus on end-of-run.** Currently deferred — possible later detail (e.g. the planet that delivered the final combust speaks one fragment).
 
 ---

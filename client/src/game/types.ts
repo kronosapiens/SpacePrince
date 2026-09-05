@@ -86,7 +86,7 @@ export interface TurnLogEntry {
   playerCombust?: boolean;
   opponentCombust?: boolean;
   propagation: PropagationEntry[];
-  turnScore: number;
+  lightGain: number;
 }
 
 export type SideState = Record<PlanetName, PlanetState>;
@@ -161,7 +161,7 @@ export interface NodeOutcome {
   kind: "combat" | "narrative";
   // free-form summary for End-of-Run inspection
   summary: string;
-  distanceDelta: number;
+  lightDelta: number;
   combusts: PlanetName[];
 }
 
@@ -201,8 +201,8 @@ export interface Run {
   /** Per-planet affliction; persists across encounters and maps, resets only
    *  at run start. Combustion is derived from it, never stored. */
   state: SideState;
-  /** Cumulative Distance — this run's score, its permanent record. */
-  distance: number;
+  /** Cumulative Light — this run's score, its permanent record. */
+  light: number;
   /** The current map only; finished maps are pushed to `events`. */
   map: MapState;
   /** Maps finished this run (0..MAPS_PER_RUN); the run ends by completion at the cap. */
@@ -230,6 +230,6 @@ export interface Prince {
   /** Reserved bitmap of unlocked achievements (deferred, §11.2). */
   achievements: number;
   /** Every run this Prince has played. The active run is the tail iff it is not
-   *  over (STATE.md). Historical runs (incl. their Distance) are read off this. */
+   *  over (STATE.md). Historical runs (incl. their Light) are read off this. */
   runs: Run[];
 }

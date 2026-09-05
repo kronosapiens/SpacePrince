@@ -1,10 +1,10 @@
 import type { Prince } from "@/game/types";
 
-// v2: stats renamed damage/healing → impact/witness (MECHANICS §2); v1
-// princes carry the old keys and would load with undefined stats.
-const PRINCE_KEY = "sp:prince:v2";
-// Pre-STATE.md keys; cleared on first load (no migration — local prototype).
-const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1"];
+// v3: the run score and its nested deltas are named Light throughout; older
+// princes carry pre-Light state and would load with undefined fields.
+const PRINCE_KEY = "sp:prince:v3";
+// Obsolete prototype shapes; cleared on first load (no migration).
+const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2"];
 
 export function loadPrince(): Prince | null {
   try {

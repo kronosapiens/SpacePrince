@@ -69,7 +69,7 @@ export function useCommitTurn() {
           nodeId: nextRun.map.currentNodeId,
           kind: "combat",
           summary: `Encounter · ${result.encounter.opponentChart.name}`,
-          distanceDelta: nextRun.distance - run.distance,
+          lightDelta: nextRun.light - run.light,
           combusts,
         };
         nextRun = {
@@ -107,7 +107,7 @@ export function useCommitNarrative() {
           nodeId: next.map.currentNodeId,
           kind: "narrative",
           summary: args.summary,
-          distanceDelta: next.distance - args.run.distance,
+          lightDelta: next.light - args.run.light,
           combusts,
         };
         next = {

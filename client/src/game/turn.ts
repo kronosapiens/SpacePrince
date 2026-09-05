@@ -3,7 +3,7 @@ import { getAspects, propagatedMagnitude } from "./aspects";
 import { combustionCeiling, isCombusted } from "./combust";
 import { cloneSideState } from "./chart";
 import { encounterRuler } from "./encounter";
-import { turnScore } from "./score";
+import { turnLight } from "./score";
 import { pickWeighted } from "./rng";
 import type {
   Chart,
@@ -90,12 +90,12 @@ export function resolveTurn(
     playerCombust,
     opponentCombust,
     propagation,
-    turnScore: 0,
+    lightGain: 0,
   };
   // Scored after the log is built: the rule is keyed on the encounter's ruler
   // and reads the whole turn as beats (`score.ts`), charts included for the
   // ceilings a combust pays.
-  log.turnScore = turnScore(log, encounterRuler(enc), {
+  log.lightGain = turnLight(log, encounterRuler(enc), {
     self: playerChart,
     other: enc.opponentChart,
   });
@@ -148,7 +148,7 @@ export function resolveTurn(
   const updatedRun: Run = {
     ...run,
     state: playerStateMap,
-    distance: run.distance + log.turnScore,
+    light: run.light + log.lightGain,
     encounter: updatedEnc,
   };
 

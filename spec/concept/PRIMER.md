@@ -27,7 +27,8 @@ Space Prince is a game about astrology. But it's unlike others you've played.
 
 Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by **creating and relieving tension.**
 
-Tension held and relieved, over and over, carries you forward. Every game measures one thing: **how far you can go.**
+Tension held and relieved, over and over, gathers into **Light.**
+When the passage ends, that Light becomes a star.
 
 The goal isn't to win, but to better understand yourself.
 
@@ -87,7 +88,7 @@ The game is about attention and balance, not conquest.
 
 And nothing resets.
 Every run is kept, permanently, written into the world.
-Each one leaves a single **star** in your sky — its light the measure of the care you brought to it.
+Each one leaves a single **star** in your sky — its brightness shaped by the Light you carried out.
 Over time the sky fills: a record, in light, of how you paid attention.
 
 The chart is already complete.

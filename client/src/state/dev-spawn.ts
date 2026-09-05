@@ -69,7 +69,7 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), fielded),
-    distance: livedInDistance(seed),
+    light: livedInLight(seed),
     map,
   };
   return devPrince(seed, tier, run);
@@ -99,7 +99,7 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), roster),
-    distance: livedInDistance(seed),
+    light: livedInLight(seed),
     encounter,
   };
   return devPrince(seed, tier, run);
@@ -126,7 +126,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), fielded),
-    distance: livedInDistance(seed),
+    light: livedInLight(seed),
     encounter,
     seenScenarioIds: [tree.scenarioId],
   };
@@ -143,15 +143,15 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
     events.push({ kind: "map-completed" as const, map: walkMap(hashString(`${seed}_end_${i}`), true, tier) });
   }
   const finalMap = walkMap(hashString(`${seed}_end_${MAPS_PER_RUN - 1}`), true, tier);
-  const distance = [...events.map((e) => e.map), finalMap].reduce(
-    (sum, m) => sum + Object.values(m.outcomes).reduce((d, o) => d + o.distanceDelta, 0),
+  const light = [...events.map((e) => e.map), finalMap].reduce(
+    (sum, m) => sum + Object.values(m.outcomes).reduce((total, o) => total + o.lightDelta, 0),
     0,
   );
   const run: Run = {
     id: `dev_run_${seed}`,
     seed,
     state: livedInState(seed, "end", devPlayerChart(seed)),
-    distance,
+    light,
     map: finalMap,
     mapsCompleted: MAPS_PER_RUN,
     encounter: null,
@@ -227,9 +227,9 @@ function livedInState(
   return out;
 }
 
-/** A synthetic run distance for a lived-in snapshot. */
-function livedInDistance(seed: number): number {
-  return 20 + Math.floor(mulberry32(hashString(`${seed}_dist`))() * 130);
+/** Synthetic run Light for a lived-in snapshot. */
+function livedInLight(seed: number): number {
+  return 20 + Math.floor(mulberry32(hashString(`${seed}_light`))() * 130);
 }
 
 /** A walk from the root over a real map (content comes pre-rolled from
@@ -269,7 +269,7 @@ function walkMap(seed: number, toTerminal: boolean, tier: number): MapState {
       nodeId,
       kind: content.kind,
       summary: content.kind === "combat" ? "Encounter" : `House ${content.house}`,
-      distanceDelta: 6 + Math.floor(outRng() * 10),
+      lightDelta: 6 + Math.floor(outRng() * 10),
       combusts: [],
     };
   }
