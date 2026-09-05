@@ -11,8 +11,12 @@ The guiding principle:
 
 **Status:** direction committed; first in-engine realization shipped.
 The cohesion model (parallel modes on a shared tonic), the home pitch, the per-planet mode mapping, and the runtime architecture are decided below.
-All seven themes now play in the client (`client/src/audio/themes.ts`, developed from `music-sketches/`), synthesized in Tone.js with the **layered model** (Architecture (b)) as vertical mixing: bed + down + up layers run in sync, and the surface picks the mix — map breathes the down layer, combat drives the up layer.
+All seven themes now play in the client (`client/src/audio/themes.ts`, developed from `music-sketches/`) as synchronized bed + down + up layers.
+The surface selects the mix — map breathes the down layer and combat drives the up layer — while one ruler's theme remains active at a time.
+This vertical variation within one theme is distinct from the future multi-planet layered model in Architecture (b).
 Theme selection: the map plays the Prince's chart ruler, combat the opponent's chart ruler, narrative the house ruler.
+The standalone per-planet signature gestures are retired as a design direction; the client still contains the legacy prototype pending removal.
+Event audio will be rebuilt from the ruler-relative degree and register system below.
 The DAW pass (real timbre and mix) remains future work; Venus and Saturn's open mode calls were resolved provisionally in the shipped themes (Venus Mixolydian, Saturn Locrian over a moving toll rather than a static pedal).
 
 ---
@@ -132,6 +136,19 @@ Each planet's degree is where its mode starts in the shared collection — the s
 So the degree comes with the mode, chosen by nobody: Sun 1, Mercury 2, Mars 3, Jupiter 4, Venus 5, Moon 6, Saturn 7.
 This reads the cohesion model column-wise: the parallel modes on D give the rows, the relative rotation gives the columns.
 
+The degree and register anchor are permanent coordinates of planetary identity.
+The register anchor is the D octave used to voice a planet's ruler-relative degree, not a fixed event pitch.
+
+| Planet | Degree | Register anchor |
+|---|---:|---:|
+| Sun | 1 | D4 |
+| Mercury | 2 | D5 |
+| Mars | 3 | D3 |
+| Jupiter | 4 | D3 |
+| Venus | 5 | D4 |
+| Moon | 6 | D4 |
+| Saturn | 7 | D2 |
+
 | Ruler's mode | Sun | Mercury | Mars | Jupiter | Venus | Moon | Saturn |
 |---|---|---|---|---|---|---|---|
 | Jupiter, Lydian | D | E | F♯ | G♯ | A | B | C♯ |
@@ -145,10 +162,12 @@ This reads the cohesion model column-wise: the parallel modes on D give the rows
 Each row down the brightness ladder flattens one more degree, and the astrology falls out unforced: the Sun never bends; Venus's fifth holds under every mode but Saturn's; Jupiter's fourth is raised only in his own row; Mars's third is major under the three bright rulers and minor under the four dark; Saturn sits on the seventh, the degree that wants to resolve to the Sun.
 A propagation wave sounds as a chord inside the ruler's mode, chosen by the aspect web.
 
-The hop grammar survives around the target's note: a harmonious hop approaches it from a fourth below and lands; an inverted hop holds a minor second against it.
-The acting planet's signature still speaks at the verb landing, on top of the target's note, so striker and struck are both audible.
-Combust keeps the cut signature and the breath.
-Register follows the signature plan above — each planet's degree sounds in the octave its signature owns, Saturn on the floor, Mercury on top.
+An action is a short phrase inside the ruler's mode: the acting planet's degree opens and the target planet's degree lands.
+Testimony and Affliction determine contour and articulation rather than selecting another pitch collection.
+A harmonious propagation approaches and resolves onto the target's note.
+An inverted propagation may use a controlled chromatic neighbor to hang against the target; the dissonance is an explicit semantic exception, not a second planetary mode.
+Combustion begins the target's ruler-relative voice, chokes it, and releases a breath.
+The event register follows the canonical anchors above, with Saturn on the floor and Mercury on top.
 Music is opt-in while sound is on by default, so the strikes must read alone, and a melody of degrees over silence does.
 
 Caveat: the column assignment assumes the diatonic set.
@@ -158,22 +177,22 @@ If a planet ever takes harmonic minor, its row still works — any seven-note sc
 
 ## Architecture — jukebox now, layered later
 
-There are two sonic layers, and this doc has so far described only one.
+There are two sonic scales.
 
 - **Music** (here): the themes — the score.
-- **Sound design** (`VIBES.md §Sound Design`): per-planet **tonal signatures** ("not a melody, a texture"), audible aspect propagation, combustion cutting a signature mid-phrase, and the soundscape going **sparser as planets combust**.
+- **Event sound** (`VIBES.md §Sound Design`): short ruler-relative phrases for actions, propagation, and combustion.
 
-These are the same identity at two scales, not two designs.
-The signature is the **motif/timbre germ**; the theme is that germ developed to three or four minutes.
-Saturn's "lowest note, held" is both the seed of Saturn's theme and the sound a Saturn combat-event makes.
-We design one Saturn, used as ambient signature and as full score — the sonic form of `STYLE.md`'s "every screen is the same drawing, continued."
+Both scales use the same tonic, mode table, planetary degrees, registers, and broad metric and timbral character.
+There is no separate library of pitched per-planet jingles.
+The ruler governs the pitch collection throughout an encounter; actors and targets remain identifiable through their degrees, registers, articulation, and rhythm.
 
 **Combat-music model: implement (a), architect for (b).**
 
-- **(a) Jukebox** *(v1)* — the active or threatening planet's battle variant plays, and the **combustion-thinning lives in the signature layer** (signatures drop out as planets go dark).
-  This delivers the `VIBES` promise without a multi-stem adaptive score.
+- **(a) Jukebox** *(v1)* — the encounter ruler's battle variant plays while the event layer articulates actions and combustion inside that mode.
+  The score does not progressively thin as individual planets combust.
 - **(b) Layered** *(possible later)* — combat music is a live mix of the fielded planets' battle stems, each muting as it combusts: literally the chart-as-chord in motion.
-  Richer, but the larger build, and it requires every theme to be writable as a simultaneous stem.
+  This is the architecture that can make the continuous soundscape grow genuinely sparser as planets go dark.
+  It is richer but larger, and it requires every theme to be writable as a simultaneous stem.
 
 The shared-tonic decision is made now *because* (b) needs it, but v1 ships the jukebox.
 In practice this means composing each battle core so it can also stand as an isolated, loopable stem over the common drone — the same material, deployed either way.
@@ -230,5 +249,6 @@ Remaining, roughly in order:
 1. Settle the two open mode calls — Venus's bright color, and Saturn's strict-Locrian-vs-drone-anchored dark.
 2. Formalize metric character per planet: confirm the five inherited from Holst, and pin the Sun's reference pulse and the Moon's nocturne.
 3. Per piece: harmonic bed → motif → form → explore/battle relationship — composing each battle core so it can also stand as an isolated stem (*Architecture* (b)).
+4. Replace the legacy signature gestures with the ruler-relative event grammar above, then compose the mint ceremony as its own cue.
 
 Blocked on nothing at the theory level; full realization is blocked on DAW infrastructure.

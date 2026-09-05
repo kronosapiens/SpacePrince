@@ -35,12 +35,16 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 ## Phase 1 — The felt layer
 
-- [x] **Tonal signatures** (`VIBES.md §Sound Design`, `MUSIC.md §Architecture`).
-  Seven per-planet textures on the shared D tonic, each in its planet's mode; verbs sound on commit; propagation is audible (trine resolves, square hangs); a combustion cuts its signature off mid-phrase; the soundscape thins as planets go dark.
-  This is the signature layer, not the themes — it front-runs the eventual score rather than competing with it.
+- [x] **Tonal-signature prototype** (`VIBES.md §Sound Design`, `MUSIC.md §Architecture`).
+  The prototype introduced seven standalone gestures, audible propagation, and a combustion cut.
+  The standalone gestures are now retired as a direction because they introduce a planet's own mode inside the ruler's mode.
+  The canonical replacement preserves the D tonic, mode table, planetary degrees, and register anchors.
   Needs a mute affordance and a user-gesture unlock for autoplay policy.
+- [ ] **Ruler-relative event audio** (`MUSIC.md §The strike grid`).
+  Remove the legacy signature gestures and derive actor, target, propagation, and combustion cues from the encounter ruler's mode.
+  Compose the mint ceremony separately rather than sequencing all seven planetary modes.
 - [x] **Combustion beat.**
-  The existing 1800ms desaturation, plus the signature cut, plus the planet's final fragment in its own voice, plus a held pause before play resumes.
+  The existing 1800ms desaturation, a choked ruler-relative event voice, a breath, the planet's final fragment, and a held pause before play resumes.
 - [x] **Unlock ceremony** (`SCREENS.md §4.1`).
   The newly unlocked planet emerges from ghost on the map chart anchor when a Macrobian threshold is crossed.
 - [x] **Star-field rendering** (`NFT.md`).

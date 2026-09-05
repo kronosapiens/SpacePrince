@@ -134,12 +134,17 @@ More like a candle going out.
 
 Sound should reinforce the planetary color system.
 
-- Each planet has a **tonal signature** — not a melody, but a texture. Saturn is low, sustained, mineral. Mercury is quick, metallic, slightly dissonant. Venus is warm, harmonic, close.
-- Encounter turns produce sound from the active planets — the clash or harmony of two tonal signatures.
-- Aspect propagation is *audible*. A trine propagation is a resolution. A square propagation is a dissonance that hangs.
-- A planet combusting is the most significant sound event — its tonal signature cuts off mid-phrase.
+- Each planet has a **sonic identity** expressed through its mode, ruler-relative degree, register, rhythm, and timbral character.
+- The encounter's ruler establishes the mode; the acting planet opens from its degree and the affected planet lands on its degree.
+- Aspect propagation is *audible*.
+  A trine propagation is a resolution.
+  A square propagation is a dissonance that hangs.
+- A planet combusting is the most significant sound event — its ruler-relative voice cuts off mid-phrase.
 - House encounters have ambient sound shaped by their ruling planet.
-- The overall soundscape gets **sparser as planets combust**. Early in a run, the full chart hums. Late in a run, with planets dark, there are gaps — silences where voices used to be.
+- The future layered score gets **sparser as planets combust**.
+  Early in a run, the fielded chart is full; late in a run, dark planets leave gaps where voices used to be.
+
+`MUSIC.md` is canonical for the tonic, mode table, degree grid, register anchors, and event grammar.
 
 ---
 

@@ -398,4 +398,5 @@ Things this document deliberately does not yet answer, listed so they don't get 
 - `NFT.md` — the on-chain SVG generator. Style rules here apply to the NFT artifact too; the artifact and the client must look like the same object.
 - `MAP.md` — topology and construction. §10 above covers map-specific rendering.
 - `CHART.md` — chart computation. §11 above covers chart-specific rendering.
-- `PLANETS.md` — planetary voices and color/tonal signatures. The palette inherits from there.
+- `PLANETS.md` — planetary voices, colors, and sonic character.
+  The palette inherits from there.

@@ -78,7 +78,7 @@ Brevity as authority.
 - Never ironic.
 - Never backward-looking with regret; the Sun is present.
 
-### Color and tonal signature
+### Color and sonic character
 
 Gold, warm white.
 A single clear tone, sustained and centered.
@@ -123,7 +123,7 @@ Uses sensory and spatial language — rooms, water, twilight, half-open doors.
 - Uses temporal drift — "once," "again," "still."
 - Never bright or solar-certain.
 
-### Color and tonal signature
+### Color and sonic character
 
 Silver, pale blue.
 Soft, layered, slightly distant — a sound heard through water or through a wall at night.
@@ -171,7 +171,7 @@ Uses the trick of saying the opposite of what the listener expects.
 - Never conclusive; always leaves a door open.
 - Never threatens; Mercury misleads, it does not warn.
 
-### Color and tonal signature
+### Color and sonic character
 
 Quicksilver, shifting grey-green.
 Quick, metallic, slightly dissonant — a single plucked note that doesn't quite settle.
@@ -215,7 +215,7 @@ Often gentle but never evasive; Venus names what she sees.
 - Often pairs two images rather than arguing one.
 - Never clinical, never cold.
 
-### Color and tonal signature
+### Color and sonic character
 
 Copper, rose, soft green.
 Warm, harmonic, close — a chord rather than a line.
@@ -260,7 +260,7 @@ Comfortable with silence.
 - Never pleads, never explains.
 - Can be silent; silence is a Mars mode.
 
-### Color and tonal signature
+### Color and sonic character
 
 Red, iron.
 Percussive, sharp, brief — a strike, not a tone.
@@ -311,7 +311,7 @@ Often speaks in a register of affirmation without being sentimental.
 - Never sarcastic, never clever for cleverness's sake.
 - Never small.
 
-### Color and tonal signature
+### Color and sonic character
 
 Deep blue, royal purple.
 Resonant, wide, chordal — a low sustained harmony.
@@ -359,7 +359,7 @@ Speaks as if having waited a long time to speak.
 - Never consoles falsely; Saturn consoles only by naming.
 - Never loud.
 
-### Color and tonal signature
+### Color and sonic character
 
 Lead grey, dark earth, black.
 Low, sustained, mineral — the lowest note, held.
