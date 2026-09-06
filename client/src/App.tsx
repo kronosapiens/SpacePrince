@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ActivePlanetTint } from "@/components/ActivePlanetTint";
-import { PageDropdown } from "@/components/PageDropdown";
-import { DevConsole } from "@/components/DevConsole";
+import { DevChrome } from "@/components/DevChrome";
 import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { PlaySurface } from "@/screens/PlaySurface";
@@ -22,8 +21,7 @@ export function App() {
         <Route path={ROUTES.index} element={<IndexScreen />} />
         <Route path="*" element={<Navigate to={ROUTES.title} replace />} />
       </Routes>
-      {import.meta.env.DEV && <PageDropdown />}
-      {import.meta.env.DEV && <DevConsole />}
+      {import.meta.env.DEV && <DevChrome />}
     </>
   );
 }

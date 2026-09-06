@@ -22,15 +22,14 @@ import { ChartTuner } from "@/components/ChartTuner";
  * sound = everything else) plus a random Change Track hop; and a Delete Prince
  * button. Prince mutations go through the store, so the chart fills in on the
  * anchor as you drag, and a live combat re-mirrors so the opponent re-fields
- * to match. Screen-spawning ("Regenerate") lives in the Page dropdown. Not
- * production UI.
+ * to match. Opened with `d`; screen-spawning and re-rolling live in DevChrome.
+ * Not production UI.
  */
-export function DevConsole() {
+export function DevConsole({ open }: { open: boolean }) {
   const prince = usePrince();
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const { enqueueCard } = useInfoCards();
-  const [collapsed, setCollapsed] = useState(true);
   const [music, setMusic] = useState(isMusicEnabled());
   const [sound, setSound] = useState(isSoundEnabled());
   // Which theme the score is pointed at — retargets whenever a surface mounts,
@@ -54,100 +53,87 @@ export function DevConsole() {
     }
   };
 
+  if (!open) return null;
+
   return (
     <div className="dev-console">
-      <button
-        type="button"
-        className="page-dropdown-button"
-        onClick={() => setCollapsed((c) => !c)}
-        aria-expanded={!collapsed}
-      >
-        <span className="page-dropdown-eyebrow">Dev</span>
-        <span className={`page-dropdown-caret${collapsed ? "" : " is-open"}`} aria-hidden>
-          ▾
-        </span>
-      </button>
-      {!collapsed && (
-        <div className="dev-console-panel">
-          {prince ? (
-            <div className="dev-console-block">
-              <div>
-                Planets <strong>{unlocked.length} / 7</strong>
-              </div>
-              <input
-                type="range"
-                min={1}
-                max={7}
-                step={1}
-                value={Math.min(Math.max(unlocked.length, 1), 7)}
-                onChange={(e) => setPlanets(Number(e.target.value))}
-              />
-              <div>{unlocked.join(" · ") || "(none)"}</div>
-              {/* Queues the top unlocked planet's introduction (shows on
-                  map/end — the stable surfaces). Scrub the slider to pick. */}
-              <button
-                type="button"
-                className="dev-chrome-button"
-                disabled={unlocked.length === 0}
-                onClick={() => {
-                  const planet = unlocked.at(-1);
-                  if (planet) enqueueCard({ kind: "planet-intro", planet });
-                }}
-              >
-                Intro Card{unlocked.length ? ` · ${unlocked.at(-1)}` : ""}
-              </button>
-            </div>
-          ) : (
-            <div>No Prince — mint one from the Title.</div>
-          )}
-          <div className="dev-console-divider" />
-          <ChartTuner />
-          <div className="dev-console-divider" />
-          <div className="dev-console-row">
-            <label className="dev-console-check">
-              <input
-                type="checkbox"
-                checked={music}
-                onChange={(e) => {
-                  setMusicEnabled(e.target.checked);
-                  setMusic(e.target.checked);
-                }}
-              />
-              Music
-            </label>
-            <label className="dev-console-check">
-              <input
-                type="checkbox"
-                checked={sound}
-                onChange={(e) => {
-                  setSoundEnabled(e.target.checked);
-                  setSound(e.target.checked);
-                }}
-              />
-              Sound
-            </label>
+      {prince ? (
+        <div className="dev-console-block">
+          <div>
+            Planets <strong>{unlocked.length} / 7</strong>
           </div>
+          <input
+            type="range"
+            min={1}
+            max={7}
+            step={1}
+            value={Math.min(Math.max(unlocked.length, 1), 7)}
+            onChange={(e) => setPlanets(Number(e.target.value))}
+          />
+          <div>{unlocked.join(" · ") || "(none)"}</div>
+          {/* Queues the top unlocked planet's introduction (shows on
+              map/end — the stable surfaces). Scrub the slider to pick. */}
           <button
             type="button"
             className="dev-chrome-button"
-            disabled={!canChangeTrack}
-            onClick={shuffleTheme}
+            disabled={unlocked.length === 0}
+            onClick={() => {
+              const planet = unlocked.at(-1);
+              if (planet) enqueueCard({ kind: "planet-intro", planet });
+            }}
           >
-            {track ? `Track · ${track}` : "Change Track"}
+            Intro Card{unlocked.length ? ` · ${unlocked.at(-1)}` : ""}
           </button>
-          {prince && (
-            <>
-              <div className="dev-console-divider" />
-              <button
-                type="button"
-                className="dev-chrome-button is-danger"
-                onClick={() => dispatch({ kind: "clear" })}
-              >
-                Delete Prince
-              </button>
-            </>
-          )}
         </div>
+      ) : (
+        <div>No Prince — mint one from the Title.</div>
+      )}
+      <div className="dev-console-divider" />
+      <ChartTuner />
+      <div className="dev-console-divider" />
+      <div className="dev-console-row">
+        <label className="dev-console-check">
+          <input
+            type="checkbox"
+            checked={music}
+            onChange={(e) => {
+              setMusicEnabled(e.target.checked);
+              setMusic(e.target.checked);
+            }}
+          />
+          Music
+        </label>
+        <label className="dev-console-check">
+          <input
+            type="checkbox"
+            checked={sound}
+            onChange={(e) => {
+              setSoundEnabled(e.target.checked);
+              setSound(e.target.checked);
+            }}
+          />
+          Sound
+        </label>
+      </div>
+      <button
+        type="button"
+        className="dev-chrome-button"
+        disabled={!canChangeTrack}
+        onClick={shuffleTheme}
+      >
+        {track ? `Track · ${track}` : "Change Track"}
+      </button>
+      {prince && (
+        <>
+          <div className="dev-console-divider" />
+          <button
+            type="button"
+            className="dev-chrome-button is-danger"
+            onClick={() => dispatch({ kind: "clear" })}
+          >
+            Delete Prince
+          </button>
+        </>
       )}
     </div>
   );
