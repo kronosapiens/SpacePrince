@@ -531,9 +531,9 @@
 .combat {
   --combat-pad: 48px;
   /* How far the strip reaches down into the wheels' boxes: the sentence's
-     slot and its gap (66 + 12), so the sentence sits in the V between the two
+     slot and its gap (42 + 12), so the sentence sits in the V between the two
      rings and the readouts sit on the boxes' top edge, above the ring tops. */
-  --combat-overlap: 78px;
+  --combat-overlap: 54px;
   position: relative;
   z-index: 1;
   min-height: 100vh;
@@ -582,14 +582,14 @@
   pointer-events: none;
 }
 .combat-topbar > * { pointer-events: auto; }
-/* One slot, two occupants — the turn's precommit, then the way out. Its height
-   is reserved for the taller of them (the button) so the charts don't shift
-   when the encounter settles; `--combat-overlap` counts it and its gap. */
+/* One slot, two occupants — the turn's precommit, then the way out. The exit is
+   text-level encounter chrome, so both states fit the same compact reserve and
+   the charts do not shift when the encounter settles. */
 .combat-announce {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 66px;
+  min-height: 42px;
 }
 .combat-announce-line {
   margin: 0;
@@ -599,6 +599,47 @@
   letter-spacing: 0.01em;
   color: var(--bone);
   text-align: center;
+}
+.combat-continue {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 3px 5px;
+  border-bottom: 1px solid rgba(232, 226, 212, 0.48);
+  color: var(--mist);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  animation: begin-breath 3s ease-in-out infinite;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+.combat-continue-mark {
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+.combat-continue:hover {
+  border-color: var(--bone);
+  color: var(--bone);
+  animation: none;
+  opacity: 1;
+}
+.combat-continue:hover .combat-continue-mark {
+  transform: translateX(3px);
+}
+.combat-continue.is-back:hover .combat-continue-mark {
+  transform: translateX(-3px);
+}
+.combat-continue:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 5px;
 }
 .combat-readouts {
   display: flex;
@@ -657,7 +698,7 @@
    budget is the viewport less the two `--combat-pad`s (top and bottom border)
    less the chrome the wheel shares its column with:
 
-     30  the strip (readouts, sentence slot, their gap: 108) less
+     30  the strip (readouts, sentence slot, their gap: 84) less
          `--combat-overlap`, the part of it inside the wheel's box
       8  the label's gap above
      24  the SELF/OTHER label
@@ -682,6 +723,11 @@
   font-family: var(--sans);
   font-size: 17px;
   letter-spacing: 0.32em;
+  /* Tracking is added after every glyph, the last included, so a tracked
+     word's box carries one dead space on its right and centring the box puts
+     the letters left of centre. The indent adds the same space on the left,
+     so the box, and anything drawn around it, is even about the ink. */
+  text-indent: 0.32em;
   color: var(--mist);
   font-weight: 500;
 }
@@ -1542,6 +1588,238 @@
    Terms of art only, never free emphasis; wrapped mechanically by TermText. */
 .term {
   color: var(--gold);
+}
+
+/* Combat guide — one translucent tracing sheet laid over the live encounter.
+   The veil itself never owns pointer events: guide mode makes the real action
+   buttons preview-only, so the player can touch the UI being explained without
+   risking a committed turn. Only the guide's close button and the dock along
+   the bottom sit above that interaction layer. */
+.combat-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  pointer-events: none;
+  isolation: isolate;
+}
+.combat-guide-veil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+/* Dash and gap sum to the component's DASH_PERIOD, which sets each ring's
+   pathLength so the pattern closes on itself. */
+.combat-guide-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-opacity: 0.82;
+  stroke-dasharray: 3 5;
+  stroke-dashoffset: 1.5;
+  filter: drop-shadow(0 0 5px rgba(201, 169, 106, 0.42));
+  animation: combat-guide-ring-in 520ms var(--ease-out) both;
+}
+.combat-guide-leader {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 0.8;
+  stroke-opacity: 0.38;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.combat-guide-notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* A note is as wide and as tall as its copy, up to a measure; the component
+   measures it and places it. A fixed width left a short note with an empty,
+   invisible margin its leader seemed to hang from. */
+.combat-guide-note {
+  position: absolute;
+  width: max-content;
+  max-width: 320px;
+  padding: 12px 20px 13px 21px;
+  background:
+    linear-gradient(135deg, rgba(201, 169, 106, 0.08), transparent 48%),
+    rgba(11, 10, 15, 0.9);
+  border-left: 1px solid rgba(201, 169, 106, 0.82);
+  border-radius: 8px; /* the outlines' BOX_RADIUS */
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
+  animation: combat-guide-note-in 420ms var(--ease-out) both;
+}
+.combat-guide-note-label {
+  margin-bottom: 6px;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.combat-guide-note-body {
+  color: var(--bone);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.28;
+}
+.combat-guide-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.combat-guide-controls button {
+  pointer-events: auto;
+}
+/* Where the `?` was, so opening and closing swap one mark for another. */
+.combat-guide-close {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: rgba(11, 10, 15, 0.88);
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1;
+  transition: background 180ms ease, color 180ms ease;
+}
+.combat-guide-close:hover {
+  background: var(--gold);
+  color: var(--void);
+}
+.combat-guide-close:focus-visible,
+.combat-guide-dock button:focus-visible {
+  outline: 1px solid var(--gold-hi);
+  outline-offset: 3px;
+}
+/* The way back and forward, and nothing else, at the centre of the screen
+   between the two wheels. It overlaps their inner edges — the rings nearly
+   touch there — which is accepted for the sake of the empty middle; the
+   notes are told its box and keep off it. */
+.combat-guide-dock {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-50%, -50%);
+}
+.combat-guide-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border: 1px solid rgba(201, 169, 106, 0.3);
+  border-radius: 999px;
+  background: rgba(11, 10, 15, 0.9);
+  pointer-events: auto;
+}
+.combat-guide-bar button {
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em; /* balances the trailing tracking, as the labels do */
+  text-transform: uppercase;
+  transition: background 160ms ease, color 160ms ease;
+}
+.combat-guide-step {
+  min-width: 76px;
+  padding: 7px 14px;
+  color: var(--mist);
+}
+.combat-guide-step:hover:not(:disabled) {
+  color: var(--bone);
+}
+.combat-guide-step.is-primary {
+  background: var(--bone);
+  color: var(--void);
+}
+/* Dark on gold under the pointer, like the close button — the general hover
+   rule above would otherwise lighten the label onto the lit fill. */
+.combat-guide-step.is-primary:hover {
+  background: var(--gold-hi);
+  color: var(--void);
+}
+.combat-guide-step:disabled {
+  cursor: default;
+  opacity: 0.28;
+}
+.combat-guide-mobile-card {
+  display: none;
+}
+@keyframes combat-guide-note-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes combat-guide-ring-in {
+  from { stroke-opacity: 0; stroke-dashoffset: 17.5; }
+  to { stroke-opacity: 0.82; stroke-dashoffset: 1.5; }
+}
+
+@media (max-width: 899px) {
+  .combat-guide-note,
+  .combat-guide-leader {
+    display: none;
+  }
+  .combat-guide-mobile-card {
+    display: block;
+    align-self: stretch;
+    margin: 0 12px;
+    max-height: 31vh;
+    overflow-y: auto;
+    padding: 15px 18px;
+    border-top: 1px solid var(--gold);
+    background: rgba(11, 10, 15, 0.94);
+    box-shadow: 0 -14px 36px rgba(0, 0, 0, 0.34);
+    pointer-events: auto;
+  }
+  .combat-guide-mobile-entry {
+    color: var(--bone);
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .combat-guide-mobile-entry + .combat-guide-mobile-entry {
+    margin-top: 11px;
+    padding-top: 11px;
+    border-top: 1px solid rgba(201, 169, 106, 0.14);
+  }
+  .combat-guide-mobile-entry > span {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--gold);
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .combat-guide-close { top: 12px; left: 12px; }
+  /* Stacked, the wheels leave no middle; the dock goes back to the bottom
+     edge with the note card above it. */
+  .combat-guide-dock {
+    top: auto;
+    right: 0;
+    bottom: 10px;
+    left: 0;
+    gap: 8px;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combat-guide-ring,
+  .combat-guide-note {
+    animation: none;
+  }
 }
 
 /* Planet introduction — the unlock ceremony's card content. */

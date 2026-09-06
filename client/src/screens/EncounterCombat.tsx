@@ -1,6 +1,6 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
-import { HelpButton } from "@/components/HelpButton";
+import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
 import { PlanetBands } from "@/components/PlanetBands";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
@@ -76,6 +76,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // commit gesture.
   const [hoveredAction, setHoveredAction] = useState<Polarity | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guidePhase, setGuidePhase] = useState<CombatGuidePhase>("read");
+  const guideSnapshot = useRef<{
+    selected: PlanetName | null;
+    pendingAction: Polarity | null;
+    study: boolean;
+  } | null>(null);
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
 
   // `over` is derived (STATE.md): the run ended once every fielded planet combust.
@@ -133,6 +140,20 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     () => unlockedPlanets(prince.numEncounters, devUnlockAll),
     [prince.numEncounters, devUnlockAll],
   );
+  const guidePlanet = useMemo(
+    () => playerUnlocked.find(
+      (planet) => !isCombusted(prince.chart.planets[planet], run.state[planet]),
+    ) ?? null,
+    [playerUnlocked, prince.chart, run.state],
+  );
+  // One of the example planet's drawn aspect lines, by its far end, for the
+  // guide to trace.
+  const guideAspect = useMemo(() => {
+    if (!guidePlanet) return null;
+    const drawn = (planet: PlanetName) =>
+      playerUnlocked.includes(planet) && !isCombusted(prince.chart.planets[planet], run.state[planet]);
+    return getAspects(prince.chart).find((a) => a.from === guidePlanet && drawn(a.to))?.to ?? null;
+  }, [guidePlanet, playerUnlocked, prince.chart, run.state]);
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
   // and the one that says what gathers Light here (`score.ts` `RULER_RULES`).
@@ -314,13 +335,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         return;
       }
       if (encounter.resolved) return;
+      if (guideOpen && guidePhase !== "act") return;
       if (!playerUnlocked.includes(planet)) return;
       if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
       setSelected(planet);
-      setPendingAction(null);
+      setPendingAction(guideOpen ? "Testimony" : null);
       setHoveredAction(null);
     },
-    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation],
+    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase],
   );
 
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
@@ -423,8 +445,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           // First click/tap arms the action (and previews its spread); a second
           // on the same action confirms. Uniform across pointer and touch.
           onChoose: (v) =>
-            pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
-          onClearPending: () => setPendingAction(null),
+            guideOpen
+              ? setPendingAction(v)
+              : pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
+          onClearPending: () => { if (!guideOpen) setPendingAction(null); },
           onHoverAction: setHoveredAction,
         }
       : undefined;
@@ -434,19 +458,56 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // handler. Skipped during animation so an in-flight resolution doesn't
   // get its selection state mid-flight.
   const handleClearSelection = useCallback(() => {
-    if (animation) return;
+    if (animation || guideOpen) return;
     if (selected !== null) {
       setSelected(null);
       setPendingAction(null);
       setHoveredAction(null);
     }
-  }, [animation, selected]);
+  }, [animation, guideOpen, selected]);
 
   const handleContinue = useCallback(() => {
-    if (animation) return;
+    if (animation || guideOpen) return;
     // Clear the encounter; PlaySurface then shows End (run over) or Map.
     onClearEncounter();
-  }, [animation, onClearEncounter]);
+  }, [animation, guideOpen, onClearEncounter]);
+
+  const openGuide = useCallback(() => {
+    if (animation) skipAnimation();
+    guideSnapshot.current = { selected, pendingAction, study };
+    setSelected(null);
+    setPendingAction(null);
+    setHovered(null);
+    setHoveredAction(null);
+    setStudy(false);
+    setGuidePhase("chart");
+    setGuideOpen(true);
+  }, [animation, pendingAction, selected, skipAnimation, study]);
+
+  const closeGuide = useCallback(() => {
+    const snapshot = guideSnapshot.current;
+    setGuideOpen(false);
+    setSelected(snapshot?.selected ?? null);
+    setPendingAction(snapshot?.pendingAction ?? null);
+    setStudy(snapshot?.study ?? false);
+    setHovered(null);
+    setHoveredAction(null);
+    guideSnapshot.current = null;
+  }, []);
+
+  const changeGuidePhase = useCallback((next: CombatGuidePhase) => {
+    setGuidePhase(next);
+    setHovered(null);
+    setHoveredAction(null);
+    setStudy(false);
+    if (next === "act" && guidePlanet && !encounter.resolved) {
+      setSelected(guidePlanet);
+      setPendingAction("Testimony");
+      return;
+    }
+    setSelected(null);
+    setPendingAction(null);
+  }, [encounter.resolved, guidePlanet]);
 
   return (
     <div className="combat" onClick={handleClearSelection}>
@@ -454,7 +515,26 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           other down the right, matching the two charts. */}
       <PlanetBands className="combat-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
       <PlanetBands className="combat-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
-      <HelpButton screen="combat" />
+      <CombatGuide
+        open={guideOpen}
+        phase={guidePhase}
+        turn={{
+          current: settled ? displayTurnIndex : Math.min(displayTurnIndex + 1, encounter.sequence.length),
+          total: encounter.sequence.length,
+        }}
+        settled={settled}
+        ruler={ruler}
+        rule={RULER_RULES[ruler].label}
+        opponentPlanet={displayOpponentTurn}
+        examplePlanet={encounter.resolved ? null : guidePlanet}
+        exampleAspect={guideAspect}
+        selectedPlanet={selected}
+        pendingAction={pendingAction}
+        projectedLight={projectedLight?.value ?? null}
+        onOpen={openGuide}
+        onClose={closeGuide}
+        onPhaseChange={changeGuidePhase}
+      />
       {/* Run- and encounter-level state, lifted out of the centre column so the
           two charts can have the room. Nothing here is chart data — Light is
           the run's score, the pips are where we are in this encounter — so it
@@ -473,7 +553,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               and cost the strip a second visual language — the pips carried no
               baseline of their own, so they could not sit with the type beside
               them. */}
-          <div className="combat-turns">
+          <div className="combat-turns" data-guide="turn">
             <span className="eyebrow">TURN</span>
             <span className="combat-turns-v">
               {settled
@@ -493,7 +573,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               be learned before it said anything, and the bar read as progress
               toward a maximum regardless — the exact misread it was built to
               avoid. */}
-          <div className="combat-light">
+          <div className="combat-light" data-guide="light">
             <span className="eyebrow">LIGHT</span>
             <span
               className="combat-light-v"
@@ -524,7 +604,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               </span>
               {/* What the indicated gesture would add. */}
               {projectedLight && (
-                <span className="combat-light-delta" style={{ color: projectedLight.color }}>
+                <span className="combat-light-delta" data-guide-part style={{ color: projectedLight.color }}>
                   +{projectedLight.value}
                 </span>
               )}
@@ -538,12 +618,18 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             and nothing else says which of them is Saturn. */}
         <div className="combat-announce">
           {settled ? (
-            <button className="begin-btn" onClick={handleContinue}>
-              {runEnded ? "Walk back" : "Continue"}
+            <button
+              className={`combat-continue${runEnded ? " is-back" : ""}`}
+              data-guide="opponent-move"
+              onClick={handleContinue}
+            >
+              {runEnded && <span className="combat-continue-mark" aria-hidden>←</span>}
+              <span>{runEnded ? "Walk back" : "Continue"}</span>
+              {!runEnded && <span className="combat-continue-mark" aria-hidden>→</span>}
             </button>
           ) : (
             displayOpponentTurn && displayOpponentAction && (
-              <p className="combat-announce-line">
+              <p className="combat-announce-line" data-guide="opponent-move">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
                   {displayOpponentTurn}
                 </span>{" "}
@@ -557,7 +643,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         </div>
       </div>
 
-      <div className="combat-side">
+      <div className="combat-side" data-guide="chart-self">
         <Chart
           chart={prince.chart}
           state={displayPlayerState}
@@ -582,14 +668,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           statsPanelActions={playerActions}
           statsPanelReserveActions
           statsPanelStudy={study}
-          onToggleStudy={() => setStudy((s) => !s)}
+          onToggleStudy={() => { if (!guideOpen) setStudy((s) => !s); }}
           inviteInteraction={!animation && !encounter.resolved && !selected}
           ringVerb={selected ? indicatedVerb : null}
         />
-        <div className="combat-side-label">SELF</div>
+        <div className="combat-side-label" data-guide="label-self">SELF</div>
       </div>
 
-      <div className="combat-side">
+      <div className="combat-side" data-guide="chart-other">
         <Chart
           chart={encounter.opponentChart}
           state={displayOpponentState}
@@ -619,7 +705,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           incoming={incomingOther}
           animationEpoch={animationEpoch}
         />
-        <div className="combat-side-label">OTHER</div>
+        <div className="combat-side-label" data-guide="label-other">OTHER</div>
       </div>
 
       {/* What is fixed for the whole encounter, under the wheels between the
@@ -627,13 +713,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           carried on the map — and the rule it sets. What moves (the turn, the
           score, the other's move) reads above the charts; this reads below. */}
       <div className="combat-foot">
-        <div className="combat-ruler">
+        <div className="combat-ruler" data-guide="ruler">
           <span className="eyebrow">RULER</span>
           <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
             {ruler}
           </span>
         </div>
-        <p className="combat-rule">
+        <p className="combat-rule" data-guide="rule">
           {/* The rule in the ruler's colour, under the name in the same colour.
               Light itself stays neutral — no colour stands for it anywhere
               else. */}

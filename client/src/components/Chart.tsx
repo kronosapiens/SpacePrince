@@ -331,6 +331,7 @@ export function Chart(props: ChartProps) {
         const rb = to.glyphR + 4;
         return (
           <line key={`aspect_${i}`}
+            data-guide={side ? `aspect-${side}-${a.from.toLowerCase()}-${a.to.toLowerCase()}` : undefined}
             x1={from.cx + ux * ra} y1={from.cy + uy * ra}
             x2={to.cx - ux * rb} y2={to.cy - uy * rb}
             stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
@@ -374,6 +375,7 @@ export function Chart(props: ChartProps) {
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
       className={["chart-svg", tuning.showGlow ? "" : "no-glow", entranceClass, className ?? ""].filter(Boolean).join(" ")}
       style={style}
+      data-guide={side ? `wheel-${side}` : undefined}
       role="img"
       aria-label={`${chart.name} natal chart${side === "other" ? " (other)" : ""}`}
       xmlns="http://www.w3.org/2000/svg"
@@ -454,6 +456,7 @@ export function Chart(props: ChartProps) {
             combusting={isCombusting}
             impactPolarity={impactPolarity}
             animationEpoch={animationEpoch}
+            guideId={side ? `planet-${side}-${p.planet.toLowerCase()}` : undefined}
           />
         );
       })}
@@ -473,6 +476,7 @@ export function Chart(props: ChartProps) {
             placement={chart.planets[p.planet]}
             affliction={state?.[p.planet]?.affliction ?? 0}
             projection={projection?.deltas[p.planet]}
+            guideId={side ? `arc-${side}-${p.planet.toLowerCase()}` : undefined}
           />
         );
       })}
@@ -536,6 +540,7 @@ function PlanetGlyph({
   actionPulse, combusting,
   impactPolarity,
   animationEpoch,
+  guideId,
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
@@ -553,6 +558,7 @@ function PlanetGlyph({
   combusting: boolean;
   impactPolarity?: Polarity;
   animationEpoch?: number;
+  guideId?: string;
 }) {
   const c = PLANET_PRIMARY[point.planet];
   const sec = PLANET_SECONDARY[point.planet];
@@ -673,7 +679,9 @@ function PlanetGlyph({
         />
       )}
       <g className={glyphClass}>
-        <circle r={r}
+        {/* The guide measures the disc, not the group: the halo and ring
+            around it breathe, and a box that breathes moves the guide's ring. */}
+        <circle r={r} data-guide={guideId}
           fill={fill} fillOpacity={fillOpacity}
           stroke={sec} strokeOpacity={CHART_STYLE.planet.rimOpacity}
           strokeWidth={Math.max(CHART_STYLE.planet.rimStrokeMin, r * CHART_STYLE.planet.rimStrokeRatio)} />
@@ -736,13 +744,14 @@ function PlanetGlyph({
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  tuning, point, placement, affliction, projection,
+  tuning, point, placement, affliction, projection, guideId,
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
   placement: PlanetPlacement;
   affliction: number;
   projection?: ProjectionChip;
+  guideId?: string;
 }) {
   const ceiling = combustionCeiling(placement);
   if (ceiling <= 0) return null;
@@ -779,7 +788,7 @@ function PlanetArc({
   }
 
   return (
-    <g transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
+    <g data-guide={guideId} transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
       {/* The whole ceiling, faint. What shows through is the affliction already
           spent, and the full extent is the planet's Resolve. */}
       <ArcStroke r={r} from={at(0)} to={at(ceiling)} full={ceiling >= 360}

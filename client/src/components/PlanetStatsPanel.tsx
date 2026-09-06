@@ -139,6 +139,7 @@ export function PlanetStatsPanel({
           leaving the panel. */}
       <div
         className="ps-card"
+        data-guide="planet-panel"
         onClick={(e) => {
           e.stopPropagation();
           if (actions?.pending) actions.onClearPending();
@@ -247,7 +248,7 @@ export function PlanetStatsPanel({
           ) : (
             <div className="ps-ops">
               {actions && (
-                <div className="ps-actions">
+                <div className="ps-actions" data-guide="actions">
                   {/* Testify leads: it is the resolving verb, and the Moon's rule,
                       so it reads as the default and afflict as the deviation.
                       Which verb scores is the encounter ruler's to say. */}
@@ -261,6 +262,7 @@ export function PlanetStatsPanel({
                       type="button"
                       key={a.v}
                       className={`ps-action ${actions.pending === a.v ? "is-on" : ""}`}
+                      data-guide={`action-${a.v.toLowerCase()}`}
                       style={{ "--vc": VALENCE_COLOR[a.v] } as CSSProperties}
                       onClick={(e) => {
                         e.stopPropagation();
