@@ -159,7 +159,6 @@ export function NarrativeGuide({
 
   return (
     <GuideOverlay
-      className="narrative-guide"
       open={open}
       phase={phase}
       phases={PHASES}

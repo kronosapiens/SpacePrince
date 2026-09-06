@@ -68,9 +68,6 @@ export interface GuideShapes {
 }
 
 export interface GuideOverlayProps<P extends string> {
-  /** An extra class on the overlay root, for a screen that wants the dock
-   *  somewhere its own composition leaves free. */
-  className?: string;
   open: boolean;
   phase: P;
   phases: P[];
@@ -100,8 +97,6 @@ const EDGE = 18;
 /** Notes stay well off the bottom, where a screen keeps its own labels. */
 const EDGE_BOTTOM = 60;
 const AVOID_PAD = 8;
-/** The close button, top-left, where the `?` was. */
-const CLOSE_RECT: GuideRect = { x: 18, y: 14, width: 46, height: 46 };
 /** One dash and one gap of the ring's stroke, in px (`.guide-ring`).
  *  Each ring's pathLength is a whole number of periods, so the pattern closes
  *  on itself without a seam whatever the ring's size. */
@@ -379,7 +374,6 @@ function routeLeader(focus: GuideRect, note: GuideRect, side: GuidePlacement): G
 }
 
 export function GuideOverlay<P extends string>({
-  className,
   open,
   phase,
   phases,
@@ -420,7 +414,8 @@ export function GuideOverlay<P extends string>({
   const { rects, viewport } = useGuideRects(open, phase, ids, revision);
 
   // Notes are as tall as their copy; positions come from the rendered size.
-  // The bar sits over the screen, so its box is measured too and kept clear.
+  // The bar sits over the screen top-left, so its box is measured too and
+  // kept clear.
   useLayoutEffect(() => {
     if (!open) return;
     const next: Record<string, GuideSize> = {};
@@ -459,7 +454,6 @@ export function GuideOverlay<P extends string>({
     });
     const extra = shapes?.obstacles?.(rects);
     const hard: GuideRect[] = [
-      CLOSE_RECT,
       ...(barRect ? [barRect] : []),
       ...(extra?.hard ?? []),
       ...spots.filter((spot) => !spot.lift).map((spot) => boundsOf(spot.rect)),
@@ -483,9 +477,9 @@ export function GuideOverlay<P extends string>({
 
   useEffect(() => {
     if (!open) return;
-    const frame = requestAnimationFrame(() => {
-      controlsRef.current?.querySelector<HTMLButtonElement>(".is-primary")?.focus();
-    });
+    // Focus lands on the bar itself, not a button: a button focused by
+    // script wears its keyboard ring, and the pill would open with one on.
+    const frame = requestAnimationFrame(() => barRef.current?.focus());
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -533,7 +527,7 @@ export function GuideOverlay<P extends string>({
 
   return createPortal(
     <div
-      className={className ? `guide-overlay ${className}` : "guide-overlay"}
+      className="guide-overlay"
       role="dialog"
       aria-modal="true"
       aria-label={phaseLabel[phase]}
@@ -604,45 +598,44 @@ export function GuideOverlay<P extends string>({
       </div>
 
       <div className="guide-controls" ref={controlsRef}>
-        <button type="button" className="guide-close" onClick={onClose} aria-label={closeLabel}>
-          ×
-        </button>
-
-        <div className="guide-dock">
-          <section className="guide-mobile-card" aria-live="polite">
-            <div className="guide-note-label">{phaseLabel[phase]}</div>
-            {notes.map((note) => (
-              <div key={note.key} className="guide-mobile-entry">
-                <span>{note.label}</span>
-                <div>{note.body}</div>
-              </div>
-            ))}
-          </section>
-
-          <div className="guide-bar" ref={barRef}>
+        {/* Where the `?` was, opened out: the way out, then back and forward,
+            one pill. */}
+        <div className="guide-bar" ref={barRef} tabIndex={-1}>
+          <button type="button" className="guide-close" onClick={onClose} aria-label={closeLabel}>
+            ×
+          </button>
+          <button
+            type="button"
+            className="guide-step"
+            onClick={() => onPhaseChange(phases[phaseIndex - 1]!)}
+            disabled={phaseIndex <= 0}
+          >
+            Back
+          </button>
+          {phaseIndex === phases.length - 1 ? (
+            <button type="button" className="guide-step is-primary" onClick={onClose}>
+              Close
+            </button>
+          ) : (
             <button
               type="button"
-              className="guide-step"
-              onClick={() => onPhaseChange(phases[phaseIndex - 1]!)}
-              disabled={phaseIndex <= 0}
+              className="guide-step is-primary"
+              onClick={() => onPhaseChange(phases[phaseIndex + 1]!)}
             >
-              Back
+              Next
             </button>
-            {phaseIndex === phases.length - 1 ? (
-              <button type="button" className="guide-step is-primary" onClick={onClose}>
-                Close
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="guide-step is-primary"
-                onClick={() => onPhaseChange(phases[phaseIndex + 1]!)}
-              >
-                Next
-              </button>
-            )}
-          </div>
+          )}
         </div>
+
+        <section className="guide-mobile-card" aria-live="polite">
+          <div className="guide-note-label">{phaseLabel[phase]}</div>
+          {notes.map((note) => (
+            <div key={note.key} className="guide-mobile-entry">
+              <span>{note.label}</span>
+              <div>{note.body}</div>
+            </div>
+          ))}
+        </section>
       </div>
     </div>,
     document.body,

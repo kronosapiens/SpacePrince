@@ -213,7 +213,6 @@ export function MapGuide({
 
   return (
     <GuideOverlay
-      className="map-guide"
       open={open}
       phase={phase}
       phases={PHASES}
