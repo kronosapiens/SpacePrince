@@ -1,5 +1,5 @@
 import { TermText } from "@/components/TermText";
-import { SCREEN_HELP, type HelpScreen } from "@/data/screen-help";
+import { SCREEN_HELP, type HelpScreen } from "@/copy/help";
 
 /** A screen's help copy as card content — the chart study's "?". The
  *  gameplay screens teach themselves with a guide overlay (`GuideOverlay`). */

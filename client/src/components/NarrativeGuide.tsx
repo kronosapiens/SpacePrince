@@ -1,7 +1,7 @@
 import { useMemo } from "react";
+import { GUIDE_COPY } from "@/copy/guide";
 import type { HouseDef } from "@/data/houses";
-import type { PlanetName } from "@/game/types";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { planetName, TermText } from "@/components/TermText";
 import {
   chartGlyphs,
   chartShape,
@@ -32,11 +32,7 @@ interface NarrativeGuideProps {
   onPhaseChange: (phase: NarrativeGuidePhase) => void;
 }
 
-const PHASE_LABEL: Record<NarrativeGuidePhase, string> = {
-  scene: "Read the scene",
-  choices: "Choose",
-  chart: "What it touches",
-};
+const COPY = GUIDE_COPY.narrative;
 
 const PHASES: NarrativeGuidePhase[] = ["scene", "choices", "chart"];
 
@@ -46,10 +42,6 @@ const PHASES: NarrativeGuidePhase[] = ["scene", "choices", "chart"];
  *  in; and not the house line or the prompt, which a note above the options
  *  straddles wherever it goes. */
 const COLUMN = ["narrative-text", "narrative-options", "narrative-light"];
-
-function planetName(planet: PlanetName) {
-  return <span style={{ color: PLANET_PRIMARY[planet] }}>{planet}</span>;
-}
 
 export function NarrativeGuide({
   open,
@@ -71,15 +63,15 @@ export function NarrativeGuide({
           key: "house",
           anchor: "narrative-house",
           placement: "top",
-          label: "The house",
-          body: <>One of the twelve houses, where the chart is tended — or taxed. {planetName(house.ruler)} rules it.</>,
+          label: COPY.notes.house.label,
+          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler), theme: house.theme }} />,
         },
         {
           key: "chorus",
           anchor: "narrative-text",
           placement: "top",
-          label: "The chorus",
-          body: <>A voice from the chorus, in {planetName(house.ruler)}'s key. It sets the mood and asks nothing of you.</>,
+          label: COPY.notes.chorus.label,
+          body: <TermText text={COPY.notes.chorus.body} vars={{ ruler: planetName(house.ruler) }} />,
         },
       ];
     }
@@ -90,8 +82,8 @@ export function NarrativeGuide({
           key: "commit",
           anchor: "narrative-options",
           placement: "bottom",
-          label: "Arm, then commit",
-          body: <>Tap an option to arm it, tap again to commit. Everything lands exactly as written unless odds are shown.</>,
+          label: COPY.notes.commit.label,
+          body: <TermText text={COPY.notes.commit.body} />,
         },
       ];
       if (asideIndex) {
@@ -104,8 +96,8 @@ export function NarrativeGuide({
           anchor: `option-${asideIndex}`,
           spotlights: [`option-aside-${asideIndex}`],
           placement: "left",
-          label: "The aside",
-          body: <>Each aside names an option's price and effect before you decide. Odds in sixtieths mark a wager, rolled against Fortune.</>,
+          label: COPY.notes.aside.label,
+          body: <TermText text={COPY.notes.aside.body} />,
         });
       }
       return choiceNotes;
@@ -117,18 +109,18 @@ export function NarrativeGuide({
         anchor: planetAnchor("self", housePlanet),
         spotlights: ["wheel-self", planetAnchor("self", housePlanet)],
         placement: "outward",
-        label: "The house's planet",
+        label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
         body: house.joy
-          ? <>This house reads {planetName(house.joy)}, its joy planet. Its Fortune decides any wager here, and some choices open only under the right sky — a joy present or harmed, a dignified ruler, a planet already lost.</>
-          : <>This house has no joy planet, so it reads its ruler, {planetName(house.ruler)}. Its Fortune decides any wager here, and some choices open only under the right sky — a dignified ruler, or a planet already lost.</>,
+          ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
+          : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
       },
       {
         key: "outcomes",
         anchor: "narrative-light",
         // The readout spans the column, so there is no "beside" — above it is.
         placement: "top",
-        label: "Outcomes",
-        body: <>Outcomes land on the chart itself: affliction taken or relieved, Light spent or gathered, sometimes a combusted planet called back.</>,
+        label: COPY.notes.outcomes.label,
+        body: <TermText text={COPY.notes.outcomes.body} />,
       },
     ];
   }, [phase, house, housePlanet, asideIndex]);
@@ -162,11 +154,11 @@ export function NarrativeGuide({
       open={open}
       phase={phase}
       phases={PHASES}
-      phaseLabel={PHASE_LABEL}
+      phaseLabel={COPY.phases}
       notes={notes}
       shapes={shapes}
-      openLabel="Study this scene"
-      closeLabel="Close scene guide"
+      openLabel={COPY.open}
+      closeLabel={COPY.close}
       onOpen={onOpen}
       onClose={onClose}
       onPhaseChange={onPhaseChange}

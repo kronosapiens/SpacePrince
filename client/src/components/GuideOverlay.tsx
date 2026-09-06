@@ -285,6 +285,27 @@ function candidateRect(focus: GuideRect, placement: GuidePlacement, size: GuideS
   return { x, y, ...size };
 }
 
+/** The centred candidate slid along its side until it just clears each
+ *  obstacle it meets — down or up beside its target, left or right above or
+ *  below it — so a note crowded off its natural spot steps aside instead of
+ *  covering what is in the way. */
+function slidRects(centred: GuideRect, side: GuidePlacement, obstacles: GuideRect[]): GuideRect[] {
+  const beside = side === "left" || side === "right";
+  return obstacles
+    .filter((other) => intersects(centred, other, AVOID_PAD))
+    .flatMap((other) =>
+      beside
+        ? [
+            { ...centred, y: other.y + other.height + AVOID_PAD },
+            { ...centred, y: other.y - AVOID_PAD - centred.height },
+          ]
+        : [
+            { ...centred, x: other.x + other.width + AVOID_PAD },
+            { ...centred, x: other.x - AVOID_PAD - centred.width },
+          ],
+    );
+}
+
 function inBounds(rect: GuideRect, viewport: GuideSize) {
   return (
     rect.x >= EDGE &&
@@ -306,8 +327,10 @@ function clampRect(rect: GuideRect, viewport: GuideSize): GuideRect {
  *  and covers nothing: not what is lit or already placed (`hard`), and not a
  *  soft obstacle. Each later pass gives something up — first the fit, by
  *  pushing the note back inside the viewport; then the soft obstacles, which
- *  the veil has not singled out; then everything but the note's own target; and
- *  at the last the preferred side is taken regardless. */
+ *  the veil has not singled out; then the centred spot, by sliding the note
+ *  along its side until it clears what is lit or already placed; then
+ *  everything but the note's own target; and at the last the preferred side
+ *  is taken regardless. */
 function placeNote(
   focus: GuideRect,
   order: GuidePlacement[],
@@ -318,21 +341,25 @@ function placeNote(
 ): { rect: GuideRect; side: GuidePlacement } {
   const clearOf = (rect: GuideRect, obstacles: GuideRect[]) =>
     !intersects(rect, focus, 0) && !obstacles.some((other) => intersects(rect, other, AVOID_PAD));
-  const passes: [GuideRect[], boolean][] = [
-    [hard.concat(soft), false],
-    [hard.concat(soft), true],
-    [hard, false],
-    [hard, true],
-    [[], true],
+  const passes: [GuideRect[], boolean, boolean][] = [
+    [hard.concat(soft), false, false],
+    [hard.concat(soft), true, false],
+    [hard, false, false],
+    [hard, true, false],
+    [hard, false, true],
+    [hard, true, true],
+    [[], true, false],
   ];
-  for (const [obstacles, clamp] of passes) {
+  for (const [obstacles, clamp, slide] of passes) {
     for (const side of order) {
-      const rect = candidateRect(focus, side, size);
-      if (clamp) {
-        const clamped = clampRect(rect, viewport);
-        if (clearOf(clamped, obstacles)) return { rect: clamped, side };
-      } else if (inBounds(rect, viewport) && clearOf(rect, obstacles)) {
-        return { rect, side };
+      const centred = candidateRect(focus, side, size);
+      for (const rect of slide ? slidRects(centred, side, obstacles) : [centred]) {
+        if (clamp) {
+          const clamped = clampRect(rect, viewport);
+          if (clearOf(clamped, obstacles)) return { rect: clamped, side };
+        } else if (inBounds(rect, viewport) && clearOf(rect, obstacles)) {
+          return { rect, side };
+        }
       }
     }
   }

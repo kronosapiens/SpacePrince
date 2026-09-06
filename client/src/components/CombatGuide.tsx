@@ -1,6 +1,7 @@
 import { useMemo } from "react";
+import { GUIDE_COPY } from "@/copy/guide";
 import type { PlanetName, Polarity } from "@/game/types";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { fillLabel, planetName, TermText } from "@/components/TermText";
 import {
   arcAnchor,
   aspectAnchor,
@@ -47,11 +48,7 @@ interface CombatGuideProps {
   onPhaseChange: (phase: CombatGuidePhase) => void;
 }
 
-const PHASE_LABEL: Record<CombatGuidePhase, string> = {
-  read: "Read the encounter",
-  chart: "Read the charts",
-  act: "Choose an answer",
-};
+const COPY = GUIDE_COPY.encounter;
 
 /** The panel's outline is concentric with its card (the card's 14px plus the
  *  padding). */
@@ -108,33 +105,31 @@ export function CombatGuide({
           key: "turn",
           anchor: "turn",
           placement: "left",
-          label: "Turn",
+          label: settled ? COPY.notes.turnSettled.label : COPY.notes.turn.label,
           body: settled
-            ? <>Every turn is answered.</>
-            : <>You are answering turn {turn.current} of {turn.total}.</>,
+            ? <TermText text={COPY.notes.turnSettled.body} />
+            : <TermText text={COPY.notes.turn.body} vars={{ current: turn.current, total: turn.total }} />,
         },
         {
           key: "light",
           anchor: "light",
           placement: "right",
-          label: "Light",
-          body: <>What this run carries forward. A previewed gain appears beside it.</>,
+          label: COPY.notes.light.label,
+          body: <TermText text={COPY.notes.light.body} />,
         },
         {
           key: "their-move",
           anchor: "opponent-move",
           placement: "bottom",
-          label: settled ? "The way out" : "Their move",
-          body: settled
-            ? <>This encounter is settled. Nothing more is asked of you here.</>
-            : <>The other acts first. Its planet, verb, and strength are already fixed.</>,
+          label: settled ? COPY.notes.wayOut.label : COPY.notes.theirMove.label,
+          body: <TermText text={settled ? COPY.notes.wayOut.body : COPY.notes.theirMove.body} />,
         },
         {
           key: "ruler",
           anchor: "ruler+rule",
           placement: "top",
-          label: "The condition",
-          body: <><span style={{ color: PLANET_PRIMARY[ruler] }}>{ruler}</span> rules this encounter. Light gathers from {rule}.</>,
+          label: COPY.notes.ruler.label,
+          body: <TermText text={COPY.notes.ruler.body} vars={{ ruler: planetName(ruler), rule }} />,
         },
       ];
     }
@@ -146,16 +141,16 @@ export function CombatGuide({
           anchor: "label-self",
           spotlights: ["wheel-self", "label-self"],
           placement: "left",
-          label: "Self",
-          body: <>Your chart. Every breathing ring is a planet that can answer.</>,
+          label: COPY.notes.self.label,
+          body: <TermText text={COPY.notes.self.body} />,
         },
         {
           key: "other",
           anchor: "label-other",
           spotlights: ["wheel-other", "label-other"],
           placement: "right",
-          label: "Other",
-          body: <>Their chart. Your answer lands against the planet acting now.</>,
+          label: COPY.notes.other.label,
+          body: <TermText text={COPY.notes.other.body} />,
         },
       ];
 
@@ -164,8 +159,8 @@ export function CombatGuide({
           key: "active-planet",
           anchor: planetAnchor("other", opponentPlanet),
           placement: "outward",
-          label: "Acting planet",
-          body: <>The turning corona names both the source and the kind of the incoming move.</>,
+          label: COPY.notes.activePlanet.label,
+          body: <TermText text={COPY.notes.activePlanet.body} />,
         });
       }
 
@@ -178,8 +173,8 @@ export function CombatGuide({
             ...(exampleAspect ? [aspectAnchor("self", examplePlanet, exampleAspect)] : []),
           ],
           placement: "outward",
-          label: "Resolve and aspects",
-          body: <>The thick arc is remaining Resolve. Lines carry effects onward; hard lines invert them.</>,
+          label: COPY.notes.anatomy.label,
+          body: <TermText text={COPY.notes.anatomy.body} />,
         });
       }
 
@@ -194,22 +189,22 @@ export function CombatGuide({
         anchor: planetAnchor("self", actingPlanet),
         spotlights: ["wheel-self", "wheel-other", planetAnchor("self", actingPlanet)],
         placement: "outward",
-        label: "Choose a planet",
-        body: <>{actingPlanet} is open as an example, not advice. Any living planet can answer.</>,
+        label: COPY.notes.example.label,
+        body: <TermText text={COPY.notes.example.body} vars={{ planet: planetName(actingPlanet) }} />,
       },
       {
         key: "actions",
         anchor: "planet-panel",
         placement: "bottom",
-        label: "Choose a verb",
-        body: <>Testify relieves affliction. Afflict adds it. The first tap previews; the second commits in play.</>,
+        label: COPY.notes.actions.label,
+        body: <TermText text={COPY.notes.actions.body} />,
       },
       {
         key: "projection",
         anchor: "light",
         placement: "right",
-        label: `${actionName} preview`,
-        body: <>The charts now show the exact outcome. This answer would gather {projectedLight ?? 0} Light.</>,
+        label: fillLabel(COPY.notes.projection.label, { action: actionName }),
+        body: <TermText text={COPY.notes.projection.body} vars={{ light: projectedLight ?? 0 }} />,
       },
     ];
   }, [phase, turn, settled, ruler, rule, opponentPlanet, examplePlanet, exampleAspect, actingPlanet, pendingAction, projectedLight]);
@@ -253,12 +248,12 @@ export function CombatGuide({
       open={open}
       phase={phase}
       phases={phases}
-      phaseLabel={PHASE_LABEL}
+      phaseLabel={COPY.phases}
       notes={notes}
       shapes={shapes}
       revision={`${pendingAction}:${projectedLight}`}
-      openLabel="Study this encounter"
-      closeLabel="Close encounter guide"
+      openLabel={COPY.open}
+      closeLabel={COPY.close}
       onOpen={onOpen}
       onClose={onClose}
       onPhaseChange={onPhaseChange}

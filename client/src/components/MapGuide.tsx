@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { NODE_R } from "@/components/MapDiagram";
+import { GUIDE_COPY } from "@/copy/guide";
 import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { fillLabel, planetName, TermText } from "@/components/TermText";
 import {
   center,
   circleRect,
@@ -13,7 +14,7 @@ import {
   type GuideRects,
   type GuideShapes,
 } from "@/components/GuideOverlay";
-import type { MapState, NodeContent, PlanetName } from "@/game/types";
+import type { MapState, NodeContent } from "@/game/types";
 
 export type MapGuidePhase = "map" | "nodes" | "chart";
 
@@ -33,11 +34,7 @@ interface MapGuideProps {
 /** Which map the player is on, as the End screen's rainbow labels it. */
 export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 
-const PHASE_LABEL: Record<MapGuidePhase, string> = {
-  map: "Read the map",
-  nodes: "What a node holds",
-  chart: "Between encounters",
-};
+const COPY = GUIDE_COPY.map;
 
 const PHASES: MapGuidePhase[] = ["map", "nodes", "chart"];
 
@@ -70,10 +67,6 @@ function pickNode(map: MapState, eligible: string[], kind: NodeContent["kind"]):
   return eligible.find(holds) ?? ahead.find(holds) ?? ids.find(holds) ?? null;
 }
 
-function rulerName(ruler: PlanetName) {
-  return <span style={{ color: PLANET_PRIMARY[ruler] }}>{ruler}</span>;
-}
-
 export function MapGuide({
   open,
   phase,
@@ -93,8 +86,8 @@ export function MapGuide({
           key: "here",
           anchor: nodeAnchor(map.currentNodeId),
           placement: "right",
-          label: "You are here",
-          body: <>The node you stand on. The path you have walked is drawn solid.</>,
+          label: COPY.notes.here.label,
+          body: <TermText text={COPY.notes.here.body} />,
         },
       ];
       const next = eligible[0];
@@ -103,8 +96,8 @@ export function MapGuide({
           key: "next",
           anchor: nodeAnchor(next),
           placement: "right",
-          label: "Next steps",
-          body: <>Lit nodes are one step ahead: tap one to consider it, tap again to travel. Nothing on the map is hidden.</>,
+          label: COPY.notes.next.label,
+          body: <TermText text={COPY.notes.next.body} />,
         });
       }
       if (map.currentNodeId !== TERMINAL_NODE_ID) {
@@ -112,8 +105,8 @@ export function MapGuide({
           key: "crossing",
           anchor: nodeAnchor(TERMINAL_NODE_ID),
           placement: "right",
-          label: "The crossing",
-          body: <>The far node crosses into the next map. Fortune turns there: each combusted planet rolls to return, and the lit ones take on fresh affliction.</>,
+          label: COPY.notes.crossing.label,
+          body: <TermText text={COPY.notes.crossing.body} />,
         });
       }
       return mapNotes;
@@ -129,20 +122,25 @@ export function MapGuide({
           key: "encounter",
           anchor: nodeAnchor(combatId),
           placement: "right",
-          label: "An encounter",
-          body: <>Self and other, face to face. {rulerName(ruler)} rules this one, and decides what gathers Light there.</>,
+          label: COPY.notes.encounter.label,
+          body: <TermText text={COPY.notes.encounter.body} vars={{ ruler: planetName(ruler) }} />,
         });
       }
       const houseId = pickNode(map, eligible, "narrative");
       const house = houseId ? map.rolledNodes[houseId] : undefined;
       if (houseId && house?.kind === "narrative") {
-        const ruler = HOUSES[house.house - 1]!.ruler;
+        const def = HOUSES[house.house - 1]!;
         nodeNotes.push({
           key: "house",
           anchor: nodeAnchor(houseId),
           placement: "right",
-          label: "A house",
-          body: <>A scene in one of the twelve houses, where the chart is tended — or taxed. The numeral is the house; the colour its ruler, {rulerName(ruler)}.</>,
+          label: COPY.notes.house.label,
+          body: (
+            <TermText
+              text={COPY.notes.house.body}
+              vars={{ name: def.name, gloss: def.gloss, ruler: planetName(def.ruler) }}
+            />
+          ),
         });
       }
       return nodeNotes;
@@ -153,15 +151,15 @@ export function MapGuide({
         key: "chart",
         anchor: "chart",
         placement: "right",
-        label: "Your chart",
-        body: <>Your planets, carried between encounters. Tap the chart to study them.</>,
+        label: COPY.notes.chart.label,
+        body: <TermText text={COPY.notes.chart.body} />,
       },
       {
         key: "index",
         anchor: "map-index",
         placement: "top",
-        label: `Map ${ROMAN[mapsCompleted] ?? mapsCompleted + 1} of VII`,
-        body: <>A run is seven maps at most, and encounters run one turn longer with each map.</>,
+        label: fillLabel(COPY.notes.index.label, { n: ROMAN[mapsCompleted] ?? mapsCompleted + 1 }),
+        body: <TermText text={COPY.notes.index.body} />,
       },
     ];
     if (showBoundary) {
@@ -169,8 +167,8 @@ export function MapGuide({
         key: "boundary",
         anchor: "map-boundary",
         placement: "left",
-        label: "The crossing's record",
-        body: <>What the last crossing did: which planets returned, and what affliction the lit ones took.</>,
+        label: COPY.notes.boundary.label,
+        body: <TermText text={COPY.notes.boundary.body} />,
       });
     }
     return chartNotes;
@@ -216,11 +214,11 @@ export function MapGuide({
       open={open}
       phase={phase}
       phases={PHASES}
-      phaseLabel={PHASE_LABEL}
+      phaseLabel={COPY.phases}
       notes={notes}
       shapes={shapes}
-      openLabel="Study this map"
-      closeLabel="Close map guide"
+      openLabel={COPY.open}
+      closeLabel={COPY.close}
       onOpen={onOpen}
       onClose={onClose}
       onPhaseChange={onPhaseChange}
