@@ -1590,19 +1590,19 @@
   color: var(--gold);
 }
 
-/* Combat guide — one translucent tracing sheet laid over the live encounter.
+/* Guide overlay — one translucent tracing sheet laid over the live screen.
    The veil itself never owns pointer events: guide mode makes the real action
    buttons preview-only, so the player can touch the UI being explained without
    risking a committed turn. Only the guide's close button and the dock along
    the bottom sit above that interaction layer. */
-.combat-guide-overlay {
+.guide-overlay {
   position: fixed;
   inset: 0;
   z-index: 240;
   pointer-events: none;
   isolation: isolate;
 }
-.combat-guide-veil {
+.guide-veil {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1612,7 +1612,7 @@
 }
 /* Dash and gap sum to the component's DASH_PERIOD, which sets each ring's
    pathLength so the pattern closes on itself. */
-.combat-guide-ring {
+.guide-ring {
   fill: none;
   stroke: var(--gold);
   stroke-width: 1;
@@ -1620,9 +1620,9 @@
   stroke-dasharray: 3 5;
   stroke-dashoffset: 1.5;
   filter: drop-shadow(0 0 5px rgba(201, 169, 106, 0.42));
-  animation: combat-guide-ring-in 520ms var(--ease-out) both;
+  animation: guide-ring-in 520ms var(--ease-out) both;
 }
-.combat-guide-leader {
+.guide-leader {
   fill: none;
   stroke: var(--gold);
   stroke-width: 0.8;
@@ -1630,7 +1630,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.combat-guide-notes {
+.guide-notes {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -1638,7 +1638,7 @@
 /* A note is as wide and as tall as its copy, up to a measure; the component
    measures it and places it. A fixed width left a short note with an empty,
    invisible margin its leader seemed to hang from. */
-.combat-guide-note {
+.guide-note {
   position: absolute;
   width: max-content;
   max-width: 320px;
@@ -1649,9 +1649,9 @@
   border-left: 1px solid rgba(201, 169, 106, 0.82);
   border-radius: 8px; /* the outlines' BOX_RADIUS */
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
-  animation: combat-guide-note-in 420ms var(--ease-out) both;
+  animation: guide-note-in 420ms var(--ease-out) both;
 }
-.combat-guide-note-label {
+.guide-note-label {
   margin-bottom: 6px;
   color: var(--gold);
   font-family: var(--sans);
@@ -1660,22 +1660,22 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
-.combat-guide-note-body {
+.guide-note-body {
   color: var(--bone);
   font-family: var(--serif);
   font-size: 17px;
   line-height: 1.28;
 }
-.combat-guide-controls {
+.guide-controls {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
-.combat-guide-controls button {
+.guide-controls button {
   pointer-events: auto;
 }
 /* Where the `?` was, so opening and closing swap one mark for another. */
-.combat-guide-close {
+.guide-close {
   position: fixed;
   top: 20px;
   left: 24px;
@@ -1690,12 +1690,12 @@
   line-height: 1;
   transition: background 180ms ease, color 180ms ease;
 }
-.combat-guide-close:hover {
+.guide-close:hover {
   background: var(--gold);
   color: var(--void);
 }
-.combat-guide-close:focus-visible,
-.combat-guide-dock button:focus-visible {
+.guide-close:focus-visible,
+.guide-dock button:focus-visible {
   outline: 1px solid var(--gold-hi);
   outline-offset: 3px;
 }
@@ -1703,7 +1703,7 @@
    between the two wheels. It overlaps their inner edges — the rings nearly
    touch there — which is accepted for the sake of the empty middle; the
    notes are told its box and keep off it. */
-.combat-guide-dock {
+.guide-dock {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -1713,7 +1713,7 @@
   gap: 10px;
   transform: translate(-50%, -50%);
 }
-.combat-guide-bar {
+.guide-bar {
   display: flex;
   align-items: center;
   padding: 4px;
@@ -1722,7 +1722,7 @@
   background: rgba(11, 10, 15, 0.9);
   pointer-events: auto;
 }
-.combat-guide-bar button {
+.guide-bar button {
   border-radius: 999px;
   font-family: var(--sans);
   font-size: 10px;
@@ -1731,46 +1731,46 @@
   text-transform: uppercase;
   transition: background 160ms ease, color 160ms ease;
 }
-.combat-guide-step {
+.guide-step {
   min-width: 76px;
   padding: 7px 14px;
   color: var(--mist);
 }
-.combat-guide-step:hover:not(:disabled) {
+.guide-step:hover:not(:disabled) {
   color: var(--bone);
 }
-.combat-guide-step.is-primary {
+.guide-step.is-primary {
   background: var(--bone);
   color: var(--void);
 }
 /* Dark on gold under the pointer, like the close button — the general hover
    rule above would otherwise lighten the label onto the lit fill. */
-.combat-guide-step.is-primary:hover {
+.guide-step.is-primary:hover {
   background: var(--gold-hi);
   color: var(--void);
 }
-.combat-guide-step:disabled {
+.guide-step:disabled {
   cursor: default;
   opacity: 0.28;
 }
-.combat-guide-mobile-card {
+.guide-mobile-card {
   display: none;
 }
-@keyframes combat-guide-note-in {
+@keyframes guide-note-in {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@keyframes combat-guide-ring-in {
+@keyframes guide-ring-in {
   from { stroke-opacity: 0; stroke-dashoffset: 17.5; }
   to { stroke-opacity: 0.82; stroke-dashoffset: 1.5; }
 }
 
 @media (max-width: 899px) {
-  .combat-guide-note,
-  .combat-guide-leader {
+  .guide-note,
+  .guide-leader {
     display: none;
   }
-  .combat-guide-mobile-card {
+  .guide-mobile-card {
     display: block;
     align-self: stretch;
     margin: 0 12px;
@@ -1782,18 +1782,18 @@
     box-shadow: 0 -14px 36px rgba(0, 0, 0, 0.34);
     pointer-events: auto;
   }
-  .combat-guide-mobile-entry {
+  .guide-mobile-entry {
     color: var(--bone);
     font-family: var(--serif);
     font-size: 15px;
     line-height: 1.35;
   }
-  .combat-guide-mobile-entry + .combat-guide-mobile-entry {
+  .guide-mobile-entry + .guide-mobile-entry {
     margin-top: 11px;
     padding-top: 11px;
     border-top: 1px solid rgba(201, 169, 106, 0.14);
   }
-  .combat-guide-mobile-entry > span {
+  .guide-mobile-entry > span {
     display: block;
     margin-bottom: 2px;
     color: var(--gold);
@@ -1802,10 +1802,10 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
-  .combat-guide-close { top: 12px; left: 12px; }
+  .guide-close { top: 12px; left: 12px; }
   /* Stacked, the wheels leave no middle; the dock goes back to the bottom
      edge with the note card above it. */
-  .combat-guide-dock {
+  .guide-dock {
     top: auto;
     right: 0;
     bottom: 10px;
@@ -1816,8 +1816,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .combat-guide-ring,
-  .combat-guide-note {
+  .guide-ring,
+  .guide-note {
     animation: none;
   }
 }
