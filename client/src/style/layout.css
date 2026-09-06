@@ -1713,6 +1713,22 @@
   gap: 10px;
   transform: translate(-50%, -50%);
 }
+/* The map's own centre is the diagram's spine, so there the dock stands off
+   to the right instead — clear of the nodes, the dev chrome above and the
+   crossing's record below. */
+@media (min-width: 900px) {
+  .map-guide .guide-dock {
+    left: auto;
+    right: 36px;
+  }
+  /* The narrative's centre is the column's rule line, so the dock drops to the
+     bottom edge — under the chart's rim and clear of the options. */
+  .narrative-guide .guide-dock {
+    top: auto;
+    bottom: 18px;
+    transform: translateX(-50%);
+  }
+}
 .guide-bar {
   display: flex;
   align-items: center;

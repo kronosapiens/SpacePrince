@@ -13,7 +13,7 @@ interface MapDiagramProps {
   bottomUp?: boolean;
 }
 
-const NODE_R = 22;
+export const NODE_R = 22;
 // Tiered visual scale used by both the edge web and the nodes themselves.
 // Semantic: solid past, translucent next-steps, faint distance.
 // Each tier bundles the values that move together (opacity + stroke
@@ -247,6 +247,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             stroke={color} strokeOpacity="1" strokeWidth={2.4} />
         )}
         <circle r={NODE_R}
+          data-guide={`node-${n.id}`}
           fill={isNarrative || isFortune ? color : "transparent"}
           fillOpacity={isNarrative || isFortune ? (isCurrent ? 0.98 : op) : 0}
           stroke={color}
@@ -302,6 +303,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
 
   return (
     <svg
+      data-guide="map"
       viewBox={`${minX} ${minY} ${w} ${h}`}
       preserveAspectRatio="xMidYMid meet"
       style={{ width: "100%", height: "100%", ...style }}

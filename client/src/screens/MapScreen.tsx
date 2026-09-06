@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChartAnchor } from "@/components/ChartAnchor";
 import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
-import { HelpButton } from "@/components/HelpButton";
 import { MapDiagram } from "@/components/MapDiagram";
+import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
@@ -34,6 +34,8 @@ export function MapScreen() {
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
   const [studyOpen, setStudyOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
 
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
@@ -157,20 +159,31 @@ export function MapScreen() {
 
   return (
     <div className="map-screen">
-      <HelpButton screen="map" />
-      <div className="map-anchor">
+      <MapGuide
+        open={guideOpen}
+        phase={guidePhase}
+        map={run.map}
+        mapsCompleted={run.mapsCompleted}
+        showBoundary={showBoundary}
+        onOpen={() => { setGuidePhase("map"); setGuideOpen(true); }}
+        onClose={() => setGuideOpen(false)}
+        onPhaseChange={setGuidePhase}
+      />
+      {/* While the guide is open the map is preview-only: a tap still previews
+          a node, but nothing commits and the study overlay stays shut. */}
+      <div className="map-anchor" data-guide="chart">
         <ChartAnchor
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
-          onExpand={() => setStudyOpen(true)}
+          onExpand={guideOpen ? noop : () => setStudyOpen(true)}
         />
       </div>
-      <div className="map-index">
+      <div className="map-index" data-guide="map-index">
         <span className="map-index-v">{ROMAN[run.mapsCompleted] ?? String(run.mapsCompleted + 1)}</span>
       </div>
       {showBoundary && boundary && (
-        <div className="map-boundary">
+        <div className="map-boundary" data-guide="map-boundary">
           <span className="eyebrow">MAP {ROMAN[run.mapsCompleted] ?? run.mapsCompleted + 1}</span>
           {boundary.uncombusts.map((u) => (
             <div key={`u-${u.planet}`} className="map-boundary-line">
@@ -192,7 +205,7 @@ export function MapScreen() {
         </div>
       )}
       <div className="map-diagram-wrap">
-        <MapDiagram map={run.map} onSelectNode={handleNodeSelect} />
+        <MapDiagram map={run.map} onSelectNode={guideOpen ? noop : handleNodeSelect} />
       </div>
       {studyOpen && (
         <ChartStudyOverlay
@@ -206,8 +219,7 @@ export function MapScreen() {
   );
 }
 
-/** Which map the player is on, as the End screen's rainbow labels it. */
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+const noop = () => {};
 
 /** Pick a planet for the active-planet tint of a map screen. Prefer the
  *  current node's ruler (where the player is standing); fall back to the

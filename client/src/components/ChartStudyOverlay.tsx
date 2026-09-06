@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Chart } from "@/components/Chart";
 import { InfoCard } from "@/components/InfoCard";
-import { ScreenHelp } from "@/components/HelpButton";
+import { ScreenHelp } from "@/components/ScreenHelp";
 import type { Chart as ChartType, PlanetName, SideState } from "@/game/types";
 
 interface ChartStudyOverlayProps {

@@ -1,6 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
-import { HelpButton } from "@/components/HelpButton";
+import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
@@ -110,6 +110,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   // with a glow, second tap on the same option commits. Cleared on node change.
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   useEffect(() => setSelectedOptionId(null), [encounter.currentNodeId]);
+  // While the guide is open the scene is preview-only: an option still arms,
+  // but a second tap disarms it instead of committing.
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guidePhase, setGuidePhase] = useState<NarrativeGuidePhase>("scene");
   // Resolution flash: dramatize the state change on the chart (SCREENS.md §3.5).
   const [flash, setFlash] = useState<{
     epoch: number;
@@ -137,6 +141,27 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     return placement.base.luck + placement.buffs.luck;
   }, [prince.chart, wagerLuckPlanet]);
   const wagerChance = fortuneChance(wagerLuck);
+
+  // Each option's aside — what it costs and does, before the choice. Resolved
+  // once so the guide can point at the first option that carries one.
+  const asides = useMemo(
+    () =>
+      shownOptions.map((o) => {
+        // Branch options (those that open a follow-up node) carry no direct
+        // effect; cue that they lead onward, with a trailing arrow.
+        let base = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
+        // Wagers show their odds — the roll's probability is derivable, so
+        // it's shown (SCREENS §1.1).
+        if (o.outcomesOnSuccess || o.outcomesOnFail) {
+          // Sixtieths, the unit every probability is stated in (MECHANICS
+          // §7) — and exact here, since the odds are already n/60.
+          const odds = `${fortuneSixtieths(wagerLuck)}/60`;
+          base = base ? `${base} · ${odds}` : odds;
+        }
+        return o.next && base ? `${base} →` : base;
+      }),
+    [shownOptions, ctx, wagerLuck],
+  );
 
   const handleOption = (option: Option) => {
     if (resolved) return;
@@ -239,13 +264,26 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       className={`narrative ${resolved ? "is-resolved" : ""}`}
       onClick={resolved ? handleContinue : () => setSelectedOptionId(null)}
     >
-      <HelpButton screen="narrative" />
+      {/* A resolved scene carries itself onward within seconds — nothing left
+          to study, so the guide comes down with the choices. */}
+      {!resolved && (
+        <NarrativeGuide
+          open={guideOpen}
+          phase={guidePhase}
+          house={house}
+          asideIndex={asides.findIndex(Boolean) + 1 || null}
+          onOpen={() => { setGuidePhase("scene"); setGuideOpen(true); }}
+          onClose={() => setGuideOpen(false)}
+          onPhaseChange={setGuidePhase}
+        />
+      )}
       <div className="narrative-chart">
         <Chart
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
           activePlanet={joyPlanet ?? null}
+          side="self"
           entrance="left"
           showColorField
           passive
@@ -260,7 +298,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           <KandinskyComposition planet={ariaPlanet} size={280} />
         </div>
 
-        <div className="narrative-text anim-fragment-in">
+        <div className="narrative-text anim-fragment-in" data-guide="narrative-text">
           {fragment && (
             <>
               <div className="narrative-fragment">
@@ -280,46 +318,41 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         </div>
 
         <div className="narrative-body">
-          <div className="narrative-house">
+          <div className="narrative-house" data-guide="narrative-house">
             <span className="narrative-house-num">{HOUSE_ROMAN[house.num - 1]}:</span> {HOUSE_NAMES[house.num - 1]}
             <span className="narrative-house-gloss"> — {house.gloss}</span>
           </div>
           <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
         </div>
 
-        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${selectedOptionId ? "is-arming" : ""}`} style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
+        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${selectedOptionId ? "is-arming" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
           {shownOptions.map((o, i) => {
-            // Branch options (those that open a follow-up node) carry no direct
-            // effect; cue that they lead onward, with a trailing arrow.
-            let baseAside = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
-            // Wagers show their odds — the roll's probability is derivable, so
-            // it's shown (SCREENS §1.1).
-            if (o.outcomesOnSuccess || o.outcomesOnFail) {
-              // Sixtieths, the unit every probability is stated in (MECHANICS
-              // §7) — and exact here, since the odds are already n/60.
-              const odds = `${fortuneSixtieths(wagerLuck)}/60`;
-              baseAside = baseAside ? `${baseAside} · ${odds}` : odds;
-            }
-            const aside = o.next && baseAside ? `${baseAside} →` : baseAside;
+            const aside = asides[i];
+            const commit = () => {
+              if (selectedOptionId !== o.id) setSelectedOptionId(o.id);
+              else if (guideOpen) setSelectedOptionId(null);
+              else handleOption(o);
+            };
             return (
               <button
                 key={o.id}
                 className={`option ${i === 1 ? "is-emph" : ""} ${selectedOptionId === o.id ? "is-selected" : ""}`}
-                onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); selectedOptionId === o.id ? handleOption(o) : setSelectedOptionId(o.id); }}
+                data-guide={`option-${i + 1}`}
+                onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); commit(); }}
                 aria-pressed={selectedOptionId === o.id}
                 type="button"
               >
                 <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
                 <span className="option-text">
                   {o.text}
-                  {aside && <span className="option-aside">{aside}</span>}
+                  {aside && <span className="option-aside" data-guide={`option-aside-${i + 1}`}>{aside}</span>}
                 </span>
               </button>
             );
           })}
         </div>
 
-        <div className="narrative-light">
+        <div className="narrative-light" data-guide="narrative-light">
           <span className="eyebrow">LIGHT</span>
           <span
             key={flash?.light ? flash.epoch : "l"}
