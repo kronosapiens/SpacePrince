@@ -18,7 +18,7 @@
  *    map — {ruler} a node's ruler; {name}/{gloss} the picked house;
  *      {n} the map's numeral
  *    narrative — {ruler} the house's ruler; {joy} its joy;
- *      {fortune} the lit planet carrying wagers; {theme} the house's theme sentence
+ *      {theme} the house's theme sentence
  *  Variants are separate entries (turn/turnSettled, theirMove/wayOut,
  *  housePlanet/housePlanetNoJoy), never a conditional inside a string. */
 
@@ -144,19 +144,19 @@ export const GUIDE_COPY = {
       },
       commit: {
         label: "Arm, then commit",
-        body: "Tap an option to arm it, choose any planets it asks for, then tap the option again to commit. The whole scene resolves in that one decision. Outcomes land on the chart itself, and what you carry out of here you carry into the next node.",
+        body: "Tap an option to arm it. If it asks for a planet, the effect waits at the chart's center: choose a highlighted planet, read the preview, and confirm beneath its readout. Otherwise, tap the option again to confirm. The whole scene resolves in that one decision.",
       },
       aside: {
         label: "The aside",
-        body: "Each aside names an option's price and its effect before you decide, so nothing here is a surprise. Odds in sixtieths mark a wager, rolled against Fortune.",
+        body: "Each aside names an option's price and effect before you decide. The chart previews the effect on the planet you inspect. Calling back a planet restores half its Resolve.",
       },
       housePlanet: {
         label: "The house's planet",
-        body: "The condition of {joy} opens some choices; dignity opens others. Any wager here reads {fortune}'s Fortune, using a lit planet when the house's own planets cannot answer.",
+        body: "The condition of {joy} opens some choices; dignity opens others. Your chart determines which help this house can offer.",
       },
       housePlanetNoJoy: {
         label: "The house's planet",
-        body: "No planet has its joy here. Some choices read the condition of {ruler}; others ask what your chart can spare. Any wager uses {fortune}'s Fortune, passing to a lit planet when the ruler cannot answer.",
+        body: "No planet has its joy here. Some choices read the condition of {ruler}; others ask what your chart can spare.",
       },
     },
   },

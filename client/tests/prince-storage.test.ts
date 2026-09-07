@@ -31,12 +31,12 @@ describe("Prince storage", () => {
     savePrince(prince);
     const restored = loadPrince()!;
     expect(restored.runs[0]!.encounter).toEqual(run.encounter);
-    const resolved = resolveNarrative(restored.runs[0]!, restored, scenario, "take", {}, () => 0)!;
+    const resolved = resolveNarrative(restored.runs[0]!, restored, scenario, "take", {})!;
     savePrince({ ...restored, runs: [resolved] });
     const reloaded = loadPrince()!;
     expect(reloaded.runs[0]!.encounter).toEqual(resolved.encounter);
     expect(reloaded.runs[0]!.light).toBe(12);
-    expect(resolveNarrative(reloaded.runs[0]!, reloaded, scenario, "take", {}, () => 0)).toBeNull();
+    expect(resolveNarrative(reloaded.runs[0]!, reloaded, scenario, "take", {})).toBeNull();
   });
 
   it("round-trips historical and active v4 Light state", () => {

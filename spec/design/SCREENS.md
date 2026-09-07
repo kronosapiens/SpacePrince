@@ -202,11 +202,12 @@ The *offensive* read (the effect on the opponent's chart) appears only while an 
 Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
 Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
 
-In narrative encounters, tap an option to arm it, select any requested planets, and tap that option again to commit.
-Targets can be selected on the chart or through labeled selectors alongside the option.
+In narrative encounters, tap an option to arm it.
+A targeted effect uses the encounter center mark to invite planet selection on the chart.
+Tap a planet to preview the consequence, then confirm through the shared planet readout.
+An option without a requested target commits on a second tap of that option.
 Only eligible targets invite selection; revival can select combusted planets without enabling them in combat.
 Determined effects project on the chart through the same resolver used at commit.
-Wagers show both consequences and the exact Fortune odds in text, with no single outcome projected as certain.
 Unavailable purchases remain visible with an explanation.
 The guide permits previews and target selection but prevents commitment.
 

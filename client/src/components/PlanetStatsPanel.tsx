@@ -7,12 +7,9 @@ import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { TermText } from "@/components/TermText";
 import { VALENCE_COLOR } from "@/svg/palette";
 
-/** When present, the panel grows the combat fan-out: two action buttons under
- *  the readout. `pending` is the armed verb (first click); a second click on it
- *  confirms. The panel owns layout; combat owns the arm/commit logic. */
+/** The panel owns action layout; the encounter owns preview and commit. */
 export interface PlanetStatsActions {
-  afflict: number;
-  testify: number;
+  choices: Array<{ verb: Polarity; value: number }>;
   pending: Polarity | null;
   onChoose: (v: Polarity) => void;
   /** Clear the armed verb without dismissing the panel — fired when a click
@@ -61,7 +58,7 @@ interface PlanetStatsPanelProps {
 // which is the budget the column widths in layout.css divide.
 export const PLANET_STATS_PANEL_W = 384;
 export const PLANET_STATS_PANEL_H = 76;
-export const PLANET_STATS_PANEL_ACTION_H = 152;
+export const PLANET_STATS_PANEL_ACTION_H = 180;
 const W = PLANET_STATS_PANEL_W;
 const ACTION_EXTRA = PLANET_STATS_PANEL_ACTION_H - PLANET_STATS_PANEL_H;
 
@@ -249,29 +246,22 @@ export function PlanetStatsPanel({
             <div className="ps-ops">
               {actions && (
                 <div className="ps-actions" data-guide="actions">
-                  {/* Testify leads: it is the resolving verb, and the Moon's rule,
-                      so it reads as the default and afflict as the deviation.
-                      Which verb scores is the encounter ruler's to say. */}
-                  {(
-                    [
-                      { v: "Testimony" as Polarity, label: "Testify", value: actions.testify },
-                      { v: "Affliction" as Polarity, label: "Afflict", value: actions.afflict },
-                    ]
-                  ).map((a) => (
+                  {actions.choices.map((a) => (
                     <button
                       type="button"
-                      key={a.v}
-                      className={`ps-action ${actions.pending === a.v ? "is-on" : ""}`}
-                      data-guide={`action-${a.v.toLowerCase()}`}
-                      style={{ "--vc": VALENCE_COLOR[a.v] } as CSSProperties}
+                      key={a.verb}
+                      className={`ps-action ${actions.pending === a.verb ? "is-on" : ""}`}
+                      aria-pressed={actions.pending === a.verb}
+                      data-guide={`action-${a.verb.toLowerCase()}`}
+                      style={{ "--vc": VALENCE_COLOR[a.verb] } as CSSProperties}
                       onClick={(e) => {
                         e.stopPropagation();
-                        actions.onChoose(a.v);
+                        actions.onChoose(a.verb);
                       }}
-                      onMouseEnter={() => actions.onHoverAction?.(a.v)}
+                      onMouseEnter={() => actions.onHoverAction?.(a.verb)}
                       onMouseLeave={() => actions.onHoverAction?.(null)}
                     >
-                      {a.label} {a.value}
+                      {a.verb === "Testimony" ? "Testify" : "Afflict"} {a.value}
                     </button>
                   ))}
                 </div>

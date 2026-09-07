@@ -1,7 +1,7 @@
 # Space Prince — Houses (Narrative Encounters)
 
 This document defines the **narrative encounter** system, organized around the twelve astrological houses.
-Narrative encounters are an alternative node type to combat, offering a single decision about immediate costs, recovery, redistribution, or a Fortune wager.
+Narrative encounters are an alternative node type to combat, offering a single decision about immediate costs, recovery, or revival.
 
 Combat mechanics are specified in `spec/mechanics/MECHANICS.md`.
 Chart construction (whole-sign houses, ASC, rulerships) is specified in `spec/mechanics/CHART.md`.
@@ -41,8 +41,8 @@ Map topology is specified in `spec/mechanics/MAP.md`.
 ## 2. Outcome Vocabulary
 
 Narrative encounters operate on the same resources as combat.
-Light can be gathered or spent; affliction can be added, relieved, or transferred between selected planets.
-A lit planet can be sacrificed, and a combusted planet can return at half its ceiling.
+Light can be gathered or spent; affliction can be added or relieved.
+A combusted planet can return at half its ceiling.
 Purchases require full payment; ordinary Light losses clamp at zero.
 The exact outcome vocabulary and validation rules live in `ENCOUNTERS.md §2–3`.
 
@@ -103,13 +103,13 @@ Pure cost scaling is one mechanism; changing options is another.
 
 Each encounter has one prompt and at most three visible options, including any exit.
 Every choice resolves immediately, with a specific consequence sentence.
-Choosing one or two target planets is part of preparing the choice and does not advance the encounter.
+Choosing a target planet is part of preparing the choice and does not advance the encounter.
 
-### 4.2 Wagers
+### 4.2 Direct effects
 
-A wager resolves in one Fortune roll, with its odds and both consequences visible before commitment.
-There are no intermediate rewards, cash-outs, or escalating ladders in this version.
-Multi-stage encounters are deferred until the one-decision experience is refined.
+Every choice has a determined consequence, previewed before commitment.
+Planet selection uses the shared encounter chart and readout.
+Wagers, deliberate sacrifice, transfers, and multi-stage encounters are deferred until the one-decision experience is refined.
 
 ### 4.3 Offered vs always-present
 

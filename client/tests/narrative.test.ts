@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getScenario, NARRATIVE_SCENARIOS, pickScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
 import { HOUSES } from "@/data/houses";
-import { applyOutcomes, availableSelections, buildNarrativeContext, conditioningPlanet, joyPresent, joyStrong, previewOption, resolveNarrative, resolveTargets, rulerStrong, selectionSlots, wagerOdds } from "@/game/narrative";
+import { applyOutcomes, availableSelections, buildNarrativeContext, joyPresent, joyStrong, previewOption, resolveNarrative, resolveTargets, rulerStrong, requiresPlanet } from "@/game/narrative";
 import { beginNarrativeEncounter } from "@/game/encounter";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
@@ -34,12 +34,10 @@ describe("single-decision narrative", () => {
       expect(new Set(scene.options.map((o) => o.id)).size).toBe(scene.options.length);
       for (const option of scene.options) {
         expect((option.cost ?? 0) % 12).toBe(0);
-        for (const result of [option.result, ...(option.failure ? [option.failure] : [])]) {
-          expect(result.text.length).toBeGreaterThan(10);
-          for (const effect of result.effects) {
-            if ("delta" in effect) expect(effect.delta % 12).toBeCloseTo(0);
-            if (effect.kind === "transfer") expect(effect.amount % 12).toBe(0);
-          }
+        expect(option.result.text.length).toBeGreaterThan(10);
+        for (const effect of option.result.effects) {
+          expect(["affliction", "uncombust", "light"]).toContain(effect.kind);
+          if ("delta" in effect) expect(effect.delta % 12).toBeCloseTo(0);
         }
       }
     }
@@ -74,20 +72,20 @@ describe("single-decision narrative", () => {
     run.state.Moon.affliction = 24;
     darken("Venus");
     expect(offered()).toEqual(["shelter", "hearth", "move"]);
-    expect(resolveNarrative(run, prince, scenario, "bed", { chosen: "Moon" }, () => 0)).toBeNull();
-    const revived = resolveNarrative(run, prince, scenario, "shelter", { chosen: "Venus" }, () => 0)!;
+    expect(resolveNarrative(run, prince, scenario, "bed", { chosen: "Moon" })).toBeNull();
+    const revived = resolveNarrative(run, prince, scenario, "shelter", { chosen: "Venus" })!;
     expect(revived.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus) / 2);
     expect(revived.light).toBe(run.light - 60);
     darken("Moon");
     expect(offered()).toEqual(["bed", "hearth", "move"]);
   });
 
-  it("offers both revival methods and an exit at the rite, with a fallback when everyone is lit", () => {
+  it("offers paid revival, rest, and an exit at the rite, with work when everyone is lit", () => {
     const { scenario, context, darken } = setup("transformation-rite");
     const offered = () => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(context())).map((o) => o.id);
-    expect(offered()).toEqual(["offer", "leave"]);
+    expect(offered()).toEqual(["offer", "rest", "leave"]);
     darken("Venus");
-    expect(offered()).toEqual(["rite", "exchange", "leave"]);
+    expect(offered()).toEqual(["rite", "rest", "leave"]);
   });
 
   it("prefers unseen scenarios and recycles an exhausted house", () => {
@@ -110,7 +108,7 @@ describe("single-decision narrative", () => {
     expect(preview.success.light).toBe(0);
     expect(preview.success.state.Moon.affliction).toBe(0);
     expect(run.state.Moon.affliction).toBe(48);
-    expect(describeOption(run, context(), option("rest"), { chosen: "Moon" })).toContain("relieve 48 affliction");
+    expect(describeOption(run, context(), option("rest"), { chosen: "Moon" })).toContain("Testify 48 on Moon");
   });
 
   it("does not sell healing to a clean or combusted target", () => {
@@ -133,9 +131,7 @@ describe("single-decision narrative", () => {
     const { run, prince, scenario, context, option, darken } = setup("creativity-song", 0);
     expect(previewOption(run, context(), option("finish"), { chosen: "Venus" }).ok).toBe(false);
     darken("Moon");
-    const rng = vi.fn(() => 0);
-    expect(resolveNarrative(run, prince, scenario, "finish", { chosen: "Moon" }, rng)).toBeNull();
-    expect(rng).not.toHaveBeenCalled();
+    expect(resolveNarrative(run, prince, scenario, "finish", { chosen: "Moon" })).toBeNull();
     expect(run.light).toBe(120);
   });
 
@@ -161,36 +157,19 @@ describe("single-decision narrative", () => {
     expect(resolveTargets("healthiest", ctx)).toEqual(["Saturn"]);
   });
 
-  it("transfers exact affliction between distinct lit planets", () => {
-    const { run, context, option, darken } = setup("relationships-stranger");
-    run.state.Moon.affliction = 48;
-    const preview = previewOption(run, context(), option("shift"), { chosen: "Moon", recipient: "Saturn" });
-    expect(preview.ok).toBe(true);
-    if (!preview.ok) throw new Error(preview.reason);
-    expect(preview.success.state.Moon.affliction).toBe(12);
-    expect(preview.success.state.Saturn.affliction).toBe(36);
-    expect(preview.success.light).toBe(run.light);
-    expect(previewOption(run, context(), option("shift"), { chosen: "Moon", recipient: "Moon" }).ok).toBe(false);
-    expect(previewOption(run, context(), option("shift"), { chosen: "Saturn", recipient: "Moon" }).ok).toBe(false);
-    darken("Saturn");
-    expect(previewOption(run, context(), option("shift"), { chosen: "Moon", recipient: "Saturn" }).ok).toBe(false);
-  });
-
-  it("revives a selected planet at half ceiling for a full price or a living sacrifice", () => {
+  it("revives only a selected extinguished planet at half ceiling for the full price", () => {
     const { run, prince, context, option, darken } = setup("transformation-rite");
     darken("Venus");
-    run.light = 0;
+    run.light = 72;
     expect(previewOption(run, context(), option("rite"), { chosen: "Venus" }).ok).toBe(false);
-    const exchanged = previewOption(run, context(), option("exchange"), { chosen: "Moon", recipient: "Venus" });
-    expect(exchanged.ok).toBe(true);
-    if (!exchanged.ok) throw new Error(exchanged.reason);
-    expect(exchanged.success.state.Moon.affliction).toBe(combustionCeiling(prince.chart.planets.Moon));
-    expect(exchanged.success.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus) / 2);
-    expect(exchanged.success.light).toBe(0);
     run.light = 84;
+    expect(availableSelections(run, context(), option("rite"))).toEqual([{ chosen: "Venus" }]);
+    expect(previewOption(run, context(), option("rite"), { chosen: "Moon" }).ok).toBe(false);
+    expect(previewOption(run, context(), option("rite")).ok).toBe(false);
     const paid = previewOption(run, context(), option("rite"), { chosen: "Venus" });
     expect(paid.ok && paid.success.light).toBe(0);
-    expect(paid.ok && paid.success.state.Venus.affliction).toBe(exchanged.success.state.Venus.affliction);
+    expect(paid.ok && paid.success.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus) / 2);
+    expect(run.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus));
   });
 
   it("conditions options on both dignity and the planet's current state", () => {
@@ -209,57 +188,26 @@ describe("single-decision narrative", () => {
     expect(rulerStrong(context())).toBe(false);
   });
 
-  it("uses lit, unlocked Fortune with a deterministic fallback", () => {
-    const { context, darken } = setup("creativity-dice");
-    expect(conditioningPlanet(context())).toBe("Venus");
-    darken("Venus");
-    expect(conditioningPlanet(context())).toBe("Sun");
-    darken("Sun");
-    expect(conditioningPlanet(context())).toBe("Moon");
-    const early = setup("creativity-dice", 0);
-    expect(wagerOdds(early.context())?.planet).toBe("Moon");
-  });
-
-  it("charges a single wager's stake on either outcome and rolls exactly once", () => {
-    const { run, prince, scenario, context, option } = setup("creativity-dice");
-    const preview = previewOption(run, context(), option("bet"));
-    expect(preview.ok).toBe(true);
-    if (!preview.ok) throw new Error(preview.reason);
-    const win = vi.fn(() => 0);
-    const miss = vi.fn(() => 0.999999);
-    const won = resolveNarrative(run, prince, scenario, "bet", {}, win)!;
-    const lost = resolveNarrative(run, prince, scenario, "bet", {}, miss)!;
-    expect(won.light - run.light).toBe(60);
-    expect(lost.light - run.light).toBe(-24);
-    expect(won.state).toEqual(preview.success.state);
-    expect(lost.state).toEqual(preview.failure!.state);
-    expect(win).toHaveBeenCalledTimes(1);
-    expect(miss).toHaveBeenCalledTimes(1);
-  });
-
-  it("rejects an invalid wager branch and hidden approach without consuming a roll", () => {
+  it("rejects hidden choices and unaffordable work before awarding anything", () => {
     const { run, prince, scenario, context, option } = setup("creativity-dice", 0);
-    const rng = vi.fn(() => 0);
     run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) - 12;
-    expect(previewOption(run, context(), option("dare"), { chosen: "Moon" }).ok).toBe(false);
-    expect(resolveNarrative(run, prince, scenario, "dare", { chosen: "Moon" }, rng)).toBeNull();
-    expect(resolveNarrative(run, prince, scenario, "play", { chosen: "Moon" }, rng)).toBeNull();
-    expect(rng).not.toHaveBeenCalled();
+    expect(previewOption(run, context(), option("work"), { chosen: "Moon" }).ok).toBe(false);
+    expect(resolveNarrative(run, prince, scenario, "work", { chosen: "Moon" })).toBeNull();
+    expect(resolveNarrative(run, prince, scenario, "play", { chosen: "Moon" })).toBeNull();
+    expect(run.light).toBe(120);
   });
 
   it("records the result once and rejects resolved, missing, or mismatched encounters", () => {
     const { run, prince, scenario } = setup("livelihood-coin");
-    const rng = vi.fn(() => 0);
-    const next = resolveNarrative(run, prince, scenario, "take", {}, rng)!;
+    const next = resolveNarrative(run, prince, scenario, "take", {})!;
     expect(next.encounter?.resolved).toBe(true);
     expect(next.encounter?.kind === "narrative" && next.encounter.resolutionText).toBe(scenario.options[0]!.result.text);
     expect(next.map.outcomes[run.map.currentNodeId]?.lightDelta).toBe(12);
     expect(next.seenFragmentIds).toEqual(["test-fragment"]);
-    expect(rng).not.toHaveBeenCalled();
-    expect(resolveNarrative(next, prince, scenario, "take", {}, rng)).toBeNull();
-    expect(resolveNarrative({ ...run, encounter: null }, prince, scenario, "take", {}, rng)).toBeNull();
-    expect(resolveNarrative(run, prince, getScenario("home-hearth"), "take", {}, rng)).toBeNull();
-    expect(resolveNarrative(run, prince, scenario, "invented", {}, rng)).toBeNull();
+    expect(resolveNarrative(next, prince, scenario, "take", {})).toBeNull();
+    expect(resolveNarrative({ ...run, encounter: null }, prince, scenario, "take", {})).toBeNull();
+    expect(resolveNarrative(run, prince, getScenario("home-hearth"), "take", {})).toBeNull();
+    expect(resolveNarrative(run, prince, scenario, "invented", {})).toBeNull();
     expect(prince.numEncounters).toBe(64); // advancement belongs to encounter clear
   });
 
@@ -277,17 +225,13 @@ describe("single-decision narrative", () => {
           for (const option of offered) {
             for (const selection of availableSelections(run, ctx, option)) {
               expect(Object.values(selection).every((p) => roster.includes(p))).toBe(true);
-              expect(Object.keys(selection)).toHaveLength(selectionSlots(option).length);
+              expect(Object.keys(selection)).toHaveLength(requiresPlanet(option) ? 1 : 0);
               const preview = previewOption(run, ctx, option, selection);
               if (!preview.ok) throw new Error(preview.reason);
-              const branches = [{ roll: 0, expected: preview.success }];
-              if (preview.failure) branches.push({ roll: 0.999999, expected: preview.failure });
-              for (const { roll, expected } of branches) {
-                const next = resolveNarrative(run, prince, scene, option.id, selection, () => roll)!;
-                expect(next.state).toEqual(expected.state);
-                expect(next.light).toBe(expected.light);
-                for (const p of PLANETS) if (!roster.includes(p)) expect(next.state[p]).toEqual(run.state[p]);
-              }
+              const next = resolveNarrative(run, prince, scene, option.id, selection)!;
+              expect(next.state).toEqual(preview.success.state);
+              expect(next.light).toBe(preview.success.light);
+              for (const p of PLANETS) if (!roster.includes(p)) expect(next.state[p]).toEqual(run.state[p]);
             }
           }
         }

@@ -5,13 +5,9 @@ import {
 
 const L = (delta: number): Outcome => ({ kind: "light", delta });
 const A = (target: Target, delta: number): Outcome => ({ kind: "affliction", target, delta });
-const transfer = (amount: number): Outcome => ({ kind: "transfer", amount });
 const revive = (target: Target): Outcome => ({ kind: "uncombust", target });
-const sacrifice = (target: Target): Outcome => ({ kind: "combust", target });
 const choice = (id: string, text: string, consequence: string, effects: Outcome[], extra: Partial<Pick<Option, "cost" | "visibleIf">> = {}): Option =>
   ({ id, text, result: { text: consequence, effects }, ...extra });
-const wager = (id: string, text: string, win: string, reward: Outcome[], loss: string, risk: Outcome[], cost = 0): Option =>
-  ({ id, text, cost, result: { text: win, effects: reward }, failure: { text: loss, effects: risk } });
 
 // A chart-conditioned offer occupies the same menu slot as its standard form.
 const conditioned = (when: (ctx: NarrativeContext) => boolean, standard: Option, special: Option): Option[] => [
@@ -43,7 +39,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
         choice("strength", "Hold it until the counting ends.", "Your arm trembles long after the purse is yours.", [A("chosen", 48), L(36)]),
         choice("wit", "Show them a better grip.", "The weight has not changed, but everyone holds it differently.", [L(24), A("chosen", -24)]),
       ),
-      wager("try", "Try for the longest count.", "They lose count before you lower the stone.", [L(72)], "The stone falls before the last voice stops.", [A("chosen", 60)]),
+      choice("try", "Hold it for one more count.", "You lower the stone with an aching arm and a heavier purse.", [A("chosen", 60), L(72)]),
       choice("quiet", "Let someone else lift it.", "You leave before the next count begins.", []),
     ],
   },
@@ -52,7 +48,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     text: "At the foot of a dead tree, a coin catches the light. Roots grip something larger underneath.",
     options: [
       choice("take", "Take the loose coin.", "One coin comes away cleanly; the roots keep the rest.", [L(12)]),
-      wager("pull", "Pull once, with everything you have.", "The root breaks, spilling the buried coins.", [L(72)], "The root holds, and something in you gives.", [A("chosen", 60)]),
+      choice("pull", "Dig until the roots give way.", "The buried coins come free, leaving your hands scraped raw.", [A("chosen", 60), L(72)]),
       choice("leave", "Leave it in the ground.", "You brush the soil back over the coin.", []),
     ],
   },
@@ -85,7 +81,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
         choice("around", "Take the long way around.", "You reach the far bank with wet boots and tired legs.", [A("chosen", 24), L(24)]),
         choice("listen", "Listen for the shallow crossing.", "Beneath the shouting, you hear water running over stones.", [L(24), A("chosen", -24)]),
       ),
-      wager("cross", "Try the remaining planks.", "The last plank holds until you step onto the bank.", [L(60)], "A plank turns, and the current throws you against a pier.", [A("chosen", 48)]),
+      choice("cross", "Help repair the crossing.", "The travelers pay for your work, and you cross with aching hands.", [A("chosen", 48), L(60)]),
       choice("wait", "Wait by the bank.", "The travelers tire of beckoning before you tire of waiting.", []),
     ],
   },
@@ -112,13 +108,13 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
   },
   {
     scenarioId: "creativity-dice", house: 5, fragmentMood: "longing",
-    text: "Travelers throw dice in the dust. They offer you a seat and name the stake for a single throw.",
+    text: "Travelers play a game in the dust. There is food to share, a place to sit, and work clearing the tables.",
     options: [
       ...conditioned(joyPresent,
-        wager("dare", "Stake an evening's work instead.", "They carry your winnings while you finish laughing.", [L(72)], "You spend the evening clearing everyone else's table.", [A("chosen", 60)]),
+        choice("work", "Clear the tables for the evening.", "The last table is clean; you sit down with sore feet and your wages.", [A("chosen", 60), L(72)]),
         choice("play", "Play without keeping score.", "For a little while, every throw is funny.", [A("chosen", -36), L(12)]),
       ),
-      wager("bet", "Put your coins beside the dice.", "The dice stop together, and the pot is pushed toward you.", [L(84)], "The dice stop apart; your coins stay on the cloth.", [], 24),
+      choice("meal", "Buy a meal and sit awhile.", "Someone makes room, and the evening asks nothing more of you.", [A("chosen", -48)], { cost: 24 }),
       choice("watch", "Only watch.", "You learn the shape of the game without joining it.", []),
     ],
   },
@@ -153,7 +149,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
       choice("push", "Work through the fever.", "The work is done, though the shaking has not stopped.", [A("chosen", 48), L(36)]),
       ...conditioned(joyPresent,
         choice("remedy", "Buy the remedy for one patient.", "One cup empties, and one breathing rhythm eases.", [A("chosen", -60)], { cost: 36 }),
-        choice("contain", "Contain the burden in one place.", "The fever gathers in one place, leaving the rest of the camp quiet.", [transfer(36)]),
+        choice("contain", "Give one patient a quiet place to rest.", "Away from the work, the shaking finally eases.", [A("chosen", -36)]),
       ),
       choice("rest", "Lose the day's wages and rest.", "The day passes without asking anything more of you.", [L(-12)]),
     ],
@@ -162,7 +158,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     scenarioId: "relationships-stranger", house: 7, fragmentMood: "longing",
     text: "A stranger falls into step beside you. They notice how unevenly you carry your bags.",
     options: [
-      choice("shift", "Move a burden to another shoulder.", "The pace changes when the weight changes hands.", [transfer(36)]),
+      choice("shift", "Accept help with the heaviest bag.", "The stranger carries it to the next fork, giving one shoulder time to ease.", [A("chosen", -36)]),
       choice("company", "Share food and a little of the road.", "You part at the fork with less to carry.", [A("allUnlocked", -12)], { cost: 12 }),
       choice("pass", "Keep your own pace.", "Your steps fall out of time, then out of earshot.", []),
     ],
@@ -174,7 +170,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
       choice("carry", "Take their load for the next mile.", "They count the coins while you ease the straps off.", [A("chosen", 48), L(48)]),
       ...conditioned(rulerStrong,
         choice("fair", "Pay them to carry one of your bags.", "One shoulder lifts as the bag changes hands.", [A("chosen", -48)], { cost: 24 }),
-        choice("exchange", "Arrange an exchange everyone can bear.", "The heaviest bag finds the shoulder that can carry it.", [transfer(60), L(12)]),
+        choice("help", "Ask them to share the work.", "Between you, the bags reach the next resting place with less strain.", [A("chosen", -60), L(12)]),
       ),
       choice("refuse", "Carry on as you are.", "The porters turn back to their argument.", []),
     ],
@@ -184,17 +180,19 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     text: "Someone you barely knew has left you a sealed chest. The keeper warns you that opening it takes more than a key.",
     options: [
       choice("take", "Break the seal.", "The chest opens, leaving its mark on the hand that opened it.", [A("chosen", 60), L(60)]),
-      choice("surrender", "Give the keeper one of your lights.", "One light goes out; the keeper leaves the whole chest at your feet.", [sacrifice("chosen"), L(96)]),
+      choice("share", "Let the keeper keep a share.", "The keeper opens the chest and counts your share into your hand.", [L(24)]),
       choice("refuse", "Leave the chest closed.", "The keeper writes another name beside yours.", []),
     ],
   },
   {
     scenarioId: "transformation-rite", house: 8, fragmentMood: "concealment",
-    text: "At a low altar, a keeper offers to call back what has gone dark. The price is coin, or another living flame.",
+    text: "At a low altar, a keeper tends a row of lamps. They offer rest to the weary and a rite to call back what has gone dark.",
     options: [
-      choice("rite", "Pay for the name you want returned.", "A voice answers from the place where you stopped listening.", [revive("chosen")], { cost: 84, visibleIf: anyCombusted }),
-      choice("exchange", "Offer one flame for another.", "As one flame lowers, another catches.", [sacrifice("chosen"), revive("recipient")], { visibleIf: anyCombusted }),
-      choice("offer", "Offer a little of your strength.", "The keeper gathers what you leave on the stone.", [A("chosen", 48), L(36)], { visibleIf: (ctx) => !anyCombusted(ctx) }),
+      ...conditioned(anyCombusted,
+        choice("offer", "Help the keeper tend the lamps.", "The keeper pays for your work as the last lamp catches.", [A("chosen", 48), L(36)]),
+        choice("rite", "Pay for the name you want returned.", "A voice answers from the place where you stopped listening.", [revive("chosen")], { cost: 84 }),
+      ),
+      choice("rest", "Pay for a place to rest.", "You wake beneath the lamps with a little more strength.", [A("chosen", -48)], { cost: 24 }),
       choice("leave", "Leave the altar untouched.", "The keeper does not call after you.", []),
     ],
   },
@@ -239,7 +237,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     text: "A foundation waits on the hill. One stone would mark your passage; a monument would ask much more.",
     options: [
       choice("stone", "Lay a single stone.", "It is small enough that someone else can build beside it.", [L(12)]),
-      wager("greater", "Set the highest stone in place.", "The last stone holds, visible from the road below.", [L(96)], "The stone tips, dragging the scaffold with it.", [A("chosen", 72)]),
+      choice("greater", "Work until the monument stands.", "The highest stone is visible from the road; you climb down stiff and spent.", [A("chosen", 72), L(96)]),
       choice("none", "Leave the hill as it is.", "The empty foundation catches the afternoon shade.", []),
     ],
   },
@@ -287,7 +285,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
         choice("glance", "Reach for what lies closest.", "You pull your hand back with a prize and a dark bruise.", [A("chosen", 36), L(24)]),
         choice("measure", "Let Saturn measure the opening.", "You take only what passes cleanly through the gap.", [A("joy", 12), L(24)]),
       ),
-      wager("through", "Slip through the gap.", "You leave with something the room has not yet missed.", [L(72)], "The gap closes around you before you can turn.", [A("chosen", 60)]),
+      choice("through", "Squeeze through and carry something out.", "The narrow opening leaves its marks, but you bring the object through.", [A("chosen", 60), L(72)]),
       choice("back", "Turn back.", "The door remains open after you have gone.", []),
     ],
   },

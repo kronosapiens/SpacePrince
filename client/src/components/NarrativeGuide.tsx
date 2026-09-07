@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import type { PlanetName } from "@/game/types";
 import { GUIDE_COPY } from "@/copy/guide";
 import type { HouseDef } from "@/data/houses";
 import { planetName, TermText } from "@/components/TermText";
@@ -26,7 +25,6 @@ interface NarrativeGuideProps {
   open: boolean;
   phase: NarrativeGuidePhase;
   house: HouseDef;
-  fortunePlanet: PlanetName | null;
   /** 1-based index of the first option carrying an aside, if any. */
   asideIndex: number | null;
   onOpen: () => void;
@@ -49,14 +47,12 @@ export function NarrativeGuide({
   open,
   phase,
   house,
-  fortunePlanet,
   asideIndex,
   onOpen,
   onClose,
   onPhaseChange,
 }: NarrativeGuideProps) {
-  // Point to the lit planet whose Fortune the displayed wagers use.
-  const housePlanet = fortunePlanet ?? house.ruler;
+  const housePlanet = house.joy ?? house.ruler;
 
   const notes = useMemo<GuideNote[]>(() => {
     if (phase === "scene") {
@@ -68,8 +64,8 @@ export function NarrativeGuide({
           placement: "outward",
           label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
           body: house.joy
-            ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />
-            : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />,
+            ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
+            : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
         },
         {
           key: "house",
@@ -112,7 +108,7 @@ export function NarrativeGuide({
       });
     }
     return choiceNotes;
-  }, [phase, house, housePlanet, fortunePlanet, asideIndex]);
+  }, [phase, house, housePlanet, asideIndex]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // Only the joy planet wears the active halo here (the chart's

@@ -36,6 +36,8 @@
 /* Default chart sizing. Chart.tsx renders <svg class="chart-svg">; consumers
    override via more-specific selectors (e.g. `.combat-side > svg { width: ... }`). */
 .chart-svg { display: block; width: 100%; height: auto; }
+/* PlanetGlyph carries keyboard focus through its circular interaction ring. */
+.chart-svg g[role="button"] { outline: none; }
 
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
@@ -1106,7 +1108,7 @@
   justify-content: center;
   gap: 24px;
 }
-.narrative-chart > svg { width: min(560px, 40vw); height: auto; }
+.narrative-chart > svg { width: 100%; height: auto; }
 .narrative-light {
   grid-column: 1 / 3;
   display: flex;
@@ -1213,43 +1215,30 @@
   border-top: 0;
   /* Invite: a quiet breathing bar in the aria planet's color marks each option
      as a live choice (the row analog of the combat chart's glow); it brightens
-     to solid on hover. The 35% base holds under reduced motion. */
-  box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) 35%, transparent);
-  animation: option-invite 1.1s ease-in-out infinite;
-}
-@keyframes option-invite {
-  0%, 100% { box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) 22%, transparent); }
-  50%      { box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) 60%, transparent); }
+     to solid on hover. It follows the chart's shared breath. */
+  box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) calc(22% + 38% * var(--breath)), transparent);
 }
 .option:hover {
   background: rgba(232, 226, 212, 0.04);
   box-shadow: inset 2px 0 0 0 var(--vc);
-  animation: none;
 }
 .option.is-emph { font-style: italic; }
 /* First tap arms an option (mirrors combat's armed action): a soft glow in the
-   aria planet's color. A second tap commits. */
+   aria planet's color. Targeted choices continue on the chart. */
 .option.is-selected {
   background: color-mix(in srgb, var(--vc) 8%, transparent);
   box-shadow: inset 3px 0 0 0 var(--vc);
-  animation: option-armed 1.8s ease-in-out infinite;
+  text-shadow: 0 0 calc(6px + 10px * var(--breath)) color-mix(in srgb, var(--vc) 50%, transparent);
 }
 .option.is-selected .option-index { color: var(--vc); }
-@keyframes option-armed {
-  0%, 100% { text-shadow: 0 0 6px color-mix(in srgb, var(--vc) 35%, transparent); }
-  50%      { text-shadow: 0 0 16px color-mix(in srgb, var(--vc) 70%, transparent); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .option,
-  .option.is-selected { animation: none; }
-}
 /* Resolved: options stay in place (so the column/aria don't shift). The chosen
    option holds a steady highlight; the roads not taken recede, pulse stilled. */
-.narrative-options.is-resolved .option { animation: none; }
+.narrative-options.is-resolved .option { box-shadow: none; text-shadow: none; }
+.narrative-options.is-resolved .option.is-selected { box-shadow: inset 3px 0 0 0 var(--vc); }
 .narrative-options.is-resolved .option:not(.is-selected) { opacity: 0.4; }
 /* Once an option is armed, the other options' invite pulse ceases — focus
    collapses to the armed choice (mirrors combat clearing the chart glow on select). */
-.narrative-options.is-arming .option:not(.is-selected) { animation: none; box-shadow: none; }
+.narrative-options.is-arming .option:not(.is-selected) { box-shadow: none; }
 .option-index {
   font-family: var(--serif);
   font-style: italic;
@@ -1279,33 +1268,8 @@
   font-size: 12px;
   margin-top: 6px;
 }
-.narrative-selection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  padding: 12px 14px;
-  color: var(--bone);
-  background: color-mix(in srgb, var(--vc) 4%, transparent);
-}
-.narrative-selection label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-family: var(--sans);
-  font-size: 12px;
-}
-.narrative-selection select {
-  font-family: var(--serif);
-  font-size: 17px;
-  color: var(--bone);
-  background: var(--void);
-  border: 1px solid var(--mist);
-  border-radius: 0;
-  padding: 6px 10px;
-}
-.narrative-selection p {
-  flex-basis: 100%;
-  margin: 0;
+.narrative-confirm {
+  margin: 8px 14px;
   color: var(--mist);
   font-size: 14px;
 }
@@ -1315,7 +1279,7 @@
     grid-template-columns: 1fr;
     padding: 24px 16px;
   }
-  .narrative-chart > svg { width: min(360px, 80vw); }
+  .narrative-chart { scroll-margin-top: 24px; }
   .narrative-composition { display: none; }
 }
 

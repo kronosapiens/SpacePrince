@@ -439,8 +439,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     inspected && !animation && !encounter.resolved &&
     !isCombusted(prince.chart.planets[inspected], run.state[inspected])
       ? {
-          afflict: getEffectiveStats(prince.chart, inspected).impact,
-          testify: getEffectiveStats(prince.chart, inspected).witness,
+          choices: [
+            { verb: "Testimony", value: getEffectiveStats(prince.chart, inspected).witness },
+            { verb: "Affliction", value: getEffectiveStats(prince.chart, inspected).impact },
+          ],
           pending: pendingAction,
           // First click/tap arms the action (and previews its spread); a second
           // on the same action confirms. Uniform across pointer and touch.

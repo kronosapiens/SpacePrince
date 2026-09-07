@@ -6,7 +6,7 @@ Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, ta
 
 ## 1. The Complementary Loop
 
-Narrative choices gather or spend Light, restore planets, or redistribute their burdens.
+Narrative choices gather or spend Light, add or relieve affliction, or revive a planet.
 Combat remains the primary scoring engine.
 
 ### 1.1 Shared resources
@@ -16,15 +16,13 @@ Combat remains the primary scoring engine.
 - **Lit planets:** the remaining choices the player can bring to subsequent encounters.
 
 Chart condition cannot be reduced to one health total.
-The location of affliction matters: restoring Mercury, preserving Saturn, or exchanging one for another changes what the player can do under the next ruler.
+The location of affliction matters: restoring Mercury or preserving Saturn changes what the player can do under the next ruler.
 
 ### 1.2 Choice families
 
 - **Press:** choose which planet absorbs an immediate affliction cost to gather Light.
 - **Tend:** spend Light for selected or distributed recovery.
-- **Redistribute:** move a fixed amount of affliction between two selected planets.
-- **Sacrifice:** extinguish a selected living planet for Light or to revive another.
-- **Wager:** accept one displayed Fortune roll with two explicit immediate consequences.
+- **Revive:** spend Light to return a selected combusted planet at half its ceiling.
 
 A scene uses the families its situation supports.
 It does not need a copy of every economic option.
@@ -50,35 +48,26 @@ Debts, vows with later consequences, Omen, Lore, and other persistent effects ar
 | Outcome | Meaning |
 |---|---|
 | `affliction { target, delta }` | Positive adds affliction; negative heals, clamped at zero. |
-| `combust { target }` | Set a lit planet to its ceiling, spending all remaining Resolve. |
 | `uncombust { target }` | Return a combusted planet at half its ceiling, through the shared uncombust rule. |
-| `transfer { amount }` | Move exactly this much affliction from `chosen` to `recipient`. |
 | `light { delta }` | Gather Light or incur an ordinary loss, clamped at zero. |
 
 An option's separate `cost` is a **purchase**, paid in full before its result.
 Insufficient Light makes the entire option unavailable; incoming rewards cannot finance its price.
-A wager's price is paid on either outcome.
 Ordinary losses remain payable at zero and cannot make Light negative.
 Paid healing requires some actual recovery; clean planets cannot consume Light for no benefit.
 
 All outcomes are atomic.
 An invalid target or unaffordable planetary cost rejects the whole choice, including any reward.
 Positive affliction must fit within the target's remaining combustion margin; landing exactly at its ceiling is permitted and combusts it.
-A deliberate sacrifice uses `combust`, so its cost is explicitly all remaining Resolve.
-
-A transfer requires two distinct lit planets, sufficient affliction at its source, and sufficient remaining margin at its recipient.
-It cannot create healing by clamping either side.
 
 ## 3. Targeting
 
 Only unlocked planets may be selected or affected.
 Ordinary affliction effects require lit planets; revival requires a combusted planet.
-Two selected roles must name different planets.
 
 | Target | Meaning |
 |---|---|
-| `chosen` | The player's first selected planet. |
-| `recipient` | The second selected planet, for transfers or sacrifice/revival. |
+| `chosen` | The player's selected planet. |
 | `allUnlocked` | All currently lit unlocked planets. |
 | `joy` | The house's joy, only if lit and unlocked. |
 | `ruler` | The house's natural ruler, only if lit and unlocked. |
@@ -139,24 +128,15 @@ Selecting targets and inspecting previews are preparation for the decision, with
 
 ### 5.2 Commitment
 
-Tap an option to arm it, select any requested planets, then tap the same option to commit.
-The chart and labeled selectors offer the same target choices.
+Tap an option to arm it.
+For a targeted effect, the shared encounter center mark invites selection on the chart.
+Tap an eligible planet to preview its exact consequence, then confirm beneath its readout.
+An option without a requested target commits on a second tap of that option.
+Hover adds a preview without committing; selecting a planet holds the preview until the player changes or clears it.
 A resolved encounter cannot resolve again.
 Its consequence is shown before returning to the map; the lifetime encounter count advances on leaving the resolved scene.
 
-### 5.3 Single-roll wagers
-
-Wagers use the shared Fortune formula and display odds in sixtieths.
-The conditioning planet is the lit, unlocked joy, otherwise the lit, unlocked ruler, otherwise the first lit planet in unlock order.
-If no planet is lit, no wager can resolve.
-Both possible outcomes must be valid for the selected targets before the roll is consumed.
-There is exactly one roll, at commit.
-
-A wager's success and failure are described separately.
-The chart never projects one uncertain branch as a determined outcome.
-Multi-stage wagers are deferred with all other multi-stage encounters.
-
-### 5.4 Exits
+### 5.3 Exits
 
 Every scene must offer a valid choice at every unlock tier and at zero Light.
 Usually this is a plain exit; a harsh house can instead impose a small ordinary Light loss, which clamps at zero.
@@ -167,7 +147,6 @@ Authored amounts are multiples of 12.
 Ordinary affliction changes currently span 12–72, Light gains up to 96, and healing prices 12–36.
 The standard paid revival costs 84 Light; a strong Home ruler offers a 60-Light alternative.
 Revival always returns a planet at half its own ceiling.
-Sacrifice spends the selected planet's remaining margin, which depends on its current state.
 These values support playtesting; they are not settled balance.
 
 ## 7. House Blueprints
@@ -175,15 +154,15 @@ These values support playtesting; they are not settled balance.
 | House | Immediate decision identity |
 |---|---|
 | 1 · Self | Attend to a chosen part of the chart, or stake its strength. |
-| 2 · Livelihood | Small certain gains versus costly labor or one risky attempt. |
+| 2 · Livelihood | Small gains versus costly labor. |
 | 3 · Communication | Selected recovery, carrying an errand, or finding a crossing. |
 | 4 · Home | Deep recovery for one planet versus smaller recovery across the chart; conditional revival. |
-| 5 · Creativity | Finishing work at a chosen cost, or wagering Light versus planetary condition. |
+| 5 · Creativity | Finishing work at a chosen cost, or taking time to recover. |
 | 6 · Labor | Concentrated versus distributed toil; Mars provides containment. |
-| 7 · Relationships | Redistribute a burden between distinct planets, or pay to remove it. |
-| 8 · Transformation | Accept a heavy cost, sacrifice a planet, or choose who returns. |
+| 7 · Relationships | Accept help, carry a load for Light, or pay for relief. |
+| 8 · Transformation | Accept a heavy cost, recover, or choose who returns. |
 | 9 · Pilgrimage | Study, demonstration, or a vigil completed within the scene. |
-| 10 · Achievement | Take a modest return, spend strength for recognition, or risk one larger attempt. |
+| 10 · Achievement | Take a modest return or spend strength for greater recognition. |
 | 11 · Friendship | Gather Light versus restore one or many planets; Jupiter adds gifts. |
 | 12 · The Hidden | Concentrate or spread an immediate burden; Saturn contains it. |
 
@@ -200,20 +179,20 @@ The alpha schema resets old tree-based saves rather than migrating them.
 - **Aria:** one fragment in the ruler's voice for the whole encounter.
 - **Prompt:** one or two concrete sentences that establish the immediate situation.
 - **Option:** a short action, with no implied debt or promise that the game does not track.
-- **Aside:** generated from the authored effects and shared resolver, including actual clamped recovery after selection.
-- **Consequence:** one specific sentence for each result, including separate wager success and failure.
+- **Aside:** generated from the authored effects and shared resolver; stays fixed while inspecting planets.
+- **Consequence:** one specific sentence for the immediate result.
 
 Mechanics belong in the aside, not in the scene's prose.
-Player-facing text uses encounter, self, and other; named Light and Fortune follow the shared copy register.
+Player-facing text uses encounter, self, and other; named Light and Resolve follow the shared copy register.
 
 ## 10. Validation
 
 Every authored scene must remain playable across all unlock tiers and representative clean, afflicted, and partially combusted charts.
-Preview and commit must agree for every valid target assignment and both wager outcomes.
-Tests cover full payment, ordinary losses, invalid targets, exact transfer amounts, combustion margins, revival, repeated resolution, and save resets.
+Preview and commit must agree for every valid target.
+Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, repeated resolution, and save resets.
 Playtests compare choices across chart conditions and upcoming rulers.
 
 ## 11. Deferred Decisions
 
-Persistent effects, multi-stage scenes, and final balance remain deferred.
+Wagers, deliberate sacrifice, transfers, persistent effects, multi-stage scenes, and final balance remain deferred.
 No additional run currency or lasting narrative state is introduced by this version.

@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties, type MouseEvent } from "react";
+import { useMemo, useState, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import { combustionCeiling, isCombusted, wouldCombust } from "@/game/combust";
@@ -190,7 +190,7 @@ export interface ChartProps {
    *  there rather than on a planet because until the player commits, the blow
    *  has no target: `resolveTurn` lands it on whichever planet is sent, so
    *  "60 of testimony is coming" is a fact about the whole chart. */
-  incoming?: { verb: Polarity; amount: number } | null;
+  incoming?: { verb: Polarity; amount?: number } | null;
   /** Per-turn key — bumped each turn so animation classes replay reliably. */
   animationEpoch?: number;
   /** When set, render the planet stats panel inside the chart at the
@@ -258,9 +258,10 @@ export function Chart(props: ChartProps) {
   // Placement reserves the *closed* height only — study mode anchors this box's
   // top and grows downward, so the location stays put when it opens.
   const panelHeight = panelHeightFor({ actions: !!statsPanelReserveActions });
+  const reserveCenter = !!incoming;
   const panelPlacement = useMemo(
-    () => computePanelPlacement(points, panelHeight),
-    [points, panelHeight],
+    () => computePanelPlacement(points, panelHeight, reserveCenter),
+    [points, panelHeight, reserveCenter],
   );
   const aspects = useMemo(() => aspectsProp ?? getAspects(chart), [chart, aspectsProp]);
   const pointMap = useMemo(() => {
@@ -471,7 +472,9 @@ export function Chart(props: ChartProps) {
           nothing left to absorb, so it drops the arc entirely rather than
           showing a spent track. */}
       {!hideAffliction && points.map((p) => {
-        if (!isUnlocked(p.planet) || planetCombusted(p.planet)) return null;
+        if (!isUnlocked(p.planet)) return null;
+        const projected = projection?.deltas[p.planet];
+        if (planetCombusted(p.planet) && !(projected?.polarity === "Testimony" && projected.delta > 0)) return null;
         return (
           <PlanetArc
             key={p.planet}
@@ -506,9 +509,7 @@ export function Chart(props: ChartProps) {
         );
       })}
 
-      {/* What is arriving here, at the centre. Above the aspect web — a line
-          between opposite planets runs straight through the middle — and below
-          the panel, which is allowed to cover it. */}
+      {/* What is arriving here stays at the centre; the readout leaves it clear. */}
       {incoming && <IncomingMark verb={incoming.verb} amount={incoming.amount} />}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
@@ -570,6 +571,7 @@ function PlanetGlyph({
   // Active state is carried by the ring, not glyph size.
   const r = point.glyphR;
   const interactive = !passive && (!!onClick || !!onHover) && eligible && !ghost;
+  const [focused, setFocused] = useState(false);
 
   const handleClick = onClick && interactive
     ? (e: MouseEvent) => { e.stopPropagation(); onClick(point.planet); }
@@ -610,8 +612,8 @@ function PlanetGlyph({
   const outerClass = actionPulse ? "anim-action-glow" : undefined;
   const glyphClass = combusted || combusting ? "anim-combust" : undefined;
 
-  const ringShown = active || selected || (invite && interactive);
-  const ringSteady = active || selected || hovered;
+  const ringShown = active || selected || ((invite || focused) && interactive);
+  const ringSteady = active || selected || hovered || focused;
   // Neutral at rest, the verb once one is determined — the same grammar as the
   // affliction arc inside it. The ring used to restate the planet's own colour,
   // which the disc, the glyph and the halo already carry three times over, so
@@ -625,7 +627,8 @@ function PlanetGlyph({
   // is the pair this costs (ΔE 61 → 41, still far past the threshold where two
   // colours read apart); afflict slightly gains. The ring stays legible as an
   // invite because the breath marks the tappable, not the brightness.
-  const ringColor = ringVerb ? VALENCE_COLOR[ringVerb] : NEUTRAL.mist;
+  const indicatedVerb = active || selected ? ringVerb : null;
+  const ringColor = indicatedVerb ? VALENCE_COLOR[indicatedVerb] : NEUTRAL.mist;
 
   return (
     <g
@@ -644,6 +647,8 @@ function PlanetGlyph({
       } : undefined}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}
     >
@@ -655,7 +660,7 @@ function PlanetGlyph({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {ringVerb && ringShown && <PlanetCorona verb={ringVerb} />}
+      {indicatedVerb && ringShown && <PlanetCorona verb={indicatedVerb} />}
       {/* One ring, three readings. It breathes in the planet's own color while
           the planet is merely tappable, so the eye lands on the choices; it goes
           steady under hover, under selection, and on the opponent's acting
@@ -916,11 +921,12 @@ function PlanetCorona({ verb }: { verb: Polarity }) {
  * commit and its Testify/Afflict button — the only other place your own
  * outgoing figure is stated — has gone with it.
  */
-function IncomingMark({ verb, amount }: { verb: Polarity; amount: number }) {
+function IncomingMark({ verb, amount }: { verb: Polarity; amount?: number }) {
   const c = VALENCE_COLOR[verb];
-  const rings = amount / 12;
+  // Revival has no fixed lattice magnitude; its corona still names the effect.
+  const rings = (amount ?? 0) / 12;
   return (
-    <g transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} style={{ pointerEvents: "none" }}>
+    <g data-guide="incoming" transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} style={{ pointerEvents: "none" }}>
       <PlanetCorona verb={verb} />
       {/* Steady, never breathing: the mark is not tappable and never will be,
           and steady is already the ring's reading for a settled thing. */}
@@ -1367,6 +1373,7 @@ function buildPlanetPoints(chart: ChartType, discR: number): PlanetPoint[] {
 function computePanelPlacement(
   points: PlanetPoint[],
   panelH: number,
+  reserveCenter: boolean,
 ): { cx: number; cy: number } {
   if (points.length === 0) return { cx: CHART_CENTER, cy: CHART_CENTER };
   const halfW = PLANET_STATS_PANEL_W / 2;
@@ -1375,6 +1382,9 @@ function computePanelPlacement(
   const RING_LIMIT = INNER_RING_R - 50;
   const GRID_HALF = 180;
   const STEP = 10;
+  // Reserve the larger corona so indicating another verb never shifts the panel.
+  const centerR = Math.max(CHART_STYLE.corona.Affliction.reach, CHART_STYLE.corona.Testimony.reach)
+    + CHART_STYLE.interactionRing.stroke;
 
   let bestCx = CHART_CENTER;
   let bestCy = CHART_CENTER;
@@ -1383,6 +1393,7 @@ function computePanelPlacement(
     for (let dy = -GRID_HALF; dy <= GRID_HALF; dy += STEP) {
       // Worst-case corner shares signs with (dx, dy) — only that one matters.
       if (Math.hypot(Math.abs(dx) + halfW, Math.abs(dy) + halfH) > RING_LIMIT) continue;
+      if (reserveCenter && Math.hypot(Math.max(0, Math.abs(dx) - halfW), Math.max(0, Math.abs(dy) - halfH)) < centerR) continue;
       const cx = CHART_CENTER + dx;
       const cy = CHART_CENTER + dy;
       const overlap = maxPlanetOverlap(cx, cy, points, panelH);
