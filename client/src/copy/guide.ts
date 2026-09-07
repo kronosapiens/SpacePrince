@@ -19,8 +19,8 @@
  *      {n} the map's numeral
  *    narrative — {ruler} the house's ruler; {joy} its joy;
  *      {theme} the house's theme sentence
- *  Variants are separate entries (turn/turnSettled, theirMove/wayOut,
- *  housePlanet/housePlanetNoJoy), never a conditional inside a string. */
+ *  Variants are separate entries (housePlanet/housePlanetNoJoy), never a
+ *  conditional inside a string. */
 
 export const GUIDE_COPY = {
   encounter: {
@@ -52,10 +52,6 @@ export const GUIDE_COPY = {
         label: "Turn",
         body: "Turn {current} of {total}. An encounter is a fixed number of turns, one more with each map. When they are spent it is settled, whatever state the charts are in.",
       },
-      turnSettled: {
-        label: "Turn",
-        body: "Every turn has been answered.",
-      },
       light: {
         label: "Light",
         body: "The run's one lasting measure. Whatever Light you leave with becomes a star on your Prince, and nothing else about the run is kept. A previewed gain appears beside it.",
@@ -63,10 +59,6 @@ export const GUIDE_COPY = {
       theirMove: {
         label: "Their move",
         body: "Declared before you choose: this planet, this verb, this much. You resolve first, so you answer knowing everything. Nothing here is hidden from you.",
-      },
-      wayOut: {
-        label: "The way out",
-        body: "The encounter is settled. The way onward is here, and nothing more is asked of you.",
       },
       ruler: {
         label: "The ruler",

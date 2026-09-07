@@ -571,9 +571,8 @@
 /* The wheel's box is square but the chart is round, so the box's top corners
    are empty: the strip reaches down into them by `--combat-overlap`, and the
    sentence sits in the V between the two rings instead of in a band above
-   the boxes. On top of the wheels for the button's sake, but only its
-   children take the pointer — content-sized and centred in the column, they
-   never shadow a planet near the top of a chart. */
+   the boxes. Only its children take the pointer — content-sized and centred
+   in the column, they never shadow a planet near the top of a chart. */
 .combat-topbar {
   grid-column: 1 / -1;
   display: flex;
@@ -585,65 +584,23 @@
   pointer-events: none;
 }
 .combat-topbar > * { pointer-events: auto; }
-/* One slot, two occupants — the turn's precommit, then the way out. The exit is
-   text-level encounter chrome, so both states fit the same compact reserve and
-   the charts do not shift when the encounter settles. */
+/* Keep the sentence's space after resolution so the charts stay still. */
 .combat-announce {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  font-size: 32px;
+  min-height: max(42px, 1lh);
 }
 .combat-announce-line {
   margin: 0;
   font-family: var(--serif);
-  font-size: 32px;
   font-style: italic;
   letter-spacing: 0.01em;
   color: var(--bone);
   text-align: center;
 }
-.combat-continue {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 3px 5px;
-  border-bottom: 1px solid rgba(232, 226, 212, 0.48);
-  color: var(--mist);
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  animation: begin-breath 3s ease-in-out infinite;
-  transition: border-color 180ms ease, color 180ms ease;
-}
-.combat-continue-mark {
-  color: var(--gold);
-  font-family: var(--serif);
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-  transition: transform 180ms ease;
-}
-.combat-continue:hover {
-  border-color: var(--bone);
-  color: var(--bone);
-  animation: none;
-  opacity: 1;
-}
-.combat-continue:hover .combat-continue-mark {
-  transform: translateX(3px);
-}
-.combat-continue.is-back:hover .combat-continue-mark {
-  transform: translateX(-3px);
-}
-.combat-continue:focus-visible {
-  outline: 1px solid var(--gold);
-  outline-offset: 5px;
-}
+.combat.is-resolved { cursor: pointer; }
 .combat-readouts {
   display: flex;
   align-items: baseline;
@@ -1078,7 +1035,7 @@
      under the strip, read before the charts rather than after scrolling past
      both. */
   .combat-foot { grid-row: 2; margin-top: 0; gap: 4px; }
-  .combat-announce-line { font-size: 23px; }
+  .combat-announce { font-size: 23px; }
   .combat-side { height: auto; gap: 4px; }
   .combat-side > svg { width: min(380px, 92vw); }
   .combat-light,

@@ -2,6 +2,7 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Chart } from "@/components/Chart";
 import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
 import { PlanetBands } from "@/components/PlanetBands";
+import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
@@ -49,7 +50,7 @@ interface CombatScreenProps {
    *  resolved). Persistence + lifetime-bump + outcome construction happen
    *  inside the implementation (real or dev). */
   onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => CommitTurnResult | null;
-  /** Clear `run.currentEncounter` and return to the map. */
+  /** Clear `run.encounter` and return to the map or end-of-run screen. */
   onClearEncounter: () => void;
   devUnlockAll: boolean;
   /** Dev only: show the animation console — fire any gesture on demand
@@ -106,6 +107,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         )
       : null;
   const settled = encounter.resolved && !animation;
+  const advance = useEncounterAdvance(settled, onClearEncounter, runEnded ? 2800 : 1800);
   const displayedRunLight = animation?.runningLight ?? run.light;
   const lightFlashEpoch = animation?.lightFlashEpoch ?? 0;
   // Tint each Light flash with the color of the planet resolving on that
@@ -327,6 +329,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // it stays put (the commit path) until commit or another planet is clicked.
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
+      if (encounter.resolved) return;
       if (animation) {
         skipAnimation();
         setSelected(null);
@@ -334,7 +337,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         setHoveredAction(null);
         return;
       }
-      if (encounter.resolved) return;
       if (guideOpen && guidePhase !== "act") return;
       if (!playerUnlocked.includes(planet)) return;
       if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
@@ -455,10 +457,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         }
       : undefined;
 
-  // Clicking anywhere outside a planet glyph clears the selection. Planet
-  // and continue-button clicks stopPropagation, so they don't reach this
-  // handler. Skipped during animation so an in-flight resolution doesn't
-  // get its selection state mid-flight.
+  // Background clicks clear the selection only while choosing an action.
   const handleClearSelection = useCallback(() => {
     if (animation || guideOpen) return;
     if (selected !== null) {
@@ -467,12 +466,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       setHoveredAction(null);
     }
   }, [animation, guideOpen, selected]);
-
-  const handleContinue = useCallback(() => {
-    if (animation || guideOpen) return;
-    // Clear the encounter; PlaySurface then shows End (run over) or Map.
-    onClearEncounter();
-  }, [animation, guideOpen, onClearEncounter]);
 
   const openGuide = useCallback(() => {
     if (animation) skipAnimation();
@@ -512,31 +505,32 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [encounter.resolved, guidePlanet]);
 
   return (
-    <div className="combat" onClick={handleClearSelection}>
+    <div className={`combat${settled ? " is-resolved" : ""}`} onClick={settled ? advance : handleClearSelection}>
       {/* The mint's bands, struck per resolution beat — self down the left edge,
           other down the right, matching the two charts. */}
       <PlanetBands className="combat-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
       <PlanetBands className="combat-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
-      <CombatGuide
-        open={guideOpen}
-        phase={guidePhase}
-        turn={{
-          current: settled ? displayTurnIndex : Math.min(displayTurnIndex + 1, encounter.sequence.length),
-          total: encounter.sequence.length,
-        }}
-        settled={settled}
-        ruler={ruler}
-        rule={RULER_RULES[ruler].label}
-        opponentPlanet={displayOpponentTurn}
-        examplePlanet={encounter.resolved ? null : guidePlanet}
-        exampleAspect={guideAspect}
-        selectedPlanet={selected}
-        pendingAction={pendingAction}
-        projectedLight={projectedLight?.value ?? null}
-        onOpen={openGuide}
-        onClose={closeGuide}
-        onPhaseChange={changeGuidePhase}
-      />
+      {!encounter.resolved && (
+        <CombatGuide
+          open={guideOpen}
+          phase={guidePhase}
+          turn={{
+            current: Math.min(displayTurnIndex + 1, encounter.sequence.length),
+            total: encounter.sequence.length,
+          }}
+          ruler={ruler}
+          rule={RULER_RULES[ruler].label}
+          opponentPlanet={displayOpponentTurn}
+          examplePlanet={guidePlanet}
+          exampleAspect={guideAspect}
+          selectedPlanet={selected}
+          pendingAction={pendingAction}
+          projectedLight={projectedLight?.value ?? null}
+          onOpen={openGuide}
+          onClose={closeGuide}
+          onPhaseChange={changeGuidePhase}
+        />
+      )}
       {/* Run- and encounter-level state, lifted out of the centre column so the
           two charts can have the room. Nothing here is chart data — Light is
           the run's score, the pips are where we are in this encounter — so it
@@ -613,34 +607,20 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             </span>
           </div>
         </div>
-        {/* One slot for what is happening and what is next: the turn's
-            precommit while it is being answered, the way out once it is not.
-            The sentence is the caption that teaches the marks — the ring's
+        {/* The sentence is the caption that teaches the marks — the ring's
             colour and the bites on the candidates say the same thing wordlessly,
             and nothing else says which of them is Saturn. */}
         <div className="combat-announce">
-          {settled ? (
-            <button
-              className={`combat-continue${runEnded ? " is-back" : ""}`}
-              data-guide="opponent-move"
-              onClick={handleContinue}
-            >
-              {runEnded && <span className="combat-continue-mark" aria-hidden>←</span>}
-              <span>{runEnded ? "Walk back" : "Continue"}</span>
-              {!runEnded && <span className="combat-continue-mark" aria-hidden>→</span>}
-            </button>
-          ) : (
-            displayOpponentTurn && displayOpponentAction && (
-              <p className="combat-announce-line" data-guide="opponent-move">
-                <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
-                  {displayOpponentTurn}
-                </span>{" "}
-                <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
-                  {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
-                  {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
-                </span>
-              </p>
-            )
+          {!settled && displayOpponentTurn && displayOpponentAction && (
+            <p className="combat-announce-line" data-guide="opponent-move">
+              <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
+                {displayOpponentTurn}
+              </span>{" "}
+              <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
+                {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
+                {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
+              </span>
+            </p>
           )}
         </div>
       </div>
@@ -651,7 +631,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           state={displayPlayerState}
           unlockedPlanets={playerUnlocked}
           selectedPlanet={selected}
-          hoveredPlanet={selected ? null : hovered}
+          hoveredPlanet={encounter.resolved || selected ? null : hovered}
+          passive={encounter.resolved}
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
@@ -684,7 +665,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           unlockedPlanets={encounter.roster}
           activePlanet={displayOpponentTurn}
           ringVerb={displayOpponentAction}
-          hoveredPlanet={selected ? null : hoveredOpponent}
+          hoveredPlanet={encounter.resolved || selected ? null : hoveredOpponent}
           entrance="right"
           side="other"
           onPlanetHover={setHoveredOpponent}

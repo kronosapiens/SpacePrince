@@ -288,7 +288,8 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 - **Turn.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
-  It is not swapped for an outcome word at the settle: the Continue button already says the encounter is over, and its label (*Continue* / *Walk back*) already says whether the run survived.
+  The final chart and Light total remain briefly after resolution finishes, then the screen advances to the map or the end-of-run screen.
+  A tap skips that final pause.
 
   Rejected: a row of pips, filled to the current turn.
   They separated three states where the fraction has two, and cost the strip a second visual language that could not share a baseline with the type beside it.
@@ -297,7 +298,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
   The sentence is the caption that teaches those marks, and the colour split is what makes it one — the name matches the disc on the other chart, the verb matches the corona around it.
   A glyph is not a name, and the audience premise is a player with no astrology, so this is the only place the other's planet is named at all.
   It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words until the board carried none.
-  The **Continue** button takes the sentence's place on settle: one place says what is happening, then what is next.
+  The sentence clears after the final animation; its space remains so the charts stay still during the pause before advancing.
 
   Rejected: a second line, *"How do you respond?"*.
   Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.

@@ -32,8 +32,6 @@ interface CombatGuideProps {
   open: boolean;
   phase: CombatGuidePhase;
   turn: { current: number; total: number };
-  /** The encounter is over: the sentence slot holds the way out. */
-  settled: boolean;
   ruler: PlanetName;
   rule: string;
   opponentPlanet: PlanetName | null;
@@ -79,7 +77,6 @@ export function CombatGuide({
   open,
   phase,
   turn,
-  settled,
   ruler,
   rule,
   opponentPlanet,
@@ -105,10 +102,8 @@ export function CombatGuide({
           key: "turn",
           anchor: "turn",
           placement: "left",
-          label: settled ? COPY.notes.turnSettled.label : COPY.notes.turn.label,
-          body: settled
-            ? <TermText text={COPY.notes.turnSettled.body} />
-            : <TermText text={COPY.notes.turn.body} vars={{ current: turn.current, total: turn.total }} />,
+          label: COPY.notes.turn.label,
+          body: <TermText text={COPY.notes.turn.body} vars={{ current: turn.current, total: turn.total }} />,
         },
         {
           key: "light",
@@ -121,8 +116,8 @@ export function CombatGuide({
           key: "their-move",
           anchor: "opponent-move",
           placement: "bottom",
-          label: settled ? COPY.notes.wayOut.label : COPY.notes.theirMove.label,
-          body: <TermText text={settled ? COPY.notes.wayOut.body : COPY.notes.theirMove.body} />,
+          label: COPY.notes.theirMove.label,
+          body: <TermText text={COPY.notes.theirMove.body} />,
         },
         {
           key: "ruler",
@@ -207,7 +202,7 @@ export function CombatGuide({
         body: <TermText text={COPY.notes.projection.body} vars={{ light: projectedLight ?? 0 }} />,
       },
     ];
-  }, [phase, turn, settled, ruler, rule, opponentPlanet, examplePlanet, exampleAspect, actingPlanet, pendingAction, projectedLight]);
+  }, [phase, turn, ruler, rule, opponentPlanet, examplePlanet, exampleAspect, actingPlanet, pendingAction, projectedLight]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // The other's acting planet always carries its corona; in the act phase

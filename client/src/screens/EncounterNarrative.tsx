@@ -1,4 +1,5 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
+import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { Chart, type ProjectionChips } from "@/components/Chart";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
@@ -210,30 +211,16 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
   const runEnded = isOver(run, prince.chart, prince.numEncounters);
 
-  const continuedRef = useRef(false);
-  const handleContinue = useCallback(() => {
-    if (continuedRef.current) return; // timer + tap both call this; fire once
-    continuedRef.current = true;
-    // Clear the encounter; PlaySurface then shows End (run over) or Map.
-    onClearEncounter();
-  }, [onClearEncounter]);
-
-  // No Continue button: once resolved, the line gets a beat to land and then
-  // the world carries the player onward (SCREENS.md §10). A tap skips the wait.
-  useEffect(() => {
-    if (!resolved) return;
-    // Let the flash land before leaving — longer when a planet combusts.
-    const ms = runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800;
-    const t = setTimeout(handleContinue, ms);
-    return () => clearTimeout(t);
-  }, [resolved, runEnded, flash, handleContinue]);
+  const advance = useEncounterAdvance(
+    resolved, onClearEncounter, runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800,
+  );
 
   const fragmentLines = (fragment?.text ?? "").split(/\n+/);
 
   return (
     <div
       className={`narrative ${resolved ? "is-resolved" : ""}`}
-      onClick={resolved ? handleContinue : resetChoice}
+      onClick={resolved ? advance : resetChoice}
     >
       {/* A resolved scene carries itself onward within seconds — nothing left
           to study, so the guide comes down with the choices. */}
@@ -329,7 +316,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                 <button
                   className={`option ${isSelected ? "is-selected" : ""}`}
                   data-guide={`option-${i + 1}`}
-                  onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); commit(); }}
+                  onClick={resolved ? advance : (e) => { e.stopPropagation(); commit(); }}
                   aria-pressed={isSelected}
                   disabled={!resolved && !assignments.length}
                   type="button"
