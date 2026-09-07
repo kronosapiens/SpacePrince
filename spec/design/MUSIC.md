@@ -15,7 +15,7 @@ All seven themes now play in the client (`client/src/audio/themes.ts`, developed
 The surface selects the mix — map breathes the down layer and combat drives the up layer — while one ruler's theme remains active at a time.
 This vertical variation within one theme is distinct from the future multi-planet layered model in Architecture (b).
 Theme selection: the map plays the Prince's chart ruler, combat the opponent's chart ruler, narrative the house ruler.
-The standalone per-planet signature gestures are retired as a design direction; the client still contains the legacy prototype pending removal.
+The standalone per-planet signature gestures have been removed from the client.
 Event audio will be rebuilt from the ruler-relative degree and register system below.
 The DAW pass (real timbre and mix) remains future work; Venus and Saturn's open mode calls were resolved provisionally in the shipped themes (Venus Mixolydian, Saturn Locrian over a moving toll rather than a static pedal).
 
@@ -249,6 +249,6 @@ Remaining, roughly in order:
 1. Settle the two open mode calls — Venus's bright color, and Saturn's strict-Locrian-vs-drone-anchored dark.
 2. Formalize metric character per planet: confirm the five inherited from Holst, and pin the Sun's reference pulse and the Moon's nocturne.
 3. Per piece: harmonic bed → motif → form → explore/battle relationship — composing each battle core so it can also stand as an isolated stem (*Architecture* (b)).
-4. Replace the legacy signature gestures with the ruler-relative event grammar above, then compose the mint ceremony as its own cue.
+4. Complete the ruler-relative action and combustion phrases above, then compose the mint ceremony as its own cue.
 
 Blocked on nothing at the theory level; full realization is blocked on DAW infrastructure.

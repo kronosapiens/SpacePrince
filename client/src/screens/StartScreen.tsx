@@ -6,7 +6,6 @@ import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { playSignature } from "@/audio/engine";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -105,10 +104,6 @@ export function StartScreen() {
     if (revealedCount === 0) return;
     const last = MACROBIAN_ORDER[revealedCount - 1] ?? null;
     setActive(last);
-    // Each planet sounds its signature as it paints in — the Macrobian ascent
-    // walks the mode ladder (MUSIC.md: "the music's emotional arc as the chart
-    // fills in is built into the unlock schedule for free").
-    if (last) playSignature(last);
   }, [stage, revealedCount, setActive]);
 
   // Keep the canvas neutral on the input + settled stages — no carry-over tint

@@ -1,12 +1,10 @@
 import type { PlanetName } from "@/game/types";
-import type { Polarity } from "@/game/types";
 import { PLANETS } from "@/game/data";
-import { SIGNATURES, gestureMidi, strikeMidi, type Signature } from "./signatures";
+import { strikeMidi } from "./pitches";
 
 /**
- * The sound layer (VIBES.md §Sound Design): per-planet tonal signatures,
- * audible propagation, combustion cutting a signature mid-phrase, and an
- * ambient hum that thins as planets go dark.
+ * The sound layer: ruler-relative impact and propagation tones, combustion
+ * breaths, and the star bell (MUSIC.md, VIBES.md §Sound Design).
  *
  * Module singleton, gesture-gated: Tone.js is imported and the AudioContext
  * started on the first pointer/key gesture (`installAudioUnlock`). Every
@@ -20,8 +18,8 @@ let T: ToneModule | null = null;
 let initPromise: Promise<void> | null = null;
 
 // Two independent gates (dev-controllable from the DevConsole): `music` is the
-// score (planet themes); `sound` is everything else — propagation dings, verb
-// signatures, combustion, the star bell.
+// score (planet themes); `sound` is everything else — impacts, propagation,
+// combustion, the star bell.
 const AUDIO_KEY = "sp:audio:v1";
 
 // Music opt-in, sound opt-out: a fresh visitor gets the reactive layer
@@ -148,52 +146,7 @@ function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
-function instrumentFor(planet: PlanetName): AnyInstrument | null {
-  if (!T || !reverb) return null;
-  const sig = SIGNATURES[planet];
-  const key = planet;
-  const existing = instruments.get(key);
-  if (existing) return existing;
-
-  let inst: AnyInstrument;
-  const envelope = {
-    attack: sig.attack,
-    decay: 0.1,
-    sustain: 0.7,
-    release: sig.release,
-  };
-  switch (sig.voice) {
-    case "pluck":
-      inst = new T.PluckSynth({ dampening: 3200, resonance: 0.92 }).connect(reverb);
-      break;
-    case "strike":
-      inst = new T.MembraneSynth({
-        pitchDecay: 0.012,
-        octaves: 2,
-        envelope: { attack: sig.attack, decay: 0.25, sustain: 0, release: sig.release },
-      }).connect(reverb);
-      break;
-    case "pad":
-      inst = new T.PolySynth(T.Synth, {
-        oscillator: { type: "sine" },
-        envelope,
-        volume: -6,
-      }).connect(reverb);
-      break;
-    case "tone":
-    default:
-      inst = new T.PolySynth(T.Synth, {
-        oscillator: { type: planet === "Moon" ? "triangle" : "sine" },
-        envelope,
-        volume: -4,
-      }).connect(reverb);
-      break;
-  }
-  instruments.set(key, inst);
-  return inst;
-}
-
-/** Shared soft voice for non-planet sounds (propagation, star). */
+/** Shared soft voice for impacts, propagation, and the star. */
 function fxSynth(): AnyInstrument | null {
   if (!T || !reverb) return null;
   const existing = instruments.get("_fx");
@@ -207,41 +160,13 @@ function fxSynth(): AnyInstrument | null {
   return inst;
 }
 
-// ── Signature playback ──────────────────────────────────────────────────
-
-function playGesture(planet: PlanetName, sig: Signature, velScale: number, cutAt?: number) {
-  if (!T || !soundOn) return;
-  const inst = instrumentFor(planet);
-  if (!inst) return;
-  const now = T.now();
-  for (const note of sig.gesture) {
-    if (cutAt !== undefined && note.at >= cutAt) continue; // never begins
-    const dur =
-      cutAt !== undefined ? Math.max(0.05, Math.min(note.dur, cutAt - note.at)) : note.dur;
-    inst.triggerAttackRelease(
-      midiToFreq(gestureMidi(planet, note.deg)),
-      dur,
-      now + note.at,
-      note.vel * velScale,
-    );
-  }
-}
-
-/** The planet's full signature — unlock ceremonies, mint reveal. */
-export function playSignature(planet: PlanetName): void {
-  playGesture(planet, SIGNATURES[planet], 1);
-}
-
-/** A verb landing: the acting planet speaks. Testimony is the gentler voicing. */
-export function playVerb(planet: PlanetName, polarity: Polarity): void {
-  playGesture(planet, SIGNATURES[planet], polarity === "Testimony" ? 0.8 : 1);
-}
+// ── Event playback ─────────────────────────────────────────────────────
 
 export type StrikeShape = "landing" | "flows" | "inverts";
 
 /**
  * A strike is audible (MUSIC.md, "The strike grid"): the struck planet rings
- * its degree in the ruler's mode, in the octave its own signature owns, so the
+ * its degree in the ruler's mode, at the planet's register, so the
  * whole encounter sounds in one mode. A harmonious hop approaches that note
  * from a fourth below and lands; an inverted hop (square/opposition) hangs a
  * minor second against it that never settles.
@@ -263,15 +188,9 @@ export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeS
   }
 }
 
-/**
- * Combustion: the planet's signature cut off mid-phrase (VIBES.md — "its tonal
- * signature cuts off mid-phrase... like a candle going out"), masked by a
- * short pink-noise breath.
- */
-export function playCombust(planet: PlanetName): void {
+/** A short pink-noise breath accompanies the combustion strike. */
+export function playCombust(): void {
   if (!T || !soundOn) return;
-  const cutAt = 0.4;
-  playGesture(planet, SIGNATURES[planet], 0.95, cutAt);
   const noiseKey = "_combust_noise";
   let noise = instruments.get(noiseKey) as import("tone").NoiseSynth | undefined;
   if (!noise && reverb) {
@@ -282,7 +201,7 @@ export function playCombust(planet: PlanetName): void {
     }).connect(reverb);
     instruments.set(noiseKey, noise as unknown as AnyInstrument);
   }
-  noise?.triggerAttackRelease(0.5, T.now() + cutAt, 0.6);
+  noise?.triggerAttackRelease(0.5, T.now() + 0.4, 0.6);
 }
 
 /** A run's star taking its place — a quiet high bell, far away. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PLANET_DEGREE, PLANET_MODE, SIGNATURES, strikeMidi } from "@/audio/signatures";
+import { PLANET_DEGREE, PLANET_MODE, PLANET_REGISTER, strikeMidi } from "@/audio/pitches";
 import { PLANETS } from "@/game/data";
 import type { PlanetName } from "@/game/types";
 
@@ -19,7 +19,7 @@ function rotatedMode(degree: number): number[] {
 
 /** The struck planet's offset above its own tonic, under a given ruler. */
 function offset(ruler: PlanetName, target: PlanetName): number {
-  return strikeMidi(ruler, target) - SIGNATURES[target].root;
+  return strikeMidi(ruler, target) - PLANET_REGISTER[target];
 }
 
 describe("the strike grid (MUSIC.md)", () => {
@@ -61,7 +61,7 @@ describe("the strike grid (MUSIC.md)", () => {
     }
   });
 
-  it("register follows the signature plan — Saturn on the floor, Mercury on top", () => {
+  it("register follows the strike grid — Saturn on the floor, Mercury on top", () => {
     for (const ruler of PLANETS) {
       expect(strikeMidi(ruler, "Saturn"), `under ${ruler}`).toBeLessThan(
         strikeMidi(ruler, "Mercury"),

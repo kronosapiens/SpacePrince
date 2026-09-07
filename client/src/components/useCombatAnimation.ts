@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
-import { playCombust, playStrike, playVerb } from "@/audio/engine";
+import { playCombust, playStrike } from "@/audio/engine";
 import { encounterRuler } from "@/game/encounter";
 import { beatScore, type ScoreCharts, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
@@ -291,13 +291,11 @@ function runScheduler(args: {
     side: "self" | "other";
     actionPlanet: PlanetName;
     actionDelta: number;
-    /** The acting (attacker) planet — on the *other* chart from `side`. */
-    attackerPlanet: PlanetName;
     actionCombust: boolean;
     sign: number;
     steps: typeof propagationSteps;
   }): number => {
-    const { base, side, actionPlanet, actionDelta, attackerPlanet, actionCombust, sign, steps } = args;
+    const { base, side, actionPlanet, actionDelta, actionCombust, sign, steps } = args;
     const isSelf = side === "self";
     // The action planet receives the opposing valence: sign < 0 means the hit
     // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
@@ -317,9 +315,6 @@ function runScheduler(args: {
 
     // Primary direct phase — apply delta, light action-glow, impact.
     schedule(() => {
-      // The acting planet speaks its verb (VIBES.md — "encounter turns produce
-      // sound from the active planets"), over the struck planet's note.
-      playVerb(attackerPlanet, receivedPolarity);
       playStrike(ruler, actionPlanet, "landing");
       updateAnimation((state) => {
         const next = cloneAnimation(state);
@@ -409,9 +404,9 @@ function runScheduler(args: {
         // The hop rings the target's degree in the ruler's mode: harmonious it
         // approaches from a fourth below, inverted (square/opposition — the
         // polarity flipped) it hangs a minor second against the note. A combust
-        // marker rings the same note under the target's own signature, cut.
+        // marker rings the same note with a short breath.
         if (step.note === "Combusts") {
-          playCombust(step.target);
+          playCombust();
           playStrike(ruler, step.target, "landing");
         } else {
           playStrike(ruler, step.target, step.polarity !== receivedPolarity ? "inverts" : "flows");
@@ -490,7 +485,7 @@ function runScheduler(args: {
 
     if (actionCombust) {
       schedule(() => {
-        playCombust(actionPlanet);
+        playCombust();
         playStrike(ruler, actionPlanet, "landing");
         updateAnimation((state) => {
           const next = cloneAnimation(state);
@@ -534,7 +529,6 @@ function runScheduler(args: {
     side: "other",
     actionPlanet: entry.opponentPlanet,
     actionDelta: entry.opponentDelta,
-    attackerPlanet: entry.playerPlanet,
     actionCombust: entry.opponentCombust ?? false,
     sign: otherSign,
     steps: opponentSteps,
@@ -547,7 +541,6 @@ function runScheduler(args: {
     side: "self",
     actionPlanet: entry.playerPlanet,
     actionDelta: entry.playerDelta,
-    attackerPlanet: entry.opponentPlanet,
     actionCombust: entry.playerCombust ?? false,
     sign: selfSign,
     steps: playerSteps,
