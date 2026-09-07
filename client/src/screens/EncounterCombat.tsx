@@ -156,7 +156,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [guidePlanet, playerUnlocked, prince.chart, run.state]);
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
-  // and the one that says what gathers Light here (`score.ts` `RULER_RULES`).
+  // and the one that says how you gain Light here (`score.ts` `RULER_RULES`).
   // The score (MUSIC.md) and the screen tint follow it too — combat plays the
   // ruler's theme at the up mix and glows the ruler's colour, both stable for
   // the whole fight. The per-turn actor is not repeated in the ambient layer:
@@ -725,7 +725,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           {/* The rule in the ruler's colour, under the name in the same colour.
               Light itself stays neutral — no colour stands for it anywhere
               else. */}
-          Light gathers from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
+          Gain Light from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
         </p>
       </div>
 

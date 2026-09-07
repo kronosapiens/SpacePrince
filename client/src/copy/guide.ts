@@ -13,7 +13,7 @@
  *  `{placeholders}` are filled by `TermText`'s `vars` (bodies) or `fillLabel`
  *  (labels):
  *    encounter — {current}/{total} the turn's numbers; {ruler} the encounter's
- *      ruler; {rule} what gathers Light under it; {planet} the planet opened
+ *      ruler; {rule} how you gain Light under it; {planet} the planet opened
  *      as the example; {light} the previewed gain; {action} Afflict or Testify
  *    map — {ruler} a node's ruler; {name}/{gloss} the picked house;
  *      {n} the map's numeral
@@ -70,7 +70,7 @@ export const GUIDE_COPY = {
       },
       ruler: {
         label: "The ruler",
-        body: "{ruler} rules this encounter, and the ruler decides what counts: Light gathers from {rule}. Everything else you do here shapes the next turn but pays nothing.",
+        body: "{ruler} rules this encounter, and the ruler decides what counts: you gain Light from {rule}. Everything else you do here shapes the next turn but pays nothing.",
       },
       example: {
         label: "Choose a planet",
@@ -82,7 +82,7 @@ export const GUIDE_COPY = {
       },
       projection: {
         label: "{action} preview",
-        body: "Nothing here is a gamble. The charts now show exactly what this answer does, and it would gather {light} Light. Read the ripple before you commit.",
+        body: "Nothing here is a gamble. The charts now show exactly what this answer does, and you would gain {light} Light. Read the ripple before you commit.",
       },
     },
   },
@@ -101,11 +101,11 @@ export const GUIDE_COPY = {
       },
       encounter: {
         label: "An encounter",
-        body: "Self and other, face to face, for a fixed number of turns. {ruler} rules this one and decides what gathers Light there, so choose your route with the ruler in view.",
+        body: "Self and other, face to face, for a fixed number of turns. {ruler} rules this one and decides how you gain Light there, so choose your route with the ruler in view.",
       },
       house: {
         label: "A house",
-        body: "A scene in one of the twelve houses, the domains of a life, where the chart is tended or taxed: affliction relieved, a lost planet called back, Light spent or gathered. This one is {name}, {gloss}, coloured by its ruler, {ruler}.",
+        body: "A scene in one of the twelve houses, the domains of a life, where the chart is tended or taxed: affliction relieved, a lost planet called back, Light lost or gained. This one is {name}, {gloss}, coloured by its ruler, {ruler}.",
       },
       chart: {
         label: "Your chart",

@@ -301,7 +301,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 
   Rejected: a second line, *"How do you respond?"*.
   Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.
-- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating what gathers Light here (*Light gathers from affliction on the other's chart*), the rule in the same colour and Light itself neutral.
+- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating how you gain Light here (*Gain Light from affliction on the Other's chart*), the rule in the same colour and Light itself neutral.
   The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
 
 **Out:**

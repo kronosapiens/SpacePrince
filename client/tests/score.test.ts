@@ -63,7 +63,7 @@ describe("RULER_RULES — each ruler pays for what that planet values", () => {
     expect(scoreBeats("Sun", BEATS, charts, "Affliction")).toBe(4 + 8);
   });
 
-  it("every rule has a label completing \"Light gathers from …\"", () => {
+  it("every rule has a label completing \"Gain Light from …\"", () => {
     for (const ruler of PLANETS) expect(RULER_RULES[ruler].label.length).toBeGreaterThan(0);
   });
 

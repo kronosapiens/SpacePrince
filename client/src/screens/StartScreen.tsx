@@ -188,7 +188,7 @@ export function StartScreen() {
               <strong>creating and relieving tension.</strong> {" "}
             </p>
             <p>
-              Tension held and relieved, over and over, gathers into <strong>Light.</strong>
+              You gain <strong>Light</strong> by creating and relieving tension.
               When the passage ends, that Light becomes a star.
             </p>
             <p>
