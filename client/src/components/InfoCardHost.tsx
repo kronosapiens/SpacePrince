@@ -1,4 +1,3 @@
-import { InfoCard } from "@/components/InfoCard";
 import { PlanetIntroCard } from "@/components/PlanetIntroCard";
 import { useInfoCards } from "@/state/InfoCardContext";
 import { usePrince } from "@/state/PrinceStore";
@@ -14,9 +13,7 @@ export function InfoCardHost() {
   switch (current.kind) {
     case "planet-intro":
       return (
-        <InfoCard ariaLabel={`${current.planet} unlocked`} onClose={dismissCard}>
-          <PlanetIntroCard chart={prince.chart} planet={current.planet} />
-        </InfoCard>
+        <PlanetIntroCard key={current.planet} chart={prince.chart} planet={current.planet} onClose={dismissCard} />
       );
   }
 }

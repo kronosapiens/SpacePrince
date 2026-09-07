@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 interface InfoCardProps {
   /** Dialog label for assistive tech. */
   ariaLabel: string;
+  className?: string;
   onClose: () => void;
   children: ReactNode;
 }
@@ -12,7 +13,7 @@ interface InfoCardProps {
  *  stage + close button. Content-agnostic — the chart study view, planet
  *  introductions, and future tooltip/tutorial cards all render inside this
  *  one frame. Dismissed via backdrop click, the close button, or ESC. */
-export function InfoCard({ ariaLabel, onClose, children }: InfoCardProps) {
+export function InfoCard({ ariaLabel, className = "", onClose, children }: InfoCardProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -26,7 +27,7 @@ export function InfoCard({ ariaLabel, onClose, children }: InfoCardProps) {
   // surface chrome regardless of where it was summoned from.
   return createPortal(
     <div
-      className="info-card-overlay anim-info-card-fade"
+      className={`info-card-overlay anim-info-card-fade ${className}`}
       role="dialog"
       aria-label={ariaLabel}
       // Dismiss on backdrop tap — and swallow it: the card may be mounted

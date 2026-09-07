@@ -1,48 +1,34 @@
 import type { Chart, PlanetName } from "@/game/types";
+import { InfoCard } from "@/components/InfoCard";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
-import { MACROBIAN_ORDER, MACROBIAN_THRESHOLDS, PLANET_ROLE } from "@/game/data";
-import { deriveStatTable } from "@/game/combat";
+import { PLANET_INTRODUCTIONS } from "@/copy/planet-introductions";
+import { PLANET_ROLE } from "@/game/data";
 import { SIGN_GLYPH } from "@/svg/glyphs";
 
 interface PlanetIntroCardProps {
   chart: Chart;
   planet: PlanetName;
+  onClose: () => void;
 }
 
-/** Planet introduction — the unlock ceremony's card content. Celebrates the
- *  position, not a person (no voice, no fragment): the glyph, the sign it
- *  holds in this chart, the role, the stats, and the honest schedule line
- *  (the Macrobian thresholds are deterministic, so the next unlock is shown). */
-export function PlanetIntroCard({ chart, planet }: PlanetIntroCardProps) {
+/** An introduction to the planet through its placement and symbolism. */
+export function PlanetIntroCard({ chart, planet, onClose }: PlanetIntroCardProps) {
   const placement = chart.planets[planet];
-  const table = deriveStatTable(placement);
-  const i = MACROBIAN_ORDER.indexOf(planet);
-  const threshold = MACROBIAN_THRESHOLDS[i]!;
-  const next = MACROBIAN_ORDER[i + 1];
 
   return (
-    <div className="planet-intro">
-      <div className="planet-intro-eyebrow">A planet unlocks</div>
-      {/* The planet-as-presence piece the narrative screen uses — same
-          presentation, same register (its own glyph centerpiece included). */}
-      <div className="planet-intro-figure">
-        <KandinskyComposition planet={planet} size={380} />
+    <InfoCard className="planet-intro-modal" ariaLabel={`${planet} unlocked`} onClose={onClose}>
+      <div className="planet-intro">
+        <div className="planet-intro-figure">
+          <KandinskyComposition planet={planet} size={280} />
+        </div>
+        <h1 className="planet-intro-name">{planet}</h1>
+        <p className="planet-intro-placement">
+          <span className="planet-intro-role">{PLANET_ROLE[planet]}</span>
+          <span aria-hidden>·</span>
+          <span>in {placement.sign} <span aria-hidden>{SIGN_GLYPH[placement.sign]}</span></span>
+        </p>
+        <p className="planet-intro-portrait">{PLANET_INTRODUCTIONS[planet][placement.sign]}</p>
       </div>
-      <div className="planet-intro-name">{planet}</div>
-      <div className="planet-intro-role">{PLANET_ROLE[planet]}</div>
-      <div className="planet-intro-sign">
-        in {placement.sign} {SIGN_GLYPH[placement.sign]}
-        {placement.dignity !== "Neutral" && ` · ${placement.dignity}`}
-      </div>
-      <div className="planet-intro-stats">
-        Testify {table.testify} · Afflict {table.afflict} · Resolve {table.resolve} · Fortune {table.fortune}/60
-      </div>
-      <div className="planet-intro-footer">
-        {threshold === 0 ? "From the first encounter" : `Encounter ${threshold}`}
-        {next
-          ? ` · next ${next} at ${MACROBIAN_THRESHOLDS[i + 1]}`
-          : " · the seventh and last"}
-      </div>
-    </div>
+    </InfoCard>
   );
 }
