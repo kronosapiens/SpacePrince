@@ -20,7 +20,7 @@ import {
   type GuideShapes,
 } from "@/components/GuideOverlay";
 
-export type NarrativeGuidePhase = "scene" | "choices" | "chart";
+export type NarrativeGuidePhase = "scene" | "choices";
 
 interface NarrativeGuideProps {
   open: boolean;
@@ -36,7 +36,7 @@ interface NarrativeGuideProps {
 
 const COPY = GUIDE_COPY.narrative;
 
-const PHASES: NarrativeGuidePhase[] = ["scene", "choices", "chart"];
+const PHASES: NarrativeGuidePhase[] = ["scene", "choices"];
 
 /** The blocks of the column a note keeps off while a clear side exists. Not
  *  the wheel, which the choice notes are meant to sit over; not the
@@ -62,6 +62,16 @@ export function NarrativeGuide({
     if (phase === "scene") {
       return [
         {
+          key: "house-planet",
+          anchor: planetAnchor("self", housePlanet),
+          spotlights: ["wheel-self", planetAnchor("self", housePlanet)],
+          placement: "outward",
+          label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
+          body: house.joy
+            ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />
+            : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />,
+        },
+        {
           key: "house",
           anchor: "narrative-house",
           placement: "top",
@@ -78,53 +88,30 @@ export function NarrativeGuide({
       ];
     }
 
-    if (phase === "choices") {
-      const choiceNotes: GuideNote[] = [
-        {
-          key: "commit",
-          anchor: "narrative-options",
-          placement: "bottom",
-          label: COPY.notes.commit.label,
-          body: <TermText text={COPY.notes.commit.body} />,
-        },
-      ];
-      if (asideIndex) {
-        choiceNotes.push({
-          key: "aside",
-          // Lit on the aside, but hung off its whole row: the aside is inset
-          // far enough that a note 28px to its left would stand inside the lit
-          // list. Only the left is free either way — that side is the chart's,
-          // and this note is meant to sit over it.
-          anchor: `option-${asideIndex}`,
-          spotlights: [`option-aside-${asideIndex}`],
-          placement: "left",
-          label: COPY.notes.aside.label,
-          body: <TermText text={COPY.notes.aside.body} />,
-        });
-      }
-      return choiceNotes;
-    }
-
-    return [
+    const choiceNotes: GuideNote[] = [
       {
-        key: "house-planet",
-        anchor: planetAnchor("self", housePlanet),
-        spotlights: ["wheel-self", planetAnchor("self", housePlanet)],
-        placement: "outward",
-        label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
-        body: house.joy
-          ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />
-          : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />,
-      },
-      {
-        key: "outcomes",
-        anchor: "narrative-light",
-        // The readout spans the column, so there is no "beside" — above it is.
-        placement: "top",
-        label: COPY.notes.outcomes.label,
-        body: <TermText text={COPY.notes.outcomes.body} />,
+        key: "commit",
+        anchor: "narrative-options",
+        placement: "bottom",
+        label: COPY.notes.commit.label,
+        body: <TermText text={COPY.notes.commit.body} />,
       },
     ];
+    if (asideIndex) {
+      choiceNotes.push({
+        key: "aside",
+        // Lit on the aside, but hung off its whole row: the aside is inset
+        // far enough that a note 28px to its left would stand inside the lit
+        // list. Only the left is free either way — that side is the chart's,
+        // and this note is meant to sit over it.
+        anchor: `option-${asideIndex}`,
+        spotlights: [`option-aside-${asideIndex}`],
+        placement: "left",
+        label: COPY.notes.aside.label,
+        body: <TermText text={COPY.notes.aside.body} />,
+      });
+    }
+    return choiceNotes;
   }, [phase, house, housePlanet, fortunePlanet, asideIndex]);
 
   const shapes = useMemo<GuideShapes>(() => {

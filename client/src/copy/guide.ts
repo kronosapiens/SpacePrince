@@ -92,21 +92,12 @@ export const GUIDE_COPY = {
     close: "Close map guide",
     phases: {
       map: "Read the map",
-      nodes: "What a node holds",
       chart: "Between encounters",
     },
     notes: {
       here: {
         label: "You are here",
-        body: "The node you stand on. A map is walked one node at a time, each an encounter of some kind, and the path behind you is drawn solid.",
-      },
-      next: {
-        label: "Next steps",
-        body: "Lit nodes are one step ahead: tap one to consider it, tap again to travel. Nothing is hidden, so a route can be read in full before you take it: which rulers, which houses.",
-      },
-      crossing: {
-        label: "The crossing",
-        body: "The far node crosses into the next map. Fortune turns there: each combusted planet rolls to return, the lit ones take on fresh affliction, and every map opens nearer the edge than the last.",
+        body: "The node you stand on; lit nodes are one step ahead. Tap one to consider it, tap again to travel. Nothing is hidden, so a route can be read in full before you take it: which rulers, which houses.",
       },
       encounter: {
         label: "An encounter",
@@ -119,6 +110,10 @@ export const GUIDE_COPY = {
       chart: {
         label: "Your chart",
         body: "Your planets as they stand. Affliction carries from node to node, so what you leave an encounter with is what you bring to the next. Tap the chart to study them.",
+      },
+      crossing: {
+        label: "The crossing",
+        body: "The far node crosses into the next map. Fortune turns there: each combusted planet rolls to return, the lit ones take on fresh affliction, and every map opens nearer the edge than the last.",
       },
       index: {
         label: "Map {n} of VII",
@@ -137,7 +132,6 @@ export const GUIDE_COPY = {
     phases: {
       scene: "Read the scene",
       choices: "Choose",
-      chart: "What it touches",
     },
     notes: {
       house: {
@@ -150,7 +144,7 @@ export const GUIDE_COPY = {
       },
       commit: {
         label: "Arm, then commit",
-        body: "Tap an option to arm it, choose any planets it asks for, then tap the option again to commit. The whole scene resolves in that one decision.",
+        body: "Tap an option to arm it, choose any planets it asks for, then tap the option again to commit. The whole scene resolves in that one decision. Outcomes land on the chart itself, and what you carry out of here you carry into the next node.",
       },
       aside: {
         label: "The aside",
@@ -163,10 +157,6 @@ export const GUIDE_COPY = {
       housePlanetNoJoy: {
         label: "The house's planet",
         body: "No planet has its joy here. Some choices read the condition of {ruler}; others ask what your chart can spare. Any wager uses {fortune}'s Fortune, passing to a lit planet when the ruler cannot answer.",
-      },
-      outcomes: {
-        label: "Outcomes",
-        body: "Outcomes land on the chart itself: affliction taken or relieved, Light spent or gathered, sometimes a combusted planet called back. What you carry out of here, you carry into the next node.",
       },
     },
   },

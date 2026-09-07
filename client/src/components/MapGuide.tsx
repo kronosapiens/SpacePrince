@@ -16,7 +16,7 @@ import {
 } from "@/components/GuideOverlay";
 import type { MapState, NodeContent } from "@/game/types";
 
-export type MapGuidePhase = "map" | "nodes" | "chart";
+export type MapGuidePhase = "map" | "chart";
 
 interface MapGuideProps {
   open: boolean;
@@ -36,7 +36,7 @@ export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 
 const COPY = GUIDE_COPY.map;
 
-const PHASES: MapGuidePhase[] = ["map", "nodes", "chart"];
+const PHASES: MapGuidePhase[] = ["map", "chart"];
 
 /** Node rings are sized in the map's own units around the measured disc, not
  *  around the group — the halo and invite ring around it breathe, and a ring
@@ -90,35 +90,11 @@ export function MapGuide({
           body: <TermText text={COPY.notes.here.body} />,
         },
       ];
-      const next = eligible[0];
-      if (next) {
-        mapNotes.push({
-          key: "next",
-          anchor: nodeAnchor(next),
-          placement: "right",
-          label: COPY.notes.next.label,
-          body: <TermText text={COPY.notes.next.body} />,
-        });
-      }
-      if (map.currentNodeId !== TERMINAL_NODE_ID) {
-        mapNotes.push({
-          key: "crossing",
-          anchor: nodeAnchor(TERMINAL_NODE_ID),
-          placement: "right",
-          label: COPY.notes.crossing.label,
-          body: <TermText text={COPY.notes.crossing.body} />,
-        });
-      }
-      return mapNotes;
-    }
-
-    if (phase === "nodes") {
-      const nodeNotes: GuideNote[] = [];
       const combatId = pickNode(map, eligible, "combat");
       const combat = combatId ? map.rolledNodes[combatId] : undefined;
       if (combatId && combat?.kind === "combat") {
         const ruler = chartRuler(seededChart(combat.opponentSeed, ""));
-        nodeNotes.push({
+        mapNotes.push({
           key: "encounter",
           anchor: nodeAnchor(combatId),
           placement: "right",
@@ -130,7 +106,7 @@ export function MapGuide({
       const house = houseId ? map.rolledNodes[houseId] : undefined;
       if (houseId && house?.kind === "narrative") {
         const def = HOUSES[house.house - 1]!;
-        nodeNotes.push({
+        mapNotes.push({
           key: "house",
           anchor: nodeAnchor(houseId),
           placement: "right",
@@ -143,7 +119,7 @@ export function MapGuide({
           ),
         });
       }
-      return nodeNotes;
+      return mapNotes;
     }
 
     const chartNotes: GuideNote[] = [
@@ -154,14 +130,23 @@ export function MapGuide({
         label: COPY.notes.chart.label,
         body: <TermText text={COPY.notes.chart.body} />,
       },
-      {
-        key: "index",
-        anchor: "map-index",
-        placement: "top",
-        label: fillLabel(COPY.notes.index.label, { n: ROMAN[mapsCompleted] ?? mapsCompleted + 1 }),
-        body: <TermText text={COPY.notes.index.body} />,
-      },
     ];
+    if (map.currentNodeId !== TERMINAL_NODE_ID) {
+      chartNotes.push({
+        key: "crossing",
+        anchor: nodeAnchor(TERMINAL_NODE_ID),
+        placement: "right",
+        label: COPY.notes.crossing.label,
+        body: <TermText text={COPY.notes.crossing.body} />,
+      });
+    }
+    chartNotes.push({
+      key: "index",
+      anchor: "map-index",
+      placement: "top",
+      label: fillLabel(COPY.notes.index.label, { n: ROMAN[mapsCompleted] ?? mapsCompleted + 1 }),
+      body: <TermText text={COPY.notes.index.body} />,
+    });
     if (showBoundary) {
       chartNotes.push({
         key: "boundary",
