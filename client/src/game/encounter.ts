@@ -107,20 +107,17 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
 export interface BeginNarrativeInput {
   run: Run;
   house: number;
-  treeId: string;
-  rootNodeId: string;
+  scenarioId: string;
   fragmentId: string;
 }
 
 export function beginNarrativeEncounter(input: BeginNarrativeInput): NarrativeEncounter {
-  const { run, house, treeId, rootNodeId, fragmentId } = input;
+  const { run, house, scenarioId, fragmentId } = input;
   return {
     kind: "narrative",
     id: `enc_narr_${run.id}_${house}_${Date.now()}`,
     house,
-    treeId,
-    currentNodeId: rootNodeId,
-    visitedNodeIds: [rootNodeId],
+    scenarioId,
     fragmentId,
     resolved: false,
   };

@@ -116,9 +116,7 @@ export interface NarrativeEncounter {
   kind: "narrative";
   id: string;
   house: number; // 1..12
-  treeId: string;
-  currentNodeId: string;
-  visitedNodeIds: string[];
+  scenarioId: string;
   fragmentId: string;
   resolved: boolean;
   resolutionText?: string;

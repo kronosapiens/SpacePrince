@@ -1,335 +1,219 @@
 # Space Prince — Narrative Encounter Authoring Spec
 
-This document is the **generation-ready specification** for narrative encounters.
-Where `HOUSES.md` answers *what each house is* (the conceptual reference), this answers *how an encounter is built* — the economy it runs on, the vocabulary it targets, how a chart conditions it, its shape, its prose, and a blueprint per house-kind.
+Narrative encounters are single decisions about the chart the player will carry onward.
+House concepts live in `HOUSES.md`, combat rules in `MECHANICS.md`, and presentation in `SCREENS.md §3.2`.
+Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, targeting, previews, and resolution live in `client/src/game/narrative.ts`.
 
-It fills the parts `HOUSES.md §1` explicitly deferred: mechanical treatment, exchange curves, and authored structure.
-When this conflicts with the rough first pass in `client/src/data/narrative-trees.ts`, this wins; the code is being upgraded to match.
+## 1. The Complementary Loop
 
-Combat resolution lives in `MECHANICS.md`; house concepts in `HOUSES.md`; screen layout in `SCREENS.md §3.2`; planetary voice in `PLANETS.md`.
+Narrative choices gather or spend Light, restore planets, or redistribute their burdens.
+Combat remains the primary scoring engine.
 
----
+### 1.1 Shared resources
 
-## 1. The Complementary-Loop Economy
+- **Light:** the run's banked score and spendable currency.
+- **Affliction:** the burden on each planet, capped at its combustion ceiling.
+- **Lit planets:** the remaining choices the player can bring to subsequent encounters.
 
-Narrative is not a second scoring engine.
-It is the **trade surface** between the run's two currencies; combat remains the resolution engine.
+Chart condition cannot be reduced to one health total.
+The location of affliction matters: restoring Mercury, preserving Saturn, or exchanging one for another changes what the player can do under the next ruler.
 
-### 1.1 Two currencies
+### 1.2 Choice families
 
-- **Light** — the run's score (`MECHANICS.md §12`).
-  Run-wide, banked.
-- **Chart-health** — low affliction and lit (un-combust) planets. Per-planet, the substrate of survival.
+- **Press:** choose which planet absorbs an immediate affliction cost to gather Light.
+- **Tend:** spend Light for selected or distributed recovery.
+- **Redistribute:** move a fixed amount of affliction between two selected planets.
+- **Sacrifice:** extinguish a selected living planet for Light or to revive another.
+- **Wager:** accept one displayed Fortune roll with two explicit immediate consequences.
 
-Combat is the primary positive-sum engine: under the encounter ruler, one resolution can gather Light while also restoring chart-health (`MECHANICS.md §12`).
-Narrative does not add a second engine — it lets the player **trade one currency for the other**, in either direction, at moments combat can't reach.
+A scene uses the families its situation supports.
+It does not need a copy of every economic option.
+Gifts can be favorable without a matching penalty; preserving the chart that reveals one is meaningful preparation.
 
-### 1.2 Two trade directions
+### 1.3 Run context
 
-Every encounter is built from two moves and a gamble.
+Affliction can end a run early, but its value also depends on the upcoming rulers and the player's available planets.
+A scene should support a different preferred choice on a different chart or route.
+The test is whether the player can explain who needs recovery, who can carry a cost, or why the Light matters now.
 
-- **Press** — take affliction (now) to gain Light (now).
-  Spend chart-health for score.
-- **Tend** — spend Light to heal affliction or call back a combusted planet.
-  Buy chart-health with score.
-- **Wager** — a push-your-luck branch (see §5.3) that resolves Press-or-nothing on a luck roll.
+### 1.4 Valence and dignity
 
-A root node typically offers one of each, plus conditional branches that the chart reveals or hides (§4).
+House valence guides the kinds of offers and their severity.
+Dignity reveals alternative approaches; it does not apply an automatic exchange-rate multiplier.
+Exact balance remains deferred.
 
-### 1.3 Why this is bounded (the anti-faucet)
+## 2. Outcomes and Payment
 
-Pressing looks like free Light, because affliction taken can later be healed in combat for more Light.
-The bound is not an arbitrary cap — it is **run-length**.
-
-A run ends on full combustion, or on completing its seventh map (`MECHANICS.md §11`).
-Affliction taken in narrative pushes planets toward their combustion ceiling, raising the risk of combusting out before the seventh map — forfeiting the encounters you'd otherwise have scored, which lowers the run's final Light.
-So Press trades run-length for immediate Light; Tend spends Light to buy run-length back.
-The master loop:
-
-| Move | Light | Chart-health (run-length) |
-|---|---|---|
-| Combat (heal) | **+** | **+** | (the engine: scores *and* survives) |
-| Narrative Press | **+** | **−** | (cash durability for score) |
-| Narrative Tend | **−** | **+** | (buy durability with score) |
-
-A per-encounter Press ceiling (§6) is a secondary guard so a single node can't dominate; the real discipline is combustion.
-
-### 1.4 Exchange rates carry valence and dignity
-
-The exchange rate is where the chart enters the trade mechanically — *not* a flavor tax.
-Two modifiers compose on every rate.
-
-**House valence** (`HOUSES.md §3.2`) — the fixed character of the place, the same for every chart:
-
-- **Good place** — favorable: Press yields more Light per affliction; Tend heals more per Light.
-- **Bad place** — unfavorable: Press yields less; Tend costs more.
-
-**Dignity of the conditioning planet** (§4.2) — how well the planet carrying the house sits, by sign:
-
-- **Strong** (Domicile / Exaltation) — shifts the rate one notch favorable.
-- **Weak** (Detriment / Fall) — one notch unfavorable.
-
-The two stack: a Strong conditioning planet in a good place trades best; a Weak one in a bad place worst.
-This is what makes the same house *feel* different on two charts — **valence is the house, dignity is the Prince**.
-These are *relationships*, not final numbers; concrete bands are tuning targets in §6.
-
----
-
-## 2. Outcome Set (v1)
-
-Narrative outcomes are restricted to the **combat-shared resources** only.
-`Omen` and `Lore` are deferred — both were inert (Omen is never read by combat; Lore is a dead counter), and shipping a resource that does nothing is worse than not having it.
+Only immediate changes to combat-shared resources are implemented.
+Debts, vows with later consequences, Omen, Lore, and other persistent effects are deferred pending a separate design and storage decision.
 
 | Outcome | Meaning |
 |---|---|
-| `affliction { planet, delta }` | `delta > 0` harms, `< 0` heals. Clamped at 0. |
-| `combust { planet, value }` | Force combust on/off. |
-| `uncombust { planet }` | Call a combusted planet back (Tend; expensive). |
-| `light { delta }` | Gather or spend score, clamped at 0. |
+| `affliction { target, delta }` | Positive adds affliction; negative heals, clamped at zero. |
+| `combust { target }` | Set a lit planet to its ceiling, spending all remaining Resolve. |
+| `uncombust { target }` | Return a combusted planet at half its ceiling, through the shared uncombust rule. |
+| `transfer { amount }` | Move exactly this much affliction from `chosen` to `recipient`. |
+| `light { delta }` | Gather Light or incur an ordinary loss, clamped at zero. |
 
-Omen/Lore can return in v2 once combat consumes Omen and Lore unlocks real content; the `Outcome` union keeps room for them but no v1 tree emits them.
+An option's separate `cost` is a **purchase**, paid in full before its result.
+Insufficient Light makes the entire option unavailable; incoming rewards cannot finance its price.
+A wager's price is paid on either outcome.
+Ordinary losses remain payable at zero and cannot make Light negative.
+Paid healing requires some actual recovery; clean planets cannot consume Light for no benefit.
 
----
+All outcomes are atomic.
+An invalid target or unaffordable planetary cost rejects the whole choice, including any reward.
+Positive affliction must fit within the target's remaining combustion margin; landing exactly at its ceiling is permitted and combusts it.
+A deliberate sacrifice uses `combust`, so its cost is explicitly all remaining Resolve.
 
-## 3. Targeting Vocabulary (unlock-safe)
+A transfer requires two distinct lit planets, sufficient affliction at its source, and sufficient remaining margin at its recipient.
+It cannot create healing by clamping either side.
 
-A Prince's chart fills in progressively (`MECHANICS.md §11.1`: Moon first, Saturn at encounter 32).
-**An encounter must never reference a locked planet.**
-Trees therefore target *abstract roles* resolved at runtime against the unlocked set, never raw planet names.
+## 3. Targeting
 
-| Target | Resolves to |
+Only unlocked planets may be selected or affected.
+Ordinary affliction effects require lit planets; revival requires a combusted planet.
+Two selected roles must name different planets.
+
+| Target | Meaning |
 |---|---|
-| `joy` | the house's joy-planet **iff unlocked**; otherwise this branch is absent (see §4.4) |
-| `ruler` | the house's natural ruler (the aria/voice planet) **iff unlocked**, else fall through |
-| `mostAfflicted` | the unlocked planet with the highest affliction (Tend targets) |
-| `healthiest` | the unlocked planet with the most combustion-margin (Press targets — absorbs without going dark) |
-| `allUnlocked` | every unlocked planet (broad small heals) |
-| `randomUnlocked` | one unlocked planet, seeded |
-| `anyCombusted` | gates uncombust options; absent if none combusted |
+| `chosen` | The player's first selected planet. |
+| `recipient` | The second selected planet, for transfers or sacrifice/revival. |
+| `allUnlocked` | All currently lit unlocked planets. |
+| `joy` | The house's joy, only if lit and unlocked. |
+| `ruler` | The house's natural ruler, only if lit and unlocked. |
+| `mostAfflicted` | The lit unlocked planet with greatest affliction. |
+| `healthiest` | The lit unlocked planet with greatest remaining combustion margin. |
 
-Resolution rule for themed targets: `joy → ruler → mostAfflicted → Moon` (the Moon is always unlocked).
-Press defaults to `healthiest` so it doesn't accidentally combust a fragile planet; Tend defaults to `mostAfflicted` so healing lands where it counts.
+Target roles bind against the state before the choice.
+Authored effects then apply in order to a copy of that state.
+An unavailable themed target never silently drops its cost or redirects it to someone else.
 
-**Early-game consequence (intended):** before encounter 4, only Moon and Mercury exist, so most joys are locked and encounters degrade to ruler/Moon variants.
-The first houses where chart-conditioning can fire are **1 (Mercury joy)** and **3 (Moon joy)** — the two most intimate houses. Lean into that; the chart literally fills in as the player goes.
+Selected targets are the usual grammar for individual harm and recovery.
+Automatic roles remain available where the situation calls for them.
+Early scenes must still work with only the Moon unlocked.
 
----
+## 4. Chart Conditioning
 
-## 4. Chart-Conditioning
+### 4.1 Current condition
 
-Conditioning must **shift the decision space, not scale numbers** (`HOUSES.md §3.4`): a hostile chart removes or disguises the best option; a friendly one reveals it.
-Two levers compose.
+A joy is present when it is unlocked, lit, and below 96 affliction.
+At or above that threshold, or when combusted, its special approach disappears.
+This threshold remains provisional.
 
-### 4.1 Run-state lever (dynamic)
+### 4.2 Dignity
 
-The joy-planet's current condition, read wherever it sits (`HOUSES.md §3.3`).
-Three states: **clean**, **afflicted**, **combust**.
+Domicile and Exaltation are the strong band.
+Neutral, Detriment, and Fall do not reveal strong-dignity approaches.
+A strong ruler must also be unlocked and lit.
 
-### 4.2 Natal lever (fixed at mint)
-
-The **dignity** of the conditioning planet (joy if available, else ruler), banded:
-
-- **Strong** — Domicile / Exaltation
-- **Neutral**
-- **Weak** — Detriment / Fall
-
-Dignity is **narrative-native**.
-As dignity moves out of combat — the *quantitative* chart (stats, aspects, sect, combustion) — and into narrative — the *qualitative* chart (dignity, joy, house placement) — narrative becomes the system where a planet's sign-condition has mechanical meaning.
-This makes the two encounter types exercise different facets of the same chart: combat is what your planets *do*, narrative is what your planets *are*.
-
-Dignity does two jobs here:
-
-- **Gates branches** (§4.3) — which premium / penalty options exist at all.
-- **Nudges exchange rates** (§1.4) — how favorably the trade resolves.
-
-(*Natal-lever alternative deferred to v2:* whether the ruler aspects the ASC, per `HOUSES.md §3.2`.)
-
-### 4.3 The authoring predicates
-
-Trees gate options with a small fixed predicate set, never ad-hoc logic:
+### 4.3 Predicates
 
 | Predicate | True when |
 |---|---|
-| `joyStrong` | joy unlocked, dignity Strong, clean |
-| `joyPresent` | joy unlocked, clean (any dignity) |
-| `joyAfflicted` | joy unlocked, afflicted or combust |
-| `joyLocked` | joy not yet unlocked |
-| `rulerStrong` / `rulerWeak` | ruler dignity band (for joyless houses, §7.2) |
-| `anyCombusted` | at least one unlocked planet combusted |
+| `joyPresent` | The joy is unlocked, lit, and below the affliction threshold. |
+| `joyStrong` | The joy is present and has strong dignity. |
+| `rulerStrong` | The ruler is lit, unlocked, and has strong dignity. |
+| `anyCombusted` | At least one unlocked planet is combusted. |
 
-Composition: the **natal** lever decides *which* premium/penalty branches exist (a Strong joy reveals a real boon; a Weak joy exposes only harsher options); the **run-state** lever decides *whether the joy's boon is live or flattened*.
-Keep each encounter to 2–3 gated branches — do not enumerate all combinations.
+Visibility is distinct from affordability.
+A chart-gated option is absent when its predicate fails.
+An offered choice with insufficient Light or no valid targets stays visible with an explanation.
 
-### 4.4 The asymmetric joy rule, mechanized
+### 4.4 Asymmetric joy
 
-`HOUSES.md §5.0`: benefic joys *add good*, malefic joys *remove bad*. Preserve the asymmetry — a clean benefic is a **bonus**, a clean malefic is a **mitigation**; they must not collapse into one mechanic.
-
-- **Benefic joy (3, 5, 9, 11), well-conditioned:** reveal a **boon** branch — a free or discounted heal / Light the option list wouldn't otherwise carry.
-- **Benefic joy, afflicted:** boon branch hidden; replaced by a flattened option ("the pleasure is dimmer than you remember") at the plain rate.
-- **Contained malefic (6, 12), well-conditioned:** affliction taken is **scoped** — bounded magnitude, contained to the joy-planet ("the malefic is honestly employed").
-- **Contained malefic, afflicted:** containment fails — affliction **spills** to other unlocked planets and/or larger magnitude.
-- **Pure bad place (2, 8):** no joy lever at all — flat, same for every chart (the two "gates"). Conditioning here is whole-chart run-state only (e.g. the uncombust rite appears iff `anyCombusted`).
-- **Pure angular (4, 7, 10):** no joy lever — conditioned by the **natal lever** (ruler dignity) and diurnal theme (§7.2).
-
----
+Benefic joys add help: a free restoration, a gift, or a better way through the scene.
+Contained malefics reduce harm: Mars or Saturn can absorb a smaller, scoped cost in their own domains.
+Without containment, the ordinary choices may concentrate a larger burden or spread it across the lit chart.
+All costs remain visible and immediate.
 
 ## 5. Encounter Shape
 
-### 5.1 Structure
+### 5.1 One decision
 
-- **Depth 2** standard (root + at most one follow-on); **depth 3** only for a two-rung wager.
-- **Breadth 2–3** options per node.
-- Every path ends in a resolution node applying §2 outcomes.
+Each scene has one prompt and at most three visible choices, including any exit.
+The default is two substantive offers and a way to decline.
+Chart-conditioned offers replace their standard counterparts within that limit.
+There are no child nodes, intermediate rewards, cash-outs, or traversal state.
+Selecting targets and inspecting previews are preparation for the decision, with no gameplay effects.
 
-### 5.2 The trade-axis root
+### 5.2 Commitment
 
-A root node spans the trade axis (§1.2): a **Tend**, a **Press**, and a **Wager** option, with conditional joy/dignity branches *replacing or augmenting* them per §4.
-Not every root carries all three — recovery houses lean Tend, ambition houses lean Press/Wager — but the axis is the design grammar.
+Tap an option to arm it, select any requested planets, then tap the same option to commit.
+The chart and labeled selectors offer the same target choices.
+A resolved encounter cannot resolve again.
+Its consequence is shown before returning to the map; the lifetime encounter count advances on leaving the resolved scene.
 
-### 5.3 Push-your-luck
+### 5.3 Single-roll wagers
 
-The Wager resolves against the **conditioning planet's luck** (joy if available, else ruler), per the existing roll (`EncounterNarrative` luck check).
+Wagers use the shared Fortune formula and display odds in sixtieths.
+The conditioning planet is the lit, unlocked joy, otherwise the lit, unlocked ruler, otherwise the first lit planet in unlock order.
+If no planet is lit, no wager can resolve.
+Both possible outcomes must be valid for the selected targets before the roll is consumed.
+There is exactly one roll, at commit.
 
-- **One rung** (default): success → Press payoff; fail → affliction, nothing gained.
-- **Two rungs** (gambling houses only — 5 Creativity, 8 Transformation, 10 Achievement): cash out after rung 1, or continue to rung 2 for a larger payoff with **rollback of rung 1 on failure**.
+A wager's success and failure are described separately.
+The chart never projects one uncertain branch as a determined outcome.
+Multi-stage wagers are deferred with all other multi-stage encounters.
 
-The three-rung ladder from `HOUSES.md §4.2` is **not** built — two rungs deliver the cash-out/rollback tension without the extra rollback-state complexity.
+### 5.4 Exits
 
-### 5.4 Always-present vs offered
+Every scene must offer a valid choice at every unlock tier and at zero Light.
+Usually this is a plain exit; a harsh house can instead impose a small ordinary Light loss, which clamps at zero.
 
-Tend, Press, and a plain exit are always visible.
-Boon branches, containment branches, and the uncombust rite are **offered** — surfaced only when their predicate (§4.3) holds. This is the primary vehicle of conditioning (`HOUSES.md §4.3`).
+## 6. Provisional Amounts
 
----
+Authored amounts are multiples of 12.
+Ordinary affliction changes currently span 12–72, Light gains up to 96, and healing prices 12–36.
+The standard paid revival costs 84 Light; a strong Home ruler offers a 60-Light alternative.
+Revival always returns a planet at half its own ceiling.
+Sacrifice spends the selected planet's remaining margin, which depends on its current state.
+These values support playtesting; they are not settled balance.
 
-## 6. Tuning Targets (provisional)
+## 7. House Blueprints
 
-Numbers are **bands to author within**, not final balance (`HOUSES.md §1` scopes exact curves out). Hold the *relationships*; tune the values in playtest.
+| House | Immediate decision identity |
+|---|---|
+| 1 · Self | Attend to a chosen part of the chart, or stake its strength. |
+| 2 · Livelihood | Small certain gains versus costly labor or one risky attempt. |
+| 3 · Communication | Selected recovery, carrying an errand, or finding a crossing. |
+| 4 · Home | Deep recovery for one planet versus smaller recovery across the chart; conditional revival. |
+| 5 · Creativity | Finishing work at a chosen cost, or wagering Light versus planetary condition. |
+| 6 · Labor | Concentrated versus distributed toil; Mars provides containment. |
+| 7 · Relationships | Redistribute a burden between distinct planets, or pay to remove it. |
+| 8 · Transformation | Accept a heavy cost, sacrifice a planet, or choose who returns. |
+| 9 · Pilgrimage | Study, demonstration, or a vigil completed within the scene. |
+| 10 · Achievement | Take a modest return, spend strength for recognition, or risk one larger attempt. |
+| 11 · Friendship | Gather Light versus restore one or many planets; Jupiter adds gifts. |
+| 12 · The Hidden | Concentrate or spread an immediate burden; Saturn contains it. |
 
-- **Affliction magnitudes:** 12–60 per node, on the stat lattice (chip scale — small against combustion ceilings, which are set by durability alone once dignity leaves combat, so narrative chips, combat swings).
-- **Press rate:** ~1 Light per 2 affliction baseline; good place better (~1:1.5), bad place worse (~1:3).
-  Sub-1:1 so press-then-heal isn't a printer.
-- **Tend rate:** ~2 Light per affliction healed; good place cheaper.
-  Above 1:1 because combat heals "for free" via scoring — narrative Tend is the between-combat / emergency heal.
-- **Dignity nudge:** a Strong / Weak conditioning planet shifts Press and Tend one band more / less favorable (§1.4), stacking with valence. Keep each notch ≈ the good-place/bad-place gap, so dignity colors the trade without dominating it.
-- **Uncombust:** ~72–96 Light, rite-gated (house 8, secondarily 4).
-  The run-saver, deliberately steep.
-- **Per-encounter Press ceiling:** ~+72 Light, so no single node dominates a turn-score's worth.
-- **Wager:** safe option ≈ baseline; risky option ≈ 2× payoff on success vs proportional affliction on fail; two-rung ≈ 3× at rung 2.
+## 8. Scenario Identity and Selection
 
-A full encounter's net Light should sit in the range of a single combat turn-score, so neither node type dominates run scoring.
+There are two scenarios per house.
+A stable `scenarioId` is the unit of the no-repeat rule.
+Prefer unseen scenarios within the selected house; recycle when its pool is exhausted.
+The scenario and aria fragment are chosen on entry and persist through reloads.
+The alpha schema resets old tree-based saves rather than migrating them.
 
----
+## 9. Prose and Mechanical Copy
 
-## 7. Per-Kind Blueprints
+- **Aria:** one fragment in the ruler's voice for the whole encounter.
+- **Prompt:** one or two concrete sentences that establish the immediate situation.
+- **Option:** a short action, with no implied debt or promise that the game does not track.
+- **Aside:** generated from the authored effects and shared resolver, including actual clamped recovery after selection.
+- **Consequence:** one specific sentence for each result, including separate wager success and failure.
 
-The five kinds (`HOUSES.md §5.0`) are the generation backbone: each house's 2–3 scenarios are instances of its kind's blueprint, differing in flavor, not in economic DNA.
+Mechanics belong in the aside, not in the scene's prose.
+Player-facing text uses encounter, self, and other; named Light and Fortune follow the shared copy register.
 
-### 7.1 Double-anchored — House 1 (Self)
+## 10. Validation
 
-Mercury joy + ASC. The origin; recovery-leaning, gentle rates.
+Every authored scene must remain playable across all unlock tiers and representative clean, afflicted, and partially combusted charts.
+Preview and commit must agree for every valid target assignment and both wager outcomes.
+Tests cover full payment, ordinary losses, invalid targets, exact transfer amounts, combustion margins, revival, repeated resolution, and save resets.
+Playtests compare choices across chart conditions and upcoming rulers.
 
-- **Tend (signature):** "return to yourself" — small broad heal across `allUnlocked` at a low Light cost.
-- **Press:** "stake your name" — Light for affliction on the conditioning planet.
-- **Boon (`joyStrong`/`joyPresent`, Mercury unlocked):** the strongest line speaks — discounted heal + small Light.
-- Voice: Mercury (the turn, paradox, the new beginning one is always arriving at).
+## 11. Deferred Decisions
 
-### 7.2 Pure angular — Houses 4 (Home/IC), 7 (Relationships/DSC), 10 (Achievement/MC)
-
-No joy → conditioned by **ruler dignity** (`rulerStrong`/`rulerWeak`) + diurnal theme. Each house gets a distinct economic flavor:
-
-- **4 (IC, interior):** Tend-heavy — rest and heal; `rulerStrong` deepens the rest. The recovery house.
-- **7 (DSC, the other):** relational Wager — ally (mutual heal) vs duel (push-your-luck on relating). Balanced.
-- **10 (MC, summit):** Press/Wager-heavy — the visible monument, the two-rung gamble for big Light and big variance.
-
-### 7.3 Benefic joy — Houses 3 (Moon), 5 (Venus), 9 (Sun), 11 (Jupiter)
-
-Good place + benefic joy. Asymmetric rule: well-conditioned joy **adds a boon** (§4.4). Favorable rates.
-
-- **3 (Moon):** reflective heal — listen, recover; afflicted Moon flattens to "letters arrive folded."
-- **5 (Venus):** play / creative Wager — the boon is a strong heal; the gamble is "games of chance" (two-rung).
-- **9 (Sun):** illumination — study for Light + heal; the far country, vows.
-- **11 (Jupiter):** the gift — unearned Light + heal when Jupiter is clean; "no one at the door" when afflicted.
-
-### 7.4 Contained malefic — Houses 6 (Mars/Labor), 12 (Saturn/Hidden)
-
-Bad place + malefic joy. Asymmetric rule: well-conditioned joy **caps the downside** (§4.4: scoped vs spill). Unfavorable rates, but legible when contained.
-
-- **6 (Mars):** toil — Press for Light; contained Mars absorbs the cut; uncontained Mars spills to other unlocked planets.
-- **12 (Saturn):** concealment — hidden costs; contained Saturn keeps them scoped and legible; uncontained = unseen spill arriving late.
-
-### 7.5 Pure bad place — Houses 2 (Livelihood), 8 (Transformation)
-
-Averse, no joy, not angular → **identical for every chart** (the two gates). Flat unfavorable rates. The heaviest, most final trades; conditioned only by whole-chart run-state.
-
-- **2 (Gate of Hades):** scarcity — the **debt** mechanic: big Light now for big affliction later (borrow against tomorrow).
-- **8 (death-house):** zero-sum — inheritance (Light at a steep affliction/combust cost) and the home of the **uncombust rite** (`anyCombusted` → spend Light to call a planet back).
-  Two-rung Wager fits the crisis theme.
-
----
-
-## 8. Scenario Identity & Selection
-
-Each authored scenario has a stable `scenarioId` (e.g. `creativity-dice`, `creativity-unfinished-song`).
-Houses carry 2–3 scenarios (§7); the **id**, not the house, is the unit of repetition.
-
-**No-repeat rule:** *no specific encounter repeats within a single run.*
-A run already tracks `seenFragmentIds` (`PLANETS.md §2`); it tracks `seenScenarioIds` the same way.
-
-Selection layers on top of the map's house roll (`SCREENS.md §4.3`):
-
-1. Pick a house — uniform over 12, excluding the immediately-previous narrative house (existing rule).
-2. Pick a scenario in that house whose `scenarioId` ∉ `seenScenarioIds`.
-3. Mark it seen on entry.
-
-**Exhaustion fallback** — a long run can outlast the pool:
-
-- If the chosen house has no unseen scenario, re-roll the house among houses that still do.
-- If *every* narrative scenario has been seen, reset `seenScenarioIds` and recycle — still honoring the no-immediate-house-repeat rule so the seam stays invisible.
-
-The pool size (12 houses × 2–3 = **24–36 distinct narrative beats**) sets how far a run travels before recycling; raise scenario counts later if runs routinely exhaust it.
-
-**Combat parallel:** the same property holds for combat by opponent — a given opponent Prince should not recur within a run (dedup by opponent id). The large matchmaker pool (`SCREENS.md §3.4`) satisfies this for free; narrative is the case that needs authored breadth.
-
----
-
-## 9. Prose Contract
-
-Per `PLANETS.md §1–2` and `SCREENS.md §3.2`.
-
-**Register: concrete but generic.**
-The body is a plain, tangible folk-situation — a coin at the foot of a tree, a stranger on the road, a letter in an unknown hand — stated plainly, with legible choices.
-The symbolism lives in the *structure* (house, planet, cost), not in the prose: no portentous mysticism, no purple lines, no Greek classical names in the body.
-The only elevated register is the **aria** (the curated fragment floating above); the situation below it stays grounded.
-
-- **Aria** — one curated, public-domain chorus fragment in the **ruler's** voice (`fragmentMood` per tree). One per *encounter*, not per node. Never explains the mechanic.
-- **Node text** — 1–2 sentences, present tense, second person, concrete and grounded (a thing happens; a choice is offered). Sets the dilemma, not the numbers.
-- **Option label** — imperative, second person, short. The *choice* ("Take the one coin and go."), never the mechanic.
-- **Aside** — the plain mechanical summary, utilitarian register, explicit ("+2 Light · heal 2 where it's needed most").
-  All numbers live here.
-- **Resolution line** — one short consequence sentence.
-
-The aria carries the planet's voice; the body stays plain.
-Tonal range still tracks the house — a bad-place situation reads grimmer than a good-place one (`HOUSES.md §5`).
-
----
-
-## 10. Authoring Checklist
-
-A scenario is generation-complete when:
-
-1. It declares its house, kind, `scenarioId`, and `fragmentMood`.
-2. Targets are abstract roles (§3), never raw planet names — verified unlock-safe.
-3. The root spans the trade axis (§5.2) within the kind's lean.
-4. Conditioning uses only §4.3 predicates, and the asymmetric joy rule (§4.4) is honored for its kind.
-5. Magnitudes sit in the §6 bands and respect the house's valence rates.
-6. Every path terminates in §2 outcomes; any Wager rolls on the conditioning planet's luck.
-7. Prose follows the §9 contract; aria fragment exists for the ruler.
-
----
-
-## 11. Open Questions
-
-- Exact exchange curves and the Press ceiling (§6) — playtest.
-- Whether the natal lever should later become ruler-aspects-ASC (§4.2) instead of / in addition to dignity.
-- Whether Tend should ever be able to *fully* clear a planet, or always leave a margin (interacts with the press-then-heal loop).
+Persistent effects, multi-stage scenes, and final balance remain deferred.
+No additional run currency or lasting narrative state is introduced by this version.

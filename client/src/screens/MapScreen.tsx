@@ -18,7 +18,7 @@ import { PLANET_GLYPH } from "@/svg/glyphs";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickFragment } from "@/data/chorus";
-import { pickScenario } from "@/data/narrative-trees";
+import { pickScenario } from "@/data/narrative-scenarios";
 import { chartRuler, seededChart } from "@/game/chart";
 import type {
   EncounterState,
@@ -107,23 +107,22 @@ export function MapScreen() {
       } else {
         const house = HOUSES[content.house - 1]!;
         const rng = mulberry32(hashString(`${run.id}_${content.house}_${nodeId}`));
-        const tree = pickScenario(content.house, nextRun.seenScenarioIds ?? [], rng);
+        const scenario = pickScenario(content.house, nextRun.seenScenarioIds ?? [], rng);
         const fragment = pickFragment({
           planet: house.ruler,
-          mood: tree.fragmentMood,
+          mood: scenario.fragmentMood,
           exclude: nextRun.seenFragmentIds,
           rng,
         });
         encounter = beginNarrativeEncounter({
           run: nextRun,
           house: content.house,
-          treeId: tree.scenarioId,
-          rootNodeId: tree.rootId,
+          scenarioId: scenario.scenarioId,
           fragmentId: fragment?.id ?? `${house.ruler.toLowerCase()}-stub`,
         });
         nextRun = {
           ...nextRun,
-          seenScenarioIds: [...(nextRun.seenScenarioIds ?? []), tree.scenarioId],
+          seenScenarioIds: [...(nextRun.seenScenarioIds ?? []), scenario.scenarioId],
         };
       }
       nextRun = { ...nextRun, encounter };

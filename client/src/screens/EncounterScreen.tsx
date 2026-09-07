@@ -1,6 +1,6 @@
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { useInfoCards } from "@/state/InfoCardContext";
-import { useCommitNarrative, useCommitTurn } from "@/state/store-actions";
+import { useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { thresholdCrossedBy } from "@/game/unlocks";
 import { EncounterCombatScreen } from "./EncounterCombat";
@@ -13,7 +13,6 @@ export function EncounterScreen() {
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const commitTurn = useCommitTurn();
-  const commitNarrative = useCommitNarrative();
   const { enqueueCard } = useInfoCards();
   const settings = loadDevSettings();
 
@@ -53,9 +52,8 @@ export function EncounterScreen() {
       run={run}
       prince={prince}
       encounter={enc}
-      onCommit={(args) =>
-        commitNarrative({ run, nextRun: args.nextRun, chart: prince.chart, summary: args.summary, resolved: args.resolved })
-      }
+      onCommit={(nextRun) => dispatch({ kind: "commitRun", run: nextRun })}
+      devUnlockAll={settings.unlockAll}
       onClearEncounter={clearEncounter}
     />
   );

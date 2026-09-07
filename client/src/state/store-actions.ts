@@ -93,38 +93,6 @@ export function useCommitTurn() {
   );
 }
 
-/** Resolve a narrative step (mid-tree or terminal) and dispatch. Records a
- *  NodeOutcome when the encounter resolves; the lifetime layer advances at
- *  encounter clear (EncounterScreen), not here. */
-export function useCommitNarrative() {
-  const dispatch = usePrinceDispatch();
-  return useCallback(
-    (args: { run: Run; nextRun: Run; chart: Chart; summary: string; resolved: boolean }) => {
-      let next = args.nextRun;
-      if (args.resolved) {
-        const combusts = newlyCombusted(args.chart, args.run.state, next.state);
-        const outcome: NodeOutcome = {
-          nodeId: next.map.currentNodeId,
-          kind: "narrative",
-          summary: args.summary,
-          lightDelta: next.light - args.run.light,
-          combusts,
-        };
-        next = {
-          ...next,
-          map: {
-            ...next.map,
-            outcomes: { ...next.map.outcomes, [outcome.nodeId]: outcome },
-          },
-        };
-      }
-      dispatch({ kind: "commitRun", run: next });
-      return next;
-    },
-    [dispatch],
-  );
-}
-
 /** Roll over to a fresh map (terminal node reached). The fielded roster gates
  *  its combat rulers and feeds the boundary's uncombust rolls and barrage. */
 export function useRolloverMap() {

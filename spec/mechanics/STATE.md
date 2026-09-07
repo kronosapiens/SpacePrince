@@ -56,15 +56,14 @@ Opponent {
 
 Narrative {
   house:    u4,                  -- 1 of 12 houses
-  planet:   u3,                  -- 1 of 7 planets (the house's joy / ruler)
-  storyIdx: u3,                  -- which scenario (2 per house today; headroom to 8). The tree-walk is client-only; the contract validates the final outcome
+  storyIdx: u3,                  -- which scenario (2 per house today; headroom to 8). one authored decision; the contract validates the option and targets
 }
 ```
 
 ## Randomness
 
 A single RNG primitive supplies true randomness on demand (VRF-style).
-Randomness never decides how a committed action resolves; it only decides what is revealed next (MECHANICS §7).
+Combat resolution is deterministic; narrative wagers explicitly consume one random roll at commit.
 It is spent deliberately:
 
 - **Once per run** — `Run.seed`, drawn at run start; the first map derives from it.
@@ -106,6 +105,10 @@ It is the planet-unlock counter; a saturating `u8` is plenty, since unlock compl
 Only the tail run carries live state; earlier runs are inert apart from `light`.
 Whether to physically prune a finished run's other fields or keep the full struct is an implementation choice — conceptually the array's payload is the Light values.
 
-Narrative gating (joy/ruler options, uncombust-rites gated on planet state) must live in the contract so it can validate a client-submitted outcome; the multi-step tree-walk itself is presentation only.
+Narrative gating, target eligibility, and full payment must live in the contract so it can validate a submitted option and selected planet ids.
+The conditioning planet and valid targets derive from the chart and current run state.
+There is no narrative traversal state or continuing effect to store.
+The prototype encounter stores `scenarioId`, `fragmentId`, `resolved`, and optional `resolutionText`, alongside its id and house.
+Target selection is transient UI state; a committed consequence persists through reloads and cannot be applied twice.
 
-The TypeScript prototype (`Profile`, `RunState`) predates this model and should be reconciled to it.
+The TypeScript prototype uses `Prince` and `Run`; its presentation and history fields are wider than the planned contract storage.

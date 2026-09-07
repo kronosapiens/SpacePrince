@@ -154,6 +154,8 @@ export interface ChartProps {
   /** When true, the player's tappable planets carry a quiet breathing ring
    *  inviting a choice — the combat decision phase. Off everywhere else. */
   inviteInteraction?: boolean;
+  /** Explicit narrative targets; may include combusted planets for revival. */
+  interactionPlanets?: ReadonlySet<PlanetName>;
   /** The verb determined for whichever planet is wearing the ring — the
    *  opponent's precommit, or the player's armed/indicated choice. Colours the
    *  ring; without one it stays neutral. Only ever one planet at a time wears a
@@ -226,6 +228,7 @@ export function Chart(props: ChartProps) {
     onPlanetClick,
     onPlanetHover,
     inviteInteraction = false,
+    interactionPlanets,
     ringVerb,
     style,
     className,
@@ -450,6 +453,7 @@ export function Chart(props: ChartProps) {
             onClick={handleClick}
             onHover={handleHover}
             passive={passive}
+            eligible={interactionPlanets ? interactionPlanets.has(p.planet) : !combusted}
             invite={inviteInteraction}
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
@@ -536,7 +540,7 @@ function PlanetGlyph({
   tuning,
   point, combusted, ghost,
   selected, active, hovered,
-  onClick, onHover, passive, invite, ringVerb,
+  onClick, onHover, passive, eligible, invite, ringVerb,
   actionPulse, combusting,
   impactPolarity,
   animationEpoch,
@@ -552,6 +556,7 @@ function PlanetGlyph({
   onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
   passive: boolean;
+  eligible: boolean;
   invite: boolean;
   ringVerb?: Polarity | null;
   actionPulse: boolean;
@@ -564,7 +569,7 @@ function PlanetGlyph({
   const sec = PLANET_SECONDARY[point.planet];
   // Active state is carried by the ring, not glyph size.
   const r = point.glyphR;
-  const interactive = !passive && (!!onClick || !!onHover) && !combusted && !ghost;
+  const interactive = !passive && (!!onClick || !!onHover) && eligible && !ghost;
 
   const handleClick = onClick && interactive
     ? (e: MouseEvent) => { e.stopPropagation(); onClick(point.planet); }
@@ -626,6 +631,17 @@ function PlanetGlyph({
     <g
       transform={`translate(${point.cx}, ${point.cy})`}
       onClick={handleClick}
+      role={handleClick ? "button" : undefined}
+      tabIndex={handleClick ? 0 : undefined}
+      aria-label={handleClick ? point.planet : undefined}
+      aria-pressed={handleClick ? selected : undefined}
+      onKeyDown={handleClick ? (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+          onClick?.(point.planet);
+        }
+      } : undefined}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       style={{ cursor: interactive ? "pointer" : "default", color: c }}

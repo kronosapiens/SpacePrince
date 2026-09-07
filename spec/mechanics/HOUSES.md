@@ -1,7 +1,7 @@
 # Space Prince — Houses (Narrative Encounters)
 
 This document defines the **narrative encounter** system, organized around the twelve astrological houses.
-Narrative encounters are an alternative node type to combat, offering short decision trees and push-your-luck choices rather than turn-by-turn planetary resolution.
+Narrative encounters are an alternative node type to combat, offering a single decision about immediate costs, recovery, redistribution, or a Fortune wager.
 
 Combat mechanics are specified in `spec/mechanics/MECHANICS.md`.
 Chart construction (whole-sign houses, ASC, rulerships) is specified in `spec/mechanics/CHART.md`.
@@ -16,16 +16,18 @@ Map topology is specified in `spec/mechanics/MAP.md`.
 - Provide a second encounter type that exercises **house placement** and **ruler-state** rather than chart-vs-chart combat.
 - Give each of the twelve houses a distinct mechanical identity.
 - Let a Prince's chart make certain houses "easier" or "harder" — narrative nodes should feel chart-specific, not generic.
-- Keep individual encounters short (depth 2–3, 2–3 options per node) and low-prep relative to combat.
-- Influences include Slay the Spire and Faster Than Light, which use push-your-luck decision-trees as alternative encounter types
+- Keep each encounter to one decision, with target selection and previews before commitment.
+- Influences include Slay the Spire and Faster Than Light, whose events connect available resources to the choices ahead.
 
 ### In Scope (v1)
 
 - Chart-conditioning model: how a chart makes a house friendly or hostile.
-- **Essential dignity as an input.** Dignity (domicile / exaltation / detriment / fall) was pulled out of combat (`MECHANICS.md §10`) to live here — a planet's competence in its sign should shape how it fares in narrative encounters, expressed with more texture than the `±2` stat nudge it was in combat. The chart already computes it (`CHART.md`); the mechanic is TBD.
+- **Essential dignity as an input.**
+  Dignity (domicile / exaltation / detriment / fall) was pulled out of combat (`MECHANICS.md §10`) to live here — a planet's competence in its sign should shape how it fares in narrative encounters, expressed with more texture than the `±2` stat nudge it was in combat.
+  The chart already computes it (`CHART.md`); strong dignity reveals alternative approaches under `ENCOUNTERS.md §4`.
 - Twelve house archetypes: theme, native valence, joy.
 - Outcome vocabulary: what resources narrative encounters can move.
-- Encounter shape: decision tree depth, push-your-luck structure, exits.
+- Encounter shape: one decision, immediate consequences, visible odds, and exits.
 
 ### Out of Scope (v1)
 
@@ -39,18 +41,13 @@ Map topology is specified in `spec/mechanics/MAP.md`.
 ## 2. Outcome Vocabulary
 
 Narrative encounters operate on the same resources as combat.
-Open question: should new resources be introduced to make these mechanics richer?
+Light can be gathered or spent; affliction can be added, relieved, or transferred between selected planets.
+A lit planet can be sacrificed, and a combusted planet can return at half its ceiling.
+Purchases require full payment; ordinary Light losses clamp at zero.
+The exact outcome vocabulary and validation rules live in `ENCOUNTERS.md §2–3`.
 
-| Resource | Scope | Notes |
-|---|---|---|
-| **Affliction** | Per-planet, real-valued | Same units as combat. Can be added or healed. |
-| **Combustion** | Per-planet, binary | Can be applied *or removed*. Uncombust is allowed (see §4). |
-| **Light** | Run-wide, integer-ish | The run's gathered or spent score metric. |
-| **Omen** (new) | Run-scoped, temporary | Buff/debuff active until end of run or trigger condition. |
-| **Lore** (new) | Persistent on Prince | Unlocks copy, hidden chart annotations, future content. |
-
-Encounters cost and reward in these terms.
-A decision tree might offer: "spend 3 Light, heal 2 affliction on Mars" or "combust Venus, unlock a lore entry, gain a +1 luck omen for the rest of the run."
+Omen, Lore, debts, vows with later consequences, and other persistent effects are deferred.
+Their storage and gameplay costs require a separate design decision.
 
 ---
 
@@ -104,23 +101,20 @@ Pure cost scaling is one mechanism; changing options is another.
 
 ### 4.1 Structure
 
-- **Depth:** 2–3 decision nodes per encounter.
-- **Breadth:** 2–3 options per node.
-- **Termination:** each path ends in a resolution node that applies outcomes from §2.
+Each encounter has one prompt and at most three visible options, including any exit.
+Every choice resolves immediately, with a specific consequence sentence.
+Choosing one or two target planets is part of preparing the choice and does not advance the encounter.
 
-### 4.2 Push-your-luck ladder
+### 4.2 Wagers
 
-One path in most encounters is a **ladder**: escalating stakes, each rung offering the choice to cash out or continue.
-
-- Rung 1: small risk, small reward.
-- Rung 2: medium risk, medium reward, rollback of rung 1 on failure.
-- Rung 3: large risk, large reward, full rollback on failure.
-
-The ladder's arithmetic (probabilities, payoffs) will be tuned per-house once mechanical treatments are committed.
+A wager resolves in one Fortune roll, with its odds and both consequences visible before commitment.
+There are no intermediate rewards, cash-outs, or escalating ladders in this version.
+Multi-stage encounters are deferred until the one-decision experience is refined.
 
 ### 4.3 Offered vs always-present
 
-Some options are always visible; others appear only when a chart condition is met (e.g. uncombust only appears if a planet is currently combusted; a ruler-aspected branch only appears when the aspect exists).
+Some options are always visible; chart-conditioned offers replace their standard counterparts within the three-choice limit.
+Revival is offered only when a planet is combusted.
 This is the primary vehicle for chart-conditioning.
 
 > Example: in FTL, having a certain species as a shipmate unlocks certain narrative paths.
@@ -130,7 +124,7 @@ This is the primary vehicle for chart-conditioning.
 ## 5. The Twelve Houses
 
 Each house is documented below with its **valence** (good place or bad place, per §3.2), its **joy** (the planet that rejoices here, per §3.3), its **kind** (category; see below), and a short note on **theme** (traditional meaning plus modern gloss).
-Mechanical treatment is deferred — the goal at this stage is a reference that builds intuition for what each house *is*, not how it plays.
+These concepts frame the mechanical blueprints in `ENCOUNTERS.md §7`.
 
 ### 5.0 Categories
 

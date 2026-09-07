@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { PlanetName } from "@/game/types";
 import { GUIDE_COPY } from "@/copy/guide";
 import type { HouseDef } from "@/data/houses";
 import { planetName, TermText } from "@/components/TermText";
@@ -25,6 +26,7 @@ interface NarrativeGuideProps {
   open: boolean;
   phase: NarrativeGuidePhase;
   house: HouseDef;
+  fortunePlanet: PlanetName | null;
   /** 1-based index of the first option carrying an aside, if any. */
   asideIndex: number | null;
   onOpen: () => void;
@@ -47,14 +49,14 @@ export function NarrativeGuide({
   open,
   phase,
   house,
+  fortunePlanet,
   asideIndex,
   onOpen,
   onClose,
   onPhaseChange,
 }: NarrativeGuideProps) {
-  // The planet the house reads: its joy, or its ruler in the five houses that
-  // have no joy — the same planet the screen rolls a wager against.
-  const housePlanet = house.joy ?? house.ruler;
+  // Point to the lit planet whose Fortune the displayed wagers use.
+  const housePlanet = fortunePlanet ?? house.ruler;
 
   const notes = useMemo<GuideNote[]>(() => {
     if (phase === "scene") {
@@ -111,8 +113,8 @@ export function NarrativeGuide({
         placement: "outward",
         label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
         body: house.joy
-          ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
-          : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
+          ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />
+          : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler), fortune: fortunePlanet ? planetName(fortunePlanet) : "no lit planet" }} />,
       },
       {
         key: "outcomes",
@@ -123,7 +125,7 @@ export function NarrativeGuide({
         body: <TermText text={COPY.notes.outcomes.body} />,
       },
     ];
-  }, [phase, house, housePlanet, asideIndex]);
+  }, [phase, house, housePlanet, fortunePlanet, asideIndex]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // Only the joy planet wears the active halo here (the chart's

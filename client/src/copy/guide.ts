@@ -17,8 +17,8 @@
  *      as the example; {light} the previewed gain; {action} Afflict or Testify
  *    map — {ruler} a node's ruler; {name}/{gloss} the picked house;
  *      {n} the map's numeral
- *    narrative — {ruler} the house's ruler; {joy} the planet with its joy
- *      there; {theme} the house's theme sentence
+ *    narrative — {ruler} the house's ruler; {joy} its joy;
+ *      {fortune} the lit planet carrying wagers; {theme} the house's theme sentence
  *  Variants are separate entries (turn/turnSettled, theirMove/wayOut,
  *  housePlanet/housePlanetNoJoy), never a conditional inside a string. */
 
@@ -150,7 +150,7 @@ export const GUIDE_COPY = {
       },
       commit: {
         label: "Arm, then commit",
-        body: "Tap an option to arm it, tap again to commit. Everything lands exactly as written unless odds are shown, and what you commit is kept.",
+        body: "Tap an option to arm it, choose any planets it asks for, then tap the option again to commit. The whole scene resolves in that one decision.",
       },
       aside: {
         label: "The aside",
@@ -158,11 +158,11 @@ export const GUIDE_COPY = {
       },
       housePlanet: {
         label: "The house's planet",
-        body: "This house reads {joy}, the planet that has its joy here. Its Fortune decides any wager, and some choices open only under the right sky: a joy present or harmed, a dignified ruler, a planet already lost.",
+        body: "The condition of {joy} opens some choices; dignity opens others. Any wager here reads {fortune}'s Fortune, using a lit planet when the house's own planets cannot answer.",
       },
       housePlanetNoJoy: {
         label: "The house's planet",
-        body: "No planet has its joy in this house, so it reads its ruler, {ruler}. Its Fortune decides any wager, and some choices open only under the right sky: a dignified ruler, or a planet already lost.",
+        body: "No planet has its joy here. Some choices read the condition of {ruler}; others ask what your chart can spare. Any wager uses {fortune}'s Fortune, passing to a lit planet when the ruler cannot answer.",
       },
       outcomes: {
         label: "Outcomes",

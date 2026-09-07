@@ -116,10 +116,11 @@ The border, the overlap, and the height budget the wheel is sized from are decid
 - **Left half:** the player's chart, drawn per `STYLE.md §11`.
 - **Right half:** a three-band column carrying the narrative encounter:
   - **Top band — Aria:** the ruling planet's glyph paired horizontally with a single chorus fragment in that planet's voice. The persistent presence of the encounter — fades in once at encounter open and remains throughout. The planet glyph is rendered with its color treatment per `STYLE.md §5`; the fragment in Cormorant Garamond per `STYLE.md §6`.
-  - **Middle band — Narrative:** the current decision node's narrative text. Updates per node.
-  - **Bottom band — Options:** the 2–3 decision options for the current node. Updates per node.
+  - **Middle band — Narrative:** the scene's prompt, replaced by its specific consequence after commitment.
+  - **Bottom band — Options:** the single decision's options, with generated costs, effects, and any required target selectors.
 
-The aria does not re-pulse on node transitions; only the middle and bottom bands change. Per `PLANETS.md §1`, **one fragment per encounter, not per node** — the aria carries the whole encounter, while the narrative text in the middle band does the per-node framing.
+The aria remains steady while the player selects targets and the decision resolves.
+There is one fragment for the whole encounter.
 
 ### 3.3 Mobile portrait
 
@@ -201,7 +202,13 @@ The *offensive* read (the effect on the opponent's chart) appears only while an 
 Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
 Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
 
-In narrative encounters, the same grammar governs *inspecting* the chart. Decision options are committed by single-tap on the option — each option's text label is itself the commit affordance, no separate confirm step.
+In narrative encounters, tap an option to arm it, select any requested planets, and tap that option again to commit.
+Targets can be selected on the chart or through labeled selectors alongside the option.
+Only eligible targets invite selection; revival can select combusted planets without enabling them in combat.
+Determined effects project on the chart through the same resolver used at commit.
+Wagers show both consequences and the exact Fortune odds in text, with no single outcome projected as certain.
+Unavailable purchases remain visible with an explanation.
+The guide permits previews and target selection but prevents commitment.
 
 ### 3.6.1 Study annotations (the inspect "i")
 

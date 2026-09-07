@@ -7,7 +7,7 @@ import { mulberry32, hashString, randomSeed } from "@/game/rng";
 import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import { HOUSES } from "@/data/houses";
-import { pickScenario } from "@/data/narrative-trees";
+import { pickScenario } from "@/data/narrative-scenarios";
 import { pickFragment } from "@/data/chorus";
 import type {
   Chart,
@@ -113,14 +113,13 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   const rng = mulberry32(seed);
   const house = opts.house ?? 1 + Math.floor(rng() * 12);
   const houseDef = HOUSES[house - 1]!;
-  const tree = pickScenario(house, [], rng);
-  const fragment = pickFragment({ planet: houseDef.ruler, mood: tree.fragmentMood, exclude: [], rng });
-  // Narrative encounters always open on the tree root; only the house/board vary.
+  const scenario = pickScenario(house, [], rng);
+  const fragment = pickFragment({ planet: houseDef.ruler, mood: scenario.fragmentMood, exclude: [], rng });
+  // Narrative encounters open on one decision; the house and chart vary.
   const encounter = beginNarrativeEncounter({
     run: base,
     house,
-    treeId: tree.scenarioId,
-    rootNodeId: tree.rootId,
+    scenarioId: scenario.scenarioId,
     fragmentId: fragment?.id ?? `${houseDef.ruler.toLowerCase()}-stub`,
   });
   const run: Run = {
@@ -128,7 +127,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
     state: livedInState(seed, "self", devPlayerChart(seed), fielded),
     light: livedInLight(seed),
     encounter,
-    seenScenarioIds: [tree.scenarioId],
+    seenScenarioIds: [scenario.scenarioId],
   };
   return devPrince(seed, tier, run);
 }

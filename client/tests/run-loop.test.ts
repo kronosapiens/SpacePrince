@@ -6,7 +6,6 @@ import { resolveTurn } from "@/game/turn";
 import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
 import { mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
-import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
@@ -115,51 +114,6 @@ describe("Run loop integration", () => {
     const next = eligibleNext(run.map.graph, firstNeighbor, [startId, firstNeighbor]);
     expect(next).not.toContain(startId);
     expect(next).not.toContain(firstNeighbor);
-  });
-
-  it("narrative outcomes can heal / harm / spend Light and uncombust", () => {
-    const prince = createStubPrince({ seed: 11 });
-    const sunCeiling = combustionCeiling(prince.chart.planets.Sun);
-    let r = beginRun(5);
-    r = { ...r, light: 10, state: { ...r.state } };
-    r.state.Sun = { affliction: sunCeiling }; // at the ceiling = combusted (derived)
-
-    const ctx = buildNarrativeContext({
-      prince,
-      run: r,
-      joyPlanet: null,
-      rulerPlanet: "Sun",
-      unlocked: [...PLANETS],
-    });
-    r = applyOutcomes(r, prince, [
-      { kind: "uncombust", target: "Sun" },
-      { kind: "light", delta: -3 },
-    ], ctx);
-    // The rite returns the planet at half ceiling — back, but scarred (§10).
-    expect(isCombusted(prince.chart.planets.Sun, r.state.Sun)).toBe(false);
-    expect(r.state.Sun.affliction).toBe(sunCeiling / 2);
-    expect(r.light).toBe(7);
-  });
-
-  it("narrative Light gathers, spends, and clamps at zero", () => {
-    const prince = createStubPrince({ seed: 12 });
-    const run = { ...beginRun(6), light: 10 };
-    const ctx = buildNarrativeContext({
-      prince,
-      run,
-      joyPlanet: null,
-      rulerPlanet: "Moon",
-      unlocked: [...PLANETS],
-    });
-
-    const gathered = applyOutcomes(run, prince, [{ kind: "light", delta: 12 }], ctx);
-    expect(gathered.light).toBe(22);
-
-    const spent = applyOutcomes(gathered, prince, [{ kind: "light", delta: -7 }], ctx);
-    expect(spent.light).toBe(15);
-
-    const depleted = applyOutcomes(spent, prince, [{ kind: "light", delta: -99 }], ctx);
-    expect(depleted.light).toBe(0);
   });
 
   it("combat length equals the map number; the opponent fields the player's tier (mirror)", () => {

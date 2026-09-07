@@ -226,7 +226,7 @@ Combustion scores only under Saturn's rule (§12); under every other ruler, comb
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative). Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters are short decision trees (`HOUSES.md`).
+- **Encounter** — one node traversal (combat or narrative). Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters resolve one decision with immediate consequences (`HOUSES.md`).
 - **Map** — one Sephirot-tree (per `MAP.md`). The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
 - **Run** — **up to seven maps.** After completing a map, the next is generated and begun. The structure is similar to FTL's sectors.
 - **Run end** — a run ends on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished).

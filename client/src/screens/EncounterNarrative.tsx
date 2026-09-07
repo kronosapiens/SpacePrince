@@ -1,17 +1,17 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Chart } from "@/components/Chart";
+import { Chart, type ProjectionChips } from "@/components/Chart";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { unlockedPlanets } from "@/game/unlocks";
-import { applyOutcomes, buildNarrativeContext } from "@/game/narrative";
+import { availableSelections, buildNarrativeContext, joyPresent, previewOption, resolveNarrative, selectionSlots, wagerOdds, type Selection, type SelectionSlot } from "@/game/narrative";
+import { describeOption, selectionLabel } from "@/copy/narrative";
 import { newlyCombusted } from "@/game/combust";
-import { fortuneChance, fortuneSixtieths } from "@/game/combat";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
-import { getScenario, getTreeNode, resolveAside, visibleOptions, type Option } from "@/data/narrative-trees";
+import { getScenario } from "@/data/narrative-scenarios";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
 import { playCombust, playStrike, setTheme } from "@/audio/engine";
 import { mulberry32 } from "@/game/rng";
@@ -35,39 +35,30 @@ const HOUSE_NAMES = [
   "Ninth House", "Tenth House", "Eleventh House", "Twelfth House",
 ];
 
-export interface CommitNarrativeArgs {
-  nextRun: Run;
-  /** Free-form summary of the choice made (used in NodeOutcome). */
-  summary: string;
-  /** True when the choice resolved the encounter. */
-  resolved: boolean;
-}
-
 interface NarrativeScreenProps {
   run: Run;
   prince: Prince;
   encounter: NarrativeEncounter;
-  /** Persistence + (when resolved) lifetime bump + outcome construction
-   *  happens inside the implementation (real or dev). */
-  onCommit: (args: CommitNarrativeArgs) => void;
-  /** Clear `run.currentEncounter` and return to the map. */
+  onCommit: (nextRun: Run) => void;
+  devUnlockAll?: boolean;
+  /** Clear `run.encounter` and return to the map. */
   onClearEncounter: () => void;
 }
 
 export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
-  const { run, prince, encounter, onCommit, onClearEncounter } = props;
+  const { run, prince, encounter, onCommit, onClearEncounter, devUnlockAll = false } = props;
   const { setActive } = useActivePlanet();
 
   const house = HOUSES[encounter.house - 1]!;
-  const tree = useMemo(
-    () => getScenario(encounter.treeId, encounter.house),
-    [encounter.treeId, encounter.house],
+  const scenario = useMemo(
+    () => getScenario(encounter.scenarioId),
+    [encounter.scenarioId],
   );
   const ariaPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
   const playerUnlocked = useMemo(
-    () => unlockedPlanets(prince.numEncounters),
-    [prince.numEncounters],
+    () => unlockedPlanets(prince.numEncounters, devUnlockAll),
+    [prince.numEncounters, devUnlockAll],
   );
 
   useEffect(() => {
@@ -86,11 +77,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     const rng = mulberry32(encounter.house * 1000 + run.seed);
     return pickFragment({
       planet: ariaPlanet,
-      mood: tree.fragmentMood,
+      mood: scenario.fragmentMood,
       exclude: run.seenFragmentIds,
       rng,
     });
-  }, [encounter.fragmentId, encounter.house, run.seed, run.seenFragmentIds, ariaPlanet, tree.fragmentMood]);
+  }, [encounter.fragmentId, encounter.house, run.seed, run.seenFragmentIds, ariaPlanet, scenario.fragmentMood]);
 
   const ctx = useMemo(
     () =>
@@ -104,79 +95,69 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     [prince, run, joyPlanet, house.ruler, playerUnlocked],
   );
 
-  const [resolved, setResolved] = useState(encounter.resolved);
-  const [resolutionLine, setResolutionLine] = useState<string | null>(encounter.resolutionText ?? null);
-  // Two-tap commit (mirrors combat, SCREENS.md §3.6): first tap arms an option
-  // with a glow, second tap on the same option commits. Cleared on node change.
+  const resolved = encounter.resolved;
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
-  useEffect(() => setSelectedOptionId(null), [encounter.currentNodeId]);
-  // While the guide is open the scene is preview-only: an option still arms,
-  // but a second tap disarms it instead of committing.
+  const [selection, setSelection] = useState<Selection>({});
+  const [activeSlot, setActiveSlot] = useState<SelectionSlot>("chosen");
+  const [inspectedPlanet, setInspectedPlanet] = useState<PlanetName | null>(null);
+  const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guidePhase, setGuidePhase] = useState<NarrativeGuidePhase>("scene");
-  // Resolution flash: dramatize the state change on the chart (SCREENS.md §3.5).
   const [flash, setFlash] = useState<{
     epoch: number;
     impact: Map<PlanetName, Polarity>;
     combusting: Set<PlanetName>;
-    light: number; // signed delta; 0 = unchanged
+    light: number;
   } | null>(null);
-  const epochRef = useRef(0);
-  // Freeze the option list at decision time so it stays put after resolution
-  // (the visibility predicates read run-state, which the outcome can change).
-  const [frozenOptions, setFrozenOptions] = useState<Option[] | null>(null);
-  const node = useMemo(() => getTreeNode(tree, encounter.currentNodeId), [tree, encounter.currentNodeId]);
-  const options = useMemo(() => visibleOptions(node, ctx), [node, ctx]);
-  const shownOptions = resolved ? (frozenOptions ?? options) : options;
+  const committedRef = useRef(false);
 
-  // The wager resolves on the conditioning planet's Fortune (ENCOUNTERS §5.3) —
-  // the same roll fate uses everywhere else, not a second formula. One value
-  // feeds both the roll and the displayed odds; the probability is derivable
-  // from public chart data, so hiding it would frame a readable bet as
-  // pretend-mystery (client honesty, SCREENS §1.1). The roll itself stays
-  // genuinely random at commit.
-  const wagerLuckPlanet = joyPlanet ?? house.ruler;
-  const wagerLuck = useMemo(() => {
-    const placement = prince.chart.planets[wagerLuckPlanet];
-    return placement.base.luck + placement.buffs.luck;
-  }, [prince.chart, wagerLuckPlanet]);
-  const wagerChance = fortuneChance(wagerLuck);
-
-  // Each option's aside — what it costs and does, before the choice. Resolved
-  // once so the guide can point at the first option that carries one.
-  const asides = useMemo(
-    () =>
-      shownOptions.map((o) => {
-        // Branch options (those that open a follow-up node) carry no direct
-        // effect; cue that they lead onward, with a trailing arrow.
-        let base = resolveAside(o, ctx) ?? (o.next ? "A further choice" : undefined);
-        // Wagers show their odds — the roll's probability is derivable, so
-        // it's shown (SCREENS §1.1).
-        if (o.outcomesOnSuccess || o.outcomesOnFail) {
-          // Sixtieths, the unit every probability is stated in (MECHANICS
-          // §7) — and exact here, since the odds are already n/60.
-          const odds = `${fortuneSixtieths(wagerLuck)}/60`;
-          base = base ? `${base} · ${odds}` : odds;
-        }
-        return o.next && base ? `${base} →` : base;
-      }),
-    [shownOptions, ctx, wagerLuck],
-  );
-
-  const handleOption = (option: Option) => {
+  const options = useMemo(() => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(ctx)), [scenario, ctx]);
+  const rows = useMemo(() => options.map((option) => {
+    const assignments = availableSelections(run, ctx, option);
+    const preview = previewOption(run, ctx, option, option.id === selectedOptionId ? selection : {});
+    return {
+      option, assignments,
+      aside: describeOption(run, ctx, option, option.id === selectedOptionId ? selection : {}),
+      reason: !assignments.length ? (preview.ok || run.light >= (option.cost ?? 0) ? "No eligible planets can carry this choice." : preview.reason) : null,
+    };
+  }), [options, run, ctx, selectedOptionId, selection]);
+  const [frozenRows, setFrozenRows] = useState<typeof rows | null>(null);
+  const shownRows = resolved ? frozenRows ?? rows : rows;
+  const selectedRow = rows.find((row) => row.option.id === selectedOptionId);
+  const selectedOption = selectedRow?.option;
+  const slots = selectedOption ? selectionSlots(selectedOption) : [];
+  const preview = selectedOption ? previewOption(run, ctx, selectedOption, selection) : null;
+  const candidates = (slot: SelectionSlot) => playerUnlocked.filter((p) => selectedRow?.assignments.some((s) =>
+    s[slot] === p && (slot === "chosen" || !selection.chosen || s.chosen === selection.chosen),
+  ));
+  const eligiblePlanets = new Set(slots.length ? candidates(activeSlot) : playerUnlocked);
+  const choosePlanet = (planet: PlanetName, slot = activeSlot) => {
     if (resolved) return;
-    let outcomes = option.outcomes ?? [];
-    let resolutionText = "";
-    if (option.outcomesOnSuccess || option.outcomesOnFail) {
-      const success = Math.random() < wagerChance;
-      outcomes = success ? (option.outcomesOnSuccess ?? []) : (option.outcomesOnFail ?? []);
-      resolutionText = success ? "The wager holds." : "The wager falls.";
+    if (!slots.length) {
+      setInspectedPlanet((p) => p === planet ? null : planet);
+      return;
     }
+    if (!slots.includes(slot) || !candidates(slot).includes(planet)) return;
+    setSelection((s) => slot === "chosen" ? { chosen: planet } : { ...s, recipient: planet });
+    setHoveredPlanet(null);
+    if (slot === "chosen" && slots.includes("recipient")) setActiveSlot("recipient");
+  };
+  const resetChoice = () => { setSelectedOptionId(null); setSelection({}); setHoveredPlanet(null); setInspectedPlanet(null); };
+  const projection: ProjectionChips = { deltas: {} };
+  // A wager has two possible states; only a determined result is drawn as an arc.
+  if (!resolved && preview?.ok && !preview.failure) {
+    for (const p of playerUnlocked) {
+      const delta = preview.success.state[p].affliction - run.state[p].affliction;
+      if (delta) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony" };
+    }
+  }
 
-    let nextRun = applyOutcomes(run, prince, outcomes, ctx);
-    if (fragment && !nextRun.seenFragmentIds.includes(fragment.id)) {
-      nextRun = { ...nextRun, seenFragmentIds: [...nextRun.seenFragmentIds, fragment.id] };
-    }
+  const handleOption = (optionId: string) => {
+    if (resolved || committedRef.current || guideOpen) return;
+    const nextRun = resolveNarrative(run, prince, scenario, optionId, selection, Math.random, devUnlockAll);
+    if (!nextRun) return;
+    committedRef.current = true;
+    setFrozenRows(rows);
 
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
     // a candle-out ripple for any combust, and a Light pulse (SCREENS.md §3.5).
@@ -188,9 +169,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       if (after.affliction < before.affliction) impact.set(p, "Testimony");
       else if (after.affliction > before.affliction) impact.set(p, "Affliction");
     }
-    epochRef.current += 1;
     setFlash({
-      epoch: epochRef.current,
+      epoch: 1,
       impact,
       combusting,
       light: nextRun.light - run.light,
@@ -208,32 +188,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       playStrike(house.ruler, p, "landing");
     }
 
-    if (option.next) {
-      const updatedEnc: NarrativeEncounter = {
-        ...encounter,
-        currentNodeId: option.next,
-        visitedNodeIds: [...encounter.visitedNodeIds, option.next],
-      };
-      nextRun = { ...nextRun, encounter: updatedEnc };
-      onCommit({ nextRun, summary: option.text, resolved: false });
-      return;
-    }
-
-    const finalEnc: NarrativeEncounter = {
-      ...encounter,
-      resolved: true,
-      resolutionText: resolutionText || option.text,
-    };
-    nextRun = { ...nextRun, encounter: finalEnc };
-
-    onCommit({
-      nextRun,
-      summary: `${house.name} · ${option.text}`,
-      resolved: true,
-    });
-    setResolved(true);
-    setResolutionLine(resolutionText || option.text);
-    setFrozenOptions(options);
+    onCommit(nextRun);
   };
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
@@ -262,7 +217,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   return (
     <div
       className={`narrative ${resolved ? "is-resolved" : ""}`}
-      onClick={resolved ? handleContinue : () => setSelectedOptionId(null)}
+      onClick={resolved ? handleContinue : resetChoice}
     >
       {/* A resolved scene carries itself onward within seconds — nothing left
           to study, so the guide comes down with the choices. */}
@@ -271,7 +226,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           open={guideOpen}
           phase={guidePhase}
           house={house}
-          asideIndex={asides.findIndex(Boolean) + 1 || null}
+          asideIndex={shownRows.length ? 1 : null}
+          fortunePlanet={wagerOdds(ctx)?.planet ?? null}
           onOpen={() => { setGuidePhase("scene"); setGuideOpen(true); }}
           onClose={() => setGuideOpen(false)}
           onPhaseChange={setGuidePhase}
@@ -282,11 +238,19 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
-          activePlanet={joyPlanet ?? null}
+          activePlanet={joyPresent(ctx) ? joyPlanet : null}
+          selectedPlanet={selection[activeSlot] ?? selection.chosen ?? inspectedPlanet}
+          hoveredPlanet={hoveredPlanet}
+          onPlanetHover={resolved ? undefined : setHoveredPlanet}
+          onPlanetClick={resolved ? undefined : (p) => choosePlanet(p)}
+          interactionPlanets={eligiblePlanets}
+          inviteInteraction={!resolved && slots.length > 0}
+          projection={projection}
+          statsPanelPlanet={hoveredPlanet ?? selection[activeSlot] ?? selection.chosen ?? inspectedPlanet}
           side="self"
           entrance="left"
           showColorField
-          passive
+          passive={resolved}
           impactPlanets={flash?.impact}
           combustingPlanets={flash?.combusting}
           animationEpoch={flash?.epoch}
@@ -322,32 +286,61 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
             <span className="narrative-house-num">{HOUSE_ROMAN[house.num - 1]}:</span> {HOUSE_NAMES[house.num - 1]}
             <span className="narrative-house-gloss"> — {house.gloss}</span>
           </div>
-          <p>{resolved ? (resolutionLine ?? "It is finished.") : node.text}</p>
+          <p>{resolved ? (encounter.resolutionText ?? "It is finished.") : scenario.text}</p>
         </div>
 
         <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${selectedOptionId ? "is-arming" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
-          {shownOptions.map((o, i) => {
-            const aside = asides[i];
+          {shownRows.map(({ option: o, aside, reason, assignments }, i) => {
+            const isSelected = selectedOptionId === o.id;
             const commit = () => {
-              if (selectedOptionId !== o.id) setSelectedOptionId(o.id);
-              else if (guideOpen) setSelectedOptionId(null);
-              else handleOption(o);
+              if (!assignments.length) return;
+              if (!isSelected) {
+                setSelectedOptionId(o.id);
+                setInspectedPlanet(null);
+                setSelection({});
+                setActiveSlot("chosen");
+                setHoveredPlanet(null);
+              } else if (guideOpen) resetChoice();
+              else handleOption(o.id);
             };
             return (
-              <button
-                key={o.id}
-                className={`option ${i === 1 ? "is-emph" : ""} ${selectedOptionId === o.id ? "is-selected" : ""}`}
-                data-guide={`option-${i + 1}`}
-                onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); commit(); }}
-                aria-pressed={selectedOptionId === o.id}
-                type="button"
-              >
-                <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
-                <span className="option-text">
-                  {o.text}
-                  {aside && <span className="option-aside" data-guide={`option-aside-${i + 1}`}>{aside}</span>}
-                </span>
-              </button>
+              <div key={o.id} className="narrative-option">
+                <button
+                  className={`option ${isSelected ? "is-selected" : ""}`}
+                  data-guide={`option-${i + 1}`}
+                  onClick={resolved ? handleContinue : (e) => { e.stopPropagation(); commit(); }}
+                  aria-pressed={isSelected}
+                  disabled={!resolved && !assignments.length}
+                  type="button"
+                >
+                  <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
+                  <span className="option-text">
+                    {o.text}
+                    <span className="option-aside" data-guide={`option-aside-${i + 1}`}>{aside}</span>
+                    {!resolved && reason && <span className="option-reason">{reason}</span>}
+                  </span>
+                </button>
+                {isSelected && !resolved && (
+                  <div className="narrative-selection" onClick={(e) => e.stopPropagation()}>
+                    {slots.map((slot) => (
+                      <label key={slot}>
+                        <span>{selectionLabel(o, slot)}</span>
+                        <select
+                          aria-label={selectionLabel(o, slot)}
+                          value={selection[slot] ?? ""}
+                          onFocus={() => setActiveSlot(slot)}
+                          onChange={(e) => choosePlanet(e.target.value as PlanetName, slot)}
+                          disabled={slot === "recipient" && !selection.chosen}
+                        >
+                          <option value="" disabled>Choose a planet</option>
+                          {candidates(slot).map((p) => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                      </label>
+                    ))}
+                    <p role="status">{guideOpen ? "Preview only while studying." : preview?.ok ? "Tap the option again to commit." : "Choose the highlighted planets here or on your chart."}</p>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

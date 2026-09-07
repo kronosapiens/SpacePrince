@@ -1,10 +1,9 @@
 import type { Prince } from "@/game/types";
 
-// v3: the run score and its nested deltas are named Light throughout; older
-// princes carry pre-Light state and would load with undefined fields.
-const PRINCE_KEY = "sp:prince:v3";
+// v4: narrative encounters hold a single decision, with no tree traversal.
+const PRINCE_KEY = "sp:prince:v4";
 // Obsolete prototype shapes; cleared on first load (no migration).
-const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2"];
+const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3"];
 
 export function loadPrince(): Prince | null {
   try {
