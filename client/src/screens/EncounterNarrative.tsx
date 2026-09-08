@@ -336,11 +336,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                     {!resolved && reason && <span className="option-reason">{reason}</span>}
                   </span>
                 </button>
-                {isSelected && !resolved && !targeting && (
-                  <p className="narrative-confirm" role="status">
-                    {guideOpen ? "Preview only while studying." : "Tap the option again to confirm."}
-                  </p>
-                )}
               </div>
             );
           })}

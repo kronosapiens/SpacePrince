@@ -9,9 +9,10 @@ export interface EffectTextPart {
 
 const signed = (n: number) => `${n < 0 ? "−" : "+"}${Math.abs(n)}`;
 const valence = (delta: number): Polarity => delta < 0 ? "Testimony" : "Affliction";
-const lightPart = (delta: number): EffectTextPart => ({
-  text: `${delta < 0 ? "Lose" : "Gain"} ${Math.abs(delta)} Light`, kind: "Light",
-});
+const lightParts = (delta: number): EffectTextPart[] => [
+  { text: `${delta < 0 ? "Lose" : "Gain"} ` },
+  { text: `${Math.abs(delta)} Light`, kind: "Light" },
+];
 const plainText = (parts: EffectTextPart[]) => parts.map((part) => part.text).join("");
 
 function afflictionParts(delta: number, target: string): EffectTextPart[] {
@@ -39,7 +40,7 @@ function targetName(target: Target, ctx: NarrativeContext, selection: Selection)
 }
 
 function effectParts(effect: Outcome, ctx: NarrativeContext, selection: Selection): EffectTextPart[] {
-  if (effect.kind === "light") return [lightPart(effect.delta)];
+  if (effect.kind === "light") return lightParts(effect.delta);
   const name = targetName(effect.target, ctx, selection);
   if (effect.kind === "uncombust") return [{ text: `call back ${name} at half Resolve` }];
   return afflictionParts(effect.delta, name);
@@ -70,7 +71,7 @@ function changeParts(before: Run, after: Run, ctx: NarrativeContext): EffectText
     }
   }
   for (const [delta, names] of groups) effects.push(afflictionParts(delta, names.join(", ")));
-  if (light) effects.push([lightPart(light)]);
+  if (light) effects.push(lightParts(light));
   return joinEffects(effects);
 }
 
@@ -84,7 +85,7 @@ export function describeOptionParts(run: Run, ctx: NarrativeContext, option: Opt
   if (preview.ok) return changeParts(run, preview.success, ctx);
   return joinEffects([
     ...option.result.effects.filter((e) => e.kind !== "light").map((e) => effectParts(e, ctx, selection)),
-    ...(option.cost ? [[lightPart(-option.cost)]] : []),
+    ...(option.cost ? [lightParts(-option.cost)] : []),
     ...option.result.effects.filter((e) => e.kind === "light").map((e) => effectParts(e, ctx, selection)),
   ]);
 }

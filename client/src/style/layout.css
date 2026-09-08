@@ -1220,11 +1220,6 @@
   font-size: 14px;
   margin-top: 6px;
 }
-.narrative-confirm {
-  margin: 8px 14px;
-  color: var(--mist);
-  font-size: 16px;
-}
 
 @media (max-width: 899px) {
   .narrative {
