@@ -7,7 +7,7 @@ Use alongside the [planet and sign matrix](PLANET_MATRIX.md) and [encounter auth
 ## Using this reference
 
 **Source notes** summarize the linked readings; **editorial direction, stakes, motifs, and scene seeds** are original writing material.
-The seeds and worked examples are proposals for a later copy pass, not live scenario changes.
+The seeds and worked examples are writing reference material; current encounter copy lives in the [scenario data](../../client/src/data/narrative-scenarios.ts).
 Choose a house's human situation first, then use the planetary reference to shape the voice or a chart-conditioned approach.
 The house should remain recognizable when its heading is removed.
 
@@ -382,7 +382,7 @@ The objects change hands within this encounter and create no inventory or later 
 5. Read the prompt without its house heading and check that its situation still carries the intended meaning.
 
 The worked examples preserve their current effect values; the other seeds are starting points, not complete option specifications.
-For the later copy pass, preserve scenario IDs, amounts, costs, targets, predicates, and at most three visible choices unless a separate mechanics change is agreed.
+When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and at most three visible choices unless a separate mechanics change is agreed.
 Keep the existing valid exit at zero Light and with only the Moon unlocked.
 The [scenario data](../../client/src/data/narrative-scenarios.ts) and [resolver](../../client/src/game/narrative.ts) remain authoritative for those details.
 
