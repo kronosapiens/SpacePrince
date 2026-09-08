@@ -2,6 +2,7 @@
 
 Narrative encounters are single decisions about the chart the player will carry onward.
 House concepts live in `HOUSES.md`, combat rules in `MECHANICS.md`, and presentation in `SCREENS.md §3.2`.
+Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md).
 Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, targeting, previews, and resolution live in `client/src/game/narrative.ts`.
 
 ## 1. The Complementary Loop

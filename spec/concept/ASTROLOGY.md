@@ -5,7 +5,7 @@
 This document traces the development of Western astrology through its major eras, with particular attention to **social context**, **scientific assumptions**, and **technical innovations**.
 The goal is not to defend astrology as true or dismiss it as superstition, but to enable **skillful discernment**: which components of astrological practice are structurally foundational, which are historically contingent, and which can be responsibly reinterpreted while remaining recognizably within the tradition.
 
-For sourced themes and symbols used in game writing, see the [astrological matrix](MATRIX.md).
+For sourced themes and symbols used in game writing, see the [planet and sign matrix](PLANET_MATRIX.md) and [house matrix](HOUSE_MATRIX.md).
 
 ### A note on perspective
 

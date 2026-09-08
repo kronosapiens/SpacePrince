@@ -1,8 +1,10 @@
-# Astrological matrix
+# Planet and sign matrix
 
 A reference for writing Space Prince's astrological copy.
 Scope: seven planets, twelve signs, and all 84 planet–sign placements in Western astrology.
 Sources consulted on 2026-09-07.
+
+For house meanings and narrative encounter material, see the [house matrix](HOUSE_MATRIX.md).
 
 Placements: [Sun](#sun-placements) · [Moon](#moon-placements) · [Mercury](#mercury-placements) · [Venus](#venus-placements) · [Mars](#mars-placements) · [Jupiter](#jupiter-placements) · [Saturn](#saturn-placements).
 
