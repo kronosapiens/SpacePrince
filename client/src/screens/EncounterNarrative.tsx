@@ -3,12 +3,12 @@ import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { Chart, type ProjectionChips } from "@/components/Chart";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
-import { PLANET_PRIMARY } from "@/svg/palette";
+import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { unlockedPlanets } from "@/game/unlocks";
 import { availableSelections, buildNarrativeContext, joyPresent, previewOption, resolveNarrative, requiresPlanet, type Selection } from "@/game/narrative";
-import { describeOption } from "@/copy/narrative";
+import { describeOptionParts } from "@/copy/narrative";
 import { newlyCombusted } from "@/game/combust";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -26,6 +26,10 @@ import type {
 } from "@/game/types";
 
 const ROMAN = ["i", "ii", "iii", "iv", "v"];
+const EFFECT_COLORS = {
+  ...VALENCE_COLOR,
+  Light: "color-mix(in srgb, var(--gold) 55%, var(--bone))",
+};
 
 const HOUSE_ROMAN = [
   "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII",
@@ -120,7 +124,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     const preview = previewOption(run, ctx, option);
     return {
       option, assignments,
-      aside: describeOption(run, ctx, option),
+      aside: describeOptionParts(run, ctx, option),
       reason: !assignments.length ? (preview.ok || run.light >= (option.cost ?? 0) ? "No eligible planets can carry this choice." : preview.reason) : null,
     };
   }), [options, run, ctx]);
@@ -324,7 +328,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                   <span className="option-index">{ROMAN[i] ?? `${i + 1}`}.</span>
                   <span className="option-text">
                     {o.text}
-                    <span className="option-aside" data-guide={`option-aside-${i + 1}`}>{aside}</span>
+                    <span className="option-aside" data-guide={`option-aside-${i + 1}`}>
+                      {aside.map((part, index) => part.kind
+                        ? <span key={index} style={{ color: EFFECT_COLORS[part.kind] }}>{part.text}</span>
+                        : part.text)}
+                    </span>
                     {!resolved && reason && <span className="option-reason">{reason}</span>}
                   </span>
                 </button>

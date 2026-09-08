@@ -1077,7 +1077,7 @@
 }
 .narrative-light-v {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 500;
   color: var(--bone);
   letter-spacing: 0.02em;
@@ -1108,14 +1108,13 @@
 }
 .narrative-fragment {
   font-family: var(--serif);
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1.45;
   color: var(--bone);
 }
-.narrative-fragment em { font-style: italic; }
 .narrative-attrib {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.24em;
   color: var(--mist);
   font-weight: 500;
@@ -1123,7 +1122,7 @@
 .narrative-body {
   grid-column: 1 / 3;
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1.55;
   color: var(--bone);
   border-top: 1px solid rgba(232, 226, 212, 0.18);
@@ -1134,7 +1133,7 @@
 .narrative-body p { margin: 0; }
 .narrative-house {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 500;
   color: var(--bone);
   letter-spacing: 0.01em;
@@ -1143,7 +1142,6 @@
 .narrative-house-gloss {
   color: var(--mist);
   font-weight: 400;
-  font-style: italic;
 }
 /* Resolved: no Continue button — the screen auto-advances, and a tap anywhere
    skips the wait (EncounterNarrative). */
@@ -1162,7 +1160,7 @@
   border-bottom: 1px solid rgba(232, 226, 212, 0.12);
   transition: background 220ms ease;
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1.4;
   color: var(--bone);
   cursor: pointer;
@@ -1179,7 +1177,6 @@
   background: rgba(232, 226, 212, 0.04);
   box-shadow: inset 2px 0 0 0 var(--vc);
 }
-.option.is-emph { font-style: italic; }
 /* First tap arms an option (mirrors combat's armed action): a soft glow in the
    aria planet's color. Targeted choices continue on the chart. */
 .option.is-selected {
@@ -1198,9 +1195,8 @@
 .narrative-options.is-arming .option:not(.is-selected) { box-shadow: none; }
 .option-index {
   font-family: var(--serif);
-  font-style: italic;
   color: var(--mist);
-  font-size: 16px;
+  font-size: 18px;
   min-width: 22px;
 }
 .option-text { flex: 1; }
@@ -1208,8 +1204,7 @@
   display: block;
   margin-top: 5px;
   color: var(--mist);
-  font-size: 16px;
-  font-style: italic;
+  font-size: 20px;
 }
 
 .narrative-option .option { width: 100%; }
@@ -1222,13 +1217,13 @@
 .option-reason {
   display: block;
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 6px;
 }
 .narrative-confirm {
   margin: 8px 14px;
   color: var(--mist);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 @media (max-width: 899px) {
@@ -1813,12 +1808,12 @@
   margin: 12px 0 0;
   color: var(--mist);
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.5;
 }
 .planet-intro-role {
   color: var(--gold);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   align-self: center;
