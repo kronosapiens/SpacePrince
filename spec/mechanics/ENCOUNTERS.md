@@ -180,10 +180,11 @@ The alpha schema resets old tree-based saves rather than migrating them.
 - **Aria:** one fragment in the ruler's voice for the whole encounter.
 - **Prompt:** one or two concrete sentences that establish the immediate situation.
 - **Option:** a short action, with no implied debt or promise that the game does not track.
-- **Aside:** generated from the authored effects and shared resolver; stays fixed while inspecting planets.
+- **Aside:** shows the full authored amounts and costs; stays fixed while inspecting planets.
 - **Consequence:** one specific sentence for the immediate result.
 
 Mechanics belong in the aside, not in the scene's prose.
+Planet previews and confirmation amounts show the actual changes from the shared resolver, including recovery clamped to current affliction.
 Player-facing text uses encounter, self, and other; named Light and Resolve follow the shared copy register.
 
 ## 10. Validation

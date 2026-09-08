@@ -124,7 +124,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     const preview = previewOption(run, ctx, option);
     return {
       option, assignments,
-      aside: describeOptionParts(run, ctx, option),
+      aside: describeOptionParts(ctx, option),
       reason: !assignments.length ? (preview.ok || run.light >= (option.cost ?? 0) ? "No eligible planets can carry this choice." : preview.reason) : null,
     };
   }), [options, run, ctx]);
@@ -201,8 +201,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     targeting && inspectedPlanet && preview?.ok && !resolved ? {
       choices: [{
         verb,
-        value: targetEffect?.kind === "affliction" ? Math.abs(targetEffect.delta)
-          : Math.abs(preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction),
+        value: Math.abs(preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction),
       }],
       pending: selectedPlanet ? verb : null,
       onChoose: () => {

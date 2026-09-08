@@ -108,7 +108,20 @@ describe("single-decision narrative", () => {
     expect(preview.success.light).toBe(0);
     expect(preview.success.state.Moon.affliction).toBe(0);
     expect(run.state.Moon.affliction).toBe(48);
-    expect(describeOption(run, context(), option("rest"), { chosen: "Moon" })).toContain("Testify 48 on Moon");
+    expect(describeOption(context(), option("rest"), { chosen: "Moon" })).toBe("Testify 60 on Moon · Lose 24 Light");
+  });
+
+  it.each([
+    { scene: "home-hearth", id: "hearth", text: "Testify 24 on each lit planet · Lose 24 Light" },
+    { scene: "hidden-weight", id: "wait", text: "Lose 12 Light" },
+  ])("keeps $scene's authored amounts independent of current resources", ({ scene, id, text }) => {
+    const { run, context, option } = setup(scene);
+    run.state.Sun.affliction = 10;
+    run.state.Moon.affliction = 48;
+    for (const light of [0, 5, 120]) {
+      run.light = light;
+      expect(describeOption(context(), option(id))).toBe(text);
+    }
   });
 
   it("does not sell healing to a clean or combusted target", () => {
@@ -143,7 +156,7 @@ describe("single-decision narrative", () => {
     run.state.Moon.affliction = ceiling - 48;
     const preview = previewOption(run, context(), option("finish"), { chosen: "Moon" });
     expect(preview.ok && preview.success.state.Moon.affliction).toBe(ceiling);
-    expect(describeOption(run, context(), option("finish"), { chosen: "Moon" })).toContain("Moon combusts");
+    expect(describeOption(context(), option("finish"), { chosen: "Moon" })).toBe("Afflict 48 on Moon · Gain 48 Light");
   });
 
   it("healthiest means greatest remaining combustion margin", () => {

@@ -38,7 +38,8 @@ function mount(id: string) {
   const prince = createStubPrince();
   const scenario = getScenario(id);
   const run = { ...beginRun(42, prince.numEncounters), light: 120 };
-  run.state.Moon.affliction = 24;
+  run.state.Moon.affliction = 10;
+  run.state.Sun.affliction = 10;
   run.state.Mars.affliction = 24;
   run.state.Venus.affliction = combustionCeiling(prince.chart.planets.Venus);
   const encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id, fragmentId: "test" });
@@ -87,20 +88,42 @@ describe("narrative chart interaction", () => {
   it("holds a selected preview through hover and applies only the replacement target", () => {
     const { onCommit } = mount("home-buried");
     const aside = element('[data-guide="option-aside-2"]').textContent;
+    expect(aside).toBe("Testify 36 on a chosen planet");
     click('[data-guide="option-2"]');
     act(() => element('[data-guide="planet-self-moon"]').dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
+    expect(element(".ps-action").textContent).toBe("Testify 10");
     choose("moon");
     act(() => element('[data-guide="planet-self-mars"]').dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
     expect(element(".ps-name").textContent).toContain("MOON");
-    expect(element(".ps-action").textContent).toBe("Testify 36");
+    expect(element(".ps-action").textContent).toBe("Testify 10");
     choose("mars");
     expect(element(".ps-name").textContent).toContain("MARS");
+    expect(element(".ps-action").textContent).toBe("Testify 24");
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
     click(".ps-action");
     const next = onCommit.mock.calls[0]![0];
     expect(next.state.Mars.affliction).toBe(0);
-    expect(next.state.Moon.affliction).toBe(24);
+    expect(next.state.Moon.affliction).toBe(10);
+  });
+
+  it("keeps group healing at its authored amount while previewing and applying individual recovery", () => {
+    const { run, onCommit } = mount("home-hearth");
+    const aside = "Testify 24 on each lit planet · Lose 24 Light";
+    expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
+    click('[data-guide="option-2"]');
+    choose("sun");
+    expect(element(".ps-name").textContent).toContain("SUN");
+    expect(document.querySelector('[data-guide="arc-self-sun"] .arc-diff')).not.toBeNull();
+    expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
+    expect(onCommit).not.toHaveBeenCalled();
+    click('[data-guide="option-2"]');
+    const next = onCommit.mock.calls[0]![0];
+    expect(next.state.Sun.affliction).toBe(0);
+    expect(next.state.Moon.affliction).toBe(0);
+    expect(next.state.Mars.affliction).toBe(0);
+    expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction);
+    expect(next.light).toBe(96);
   });
 
   it("clears the target when changing the option or backing out of its readout", () => {
