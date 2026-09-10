@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ActivePlanetTint } from "@/components/ActivePlanetTint";
+import { Starfield } from "@/components/Starfield";
 import { DevChrome } from "@/components/DevChrome";
 import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
@@ -14,6 +15,7 @@ export function App() {
   useEffect(() => installAudioUnlock(), []);
   return (
     <>
+      <Starfield />
       <ActivePlanetTint />
       <Routes>
         <Route path={ROUTES.title} element={<TitleScreen />} />

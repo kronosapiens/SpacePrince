@@ -70,6 +70,17 @@
   }
 }
 
+/* Sparse, staggered fades keep the sky quieter than the interaction rings. */
+@keyframes star-twinkle {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.06; }
+}
+.anim-star-twinkle {
+  animation-name: star-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
 /* Slow, gentle breath on the map's current-node halo — same family as
    the tint-overlay breath but applied to an SVG circle. */
 @keyframes map-current-halo-breath {
@@ -300,6 +311,7 @@
   .anim-light-flash,
   .anim-light-pop,
   .anim-map-current-halo,
+  .anim-star-twinkle,
   .planet-corona,
   .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
