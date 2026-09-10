@@ -3,8 +3,9 @@
  *  be tuned in one place. Layout stays in the guides: note keys, anchors,
  *  spotlights, placements, and phase order are code.
  *  Register: direct game instructions, accurate to MECHANICS.md. Pair the
- *  game's terms with familiar meanings: Resolve is health, Afflict deals
- *  damage, Testify heals, and combusted means knocked out until revived.
+ *  game's terms with familiar meanings at first mention, once per screen's
+ *  full tutorial: Resolve is maximum health, Afflict deals damage, Testify
+ *  heals, and combusted means knocked out until revived.
  *  Casing per SCREENS.md §1.2: named quantities capped
  *  (Resolve, Fortune, Light, Afflict, Testify — TermText golds these);
  *  substances, processes, and stats lowercase in prose.
@@ -42,7 +43,7 @@ export const GUIDE_COPY = {
       },
       activePlanet: {
         label: "Incoming move",
-        body: "The corona, or glowing ring, marks the opposing planet acting this turn. Amber means Afflict (damage); violet means Testify (healing). Combust it (knock it out) before it acts to cancel its move.",
+        body: "The corona, or glowing ring, marks the opposing planet acting this turn. Amber means Afflict (damage); violet means Testify (healing). Knock it out before it acts to cancel its move.",
       },
       anatomy: {
         label: "Health and linked effects",
@@ -54,7 +55,7 @@ export const GUIDE_COPY = {
       },
       light: {
         label: "Your goal: gather Light",
-        body: "Gather Light as your Prince travels the universe. Light is your score for the run; your final total becomes a star on your Prince. The number beside it previews this turn's gain.",
+        body: "Gather Light, your run's score, as your Prince travels the universe. Your final total becomes a star on your Prince. The number beside it previews this turn's gain.",
       },
       theirMove: {
         label: "Their move",
@@ -66,11 +67,11 @@ export const GUIDE_COPY = {
       },
       example: {
         label: "Choose a planet",
-        body: "You are inspecting {planet}. Choose any planet with a pulsing ring. Its Afflict and Testify stats set its damage and healing; the target's aspects determine which other planets are affected.",
+        body: "You are inspecting {planet}. Choose any planet with a pulsing ring. Its stats set each action's strength; the target's aspects determine which other planets are affected.",
       },
       actions: {
         label: "Damage or heal",
-        body: "Afflict deals damage (affliction) to the opposing planet. Testify heals it (testimony). Healing cannot revive a combusted planet. Damage and healing can both earn Light, depending on the ruler. Tap once to preview your score and effects, then again to confirm.",
+        body: "Both actions target the opposing planet. Healing cannot revive a combusted planet. Either action can earn Light, depending on the ruler. Tap once to preview your score and effects, then again to confirm.",
       },
       projection: {
         label: "{action} preview",
@@ -89,11 +90,11 @@ export const GUIDE_COPY = {
     notes: {
       here: {
         label: "You are here",
-        body: "Guide your Prince through the universe, gathering Light along the way. This node marks your location; lit nodes are your next destinations. Tap once to preview, then again to travel. Check rulers and houses across the map to plan your route.",
+        body: "Gather Light, your run's score, as you guide your Prince through the universe. This node marks your location; lit nodes are your next destinations. Tap once to preview, then again to travel. Check destinations across the map to plan your route.",
       },
       encounter: {
         label: "An encounter",
-        body: "An encounter is turn-based combat between your planets and another chart. Its ruler, {ruler}, determines how you earn Light, your score. Check the scoring rule when planning your route.",
+        body: "An encounter is turn-based combat between your planets and another chart. Its ruler, {ruler}, determines how you earn Light. Check the scoring rule when planning your route.",
       },
       house: {
         label: "A house",
@@ -109,7 +110,7 @@ export const GUIDE_COPY = {
       },
       index: {
         label: "Map {n} of VII",
-        body: "A run lasts up to seven maps, and each adds a turn to its combat encounters. The run ends when you complete the seventh map or all your unlocked planets are combusted (knocked out).",
+        body: "A run lasts up to seven maps, and each adds a turn to its combat encounters. The run ends when you complete the seventh map or all your unlocked planets are combusted.",
       },
       boundary: {
         label: "Crossing results",
@@ -140,7 +141,7 @@ export const GUIDE_COPY = {
       },
       aside: {
         label: "Costs and effects",
-        body: "The aside is an option's cost and effect summary. Inspect a planet to preview the effect on your chart. Calling back a combusted planet means reviving it at half its maximum health (Resolve).",
+        body: "The aside is an option's cost and effect summary. Inspect a planet to preview the effect on your chart. Calling back a knocked-out planet revives it at half its maximum health (Resolve).",
       },
       housePlanet: {
         label: "The house's planet",

@@ -42,13 +42,13 @@ export interface ScoringRule {
  * terminal combust markers on both charts.
  */
 export const RULER_RULES: Record<PlanetName, ScoringRule> = {
-  Moon:    { polarity: "Testimony",  chart: "other", channel: "all",     payout: "magnitude", label: "testimony on the Other's chart" },
+  Moon:    { polarity: "Testimony",  chart: "other", channel: "all",     payout: "magnitude", label: "healing on the Other's chart" },
   Mercury: { polarity: "Contrary",   chart: "other", channel: "all",     payout: "magnitude", label: "effects contrary to the Other's action" },
-  Venus:   { polarity: "Testimony",  chart: "both",   channel: "direct",  payout: "magnitude", label: "direct testimony on both charts" },
+  Venus:   { polarity: "Testimony",  chart: "both",   channel: "direct",  payout: "magnitude", label: "direct healing on both charts" },
   Sun:     { polarity: "Accord",     chart: "other", channel: "all",     payout: "magnitude", label: "effects in accord with the Other's action" },
-  Mars:    { polarity: "Affliction", chart: "other", channel: "all",     payout: "magnitude", label: "affliction on the Other's chart" },
+  Mars:    { polarity: "Affliction", chart: "other", channel: "all",     payout: "magnitude", label: "damage on the Other's chart" },
   Jupiter: { polarity: "Either",     chart: "both",   channel: "direct",  payout: "magnitude", label: "direct effects on both charts" },
-  Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust", payout: "ceiling",   label: "combustion on both charts" },
+  Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust", payout: "ceiling",   label: "knockouts on both charts" },
 };
 
 export interface ScoreCharts {

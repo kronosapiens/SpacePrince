@@ -58,6 +58,13 @@ export function NarrativeGuide({
     if (phase === "scene") {
       return [
         {
+          key: "house",
+          anchor: "narrative-house",
+          placement: "top",
+          label: COPY.notes.house.label,
+          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler), theme: house.theme }} />,
+        },
+        {
           key: "house-planet",
           anchor: planetAnchor("self", housePlanet),
           spotlights: ["wheel-self", planetAnchor("self", housePlanet)],
@@ -66,13 +73,6 @@ export function NarrativeGuide({
           body: house.joy
             ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
             : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
-        },
-        {
-          key: "house",
-          anchor: "narrative-house",
-          placement: "top",
-          label: COPY.notes.house.label,
-          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler), theme: house.theme }} />,
         },
         {
           key: "chorus",
