@@ -113,13 +113,6 @@ export function CombatGuide({
           body: <TermText text={COPY.notes.light.body} />,
         },
         {
-          key: "their-move",
-          anchor: "opponent-move",
-          placement: "bottom",
-          label: COPY.notes.theirMove.label,
-          body: <TermText text={COPY.notes.theirMove.body} />,
-        },
-        {
           key: "ruler",
           anchor: "ruler+rule",
           placement: "top",
@@ -152,8 +145,8 @@ export function CombatGuide({
       if (opponentPlanet) {
         chartNotes.push({
           key: "active-planet",
-          anchor: planetAnchor("other", opponentPlanet),
-          placement: "outward",
+          anchor: "opponent-move",
+          placement: "bottom",
           label: COPY.notes.activePlanet.label,
           body: <TermText text={COPY.notes.activePlanet.body} />,
         });

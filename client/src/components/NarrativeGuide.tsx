@@ -62,7 +62,7 @@ export function NarrativeGuide({
           anchor: "narrative-house",
           placement: "top",
           label: COPY.notes.house.label,
-          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler), theme: house.theme }} />,
+          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler) }} />,
         },
         {
           key: "house-planet",

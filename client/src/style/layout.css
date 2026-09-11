@@ -1556,15 +1556,14 @@
 }
 
 /* Guide overlay — one translucent tracing sheet laid over the live screen.
-   The veil itself never owns pointer events: guide mode makes the real action
-   buttons preview-only, so the player can touch the UI being explained without
-   risking a committed turn. Only the guide's bar sits above that interaction
-   layer. */
+   Taps advance the guide while its bar keeps explicit navigation.
+   The sheet catches clicks before they reach the game beneath it. */
 .guide-overlay {
   position: fixed;
   inset: 0;
   z-index: 240;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   isolation: isolate;
 }
 .guide-veil {
@@ -1655,6 +1654,7 @@
   background: rgba(11, 10, 15, 0.9);
   outline: none; /* takes focus on open so no button wears a ring until Tab */
   pointer-events: auto;
+  cursor: default;
 }
 .guide-bar button {
   border-radius: 999px;

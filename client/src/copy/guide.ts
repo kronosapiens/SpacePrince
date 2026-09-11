@@ -18,8 +18,7 @@
  *      as the example; {light} the previewed gain; {action} Afflict or Testify
  *    map — {ruler} a node's ruler; {name}/{gloss} the picked house;
  *      {n} the map's numeral
- *    narrative — {ruler} the house's ruler; {joy} its joy;
- *      {theme} the house's theme sentence
+ *    narrative — {ruler} the house's ruler; {joy} its joy
  *  Variants are separate entries (housePlanet/housePlanetNoJoy), never a
  *  conditional inside a string. */
 
@@ -35,7 +34,7 @@ export const GUIDE_COPY = {
     notes: {
       self: {
         label: "Self",
-        body: "Self is your chart: your team of seven planets. Their positions are fixed. Planets with pulsing rings are available to act; tap one to select it.",
+        body: "Self is your chart: seven planets with fixed positions. Pulsing rings mark planets available to act; tap one to select it.",
       },
       other: {
         label: "Other",
@@ -43,39 +42,35 @@ export const GUIDE_COPY = {
       },
       activePlanet: {
         label: "Incoming move",
-        body: "The corona, or glowing ring, marks the opposing planet acting this turn. Amber means Afflict (damage); violet means Testify (healing). Knock it out before it acts to cancel its move.",
+        body: "This planet will damage (Afflict, amber) or heal (Testify, violet) your selected planet by this amount. You act first; knocking it out cancels its move.",
       },
       anatomy: {
         label: "Health and linked effects",
-        body: "Resolve is maximum health; the arc shows how much remains. At zero, the planet is combusted: knocked out until revived. Aspects are links that spread damage and healing between planets. Red links reverse the effect: damage becomes healing, and healing becomes damage.",
+        body: "Resolve is maximum health; the arc shows what remains. At zero, planets are combusted: knocked out until revived. Aspect links spread damage or healing; red links swap the two.",
       },
       turn: {
         label: "Turn",
-        body: "Turn {current} of {total}. Encounters last up to this many turns, increasing by one per map. They end early if either side has no planets left that can act.",
+        body: "Turn {current} of {total}. Each map adds one turn to encounters. They end early if either side has no planets able to act.",
       },
       light: {
         label: "Your goal: gather Light",
-        body: "Gather Light, your run's score, as your Prince travels the universe. Your final total becomes a star on your Prince. The number beside it previews this turn's gain.",
-      },
-      theirMove: {
-        label: "Their move",
-        body: "The opponent's move is shown before you choose: which planet will act, whether it will damage or heal your selected planet, and how much. You act first.",
+        body: "Light is your run's score. Your final total becomes a star on your Prince. The number beside it previews this turn's gain.",
       },
       ruler: {
         label: "Ruler and scoring",
-        body: "{ruler} is this encounter's ruler: the planet that sets its scoring rule. You earn Light from {rule}. Other effects can help you survive or set up later turns, but earn no points.",
+        body: "The ruler, {ruler}, sets this encounter's scoring rule: earn Light from {rule}. Other effects can help you survive, but earn no points.",
       },
       example: {
         label: "Choose a planet",
-        body: "You are inspecting {planet}. Choose any planet with a pulsing ring. Its stats set each action's strength; the target's aspects determine which other planets are affected.",
+        body: "Select any planet with a pulsing ring. {planet}'s stats set your action's strength; the target's aspects determine which other planets are affected.",
       },
       actions: {
         label: "Damage or heal",
-        body: "Both actions target the opposing planet. Healing cannot revive a combusted planet. Either action can earn Light, depending on the ruler. Tap once to preview your score and effects, then again to confirm.",
+        body: "Either action can earn Light, depending on the ruler. Healing cannot revive combusted planets. Tap once to preview your score and effects, then again to confirm.",
       },
       projection: {
         label: "{action} preview",
-        body: "The charts preview the exact damage, healing, and knockouts from this turn. You would gain {light} Light. Check the linked effects before confirming.",
+        body: "The charts preview this turn's damage, healing, and knockouts. You would gain {light} Light. Check the linked effects before confirming.",
       },
     },
   },
@@ -90,7 +85,7 @@ export const GUIDE_COPY = {
     notes: {
       here: {
         label: "You are here",
-        body: "Gather Light, your run's score, as you guide your Prince through the universe. This node marks your location; lit nodes are your next destinations. Tap once to preview, then again to travel. Check destinations across the map to plan your route.",
+        body: "Gather Light, your run's score. This node marks your location; lit nodes are next destinations. Tap once to preview, then again to travel.",
       },
       encounter: {
         label: "An encounter",
@@ -98,23 +93,23 @@ export const GUIDE_COPY = {
       },
       house: {
         label: "A house",
-        body: "A house is a story event where choices can heal or damage your planets, revive knocked-out planets, or change your Light. Each of the twelve houses covers an area of life. This is {name}: {gloss}. Its ruler, {ruler}, sets its colour.",
+        body: "Houses are story events. Choices change health or Light, or revive knocked-out planets. This is {name}: {gloss}. Its ruler, {ruler}, sets its colour.",
       },
       chart: {
         label: "Your chart",
-        body: "Your chart shows your planets' current health. Affliction is damage taken; it carries between encounters, so health does not reset after combat. Combusted planets are knocked out until revived. Tap the chart to inspect your team.",
+        body: "Tap your chart to inspect your planets. Affliction is damage taken and persists between encounters. Combusted planets are knocked out until revived.",
       },
       crossing: {
         label: "The crossing",
-        body: "The crossing is the exit to the next map. Combusted planets roll to revive, then all available planets take damage. Fortune is each planet's chance to revive or halve its damage. Later crossings can deal more damage, but never knock a planet out.",
+        body: "Crossings lead to the next map. Combusted planets roll to revive, then available planets take damage without being knocked out. Fortune is each planet's chance to revive or halve damage.",
       },
       index: {
         label: "Map {n} of VII",
-        body: "A run lasts up to seven maps, and each adds a turn to its combat encounters. The run ends when you complete the seventh map or all your unlocked planets are combusted.",
+        body: "Each map adds a turn to encounters. Your run ends after seven maps, or when all your unlocked planets are combusted.",
       },
       boundary: {
         label: "Crossing results",
-        body: "The results of entering this map: which planets revived and how much damage each took. These changes have already been applied to your chart.",
+        body: "These are your crossing results: planets revived and damage taken. The changes are already applied to your chart.",
       },
     },
   },
@@ -129,27 +124,27 @@ export const GUIDE_COPY = {
     notes: {
       house: {
         label: "The house",
-        body: "A house is a story event where one choice can change your planets' health or your Light, the run's score. Its ruler, {ruler}, sets the theme: {theme}",
+        body: "A house is a story event: your choice can change health or Light, your run's score. Its ruler, {ruler}, sets the scene's tone.",
       },
       chorus: {
         label: "The chorus",
-        body: "The chorus is flavour text: a voice associated with {ruler} that sets the scene's mood. It has no gameplay effect. These voices reveal each planet's character over multiple runs.",
+        body: "The chorus is flavour text voiced by {ruler}. It sets the scene's mood and reveals the planet's character, with no gameplay effect.",
       },
       commit: {
         label: "Preview, then confirm",
-        body: "Tap an option to preview it. If it needs a target, choose a highlighted planet, check the preview, and confirm beneath its stats. Otherwise, tap the option again to confirm. Confirming applies the effects and ends the scene.",
+        body: "Tap an option to preview. For targeted choices, select a highlighted planet, then confirm beneath its stats. Otherwise, tap the option again. Confirming ends the scene.",
       },
       aside: {
         label: "Costs and effects",
-        body: "The aside is an option's cost and effect summary. Inspect a planet to preview the effect on your chart. Calling back a knocked-out planet revives it at half its maximum health (Resolve).",
+        body: "The aside lists an option's costs and effects. Calling back a knocked-out planet revives it at half its maximum health (Resolve).",
       },
       housePlanet: {
         label: "The house's planet",
-        body: "{joy} has its joy here: it is the planet whose condition changes this house's choices. Its damage and dignity (how favourably it is placed in its sign) determine which options appear.",
+        body: "{joy} is this house's joy planet: its damage and dignity (how favourably it is placed in its sign) determine which choices appear.",
       },
       housePlanetNoJoy: {
         label: "The house's planet",
-        body: "A joy planet is one whose condition changes the house's choices; this house has none. Some options depend on its ruler, {ruler}, being available with favourable dignity (placement in its sign). Others require enough health or Light to pay their cost.",
+        body: "Some choices require {ruler} to be available with favourable dignity (placement in its sign). Others need enough health or Light to pay their cost.",
       },
     },
   },

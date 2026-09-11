@@ -422,6 +422,11 @@ export function GuideOverlay<P extends string>({
   const [barRect, setBarRect] = useState<GuideRect | null>(null);
   const maskId = `guide-mask-${useId().replace(/:/g, "")}`;
   const phaseIndex = phases.indexOf(phase);
+  const advance = () => {
+    const next = phases[phaseIndex + 1];
+    if (next) onPhaseChange(next);
+    else onClose();
+  };
 
   const litIds = useMemo(
     () => Array.from(new Set(notes.flatMap((note) => note.spotlights ?? [note.anchor]))),
@@ -558,6 +563,10 @@ export function GuideOverlay<P extends string>({
       role="dialog"
       aria-modal="true"
       aria-label={phaseLabel[phase]}
+      onClick={(event) => {
+        event.stopPropagation();
+        advance();
+      }}
     >
       <svg
         className="guide-veil"
@@ -627,7 +636,7 @@ export function GuideOverlay<P extends string>({
       <div className="guide-controls" ref={controlsRef}>
         {/* Where the `?` was, opened out: the way out, then back and forward,
             one pill. */}
-        <div className="guide-bar" ref={barRef} tabIndex={-1}>
+        <div className="guide-bar" ref={barRef} tabIndex={-1} onClick={(event) => event.stopPropagation()}>
           <button type="button" className="guide-close" onClick={onClose} aria-label={closeLabel}>
             ×
           </button>
@@ -639,19 +648,9 @@ export function GuideOverlay<P extends string>({
           >
             Back
           </button>
-          {phaseIndex === phases.length - 1 ? (
-            <button type="button" className="guide-step is-primary" onClick={onClose}>
-              Close
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="guide-step is-primary"
-              onClick={() => onPhaseChange(phases[phaseIndex + 1]!)}
-            >
-              Next
-            </button>
-          )}
+          <button type="button" className="guide-step is-primary" onClick={advance}>
+            {phaseIndex === phases.length - 1 ? "Close" : "Next"}
+          </button>
         </div>
 
         <section className="guide-mobile-card" aria-live="polite">
