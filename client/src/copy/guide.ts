@@ -34,43 +34,43 @@ export const GUIDE_COPY = {
     notes: {
       self: {
         label: "Self",
-        body: "Self is your chart: seven planets with fixed positions. Pulsing rings mark planets available to act; tap one to select it.",
+        body: "This is your chart: seven planets with fixed positions. Pulsing rings mark planets available to act; tap to select.",
       },
       other: {
         label: "Other",
-        body: "Other is the opposing chart. It follows the same rules as yours. Your action targets its acting planet.",
+        body: "The opposing chart, which follows the same rules as yours. Your action affect its acting planet.",
       },
       activePlanet: {
         label: "Incoming move",
-        body: "This planet will damage (Afflict, amber) or heal (Testify, violet) your selected planet by this amount. You act first; knocking it out cancels its move.",
+        body: "This planet will damage (Afflict, amber) or heal (Testify, violet) your selected planet by this amount. You act first; knocking it out stops its move.",
       },
       anatomy: {
         label: "Health and linked effects",
-        body: "Resolve is maximum health; the arc shows what remains. At zero, planets are combusted: knocked out until revived. Aspect links spread damage or healing; red links swap the two.",
+        body: "Resolve is maximum health; the arc shows what remains. At zero, planets are combusted -- knocked out until revived. Aspect links spread damage or healing; red flips the effect.",
       },
       turn: {
         label: "Turn",
-        body: "Turn {current} of {total}. Each map adds one turn to encounters. They end early if either side has no planets able to act.",
+        body: "Turn {current} of {total}. Each map adds one turn to encounters. They end early if either side is out of planets.",
       },
       light: {
         label: "Your goal: gather Light",
-        body: "Light is your run's score. Your final total becomes a star on your Prince. The number beside it previews this turn's gain.",
+        body: "Light is your run's score. The final total becomes a permanent star on your Prince. The number beside it previews this turn's gain (or loss).",
       },
       ruler: {
         label: "Ruler and scoring",
-        body: "The ruler, {ruler}, sets this encounter's scoring rule: earn Light from {rule}. Other effects can help you survive, but earn no points.",
+        body: "The ruler, {ruler}, sets the scoring rule: earn Light from {rule}. Other effects can help you survive, but earn no points.",
       },
       example: {
         label: "Choose a planet",
-        body: "Select any planet with a pulsing ring. {planet}'s stats set your action's strength; the target's aspects determine which other planets are affected.",
+        body: "Select any planet with a pulsing ring. {planet}'s stats set your action's effect; the target's aspects determine which other planets are affected.",
       },
       actions: {
         label: "Damage or heal",
-        body: "Either action can earn Light, depending on the ruler. Healing cannot revive combusted planets. Tap once to preview your score and effects, then again to confirm.",
+        body: "Either action can earn Light, depending on the ruler. Healing cannot revive combusted planets. Tap once to preview the action, then again to confirm.",
       },
       projection: {
         label: "{action} preview",
-        body: "The charts preview this turn's damage, healing, and knockouts. You would gain {light} Light. Check the linked effects before confirming.",
+        body: "The charts preview this turn's damage, healing, and knockouts. You would gain {light} Light. Check effects before confirming.",
       },
     },
   },
@@ -85,11 +85,11 @@ export const GUIDE_COPY = {
     notes: {
       here: {
         label: "You are here",
-        body: "Gather Light, your run's score. This node marks your location; lit nodes are next destinations. Tap once to preview, then again to travel.",
+        body: "Gather Light, your run's score. This node marks your location; lit nodes are next destinations. Tap once to preview, again to travel.",
       },
       encounter: {
         label: "An encounter",
-        body: "An encounter is turn-based combat between your planets and another chart. Its ruler, {ruler}, determines how you earn Light. Check the scoring rule when planning your route.",
+        body: "An encounter is turn-based interaction between your planets and another chart. Its ruler, {ruler}, determines how you earn Light. Check the scoring rule when planning your route.",
       },
       house: {
         label: "A house",
@@ -101,15 +101,15 @@ export const GUIDE_COPY = {
       },
       crossing: {
         label: "The crossing",
-        body: "Crossings lead to the next map. Combusted planets roll to revive, then available planets take damage without being knocked out. Fortune is each planet's chance to revive or halve damage.",
+        body: "Crossings lead to the next map. Combusted planets may revive, and available planets take some damage. Each planet's Fortune affects its outcome.",
       },
       index: {
         label: "Map {n} of VII",
-        body: "Each map adds a turn to encounters. Your run ends after seven maps, or when all your unlocked planets are combusted.",
+        body: "Each map adds one turn to encounters. Your run ends after seven maps, or when all your planets combust.",
       },
       boundary: {
         label: "Crossing results",
-        body: "These are your crossing results: planets revived and damage taken. The changes are already applied to your chart.",
+        body: "These are your crossing results: planets revived and damage taken.",
       },
     },
   },
@@ -124,15 +124,15 @@ export const GUIDE_COPY = {
     notes: {
       house: {
         label: "The house",
-        body: "A house is a story event: your choice can change health or Light, your run's score. Its ruler, {ruler}, sets the scene's tone.",
+        body: "A house is a story event: your choice can change health or Light, your run's score. Its ruler, {ruler}, sets the stage.",
       },
       chorus: {
         label: "The chorus",
-        body: "The chorus is flavour text voiced by {ruler}. It sets the scene's mood and reveals the planet's character, with no gameplay effect.",
+        body: "The chorus is flavour text voiced by {ruler}. It sets the mood and reveals the planet's character.",
       },
       commit: {
         label: "Preview, then confirm",
-        body: "Tap an option to preview. For targeted choices, select a highlighted planet, then confirm beneath its stats. Otherwise, tap the option again. Confirming ends the scene.",
+        body: "Tap an option to preview, then tap the again to confirm. Confirming ends the scene.",
       },
       aside: {
         label: "Costs and effects",
@@ -144,7 +144,7 @@ export const GUIDE_COPY = {
       },
       housePlanetNoJoy: {
         label: "The house's planet",
-        body: "Some choices require {ruler} to be available with favourable dignity (placement in its sign). Others need enough health or Light to pay their cost.",
+        body: "Some choices require {ruler} to be available with favourable dignity. Others need enough health or Light to pay their cost.",
       },
     },
   },
