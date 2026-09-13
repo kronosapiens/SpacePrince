@@ -1,4 +1,4 @@
-/** The chart and map share one slow turn, omitted under reduced motion. */
+/** Slow chart rotation, omitted under reduced motion. */
 export function SvgRotation({ cx = 0, cy = 0, degrees = -360 }: {
   cx?: number;
   cy?: number;

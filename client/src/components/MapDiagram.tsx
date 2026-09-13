@@ -3,9 +3,8 @@ import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
-import { HOUSE_BORDER, MAP_PADDING } from "@/svg/map-style";
+import { FORTUNE_STYLE, HOUSE_BORDER, MAP_PADDING } from "@/svg/map-style";
 import { hexagramPoints } from "@/svg/geometry";
-import { SvgRotation } from "@/components/SvgRotation";
 import type { MapState, PlanetName } from "@/game/types";
 
 interface MapDiagramProps {
@@ -99,6 +98,12 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     return null;
   };
 
+  const nodeColor = (id: string) => {
+    if (id === ROOT_NODE_ID) return NEUTRAL.gold;
+    const r = ruler(id);
+    return r ? PLANET_PRIMARY[r] : NEUTRAL.bone;
+  };
+
   // Edge gradients between rulers. Lines are shortened to start/end at the
   // disc rim rather than the node center, so traversed-node visuals (which
   // are dimmed via opacity) don't show the edge bleeding through the disc.
@@ -130,10 +135,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const isSelectedEdge = eligibleEdge && selectedNodeId !== null &&
       (e.from === selectedNodeId || e.to === selectedNodeId);
     const inReach = traversedEdge || isSelectedEdge;
-    const rA = ruler(e.from);
-    const rB = ruler(e.to);
-    const cA = rA ? PLANET_PRIMARY[rA] : NEUTRAL.bone;
-    const cB = rB ? PLANET_PRIMARY[rB] : NEUTRAL.bone;
+    const cA = nodeColor(e.from);
+    const cB = nodeColor(e.to);
     const gid = `m2-edge-${i}`;
     // Gradient endpoints match the shortened line so the color travel reads
     // cleanly across the visible segment.
@@ -167,7 +170,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const isTraversed = visited.has(n.id) && !isCurrent;
     const isDistant = !isCurrent && !isEligible && !isTraversed;
     const r = ruler(n.id);
-    const color = r ? PLANET_PRIMARY[r] : NEUTRAL.bone;
+    const color = nodeColor(n.id);
     const isNarrative = content?.kind === "narrative";
     const isCombat = content?.kind === "combat";
 
@@ -253,24 +256,22 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         <circle r={NODE_R}
           data-guide={`node-${n.id}`}
           fill={isNarrative || isFortune ? color : "transparent"}
-          fillOpacity={isNarrative || isFortune ? (isCurrent ? 0.98 : op) : 0}
+          fillOpacity={isFortune ? op : isNarrative ? (isCurrent ? 0.98 : op) : 0}
           stroke={color}
           strokeOpacity={op}
           strokeWidth={isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8} />
-        {/* Void X on the bone disc — the narrative-token formula (solid coin,
-            dark mark) applied to the threshold. */}
+        {/* Dark cross and inner rim divide the solid gold Fortune disc. */}
         {isFortune && (() => {
-          const d = NODE_R * Math.SQRT1_2;
-          // Constant bold weight, graded by opacity only — matching how the
-          // narrative numerals carry their mark across the tiers.
-          const sw = 3.2;
+          // Match the outside edge of the house's dark rim, leaving the same colored band.
+          const innerR = HOUSE_BORDER.rimR + (HOUSE_BORDER.stroke - FORTUNE_STYLE.stroke) / 2;
+          const d = innerR * Math.SQRT1_2;
           return (
-            <>
-              <line x1={-d} y1={-d} x2={d} y2={d} stroke={NEUTRAL.void}
-                strokeOpacity={op} strokeWidth={sw} strokeLinecap="round" />
-              <line x1={-d} y1={d} x2={d} y2={-d} stroke={NEUTRAL.void}
-                strokeOpacity={op} strokeWidth={sw} strokeLinecap="round" />
-            </>
+            <g stroke={NEUTRAL.void} strokeOpacity={op} strokeWidth={FORTUNE_STYLE.stroke}
+              strokeLinecap="round" style={{ pointerEvents: "none" }}>
+              <circle r={innerR} fill="none" />
+              <line x1={-d} y1={-d} x2={d} y2={d} />
+              <line x1={-d} y1={d} x2={d} y2={-d} />
+            </g>
           );
         })()}
         {isNarrative && r && (
@@ -293,7 +294,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
             <g style={{ pointerEvents: "none" }}>
-              <SvgRotation />
               {ENCOUNTER_TRIANGLES.map((points, i) => (
                 <polygon key={i} points={points}
                   fill={color} fillOpacity={fillOp}

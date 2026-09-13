@@ -6,3 +6,7 @@ export const HOUSE_BORDER = {
   rimR: 20,
   stroke: 1,
 } as const;
+
+export const FORTUNE_STYLE = {
+  stroke: HOUSE_BORDER.stroke,
+} as const;
