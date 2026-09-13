@@ -3,7 +3,8 @@ import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
-import { MAP_PADDING } from "@/svg/map-style";
+import { HOUSE_BORDER, MAP_PADDING } from "@/svg/map-style";
+import { hexagramPoints } from "@/svg/geometry";
 import type { MapState, PlanetName } from "@/game/types";
 
 interface MapDiagramProps {
@@ -15,6 +16,7 @@ interface MapDiagramProps {
 }
 
 export const NODE_R = 22;
+const ENCOUNTER_TRIANGLES = hexagramPoints(0, 0, NODE_R);
 // Tiered visual scale used by both the edge web and the nodes themselves.
 // Semantic: solid past, translucent next-steps, faint distance.
 // Each tier bundles the values that move together (opacity + stroke
@@ -271,30 +273,31 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
           );
         })()}
         {isNarrative && r && (
-          <text textAnchor="middle" dominantBaseline="central"
-            fontSize={14}
-            fill={NEUTRAL.void}
-            fillOpacity={op}
-            fontFamily="'Cormorant Garamond', Garamond, serif"
-            fontWeight={700}
-            style={{ pointerEvents: "none", userSelect: "none" }}>
-            {romanHouse(content.house)}
-          </text>
+          <>
+            <circle r={HOUSE_BORDER.rimR} fill="none"
+              stroke={NEUTRAL.void} strokeOpacity={op}
+              strokeWidth={HOUSE_BORDER.stroke} style={{ pointerEvents: "none" }} />
+            <text textAnchor="middle" dominantBaseline="central"
+              fontSize={14}
+              fill={NEUTRAL.void}
+              fillOpacity={op}
+              fontFamily="'Cormorant Garamond', Garamond, serif"
+              fontWeight={700}
+              style={{ pointerEvents: "none", userSelect: "none" }}>
+              {romanHouse(content.house)}
+            </text>
+          </>
         )}
         {isCombat && (() => {
           const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
             <>
-              <polygon
-                points={trianglePoints(0, 0, NODE_R, 90)}
-                fill={color} fillOpacity={fillOp}
-                stroke={color} strokeOpacity={op}
-                strokeWidth={1} strokeLinejoin="round" />
-              <polygon
-                points={trianglePoints(0, 0, NODE_R, 270)}
-                fill={color} fillOpacity={fillOp}
-                stroke={color} strokeOpacity={op}
-                strokeWidth={1} strokeLinejoin="round" />
+              {ENCOUNTER_TRIANGLES.map((points, i) => (
+                <polygon key={i} points={points}
+                  fill={color} fillOpacity={fillOp}
+                  stroke={color} strokeOpacity={op}
+                  strokeWidth={1} strokeLinejoin="round" />
+              ))}
             </>
           );
         })()}
@@ -326,18 +329,4 @@ function edgeKey(a: string, b: string): string {
 function romanHouse(house: number): string {
   const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
   return numerals[house - 1] ?? String(house);
-}
-
-/** Three vertices of an equilateral triangle, circumradius `r`, with the
- *  first vertex at angle `baseDeg` (math convention: 90° = top, 270° = bottom).
- *  Two of these at 90° + 270° form a hexagram. */
-function trianglePoints(cx: number, cy: number, r: number, baseDeg: number): string {
-  const pts: string[] = [];
-  for (let i = 0; i < 3; i++) {
-    const rad = ((baseDeg + i * 120) * Math.PI) / 180;
-    const x = cx + r * Math.cos(rad);
-    const y = cy - r * Math.sin(rad); // SVG y-axis flipped vs. math convention
-    pts.push(`${x.toFixed(2)},${y.toFixed(2)}`);
-  }
-  return pts.join(" ");
 }

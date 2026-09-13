@@ -20,6 +20,7 @@ import {
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { ASPECT_COLOR, COMBUST_WARNING, NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY, VALENCE_COLOR } from "@/svg/palette";
 import { CHART_STYLE } from "@/svg/chart-style";
+import { hexagramPoints } from "@/svg/geometry";
 import { useTuning, type ChartTuning } from "@/svg/tuning";
 import type {
   AspectConnection,
@@ -1207,10 +1208,7 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
   const { hexagramR, vesicaR, vesicaOffset } = CHART_STYLE.substrate;
-  // Two interlaced hexagrams (four triangles) → a twelve-point star.
-  const triangles = [0, 30, 60, 90].map((base) =>
-    [0, 120, 240].map((step) => polar(cx, cy, hexagramR, base + step)),
-  );
+  const triangles = hexagramPoints(cx, cy, hexagramR);
   // Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
   // itself — exactly what the on-chain NFT SVG will emit. Omitted under
   // prefers-reduced-motion (the still figure reads fine at any angle).
@@ -1230,8 +1228,8 @@ function renderSubstrate() {
     <g opacity={CHART_STYLE.substrate.opacity}>
       <g>
         {turn(-360)}
-        {triangles.map((tri, i) => (
-          <polygon key={`hex_${i}`} points={tri.map((p) => `${p.x},${p.y}`).join(" ")}
+        {triangles.map((points, i) => (
+          <polygon key={`hex_${i}`} points={points}
             fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
       </g>
