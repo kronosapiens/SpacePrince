@@ -307,10 +307,13 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
 
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
-  const { hexagramR, vesicaR, vesicaOffset } = CHART_STYLE.substrate;
+  const { hexagramR, vesicaR, vesicaOffset, vesicaCircleCount } = CHART_STYLE.substrate;
   // Two interlaced hexagrams (four triangles) → a twelve-point star.
   const triangles = [0, 30, 60, 90].map((base) =>
     [0, 120, 240].map((step) => polar(cx, cy, hexagramR, base + step)),
+  );
+  const vesicaCenters = Array.from({ length: vesicaCircleCount }, (_, i) =>
+    polar(cx, cy, vesicaOffset, i * 360 / vesicaCircleCount),
   );
   // Same period, opposite signs — see the client's copy for why the two halves
   // counter-rotate and why they must share one period.
@@ -328,13 +331,13 @@ function renderSubstrate() {
             fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
       </g>
-      {/* Four-fold vesica: left/right + top/bottom. */}
+      {/* Six circles place crossings on all twelve rays whenever the star is upright. */}
       <g>
         {turn(360)}
-        <circle cx={cx - vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx + vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy - vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy + vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        {vesicaCenters.map((center, i) => (
+          <circle key={`vesica_${i}`} cx={center.x} cy={center.y} r={vesicaR}
+            fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        ))}
       </g>
     </g>
   );

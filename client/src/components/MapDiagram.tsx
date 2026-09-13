@@ -5,6 +5,7 @@ import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
 import { HOUSE_BORDER, MAP_PADDING } from "@/svg/map-style";
 import { hexagramPoints } from "@/svg/geometry";
+import { SvgRotation } from "@/components/SvgRotation";
 import type { MapState, PlanetName } from "@/game/types";
 
 interface MapDiagramProps {
@@ -291,14 +292,15 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         {isCombat && (() => {
           const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
-            <>
+            <g style={{ pointerEvents: "none" }}>
+              <SvgRotation />
               {ENCOUNTER_TRIANGLES.map((points, i) => (
                 <polygon key={i} points={points}
                   fill={color} fillOpacity={fillOp}
                   stroke={color} strokeOpacity={op}
                   strokeWidth={1} strokeLinejoin="round" />
               ))}
-            </>
+            </g>
           );
         })()}
       </g>

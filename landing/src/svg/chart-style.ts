@@ -20,6 +20,7 @@ export const CHART_STYLE = {
     hexagramR: 180,
     vesicaR: 280,
     vesicaOffset: 60,
+    vesicaCircleCount: 6,
   },
 
   /** Diagram — structural rings of the wheel. */

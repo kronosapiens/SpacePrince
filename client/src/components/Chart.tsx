@@ -9,6 +9,7 @@ import {
   type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
+import { SvgRotation } from "@/components/SvgRotation";
 import {
   AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_SIZE,
@@ -1207,8 +1208,11 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
 
 function renderSubstrate() {
   const cx = CHART_CENTER, cy = CHART_CENTER;
-  const { hexagramR, vesicaR, vesicaOffset } = CHART_STYLE.substrate;
+  const { hexagramR, vesicaR, vesicaOffset, vesicaCircleCount } = CHART_STYLE.substrate;
   const triangles = hexagramPoints(cx, cy, hexagramR);
+  const vesicaCenters = Array.from({ length: vesicaCircleCount }, (_, i) =>
+    polar(cx, cy, vesicaOffset, i * 360 / vesicaCircleCount),
+  );
   // Gentle full turn (~120s) as SMIL, so the motion lives in the SVG markup
   // itself — exactly what the on-chain NFT SVG will emit. Omitted under
   // prefers-reduced-motion (the still figure reads fine at any angle).
@@ -1219,38 +1223,25 @@ function renderSubstrate() {
   // intersect and opposing them creates no crossings to shimmer. One period,
   // deliberately — two would beat against each other, and a beat is a second
   // rhythm however it is labelled (`spec/design/STYLE.md §11`).
-  const turn = (deg: number) =>
-    prefersReducedMotion() ? null : (
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate"
-        from={`0 ${cx} ${cy}`} to={`${deg} ${cx} ${cy}`} dur="120s" repeatCount="indefinite" />
-    );
   return (
     <g opacity={CHART_STYLE.substrate.opacity}>
       <g>
-        {turn(-360)}
+        <SvgRotation cx={cx} cy={cy} />
         {triangles.map((points, i) => (
           <polygon key={`hex_${i}`} points={points}
             fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
         ))}
       </g>
-      {/* Four-fold vesica: left/right + top/bottom. */}
+      {/* Six circles place crossings on all twelve rays whenever the star is upright. */}
       <g>
-        {turn(360)}
-        <circle cx={cx - vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx + vesicaOffset} cy={cy} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy - vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
-        <circle cx={cx} cy={cy + vesicaOffset} r={vesicaR} fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        <SvgRotation cx={cx} cy={cy} degrees={360} />
+        {vesicaCenters.map((center, i) => (
+          <circle key={`vesica_${i}`} cx={center.x} cy={center.y} r={vesicaR}
+            fill="none" stroke={NEUTRAL.bone} strokeWidth={CHART_STYLE.substrate.stroke} />
+        ))}
       </g>
     </g>
   );
-}
-
-/** Whether the OS asks for reduced motion. SMIL can't read the media query, so
- *  we gate the rotation in JS instead (the NFT SVG just always includes it). */
-function prefersReducedMotion(): boolean {
-  return typeof window !== "undefined"
-    && typeof window.matchMedia === "function"
-    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 // ─── Geometry ───────────────────────────────────────────────────────────
