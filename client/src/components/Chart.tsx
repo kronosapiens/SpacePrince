@@ -143,7 +143,7 @@ export interface ChartProps {
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
   /** Hide the affliction display — arc and badge both. For charts shown for
-   *  their form rather than their state (Title, the map's chart anchor);
+   *  their form rather than their state (such as the Title's sample charts);
    *  gameplay screens don't set it. */
   hideAffliction?: boolean;
   scale?: number;

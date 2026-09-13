@@ -163,10 +163,21 @@ export function StartScreen() {
   );
 
   return (
-    <div className="mint-screen">
+    <div className="chart-layout mint-screen">
       <PlanetBands on={bandsOn} current={bandsCurrent} />
 
-      <div className="mint-center">
+      <div className="chart-layout-chart mint-stage">
+        <Chart
+          chart={computed ?? SCAFFOLD_CHART}
+          unlockedPlanets={showCeremony ? revealedPlanets : []}
+          activePlanet={showCeremony && !ghosted ? currentRevealing : null}
+          showColorField={showCeremony}
+          showSubstrate
+          passive
+        />
+      </div>
+
+      <div className="chart-layout-content mint-content">
         {stage === "framing" && (
           <div className={`mint-framing anim-surface-in ${leavingFraming ? "is-leaving" : ""}`}>
             <p>
@@ -209,31 +220,6 @@ export function StartScreen() {
             >
               Continue
             </button>
-          </div>
-        )}
-
-        {stage === "input" && (
-          <div className="mint-stage anim-surface-in">
-            <Chart
-              chart={computed ?? SCAFFOLD_CHART}
-              unlockedPlanets={[]}
-              showColorField={false}
-              showSubstrate
-              passive
-            />
-          </div>
-        )}
-
-        {showCeremony && computed && (
-          <div className="mint-stage">
-            <Chart
-              chart={computed}
-              unlockedPlanets={revealedPlanets}
-              activePlanet={ghosted ? null : currentRevealing}
-              showColorField
-              showSubstrate
-              passive
-            />
           </div>
         )}
 

@@ -34,6 +34,7 @@
   --chrome: "Inter", system-ui, sans-serif;
   --serif: var(--display);
   --sans: var(--chrome);
+  --title-wordmark-size: clamp(22px, 9cqi, 64px);
 
   /* Stroke scale */
   --stroke-hairline: 0.5;

@@ -5,6 +5,7 @@ import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { fillLabel, planetName, TermText } from "@/components/TermText";
+import { chartGlyphs, chartShape, planetAnchor, planetCircle, PLANET_REACH } from "@/components/chart-guide";
 import {
   center,
   circleRect,
@@ -14,7 +15,7 @@ import {
   type GuideRects,
   type GuideShapes,
 } from "@/components/GuideOverlay";
-import type { MapState, NodeContent } from "@/game/types";
+import type { MapState, NodeContent, PlanetName } from "@/game/types";
 
 export type MapGuidePhase = "map" | "chart";
 
@@ -22,9 +23,10 @@ interface MapGuideProps {
   open: boolean;
   phase: MapGuidePhase;
   map: MapState;
+  examplePlanet: PlanetName;
   /** Maps already crossed — the index the screen prints under the diagram. */
   mapsCompleted: number;
-  /** The screen is showing the crossing's record, bottom-right. */
+  /** The screen is showing the crossing's record below the map. */
   showBoundary: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -71,6 +73,7 @@ export function MapGuide({
   open,
   phase,
   map,
+  examplePlanet,
   mapsCompleted,
   showBoundary,
   onOpen,
@@ -125,8 +128,9 @@ export function MapGuide({
     const chartNotes: GuideNote[] = [
       {
         key: "chart",
-        anchor: "chart",
-        placement: "right",
+        anchor: planetAnchor("self", examplePlanet),
+        spotlights: ["chart", planetAnchor("self", examplePlanet)],
+        placement: "top",
         label: COPY.notes.chart.label,
         body: <TermText text={COPY.notes.chart.body} />,
       },
@@ -157,10 +161,11 @@ export function MapGuide({
       });
     }
     return chartNotes;
-  }, [phase, map, mapsCompleted, showBoundary]);
+  }, [phase, map, examplePlanet, mapsCompleted, showBoundary]);
 
   const shapes = useMemo<GuideShapes>(() => {
     const nodeIds = map.graph.nodes.map((n) => nodeAnchor(n.id));
+    const glyphs = chartGlyphs("self");
     // The chart's outer ring sits at 96% of its box; the circle clears it.
     const chartCircle = (rects: GuideRects): GuideRect | null => {
       const rect = rects["chart"];
@@ -170,7 +175,7 @@ export function MapGuide({
     return {
       // The diagram itself: nothing points at it, but observing it re-measures
       // every node when the map resizes.
-      measure: [...nodeIds, "map"],
+      measure: [...nodeIds, ...glyphs, "map"],
       shape: (id, rects) => {
         if (id.startsWith("node-")) {
           const circle = nodeCircle(id, rects);
@@ -178,9 +183,9 @@ export function MapGuide({
         }
         if (id === "chart") {
           const circle = chartCircle(rects);
-          return circle ? { rect: circle, radius: circle.width / 2 } : undefined;
+          return circle ? { rect: circle, radius: circle.width / 2, lift: true } : undefined;
         }
-        return undefined;
+        return chartShape(id, rects, () => PLANET_REACH);
       },
       obstacles: (rects) => ({
         soft: [
@@ -188,7 +193,7 @@ export function MapGuide({
             const circle = nodeCircle(id, rects);
             return circle ? [circle] : [];
           }),
-          ...(chartCircle(rects) ? [chartCircle(rects)!] : []),
+          ...glyphs.flatMap((id) => planetCircle(id, PLANET_REACH, rects) ?? []),
         ],
       }),
     };

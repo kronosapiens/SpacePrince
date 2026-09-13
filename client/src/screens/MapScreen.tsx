@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChartAnchor } from "@/components/ChartAnchor";
-import { ChartStudyOverlay } from "@/components/ChartStudyOverlay";
+import { ChartInspection } from "@/components/ChartInspection";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
@@ -33,7 +32,6 @@ export function MapScreen() {
   const dispatch = usePrinceDispatch();
   const rolloverMap = useRolloverMap();
   const { setActive } = useActivePlanet();
-  const [studyOpen, setStudyOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
 
@@ -157,63 +155,56 @@ export function MapScreen() {
     (boundary.uncombusts.length > 0 || boundary.barrage.length > 0);
 
   return (
-    <div className="map-screen">
+    <div className="chart-layout map-screen">
       <MapGuide
         open={guideOpen}
         phase={guidePhase}
         map={run.map}
+        examplePlanet={playerUnlocked[0] ?? "Moon"}
         mapsCompleted={run.mapsCompleted}
         showBoundary={showBoundary}
         onOpen={() => { setGuidePhase("map"); setGuideOpen(true); }}
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
-      {/* While the guide is open the map is preview-only: a tap still previews
-          a node, but nothing commits and the study overlay stays shut. */}
-      <div className="map-anchor" data-guide="chart">
-        <ChartAnchor
+      <div className="chart-layout-chart map-chart" data-guide="chart">
+        <ChartInspection
           chart={prince.chart}
           state={run.state}
           unlockedPlanets={playerUnlocked}
-          onExpand={guideOpen ? noop : () => setStudyOpen(true)}
+          disabled={guideOpen}
         />
       </div>
-      <div className="map-index" data-guide="map-index">
-        <span className="map-index-v">{ROMAN[run.mapsCompleted] ?? String(run.mapsCompleted + 1)}</span>
-      </div>
-      {showBoundary && boundary && (
-        <div className="map-boundary" data-guide="map-boundary">
-          <span className="eyebrow">MAP {ROMAN[run.mapsCompleted] ?? run.mapsCompleted + 1}</span>
-          {boundary.uncombusts.map((u) => (
-            <div key={`u-${u.planet}`} className="map-boundary-line">
-              <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[u.planet] }}>
-                {PLANET_GLYPH[u.planet]}
-              </span>
-              {u.success ? `${u.planet} uncombusts` : `${u.planet} stays combust`} ·{" "}
-              {Math.round(u.chance * 100)}%
-            </div>
-          ))}
-          {boundary.barrage.map((b) => (
-            <div key={`b-${b.planet}`} className="map-boundary-line">
-              <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[b.planet] }}>
-                {PLANET_GLYPH[b.planet]}
-              </span>
-              {b.planet} +{b.amount} affliction{b.halved ? " · halved" : ""}
-            </div>
-          ))}
+      <div className="map-content">
+        <div className="map-diagram-wrap">
+          <MapDiagram map={run.map} onSelectNode={guideOpen ? noop : handleNodeSelect} />
         </div>
-      )}
-      <div className="map-diagram-wrap">
-        <MapDiagram map={run.map} onSelectNode={guideOpen ? noop : handleNodeSelect} />
+        <div className="map-index" data-guide="map-index">
+          <span className="map-index-v">{ROMAN[run.mapsCompleted] ?? String(run.mapsCompleted + 1)}</span>
+        </div>
+        {showBoundary && boundary && (
+          <div className="map-boundary" data-guide="map-boundary">
+            <span className="eyebrow">MAP {ROMAN[run.mapsCompleted] ?? run.mapsCompleted + 1}</span>
+            {boundary.uncombusts.map((u) => (
+              <div key={`u-${u.planet}`} className="map-boundary-line">
+                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[u.planet] }}>
+                  {PLANET_GLYPH[u.planet]}
+                </span>
+                {u.success ? `${u.planet} uncombusts` : `${u.planet} stays combust`} ·{" "}
+                {Math.round(u.chance * 100)}%
+              </div>
+            ))}
+            {boundary.barrage.map((b) => (
+              <div key={`b-${b.planet}`} className="map-boundary-line">
+                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[b.planet] }}>
+                  {PLANET_GLYPH[b.planet]}
+                </span>
+                {b.planet} +{b.amount} affliction{b.halved ? " · halved" : ""}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {studyOpen && (
-        <ChartStudyOverlay
-          chart={prince.chart}
-          state={run.state}
-          unlockedPlanets={playerUnlocked}
-          onClose={() => setStudyOpen(false)}
-        />
-      )}
     </div>
   );
 }

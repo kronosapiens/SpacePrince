@@ -97,7 +97,7 @@ export const GUIDE_COPY = {
       },
       chart: {
         label: "Your chart",
-        body: "Tap your chart to inspect your planets. Affliction is damage taken and persists between encounters. Combusted planets are knocked out until revived.",
+        body: "Tap a planet to inspect it. Affliction is damage taken and persists between encounters. Combusted planets are knocked out until revived.",
       },
       crossing: {
         label: "The crossing",

@@ -7,9 +7,11 @@ import { setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
+import { ChartInspection } from "@/components/ChartInspection";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
+import { unlockedPlanets } from "@/game/unlocks";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
 
 const RECHART_INTERVAL_MS = 3000;
@@ -32,18 +34,17 @@ export function TitleScreen() {
     setTheme(null);
   }, [setActive]);
 
-  // Cycle a fresh random sample chart every few seconds so the Title canvas
-  // stays alive. Only the interval re-rolls it — hover and other state changes
-  // during the visit don't.
+  // New visitors see sample charts; returning players keep their own Prince.
   const [chart, setChart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
 
   useEffect(() => {
+    if (prince) return;
     const id = window.setInterval(
       () => setChart(seededChart(randomSeed(), "Sample")),
       RECHART_INTERVAL_MS,
     );
     return () => window.clearInterval(id);
-  }, []);
+  }, [prince]);
 
   // Continue resumes a live (non-over) run; Begin starts a new run on the same
   // Prince — identity persists, the lifetime layer accumulates (SCREENS §9.2).
@@ -60,10 +61,15 @@ export function TitleScreen() {
   };
 
   return (
-    <div className={`title ${leaving ? "is-leaving" : ""}`}>
-      <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
-      <div className="title-stage">
-        <div className="title-chart">
+    <div className={`chart-layout title ${leaving ? "is-leaving" : ""}`}>
+      <div className="chart-layout-chart title-chart">
+        {prince ? (
+          <ChartInspection
+            chart={prince.chart}
+            state={run?.state}
+            unlockedPlanets={unlockedPlanets(prince.numEncounters)}
+          />
+        ) : (
           <Chart
             chart={chart}
             unlockedPlanets={PLANETS}
@@ -72,9 +78,10 @@ export function TitleScreen() {
             hideAffliction
             showColorField
           />
-        </div>
+        )}
       </div>
-      <div className="title-foot">
+      <div className="chart-layout-content title-content">
+        <h1 className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</h1>
         <button className="begin-btn" onClick={handleBegin} type="button">
           {label}
         </button>
