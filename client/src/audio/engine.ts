@@ -4,7 +4,7 @@ import { strikeMidi } from "./pitches";
 
 /**
  * The sound layer: ruler-relative impact and propagation tones, combustion
- * breaths, and the star bell (MUSIC.md, VIBES.md §Sound Design).
+ * breaths, the star bell, and quiet UI cues (MUSIC.md, VIBES.md §Sound Design).
  *
  * Module singleton, gesture-gated: Tone.js is imported and the AudioContext
  * started on the first pointer/key gesture (`installAudioUnlock`). Every
@@ -19,7 +19,7 @@ let initPromise: Promise<void> | null = null;
 
 // Two independent gates (dev-controllable from the DevConsole): `music` is the
 // score (planet themes); `sound` is everything else — impacts, propagation,
-// combustion, the star bell.
+// combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
 // Music opt-in, sound opt-out: a fresh visitor gets the reactive layer
@@ -161,6 +161,35 @@ function fxSynth(): AnyInstrument | null {
 }
 
 // ── Event playback ─────────────────────────────────────────────────────
+
+export type UISound = "hover" | "select" | "commit" | "dismiss";
+
+const UI_SOUNDS: Record<UISound, { note: string; duration: number; velocity: number }> = {
+  hover: { note: "D6", duration: 0.025, velocity: 0.16 },
+  select: { note: "A5", duration: 0.045, velocity: 0.3 },
+  commit: { note: "D5", duration: 0.09, velocity: 0.4 },
+  dismiss: { note: "A4", duration: 0.035, velocity: 0.24 },
+};
+const UI_VOLUME_DB = -22;
+const UI_HOVER_COOLDOWN_S = 0.07;
+let uiSynth: import("tone").PolySynth | null = null;
+let lastUISoundAt = -Infinity;
+
+/** Brief, dry cues; sweeping across targets never queues a trail of ticks. */
+export function playUISound(cue: UISound): void {
+  if (!T || !soundOn || T.getContext().state !== "running") return;
+  const now = T.now();
+  // A clicked control can be replaced under the pointer during navigation.
+  if (cue === "hover" && now - lastUISoundAt < UI_HOVER_COOLDOWN_S) return;
+  lastUISoundAt = now;
+  uiSynth ??= new T.PolySynth(T.Synth, {
+    oscillator: { type: "sine" },
+    envelope: { attack: 0.003, decay: 0.055, sustain: 0.12, release: 0.045 },
+    volume: UI_VOLUME_DB,
+  }).toDestination();
+  const sound = UI_SOUNDS[cue];
+  uiSynth.triggerAttackRelease(sound.note, sound.duration, now, sound.velocity);
+}
 
 export type StrikeShape = "landing" | "flows" | "inverts";
 

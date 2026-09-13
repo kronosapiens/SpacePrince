@@ -9,11 +9,11 @@ import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter"
 import { beginRun } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
-import { playCombust } from "@/audio/engine";
+import { playCombust, playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
 vi.mock("@/screens/MapScreen", () => ({ MapScreen: () => <div data-screen="map" /> }));
 vi.mock("@/screens/EndOfRunScreen", () => ({ EndOfRunScreen: () => <div data-screen="end" /> }));
 vi.mock("@/components/InfoCardHost", () => ({
@@ -84,6 +84,21 @@ function settle() {
 }
 
 describe("encounter advancement", () => {
+  it("sounds selection and commitment separately, and leaves repeated selection silent", () => {
+    const { prince } = combat(2);
+    mount(prince);
+    const planet = get('[data-guide="planet-self-moon"]');
+    click(planet);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
+    click(planet);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
+    const action = get('[data-guide="action-testimony"]');
+    click(action);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["select"]]);
+    click(action);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["select"], ["commit"]]);
+  });
+
   it("waits for the full propagation playback and final pause before returning to the map", () => {
     const { prince } = combat();
     mount(prince);
@@ -100,6 +115,7 @@ describe("encounter advancement", () => {
     expect(container.querySelector(".combat.is-resolved")).toBeNull();
     settle();
     expect(loadPrince()!.numEncounters).toBe(64);
+    vi.mocked(playUISound).mockClear();
     advanceTime(1799);
     expect(container.querySelector('[data-screen="map"]')).toBeNull();
     advanceTime(1);
@@ -107,6 +123,7 @@ describe("encounter advancement", () => {
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     expect(loadPrince()!.runs[0]!.light).toBe(committed.runs[0]!.light);
     expect(loadPrince()!.numEncounters).toBe(65);
+    expect(playUISound).not.toHaveBeenCalled();
   });
 
   it("lets a tap on the final chart skip the pause and advances only once", () => {
@@ -116,10 +133,12 @@ describe("encounter advancement", () => {
     expect(container.querySelector("[data-intro]")).toBeNull();
     settle();
     const planet = get('[data-guide="planet-self-moon"]');
+    vi.mocked(playUISound).mockClear();
     act(() => {
       planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     advanceTime(5000);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(get("[data-intro]").textContent).toBe("Mercury");

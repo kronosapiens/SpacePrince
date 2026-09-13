@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   MOTION_KNOBS,
+  TUNING_DEFAULTS,
   TUNING_KNOBS,
   readMotionKnob,
   resetMotionKnobs,
@@ -9,6 +10,8 @@ import {
   setTuning,
   useTuning,
 } from "@/svg/tuning";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 /**
  * Dev-only chart tuner: live sliders for the concentric radii, the arc, and the
@@ -30,6 +33,11 @@ export function ChartTuner() {
   );
 
   const resetAll = () => {
+    const changed = (Object.keys(tuning) as Array<keyof typeof tuning>).some(
+      (key) => tuning[key] !== TUNING_DEFAULTS[key],
+    ) || MOTION_KNOBS.some((knob) => document.documentElement.style.getPropertyValue(knob.prop));
+    if (!changed) return;
+    playUISound("select");
     resetTuning();
     resetMotionKnobs();
     setMotion(Object.fromEntries(MOTION_KNOBS.map((k) => [k.prop, readMotionKnob(k.prop)])));
@@ -39,7 +47,7 @@ export function ChartTuner() {
     <div className="dev-console-block">
       <div className="dev-tuner-head">
         <span>Chart</span>
-        <button type="button" className="dev-tuner-reset" onClick={resetAll}>
+        <button type="button" className="dev-tuner-reset" onClick={resetAll} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
           Reset
         </button>
       </div>
@@ -48,7 +56,12 @@ export function ChartTuner() {
         <input
           type="checkbox"
           checked={tuning.showBadges}
-          onChange={(e) => setTuning({ showBadges: e.target.checked })}
+          onPointerEnter={playHoverSound}
+          onFocus={playFocusSound}
+          onChange={(e) => {
+            playUISound("select");
+            setTuning({ showBadges: e.target.checked });
+          }}
         />
         Badges
       </label>
@@ -57,7 +70,12 @@ export function ChartTuner() {
         <input
           type="checkbox"
           checked={tuning.showGlow}
-          onChange={(e) => setTuning({ showGlow: e.target.checked })}
+          onPointerEnter={playHoverSound}
+          onFocus={playFocusSound}
+          onChange={(e) => {
+            playUISound("select");
+            setTuning({ showGlow: e.target.checked });
+          }}
         />
         Glow
       </label>
@@ -73,6 +91,8 @@ export function ChartTuner() {
             max={knob.max}
             step={knob.step}
             value={tuning[knob.key]}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
             onChange={(e) => setTuning({ [knob.key]: Number(e.target.value) })}
           />
         </label>
@@ -89,6 +109,8 @@ export function ChartTuner() {
             max={knob.max}
             step={knob.step}
             value={motion[knob.prop] ?? knob.min}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
             onChange={(e) => {
               const value = Number(e.target.value);
               setMotionKnob(knob.prop, value, knob.suffix);

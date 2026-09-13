@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
@@ -200,27 +202,41 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     }
 
     const isSelected = isEligible && n.id === selectedNodeId;
-    const handleClick = onSelectNode && isEligible
-      ? (e: MouseEvent) => {
-          e.stopPropagation();
+    const selectNode = onSelectNode && isEligible
+      ? () => {
           if (selectedNodeId === n.id) {
             onSelectNode(n.id);
             setSelectedNodeId(null);
           } else {
+            playUISound("select");
             setSelectedNodeId(n.id);
           }
         }
       : undefined;
-    const isClickable = !!handleClick;
+    const isClickable = !!selectNode;
     const isHovered = isClickable && hoveredNodeId === n.id;
 
     return (
       <g
         key={n.id}
         transform={`translate(${n.x}, ${n.y})`}
-        onClick={handleClick}
+        role={isClickable ? "button" : undefined}
+        tabIndex={isClickable ? 0 : undefined}
+        aria-label={isClickable ? isNarrative ? `House ${romanHouse(content.house)}` : `${r ?? "Planet"} encounter` : undefined}
+        aria-pressed={isClickable ? isSelected : undefined}
+        onClick={selectNode ? (e) => { e.stopPropagation(); selectNode(); } : undefined}
+        onKeyDown={selectNode ? (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!e.repeat) selectNode();
+          }
+        } : undefined}
         onMouseEnter={isClickable ? () => setHoveredNodeId(n.id) : undefined}
         onMouseLeave={isClickable ? () => setHoveredNodeId(null) : undefined}
+        onPointerEnter={isClickable ? playHoverSound : undefined}
+        onFocus={isClickable ? (e) => { setHoveredNodeId(n.id); playFocusSound(e); } : undefined}
+        onBlur={isClickable ? () => setHoveredNodeId(null) : undefined}
         style={{ cursor: isClickable ? "pointer" : "default", color }}
       >
         {isCurrent && (
@@ -315,7 +331,10 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       style={{ width: "100%", height: "100%", ...style }}
       role="img"
       aria-label="Map"
-      onClick={() => setSelectedNodeId(null)}
+      onClick={() => {
+        if (selectedNodeId) playUISound("dismiss");
+        setSelectedNodeId(null);
+      }}
     >
       <defs>{edgeDefs}{haloDefs}</defs>
       {edgeEls}

@@ -3,7 +3,8 @@ import { MapDiagram } from "@/components/MapDiagram";
 import { BeginButton } from "@/components/BeginButton";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { setTheme } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
@@ -43,7 +44,10 @@ export function EndOfRunScreen() {
   // Begin new run: a fresh run on the same Prince (SCREENS §6.3). Afflictions
   // and combusts reset; numEncounters, unlocks, and the run record persist —
   // that's the lifetime layer. Wiping identity is dev-only (DevConsole).
-  const beginNew = () => startRun();
+  const beginNew = () => {
+    startRun();
+    playUISound("commit");
+  };
 
   return (
     <EndOfRunView
@@ -98,6 +102,7 @@ function EndOfRunView({
     // Clicking the currently-selected card deselects it (returns to
     // uniform small layout); clicking any other card selects it.
     const next = i === currentCardIdx ? null : i;
+    playUISound(next === null ? "dismiss" : "select");
     // Only the outgoing + incoming cards crossfade; neighbors stay put.
     const fading = new Set<number>();
     if (currentCardIdx !== null) fading.add(currentCardIdx);
@@ -149,6 +154,10 @@ function EndOfRunView({
               key={m.id}
               className={`eor-card ${isCurrent ? "is-current" : ""} ${isFading ? "is-fading" : ""}`}
               onClick={() => selectCard(i)}
+              onPointerEnter={transitioning ? undefined : playHoverSound}
+              onFocus={transitioning ? undefined : playFocusSound}
+              aria-pressed={isCurrent}
+              aria-disabled={transitioning}
               type="button"
             >
               <div

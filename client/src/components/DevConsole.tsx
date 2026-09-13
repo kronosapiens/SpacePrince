@@ -9,12 +9,14 @@ import {
   currentTheme,
   isMusicEnabled,
   isSoundEnabled,
+  playUISound,
   setMusicEnabled,
   setSoundEnabled,
   shuffleTheme,
   subscribeTheme,
 } from "@/audio/engine";
 import { ChartTuner } from "@/components/ChartTuner";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 /**
  * Dev-only console (rendered only under `import.meta.env.DEV`). Three zones:
@@ -72,6 +74,8 @@ export function DevConsole({ open }: { open: boolean }) {
                 max={7}
                 step={1}
                 value={Math.min(Math.max(unlocked.length, 1), 7)}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
                 onChange={(e) => setPlanets(Number(e.target.value))}
               />
               <div>{unlocked.join(" · ") || "(none)"}</div>
@@ -80,9 +84,14 @@ export function DevConsole({ open }: { open: boolean }) {
                 type="button"
                 className="dev-chrome-button"
                 disabled={unlocked.length === 0}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
                 onClick={() => {
                   const planet = unlocked.at(-1);
-                  if (planet) setIntroPlanet(planet);
+                  if (planet && planet !== introPlanet) {
+                    playUISound("select");
+                    setIntroPlanet(planet);
+                  }
                 }}
               >
                 Intro Card{unlocked.length ? ` · ${unlocked.at(-1)}` : ""}
@@ -99,9 +108,12 @@ export function DevConsole({ open }: { open: boolean }) {
               <input
                 type="checkbox"
                 checked={music}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
                 onChange={(e) => {
                   setMusicEnabled(e.target.checked);
                   setMusic(e.target.checked);
+                  playUISound("select");
                 }}
               />
               Music
@@ -110,9 +122,12 @@ export function DevConsole({ open }: { open: boolean }) {
               <input
                 type="checkbox"
                 checked={sound}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
                 onChange={(e) => {
                   setSoundEnabled(e.target.checked);
                   setSound(e.target.checked);
+                  if (e.target.checked) playUISound("select");
                 }}
               />
               Sound
@@ -122,7 +137,13 @@ export function DevConsole({ open }: { open: boolean }) {
             type="button"
             className="dev-chrome-button"
             disabled={!canChangeTrack}
-            onClick={shuffleTheme}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
+            onClick={() => {
+              if (!canChangeTrack) return;
+              playUISound("select");
+              shuffleTheme();
+            }}
           >
             {track ? `Track · ${track}` : "Change Track"}
           </button>
@@ -132,7 +153,12 @@ export function DevConsole({ open }: { open: boolean }) {
               <button
                 type="button"
                 className="dev-chrome-button is-danger"
-                onClick={() => dispatch({ kind: "clear" })}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
+                onClick={() => {
+                  playUISound("commit");
+                  dispatch({ kind: "clear" });
+                }}
               >
                 Delete Prince
               </button>

@@ -7,16 +7,18 @@ import { beginRun } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { getScenario } from "@/data/narrative-scenarios";
 import { createStubPrince } from "./fixtures";
+import { playUISound } from "@/audio/engine";
 
 vi.hoisted(() => {
   // Chart's optional numeric badges measure text through canvas.
   HTMLCanvasElement.prototype.getContext = () => null;
 });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
+  vi.clearAllMocks();
   vi.useFakeTimers();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
@@ -71,6 +73,7 @@ describe("narrative chart interaction", () => {
     click('[data-guide="option-1"]');
     expect(onCommit).not.toHaveBeenCalled();
     choose("venus");
+    expect(playUISound).toHaveBeenLastCalledWith("select");
     expect(document.querySelector('[data-guide="arc-self-venus"] .arc-diff')).not.toBeNull();
     expect(element(".ps-action").textContent).toBe(`Testify ${run.state.Venus.affliction / 2}`);
     expect(onCommit).not.toHaveBeenCalled();
@@ -80,6 +83,7 @@ describe("narrative chart interaction", () => {
       action.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(playUISound).mock.calls.filter(([cue]) => cue === "commit")).toHaveLength(1);
     const next = onCommit.mock.calls[0]![0];
     expect(next.light).toBe(36);
     expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction / 2);
@@ -146,20 +150,25 @@ describe("narrative chart interaction", () => {
     click('[data-guide="option-1"]');
     choose("venus");
     click('[aria-label="Study this scene"]');
+    vi.mocked(playUISound).mockClear();
     click(".ps-action");
     expect(onCommit).not.toHaveBeenCalled();
+    expect(playUISound).not.toHaveBeenCalled();
     click('[aria-label="Close scene guide"]');
     expect(element(".ps-action").getAttribute("aria-pressed")).toBe("true");
     click(".ps-action");
     expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(playUISound).toHaveBeenLastCalledWith("commit");
   });
 
   it("confirms an untargeted option on its second tap", () => {
     const { onCommit } = mount("livelihood-coin");
     click('[data-guide="option-1"]');
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     expect(document.querySelector(".ps-action")).toBeNull();
     expect(onCommit).not.toHaveBeenCalled();
     click('[data-guide="option-1"]');
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit.mock.calls[0]![0].light).toBe(132);
   });

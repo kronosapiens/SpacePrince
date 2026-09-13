@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 type CityRow = [name: string, admin1: string, country: string, lat: number, lon: number, pop: number, tz: string];
 
@@ -91,6 +93,11 @@ export function CityPicker({ lat, lon, onChange }: Props) {
     if (!dataset) return [];
     return rank(dataset, query);
   }, [dataset, query]);
+  const resultsVisible = !manual && open && (query.trim().length >= 2 || loading);
+  const closeResults = useCallback(() => {
+    if (resultsVisible) playUISound("dismiss");
+    setOpen(false);
+  }, [resultsVisible]);
 
   useEffect(() => {
     setHighlight(0);
@@ -99,17 +106,22 @@ export function CityPicker({ lat, lon, onChange }: Props) {
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (!wrapRef.current) return;
-      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current.contains(e.target as Node)) return;
+      // Let another action's own cue carry the click that also closes results.
+      const control = (e.target as Element).closest('button, a[href], [role="button"]');
+      if (e.button === 0 && control && !control.matches(':disabled, [aria-disabled="true"]')) setOpen(false);
+      else closeResults();
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
-  }, []);
+  }, [closeResults]);
 
   const pick = (c: CityRow) => {
     setSelected(c);
     setQuery("");
     setOpen(false);
     onChange(round1(c[3]), round1(c[4]), c[6]);
+    playUISound("select");
   };
 
   // Manual coordinate entry — toggled by the compass. Prefills from a picked
@@ -137,10 +149,18 @@ export function CityPicker({ lat, lon, onChange }: Props) {
     if (!open) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlight((h) => Math.min(h + 1, matches.length - 1));
+      const next = Math.min(highlight + 1, matches.length - 1);
+      if (matches.length && next !== highlight) {
+        playUISound("hover");
+        setHighlight(next);
+      }
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlight((h) => Math.max(h - 1, 0));
+      const next = Math.max(highlight - 1, 0);
+      if (matches.length && next !== highlight) {
+        playUISound("hover");
+        setHighlight(next);
+      }
     } else if (e.key === "Enter") {
       const c = matches[highlight];
       if (c) {
@@ -148,7 +168,7 @@ export function CityPicker({ lat, lon, onChange }: Props) {
         pick(c);
       }
     } else if (e.key === "Escape") {
-      setOpen(false);
+      closeResults();
     }
   };
 
@@ -188,7 +208,7 @@ export function CityPicker({ lat, lon, onChange }: Props) {
                 }}
                 onKeyDown={onKeyDown}
               />
-              {open && (query.trim().length >= 2 || loading) && (
+              {resultsVisible && (
                 <ul className="city-results" role="listbox">
                   {loading && !dataset && <li className="city-empty">Loading places…</li>}
                   {!loading && dataset && matches.length === 0 && (
@@ -201,10 +221,12 @@ export function CityPicker({ lat, lon, onChange }: Props) {
                       role="option"
                       aria-selected={i === highlight}
                       onMouseDown={(e) => {
+                        if (e.button !== 0) return;
                         e.preventDefault();
                         pick(c);
                       }}
                       onMouseEnter={() => setHighlight(i)}
+                      onPointerEnter={playHoverSound}
                     >
                       <span className="city-name">{c[0]}</span>
                       {isAlphaAdmin(c[1]) && <span className="city-admin">, {c[1]}</span>}
@@ -221,7 +243,14 @@ export function CityPicker({ lat, lon, onChange }: Props) {
           className={`city-compass ${manual ? "is-active" : ""}`}
           title={manual ? "Search for a city" : "Enter coordinates"}
           aria-label={manual ? "Search for a city" : "Enter coordinates"}
-          onClick={() => (manual ? setManual(false) : enterManual())}
+          aria-expanded={manual}
+          onPointerEnter={playHoverSound}
+          onFocus={playFocusSound}
+          onClick={() => {
+            playUISound(manual ? "dismiss" : "select");
+            if (manual) setManual(false);
+            else enterManual();
+          }}
         >
           <CompassGlyph />
         </button>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
-import { setTheme } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
@@ -57,6 +57,7 @@ export function TitleScreen() {
   const handleBegin = () => {
     if (leaving) return;
     if (prince && !hasLiveRun) startRun();
+    playUISound(prince && !hasLiveRun ? "commit" : "select");
     setLeaving(true); // fade out, then hand off to /play
     window.setTimeout(() => navigate(ROUTES.play), TITLE_FADE_MS);
   };
@@ -83,7 +84,7 @@ export function TitleScreen() {
       </div>
       <div className="chart-layout-content title-content">
         <h1 className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</h1>
-        <BeginButton onClick={handleBegin}>
+        <BeginButton onClick={handleBegin} disabled={leaving}>
           {label}
         </BeginButton>
       </div>

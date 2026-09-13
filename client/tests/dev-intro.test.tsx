@@ -18,6 +18,7 @@ vi.mock("@/audio/engine", () => ({
   setMusicEnabled: vi.fn(),
   setSoundEnabled: vi.fn(),
   shuffleTheme: vi.fn(),
+  playUISound: vi.fn(),
 }));
 
 let root: Root;

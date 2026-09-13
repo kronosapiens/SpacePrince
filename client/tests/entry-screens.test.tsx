@@ -10,9 +10,10 @@ import { beginRun } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext } from "@/game/map-gen";
 import { createStubPrince } from "./fixtures";
+import { playUISound } from "@/audio/engine";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -85,9 +86,12 @@ describe("chart inspection on entry screens", () => {
 
     const map = prince.runs[0]!.map;
     const next = eligibleNext(map.graph, map.currentNodeId, map.visitedNodeIds)[0]!;
+    vi.mocked(playUISound).mockClear();
     click(element(`[data-guide="node-${next}"]`));
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     expect(loadPrince()).toEqual(prince);
     click(element(`[data-guide="node-${next}"]`));
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
     const run = loadPrince()!.runs[0]!;
     expect(run.map.currentNodeId).toBe(next);
     expect(run.encounter).not.toBeNull();

@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
@@ -9,6 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 export type GuidePlacement = "top" | "right" | "bottom" | "left";
 
@@ -415,6 +418,7 @@ export function GuideOverlay<P extends string>({
   onPhaseChange,
 }: GuideOverlayProps<P>): ReactElement {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const restoringFocus = useRef(false);
   const controlsRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const noteRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -422,10 +426,22 @@ export function GuideOverlay<P extends string>({
   const [barRect, setBarRect] = useState<GuideRect | null>(null);
   const maskId = `guide-mask-${useId().replace(/:/g, "")}`;
   const phaseIndex = phases.indexOf(phase);
+  const close = useCallback(() => {
+    playUISound("dismiss");
+    onClose();
+  }, [onClose]);
   const advance = () => {
     const next = phases[phaseIndex + 1];
-    if (next) onPhaseChange(next);
-    else onClose();
+    if (next) {
+      playUISound("select");
+      onPhaseChange(next);
+    } else close();
+  };
+  const back = () => {
+    const previous = phases[phaseIndex - 1];
+    if (!previous) return;
+    playUISound("dismiss");
+    onPhaseChange(previous);
   };
 
   const litIds = useMemo(
@@ -516,7 +532,7 @@ export function GuideOverlay<P extends string>({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        if (!event.repeat) close();
         return;
       }
       if (event.key !== "Tab") return;
@@ -536,9 +552,13 @@ export function GuideOverlay<P extends string>({
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("keydown", onKeyDown);
-      requestAnimationFrame(() => triggerRef.current?.focus());
+      requestAnimationFrame(() => {
+        restoringFocus.current = true;
+        triggerRef.current?.focus();
+        restoringFocus.current = false;
+      });
     };
-  }, [open, onClose]);
+  }, [open, close]);
 
   if (!open) {
     return (
@@ -547,8 +567,11 @@ export function GuideOverlay<P extends string>({
         type="button"
         className="screen-help-button"
         aria-label={openLabel}
+        onPointerEnter={playHoverSound}
+        onFocus={(event) => { if (!restoringFocus.current) playFocusSound(event); }}
         onClick={(event) => {
           event.stopPropagation();
+          playUISound("select");
           onOpen();
         }}
       >
@@ -637,18 +660,20 @@ export function GuideOverlay<P extends string>({
         {/* Where the `?` was, opened out: the way out, then back and forward,
             one pill. */}
         <div className="guide-bar" ref={barRef} tabIndex={-1} onClick={(event) => event.stopPropagation()}>
-          <button type="button" className="guide-close" onClick={onClose} aria-label={closeLabel}>
+          <button type="button" className="guide-close" onClick={close} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-label={closeLabel}>
             ×
           </button>
           <button
             type="button"
             className="guide-step"
-            onClick={() => onPhaseChange(phases[phaseIndex - 1]!)}
+            onClick={back}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
             disabled={phaseIndex <= 0}
           >
             Back
           </button>
-          <button type="button" className="guide-step is-primary" onClick={advance}>
+          <button type="button" className="guide-step is-primary" onClick={advance} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
             {phaseIndex === phases.length - 1 ? "Close" : "Next"}
           </button>
         </div>

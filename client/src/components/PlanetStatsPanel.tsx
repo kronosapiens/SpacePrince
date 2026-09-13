@@ -6,6 +6,8 @@ import { PLANET_ROLE } from "@/game/data";
 import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { TermText } from "@/components/TermText";
 import { VALENCE_COLOR } from "@/svg/palette";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 /** The panel owns action layout; the encounter owns preview and commit. */
 export interface PlanetStatsActions {
@@ -96,7 +98,10 @@ export function PlanetStatsPanel({
   // column head's (what the column means) — to drop prose below the table;
   // one open at a time.
   const [openKey, setOpenKey] = useState<BlurbKey | null>(null);
-  const toggleKey = (k: BlurbKey) => setOpenKey((c) => (c === k ? null : k));
+  const toggleKey = (k: BlurbKey) => {
+    playUISound(openKey === k ? "dismiss" : "select");
+    setOpenKey(openKey === k ? null : k);
+  };
   const contentRef = useRef<HTMLDivElement>(null);
   const [boxH, setBoxH] = useState(height);
   // The height transition is suppressed until the first paint lands, so the
@@ -157,11 +162,15 @@ export function PlanetStatsPanel({
             <div className="ps-head">
               <span className="ps-name">
                 {onToggleStudy && (
-                  <span
+                  <button
+                    type="button"
                     className="ps-tri ps-tri-tap"
-                    aria-hidden
+                    aria-label={`Study ${planet}`}
+                    aria-expanded={study}
+                    onPointerEnter={playHoverSound}
+                    onFocus={playFocusSound}
                     onClick={(e) => { e.stopPropagation(); onToggleStudy(); }}
-                  >▶</span>
+                  >▶</button>
                 )}
                 {planet.toUpperCase()}
                 <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
@@ -193,14 +202,18 @@ export function PlanetStatsPanel({
                         <th key={key}>{header}</th>
                       ) : (
                         <th key={key} className={`ps-colhead ${openKey === key ? "is-open" : ""}`}>
-                          <span
+                          <button
+                            type="button"
                             className="ps-tri ps-tri-tap"
-                            aria-hidden
+                            aria-label={`Explain ${header}`}
+                            aria-expanded={openKey === key}
+                            onPointerEnter={playHoverSound}
+                            onFocus={playFocusSound}
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleKey(key);
                             }}
-                          >▶</span>
+                          >▶</button>
                           {header}
                         </th>
                       ),
@@ -211,14 +224,18 @@ export function PlanetStatsPanel({
                   {table.rows.map((row) => (
                     <tr key={row.key} className={`ps-statrow ${openKey === row.key ? "is-open" : ""}`}>
                       <td className="ps-rowlabel">
-                        <span
+                        <button
+                          type="button"
                           className="ps-tri ps-tri-tap"
-                          aria-hidden
+                          aria-label={`Explain ${row.label}`}
+                          aria-expanded={openKey === row.key}
+                          onPointerEnter={playHoverSound}
+                          onFocus={playFocusSound}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleKey(row.key);
                           }}
-                        >▶</span>
+                        >▶</button>
                         {row.label}
                       </td>
                       <td>{row.core}</td>
@@ -260,6 +277,8 @@ export function PlanetStatsPanel({
                       }}
                       onMouseEnter={() => actions.onHoverAction?.(a.verb)}
                       onMouseLeave={() => actions.onHoverAction?.(null)}
+                      onPointerEnter={playHoverSound}
+                      onFocus={playFocusSound}
                     >
                       {a.verb === "Testimony" ? "Testify" : "Afflict"} {a.value}
                     </button>

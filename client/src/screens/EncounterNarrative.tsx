@@ -15,7 +15,8 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario } from "@/data/narrative-scenarios";
 import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
-import { playCombust, playStrike, setTheme } from "@/audio/engine";
+import { playCombust, playStrike, playUISound, setTheme } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
@@ -141,11 +142,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const verb: Polarity = targetEffect?.kind === "affliction" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
   const choosePlanet = (planet: PlanetName) => {
     if (resolved || !eligiblePlanets.has(planet)) return;
+    playUISound(selectedPlanet === planet ? "dismiss" : "select");
     setSelectedPlanet((p) => p === planet ? null : planet);
     setHoveredPlanet(null);
   };
   const resetChoice = () => {
     if (guideOpen) return;
+    if (selectedOptionId || selectedPlanet) playUISound("dismiss");
     setSelectedOptionId(null);
     setSelectedPlanet(null);
     setHoveredPlanet(null);
@@ -163,6 +166,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     const nextRun = resolveNarrative(run, prince, scenario, optionId, selection, devUnlockAll);
     if (!nextRun) return;
     committedRef.current = true;
+    playUISound("commit");
     setFrozenRows(rows);
 
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
@@ -205,10 +209,16 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       }],
       pending: selectedPlanet ? verb : null,
       onChoose: () => {
-        if (!selectedPlanet) setSelectedPlanet(inspectedPlanet);
-        else handleOption(selectedOption!.id);
+        if (!selectedPlanet) {
+          playUISound("select");
+          setSelectedPlanet(inspectedPlanet);
+        } else handleOption(selectedOption!.id);
       },
-      onClearPending: () => { setSelectedPlanet(null); setHoveredPlanet(null); },
+      onClearPending: () => {
+        if (selectedPlanet) playUISound("dismiss");
+        setSelectedPlanet(null);
+        setHoveredPlanet(null);
+      },
     } : undefined;
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
@@ -306,6 +316,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
             const commit = () => {
               if (!assignments.length) return;
               if (!isSelected) {
+                playUISound("select");
                 setSelectedOptionId(o.id);
                 setSelectedPlanet(null);
                 setHoveredPlanet(null);
@@ -320,6 +331,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                   className={`option ${isSelected ? "is-selected" : ""}`}
                   data-guide={`option-${i + 1}`}
                   onClick={resolved ? advance : (e) => { e.stopPropagation(); commit(); }}
+                  onPointerEnter={playHoverSound}
+                  onFocus={playFocusSound}
                   aria-pressed={isSelected}
                   disabled={!resolved && !assignments.length}
                   type="button"

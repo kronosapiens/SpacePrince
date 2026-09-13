@@ -7,6 +7,8 @@ import { spawn, type SpawnKind } from "@/state/dev-spawn";
 import { DevConsole } from "@/components/DevConsole";
 import gridStyles from "@/style/dev-grid.css?raw";
 import type { Prince, Run } from "@/game/types";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 type Surface = "title" | "index" | "mint" | "map" | "combat" | "narrative" | "end";
 
@@ -69,6 +71,8 @@ export function DevChrome() {
 
   const go = (page: Page) => {
     setPagesOpen(false);
+    if (page.kind === "title" && surface === "title") return;
+    playUISound(page.kind === "title" ? "select" : "commit");
     if (page.kind === "title") navigate(ROUTES.title);
     else if (page.kind === "mint") {
       dispatch({ kind: "clear" }); // no active run → PlaySurface shows mint
@@ -77,19 +81,26 @@ export function DevChrome() {
   };
 
   const regenerate = () => {
-    if (regenKind) launch(regenKind);
+    if (!regenKind) return;
+    playUISound("commit");
+    launch(regenKind);
   };
 
   // The list and the console share the corner, so opening one shuts the other.
   const togglePages = () => {
+    playUISound(pagesOpen ? "dismiss" : "select");
     setConsoleOpen(false);
     setPagesOpen((v) => !v);
   };
   const toggleConsole = () => {
+    playUISound(consoleOpen ? "dismiss" : "select");
     setPagesOpen(false);
     setConsoleOpen((v) => !v);
   };
-  const toggleGrid = () => setGridOn((v) => !v);
+  const toggleGrid = () => {
+    playUISound("select");
+    setGridOn((v) => !v);
+  };
 
   // The key handler reads the latest state and actions through a ref, so it
   // is bound once rather than on every render.
@@ -106,7 +117,7 @@ export function DevChrome() {
       else if (event.key === "r") regenerate();
       else if (event.key === "p") togglePages();
       else if (event.key.toLowerCase() === "g") toggleGrid();
-      else if (event.key === "Escape") setPagesOpen(false);
+      else if (event.key === "Escape" && pagesOpen) togglePages();
       else if (pagesOpen && /^[1-6]$/.test(event.key)) {
         const page = PAGES[Number(event.key) - 1];
         if (page) go(page);
@@ -120,19 +131,19 @@ export function DevChrome() {
     <>
       {gridOn && <style>{gridStyles}</style>}
       <div className="dev-keys" aria-label="Dev shortcuts">
-        <button type="button" onClick={toggleConsole} aria-expanded={consoleOpen}>
+        <button type="button" onClick={toggleConsole} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-expanded={consoleOpen}>
           <kbd>d</kbd>dev
         </button>
         <span aria-hidden>·</span>
-        <button type="button" onClick={regenerate} disabled={!regenKind}>
+        <button type="button" onClick={regenerate} onPointerEnter={playHoverSound} onFocus={playFocusSound} disabled={!regenKind}>
           <kbd>r</kbd>regenerate
         </button>
         <span aria-hidden>·</span>
-        <button type="button" onClick={togglePages} aria-expanded={pagesOpen}>
+        <button type="button" onClick={togglePages} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-expanded={pagesOpen}>
           <kbd>p</kbd>page
         </button>
         <span aria-hidden>·</span>
-        <button type="button" onClick={toggleGrid} aria-pressed={gridOn}>
+        <button type="button" onClick={toggleGrid} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-pressed={gridOn}>
           <kbd>g</kbd>grid
         </button>
       </div>
@@ -144,6 +155,8 @@ export function DevChrome() {
                 type="button"
                 className={`dev-page${SURFACE_LABEL[surface] === p.label ? " is-current" : ""}`}
                 onClick={() => go(p)}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
               >
                 <kbd>{i + 1}</kbd>{p.label}
               </button>

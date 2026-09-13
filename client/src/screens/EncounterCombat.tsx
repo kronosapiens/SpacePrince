@@ -7,7 +7,8 @@ import { hashString, mulberry32 } from "@/game/rng";
 import { resolveTurn } from "@/game/turn";
 import { isOver } from "@/game/run";
 import { PLANETS } from "@/game/data";
-import { setTheme } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { encounterRuler } from "@/game/encounter";
 import { RULER_RULES, scoreBeats } from "@/game/score";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -332,6 +333,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       if (encounter.resolved) return;
       if (animation) {
         skipAnimation();
+        playUISound("dismiss");
         setSelected(null);
         setPendingAction(null);
         setHoveredAction(null);
@@ -340,11 +342,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       if (guideOpen && guidePhase !== "act") return;
       if (!playerUnlocked.includes(planet)) return;
       if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
+      if (selected !== planet) playUISound("select");
+      else if (pendingAction !== (guideOpen ? "Testimony" : null)) playUISound(guideOpen ? "select" : "dismiss");
       setSelected(planet);
+      setHovered(null);
       setPendingAction(guideOpen ? "Testimony" : null);
       setHoveredAction(null);
     },
-    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase],
+    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase, selected, pendingAction],
   );
 
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
@@ -381,6 +386,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       });
       const committed = onCommitTurn(planet, action, rng);
       if (!committed) return;
+      playUISound("commit");
       startAnimation({
         entry: committed.log,
         previousRun,
@@ -421,6 +427,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       const result = resolveTurn(devRun, prince.chart, cfg.playerPlanet, cfg.valence, rng);
       if (!result) return;
       const entry: TurnLogEntry = { ...result.log };
+      playUISound("select");
       // opponentCombust = the player's action landing on the target planet
       // (phase 1) — that's the gesture you're evaluating.
       if (cfg.combust) entry.opponentCombust = true;
@@ -448,11 +455,19 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           pending: pendingAction,
           // First click/tap arms the action (and previews its spread); a second
           // on the same action confirms. Uniform across pointer and touch.
-          onChoose: (v) =>
-            guideOpen
-              ? setPendingAction(v)
-              : pendingAction === v ? handleCommit(inspected, v) : setPendingAction(v),
-          onClearPending: () => { if (!guideOpen) setPendingAction(null); },
+          onChoose: (v) => {
+            if (!guideOpen && pendingAction === v) handleCommit(inspected, v);
+            else if (pendingAction !== v) {
+              playUISound("select");
+              setPendingAction(v);
+            }
+          },
+          onClearPending: () => {
+            if (!guideOpen && pendingAction) {
+              playUISound("dismiss");
+              setPendingAction(null);
+            }
+          },
           onHoverAction: setHoveredAction,
         }
       : undefined;
@@ -461,7 +476,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const handleClearSelection = useCallback(() => {
     if (animation || guideOpen) return;
     if (selected !== null) {
+      playUISound("dismiss");
       setSelected(null);
+      setHovered(null);
       setPendingAction(null);
       setHoveredAction(null);
     }
@@ -636,7 +653,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           entrance="left"
           side="self"
           onPlanetClick={handlePlayerClick}
-          onPlanetHover={handlePlayerHover}
+          onPlanetHover={!animation && !selected && (!guideOpen || guidePhase === "act") ? handlePlayerHover : undefined}
           projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
           activePlanet={animation?.playerPlanet ?? null}
           activePropagationKeys={activePropagationKeys.self}
@@ -651,7 +668,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           statsPanelActions={playerActions}
           statsPanelReserveActions
           statsPanelStudy={study}
-          onToggleStudy={() => { if (!guideOpen) setStudy((s) => !s); }}
+          onToggleStudy={guideOpen ? undefined : () => {
+            playUISound(study ? "dismiss" : "select");
+            setStudy(!study);
+          }}
           inviteInteraction={!animation && !encounter.resolved && !selected}
           ringVerb={selected ? indicatedVerb : null}
         />
@@ -748,7 +768,10 @@ function DevAnimationPanel({
 
   return (
     <div className="anim-console" onClick={(e) => e.stopPropagation()}>
-      <button className="anim-console-header" onClick={() => setCollapsed((c) => !c)}>
+      <button className="anim-console-header" onPointerEnter={playHoverSound} onFocus={playFocusSound} onClick={() => {
+        playUISound(collapsed ? "select" : "dismiss");
+        setCollapsed(!collapsed);
+      }}>
         <span className="anim-console-caret" aria-hidden>{collapsed ? "▸" : "▾"}</span>
         <span>Animation Console</span>
       </button>
@@ -756,29 +779,47 @@ function DevAnimationPanel({
         <>
           <label className="anim-console-row">
             <span className="anim-console-label">Player</span>
-            <select className="anim-console-select" value={playerPlanet} onChange={(e) => setPlayerPlanet(e.target.value as PlanetName)}>
+            <select className="anim-console-select" value={playerPlanet} onPointerEnter={playHoverSound} onFocus={playFocusSound} onChange={(e) => {
+              playUISound("select");
+              setPlayerPlanet(e.target.value as PlanetName);
+            }}>
               {playerPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </label>
           <label className="anim-console-row">
             <span className="anim-console-label">Target</span>
-            <select className="anim-console-select" value={opponentPlanet} onChange={(e) => setOpponentPlanet(e.target.value as PlanetName)}>
+            <select className="anim-console-select" value={opponentPlanet} onPointerEnter={playHoverSound} onFocus={playFocusSound} onChange={(e) => {
+              playUISound("select");
+              setOpponentPlanet(e.target.value as PlanetName);
+            }}>
               {opponentPlanets.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </label>
           <div className="anim-console-row">
             <span className="anim-console-label">Verb</span>
             <div className="anim-console-segs">
-              <button className={`anim-console-seg${valence === "Testimony" ? " is-on" : ""}`} onClick={() => setValence("Testimony")}>Testify</button>
-              <button className={`anim-console-seg${valence === "Affliction" ? " is-on" : ""}`} onClick={() => setValence("Affliction")}>Afflict</button>
+              <button className={`anim-console-seg${valence === "Testimony" ? " is-on" : ""}`} onPointerEnter={playHoverSound} onFocus={playFocusSound} onClick={() => {
+                if (valence !== "Testimony") playUISound("select");
+                setValence("Testimony");
+              }}>Testify</button>
+              <button className={`anim-console-seg${valence === "Affliction" ? " is-on" : ""}`} onPointerEnter={playHoverSound} onFocus={playFocusSound} onClick={() => {
+                if (valence !== "Affliction") playUISound("select");
+                setValence("Affliction");
+              }}>Afflict</button>
             </div>
           </div>
           <div className="anim-console-checks">
-            <label className="anim-console-check"><input type="checkbox" checked={combust} onChange={(e) => setCombust(e.target.checked)} />Combust</label>
+            <label className="anim-console-check"><input type="checkbox" checked={combust} onPointerEnter={playHoverSound} onFocus={playFocusSound} onChange={(e) => {
+              playUISound("select");
+              setCombust(e.target.checked);
+            }} />Combust</label>
           </div>
           <div className="anim-console-actions">
-            <button className="anim-console-btn is-primary" onClick={() => onFire({ playerPlanet, opponentPlanet, valence, combust })}>Fire</button>
-            <button className="anim-console-btn" disabled={!animating} onClick={onSkip}>Skip</button>
+            <button className="anim-console-btn is-primary" onPointerEnter={playHoverSound} onFocus={playFocusSound} onClick={() => onFire({ playerPlanet, opponentPlanet, valence, combust })}>Fire</button>
+            <button className="anim-console-btn" disabled={!animating} onPointerEnter={playHoverSound} onFocus={playFocusSound} onClick={() => {
+              playUISound("dismiss");
+              onSkip();
+            }}>Skip</button>
           </div>
         </>
       )}

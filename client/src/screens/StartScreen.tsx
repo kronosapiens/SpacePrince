@@ -10,6 +10,7 @@ import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
+import { playUISound } from "@/audio/engine";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
@@ -124,13 +125,14 @@ export function StartScreen() {
     : null;
 
   const handleConfirm = () => {
-    if (!computed) return;
+    if (!computed || stage !== "input") return;
+    playUISound("commit");
     setStage("revealing");
     setRevealedCount(0);
   };
 
   const handleEnter = () => {
-    if (!computed) return;
+    if (!computed || stage !== "settled") return;
     const ms = quantizeMs(localToUtcMs(form.date, form.time, form.tz));
     const iso = new Date(ms).toISOString();
     const prince: Prince = {
@@ -148,6 +150,7 @@ export function StartScreen() {
     dispatchPrince({ kind: "mint", prince });
     // Append a fresh run; PlaySurface then renders the map (we're on /play).
     startRun();
+    playUISound("commit");
   };
 
   const showCeremony = stage === "revealing" || stage === "settled";
@@ -213,7 +216,10 @@ export function StartScreen() {
             </p>
             <BeginButton
               type="button"
+              disabled={leavingFraming}
               onClick={() => {
+                if (leavingFraming) return;
+                playUISound("select");
                 setLeavingFraming(true); // fade out, then reveal the input form
                 window.setTimeout(() => setStage("input"), FRAMING_FADE_MS);
               }}

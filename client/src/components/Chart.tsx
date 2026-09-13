@@ -10,6 +10,7 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { PropagationLine } from "@/components/PropagationLine";
 import { SvgRotation } from "@/components/SvgRotation";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
   AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_SIZE,
@@ -644,12 +645,16 @@ function PlanetGlyph({
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           e.stopPropagation();
-          onClick?.(point.planet);
+          if (!e.repeat) onClick?.(point.planet);
         }
       } : undefined}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      onFocus={() => setFocused(true)}
+      onPointerEnter={handleEnter ? playHoverSound : undefined}
+      onFocus={(e) => {
+        setFocused(true);
+        if (handleEnter) playFocusSound(e);
+      }}
       onBlur={() => setFocused(false)}
       style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}

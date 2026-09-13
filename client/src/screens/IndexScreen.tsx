@@ -8,6 +8,8 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Prince } from "@/game/types";
+import { playUISound } from "@/audio/engine";
+import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 export function IndexScreen() {
   const prince = usePrince();
@@ -17,6 +19,8 @@ export function IndexScreen() {
   const [settings, setSettings] = useState<DevSettings>(() => loadDevSettings());
 
   const update = (next: DevSettings) => {
+    if (Object.keys(next).every((key) => next[key as keyof DevSettings] === settings[key as keyof DevSettings])) return;
+    playUISound("select");
     setSettings(next);
     saveDevSettings(next);
   };
@@ -35,7 +39,7 @@ export function IndexScreen() {
           ] as Array<[string, string]>
         ).map(([label, to]) => (
           <div key={to} className="index-row">
-            <Link className="index-link" to={to}>{label}</Link>
+            <Link className="index-link" to={to} onClick={() => playUISound("select")} onPointerEnter={playHoverSound} onFocus={playFocusSound}>{label}</Link>
           </div>
         ))}
       </section>
@@ -60,12 +64,15 @@ export function IndexScreen() {
             <div className="index-row">
               <button
                 className="title-second"
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
                 onClick={() => {
                   if (!prince) return;
                   const v = window.prompt("Set numEncounters", String(prince.numEncounters));
                   if (v == null) return;
                   const n = Math.max(0, Math.floor(Number(v)));
-                  if (Number.isFinite(n)) {
+                  if (Number.isFinite(n) && n !== prince.numEncounters) {
+                    playUISound("commit");
                     dispatch({ kind: "setEncounters", count: n });
                   }
                 }}
@@ -74,7 +81,12 @@ export function IndexScreen() {
               </button>
               <button
                 className="title-second"
-                onClick={resetAll}
+                onPointerEnter={playHoverSound}
+                onFocus={playFocusSound}
+                onClick={() => {
+                  playUISound("commit");
+                  resetAll();
+                }}
               >
                 Reset Prince (all runs)
               </button>
@@ -87,6 +99,8 @@ export function IndexScreen() {
           <div className="index-row">
             <button
               className="title-second"
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
               onClick={() => {
                 const seed = randomSeed();
                 const chart = seededChart(seed, "Stub Prince");
@@ -98,6 +112,7 @@ export function IndexScreen() {
                   achievements: 0,
                   runs: [],
                 };
+                playUISound("commit");
                 dispatch({ kind: "mint", prince: next });
               }}
             >
@@ -127,6 +142,8 @@ export function IndexScreen() {
             <input
               type="checkbox"
               checked={settings.unlockAll}
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
               onChange={(e) => update({ ...settings, unlockAll: e.target.checked })}
             />
             Unlock all planets
@@ -137,6 +154,8 @@ export function IndexScreen() {
             <input
               type="checkbox"
               checked={settings.forceCombat}
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
               onChange={(e) =>
                 update({ ...settings, forceCombat: e.target.checked, forceNarrativeHouse: null })
               }
@@ -148,6 +167,8 @@ export function IndexScreen() {
           <label>Force narrative house</label>
           <select
             value={settings.forceNarrativeHouse ?? ""}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
             onChange={(e) =>
               update({
                 ...settings,

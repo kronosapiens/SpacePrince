@@ -3,7 +3,7 @@ import { ChartInspection } from "@/components/ChartInspection";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
-import { setTheme } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useRolloverMap } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
@@ -128,6 +128,7 @@ export function MapScreen() {
       // currentNodeId, the new encounter) to the tail run. PlaySurface sees the
       // encounter and renders it — no navigation needed.
       dispatch({ kind: "commitRun", run: nextRun });
+      playUISound("commit");
     },
     [run, prince, settings, dispatch],
   );
