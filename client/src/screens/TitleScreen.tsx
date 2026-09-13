@@ -7,6 +7,7 @@ import { setTheme } from "@/audio/engine";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
+import { BeginButton } from "@/components/BeginButton";
 import { ChartInspection } from "@/components/ChartInspection";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
@@ -82,9 +83,9 @@ export function TitleScreen() {
       </div>
       <div className="chart-layout-content title-content">
         <h1 className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</h1>
-        <button className="begin-btn" onClick={handleBegin} type="button">
+        <BeginButton onClick={handleBegin}>
           {label}
-        </button>
+        </BeginButton>
       </div>
     </div>
   );

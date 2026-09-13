@@ -35,6 +35,8 @@
   --serif: var(--display);
   --sans: var(--chrome);
   --title-wordmark-size: clamp(22px, 9cqi, 64px);
+  --begin-btn-font-size: 24px;
+  --begin-btn-padding: 8px 20px;
 
   /* Chart-casting form */
   --mint-form-width: 480px;

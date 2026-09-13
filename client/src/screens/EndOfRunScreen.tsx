@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapDiagram } from "@/components/MapDiagram";
+import { BeginButton } from "@/components/BeginButton";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { setTheme } from "@/audio/engine";
@@ -168,7 +169,7 @@ function EndOfRunView({
       </div>
 
       <div className="eor-actions">
-        <button className="begin-btn" onClick={onBegin}>{beginLabel}</button>
+        <BeginButton onClick={onBegin}>{beginLabel}</BeginButton>
       </div>
     </div>
   );

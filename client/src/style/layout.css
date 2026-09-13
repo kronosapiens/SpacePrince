@@ -90,35 +90,36 @@
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 .begin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 100%;
+  flex-shrink: 0;
+  align-self: center;
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: var(--begin-btn-font-size);
   font-style: italic;
+  line-height: 1.2;
   letter-spacing: 0.02em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
   color: var(--bone);
-  padding: 14px 48px;
-  border: 1px solid var(--bone);
+  padding: var(--begin-btn-padding);
+  border: 0;
   background: transparent;
-  border-radius: 999px;
   cursor: pointer;
-  transition: background 220ms ease, color 220ms ease, border-color 220ms ease;
-  animation: begin-breath 3s ease-in-out infinite;
+  transition: color 220ms ease;
 }
-.begin-btn:hover {
-  background: var(--bone);
-  color: var(--void);
-  animation: none;
-  opacity: 1;
+.begin-btn:hover:not(:disabled),
+.begin-btn:focus-visible { color: var(--gold-hi); }
+.begin-btn:focus-visible {
+  outline: none;
+  text-decoration-thickness: 2px;
 }
-.begin-btn:disabled { opacity: 0.45; cursor: not-allowed; animation: none; }
-.begin-btn-ghost {
-  border-color: var(--mist);
-  color: var(--mist);
-  font-size: 18px;
-  padding: 10px 32px;
-  font-style: italic;
-  animation: none; /* secondary action — no breath */
-}
-.begin-btn-ghost:hover { background: transparent; color: var(--bone); border-color: var(--bone); }
+.begin-btn:disabled { opacity: 0.45; cursor: not-allowed; text-shadow: none; }
 
 /* ── Title ─────────────────────────────────────────────────────────────── */
 

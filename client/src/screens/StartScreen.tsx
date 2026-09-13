@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Chart } from "@/components/Chart";
+import { BeginButton } from "@/components/BeginButton";
 import { CityPicker } from "@/components/CityPicker";
 import { PlanetBands } from "@/components/PlanetBands";
 import { computeBirthChart } from "@/astronomy/compute";
@@ -210,8 +211,7 @@ export function StartScreen() {
               your Prince's visual appearance.
               The video game save file turned art object.
             </p>
-            <button
-              className="begin-btn"
+            <BeginButton
               type="button"
               onClick={() => {
                 setLeavingFraming(true); // fade out, then reveal the input form
@@ -219,7 +219,7 @@ export function StartScreen() {
               }}
             >
               Continue
-            </button>
+            </BeginButton>
           </div>
         )}
 
@@ -254,9 +254,9 @@ export function StartScreen() {
                 />
               </Field>
             </div>
-            <button className="begin-btn mint-submit" onClick={handleConfirm} disabled={!computed}>
+            <BeginButton className="mint-submit" onClick={handleConfirm} disabled={!computed}>
               Cast Chart
-            </button>
+            </BeginButton>
           </>
         )}
 
@@ -273,7 +273,7 @@ export function StartScreen() {
         {stage === "settled" && (
           <>
             <div className="mint-caption-italic">The Moon rises in the east. The rest, in time.</div>
-            <button className="begin-btn" onClick={handleEnter}>Continue</button>
+            <BeginButton onClick={handleEnter}>Continue</BeginButton>
           </>
         )}
 
