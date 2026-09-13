@@ -3,6 +3,7 @@ import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
+import { MAP_PADDING } from "@/svg/map-style";
 import type { MapState, PlanetName } from "@/game/types";
 
 interface MapDiagramProps {
@@ -67,10 +68,10 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
 
   const xs = positioned.map((n) => n.x);
   const ys = positioned.map((n) => n.y);
-  const minX = Math.min(...xs) - 90;
-  const maxX = Math.max(...xs) + 90;
-  const minY = Math.min(...ys) - 90;
-  const maxY = Math.max(...ys) + 90;
+  const minX = Math.min(...xs) - MAP_PADDING;
+  const maxX = Math.max(...xs) + MAP_PADDING;
+  const minY = Math.min(...ys) - MAP_PADDING;
+  const maxY = Math.max(...ys) + MAP_PADDING;
   const w = maxX - minX;
   const h = maxY - minY;
 

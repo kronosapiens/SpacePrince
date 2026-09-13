@@ -441,9 +441,12 @@
 
 /* ── Map ──────────────────────────────────────────────────────────────── */
 
+.map-screen {
+  padding-block: var(--map-pad-block);
+}
 .map-content {
   min-width: 0;
-  height: calc(100svh - 120px);
+  height: calc(100svh - 2 * var(--map-pad-block));
   min-height: 480px;
   display: flex;
   flex-direction: column;

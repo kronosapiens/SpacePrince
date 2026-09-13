@@ -47,6 +47,8 @@
   --mint-compass-size: 26.5px;
   --mint-compass-offset-x: -4.75px;
 
+  --map-pad-block: 24px;
+
   /* Stroke scale */
   --stroke-hairline: 0.5;
   --stroke-light: 1;
