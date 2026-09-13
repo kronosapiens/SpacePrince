@@ -1776,8 +1776,8 @@
    One visual vocabulary for both: pill toggles, blurred near-black panels,
    uppercase micro-type, mist → bone on hover. */
 
-/* Dev chrome — three keys, spelled out small in the lower-left: `d` opens the
-   console, `r` re-rolls the surface, `p` lists the pages. The words are
+/* Dev chrome — four keys, spelled out small in the lower-left: `d` opens the
+   console, `r` re-rolls the surface, `p` lists the pages, `g` outlines boxes. The words are
    buttons too. Hidden while a guide is open, and on phones, which have no
    keyboard. */
 .dev-keys {
@@ -1808,6 +1808,7 @@
   transition: color 180ms ease;
 }
 .dev-keys button:hover:not(:disabled) { color: var(--bone); }
+.dev-keys button[aria-pressed="true"] { color: var(--gold); }
 .dev-keys button:disabled { opacity: 0.4; cursor: default; }
 .dev-keys kbd,
 .dev-page kbd {
