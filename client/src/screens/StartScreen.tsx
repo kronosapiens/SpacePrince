@@ -229,6 +229,7 @@ export function StartScreen() {
               <Field label="Date">
                 <input
                   type="date"
+                  className="invite-text"
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />
@@ -236,6 +237,7 @@ export function StartScreen() {
               <Field label="Time">
                 <input
                   type="time"
+                  className="invite-text"
                   step={300}
                   value={form.time}
                   onChange={(e) => setForm({ ...form, time: e.target.value })}

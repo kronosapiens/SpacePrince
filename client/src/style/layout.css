@@ -224,10 +224,11 @@
 }
 
 .mint-form {
+  container-type: inline-size;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
-  width: min(420px, 100%);
+  gap: var(--mint-form-gap);
+  width: min(var(--mint-form-width), 100%);
   text-align: left;
 }
 /* A little breathing room above the mint's primary button. */
@@ -236,13 +237,13 @@
 }
 .mint-row {
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) 2fr;
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, 3fr);
   align-items: center;
   gap: 12px;
 }
 .mint-row label {
-  font-family: var(--sans);
-  font-size: 13px;
+  font-family: var(--serif);
+  font-size: var(--mint-label-size);
   letter-spacing: 0.04em;
   color: var(--mist);
 }
@@ -253,14 +254,30 @@
   border: 0;
   border-bottom: 1px solid var(--mist);
   color: var(--bone);
-  font-family: var(--serif);
-  font-size: 18px;
-  padding: 6px 4px;
+  font-family: var(--sans);
+  font-size: var(--mint-input-size);
+  padding: var(--mint-input-padding) 4px;
   outline: none;
+}
+.mint-row :is(input, select),
+.city-field {
   transition: border-color 200ms ease;
 }
-.mint-row input:focus,
-.mint-row select:focus { border-color: var(--bone); }
+.mint-row > :is(input, select):is(:hover, :focus),
+.city-field:is(:hover, :focus-within) {
+  border-bottom-color: var(--bone);
+}
+.city-field:is(:hover, :focus-within) .invite-text {
+  --invite-glow-opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mint-row :is(input, select),
+  .city-field { transition: none; }
+}
+@container (max-width: 440px) {
+  .mint-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .city-manual { flex-direction: column; }
+}
 /* Tint the native date/time picker icons to bone so they match the custom
    compass on the Place field. `brightness(0)` first makes the result
    deterministic regardless of the OS/browser default indicator color. */
@@ -311,10 +328,6 @@
   /* One underline across the whole field (like the date/time inputs), running
      under the compass — not a short underline that stops before it. */
   border-bottom: 1px solid var(--mist);
-  transition: border-color 200ms ease;
-}
-.city-field:focus-within {
-  border-bottom-color: var(--bone);
 }
 /* The inputs sit inside the field's shared underline — drop their own. */
 .city-field input {
@@ -365,13 +378,17 @@
   color: var(--bone);
   opacity: 0.85; /* match the brightness of the native date/time picker icons */
   /* The native indicators baseline-align (sit a touch far); nudge to match. */
-  transform: translateX(-3px);
+  transform: translateX(var(--mint-compass-offset-x));
   cursor: pointer;
   transition: opacity 200ms ease;
 }
 .city-compass:hover,
 .city-compass.is-active {
   opacity: 1;
+}
+.city-compass svg {
+  width: var(--mint-compass-size);
+  height: var(--mint-compass-size);
 }
 .city-results {
   position: absolute;

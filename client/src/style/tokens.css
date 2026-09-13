@@ -36,6 +36,15 @@
   --sans: var(--chrome);
   --title-wordmark-size: clamp(22px, 9cqi, 64px);
 
+  /* Chart-casting form */
+  --mint-form-width: 480px;
+  --mint-form-gap: 20px;
+  --mint-label-size: 28pt;
+  --mint-input-size: 24px;
+  --mint-input-padding: 10px;
+  --mint-compass-size: 26.5px;
+  --mint-compass-offset-x: -4.75px;
+
   /* Stroke scale */
   --stroke-hairline: 0.5;
   --stroke-light: 1;

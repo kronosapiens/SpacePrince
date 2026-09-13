@@ -221,8 +221,8 @@
    swing stays small — the halo is what carries reach, the ring only needs to
    register as alive.
 
-   One clock, many breathers: a registered custom property (--breath, 0→1→0
-   over 3s) animates on :root and never restarts, and every invite element
+   One clock, many breathers: a registered custom property (--breath, 0→1→0)
+   animates on :root and never restarts, and every invite element
    derives its opacity/scale from it via calc(). Hovers, tap-previews, and
    remounts therefore can't knock an element out of phase — the whole surface
    breathes together. Browsers without @property (Safari <16.4, Firefox <128)
@@ -236,7 +236,7 @@
   0%, 100% { --breath: 0; }
   50%      { --breath: 1; }
 }
-/* The invite's four tunable values. Declared here rather than in a token module
+/* The invite's shared settings. Declared here rather than in a token module
    because their consumers are the CSS animations below; the dev console
    overrides them inline on :root and clearing the override falls back to these.
    Period was 1s, which read as panting; 1.5s is where it settled under the live
@@ -246,12 +246,23 @@
   --breath-period: 1.5s;
   --invite-glow-min: 0.28;
   --invite-glow-range: 0.22;
+  --invite-glow-blur: 8px;
+  --invite-glow-opacity: calc(var(--invite-glow-min) + var(--invite-glow-range) * var(--breath));
   --invite-ring-swing: 0.05;
 }
 :root { animation: breath-clock var(--breath-period) ease-in-out infinite; }
 
 .anim-invite-glow {
-  opacity: calc(var(--invite-glow-min) + var(--invite-glow-range) * var(--breath));
+  opacity: var(--invite-glow-opacity);
+}
+
+/* Text uses the planets' shared glow and clock without dimming the characters. */
+.invite-text {
+  text-shadow: 0 0 var(--invite-glow-blur)
+    color-mix(in srgb, currentColor calc(100% * var(--invite-glow-opacity)), transparent);
+}
+.invite-text:is(:hover, :focus) {
+  --invite-glow-opacity: 1;
 }
 
 /* Combust warning — the affliction badge of a planet for whom combustion is on
@@ -270,7 +281,7 @@
    a second ring.
    fill-box/center keep the scale breath centered on the ring itself. */
 .invite-ring {
-  filter: drop-shadow(0 0 8px currentColor);
+  filter: drop-shadow(0 0 var(--invite-glow-blur) currentColor);
   transform-box: fill-box;
   transform-origin: center;
 }

@@ -57,7 +57,7 @@ function rank(rows: CityRow[], q: string): CityRow[] {
  *  calendar/clock picker icons on the date and time fields. */
 function CompassGlyph() {
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.2" />
       <path
         d="M12 4 L13.6 10.4 L20 12 L13.6 13.6 L12 20 L10.4 13.6 L4 12 L10.4 10.4 Z"
@@ -160,11 +160,13 @@ export function CityPicker({ lat, lon, onChange }: Props) {
             <div className="city-manual">
               <input
                 type="text" inputMode="decimal" maxLength={7}
+                className="invite-text"
                 placeholder="Lat" value={manLat}
                 onChange={(e) => applyManual(maskCoord(e.target.value), manLon)}
               />
               <input
                 type="text" inputMode="decimal" maxLength={7}
+                className="invite-text"
                 placeholder="Lon" value={manLon}
                 onChange={(e) => applyManual(manLat, maskCoord(e.target.value))}
               />
@@ -173,7 +175,7 @@ export function CityPicker({ lat, lon, onChange }: Props) {
             <>
               <input
                 type="text"
-                className={`city-input ${selected ? "has-city" : ""}`}
+                className={`city-input invite-text ${selected ? "has-city" : ""}`}
                 placeholder={selected ? formatCity(selected) : "City"}
                 value={query}
                 onFocus={() => {
