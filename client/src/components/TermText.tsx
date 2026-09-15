@@ -9,15 +9,18 @@ const MECHANIC_TERM_RE = /^(?:aspects?|combust(?:ed)?)$/i;
 
 /** `{name}` slots a template leaves for a caller's value. */
 const VAR_RE = /\{(\w+)\}/;
+/** `**…**` marks a run of free emphasis (the mint framing's register). */
+const BOLD_RE = /\*\*(.+?)\*\*/;
 
-/** Renders prose with the named terms wrapped in the gold `.term` accent, and
- *  any `{name}` placeholder replaced by `vars[name]`. Mechanical, so copy stays
- *  plain strings and can't drift out of compliance. */
+/** Renders prose with the named terms wrapped in the gold `.term` accent,
+ *  `**…**` runs in `<strong>`, and any `{name}` placeholder replaced by
+ *  `vars[name]`. Mechanical, so copy stays plain strings and can't drift out
+ *  of compliance. */
 export function TermText({ text, vars }: { text: string; vars?: Record<string, ReactNode> }): ReactNode {
   // Placeholders first: a filled value is already a node, so only the prose
-  // runs around it go through the term highlighter.
+  // runs around it go through the markup passes.
   return text.split(VAR_RE).map((part, i) => (
-    <Fragment key={i}>{i % 2 === 1 ? vars?.[part] : goldTerms(part)}</Fragment>
+    <Fragment key={i}>{i % 2 === 1 ? vars?.[part] : emphasis(part)}</Fragment>
   ));
 }
 
@@ -29,6 +32,12 @@ export function fillLabel(text: string, vars: Record<string, string | number>): 
 /** A planet's name in its own colour — the other accented run in guide copy. */
 export function planetName(planet: PlanetName): ReactNode {
   return <span style={{ color: PLANET_PRIMARY[planet] }}>{planet}</span>;
+}
+
+function emphasis(text: string): ReactNode {
+  return text.split(BOLD_RE).map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{goldTerms(part)}</strong> : <Fragment key={i}>{goldTerms(part)}</Fragment>,
+  );
 }
 
 function goldTerms(text: string): ReactNode {

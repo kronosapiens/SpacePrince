@@ -3,6 +3,7 @@ import { Chart } from "@/components/Chart";
 import { BeginButton } from "@/components/BeginButton";
 import { CityPicker } from "@/components/CityPicker";
 import { PlanetBands } from "@/components/PlanetBands";
+import { TermText } from "@/components/TermText";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
@@ -14,8 +15,9 @@ import { playUISound, setTheme } from "@/audio/engine";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
+import { PRIMER_FRAMING } from "@/copy/primer";
 
-// The framing (SCREENS.md §9.6 / PRIMER.md) opens the mint — its intent-and-
+// The framing (SCREENS.md §9.6; copy in `copy/primer.ts`) opens the mint — its intent-and-
 // stakes beat. It rides the mint surface so Continue (resume) bypasses it for
 // free: only a New Game, a fresh mint, passes through it.
 type Stage = "framing" | "input" | "revealing" | "settled";
@@ -186,36 +188,9 @@ export function StartScreen() {
       <div className="chart-layout-content mint-content">
         {stage === "framing" && (
           <div className={`mint-framing anim-surface-in ${leavingFraming ? "is-leaving" : ""}`}>
-            <p>
-              Astrology is one of humanity's oldest systems of knowledge. For four
-              millennia, astrologers have been making sense of the stars.
-            </p>
-            <p>
-              Space Prince is a game about astrology. But it's unlike others you've played.
-            </p>
-            <p>
-              Instead of playing <strong>as a character</strong>, you play as <strong>yourself</strong> —
-              your birth chart is your stats sheet.
-              Instead of getting stronger and dominating others, you play by {" "}
-              <strong>creating and relieving tension.</strong> {" "}
-            </p>
-            <p>
-              You gain <strong>Light</strong> by creating and relieving tension.
-              When the passage ends, that Light becomes a star.
-            </p>
-            <p>
-              The goal isn't to win, but to better understand yourself.
-            </p>
-            <p>
-              To begin, <strong>cast your chart</strong> and create a
-              globally unique token: your Space Prince.
-              Nobody else can play as you, because <strong>nobody else is you.</strong>
-            </p>
-            <p>
-              All of your games will be permanently recorded and reflected in
-              your Prince's visual appearance.
-              The video game save file turned art object.
-            </p>
+            {PRIMER_FRAMING.map((p, i) => (
+              <p key={i}><TermText text={p} /></p>
+            ))}
             <BeginButton
               type="button"
               disabled={leavingFraming}

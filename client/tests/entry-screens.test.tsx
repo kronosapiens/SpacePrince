@@ -11,6 +11,7 @@ import { beginRun } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext } from "@/game/map-gen";
 import { createStubPrince } from "./fixtures";
+import { PRIMER_FRAMING } from "@/copy/primer";
 import { playUISound, setTheme } from "@/audio/engine";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -76,7 +77,10 @@ describe("entry screens", () => {
     expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"]]);
     click(element(".begin-btn"));
     act(() => vi.advanceTimersByTime(500));
-    expect(container.querySelector(".mint-framing")).not.toBeNull();
+    const framing = element(".mint-framing");
+    expect(framing.querySelectorAll("p").length).toBe(PRIMER_FRAMING.length);
+    expect(framing.querySelector("strong")?.textContent).toBe("as a character");
+    expect(framing.textContent).not.toContain("**");
     expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"], ["Main"]]);
   });
 

@@ -19,23 +19,7 @@ Stays above the named mechanics — *testimony, affliction, combustion, Resolve,
 ## The framing — shown at mint
 
 *A few lines: the minimum that creates intent and stakes.*
-
-```
-Astrology is one of humanity's oldest systems of knowledge. For four millennia, astrologers have been making sense of the stars.
-
-Space Prince is a game about astrology. But it's unlike others you've played.
-
-Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by **creating and relieving tension.**
-
-Tension held and relieved, over and over, gathers into **Light.**
-When the passage ends, that Light becomes a star.
-
-The goal isn't to win, but to better understand yourself.
-
-To begin, **cast your chart** and create a globally unique token: your Space Prince. Nobody else can play as you, because **nobody else is you.**
-
-All of your games will be permanently recorded and reflected in your Prince's visual appearance. The video game save file turned art object.
-```
+The words live in the client, at `client/src/copy/primer.ts`, and are edited there.
 
 ---
 
