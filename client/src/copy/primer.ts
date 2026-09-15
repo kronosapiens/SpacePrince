@@ -1,8 +1,8 @@
 /** Primer copy — the framing shown at mint, the game's opening intent-and-
- *  stakes beat (SCREENS.md §9.6). PRIMER.md holds the voice notes and the
- *  codex; the words themselves live here. One string per paragraph, rendered
- *  through `TermText`: `**…**` marks emphasis, and Light takes the gold term
- *  accent on its own.
+ *  stakes beat (SCREENS.md §9.6), and the line that opens the cast form after
+ *  it. PRIMER.md holds the voice notes and the codex; the words themselves
+ *  live here. One string per paragraph, rendered through `TermText`: `**…**`
+ *  marks emphasis, and Light takes the gold term accent on its own.
  *  Register: spare, confident, unhurried — assumes no astrology and stays
  *  above the named mechanics (Resolve, affliction, testimony are taught in
  *  play). */
@@ -14,3 +14,6 @@ export const PRIMER_FRAMING: string[] = [
   "Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating, you play by **creating and relieving tension** — in relationship with others.",
   "The goal isn't to win, but to better understand yourself, and the inner architecture that sustains you.",
 ];
+
+/** The instruction above the cast form. */
+export const PRIMER_CAST = "Cast your chart to begin.";

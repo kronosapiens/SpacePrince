@@ -224,6 +224,11 @@
   align-self: center;
 }
 
+/* The instruction above and the button below sit the same distance off the fields. */
+.mint-form,
+.mint-submit {
+  margin-top: var(--mint-form-margin);
+}
 .mint-form {
   container-type: inline-size;
   display: grid;
@@ -231,10 +236,6 @@
   gap: var(--mint-form-gap);
   width: min(var(--mint-form-width), 100%);
   text-align: left;
-}
-/* A little breathing room above the mint's primary button. */
-.mint-submit {
-  margin-top: 16px;
 }
 .mint-row {
   display: grid;

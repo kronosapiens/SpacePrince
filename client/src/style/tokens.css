@@ -41,11 +41,12 @@
   /* Chart-casting form */
   --mint-form-width: 480px;
   --mint-form-gap: 20px;
-  --mint-label-size: 28pt;
-  --mint-input-size: 24px;
-  --mint-input-padding: 10px;
-  --mint-compass-size: 26.5px;
-  --mint-compass-offset-x: -4.75px;
+  --mint-form-margin: 16px; /* instruction above, button below: same distance off the fields */
+  --mint-label-size: 22px;
+  --mint-input-size: 18px;
+  --mint-input-padding: 8px;
+  --mint-compass-size: 20px;
+  --mint-compass-offset-x: -3.5px;
 
   --map-pad-block: 24px;
 

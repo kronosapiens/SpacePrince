@@ -15,7 +15,7 @@ import { playUISound, setTheme } from "@/audio/engine";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
-import { PRIMER_FRAMING } from "@/copy/primer";
+import { PRIMER_CAST, PRIMER_FRAMING } from "@/copy/primer";
 
 // The framing (SCREENS.md §9.6; copy in `copy/primer.ts`) opens the mint — its intent-and-
 // stakes beat. It rides the mint surface so Continue (resume) bypasses it for
@@ -208,6 +208,7 @@ export function StartScreen() {
 
         {stage === "input" && (
           <>
+            <div className="mint-caption-italic anim-surface-in"><TermText text={PRIMER_CAST} /></div>
             <div className="mint-form anim-surface-in">
               <Field label="Date">
                 <input
