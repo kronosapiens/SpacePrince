@@ -28,8 +28,8 @@ export const CORONA_REACH = 86;
 const ASPECT_BREADTH = 14;
 const ASPECT_OVERRUN = 4;
 
-/** Whole wheels lift through the veil without a ring of their own — the
- *  wheel's outer ring is already the shape — and notes may sit over them. */
+/** Whole wheels lift through the veil without a ring of their own.
+ *  Notes may sit over the wheel while keeping its planets clear. */
 export const WHEELS = ["wheel-self", "wheel-other"];
 
 export function planetAnchor(side: ChartSide, planet: PlanetName) {
@@ -51,8 +51,6 @@ export function wheelOf(id: string) {
   return `wheel-${id.split("-")[1]}`;
 }
 
-/** Every glyph on one wheel: never lit as a group, but notes keep off them
- *  whenever a clear side exists. */
 export function chartGlyphs(side: ChartSide) {
   return PLANETS.map((planet) => planetAnchor(side, planet));
 }
@@ -123,7 +121,13 @@ export function chartShape(
 
   if (WHEELS.includes(id)) {
     const box = crispRect(rect);
-    return { rect: box, radius: Math.max(box.width, box.height) / 2, lift: true };
+    const side = id === "wheel-self" ? "self" : "other";
+    return {
+      rect: box,
+      radius: Math.max(box.width, box.height) / 2,
+      lift: true,
+      obstacles: chartGlyphs(side).flatMap((planet) => planetCircle(planet, reachOf(planet), rects) ?? []),
+    };
   }
 
   return undefined;

@@ -2,11 +2,10 @@ import { Fragment, type ReactNode } from "react";
 import type { PlanetName } from "@/game/types";
 import { PLANET_PRIMARY } from "@/svg/palette";
 
-/** The named terms of SCREENS.md §1.2 — capitalized in prose, rendered in
- *  gold on player surfaces (the accent replaces bold). Mention-cased only:
- *  lowercase uses ("afflict their actor") stay body text, so the casing rule
- *  is exactly what the highlighter reads. */
-const TERM_RE = /\b(Resolve|Fortune|Light|Afflict|Testify)\b/g;
+/** Named quantities and actions keep their prose capitals; aspect and
+ *  combust take the gold accent regardless of capitalization. */
+const NAMED_TERMS = new Set(["Resolve", "Fortune", "Light", "Afflict", "Testify"]);
+const MECHANIC_TERM_RE = /^(?:aspects?|combust(?:ed)?)$/i;
 
 /** `{name}` slots a template leaves for a caller's value. */
 const VAR_RE = /\{(\w+)\}/;
@@ -33,9 +32,8 @@ export function planetName(planet: PlanetName): ReactNode {
 }
 
 function goldTerms(text: string): ReactNode {
-  // split with a capturing group alternates [plain, term, plain, term, …].
-  return text.split(TERM_RE).map((part, i) =>
-    i % 2 === 1 ? (
+  return text.split(/\b/).map((part, i) =>
+    NAMED_TERMS.has(part) || MECHANIC_TERM_RE.test(part) ? (
       <span key={i} className="term">{part}</span>
     ) : (
       part

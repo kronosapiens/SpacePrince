@@ -9,7 +9,6 @@ import {
   chartShape,
   CORONA_REACH,
   planetAnchor,
-  planetCircle,
   PLANET_REACH,
   wheelOf,
   WHEELS,
@@ -53,10 +52,6 @@ const COPY = GUIDE_COPY.encounter;
 const PANEL_PAD = 8;
 const PANEL_RADIUS = 14 + PANEL_PAD;
 
-/** Every glyph on both wheels: never lit as a group, but notes keep off them
- *  whenever a clear side exists. */
-const GLYPHS = (["self", "other"] as const).flatMap(chartGlyphs);
-
 /** The chart's shapes first; past them, the encounter's own readouts, which
  *  each want their own padding. */
 function encounterShape(id: string, rects: GuideRects, reachOf: (id: string) => number): GuideShape | undefined {
@@ -97,7 +92,7 @@ export function CombatGuide({
 
   const notes = useMemo<GuideNote[]>(() => {
     if (phase === "read") {
-      return [
+      const readNotes: GuideNote[] = [
         {
           key: "turn",
           anchor: "turn",
@@ -120,6 +115,18 @@ export function CombatGuide({
           body: <TermText text={COPY.notes.ruler.body} vars={{ ruler: planetName(ruler), rule }} />,
         },
       ];
+
+      if (opponentPlanet) {
+        readNotes.push({
+          key: "active-planet",
+          anchor: "opponent-move",
+          placement: "bottom",
+          label: COPY.notes.activePlanet.label,
+          body: <TermText text={COPY.notes.activePlanet.body} />,
+        });
+      }
+
+      return readNotes;
     }
 
     if (phase === "chart") {
@@ -142,28 +149,23 @@ export function CombatGuide({
         },
       ];
 
-      if (opponentPlanet) {
-        chartNotes.push({
-          key: "active-planet",
-          anchor: "opponent-move",
-          placement: "bottom",
-          label: COPY.notes.activePlanet.label,
-          body: <TermText text={COPY.notes.activePlanet.body} />,
-        });
-      }
-
       if (examplePlanet) {
         chartNotes.push({
           key: "anatomy",
           anchor: arcAnchor("self", examplePlanet),
-          spotlights: [
-            arcAnchor("self", examplePlanet),
-            ...(exampleAspect ? [aspectAnchor("self", examplePlanet, exampleAspect)] : []),
-          ],
           placement: "outward",
           label: COPY.notes.anatomy.label,
           body: <TermText text={COPY.notes.anatomy.body} />,
         });
+        if (exampleAspect) {
+          chartNotes.push({
+            key: "aspects",
+            anchor: aspectAnchor("self", examplePlanet, exampleAspect),
+            placement: "outward",
+            label: COPY.notes.aspects.label,
+            body: <TermText text={COPY.notes.aspects.body} />,
+          });
+        }
       }
 
       return chartNotes;
@@ -208,20 +210,8 @@ export function CombatGuide({
     const arcGlyphs = named.filter((id) => id.startsWith("arc-")).map((id) => id.replace("arc-", "planet-"));
 
     return {
-      measure: [...WHEELS, ...GLYPHS, ...arcGlyphs],
+      measure: [...WHEELS, ...chartGlyphs("self"), ...chartGlyphs("other"), ...arcGlyphs],
       shape: (id, rects) => encounterShape(id, rects, reachOf),
-      obstacles: (rects) => {
-        // The acting planet's corona is the incoming move; a note never covers
-        // it, lit or not.
-        const acting = actingId ? planetCircle(actingId, CORONA_REACH, rects) : null;
-        return {
-          hard: acting ? [acting] : [],
-          soft: GLYPHS.flatMap((id) => {
-            const rect = planetCircle(id, PLANET_REACH, rects);
-            return rect ? [rect] : [];
-          }),
-        };
-      },
       // Above or below according to which half of its wheel the planet sits
       // in, so the note leaves the wheel rather than crossing it.
       outwardFrom: (anchor, rects): GuidePoint | undefined => {

@@ -7,7 +7,6 @@ import {
   chartShape,
   CORONA_REACH,
   planetAnchor,
-  planetCircle,
   PLANET_REACH,
   wheelOf,
 } from "@/components/chart-guide";
@@ -35,13 +34,6 @@ interface NarrativeGuideProps {
 const COPY = GUIDE_COPY.narrative;
 
 const PHASES: NarrativeGuidePhase[] = ["scene", "choices"];
-
-/** The blocks of the column a note keeps off while a clear side exists. Not
- *  the wheel, which the choice notes are meant to sit over; not the
- *  composition, whose box reaches into the one band the house note can stand
- *  in; and not the house line or the prompt, which a note above the options
- *  straddles wherever it goes. */
-const COLUMN = ["narrative-text", "narrative-options", "narrative-light"];
 
 export function NarrativeGuide({
   open,
@@ -114,17 +106,10 @@ export function NarrativeGuide({
     // Only the joy planet wears the active halo here (the chart's
     // `activePlanet`), so only its ring has to clear a corona.
     const joyId = house.joy ? planetAnchor("self", house.joy) : null;
-    const glyphs = chartGlyphs("self");
 
     return {
-      measure: ["wheel-self", ...glyphs, ...COLUMN],
+      measure: ["wheel-self", ...chartGlyphs("self")],
       shape: (id, rects) => chartShape(id, rects, (planet) => (planet === joyId ? CORONA_REACH : PLANET_REACH)),
-      obstacles: (rects) => ({
-        soft: [
-          ...glyphs.flatMap((id) => planetCircle(id, PLANET_REACH, rects) ?? []),
-          ...COLUMN.flatMap((id) => rects[id] ?? []),
-        ],
-      }),
       // Away from the wheel's centre, so a planet's note leaves the chart
       // rather than crossing it.
       outwardFrom: (anchor, rects): GuidePoint | undefined => {

@@ -53,18 +53,16 @@ export interface GuideShape {
   rect: GuideRect;
   radius: number;
   lift?: boolean;
+  /** Parts of a lifted shape that notes keep clear of while it is highlighted. */
+  obstacles?: GuideRect[];
 }
 
 export interface GuideShapes {
-  /** Ids to measure beyond what the notes name — obstacles, or centres other
-   *  shapes need. */
+  /** Ids to measure beyond what the notes name, for shape geometry. */
   measure?: string[];
   /** The lit shape for an id when it isn't the default padded box; `undefined`
    *  falls through to the default. */
   shape?: (id: string, rects: GuideRects) => GuideShape | undefined;
-  /** What notes keep off besides the lit shapes, the dock and the close button:
-   *  `hard` always, `soft` while a clear side exists. */
-  obstacles?: (rects: GuideRects) => { hard?: GuideRect[]; soft?: GuideRect[] };
   /** For `outward` notes: the point the note should move away from; `undefined`
    *  falls back to the `top` order. */
   outwardFrom?: (anchor: string, rects: GuideRects) => GuidePoint | undefined;
@@ -309,15 +307,6 @@ function slidRects(centred: GuideRect, side: GuidePlacement, obstacles: GuideRec
     );
 }
 
-function inBounds(rect: GuideRect, viewport: GuideSize) {
-  return (
-    rect.x >= EDGE &&
-    rect.y >= EDGE &&
-    rect.x + rect.width <= viewport.width - EDGE &&
-    rect.y + rect.height <= viewport.height - EDGE_BOTTOM
-  );
-}
-
 function clampRect(rect: GuideRect, viewport: GuideSize): GuideRect {
   return {
     ...rect,
@@ -326,48 +315,29 @@ function clampRect(rect: GuideRect, viewport: GuideSize): GuideRect {
   };
 }
 
-/** The first side, in order of preference, where the note fits the viewport
- *  and covers nothing: not what is lit or already placed (`hard`), and not a
- *  soft obstacle. Each later pass gives something up — first the fit, by
- *  pushing the note back inside the viewport; then the soft obstacles, which
- *  the veil has not singled out; then the centred spot, by sliding the note
- *  along its side until it clears what is lit or already placed; then
- *  everything but the note's own target; and at the last the preferred side
- *  is taken regardless. */
+/** Pick the shortest clear connection among the centered and slid positions.
+ *  Side preference breaks ties; every position stays inside the viewport. */
 function placeNote(
   focus: GuideRect,
   order: GuidePlacement[],
   size: GuideSize,
   viewport: GuideSize,
   hard: GuideRect[],
-  soft: GuideRect[],
 ): { rect: GuideRect; side: GuidePlacement } {
+  const bounds = boundsOf(focus);
   const clearOf = (rect: GuideRect, obstacles: GuideRect[]) =>
-    !intersects(rect, focus, 0) && !obstacles.some((other) => intersects(rect, other, AVOID_PAD));
-  const passes: [GuideRect[], boolean, boolean][] = [
-    [hard.concat(soft), false, false],
-    [hard.concat(soft), true, false],
-    [hard, false, false],
-    [hard, true, false],
-    [hard, false, true],
-    [hard, true, true],
-    [[], true, false],
-  ];
-  for (const [obstacles, clamp, slide] of passes) {
-    for (const side of order) {
-      const centred = candidateRect(focus, side, size);
-      for (const rect of slide ? slidRects(centred, side, obstacles) : [centred]) {
-        if (clamp) {
-          const clamped = clampRect(rect, viewport);
-          if (clearOf(clamped, obstacles)) return { rect: clamped, side };
-        } else if (inBounds(rect, viewport) && clearOf(rect, obstacles)) {
-          return { rect, side };
-        }
-      }
-    }
-  }
-  const side = order[0]!;
-  return { rect: clampRect(candidateRect(focus, side, size), viewport), side };
+    !intersects(rect, bounds, 0) && !obstacles.some((other) => intersects(rect, other, AVOID_PAD));
+  const candidates = order.flatMap((side) => {
+    const centred = candidateRect(bounds, side, size);
+    return [centred, ...slidRects(centred, side, hard)].map((candidate) => {
+      const rect = clampRect(candidate, viewport);
+      const [from, to] = routeLeader(focus, rect, side);
+      return { rect, side, distance: Math.round(Math.hypot(to.x - from.x, to.y - from.y)) };
+    });
+  }).sort((a, b) => a.distance - b.distance);
+  return candidates.find(({ rect }) => clearOf(rect, hard))
+    ?? candidates.find(({ rect }) => clearOf(rect, []))
+    ?? candidates[0]!;
 }
 
 /** The midpoint of a box's side — for a circle, its pole on that side. */
@@ -379,28 +349,15 @@ function sideMidpoint(rect: GuideRect, side: GuidePlacement): GuidePoint {
   return { x: rect.x + rect.width, y: c.y };
 }
 
-const OPPOSITE: Record<GuidePlacement, GuidePlacement> = {
-  top: "bottom",
-  bottom: "top",
-  left: "right",
-  right: "left",
-};
-
-/** The leader leaves the middle of the target's side and enters the middle
- *  of the note's facing side: one straight line when the two align, else a
- *  right-angled route out, across and in, so a note the search had to push
- *  aside still reads as deliberately tied to its target. */
-function routeLeader(focus: GuideRect, note: GuideRect, side: GuidePlacement): GuidePoint[] {
-  const from = sideMidpoint(focus, side);
-  const to = sideMidpoint(note, OPPOSITE[side]);
-  if (side === "left" || side === "right") {
-    if (Math.abs(from.y - to.y) < 1) return [from, to];
-    const mid = (from.x + to.x) / 2;
-    return [from, { x: mid, y: from.y }, { x: mid, y: to.y }, to];
-  }
-  if (Math.abs(from.x - to.x) < 1) return [from, to];
-  const mid = (from.y + to.y) / 2;
-  return [from, { x: from.x, y: mid }, { x: to.x, y: mid }, to];
+/** A straight connection to the nearest point on the note. Aspect capsules
+ *  use their midpoint, which stays on the line at every rotation; other
+ *  targets use their facing edge. */
+function routeLeader(focus: GuideRect, note: GuideRect, side: GuidePlacement): [GuidePoint, GuidePoint] {
+  const from = focus.angle !== undefined ? center(focus) : sideMidpoint(focus, side);
+  return [from, {
+    x: Math.max(note.x, Math.min(from.x, note.x + note.width)),
+    y: Math.max(note.y, Math.min(from.y, note.y + note.height)),
+  }];
 }
 
 export function GuideOverlay<P extends string>({
@@ -500,13 +457,13 @@ export function GuideOverlay<P extends string>({
       const shape = shapeOf(id);
       return shape ? [{ id, ...shape }] : [];
     });
-    const extra = shapes?.obstacles?.(rects);
     const hard: GuideRect[] = [
       ...(barRect ? [barRect] : []),
-      ...(extra?.hard ?? []),
-      ...spots.filter((spot) => !spot.lift).map((spot) => boundsOf(spot.rect)),
+      ...spots.flatMap((spot) => [
+        ...(!spot.lift ? [boundsOf(spot.rect)] : []),
+        ...(spot.obstacles ?? []),
+      ]),
     ];
-    const soft = extra?.soft ?? [];
     const placed = notes.flatMap((note) => {
       const anchor = rectOf(note.anchor, rects);
       const focus = shapeOf(note.anchor);
@@ -514,10 +471,11 @@ export function GuideOverlay<P extends string>({
       const from = note.placement === "outward" ? shapes?.outwardFrom?.(note.anchor, rects) : undefined;
       const order = from ? outwardOrder(from, center(anchor)) : ORDER[note.placement === "outward" ? "top" : note.placement];
       const size = sizes[note.key] ?? { width: NOTE_WIDTH, height: NOTE_HEIGHT };
-      const { rect, side } = placeNote(focus.rect, order, size, viewport, hard, soft);
+      const focusBounds = boundsOf(focus.rect);
+      const { rect, side } = placeNote(focus.rect, order, size, viewport, hard);
       hard.push(rect);
       // A note the search had to drop onto its own target gets no leader.
-      const leader = intersects(rect, focus.rect, 0) ? null : routeLeader(focus.rect, rect, side);
+      const leader = intersects(rect, focusBounds, 0) ? null : routeLeader(focus.rect, rect, side);
       return [{ note, rect, leader }];
     });
     return { spots, placed };
@@ -586,6 +544,15 @@ export function GuideOverlay<P extends string>({
       role="dialog"
       aria-modal="true"
       aria-label={phaseLabel[phase]}
+      onKeyDown={(event) => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.repeat) return;
+        if (event.key === "ArrowRight") advance();
+        else back();
+      }}
       onClick={(event) => {
         event.stopPropagation();
         advance();
@@ -670,10 +637,11 @@ export function GuideOverlay<P extends string>({
             onPointerEnter={playHoverSound}
             onFocus={playFocusSound}
             disabled={phaseIndex <= 0}
+            aria-keyshortcuts="ArrowLeft"
           >
             Back
           </button>
-          <button type="button" className="guide-step is-primary" onClick={advance} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
+          <button type="button" className="guide-step is-primary" onClick={advance} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-keyshortcuts="ArrowRight">
             {phaseIndex === phases.length - 1 ? "Close" : "Next"}
           </button>
         </div>

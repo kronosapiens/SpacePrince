@@ -5,7 +5,7 @@ import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { fillLabel, planetName, TermText } from "@/components/TermText";
-import { chartGlyphs, chartShape, planetAnchor, planetCircle, PLANET_REACH } from "@/components/chart-guide";
+import { chartGlyphs, chartShape, planetAnchor, PLANET_REACH } from "@/components/chart-guide";
 import {
   center,
   circleRect,
@@ -164,8 +164,6 @@ export function MapGuide({
   }, [phase, map, examplePlanet, mapsCompleted, showBoundary]);
 
   const shapes = useMemo<GuideShapes>(() => {
-    const nodeIds = map.graph.nodes.map((n) => nodeAnchor(n.id));
-    const glyphs = chartGlyphs("self");
     // The chart's outer ring sits at 96% of its box; the circle clears it.
     const chartCircle = (rects: GuideRects): GuideRect | null => {
       const rect = rects["chart"];
@@ -175,7 +173,7 @@ export function MapGuide({
     return {
       // The diagram itself: nothing points at it, but observing it re-measures
       // every node when the map resizes.
-      measure: [...nodeIds, ...glyphs, "map"],
+      measure: ["map", "wheel-self", ...chartGlyphs("self")],
       shape: (id, rects) => {
         if (id.startsWith("node-")) {
           const circle = nodeCircle(id, rects);
@@ -183,21 +181,17 @@ export function MapGuide({
         }
         if (id === "chart") {
           const circle = chartCircle(rects);
-          return circle ? { rect: circle, radius: circle.width / 2, lift: true } : undefined;
+          return circle ? {
+            ...chartShape("wheel-self", rects, () => PLANET_REACH),
+            rect: circle,
+            radius: circle.width / 2,
+            lift: true,
+          } : undefined;
         }
         return chartShape(id, rects, () => PLANET_REACH);
       },
-      obstacles: (rects) => ({
-        soft: [
-          ...nodeIds.flatMap((id) => {
-            const circle = nodeCircle(id, rects);
-            return circle ? [circle] : [];
-          }),
-          ...glyphs.flatMap((id) => planetCircle(id, PLANET_REACH, rects) ?? []),
-        ],
-      }),
     };
-  }, [map.graph.nodes]);
+  }, []);
 
   return (
     <GuideOverlay

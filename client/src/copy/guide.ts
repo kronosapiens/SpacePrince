@@ -7,7 +7,8 @@
  *  full tutorial: Resolve is maximum health, Afflict deals damage, Testify
  *  heals, and combusted means knocked out until revived.
  *  Casing per SCREENS.md §1.2: named quantities capped
- *  (Resolve, Fortune, Light, Afflict, Testify — TermText golds these);
+ *  (Resolve, Fortune, Light, Afflict, Testify — TermText golds these,
+ *  plus aspect/aspects and combust/combusted in any case);
  *  substances, processes, and stats lowercase in prose.
  *  A note runs two beats: the label names the thing, the body says what it is
  *  and what turns on it.
@@ -38,22 +39,26 @@ export const GUIDE_COPY = {
       },
       other: {
         label: "Other",
-        body: "The opposing chart, which follows the same rules as yours. Your action affect its acting planet.",
+        body: "The opposing chart, which follows the same rules as yours. Your action affects its acting planet.",
       },
       activePlanet: {
         label: "Incoming move",
-        body: "This planet will damage (Afflict, amber) or heal (Testify, violet) your selected planet by this amount. You act first; knocking it out stops its move.",
+        body: "This planet will damage (Afflict) or heal (Testify) your selected planet by this amount. You act first; knocking it out cancels its move.",
       },
       anatomy: {
-        label: "Health and linked effects",
-        body: "Resolve is maximum health; the arc shows what remains. At zero, planets are combusted -- knocked out until revived. Aspect links spread damage or healing; red flips the effect.",
+        label: "Health",
+        body: "Resolve is maximum health; the arc shows what remains. At zero, planets combust (knocked out until revived).",
+      },
+      aspects: {
+        label: "Aspects",
+        body: "Aspect links spread damage or healing between planets. Wider angles carry more, and red links reverse the effect.",
       },
       turn: {
         label: "Turn",
         body: "Turn {current} of {total}. Each map adds one turn to encounters. They end early if either side is out of planets.",
       },
       light: {
-        label: "Your goal: gather Light",
+        label: "Light",
         body: "Light is your run's score. The final total becomes a permanent star on your Prince. The number beside it previews this turn's gain (or loss).",
       },
       ruler: {
@@ -66,11 +71,11 @@ export const GUIDE_COPY = {
       },
       actions: {
         label: "Damage or heal",
-        body: "Either action can earn Light, depending on the ruler. Healing cannot revive combusted planets. Tap once to preview the action, then again to confirm.",
+        body: "Either action can earn Light, depending on the ruler. Tap once to preview the action, then again to confirm. Healing cannot revive combusted planets.",
       },
       projection: {
         label: "{action} preview",
-        body: "The charts preview this turn's damage, healing, and knockouts. You would gain {light} Light. Check effects before confirming.",
+        body: "The charts preview this turn's effects. This move would gather {light} Light.",
       },
     },
   },
@@ -132,7 +137,7 @@ export const GUIDE_COPY = {
       },
       commit: {
         label: "Preview, then confirm",
-        body: "Tap an option to preview, then tap the again to confirm. Confirming ends the scene.",
+        body: "Tap an option to preview, then tap again to confirm. Confirming ends the scene.",
       },
       aside: {
         label: "Costs and effects",
