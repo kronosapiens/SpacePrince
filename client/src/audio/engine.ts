@@ -1,6 +1,9 @@
 import type { PlanetName } from "@/game/types";
-import { PLANETS } from "@/game/data";
 import { strikeMidi } from "./pitches";
+import { THEMES, type ThemeName } from "./themes";
+import { createScore, type ThemeSurface } from "./score";
+
+export type { ThemeSurface } from "./score";
 
 /**
  * The sound layer: ruler-relative impact and propagation tones, combustion
@@ -17,21 +20,23 @@ type ToneModule = typeof import("tone");
 let T: ToneModule | null = null;
 let initPromise: Promise<void> | null = null;
 
-// Two independent gates (dev-controllable from the DevConsole): `music` is the
-// score (planet themes); `sound` is everything else — impacts, propagation,
+// Two independent volumes (dev-controllable from the DevConsole): `music` is the
+// score; `sound` is everything else — impacts, propagation,
 // combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
 // Music opt-in, sound opt-out: a fresh visitor gets the reactive layer
 // (propagation, combustion, the bell) but chooses the score deliberately.
-let musicOn = false;
-let soundOn = true;
+let musicVolume = 0;
+let soundVolume = 1;
+let musicOutput: import("tone").Gain | null = null;
+let soundOutput: import("tone").Gain | null = null;
 try {
   const raw = localStorage.getItem(AUDIO_KEY);
   if (raw) {
-    const saved = JSON.parse(raw) as { music?: boolean; sound?: boolean };
-    musicOn = saved.music === true;
-    soundOn = saved.sound !== false;
+    const saved = JSON.parse(raw) as { music?: number | boolean; sound?: number | boolean };
+    musicVolume = typeof saved.music === "number" ? saved.music : saved.music === true ? 1 : 0;
+    soundVolume = typeof saved.sound === "number" ? saved.sound : saved.sound === false ? 0 : 1;
   }
 } catch {
   /* storage unavailable — session-only defaults */
@@ -39,31 +44,34 @@ try {
 
 function persistAudio(): void {
   try {
-    localStorage.setItem(AUDIO_KEY, JSON.stringify({ music: musicOn, sound: soundOn }));
+    localStorage.setItem(AUDIO_KEY, JSON.stringify({ music: musicVolume, sound: soundVolume }));
   } catch {
     /* storage unavailable — session-only */
   }
 }
 
-export function isMusicEnabled(): boolean {
-  return musicOn;
+export function getMusicVolume(): number {
+  return musicVolume;
 }
 
-export function setMusicEnabled(next: boolean): void {
-  musicOn = next;
+export function setMusicVolume(next: number): void {
+  const previous = musicVolume;
+  musicVolume = next;
   persistAudio();
+  musicOutput?.gain.rampTo(next, 0.05);
   if (!T) return;
-  if (next) applyTheme(); // re-establish the score where it's pointed
-  else haltTheme(0.1);
+  if (next === 0) haltTheme(0.1);
+  else if (previous === 0) applyTheme();
 }
 
-export function isSoundEnabled(): boolean {
-  return soundOn;
+export function getSoundVolume(): number {
+  return soundVolume;
 }
 
-export function setSoundEnabled(next: boolean): void {
-  soundOn = next;
+export function setSoundVolume(next: number): void {
+  soundVolume = next;
   persistAudio();
+  soundOutput?.gain.rampTo(next, 0.05);
 }
 
 /** Install gesture listeners that boot the audio engine. They keep listening
@@ -105,14 +113,11 @@ async function init(): Promise<void> {
     const tone = await import("tone");
     await tone.start();
     T = tone;
-    T.getDestination().volume.value = -4;
-    // Kept on the dry side — a long wet reverb smears attack transients into
-    // wash, which is half of what makes synth beds read as drone.
-    reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).toDestination();
-    themeBus = new T.Gain(0.9).connect(reverb);
-    for (const layer of LAYERS) {
-      layerGains[layer] = new T.Gain(0).connect(themeBus);
-    }
+    T.getDestination().volume.value = 0;
+    musicOutput = new T.Gain(musicVolume).toDestination();
+    soundOutput = new T.Gain(soundVolume).toDestination();
+    // Event sounds have their own space; the score owns its mix and effects.
+    reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).connect(soundOutput);
     T.getTransport().start();
     applyTheme();
   })().catch((err) => {
@@ -125,11 +130,6 @@ async function init(): Promise<void> {
 // ── Instruments ──────────────────────────────────────────────────────────
 
 let reverb: import("tone").Reverb | null = null;
-let themeBus: import("tone").Gain | null = null;
-
-const LAYERS = ["bed", "down", "up"] as const;
-type ThemeLayer = (typeof LAYERS)[number];
-const layerGains: Partial<Record<ThemeLayer, import("tone").Gain>> = {};
 
 type AnyInstrument = {
   triggerAttackRelease: (
@@ -154,7 +154,7 @@ function fxSynth(): AnyInstrument | null {
   const inst = new T.PolySynth(T.Synth, {
     oscillator: { type: "sine" },
     envelope: { attack: 0.02, decay: 0.08, sustain: 0.5, release: 0.6 },
-    volume: -14,
+    volume: -10,
   }).connect(reverb);
   instruments.set("_fx", inst);
   return inst;
@@ -170,14 +170,14 @@ const UI_SOUNDS: Record<UISound, { note: string; duration: number; velocity: num
   commit: { note: "D5", duration: 0.09, velocity: 0.4 },
   dismiss: { note: "A4", duration: 0.035, velocity: 0.24 },
 };
-const UI_VOLUME_DB = -22;
+const UI_VOLUME_DB = -18;
 const UI_HOVER_COOLDOWN_S = 0.07;
 let uiSynth: import("tone").PolySynth | null = null;
 let lastUISoundAt = -Infinity;
 
 /** Brief, dry cues; sweeping across targets never queues a trail of ticks. */
 export function playUISound(cue: UISound): void {
-  if (!T || !soundOn || T.getContext().state !== "running") return;
+  if (!T || soundVolume === 0 || T.getContext().state !== "running") return;
   const now = T.now();
   // A clicked control can be replaced under the pointer during navigation.
   if (cue === "hover" && now - lastUISoundAt < UI_HOVER_COOLDOWN_S) return;
@@ -186,7 +186,7 @@ export function playUISound(cue: UISound): void {
     oscillator: { type: "sine" },
     envelope: { attack: 0.003, decay: 0.055, sustain: 0.12, release: 0.045 },
     volume: UI_VOLUME_DB,
-  }).toDestination();
+  }).connect(soundOutput!);
   const sound = UI_SOUNDS[cue];
   uiSynth.triggerAttackRelease(sound.note, sound.duration, now, sound.velocity);
 }
@@ -201,7 +201,7 @@ export type StrikeShape = "landing" | "flows" | "inverts";
  * minor second against it that never settles.
  */
 export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeShape): void {
-  if (!T || !soundOn) return;
+  if (!T || soundVolume === 0) return;
   const fx = fxSynth();
   if (!fx) return;
   const now = T.now();
@@ -219,14 +219,14 @@ export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeS
 
 /** A short pink-noise breath accompanies the combustion strike. */
 export function playCombust(): void {
-  if (!T || !soundOn) return;
+  if (!T || soundVolume === 0) return;
   const noiseKey = "_combust_noise";
   let noise = instruments.get(noiseKey) as import("tone").NoiseSynth | undefined;
   if (!noise && reverb) {
     noise = new T.NoiseSynth({
       noise: { type: "pink" },
       envelope: { attack: 0.01, decay: 0.5, sustain: 0 },
-      volume: -18,
+      volume: -14,
     }).connect(reverb);
     instruments.set(noiseKey, noise as unknown as AnyInstrument);
   }
@@ -235,7 +235,7 @@ export function playCombust(): void {
 
 /** A run's star taking its place — a quiet high bell, far away. */
 export function playStar(): void {
-  if (!T || !soundOn) return;
+  if (!T || soundVolume === 0) return;
   const fx = fxSynth();
   if (!fx) return;
   const now = T.now();
@@ -243,333 +243,85 @@ export function playStar(): void {
   fx.triggerAttackRelease(midiToFreq(81), 1.0, now + 0.18, 0.2); // A5 under it
 }
 
-// ── The score: seven planet themes, vertically mixed ─────────────────────
-// Themes live in themes.ts (developed from spec/design/music-sketches).
-// All three layers of the active theme run in sync on the transport; the
-// surface chooses the mix (the FTL model): the map breathes the down layer,
-// combat drives the up layer, narrative sits close to the bed alone.
+// ── The score ───────────────────────────────────────────────────────────
 
-import { THEMES, nameToMidi, type LeadVoice, type ThemeNote } from "./themes";
+const MIX_RAMP_S = 2.2;
+const SWAP_FADE_S = 1.1;
+const SCORE_VOLUME = 0.9;
 
-export type ThemeSurface = "map" | "combat" | "narrative";
-
-const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
-  map: { bed: 0.9, down: 1, up: 0 },
-  narrative: { bed: 0.6, down: 0.35, up: 0 },
-  combat: { bed: 1, down: 0, up: 1 },
-};
-
-const MIX_RAMP_S = 2.2; // FTL-style slow crossfade between variants
-const SWAP_FADE_S = 1.1; // theme-to-theme handoff
-
-interface StoppablePart {
-  stop(): unknown;
-  dispose(): unknown;
-}
-
-let desired: { planet: PlanetName; surface: ThemeSurface } | null = null;
-let playing: { planet: PlanetName; parts: StoppablePart[] } | null = null;
+let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
+let playing: { theme: ThemeName; score: ReturnType<typeof createScore> } | null = null;
 let swapTimer: number | null = null;
+const themeListeners = new Set<() => void>();
 
-/** Per-layer instrument pool, so layer gains only touch the score. */
-const themeInstruments = new Map<string, AnyInstrument>();
-
-// ── Sampled voices: the actual GM soundbank ─────────────────────────────────
-// The sketches were auditioned through FluidR3_GM; the same bank's per-note
-// renders are vendored under public/soundfont (see its README). Samplers load
-// async on first use; until a sampler's buffers arrive, the synth patch below
-// stands in, so the score never waits on the network. Percussion stays
-// synthesized — the kit punches better than GM drums at this scale.
-
-const GM_BY_ROLE: Partial<Record<ThemeNote["role"], string>> = {
-  pad: "string_ensemble_1",
-  arp: "orchestral_harp",
-  bass: "contrabass",
-};
-
-const GM_BY_LEAD: Record<LeadVoice, string> = {
-  horn: "french_horn",
-  flute: "flute",
-  strings: "string_ensemble_1",
-};
-
-const GM_VOLUME: Record<string, number> = {
-  string_ensemble_1: -6,
-  orchestral_harp: -1,
-  contrabass: -1,
-  french_horn: -3,
-  flute: -3,
-};
-
-/** Sampled every tritone, C and Gb per octave — Sampler shifts the rest. */
-const SAMPLE_NOTES = ["C1", "Gb1", "C2", "Gb2", "C3", "Gb3", "C4", "Gb4", "C5", "Gb5", "C6", "Gb6"];
-
-const samplers = new Map<string, { sampler: import("tone").Sampler; loaded: boolean }>();
-
-function samplerFor(gm: string, layer: ThemeLayer, bus: import("tone").Gain): AnyInstrument | null {
-  if (!T) return null;
-  const key = `${layer}:${gm}`;
-  let entry = samplers.get(key);
-  if (!entry) {
-    const urls: Record<string, string> = {};
-    for (const n of SAMPLE_NOTES) urls[n] = `${n}.mp3`;
-    const holder: { sampler: import("tone").Sampler; loaded: boolean } = {
-      loaded: false,
-      sampler: new T.Sampler({
-        urls,
-        baseUrl: `/soundfont/${gm}/`,
-        release: gm === "orchestral_harp" || gm === "contrabass" ? 0.3 : 0.9,
-        volume: GM_VOLUME[gm] ?? -8,
-        onload: () => {
-          holder.loaded = true;
-        },
-      }).connect(bus),
-    };
-    entry = holder;
-    samplers.set(key, entry);
-  }
-  return entry.loaded ? (entry.sampler as unknown as AnyInstrument) : null;
+/** Change the mix in place for the same theme; fade between different themes. */
+export function setTheme(theme: ThemeName | null, surface: ThemeSurface = "map"): void {
+  desired = theme ? { theme, surface } : null;
+  for (const listener of themeListeners) listener();
+  if (T && musicVolume > 0) applyTheme();
 }
 
-function themeInstrument(
-  layer: ThemeLayer,
-  role: ThemeNote["role"],
-  leadVoice: LeadVoice,
-): AnyInstrument | null {
-  if (!T) return null;
-  const bus = layerGains[layer];
-  if (!bus) return null;
-  // Prefer the sampled GM voice; fall back to the synth patch until loaded.
-  const gm = role === "lead" ? GM_BY_LEAD[leadVoice] : GM_BY_ROLE[role];
-  if (gm) {
-    const sampled = samplerFor(gm, layer, bus);
-    if (sampled) return sampled;
-  }
-  const key = `${layer}:${role}`;
-  const existing = themeInstruments.get(key);
-  if (existing) return existing;
-  let inst: AnyInstrument;
-  switch (role) {
-    // Timbre note: the MIDI sketches auditioned through General MIDI
-    // instruments — percussive attacks, rich harmonics, natural decay. Pure
-    // sine/triangle waves at high sustain read as drone regardless of the
-    // harmony, so every pitched role here either evolves (FM) or decays
-    // (pluck, filtered mono bass). Notes bloom and recede; nothing holds a
-    // steady state.
-    case "pad":
-      inst = new T.PolySynth(T.FMSynth, {
-        harmonicity: 1.007, // a hair off unison — slow beating keeps the chord alive
-        modulationIndex: 6,
-        oscillator: { type: "sine" },
-        modulation: { type: "sine" },
-        envelope: { attack: 0.35, decay: 1.6, sustain: 0.3, release: 1.8 },
-        modulationEnvelope: { attack: 0.5, decay: 1.2, sustain: 0.4, release: 1.5 },
-        volume: -14,
-      }).connect(bus);
-      break;
-    case "lead":
-      inst = new T.PolySynth(T.FMSynth, {
-        harmonicity: 2,
-        modulationIndex: 4, // reedy, horn-adjacent — closer to the sketches' GM voices
-        envelope: { attack: 0.04, decay: 0.4, sustain: 0.4, release: 0.4 },
-        modulationEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.3, release: 0.4 },
-        volume: -12,
-      }).connect(bus);
-      break;
-    case "bass":
-      inst = new T.MonoSynth({
-        oscillator: { type: "sawtooth" },
-        filter: { type: "lowpass", Q: 1 },
-        filterEnvelope: {
-          attack: 0.01,
-          decay: 0.25,
-          sustain: 0.4,
-          release: 0.3,
-          baseFrequency: 110,
-          octaves: 2.2,
-        },
-        envelope: { attack: 0.01, decay: 0.3, sustain: 0.6, release: 0.25 },
-        volume: -9,
-      }).connect(bus);
-      break;
-    case "arp":
-      // Karplus-Strong — an actual plucked string, like the sketches' harp.
-      inst = new T.PluckSynth({
-        attackNoise: 1.4,
-        dampening: 3800,
-        resonance: 0.95,
-        volume: -10,
-      }).connect(bus);
-      break;
-    case "kick":
-      inst = new T.MembraneSynth({
-        pitchDecay: 0.03,
-        octaves: 4,
-        envelope: { attack: 0.001, decay: 0.35, sustain: 0, release: 0.1 },
-        volume: -9,
-      }).connect(bus);
-      break;
-    case "snare":
-      inst = new T.NoiseSynth({
-        noise: { type: "white" },
-        envelope: { attack: 0.001, decay: 0.16, sustain: 0 },
-        volume: -16,
-      }).connect(bus);
-      break;
-    case "hat":
-    default:
-      inst = new T.NoiseSynth({
-        noise: { type: "white" },
-        envelope: { attack: 0.001, decay: 0.045, sustain: 0 },
-        volume: -22,
-      }).connect(bus);
-      break;
-  }
-  themeInstruments.set(key, inst);
-  return inst;
+/** The theme selected by the surface, even when music is disabled. */
+export function currentTheme(): ThemeName | null {
+  return desired?.theme ?? null;
 }
 
-/**
- * Point the score at a planet's theme for a surface (null = fade to silence).
- * Same planet, new surface → the layers crossfade in place; a new planet
- * fades the bus, swaps the parts, and fades back in.
- */
-export function setTheme(planet: PlanetName | null, surface: ThemeSurface = "map"): void {
-  desired = planet ? { planet, surface } : null;
-  notifyThemeChange();
-  if (!T || !musicOn) return;
-  applyTheme();
-}
-
-/** The planet whose theme the score is pointed at (what's sounding, or would
- *  be with music on), or null on surfaces with no score (title / end). */
-export function currentTheme(): PlanetName | null {
-  return desired?.planet ?? null;
-}
-
-/** Subscribe to theme retargets (for useSyncExternalStore in dev chrome). */
 export function subscribeTheme(listener: () => void): () => void {
   themeListeners.add(listener);
   return () => themeListeners.delete(listener);
 }
 
-const themeListeners = new Set<() => void>();
-
-function notifyThemeChange(): void {
-  for (const listener of themeListeners) listener();
-}
-
-/** Dev affordance: hop the score to a random *other* planet's theme, keeping
- *  the current surface mix — every press audibly changes the track. No-op on
- *  surfaces with no score. */
+/** Dev audition: select a different theme while keeping the surface mix. */
 export function shuffleTheme(): void {
   const cur = desired;
   if (!cur) return;
-  const others = PLANETS.filter((p) => p !== cur.planet);
+  const others = (Object.keys(THEMES) as ThemeName[]).filter((theme) => theme !== cur.theme);
   const next = others[Math.floor(Math.random() * others.length)]!;
   setTheme(next, cur.surface);
 }
 
+function cancelSwap(): void {
+  if (swapTimer === null) return;
+  window.clearTimeout(swapTimer);
+  swapTimer = null;
+}
+
 function applyTheme(): void {
-  if (!T || !themeBus || !musicOn) return;
-  if (swapTimer !== null) {
-    window.clearTimeout(swapTimer);
-    swapTimer = null;
-  }
+  if (!T || musicVolume === 0) return;
+  cancelSwap();
   if (!desired) {
     haltTheme(SWAP_FADE_S);
     return;
   }
-  const { planet, surface } = desired;
-  if (playing && playing.planet === planet) {
-    rampMix(surface, MIX_RAMP_S);
-    themeBus.gain.rampTo(0.9, MIX_RAMP_S);
-    return;
-  }
-  if (playing) {
-    // Fade the old theme out, then hand off.
-    themeBus.gain.rampTo(0, SWAP_FADE_S);
+  const { theme, surface } = desired;
+  if (playing?.theme === theme) {
+    playing.score.mix(surface, MIX_RAMP_S);
+    playing.score.fade(SCORE_VOLUME, MIX_RAMP_S);
+  } else if (playing) {
+    playing.score.fade(0, SWAP_FADE_S);
     swapTimer = window.setTimeout(() => {
       swapTimer = null;
-      stopParts();
-      startParts(planet, surface);
+      playing?.score.dispose();
+      startScore(theme, surface);
     }, SWAP_FADE_S * 1000 + 50);
-    return;
-  }
-  startParts(planet, surface);
-}
-
-function startParts(planet: PlanetName, surface: ThemeSurface): void {
-  if (!T || !themeBus) return;
-  const spec = THEMES[planet];
-  const spb = 60 / spec.bpm;
-  const loopEnd = spec.beats * spb;
-  const layers: Array<[ThemeLayer, ThemeNote[]]> = [
-    ["bed", spec.bed],
-    ["down", spec.down],
-    ["up", spec.up],
-  ];
-  // Tone.Part's event type wants a `time` field on the event object itself.
-  type TimedNote = ThemeNote & { time: number };
-  const parts = layers.map(([layer, notes]) => {
-    const part = new T!.Part<TimedNote>(
-      (time, note) => {
-        const inst = themeInstrument(layer, note.role, spec.leadVoice);
-        if (!inst) return;
-        if (note.role === "snare" || note.role === "hat") {
-          // NoiseSynth is unpitched: (duration, time, velocity).
-          (inst as unknown as import("tone").NoiseSynth).triggerAttackRelease(
-            note.d * spb,
-            time,
-            note.v,
-          );
-        } else {
-          inst.triggerAttackRelease(midiToFreq(nameToMidi(note.n)), note.d * spb, time, note.v);
-        }
-      },
-      notes.map((note) => ({ ...note, time: note.t * spb })),
-    );
-    part.loop = true;
-    part.loopEnd = loopEnd;
-    part.start("+0.05");
-    return part;
-  });
-  playing = { planet, parts };
-  // Enter at the surface's mix; snap layer gains before the bus fades in.
-  rampMix(surface, 0.01);
-  themeBus.gain.rampTo(0.9, SWAP_FADE_S);
-}
-
-function rampMix(surface: ThemeSurface, rampS: number): void {
-  const mix = SURFACE_MIX[surface];
-  for (const layer of LAYERS) {
-    layerGains[layer]?.gain.rampTo(mix[layer], rampS);
+  } else {
+    startScore(theme, surface);
   }
 }
 
-function stopParts(): void {
-  if (!playing) return;
-  for (const part of playing.parts) {
-    part.stop();
-    part.dispose();
-  }
-  playing = null;
+function startScore(theme: ThemeName, surface: ThemeSurface): void {
+  if (!T) return;
+  const score = createScore(T, THEMES[theme], surface, musicOutput!);
+  playing = { theme, score };
+  score.fade(SCORE_VOLUME, SWAP_FADE_S);
 }
 
 function haltTheme(fadeS: number): void {
-  if (!T || !themeBus) {
-    playing = null;
-    return;
-  }
-  themeBus.gain.rampTo(0, fadeS);
+  cancelSwap();
   const held = playing;
   playing = null;
-  window.setTimeout(() => {
-    if (held) {
-      for (const part of held.parts) {
-        part.stop();
-        part.dispose();
-      }
-    }
-  }, fadeS * 1000 + 100);
+  if (!held) return;
+  held.score.fade(0, fadeS);
+  // A quick off/on gets a separate score, so this tail cannot enter its mix.
+  window.setTimeout(() => held.score.dispose(), fadeS * 1000 + 100);
 }

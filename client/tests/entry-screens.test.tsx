@@ -1,8 +1,9 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TitleScreen } from "@/screens/TitleScreen";
+import { StartScreen } from "@/screens/StartScreen";
 import { MapScreen } from "@/screens/MapScreen";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
@@ -10,7 +11,7 @@ import { beginRun } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext } from "@/game/map-gen";
 import { createStubPrince } from "./fixtures";
-import { playUISound } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
@@ -18,6 +19,7 @@ vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
+  vi.clearAllMocks();
   localStorage.clear();
   vi.useFakeTimers();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -59,7 +61,25 @@ function click(target: Element) {
   act(() => target.dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
 
-describe("chart inspection on entry screens", () => {
+describe("entry screens", () => {
+  it("selects Main on Title and keeps that selection through Prince creation", () => {
+    act(() => root.render(
+      <MemoryRouter>
+        <PrinceStoreProvider>
+          <Routes>
+            <Route path="/" element={<TitleScreen />} />
+            <Route path="/play" element={<StartScreen />} />
+          </Routes>
+        </PrinceStoreProvider>
+      </MemoryRouter>,
+    ));
+    expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"]]);
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(500));
+    expect(container.querySelector(".mint-framing")).not.toBeNull();
+    expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"], ["Main"]]);
+  });
+
   it("keeps the returning player's chart and current health on Title instead of cycling samples", () => {
     const prince = mount("title");
     expect(element(".title .chart-svg").getAttribute("aria-label")).toBe("Stub natal chart");

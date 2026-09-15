@@ -10,7 +10,7 @@ import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { playUISound } from "@/audio/engine";
+import { playUISound, setTheme } from "@/audio/engine";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { Chart as ChartType, Prince, PlanetName, SignName } from "@/game/types";
@@ -55,6 +55,8 @@ export function StartScreen() {
   const [revealedCount, setRevealedCount] = useState(0);
   const [ghosted, setGhosted] = useState(false);
   const [leavingFraming, setLeavingFraming] = useState(false);
+
+  useEffect(() => { setTheme("Main"); }, []);
 
   const computed: ChartType | null = useMemo(() => {
     if (!form.lat || !form.lon) return null;

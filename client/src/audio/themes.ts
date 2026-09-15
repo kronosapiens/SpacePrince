@@ -1,41 +1,19 @@
 import type { PlanetName } from "@/game/types";
 
 /**
- * Seven planet themes (MUSIC.md), developed from the MIDI sketches in
- * spec/design/music-sketches/ — the sketch material is the bed; the down and
- * up layers are new, written for vertical mixing (the FTL model): all layers
- * run in sync, and the surface decides the mix — the map breathes the down
- * layer in, combat the up layer.
- *
- *   bed  — the theme's identity: harmony + motif. Present in every mix.
- *   down — sparse figuration (slow arps, soft counterlines). Map register.
- *   up   — percussion + drive. Combat register.
- *
- * All themes share the D tonic (MUSIC.md §Cohesion); mode is the fingerprint,
- * meter the personality. Venus and Moon had no sketch — composed here in
- * their committed modes (Mixolydian warmth, Aeolian nocturne).
+ * Shared D and a shared melodic contour: tonic, fifth, second, third.
+ * The planets each keep one mode; the main theme moves between their colors.
+ * Themes develop through written sections and altered returns.
+ * Bed carries the tune and harmony, down adds detail, up adds motion.
+ * All positions and durations are quarter-note beats, including compound meters.
  */
-
 export type ThemeRole = "pad" | "lead" | "bass" | "arp" | "kick" | "snare" | "hat";
-
-export interface ThemeNote {
-  /** Beat position (quarter-note beats from loop start). */
-  t: number;
-  /** Note name ("Eb3") — percussion roles ignore pitch except kick. */
-  n: string;
-  /** Duration in beats. */
-  d: number;
-  /** Velocity 0..1. */
-  v: number;
-  role: ThemeRole;
-}
-
-/** The lead's sampled voice — the GM instrument the sketch's lead track named. */
-export type LeadVoice = "horn" | "flute" | "strings";
-
+export type ThemeName = PlanetName | "Main";
+export interface ThemeNote { t: number; n: string; d: number; v: number; role: ThemeRole }
+/** Instrument families used to choose the lead's synthesis and articulation. */
+export type LeadVoice = "horn" | "flute" | "strings" | "bell";
 export interface ThemeSpec {
   bpm: number;
-  /** Loop length in beats. */
   beats: number;
   leadVoice: LeadVoice;
   bed: ThemeNote[];
@@ -44,7 +22,6 @@ export interface ThemeSpec {
 }
 
 const LETTER: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-
 export function nameToMidi(name: string): number {
   const m = /^([A-G])([#b]?)(-?\d)$/.exec(name);
   if (!m) throw new Error(`bad note ${name}`);
@@ -52,300 +29,593 @@ export function nameToMidi(name: string): number {
   return LETTER[m[1]!]! + acc + (Number(m[3]) + 1) * 12;
 }
 
-// ── tiny builders ───────────────────────────────────────────────────────────
-
-const N = (role: ThemeRole, t: number, n: string, d: number, v: number): ThemeNote => ({
-  t, n, d, v, role,
-});
-
-/** A chord: several simultaneous pad notes. */
-function chord(t: number, notes: string[], d: number, v: number): ThemeNote[] {
-  return notes.map((n) => N("pad", t, n, d, v));
+type Step = [beat: number, note: string, duration: number, velocity: number];
+function line(role: ThemeRole, steps: Step[]): ThemeNote[] {
+  return steps.map(([t, n, d, v]) => ({ role, t, n, d, v }));
 }
 
-/** A melodic line from [beat, note, dur] triples. */
-function line(role: ThemeRole, v: number, steps: Array<[number, string, number]>): ThemeNote[] {
-  return steps.map(([t, n, d]) => N(role, t, n, d, v));
+/** Bass leaves room for up-layer pickups; pad voices enter with a slight roll. */
+function harmony(t: number, d: number, bass: string, voices: string[], v = 0.28): ThemeNote[] {
+  return [
+    { role: "bass", t, n: bass, d: d * 0.72, v: v + 0.07 },
+    ...voices.map((n, i): ThemeNote => ({ role: "pad", t: t + i * 0.12, n, d: d - 0.3 - i * 0.12, v: v - i * 0.015 })),
+  ];
 }
 
-/** Repeat a one-cycle pattern across the loop. */
-function every(cycle: number, until: number, notes: ThemeNote[]): ThemeNote[] {
+/** Written pitch sequences; null leaves space for the delayed answer. */
+function plucks(t: number, step: number, notes: (string | null)[], v = 0.28): ThemeNote[] {
+  return notes.flatMap((n, i) => n === null ? [] : [{
+    role: "arp" as const, t: t + i * step, n,
+    d: step * (i % 3 === 0 ? 0.8 : 0.52),
+    v: v * (i % 3 === 0 ? 1 : i % 3 === 1 ? 0.72 : 0.86),
+  }]);
+}
+
+/** Local rhythm repeats; the score chooses where it enters and leaves. */
+function every(start: number, end: number, cycle: number, notes: ThemeNote[]): ThemeNote[] {
   const out: ThemeNote[] = [];
-  for (let base = 0; base < until; base += cycle) {
+  for (let base = start; base < end; base += cycle) {
     for (const note of notes) {
-      if (base + note.t < until) out.push({ ...note, t: base + note.t });
+      if (base + note.t + note.d <= end) out.push({ ...note, t: base + note.t });
     }
   }
   return out;
 }
 
-// ── Jupiter · Lydian · 3/4 · 96 — broad, the ♯4 reaching (sketch 01) ───────
-
-const jupiter: ThemeSpec = {
-  leadVoice: "horn",
-  bpm: 96,
-  beats: 48, // sketch's 8 bars, then the lead answers an octave higher
-  bed: [
-    // Pad: I | II (the Lydian brightness) | V | I | II | iii | V | I — ×2
-    ...every(24, 48, [
-      ...chord(0, ["D3", "F#3", "A3"], 3, 0.4),
-      ...chord(3, ["E3", "G#3", "B3"], 3, 0.4),
-      ...chord(6, ["A3", "C#4", "E4"], 3, 0.4),
-      ...chord(9, ["D3", "F#3", "A3"], 3, 0.4),
-      ...chord(12, ["E3", "G#3", "B3"], 3, 0.4),
-      ...chord(15, ["F#3", "A3", "C#4"], 3, 0.4),
-      ...chord(18, ["A3", "C#4", "E4"], 3, 0.4),
-      ...chord(21, ["D3", "F#3", "A3"], 3, 0.4),
-    ]),
-    // Horn line (sketch), answered up the octave on the repeat.
-    ...line("lead", 0.5, [
-      [0, "A4", 2], [2, "F#4", 1], [3, "G#4", 3], [6, "A4", 2], [8, "B4", 1], [9, "A4", 3],
-      [12, "B4", 2], [14, "C#5", 1], [15, "A4", 3], [18, "G#4", 2], [20, "E4", 1], [21, "D5", 3],
-    ]),
-    ...line("lead", 0.42, [
-      [24, "A5", 2], [26, "F#5", 1], [27, "G#5", 3], [30, "A5", 2], [32, "B5", 1], [33, "A5", 3],
-      [36, "B5", 2], [38, "C#6", 1], [39, "A5", 3], [42, "G#5", 2], [44, "E5", 1], [45, "D6", 3],
-    ]),
-  ],
-  down: every(6, 48, [
-    // Slow broken chord, one arc per two bars.
-    N("arp", 0, "D4", 0.9, 0.3), N("arp", 1, "A4", 0.9, 0.26),
-    N("arp", 2, "F#4", 0.9, 0.28), N("arp", 3, "G#4", 0.9, 0.24),
-    N("arp", 4, "A4", 1.9, 0.26),
-  ]),
-  up: [
-    ...every(3, 48, [
-      N("kick", 0, "D2", 0.3, 0.7),
-      N("hat", 1, "F#5", 0.1, 0.25), N("hat", 2, "F#5", 0.1, 0.25),
-    ]),
-    ...every(6, 48, [N("snare", 4, "D3", 0.2, 0.4)]),
-    ...every(3, 48, [N("bass", 0, "D2", 1.4, 0.5), N("bass", 1.5, "A2", 1.4, 0.4)]),
-  ],
-};
-
-// ── Sun · Ionian · 4/4 · 72 — the home key, centered (sketch 02) ────────────
-
-const sun: ThemeSpec = {
-  leadVoice: "flute",
-  bpm: 72,
-  beats: 32,
-  bed: [
-    // Pad: I | IV | I | V | I | IV | V | I (sketch).
-    ...chord(0, ["D3", "F#3", "A3"], 4, 0.38), ...chord(4, ["G3", "B3", "D4"], 4, 0.38),
-    ...chord(8, ["D3", "F#3", "A3"], 4, 0.38), ...chord(12, ["A3", "C#4", "E4"], 4, 0.38),
-    ...chord(16, ["D3", "F#3", "A3"], 4, 0.38), ...chord(20, ["G3", "B3", "D4"], 4, 0.38),
-    ...chord(24, ["A3", "C#4", "E4"], 4, 0.38), ...chord(28, ["D3", "F#3", "A3"], 4, 0.38),
-    // Flute line (sketch, complete).
-    ...line("lead", 0.46, [
-      [0, "D4", 2], [2, "F#4", 1], [3, "A4", 1], [4, "B4", 2], [6, "A4", 1], [7, "G4", 1],
-      [8, "F#4", 2], [10, "E4", 1], [11, "D4", 1], [12, "E4", 2], [14, "A4", 2],
-      [16, "D4", 2], [18, "F#4", 1], [19, "A4", 1], [20, "B4", 2], [22, "A4", 1], [23, "G4", 1],
-      [24, "A4", 2], [26, "C#5", 1], [27, "B4", 1], [28, "D4", 4],
-    ]),
-  ],
-  down: every(4, 32, [
-    N("arp", 0, "D5", 1.9, 0.22), N("arp", 2, "A4", 1.9, 0.2),
-  ]),
-  up: [
-    ...every(4, 32, [
-      N("kick", 0, "D2", 0.3, 0.6), N("kick", 2, "D2", 0.3, 0.45),
-      N("hat", 1, "F#5", 0.1, 0.22), N("hat", 3, "F#5", 0.1, 0.22),
-    ]),
-    ...every(2, 32, [N("bass", 0, "D2", 0.9, 0.45), N("bass", 1, "A2", 0.9, 0.35)]),
-  ],
-};
-
-// ── Mercury · Dorian · 6/8 · 138 — moto perpetuo, ends unsettled (sketch 03) ─
-
+// Mercury · Dorian · 6/8 · quick plucks underneath a slower, lilting melody.
 const mercury: ThemeSpec = {
-  leadVoice: "flute",
-  bpm: 138,
-  beats: 48,
+  leadVoice: "flute", bpm: 138, beats: 192,
   bed: [
-    // Harp engine: i broken | IV (the bright Dorian G-major) broken (sketch).
-    ...every(6, 48, [
-      N("arp", 0, "D3", 0.5, 0.34), N("arp", 0.5, "F3", 0.5, 0.34), N("arp", 1, "A3", 0.5, 0.34),
-      N("arp", 1.5, "D4", 0.5, 0.34), N("arp", 2, "F3", 0.5, 0.34), N("arp", 2.5, "A3", 0.5, 0.34),
-      N("arp", 3, "G3", 0.5, 0.34), N("arp", 3.5, "B3", 0.5, 0.34), N("arp", 4, "D4", 0.5, 0.34),
-      N("arp", 4.5, "G4", 0.5, 0.34), N("arp", 5, "B3", 0.5, 0.34), N("arp", 5.5, "D4", 0.5, 0.34),
-    ]),
-    // The quick line that never lands (sketch): rises through i, leaves on E.
-    // Three passes at pitch; the fourth answers an octave up.
-    ...every(12, 36, [
-      ...line("lead", 0.42, [
-        [0, "D4", 0.5], [0.5, "F4", 0.5], [1, "A4", 0.5], [1.5, "B4", 0.5], [2, "A4", 0.5], [2.5, "F4", 0.5],
-        [3, "G4", 0.5], [3.5, "B4", 0.5], [4, "D5", 0.5], [4.5, "B4", 0.5], [5, "G4", 0.5], [5.5, "E4", 0.5],
-        [6, "D4", 0.5], [6.5, "F4", 0.5], [7, "A4", 0.5], [7.5, "B4", 0.5], [8, "A4", 0.5], [8.5, "F4", 0.5],
-        [9, "G4", 0.5], [9.5, "B4", 0.5], [10, "D5", 0.5], [10.5, "B4", 0.5], [11, "G4", 0.5], [11.5, "E4", 0.5],
-      ]),
-    ]),
-    ...line("lead", 0.36, [
-      [36, "D5", 0.5], [36.5, "F5", 0.5], [37, "A5", 0.5], [37.5, "B5", 0.5], [38, "A5", 0.5], [38.5, "F5", 0.5],
-      [39, "G5", 0.5], [39.5, "B5", 0.5], [40, "D6", 0.5], [40.5, "B5", 0.5], [41, "G5", 0.5], [41.5, "E5", 0.5],
-      [42, "D5", 0.5], [42.5, "F5", 0.5], [43, "A5", 0.5], [43.5, "B5", 0.5], [44, "A5", 0.5], [44.5, "F5", 0.5],
-      [45, "G5", 0.5], [45.5, "B5", 0.5], [46, "D6", 0.5], [46.5, "B5", 0.5], [47, "G5", 0.5], [47.5, "E5", 0.5],
+    ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "G2", ["D3", "G3", "B3"]),
+    ...harmony(24, 12, "C3", ["C3", "G3", "E4"]), ...harmony(36, 12, "D2", ["D3", "A3", "F4"]),
+    ...harmony(48, 12, "G2", ["G3", "B3", "D4"], 0.31), ...harmony(60, 12, "F2", ["F3", "A3", "E4"]),
+    ...harmony(72, 12, "E2", ["E3", "G3", "B3"]), ...harmony(84, 12, "D2", ["D3", "A3", "C4"]),
+    ...harmony(96, 18, "F2", ["F3", "A3", "C4"], 0.21), ...harmony(114, 18, "E2", ["E3", "G3", "D4"], 0.22),
+    ...harmony(132, 12, "D2", ["D3", "A3", "E4"], 0.25),
+    ...harmony(144, 12, "D2", ["D3", "A3", "F4"], 0.3), ...harmony(156, 12, "G2", ["D3", "G3", "B3"], 0.31),
+    ...harmony(168, 12, "C3", ["C3", "G3", "D4"]), ...harmony(180, 12, "D2", ["D3", "A3", "E4"], 0.26),
+    ...line("pad", [[103.5, "E4", 5.8, 0.2], [121.5, "B3", 6, 0.21], [136.5, "F4", 3.5, 0.23]]),
+    ...plucks(0, 0.75, ["D4", "A4", "E5", "F5", null, "A4", "D5", null, "F4", "A4", "E5", null, "D5", "A4", null, "E5"]),
+    ...plucks(12, 0.75, ["G4", "D5", "B4", null, "A4", "D5", "G5", null, "B4", "A4", "G4", null, "D5", "B4", null, "A4"]),
+    ...plucks(24, 0.75, ["C4", "G4", "E5", "D5", null, "G4", "C5", null, "E4", "G4", "D5", null, "E5", "C5", null, "G4"]),
+    ...plucks(36, 0.75, ["D4", "A4", "F5", null, "E5", "A4", "D5", null, "F4", "A4", "E5", null, "D5", null, "A4", null]),
+    ...plucks(48, 0.75, ["G4", "B4", "D5", "A5", "G5", null, "D5", "B4", "G4", "D5", "B4", null, "A4", "D5", "G5", null], 0.32),
+    ...plucks(60, 0.75, ["F4", "C5", "A4", "E5", null, "C5", "A4", "G4", "F4", "A4", "C5", null, "E5", "C5", null, "A4"], 0.31),
+    ...plucks(72, 0.75, ["E4", "B4", "G5", "F5", "E5", null, "B4", "G4", "E4", "G4", "D5", null, "B4", "G4", "E5", null]),
+    ...plucks(84, 0.75, ["D4", "A4", "C5", "E5", null, "D5", "A4", null, "F4", "A4", "E5", null, "D5", null, null, null]),
+    ...plucks(96, 1.5, ["F4", null, "C5", "A4", null, "E5", null, null], 0.22),
+    ...plucks(114, 1.5, ["E4", null, "B4", "G4", null, "D5", null, null], 0.21),
+    ...plucks(132, 0.75, ["D4", null, "A4", null, "E5", "F5", null, "A4", "D5", null, "F4", "A4", "E5", null, "D5", null], 0.26),
+    ...plucks(144, 0.75, ["D4", "A4", "E5", "F5", null, "A4", "D5", "E5", "F5", "A4", "E5", null, "D5", "F5", null, "A4"], 0.32),
+    ...plucks(156, 0.75, ["G4", "D5", "B4", "A4", null, "D5", "G5", "D5", "B4", "A4", "G4", null, "B4", "D5", null, "A4"], 0.32),
+    ...plucks(168, 0.75, ["C4", "G4", "D5", "E5", null, "G4", "C5", null, "E4", "G4", "D5", null, "E5", "C5", null, "A4"]),
+    ...plucks(180, 0.75, ["D4", "A4", "F5", "E5", null, "A4", "D5", null, "E4", "A4", null, "D5", null, null, "A4", null], 0.26),
+    ...line("lead", [
+      [6, "D4", 2.1, 0.43], [9, "A4", 1.2, 0.5], [10.5, "E4", 0.9, 0.37], [12, "F4", 3.6, 0.46],
+      [18, "G4", 2.1, 0.44], [21, "B4", 1.2, 0.51], [22.5, "A4", 1.1, 0.41], [24, "G4", 2.5, 0.43],
+      [28.5, "E4", 2, 0.36], [33, "D4", 1.2, 0.42], [34.5, "F4", 0.9, 0.4], [36, "A4", 3.4, 0.48], [42, "E4", 2.2, 0.35],
+      [49.5, "G4", 2.1, 0.48], [52.5, "B4", 1.1, 0.52], [54, "D5", 3.5, 0.55], [58.5, "B4", 1.1, 0.43],
+      [60, "A4", 2.5, 0.47], [64.5, "C5", 1.1, 0.49], [66, "A4", 1.9, 0.44], [69, "F4", 2.2, 0.38],
+      [73.5, "E4", 2, 0.41], [76.5, "G4", 1.1, 0.44], [78, "B4", 2.4, 0.49],
+      [82.5, "A4", 1, 0.4], [84, "F4", 2.2, 0.43], [87, "E4", 1, 0.35], [90, "D4", 3.5, 0.42],
+      [108, "C4", 3.8, 0.32], [117, "B3", 4.4, 0.34], [126, "D4", 2.5, 0.36], [132, "E4", 3.5, 0.37],
+      [145.5, "D4", 2, 0.46], [148.5, "A4", 1.1, 0.52], [150, "E4", 0.9, 0.38], [151.5, "F4", 3.3, 0.48],
+      [156, "G4", 2.4, 0.46], [160.5, "B4", 1.1, 0.54], [162, "D5", 2.5, 0.56], [166.5, "B4", 1.1, 0.44],
+      [168, "G4", 2.4, 0.45], [172.5, "E4", 1.8, 0.38], [177, "F4", 1.1, 0.42],
+      [178.5, "E4", 1, 0.36], [180, "D4", 4, 0.45], [189, "A3", 1.3, 0.3],
     ]),
   ],
-  down: every(6, 48, [
-    N("arp", 0, "D5", 2.9, 0.2), N("arp", 3, "G5", 2.9, 0.18),
-  ]),
+  down: [
+    ...line("lead", [[3, "A3", 1.4, 0.23], [30, "C4", 1.8, 0.25], [45, "F4", 1.8, 0.26],
+      [96, "A3", 3.5, 0.26], [101.5, "C4", 2.5, 0.29], [111, "A3", 1.5, 0.23],
+      [122, "G3", 2.5, 0.25], [138, "A3", 3, 0.28], [185, "F4", 2, 0.26]]),
+    ...plucks(18, 1.5, ["D6", null, "B5", null], 0.19), ...plucks(66, 1.5, ["C6", null, "A5", null], 0.19),
+    ...plucks(102, 1.5, ["C5", "E5", null, "A5", null, "E5", "C5", null], 0.21),
+    ...plucks(120, 1.5, ["B4", "D5", null, "G5", null, "D5", "B4", null], 0.2),
+  ],
   up: [
-    ...every(1, 48, [N("hat", 0, "F#5", 0.08, 0.2)]),
-    ...every(3, 48, [N("kick", 0, "D2", 0.2, 0.55), N("kick", 1.5, "D2", 0.2, 0.35)]),
-    ...every(3, 48, [
-      N("bass", 0, "D2", 0.45, 0.45), N("bass", 0.5, "D2", 0.45, 0.3),
-      N("bass", 1.5, "G2", 0.45, 0.4), N("bass", 2, "G2", 0.45, 0.3),
+    ...every(0, 96, 3, [
+      ...line("kick", [[0, "D2", 0.22, 0.52], [1.5, "D2", 0.18, 0.33]]),
+      ...line("hat", [[0.5, "D5", 0.08, 0.16], [1, "D5", 0.08, 0.12], [2, "D5", 0.08, 0.2], [2.5, "D5", 0.08, 0.14]]),
     ]),
+    ...every(144, 192, 3, [
+      ...line("kick", [[0, "D2", 0.22, 0.57], [1.5, "D2", 0.18, 0.36]]),
+      ...line("hat", [[0.5, "D5", 0.08, 0.19], [1, "D5", 0.08, 0.13], [2, "D5", 0.08, 0.22], [2.5, "D5", 0.08, 0.16]]),
+    ]),
+    ...every(48, 96, 6, line("snare", [[4.5, "D3", 0.18, 0.3]])),
+    ...every(144, 192, 6, line("snare", [[4.5, "D3", 0.18, 0.33]])),
+    ...every(96, 144, 6, line("kick", [[0, "D2", 0.22, 0.35]])),
+    ...line("bass", [[9.75, "A2", 0.6, 0.34], [21.75, "D3", 0.6, 0.32], [33.75, "G2", 0.6, 0.33], [45.75, "F2", 0.6, 0.3],
+      [57.75, "D3", 0.6, 0.37], [69.75, "C3", 0.6, 0.35], [81.75, "G2", 0.6, 0.33], [93.75, "E2", 0.6, 0.3],
+      [153.75, "A2", 0.6, 0.37], [165.75, "D3", 0.6, 0.36], [177.75, "G2", 0.6, 0.35], [189.75, "A2", 0.6, 0.31]]),
+    ...plucks(48, 1.5, ["D4", null, "G4", "A4", "B4", null, "D5", "B4"], 0.25),
+    ...plucks(72, 1.5, ["B3", null, "E4", "F4", "G4", null, "B4", "G4"], 0.25),
+    ...plucks(144, 1.5, ["A3", null, "D4", "E4", "F4", null, "A4", "F4"], 0.26),
+    ...plucks(168, 1.5, ["G3", null, "C4", "D4", "E4", null, "G4", "E4"], 0.25),
   ],
 };
 
-// ── Venus · Mixolydian · 3/4 · 72 — warm, the ♭7 ache (composed) ────────────
-
-const venus: ThemeSpec = {
-  leadVoice: "flute",
-  bpm: 72,
-  beats: 36,
+// Sun · Ionian · 4/4 · settled pulse, generous answers and suspended inner voices.
+const sun: ThemeSpec = {
+  leadVoice: "flute", bpm: 72, beats: 128,
   bed: [
-    // I | ♭VII (the Mixolydian ache) | IV | I — ×2, close voicings.
-    ...every(18, 36, [
-      ...chord(0, ["D3", "F#3", "A3", "C4"], 6, 0.36), // I with the ♭7 folded in
-      ...chord(6, ["C3", "E3", "G3"], 6, 0.36),
-      ...chord(12, ["G3", "B3", "D4"], 3, 0.36),
-      ...chord(15, ["D3", "F#3", "A3"], 3, 0.36),
+    ...harmony(0, 8, "D2", ["D3", "A3", "E4"]), ...harmony(8, 8, "G2", ["D3", "G3", "B3"]),
+    ...harmony(16, 8, "F#2", ["D3", "F#3", "A3"]), ...harmony(24, 8, "A2", ["E3", "A3", "C#4"]),
+    ...harmony(32, 8, "B2", ["B3", "D4", "F#4"], 0.3), ...harmony(40, 8, "E2", ["G3", "B3", "E4"]),
+    ...harmony(48, 4, "G2", ["G3", "A3", "D4"]), ...harmony(52, 4, "F#2", ["F#3", "A3", "D4"]),
+    ...harmony(56, 8, "A2", ["E3", "A3", "C#4"]),
+    ...harmony(64, 16, "D2", ["D3", "A3"], 0.21), ...harmony(80, 8, "G2", ["G3", "B3", "D4"], 0.24),
+    ...harmony(88, 8, "A2", ["E3", "A3"], 0.25),
+    ...harmony(96, 8, "D2", ["D3", "A3", "F#4"], 0.3), ...harmony(104, 8, "G2", ["D3", "G3", "B3"]),
+    ...harmony(112, 8, "A2", ["E3", "A3", "C#4"]), ...harmony(120, 8, "D2", ["D3", "A3", "E4"], 0.26),
+    ...line("pad", [[65, "F#4", 6.4, 0.21], [73, "E4", 5.4, 0.2], [88.5, "D4", 3.5, 0.24], [93, "C#4", 2.4, 0.21]]),
+    ...line("lead", [
+      [2, "D4", 1.4, 0.41], [4, "A4", 1.4, 0.49], [6, "E4", 0.7, 0.35], [7, "F#4", 2.4, 0.44],
+      [12, "G4", 1.4, 0.43], [14, "B4", 0.7, 0.49], [15, "A4", 2.4, 0.45],
+      [20, "F#4", 1.3, 0.39], [22, "E4", 0.7, 0.35], [24, "E4", 1.4, 0.41], [26, "A4", 2.7, 0.46],
+      [33, "F#4", 1.4, 0.46], [35, "A4", 0.7, 0.48], [36, "B4", 2.8, 0.53],
+      [40, "G4", 1.4, 0.45], [42, "F#4", 0.7, 0.39], [43, "E4", 2.7, 0.42],
+      [48, "D5", 2.4, 0.54], [51, "B4", 0.7, 0.45], [52, "A4", 2.4, 0.48],
+      [56, "G4", 1.5, 0.43], [58, "E4", 0.7, 0.36], [60, "D4", 2.5, 0.4],
+      [72, "A3", 2.5, 0.32], [76, "D4", 2.3, 0.37], [83, "E4", 1.4, 0.35], [85, "G4", 1.5, 0.39],
+      [90, "F#4", 1.5, 0.37], [92, "E4", 1.5, 0.33],
+      [97, "D4", 1.4, 0.44], [99, "A4", 1.4, 0.52], [101, "E4", 0.7, 0.37], [102, "F#4", 2.5, 0.46],
+      [106, "G4", 1.3, 0.45], [108, "B4", 1.4, 0.51], [110, "D5", 2.2, 0.54],
+      [114, "C#5", 1.5, 0.45], [116, "A4", 1.2, 0.42], [118, "E4", 0.7, 0.35],
+      [120, "F#4", 1.6, 0.43], [122, "E4", 0.8, 0.35], [124, "D4", 2.5, 0.4],
     ]),
-    ...line("lead", 0.4, [
-      [0, "A4", 2], [2, "B4", 1], [3, "A4", 2], [5, "G4", 1],
-      [6, "E4", 2], [8, "G4", 1], [9, "F#4", 3],
-      [12, "G4", 2], [14, "B4", 1], [15, "A4", 3],
-      [18, "A4", 2], [20, "B4", 1], [21, "C5", 3], // rises to the ♭7 —
-      [24, "B4", 2], [26, "G4", 1], [27, "A4", 3], // — and eases back
-      [30, "F#4", 2], [32, "E4", 1], [33, "D4", 3],
-    ]),
+    ...plucks(0, 1, ["D4", null, "A4", "E5", "F#4", null, "A4", null], 0.25),
+    ...plucks(8, 1, ["G4", null, "D5", "B4", "A4", null, "G4", null], 0.25),
+    ...plucks(16, 1, ["F#4", null, "A4", "D5", "E5", null, "A4", null], 0.24),
+    ...plucks(24, 1, ["E4", null, "A4", "C#5", "B4", null, "A4", null], 0.24),
+    ...plucks(32, 1, ["B4", "F#5", null, "D5", "A4", null, "F#4", null], 0.29),
+    ...plucks(40, 1, ["E4", "B4", null, "G4", "D5", null, "B4", null]),
+    ...plucks(48, 1, ["G4", null, "D5", "A4", "F#4", null, "D5", null]),
+    ...plucks(56, 1, ["E4", "A4", null, "C#5", "B4", null, "A4", null], 0.27),
+    ...plucks(64, 2, ["D4", null, "A4", null, "F#4", null, "E5", null], 0.2),
+    ...plucks(80, 1, ["G4", null, null, "D5", "B4", null, "A4", null], 0.23),
+    ...plucks(88, 1, ["E4", null, "A4", null, "D5", "C#5", "B4", null], 0.25),
+    ...plucks(96, 1, ["D4", "A4", null, "E5", "F#4", "A4", null, "D5"], 0.29),
+    ...plucks(104, 1, ["G4", "D5", null, "B4", "A4", "B4", null, "D5"]),
+    ...plucks(112, 1, ["E4", "A4", null, "C#5", "B4", "E5", null, "A4"], 0.27),
+    ...plucks(120, 1, ["D4", null, "A4", "E5", "F#4", null, null, null], 0.24),
   ],
-  down: every(6, 36, [
-    N("arp", 0, "D4", 1.4, 0.24), N("arp", 1.5, "A4", 1.4, 0.22),
-    N("arp", 3, "F#4", 1.4, 0.22), N("arp", 4.5, "C5", 1.4, 0.18),
-  ]),
+  down: [
+    ...line("lead", [[10, "D4", 1.4, 0.25], [18, "A3", 1.4, 0.23], [30, "E4", 1.1, 0.24],
+      [65, "F#4", 2.5, 0.3], [69, "E4", 1.5, 0.25], [79, "D4", 1.3, 0.25], [94, "A3", 1.3, 0.23]]),
+    ...plucks(32, 2, ["D6", null, "B5", null], 0.17),
+    ...plucks(64, 2, ["A4", "D5", null, "F#5", "E5", null, "D5", null], 0.21),
+    ...plucks(104, 2, ["D6", null, "B5", null], 0.17),
+  ],
   up: [
-    ...every(3, 36, [
-      N("kick", 0, "D2", 0.3, 0.5),
-      N("hat", 1.5, "F#5", 0.1, 0.18),
+    ...every(0, 64, 4, [
+      ...line("kick", [[0, "D2", 0.25, 0.47], [2.5, "D2", 0.2, 0.3]]),
+      ...line("hat", [[1, "D5", 0.08, 0.15], [3, "D5", 0.08, 0.18], [3.5, "D5", 0.06, 0.1]]),
     ]),
-    ...every(6, 36, [N("bass", 0, "D2", 2.8, 0.4), N("bass", 3, "C3", 2.8, 0.32)]),
+    ...every(64, 96, 8, line("kick", [[0, "D2", 0.25, 0.3], [6, "D2", 0.2, 0.23]])),
+    ...every(96, 128, 4, [
+      ...line("kick", [[0, "D2", 0.25, 0.52], [2.5, "D2", 0.2, 0.34]]),
+      ...line("hat", [[1, "D5", 0.08, 0.18], [3, "D5", 0.08, 0.21]]),
+      ...line("snare", [[2, "D3", 0.16, 0.25]]),
+    ]),
+    ...line("bass", [[6.5, "A2", 0.7, 0.3], [14.5, "B2", 0.7, 0.29], [22.5, "D2", 0.7, 0.28],
+      [30.5, "A2", 0.7, 0.31], [38.5, "F#2", 0.7, 0.32], [46.5, "B2", 0.7, 0.31], [62.5, "E2", 0.7, 0.3],
+      [102.5, "F#2", 0.7, 0.33], [110.5, "B2", 0.7, 0.32], [118.5, "E2", 0.7, 0.31]]),
+    ...plucks(32, 1, ["F#4", null, "A4", "B4", null, "D5", "F#4", null], 0.24),
+    ...plucks(48, 1, ["D4", null, "G4", "A4", "D4", null, "F#4", null], 0.24),
+    ...plucks(96, 1, ["A3", null, "D4", "E4", null, "F#4", "A4", null], 0.24),
+    ...plucks(112, 1, ["E4", null, "A4", "B4", null, "C#5", "E5", null], 0.23),
   ],
 };
 
-// ── Mars · Phrygian · 5/4 · 138 — the Holst hammer, ♭II stabs (sketch 04) ───
-
-const mars: ThemeSpec = {
-  leadVoice: "horn",
-  bpm: 138,
-  beats: 40,
-  bed: [
-    // Brass stabs (sketch): Dm two bars, ♭II (E♭ major) answer, Dm close.
-    ...every(20, 40, [
-      ...chord(0, ["D3", "F3", "A3"], 1.75, 0.5),
-      ...chord(3, ["D3", "F3", "A3"], 1.75, 0.45),
-      ...chord(5, ["D3", "F3", "A3"], 1.75, 0.5),
-      ...chord(8, ["D3", "F3", "A3"], 1.75, 0.45),
-      ...chord(10, ["Eb3", "G3", "Bb3"], 1.75, 0.5),
-      ...chord(13, ["Eb3", "G3", "Bb3"], 1.75, 0.45),
-      ...chord(15, ["D3", "F3", "A3"], 1.75, 0.5),
-      ...chord(18, ["D3", "F3", "A3"], 1.75, 0.45),
-    ]),
-    // The two-note verdict at each phrase end (sketch): ♭2 falling to 1.
-    ...every(10, 40, [...line("lead", 0.55, [[8, "Eb4", 1], [9, "D4", 1]])]),
-  ],
-  down: every(5, 40, [
-    // The ostinato at half presence — the war heard from the map.
-    N("arp", 0, "D3", 0.7, 0.26), N("arp", 2, "Eb3", 0.7, 0.22), N("arp", 3, "D3", 0.7, 0.24),
-  ]),
-  up: [
-    // Full 5/4 ostinato (sketch): D D E♭ D D, hammered.
-    ...every(5, 40, [
-      N("bass", 0, "D2", 0.75, 0.6), N("bass", 1, "D2", 0.75, 0.6),
-      N("bass", 2, "Eb2", 0.75, 0.65), N("bass", 3, "D2", 0.75, 0.6), N("bass", 4, "D2", 0.75, 0.6),
-    ]),
-    // Drums (sketch): hat every beat; kick on the stab rhythm; snare with the ♭2.
-    ...every(1, 40, [N("hat", 0, "F#5", 0.08, 0.22)]),
-    ...every(10, 40, [
-      N("kick", 0, "C2", 0.3, 0.75), N("kick", 3, "C2", 0.3, 0.6),
-      N("kick", 5, "C2", 0.3, 0.7), N("kick", 8, "C2", 0.3, 0.6),
-      N("snare", 2, "D3", 0.2, 0.55), N("snare", 7, "D3", 0.2, 0.5),
-    ]),
-  ],
-};
-
-// ── Moon · Aeolian · 6/8 · 63 — nocturne, half-lit (composed) ───────────────
-
+// Moon · Aeolian · 6/8 · wide rests, falling answers and a low rocking figure.
 const moon: ThemeSpec = {
-  leadVoice: "flute",
-  bpm: 63,
-  beats: 24,
+  leadVoice: "strings", bpm: 63, beats: 96,
   bed: [
-    // i | ♭VI | ♭VII | i — the nocturne wheel, low and close.
-    ...chord(0, ["D3", "F3", "A3"], 6, 0.34),
-    ...chord(6, ["Bb2", "D3", "F3"], 6, 0.34),
-    ...chord(12, ["C3", "E3", "G3"], 6, 0.34),
-    ...chord(18, ["D3", "F3", "A3"], 6, 0.34),
-    // A sparse line that keeps returning to rest.
-    ...line("lead", 0.36, [
-      [1, "A4", 2], [4, "F4", 2], [7, "D4", 2], [10, "F4", 2],
-      [13, "G4", 2], [16, "E4", 2], [19, "D4", 4],
+    ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.24), ...harmony(6, 6, "Bb2", ["D3", "F3", "Bb3"], 0.26),
+    ...harmony(12, 6, "C3", ["E3", "G3", "C4"], 0.24), ...harmony(18, 6, "D2", ["D3", "A3", "F4"], 0.25),
+    ...harmony(24, 6, "Bb2", ["F3", "Bb3", "D4"]), ...harmony(30, 6, "G2", ["G3", "Bb3", "D4"], 0.27),
+    ...harmony(36, 6, "C3", ["G3", "C4", "E4"], 0.27), ...harmony(42, 6, "D2", ["F3", "A3", "D4"], 0.24),
+    ...harmony(48, 12, "D2", ["D3", "A3"], 0.2), ...harmony(60, 6, "Bb2", ["F3", "Bb3", "C4"], 0.22),
+    ...harmony(66, 6, "C3", ["E3", "G3", "C4"], 0.23),
+    ...harmony(72, 6, "D2", ["D3", "A3", "F4"], 0.27), ...harmony(78, 6, "Bb2", ["D3", "F3", "Bb3"], 0.27),
+    ...harmony(84, 6, "C3", ["E3", "G3", "C4"], 0.25), ...harmony(90, 6, "D2", ["D3", "A3", "E4"], 0.22),
+    ...line("pad", [[49, "F4", 4.6, 0.21], [55, "E4", 4, 0.19], [64, "D4", 3, 0.21]]),
+    ...line("lead", [
+      [1.5, "D4", 1, 0.35], [3, "A4", 1.9, 0.43], [6, "E4", 0.7, 0.31], [7.5, "F4", 2.1, 0.39],
+      [13.5, "G4", 1.5, 0.38], [16, "E4", 1.1, 0.32], [19.5, "D4", 2.4, 0.36],
+      [24.5, "F4", 1.7, 0.41], [27, "A4", 0.7, 0.43], [28.5, "Bb4", 2, 0.48],
+      [33, "A4", 0.9, 0.37], [34.5, "G4", 1.8, 0.4], [38, "E4", 1.8, 0.35],
+      [42.5, "F4", 1.2, 0.37], [44.5, "E4", 0.7, 0.31], [46, "D4", 1.3, 0.34],
+      [57, "A3", 2.1, 0.29], [62, "D4", 2, 0.33], [68, "C4", 2.1, 0.3],
+      [72.5, "D4", 1, 0.38], [74, "A4", 1.7, 0.46], [76.5, "E4", 0.7, 0.33], [78, "F4", 2.2, 0.42],
+      [82, "Bb4", 1.2, 0.46], [84, "G4", 1.4, 0.38], [86.5, "E4", 1.1, 0.33],
+      [90, "F4", 1.1, 0.37], [91.5, "E4", 0.7, 0.31], [93, "D4", 2.1, 0.34],
     ]),
+    ...plucks(0, 1.5, ["D4", "A4", null, "E5"], 0.24), ...plucks(6, 1.5, ["Bb4", "F5", null, "D5"], 0.23),
+    ...plucks(12, 1.5, ["C4", "G4", null, "E5"], 0.23), ...plucks(18, 1.5, ["D4", "A4", null, "F5"], 0.22),
+    ...plucks(24, 0.75, ["Bb4", null, "F5", "D5", null, "A4", "F4", null], 0.25),
+    ...plucks(30, 0.75, ["G4", null, "D5", "Bb4", null, "A4", "G4", null], 0.25),
+    ...plucks(36, 0.75, ["C4", null, "G4", "E5", null, "D5", "G4", null], 0.24),
+    ...plucks(42, 0.75, ["D4", null, "A4", "F5", null, "E5", null, null], 0.23),
+    ...plucks(48, 3, ["D4", null, "A4", null], 0.2), ...plucks(60, 1.5, ["Bb4", null, "F5", null], 0.21),
+    ...plucks(66, 1.5, ["C5", null, "G4", "E5"], 0.21),
+    ...plucks(72, 0.75, ["D4", null, "A4", "E5", null, "F5", "A4", null], 0.26),
+    ...plucks(78, 0.75, ["Bb4", null, "F5", "D5", null, "A4", "Bb4", null], 0.25),
+    ...plucks(84, 0.75, ["C4", null, "G4", "E5", null, "D5", "G4", null], 0.23),
+    ...plucks(90, 1.5, ["D4", "A4", null, null], 0.21),
   ],
-  down: every(6, 24, [
-    N("arp", 0, "D4", 0.9, 0.24), N("arp", 1, "A4", 0.9, 0.2), N("arp", 2, "F4", 0.9, 0.22),
-    N("arp", 3, "A4", 0.9, 0.2), N("arp", 4, "D5", 1.9, 0.18),
-  ]),
+  down: [
+    ...line("lead", [[10.5, "D4", 1.7, 0.25], [22.5, "A3", 1, 0.22], [49, "F4", 2.4, 0.3],
+      [52.5, "E4", 1.7, 0.25], [65, "F4", 0.8, 0.25], [88, "C4", 1.1, 0.23]]),
+    ...plucks(48, 1.5, ["A4", null, "D5", null, "E5", "F5", null, "D5"], 0.19),
+    ...plucks(60, 1.5, ["F4", "C5", null, "Bb4"], 0.2),
+  ],
   up: [
-    ...every(6, 24, [
-      N("kick", 0, "D2", 0.3, 0.45), N("kick", 3, "D2", 0.3, 0.3),
-      N("hat", 1.5, "F#5", 0.1, 0.15), N("hat", 4.5, "F#5", 0.1, 0.15),
+    ...every(0, 48, 6, [
+      ...line("kick", [[0, "D2", 0.25, 0.43], [3, "D2", 0.22, 0.28]]),
+      ...line("hat", [[1.5, "D5", 0.09, 0.14], [4.5, "D5", 0.09, 0.17]]),
     ]),
-    ...every(3, 24, [N("bass", 0, "D2", 1.4, 0.4)]),
+    ...every(48, 72, 6, line("kick", [[0, "D2", 0.25, 0.28]])),
+    ...every(72, 96, 6, [
+      ...line("kick", [[0, "D2", 0.25, 0.47], [3, "D2", 0.22, 0.3]]),
+      ...line("hat", [[1.5, "D5", 0.09, 0.16], [4.5, "D5", 0.09, 0.19], [5, "D5", 0.06, 0.1]]),
+      ...line("snare", [[4.5, "D3", 0.18, 0.22]]),
+    ]),
+    ...line("bass", [[5.25, "A2", 0.4, 0.28], [11.25, "F2", 0.4, 0.27], [17.25, "G2", 0.4, 0.27],
+      [23.25, "A2", 0.4, 0.28], [29.25, "F2", 0.4, 0.3], [35.25, "D3", 0.4, 0.29], [41.25, "G2", 0.4, 0.28],
+      [77.25, "A2", 0.4, 0.3], [83.25, "F2", 0.4, 0.29], [89.25, "G2", 0.4, 0.28]]),
+    ...plucks(24, 0.75, ["F4", "A4", null, "Bb4", "D5", null, "A4", null], 0.22),
+    ...plucks(36, 0.75, ["G4", "C5", null, "D5", "E5", null, "C5", null], 0.21),
+    ...plucks(72, 0.75, ["A3", "D4", null, "E4", "F4", null, "A4", null], 0.22),
   ],
 };
 
-// ── Saturn · Locrian · 4/4 · 50 — the toll, ♭II consolation (sketch 05) ─────
+// Venus · Mixolydian · 3/4 · close, conversational phrases and a softened seventh.
+const venus: ThemeSpec = {
+  leadVoice: "strings", bpm: 72, beats: 96,
+  bed: [
+    ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.26), ...harmony(6, 6, "F#2", ["D3", "F#3", "C4"]),
+    ...harmony(12, 6, "C3", ["E3", "G3", "C4"], 0.26), ...harmony(18, 6, "G2", ["D3", "G3", "B3"], 0.27),
+    ...harmony(24, 6, "F#2", ["F#3", "A3", "D4"], 0.29), ...harmony(30, 6, "E2", ["G3", "B3", "E4"], 0.29),
+    ...harmony(36, 6, "C3", ["G3", "C4", "E4"]), ...harmony(42, 6, "D2", ["F#3", "A3", "D4"], 0.26),
+    ...harmony(48, 12, "D2", ["D3", "A3"], 0.21), ...harmony(60, 6, "C3", ["E3", "G3", "C4"], 0.23),
+    ...harmony(66, 6, "G2", ["D3", "G3", "B3"], 0.24),
+    ...harmony(72, 6, "D2", ["D3", "A3", "F#4"], 0.3), ...harmony(78, 6, "G2", ["G3", "B3", "D4"]),
+    ...harmony(84, 6, "C3", ["E3", "G3", "C4"], 0.27), ...harmony(90, 6, "D2", ["D3", "A3", "E4"], 0.25),
+    ...line("pad", [[49, "C4", 4.5, 0.22], [55, "B3", 4, 0.2], [64, "D4", 3.6, 0.22], [69, "F#4", 2.2, 0.23]]),
+    ...line("lead", [
+      [1, "D4", 1.3, 0.39], [3, "A4", 1.7, 0.47], [5, "E4", 0.6, 0.33], [6, "F#4", 2.3, 0.43],
+      [10, "C5", 1.5, 0.48], [13, "B4", 1.2, 0.41], [15, "G4", 1.7, 0.4],
+      [19, "A4", 1.2, 0.42], [21, "G4", 0.7, 0.35], [22, "F#4", 1.3, 0.38],
+      [25, "A4", 1.3, 0.47], [27, "B4", 0.7, 0.46], [28, "D5", 2.3, 0.53],
+      [32, "B4", 1.4, 0.43], [34, "G4", 0.8, 0.37], [36, "E4", 1.6, 0.4],
+      [39, "G4", 0.7, 0.41], [40, "A4", 1.3, 0.44], [43, "F#4", 1.3, 0.39], [45, "E4", 1.6, 0.34],
+      [55, "C4", 2.3, 0.3], [61, "E4", 1.7, 0.34], [64, "G4", 1.3, 0.38], [68, "D4", 2.3, 0.33],
+      [73, "D4", 1.3, 0.42], [75, "A4", 1.4, 0.5], [77, "E4", 0.6, 0.35], [78, "F#4", 1.7, 0.45],
+      [81, "B4", 0.7, 0.46], [82, "C5", 1.6, 0.51], [85, "B4", 1.2, 0.43], [87, "G4", 1.4, 0.39],
+      [90, "A4", 1.2, 0.43], [92, "F#4", 0.7, 0.36], [93, "D4", 2.1, 0.39],
+    ]),
+    ...plucks(0, 1, ["D4", null, "A4", "E5", null, "A4"], 0.24),
+    ...plucks(6, 1, ["F#4", null, "A4", "C5", null, "A4"], 0.25),
+    ...plucks(12, 1, ["E4", null, "G4", "C5", null, "D5"], 0.24),
+    ...plucks(18, 1, ["G4", null, "B4", "D5", null, "A4"], 0.24),
+    ...plucks(24, 0.75, ["F#4", "A4", null, "D5", "E5", null, "A4", null]),
+    ...plucks(30, 0.75, ["E4", "B4", null, "G4", "D5", null, "B4", null], 0.27),
+    ...plucks(36, 0.75, ["C5", "G4", null, "E5", "D5", null, "G4", null], 0.26),
+    ...plucks(42, 0.75, ["D4", "A4", null, "F#5", "E5", null, "D5", null], 0.25),
+    ...plucks(48, 2, ["D4", null, "A4", "C5", null, null], 0.2),
+    ...plucks(60, 1, ["C5", null, "G4", null, "E5", null], 0.22),
+    ...plucks(66, 1, ["G4", null, "D5", null, "B4", "A4"], 0.24),
+    ...plucks(72, 0.75, ["D4", "A4", null, "E5", "F#5", null, "A4", null]),
+    ...plucks(78, 0.75, ["G4", "B4", null, "D5", "A4", null, "B4", null], 0.27),
+    ...plucks(84, 0.75, ["C5", "G4", null, "E5", "D5", null, "G4", null], 0.25),
+    ...plucks(90, 1, ["D4", null, "A4", "E5", null, null], 0.23),
+  ],
+  down: [
+    ...line("lead", [[8.5, "A3", 1, 0.25], [17, "E4", 1.3, 0.26], [23.5, "D4", 0.7, 0.23],
+      [48.5, "F#4", 2.1, 0.3], [52, "E4", 1.7, 0.26], [58, "A3", 1.6, 0.23], [71, "A3", 1.1, 0.24]]),
+    ...plucks(48, 1.5, ["A4", null, "C5", "E5", null, "D5", "A4", null], 0.2),
+    ...plucks(60, 1.5, ["G4", "C5", null, "E5"], 0.2),
+  ],
+  up: [
+    ...every(0, 48, 3, [
+      ...line("kick", [[0, "D2", 0.24, 0.43]]), ...line("hat", [[1, "D5", 0.08, 0.13], [2.5, "D5", 0.08, 0.17]]),
+    ]),
+    ...every(48, 72, 6, line("kick", [[0, "D2", 0.24, 0.28]])),
+    ...every(72, 96, 3, [
+      ...line("kick", [[0, "D2", 0.24, 0.48]]), ...line("hat", [[1, "D5", 0.08, 0.16], [2.5, "D5", 0.08, 0.2]]),
+    ]),
+    ...every(24, 48, 6, line("snare", [[4, "D3", 0.18, 0.22]])),
+    ...every(72, 96, 6, line("snare", [[4, "D3", 0.18, 0.25]])),
+    ...line("bass", [[5, "A2", 0.65, 0.28], [11, "A2", 0.65, 0.27], [17, "G2", 0.65, 0.27], [23, "B2", 0.65, 0.29],
+      [29, "A2", 0.65, 0.31], [35, "B2", 0.65, 0.29], [41, "G2", 0.65, 0.28], [47, "A2", 0.65, 0.27],
+      [77, "A2", 0.65, 0.31], [83, "B2", 0.65, 0.3], [89, "G2", 0.65, 0.29], [95, "A2", 0.65, 0.25]]),
+    ...plucks(24, 1, ["A3", "D4", null, "E4", "F#4", null], 0.23),
+    ...plucks(36, 1, ["G3", "C4", null, "D4", "E4", null], 0.22),
+    ...plucks(72, 1, ["A3", "D4", null, "E4", "F#4", null], 0.24),
+    ...plucks(84, 1, ["G3", "C4", null, "D4", "E4", null], 0.23),
+  ],
+};
 
+// Mars · Phrygian · 5/4 · a 3+2 gait, clipped resonance and a tune with teeth.
+const mars: ThemeSpec = {
+  leadVoice: "horn", bpm: 138, beats: 200,
+  bed: [
+    ...harmony(0, 10, "D2", ["D3", "A3", "F4"], 0.3), ...harmony(10, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.31),
+    ...harmony(20, 10, "D2", ["D3", "A3", "C4"], 0.29), ...harmony(30, 10, "G2", ["D3", "G3", "Bb3"], 0.29),
+    ...harmony(40, 10, "D2", ["D3", "A3", "F4"], 0.3),
+    ...harmony(50, 10, "Bb2", ["F3", "Bb3", "D4"], 0.33), ...harmony(60, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.32),
+    ...harmony(70, 10, "C3", ["G3", "C4", "Eb4"], 0.3), ...harmony(80, 10, "G2", ["D3", "G3", "Bb3"], 0.31),
+    ...harmony(90, 10, "D2", ["D3", "A3", "F4"], 0.29),
+    ...harmony(100, 20, "D2", ["D3", "A3"], 0.22), ...harmony(120, 20, "G2", ["D3", "G3"], 0.24),
+    ...harmony(140, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.26),
+    ...harmony(150, 10, "D2", ["D3", "A3", "F4"], 0.34), ...harmony(160, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.33),
+    ...harmony(170, 10, "Bb2", ["F3", "Bb3", "D4"], 0.32), ...harmony(180, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.3),
+    ...harmony(190, 10, "D2", ["D3", "A3", "F4"], 0.27),
+    ...line("pad", [[101, "Eb4", 7.5, 0.23], [111, "F4", 7.5, 0.21], [121, "Bb3", 7.5, 0.24], [131, "A3", 7.5, 0.22]]),
+    ...line("lead", [
+      [2, "D4", 1.2, 0.47], [5, "A4", 1.5, 0.55], [8, "Eb4", 0.65, 0.44], [9, "F4", 2.6, 0.5],
+      [15, "G4", 1.5, 0.5], [18, "Eb4", 0.65, 0.43], [19, "D4", 1.7, 0.48],
+      [25, "C4", 1.5, 0.39], [28, "D4", 0.65, 0.45], [30, "G4", 2.5, 0.51],
+      [35, "Bb4", 1.3, 0.54], [38, "A4", 0.65, 0.45], [40, "F4", 2.6, 0.48], [46, "Eb4", 0.7, 0.42], [48, "D4", 1.2, 0.46],
+      [52, "F4", 1.3, 0.51], [55, "Bb4", 2.5, 0.58], [59, "A4", 0.65, 0.46],
+      [60, "G4", 2.6, 0.53], [65, "Eb4", 1.5, 0.45], [68, "G4", 0.65, 0.48],
+      [70, "C5", 2.4, 0.57], [75, "Bb4", 1.5, 0.5], [78, "G4", 0.7, 0.44],
+      [80, "A4", 2.5, 0.52], [85, "G4", 1.3, 0.47], [88, "F4", 0.65, 0.43],
+      [90, "Eb4", 1.4, 0.49], [93, "D4", 3.5, 0.46],
+      [113, "A3", 3.5, 0.33], [123, "Bb3", 3.5, 0.36], [133, "D4", 2.6, 0.38],
+      [140, "Eb4", 2.5, 0.42], [145, "G4", 1.5, 0.46],
+      [152, "D4", 1.2, 0.5], [155, "A4", 1.5, 0.58], [158, "Eb4", 0.65, 0.46], [159, "F4", 2.6, 0.53],
+      [165, "G4", 1.5, 0.52], [168, "Bb4", 0.65, 0.54], [170, "D5", 2.6, 0.6],
+      [175, "C5", 1.5, 0.51], [178, "Bb4", 0.7, 0.46], [180, "G4", 2.5, 0.49],
+      [185, "F4", 1.4, 0.44], [188, "Eb4", 0.65, 0.41], [190, "D4", 4, 0.48],
+    ]),
+    ...plucks(0, 1, ["D4", "A4", null, "Eb5", "F5", "D4", null, "A4", "F5", null], 0.32),
+    ...plucks(10, 1, ["Eb4", "Bb4", null, "G5", "F5", "Eb4", null, "Bb4", "G5", null], 0.31),
+    ...plucks(20, 1, ["D4", "A4", null, "C5", "F5", "D4", null, "A4", "Eb5", null], 0.29),
+    ...plucks(30, 1, ["G4", "D5", null, "Bb4", "A4", "G4", null, "D5", "Bb4", null], 0.3),
+    ...plucks(40, 1, ["D4", "A4", null, "F5", "Eb5", "D4", null, "A4", null, null], 0.3),
+    ...plucks(50, 0.5, ["Bb4", null, "F5", "D5", null, null, "A4", "Bb4", null, "D5", "F5", null, "D5", "A4", null, "Bb4", "F5", null, "D5", null], 0.34),
+    ...plucks(60, 1, ["Eb4", "Bb4", "G5", null, "F5", "Eb5", null, "Bb4", "G4", null], 0.33),
+    ...plucks(70, 1, ["C4", "G4", "Eb5", null, "D5", "C5", null, "G4", "Bb4", null], 0.32),
+    ...plucks(80, 1, ["G4", "D5", "Bb4", null, "A4", "G4", null, "D5", "Bb4", null], 0.32),
+    ...plucks(90, 1, ["D4", "A4", "F5", null, "Eb5", "D5", null, null, null, null]),
+    ...plucks(100, 2.5, ["D4", null, "A4", null, "Eb5", null, null, null], 0.23),
+    ...plucks(120, 2.5, ["G4", null, "D5", null, "Bb4", null, "A4", null], 0.24),
+    ...plucks(140, 1, ["Eb4", null, "Bb4", "G5", null, "F5", "Eb5", null, "Bb4", null]),
+    ...plucks(150, 1, ["D4", "A4", null, "Eb5", "F5", "A5", null, "F5", "D5", null], 0.35),
+    ...plucks(160, 1, ["Eb4", "Bb4", null, "G5", "F5", "Eb5", null, "Bb4", "G5", null], 0.34),
+    ...plucks(170, 1, ["Bb4", "F5", null, "D5", "C5", "Bb4", null, "F5", "A4", null], 0.33),
+    ...plucks(180, 1, ["Eb4", "Bb4", null, "G5", "F5", "Eb5", null, "Bb4", "G4", null], 0.31),
+    ...plucks(190, 1, ["D4", "A4", null, "F5", "Eb5", "D5", null, null, null, null], 0.27),
+  ],
+  down: [
+    ...line("lead", [[22, "A3", 1.8, 0.27], [43.5, "C4", 1.6, 0.26], [103, "F4", 3, 0.33],
+      [108, "Eb4", 2.5, 0.28], [118, "D4", 2.5, 0.3], [128, "F4", 2.6, 0.31], [137, "Eb4", 1.8, 0.28], [196, "A3", 1.8, 0.25]]),
+    ...plucks(100, 2, ["A4", null, "D5", null, "Eb5", "F5", null, "Eb5", "D5", null], 0.2),
+    ...plucks(120, 2, ["D5", null, "G5", null, "Bb4", "A4", null, "G4", "D5", null], 0.2),
+  ],
+  up: [
+    ...every(0, 100, 5, [
+      ...line("kick", [[0, "D2", 0.23, 0.6], [3, "D2", 0.2, 0.47]]), ...line("snare", [[2, "D3", 0.17, 0.34]]),
+      ...line("hat", [[0.5, "D5", 0.08, 0.17], [1.5, "D5", 0.08, 0.13], [3.5, "D5", 0.08, 0.2], [4.5, "D5", 0.08, 0.14]]),
+    ]),
+    ...every(100, 150, 10, line("kick", [[0, "D2", 0.23, 0.36], [8, "D2", 0.2, 0.28]])),
+    ...every(150, 200, 5, [
+      ...line("kick", [[0, "D2", 0.23, 0.65], [3, "D2", 0.2, 0.5]]),
+      ...line("snare", [[2, "D3", 0.17, 0.38], [4.5, "D3", 0.12, 0.15]]),
+      ...line("hat", [[0.5, "D5", 0.08, 0.2], [1.5, "D5", 0.08, 0.15], [3.5, "D5", 0.08, 0.23], [4.5, "D5", 0.08, 0.17]]),
+    ]),
+    ...line("bass", [[7.5, "A2", 0.5, 0.37], [9, "D3", 0.55, 0.4], [17.5, "Bb2", 0.5, 0.36], [19, "Eb3", 0.55, 0.4],
+      [27.5, "A2", 0.5, 0.35], [29, "C3", 0.55, 0.37], [37.5, "D3", 0.5, 0.36], [39, "Bb2", 0.55, 0.38],
+      [47.5, "A2", 0.5, 0.36], [49, "D3", 0.55, 0.39], [57.5, "F2", 0.5, 0.38], [59, "Bb2", 0.55, 0.41],
+      [67.5, "Bb2", 0.5, 0.37], [69, "Eb3", 0.55, 0.4], [77.5, "G2", 0.5, 0.35], [79, "C3", 0.55, 0.38],
+      [87.5, "D3", 0.5, 0.36], [89, "Bb2", 0.55, 0.38], [97.5, "A2", 0.5, 0.34],
+      [157.5, "A2", 0.5, 0.39], [159, "D3", 0.55, 0.42], [167.5, "Bb2", 0.5, 0.38], [169, "Eb3", 0.55, 0.41],
+      [177.5, "F2", 0.5, 0.37], [179, "Bb2", 0.55, 0.4], [187.5, "Bb2", 0.5, 0.35], [189, "Eb3", 0.55, 0.38]]),
+    ...plucks(50, 1, ["F4", null, "A4", "Bb4", null, "D5", null, "F5", "D5", null], 0.26),
+    ...plucks(70, 1, ["G3", null, "C4", "D4", null, "Eb4", null, "G4", "Eb4", null], 0.25),
+    ...plucks(150, 1, ["A3", null, "D4", "Eb4", null, "F4", null, "A4", "F4", null]),
+    ...plucks(170, 1, ["F4", null, "Bb4", "C5", null, "D5", null, "F5", "D5", null], 0.26),
+  ],
+};
+
+// Jupiter · Lydian · 3/4 · broad phrases; the raised fourth opens the music outward.
+const jupiter: ThemeSpec = {
+  leadVoice: "horn", bpm: 96, beats: 144,
+  bed: [
+    ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "E2", ["D3", "G#3", "B3"], 0.3),
+    ...harmony(24, 12, "A2", ["E3", "A3", "C#4"]),
+    ...harmony(36, 9, "E2", ["E3", "G#3", "B3"], 0.33), ...harmony(45, 9, "F#2", ["F#3", "A3", "C#4"], 0.3),
+    ...harmony(54, 9, "G#2", ["G#3", "B3", "E4"], 0.32), ...harmony(63, 9, "D2", ["F#3", "A3", "D4"], 0.29),
+    ...harmony(72, 18, "D2", ["D3", "A3"], 0.21), ...harmony(90, 9, "B2", ["F#3", "B3", "C#4"], 0.23),
+    ...harmony(99, 9, "E2", ["E3", "G#3", "B3"], 0.26),
+    ...harmony(108, 9, "D2", ["D3", "A3", "F#4"], 0.32), ...harmony(117, 9, "E2", ["D3", "G#3", "B3"], 0.33),
+    ...harmony(126, 9, "A2", ["E3", "A3", "C#4"], 0.3), ...harmony(135, 9, "D2", ["D3", "A3", "E4"], 0.27),
+    ...line("pad", [[74, "E4", 6.5, 0.21], [82, "F#4", 6, 0.23], [95, "D4", 5, 0.23], [102, "F#4", 4.5, 0.24]]),
+    ...line("lead", [
+      [3, "D4", 2.2, 0.44], [6, "A4", 2.2, 0.52], [9, "E4", 1.2, 0.38], [10.5, "F#4", 3.8, 0.47],
+      [18, "G#4", 3.5, 0.54], [22.5, "B4", 1, 0.47], [24, "A4", 3.5, 0.48], [30, "E4", 2.5, 0.37],
+      [37.5, "G#4", 2.3, 0.54], [40.5, "B4", 1.2, 0.53], [42, "D5", 3.5, 0.59],
+      [48, "C#5", 2.2, 0.51], [51, "A4", 1.9, 0.45], [54, "B4", 3.8, 0.54],
+      [60, "G#4", 2.1, 0.46], [63, "F#4", 2.2, 0.45], [66, "E4", 1.1, 0.38], [67.5, "D4", 2.7, 0.42],
+      [84, "A3", 3.5, 0.32], [93, "C#4", 3.5, 0.36], [102, "E4", 2.6, 0.39],
+      [109.5, "D4", 2.2, 0.47], [112.5, "A4", 2.1, 0.55], [115.5, "E4", 1, 0.4], [117, "F#4", 2.5, 0.49],
+      [121.5, "G#4", 2.4, 0.57], [124.5, "B4", 1, 0.5], [126, "D5", 2.5, 0.58],
+      [130.5, "C#5", 1.2, 0.48], [132, "A4", 1.7, 0.44], [135, "F#4", 2.1, 0.44],
+      [138, "E4", 1, 0.37], [139.5, "D4", 3, 0.41],
+    ]),
+    ...plucks(0, 1.5, ["D4", "A4", null, "E5", "F#5", null, "A4", null], 0.26),
+    ...plucks(12, 1.5, ["E4", "B4", null, "D5", "G#5", null, "B4", null]),
+    ...plucks(24, 1.5, ["A4", "E5", null, "C#5", "B4", null, "A4", null], 0.25),
+    ...plucks(36, 0.75, ["E4", "B4", null, "G#5", "F#5", "E5", null, "B4", "G#4", null, "E5", null], 0.31),
+    ...plucks(45, 0.75, ["F#4", "C#5", null, "A5", "G#5", "F#5", null, "C#5", "A4", null, "E5", null], 0.3),
+    ...plucks(54, 0.75, ["G#4", "B4", null, "E5", "F#5", "G#5", null, "B4", "E5", null, "D5", null], 0.31),
+    ...plucks(63, 0.75, ["D4", "A4", null, "F#5", "E5", "D5", null, "A4", null, null, null, null], 0.26),
+    ...plucks(72, 3, ["D4", null, "A4", "E5", null, null], 0.2),
+    ...plucks(90, 1.5, ["B4", null, "F#5", "C#5", null, null], 0.23),
+    ...plucks(99, 1.5, ["E4", "B4", null, "G#5", "F#5", null], 0.26),
+    ...plucks(108, 0.75, ["D4", "A4", null, "E5", "F#5", "A5", null, "F#5", "E5", null, "A4", null], 0.32),
+    ...plucks(117, 0.75, ["E4", "B4", null, "D5", "G#5", "B5", null, "G#5", "F#5", null, "B4", null], 0.33),
+    ...plucks(126, 0.75, ["A4", "E5", null, "C#5", "B4", "A4", null, "E5", "C#5", null, "B4", null], 0.29),
+    ...plucks(135, 1.5, ["D4", "A4", null, "E5", null, null], 0.25),
+  ],
+  down: [
+    ...line("lead", [[15, "B3", 2, 0.26], [33, "C#4", 1.8, 0.26], [74, "F#4", 3.5, 0.32],
+      [79.5, "E4", 2.5, 0.27], [88.5, "D4", 1, 0.26], [97.5, "F#4", 1, 0.27], [106, "B3", 1.5, 0.25]]),
+    ...plucks(72, 1.5, ["A4", null, "D5", "E5", null, "F#5", "E5", null, "A4", "D5", null, null], 0.21),
+    ...plucks(90, 1.5, ["F#4", "B4", null, "C#5", "D5", null], 0.21),
+  ],
+  up: [
+    ...every(0, 72, 3, [
+      ...line("kick", [[0, "D2", 0.25, 0.51]]), ...line("hat", [[1, "D5", 0.09, 0.16], [2.5, "D5", 0.08, 0.19]]),
+    ]),
+    ...every(36, 72, 6, line("snare", [[4, "D3", 0.2, 0.3]])),
+    ...every(72, 108, 6, line("kick", [[0, "D2", 0.25, 0.32]])),
+    ...every(108, 144, 3, [
+      ...line("kick", [[0, "D2", 0.25, 0.57], [2, "D2", 0.18, 0.29]]),
+      ...line("hat", [[1, "D5", 0.09, 0.19], [2.5, "D5", 0.08, 0.23]]),
+    ]),
+    ...every(108, 144, 6, line("snare", [[4, "D3", 0.2, 0.34]])),
+    ...line("bass", [[10, "A2", 1, 0.29], [22, "B2", 1, 0.3], [34, "C#3", 1, 0.28],
+      [43.5, "B2", 0.8, 0.34], [52.5, "C#3", 0.8, 0.32], [61.5, "B2", 0.8, 0.34], [70.5, "A2", 0.8, 0.3],
+      [115.5, "A2", 0.8, 0.35], [124.5, "B2", 0.8, 0.36], [133.5, "C#3", 0.8, 0.32], [142.5, "A2", 0.8, 0.28]]),
+    ...plucks(36, 1.5, ["B3", null, "E4", "F#4", "G#4", null], 0.25),
+    ...plucks(54, 1.5, ["E4", null, "G#4", "B4", "D5", null], 0.25),
+    ...plucks(108, 1.5, ["A3", null, "D4", "E4", "F#4", null], 0.27),
+    ...plucks(126, 1.5, ["E4", null, "A4", "B4", "C#5", null], 0.25),
+  ],
+};
+
+// Saturn · Locrian · 4/4 · tolling bass; the shared contour bends around Ab.
 const saturn: ThemeSpec = {
-  leadVoice: "strings",
-  bpm: 50,
-  beats: 24,
+  leadVoice: "strings", bpm: 50, beats: 64,
   bed: [
-    // Half-diminished breath | E♭ consolation | back (sketch pad).
-    ...chord(0, ["D3", "F3", "G#3", "C4"], 8, 0.34),
-    ...chord(8, ["Eb3", "G3", "Bb3"], 8, 0.34),
-    ...chord(16, ["D3", "F3", "G#3", "C4"], 8, 0.34),
-    // The toll (sketch): tonic against its own denied fifth.
-    ...line("bass", 0.5, [
-      [0, "D2", 4], [4, "G#2", 4], [8, "D2", 4], [12, "G#2", 4], [16, "D2", 4], [20, "D2", 4],
+    ...harmony(0, 4, "D2", ["D3", "Ab3", "C4"], 0.25), ...harmony(4, 4, "Ab2", ["D3", "Ab3", "F4"], 0.24),
+    ...harmony(8, 4, "Eb2", ["Eb3", "Bb3", "G4"], 0.26), ...harmony(12, 4, "Bb2", ["Eb3", "Bb3", "F4"], 0.24),
+    ...harmony(16, 4, "F2", ["F3", "Ab3", "C4"]), ...harmony(20, 4, "Eb2", ["G3", "Bb3", "Eb4"]),
+    ...harmony(24, 4, "D2", ["F3", "Ab3", "D4"], 0.27), ...harmony(28, 4, "Ab2", ["Eb3", "Ab3", "C4"], 0.24),
+    ...harmony(32, 8, "D2", ["D3", "Ab3"], 0.2), ...harmony(40, 4, "Ab2", ["D3", "Ab3", "C4"], 0.19),
+    ...harmony(44, 4, "Eb2", ["Eb3", "Bb3", "G4"], 0.23),
+    ...harmony(48, 4, "D2", ["D3", "Ab3", "F4"]), ...harmony(52, 4, "Eb2", ["Eb3", "Bb3", "G4"]),
+    ...harmony(56, 4, "F2", ["F3", "Ab3", "C4"], 0.25), ...harmony(60, 4, "D2", ["D3", "Ab3", "C4"], 0.22),
+    ...line("pad", [[33, "C4", 2.4, 0.2], [36, "Bb3", 3.4, 0.18], [42, "F4", 2.4, 0.21], [46, "F4", 1.4, 0.2]]),
+    ...line("lead", [
+      [1, "D4", 1.2, 0.37], [3, "Ab4", 1.4, 0.45], [5, "Eb4", 0.7, 0.33], [6, "F4", 1.6, 0.41],
+      [9, "G4", 1.6, 0.42], [12, "F4", 0.7, 0.36], [13, "Eb4", 1.5, 0.37],
+      [17, "C5", 1.5, 0.49], [19, "Ab4", 0.6, 0.4], [21, "G4", 1.5, 0.43],
+      [24, "F4", 1.4, 0.4], [26, "Eb4", 0.7, 0.34], [28, "D4", 2.5, 0.38],
+      [39, "C4", 2.5, 0.3], [44.5, "Bb3", 2, 0.31],
+      [48.5, "D4", 1, 0.4], [50, "Ab4", 1.2, 0.47], [52, "Eb4", 0.7, 0.35], [53, "F4", 1.5, 0.43],
+      [56, "Ab4", 1.3, 0.42], [58, "F4", 0.7, 0.37], [60, "Eb4", 1.1, 0.36], [62, "D4", 1.5, 0.35],
     ]),
-    // Falling strings (sketch): F → E♭ → D, twice.
-    ...line("lead", 0.4, [
-      [2, "F4", 2], [4, "Eb4", 4], [10, "D4", 2],
-      [16, "F4", 2], [18, "Eb4", 2], [20, "D4", 4],
-    ]),
+    ...plucks(0, 1, ["D4", null, "Ab4", null, "C5", null, "F4", null], 0.24),
+    ...plucks(8, 1, ["Eb4", null, "Bb4", null, "G5", null, "F5", null], 0.23),
+    ...plucks(16, 0.5, ["F4", null, "C5", "Ab4", null, "G4", "F4", null], 0.26),
+    ...plucks(20, 0.5, ["Eb4", null, "Bb4", "G5", null, "F5", "Eb5", null], 0.25),
+    ...plucks(24, 0.5, ["D4", null, "Ab4", "F5", null, "Eb5", "D5", null], 0.25),
+    ...plucks(28, 1, ["Ab4", null, "Eb5", null], 0.21),
+    ...plucks(32, 2, ["D4", null, "Ab4", null, "C5", null], 0.18),
+    ...plucks(44, 1, ["Eb4", null, "Bb4", "G5"], 0.21),
+    ...plucks(48, 0.5, ["D4", null, "Ab4", "Eb5", null, "F5", "C5", null], 0.27),
+    ...plucks(52, 0.5, ["Eb4", null, "Bb4", "G5", null, "F5", "Eb5", null], 0.26),
+    ...plucks(56, 0.5, ["F4", null, "C5", "Ab4", null, "G4", "F4", null], 0.23),
+    ...plucks(60, 1, ["D4", null, "Ab4", null], 0.2),
   ],
-  down: every(8, 24, [
-    N("arp", 0, "D4", 3.8, 0.18), N("arp", 4, "G#4", 3.8, 0.15),
-  ]),
+  down: [
+    ...line("lead", [[15, "D4", 0.7, 0.25], [33, "F4", 2.5, 0.31], [36.5, "Eb4", 1.5, 0.26], [42, "D4", 1.2, 0.27], [47, "Eb4", 0.8, 0.25]]),
+    ...plucks(32, 1, ["Ab4", null, "C5", null, "F5", "Eb5", null, "C5", null, "Ab4", null, null], 0.18),
+    ...plucks(8, 2, ["Bb5", null, "G5", null], 0.16),
+  ],
   up: [
-    ...every(4, 24, [
-      N("kick", 0, "C2", 0.5, 0.6), N("kick", 2, "C2", 0.5, 0.4),
-      N("snare", 3, "D3", 0.3, 0.35),
+    ...every(0, 32, 4, [
+      ...line("kick", [[0, "D2", 0.35, 0.48], [2.5, "D2", 0.25, 0.28]]),
+      ...line("hat", [[1.5, "D5", 0.12, 0.12], [3.5, "D5", 0.09, 0.16]]),
     ]),
-    ...every(2, 24, [N("bass", 0, "D1", 1.9, 0.4)]),
+    ...every(16, 32, 4, line("snare", [[3, "D3", 0.22, 0.25]])),
+    ...every(32, 48, 8, line("kick", [[0, "D2", 0.35, 0.3]])),
+    ...every(48, 64, 4, [
+      ...line("kick", [[0, "D2", 0.35, 0.54], [2.5, "D2", 0.25, 0.32]]),
+      ...line("snare", [[3, "D3", 0.22, 0.28]]),
+      ...line("hat", [[1.5, "D5", 0.12, 0.15], [3.5, "D5", 0.09, 0.18]]),
+    ]),
+    ...line("bass", [[3.25, "Ab2", 0.5, 0.29], [7.25, "C3", 0.5, 0.27], [11.25, "Bb2", 0.5, 0.29], [15.25, "G2", 0.5, 0.27],
+      [19.25, "C3", 0.5, 0.32], [23.25, "Bb2", 0.5, 0.3], [27.25, "Ab2", 0.5, 0.29],
+      [51.25, "Ab2", 0.5, 0.33], [55.25, "Bb2", 0.5, 0.31], [59.25, "C3", 0.5, 0.29]]),
+    ...plucks(16, 1, ["C4", "F4", null, "Ab4"], 0.21),
+    ...plucks(24, 1, ["Ab3", "D4", null, "F4"], 0.21),
+    ...plucks(48, 1, ["Ab3", "D4", "Eb4", "F4"], 0.23),
+    ...plucks(56, 1, ["C4", "F4", null, "Ab4"], 0.21),
   ],
 };
 
-export const THEMES: Record<PlanetName, ThemeSpec> = {
-  Sun: sun,
-  Moon: moon,
-  Mercury: mercury,
-  Venus: venus,
-  Mars: mars,
-  Jupiter: jupiter,
-  Saturn: saturn,
+// Main · 4/4 · a searching minor statement opens into light, then settles back.
+const main: ThemeSpec = {
+  leadVoice: "bell", bpm: 80, beats: 128,
+  bed: [
+    // Open fifths leave the melody to introduce the minor third.
+    ...harmony(0, 8, "D2", ["D3", "A3"], 0.22), ...harmony(8, 8, "Bb2", ["D3", "F3", "A3"], 0.24),
+    ...harmony(16, 8, "C3", ["E3", "G3", "D4"], 0.24), ...harmony(24, 8, "D2", ["D3", "A3"], 0.22),
+    // B natural lifts the second statement without losing its minor center.
+    ...harmony(32, 8, "D2", ["D3", "A3", "E4"], 0.25), ...harmony(40, 8, "G2", ["D3", "G3", "B3"], 0.27),
+    ...harmony(48, 8, "F2", ["F3", "A3", "E4"], 0.26), ...harmony(56, 8, "G2", ["D3", "G3", "B3"], 0.27),
+    // The major third arrives with the returning rhythm; G# follows later.
+    ...harmony(64, 8, "D2", ["D3", "A3", "E4"], 0.29), ...harmony(72, 8, "E2", ["E3", "G#3", "B3"], 0.3),
+    ...harmony(80, 8, "B2", ["F#3", "B3", "D4"], 0.28), ...harmony(88, 8, "A2", ["E3", "A3", "C#4"], 0.26),
+    ...harmony(96, 8, "D2", ["D3", "A3"], 0.22), ...harmony(104, 8, "Bb2", ["D3", "F3", "A3"], 0.22),
+    ...harmony(112, 8, "G2", ["D3", "G3", "Bb3"], 0.21), ...harmony(120, 8, "D2", ["D3", "A3"], 0.19),
+    ...line("pad", [
+      [5, "E4", 4.8, 0.18], [11, "D4", 4.3, 0.19], [25, "F4", 2.8, 0.19], [29, "E4", 2.4, 0.17],
+      [66, "F#4", 5.2, 0.23], [75, "F#4", 5.5, 0.22], [83, "E4", 4.2, 0.2],
+      [98, "E4", 4.7, 0.18], [108, "C4", 4.5, 0.18], [116, "A3", 3, 0.17],
+    ]),
+    ...line("lead", [
+      // Eight bars: a leap, a short pickup into F, then a falling answer.
+      [0.25, "D4", 1.35, 0.47], [2, "A4", 0.85, 0.54], [3.5, "E4", 0.45, 0.39], [4.25, "F4", 2.1, 0.49],
+      [7, "E4", 0.55, 0.39], [8, "D4", 1.35, 0.45], [10.5, "C4", 0.6, 0.35], [11.5, "D4", 0.4, 0.4],
+      [12.25, "A3", 2.5, 0.38],
+      [16.25, "D4", 1.35, 0.46], [18, "F4", 0.8, 0.48], [19.5, "A4", 0.45, 0.5], [20.25, "G4", 2.1, 0.47],
+      [23, "E4", 0.55, 0.38], [24, "F4", 1.35, 0.44], [26, "E4", 0.8, 0.37], [28, "D4", 2.5, 0.43],
+      // The leap returns; its answer climbs through the brighter sixth.
+      [32.25, "D4", 1.35, 0.49], [34, "A4", 0.85, 0.56], [35.5, "E4", 0.45, 0.4], [36.25, "F4", 2.1, 0.51],
+      [39, "G4", 0.55, 0.47], [40.25, "B4", 1.8, 0.55], [43, "A4", 0.55, 0.44], [44, "G4", 2.2, 0.48],
+      [48.25, "A4", 1.35, 0.51], [50, "C5", 0.8, 0.55], [51.5, "A4", 0.45, 0.44], [52.25, "F4", 2.1, 0.46],
+      [55, "E4", 0.55, 0.38], [56, "G4", 1.35, 0.49], [58, "B4", 0.8, 0.54], [60, "A4", 2.4, 0.47],
+      // A major third changes the familiar phrase before the widest answer.
+      [64.25, "D4", 1.35, 0.52], [66, "A4", 0.85, 0.59], [67.5, "E4", 0.45, 0.43], [68.25, "F#4", 2.1, 0.56],
+      [71, "E4", 0.55, 0.43], [72.25, "G#4", 1.8, 0.57], [75, "B4", 0.6, 0.54], [76.25, "A4", 2.2, 0.5],
+      [80.25, "B4", 1.35, 0.55], [82, "C#5", 0.8, 0.57], [83.5, "B4", 0.45, 0.47], [84.25, "D5", 2.8, 0.61],
+      [88.25, "C#5", 1.4, 0.5], [90, "A4", 0.8, 0.44], [92, "E4", 2.1, 0.39],
+      // The original minor color returns with fewer notes and softer attacks.
+      [96.25, "D4", 1.35, 0.43], [98, "A4", 0.85, 0.49], [99.5, "E4", 0.45, 0.35], [100.25, "F4", 2.1, 0.45],
+      [104.25, "E4", 1.8, 0.36], [108, "D4", 2.3, 0.4],
+      [112.25, "G4", 1.35, 0.42], [114, "F4", 0.8, 0.38], [116, "E4", 1.8, 0.34],
+      [120.25, "D4", 3.4, 0.39],
+    ]),
+    // Echoes occupy the spaces at the ends of phrases.
+    ...plucks(14.5, 0.5, ["A4", null, "D5"], 0.2), ...plucks(30.5, 0.5, ["E5", null, "A4"], 0.19),
+    ...plucks(46.5, 0.5, ["B4", "D5", null], 0.21), ...plucks(54.5, 0.5, ["C5", null, "A4"], 0.19),
+    ...plucks(62.5, 0.5, ["D5", "B4", null], 0.22),
+    ...plucks(64, 1, ["D5", null, null, "A4", null, "E5", null, null], 0.21),
+    ...plucks(72, 1, ["B4", null, null, "G#5", null, "E5", null, null], 0.23),
+    ...plucks(80, 1, ["F#5", null, null, "D5", null, "B4", null, null], 0.22),
+    ...plucks(88, 1, ["E5", null, null, "C#5", null, "A4", null, null], 0.2),
+    ...plucks(110.5, 0.5, ["F5", null, "D5"], 0.17), ...plucks(118.5, 0.5, ["A4", null, "E5"], 0.16),
+    ...plucks(124.5, 0.75, ["A4", null, "D5"], 0.15),
+    // A gentle pulse belongs to the bed because Main plays in the map mix.
+    ...every(32, 64, 8, line("kick", [[0, "D2", 0.25, 0.24], [6.5, "D2", 0.18, 0.16]])),
+    ...every(64, 96, 4, line("kick", [[0, "D2", 0.25, 0.3], [2.5, "D2", 0.18, 0.2]])),
+    ...every(64, 88, 4, line("hat", [[1.5, "D5", 0.08, 0.1], [3.5, "D5", 0.08, 0.13]])),
+  ],
+  down: [
+    ...line("arp", [[15.5, "E4", 1.2, 0.16], [31, "A3", 1.2, 0.15], [47, "D4", 1.2, 0.17],
+      [63, "E4", 1.2, 0.17], [95, "A3", 1.2, 0.15], [111, "A3", 1.2, 0.14]]),
+  ],
+  up: [],
+};
+
+export const THEMES: Record<ThemeName, ThemeSpec> = {
+  Main: main,
+  Sun: sun, Moon: moon, Mercury: mercury, Venus: venus, Mars: mars, Jupiter: jupiter, Saturn: saturn,
 };

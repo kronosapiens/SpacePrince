@@ -30,9 +30,8 @@ export function TitleScreen() {
   useEffect(() => {
     // Neutral bone glow on Title — clear any planet tint carried in from
     // another screen so the background falls back to the resting neutral.
-    // The score fades out too: the Title is arrival, not a surface.
     setActive(null);
-    setTheme(null);
+    setTheme("Main");
   }, [setActive]);
 
   // New visitors see sample charts; returning players keep their own Prince.

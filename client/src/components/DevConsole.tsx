@@ -7,11 +7,11 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { MACROBIAN_THRESHOLDS } from "@/game/data";
 import {
   currentTheme,
-  isMusicEnabled,
-  isSoundEnabled,
+  getMusicVolume,
+  getSoundVolume,
   playUISound,
-  setMusicEnabled,
-  setSoundEnabled,
+  setMusicVolume,
+  setSoundVolume,
   shuffleTheme,
   subscribeTheme,
 } from "@/audio/engine";
@@ -21,7 +21,7 @@ import { playFocusSound, playHoverSound } from "@/audio/interaction";
 /**
  * Dev-only console (rendered only under `import.meta.env.DEV`). Three zones:
  * a 7-stop slider that scrubs the Prince's planet-unlock tier (one stop per
- * planet, snapping to its Macrobian threshold); audio gates (music = score,
+ * planet, snapping to its Macrobian threshold); audio volumes (music = score,
  * sound = everything else) plus a random Change Track hop; and a Delete Prince
  * button. Prince mutations go through the store, so the chart fills in on the
  * anchor as you drag, and a live combat re-mirrors so the opponent re-fields
@@ -33,12 +33,12 @@ export function DevConsole({ open }: { open: boolean }) {
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const [introPlanet, setIntroPlanet] = useState<PlanetName | null>(null);
-  const [music, setMusic] = useState(isMusicEnabled());
-  const [sound, setSound] = useState(isSoundEnabled());
+  const [music, setMusic] = useState(getMusicVolume);
+  const [sound, setSound] = useState(getSoundVolume);
   // Which theme the score is pointed at — retargets whenever a surface mounts,
   // so the label subscribes to the engine rather than reading once per render.
   const track = useSyncExternalStore(subscribeTheme, currentTheme);
-  const canChangeTrack = !!track && music;
+  const canChangeTrack = !!track && music > 0;
 
   const unlocked = prince ? unlockedPlanets(prince.numEncounters) : [];
 
@@ -103,34 +103,42 @@ export function DevConsole({ open }: { open: boolean }) {
           <div className="dev-console-divider" />
           <ChartTuner />
           <div className="dev-console-divider" />
-          <div className="dev-console-row">
-            <label className="dev-console-check">
+          <div className="dev-console-block">
+            <label className="dev-tuner-knob">
+              <span>Music <strong>{Math.round(music * 100)}%</strong></span>
               <input
-                type="checkbox"
-                checked={music}
+                type="range"
+                aria-label="Music volume"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(music * 100)}
                 onPointerEnter={playHoverSound}
                 onFocus={playFocusSound}
                 onChange={(e) => {
-                  setMusicEnabled(e.target.checked);
-                  setMusic(e.target.checked);
-                  playUISound("select");
+                  const volume = Number(e.target.value) / 100;
+                  setMusicVolume(volume);
+                  setMusic(volume);
                 }}
               />
-              Music
             </label>
-            <label className="dev-console-check">
+            <label className="dev-tuner-knob">
+              <span>Sound <strong>{Math.round(sound * 100)}%</strong></span>
               <input
-                type="checkbox"
-                checked={sound}
+                type="range"
+                aria-label="Sound volume"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(sound * 100)}
                 onPointerEnter={playHoverSound}
                 onFocus={playFocusSound}
                 onChange={(e) => {
-                  setSoundEnabled(e.target.checked);
-                  setSound(e.target.checked);
-                  if (e.target.checked) playUISound("select");
+                  const volume = Number(e.target.value) / 100;
+                  setSoundVolume(volume);
+                  setSound(volume);
                 }}
               />
-              Sound
             </label>
           </div>
           <button
@@ -145,7 +153,7 @@ export function DevConsole({ open }: { open: boolean }) {
               shuffleTheme();
             }}
           >
-            {track ? `Track · ${track}` : "Change Track"}
+            {track ? `Track · ${track === "Main" ? "Main Theme" : track}` : "Change Track"}
           </button>
           {prince && (
             <>

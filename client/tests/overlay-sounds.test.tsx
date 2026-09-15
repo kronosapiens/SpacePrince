@@ -7,17 +7,17 @@ import { InfoCard } from "@/components/InfoCard";
 import { DevChrome } from "@/components/DevChrome";
 import { DevConsole } from "@/components/DevConsole";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
-import { playUISound, setSoundEnabled, shuffleTheme } from "@/audio/engine";
+import { playUISound, setMusicVolume, setSoundVolume, shuffleTheme } from "@/audio/engine";
 
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
   playUISound: vi.fn(),
   currentTheme: () => "Moon",
   subscribeTheme: () => () => {},
-  isMusicEnabled: () => true,
-  isSoundEnabled: () => true,
-  setMusicEnabled: vi.fn(),
-  setSoundEnabled: vi.fn(),
+  getMusicVolume: () => 1,
+  getSoundVolume: () => 1,
+  setMusicVolume: vi.fn(),
+  setSoundVolume: vi.fn(),
   shuffleTheme: vi.fn(),
 }));
 
@@ -138,21 +138,24 @@ describe("developer feedback", () => {
     expect(cues()).toEqual(["select", "select", "dismiss", "select", "dismiss", "select"]);
   });
 
-  it("mutes before any activation cue and sounds only enabled controls", () => {
+  it("adjusts audio levels with sliders and disables track changes at zero music volume", () => {
     act(() => root.render(<PrinceStoreProvider><DevConsole open /></PrinceStoreProvider>));
-    const sound = ".dev-console-row label:nth-child(2) input";
-    click(sound);
-    expect(setSoundEnabled).toHaveBeenLastCalledWith(false);
-    expect(cues()).toEqual([]);
-    click(sound);
-    expect(setSoundEnabled).toHaveBeenLastCalledWith(true);
-    expect(cues()).toEqual(["select"]);
-    expect(vi.mocked(setSoundEnabled).mock.invocationCallOrder.at(-1))
-      .toBeLessThan(vi.mocked(playUISound).mock.invocationCallOrder[0]!);
-    click(".dev-console-row label:first-child input");
-    vi.mocked(playUISound).mockClear();
+    const adjust = (label: string, value: number) => act(() => {
+      const input = get(`input[aria-label="${label} volume"]`);
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, String(value));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    adjust("Sound", 35);
+    expect(setSoundVolume).toHaveBeenLastCalledWith(0.35);
+    adjust("Music", 60);
+    expect(setMusicVolume).toHaveBeenLastCalledWith(0.6);
+    expect(get(".dev-console").textContent).toContain("Music 60%");
+    adjust("Music", 0);
     click(".dev-console > .dev-chrome-button");
     expect(shuffleTheme).not.toHaveBeenCalled();
     expect(cues()).toEqual([]);
+    adjust("Music", 20);
+    click(".dev-console > .dev-chrome-button");
+    expect(shuffleTheme).toHaveBeenCalledOnce();
   });
 });

@@ -13,10 +13,10 @@ vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
   currentTheme: () => null,
   subscribeTheme: () => () => {},
-  isMusicEnabled: () => false,
-  isSoundEnabled: () => false,
-  setMusicEnabled: vi.fn(),
-  setSoundEnabled: vi.fn(),
+  getMusicVolume: () => 0,
+  getSoundVolume: () => 0,
+  setMusicVolume: vi.fn(),
+  setSoundVolume: vi.fn(),
   shuffleTheme: vi.fn(),
   playUISound: vi.fn(),
 }));

@@ -70,16 +70,16 @@ describe("UI audio", () => {
 
   it("uses the sound setting independently of music", async () => {
     await engine.ensureAudio();
-    expect(engine.isMusicEnabled()).toBe(false);
+    expect(engine.getMusicVolume()).toBe(0);
     engine.playUISound("select");
     expect(tone.trigger).toHaveBeenCalledTimes(1);
 
-    engine.setSoundEnabled(false);
-    engine.setMusicEnabled(true);
+    engine.setSoundVolume(0);
+    engine.setMusicVolume(1);
     engine.playUISound("commit");
     expect(tone.trigger).toHaveBeenCalledTimes(1);
 
-    engine.setSoundEnabled(true);
+    engine.setSoundVolume(1);
     engine.playUISound("commit");
     expect(tone.trigger).toHaveBeenCalledTimes(2);
   });

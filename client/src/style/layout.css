@@ -1944,11 +1944,6 @@ body:has(.guide-overlay) .dev-keys { display: none; }
   flex-direction: column;
   gap: 6px;
 }
-.dev-console-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 .dev-console-check {
   display: flex;
   align-items: center;
