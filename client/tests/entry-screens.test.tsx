@@ -79,7 +79,8 @@ describe("entry screens", () => {
     act(() => vi.advanceTimersByTime(500));
     const framing = element(".mint-framing");
     expect(framing.querySelectorAll("p").length).toBe(PRIMER_FRAMING.length);
-    expect(framing.querySelector("strong")?.textContent).toBe("as a character");
+    const firstBold = PRIMER_FRAMING.join(" ").match(/\*\*(.+?)\*\*/)?.[1];
+    expect(framing.querySelector("strong")?.textContent).toBe(firstBold);
     expect(framing.textContent).not.toContain("**");
     expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"], ["Main"]]);
   });
