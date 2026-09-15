@@ -12,7 +12,7 @@ import {
   playUISound,
   setMusicVolume,
   setSoundVolume,
-  shuffleTheme,
+  nextTheme,
   subscribeTheme,
 } from "@/audio/engine";
 import { ChartTuner } from "@/components/ChartTuner";
@@ -22,7 +22,7 @@ import { playFocusSound, playHoverSound } from "@/audio/interaction";
  * Dev-only console (rendered only under `import.meta.env.DEV`). Three zones:
  * a 7-stop slider that scrubs the Prince's planet-unlock tier (one stop per
  * planet, snapping to its Macrobian threshold); audio volumes (music = score,
- * sound = everything else) plus a random Change Track hop; and a Delete Prince
+ * sound = everything else) plus a sequential Change Track button; and a Delete Prince
  * button. Prince mutations go through the store, so the chart fills in on the
  * anchor as you drag, and a live combat re-mirrors so the opponent re-fields
  * to match. Opened with `d`; screen-spawning and re-rolling live in DevChrome.
@@ -150,7 +150,7 @@ export function DevConsole({ open }: { open: boolean }) {
             onClick={() => {
               if (!canChangeTrack) return;
               playUISound("select");
-              shuffleTheme();
+              nextTheme();
             }}
           >
             {track ? `Track · ${track === "Main" ? "Main Theme" : track}` : "Change Track"}

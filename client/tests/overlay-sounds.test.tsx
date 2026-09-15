@@ -7,7 +7,7 @@ import { InfoCard } from "@/components/InfoCard";
 import { DevChrome } from "@/components/DevChrome";
 import { DevConsole } from "@/components/DevConsole";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
-import { playUISound, setMusicVolume, setSoundVolume, shuffleTheme } from "@/audio/engine";
+import { playUISound, setMusicVolume, setSoundVolume, nextTheme } from "@/audio/engine";
 
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
@@ -18,7 +18,7 @@ vi.mock("@/audio/engine", () => ({
   getSoundVolume: () => 1,
   setMusicVolume: vi.fn(),
   setSoundVolume: vi.fn(),
-  shuffleTheme: vi.fn(),
+  nextTheme: vi.fn(),
 }));
 
 let root: Root;
@@ -152,10 +152,10 @@ describe("developer feedback", () => {
     expect(get(".dev-console").textContent).toContain("Music 60%");
     adjust("Music", 0);
     click(".dev-console > .dev-chrome-button");
-    expect(shuffleTheme).not.toHaveBeenCalled();
+    expect(nextTheme).not.toHaveBeenCalled();
     expect(cues()).toEqual([]);
     adjust("Music", 20);
     click(".dev-console > .dev-chrome-button");
-    expect(shuffleTheme).toHaveBeenCalledOnce();
+    expect(nextTheme).toHaveBeenCalledOnce();
   });
 });

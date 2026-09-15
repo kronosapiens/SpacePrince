@@ -1,4 +1,4 @@
-import type { LeadVoice, ThemeNote, ThemeRole, ThemeSpec } from "./themes";
+import type { ThemeNote, ThemeRole, ThemeSpec } from "./themes";
 
 type ToneModule = typeof import("tone");
 export type ThemeSurface = "map" | "combat" | "narrative";
@@ -9,18 +9,6 @@ const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
   map: { bed: 0.9, down: 1, up: 0 },
   narrative: { bed: 0.65, down: 0.4, up: 0 },
   combat: { bed: 1, down: 0.25, up: 0.85 },
-};
-
-// These names describe the lead's color; every voice is synthesized in Tone.
-const LEAD_COLOR: Record<Exclude<LeadVoice, "bell">, {
-  partials: number[];
-  attack: number;
-  cutoff: number;
-  vibrato: number;
-}> = {
-  flute: { partials: [1, 0.12, 0.22, 0.03, 0.06], attack: 0.045, cutoff: 650, vibrato: 0.035 },
-  horn: { partials: [1, 0.5, 0.3, 0.12, 0.06], attack: 0.09, cutoff: 450, vibrato: 0.025 },
-  strings: { partials: [1, 0.38, 0.25, 0.18, 0.09, 0.05], attack: 0.22, cutoff: 360, vibrato: 0.065 },
 };
 
 interface Disposable { dispose(): unknown }
@@ -72,33 +60,16 @@ export function createScore(
         const echo = own(new T.FeedbackDelay({
           delayTime: 1.5 * spb, feedback: 0.16, wet: 0.12, maxDelay: 3,
         })).connect(room);
-        if (spec.leadVoice === "bell") {
-          // The bright attack fades into a rounded, sustained carrier tone.
-          inst = own(new T.PolySynth(T.FMSynth, {
-            harmonicity: 2.005,
-            modulationIndex: 1.4,
-            oscillator: { type: "sine" },
-            modulation: { type: "sine" },
-            envelope: { attack: 0.012, decay: 1.5, sustain: 0.55, release: 1.1 },
-            modulationEnvelope: { attack: 0.002, decay: 0.18, sustain: 0.015, release: 0.12 },
-            volume: 4,
-          })).connect(echo);
-          break;
-        }
-        const color = LEAD_COLOR[spec.leadVoice];
-        const vibrato = own(new T.Vibrato({
-          frequency: 4.6, depth: color.vibrato, maxDelay: 0.005,
-        })).connect(echo);
-        inst = own(new T.PolySynth(T.MonoSynth, {
-          oscillator: { type: "custom", partials: color.partials },
-          filter: { type: "lowpass", Q: 0.65, rolloff: -12 },
-          filterEnvelope: {
-            attack: color.attack * 2, decay: 0.8, sustain: 0.35, release: 0.9,
-            baseFrequency: color.cutoff, octaves: 2.3,
-          },
-          envelope: { attack: color.attack, decay: 0.7, sustain: 0.65, release: 0.7 },
+        // The bright attack fades into a rounded, sustained carrier tone.
+        inst = own(new T.PolySynth(T.FMSynth, {
+          harmonicity: 2.005,
+          modulationIndex: 1.4,
+          oscillator: { type: "sine" },
+          modulation: { type: "sine" },
+          envelope: { attack: 0.012, decay: 1.5, sustain: 0.55, release: 1.1 },
+          modulationEnvelope: { attack: 0.002, decay: 0.18, sustain: 0.015, release: 0.12 },
           volume: 4,
-        })).connect(vibrato);
+        })).connect(echo);
         break;
       }
       case "arp": {

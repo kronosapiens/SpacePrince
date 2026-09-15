@@ -10,12 +10,9 @@ import type { PlanetName } from "@/game/types";
 export type ThemeRole = "pad" | "lead" | "bass" | "arp" | "kick" | "snare" | "hat";
 export type ThemeName = PlanetName | "Main";
 export interface ThemeNote { t: number; n: string; d: number; v: number; role: ThemeRole }
-/** Instrument families used to choose the lead's synthesis and articulation. */
-export type LeadVoice = "horn" | "flute" | "strings" | "bell";
 export interface ThemeSpec {
   bpm: number;
   beats: number;
-  leadVoice: LeadVoice;
   bed: ThemeNote[];
   down: ThemeNote[];
   up: ThemeNote[];
@@ -64,7 +61,7 @@ function every(start: number, end: number, cycle: number, notes: ThemeNote[]): T
 
 // Mercury · Dorian · 6/8 · quick plucks underneath a slower, lilting melody.
 const mercury: ThemeSpec = {
-  leadVoice: "flute", bpm: 138, beats: 192,
+  bpm: 138, beats: 192,
   bed: [
     ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "G2", ["D3", "G3", "B3"]),
     ...harmony(24, 12, "C3", ["C3", "G3", "E4"]), ...harmony(36, 12, "D2", ["D3", "A3", "F4"]),
@@ -137,7 +134,7 @@ const mercury: ThemeSpec = {
 
 // Sun · Ionian · 4/4 · settled pulse, generous answers and suspended inner voices.
 const sun: ThemeSpec = {
-  leadVoice: "flute", bpm: 72, beats: 128,
+  bpm: 72, beats: 128,
   bed: [
     ...harmony(0, 8, "D2", ["D3", "A3", "E4"]), ...harmony(8, 8, "G2", ["D3", "G3", "B3"]),
     ...harmony(16, 8, "F#2", ["D3", "F#3", "A3"]), ...harmony(24, 8, "A2", ["E3", "A3", "C#4"]),
@@ -210,7 +207,7 @@ const sun: ThemeSpec = {
 
 // Moon · Aeolian · 6/8 · wide rests, falling answers and a low rocking figure.
 const moon: ThemeSpec = {
-  leadVoice: "strings", bpm: 63, beats: 96,
+  bpm: 63, beats: 96,
   bed: [
     ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.24), ...harmony(6, 6, "Bb2", ["D3", "F3", "Bb3"], 0.26),
     ...harmony(12, 6, "C3", ["E3", "G3", "C4"], 0.24), ...harmony(18, 6, "D2", ["D3", "A3", "F4"], 0.25),
@@ -273,7 +270,7 @@ const moon: ThemeSpec = {
 
 // Venus · Mixolydian · 3/4 · close, conversational phrases and a softened seventh.
 const venus: ThemeSpec = {
-  leadVoice: "strings", bpm: 72, beats: 96,
+  bpm: 72, beats: 96,
   bed: [
     ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.26), ...harmony(6, 6, "F#2", ["D3", "F#3", "C4"]),
     ...harmony(12, 6, "C3", ["E3", "G3", "C4"], 0.26), ...harmony(18, 6, "G2", ["D3", "G3", "B3"], 0.27),
@@ -340,7 +337,7 @@ const venus: ThemeSpec = {
 
 // Mars · Phrygian · 5/4 · a 3+2 gait, clipped resonance and a tune with teeth.
 const mars: ThemeSpec = {
-  leadVoice: "horn", bpm: 138, beats: 200,
+  bpm: 138, beats: 200,
   bed: [
     ...harmony(0, 10, "D2", ["D3", "A3", "F4"], 0.3), ...harmony(10, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.31),
     ...harmony(20, 10, "D2", ["D3", "A3", "C4"], 0.29), ...harmony(30, 10, "G2", ["D3", "G3", "Bb3"], 0.29),
@@ -423,7 +420,7 @@ const mars: ThemeSpec = {
 
 // Jupiter · Lydian · 3/4 · broad phrases; the raised fourth opens the music outward.
 const jupiter: ThemeSpec = {
-  leadVoice: "horn", bpm: 96, beats: 144,
+  bpm: 96, beats: 144,
   bed: [
     ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "E2", ["D3", "G#3", "B3"], 0.3),
     ...harmony(24, 12, "A2", ["E3", "A3", "C#4"]),
@@ -490,7 +487,7 @@ const jupiter: ThemeSpec = {
 
 // Saturn · Locrian · 4/4 · tolling bass; the shared contour bends around Ab.
 const saturn: ThemeSpec = {
-  leadVoice: "strings", bpm: 50, beats: 64,
+  bpm: 50, beats: 64,
   bed: [
     ...harmony(0, 4, "D2", ["D3", "Ab3", "C4"], 0.25), ...harmony(4, 4, "Ab2", ["D3", "Ab3", "F4"], 0.24),
     ...harmony(8, 4, "Eb2", ["Eb3", "Bb3", "G4"], 0.26), ...harmony(12, 4, "Bb2", ["Eb3", "Bb3", "F4"], 0.24),
@@ -552,7 +549,7 @@ const saturn: ThemeSpec = {
 
 // Main · 4/4 · a searching minor statement opens into light, then settles back.
 const main: ThemeSpec = {
-  leadVoice: "bell", bpm: 80, beats: 128,
+  bpm: 80, beats: 128,
   bed: [
     // Open fifths leave the melody to introduce the minor third.
     ...harmony(0, 8, "D2", ["D3", "A3"], 0.22), ...harmony(8, 8, "Bb2", ["D3", "F3", "A3"], 0.24),

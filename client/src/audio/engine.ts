@@ -1,4 +1,5 @@
 import type { PlanetName } from "@/game/types";
+import { MACROBIAN_ORDER } from "@/game/data";
 import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
@@ -248,6 +249,7 @@ export function playStar(): void {
 const MIX_RAMP_S = 2.2;
 const SWAP_FADE_S = 1.1;
 const SCORE_VOLUME = 0.9;
+const THEME_ORDER: ThemeName[] = ["Main", ...MACROBIAN_ORDER];
 
 let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
 let playing: { theme: ThemeName; score: ReturnType<typeof createScore> } | null = null;
@@ -271,12 +273,11 @@ export function subscribeTheme(listener: () => void): () => void {
   return () => themeListeners.delete(listener);
 }
 
-/** Dev audition: select a different theme while keeping the surface mix. */
-export function shuffleTheme(): void {
+/** Dev audition: cycle through Main and the planets in Macrobian order. */
+export function nextTheme(): void {
   const cur = desired;
   if (!cur) return;
-  const others = (Object.keys(THEMES) as ThemeName[]).filter((theme) => theme !== cur.theme);
-  const next = others[Math.floor(Math.random() * others.length)]!;
+  const next = THEME_ORDER[(THEME_ORDER.indexOf(cur.theme) + 1) % THEME_ORDER.length]!;
   setTheme(next, cur.surface);
 }
 
