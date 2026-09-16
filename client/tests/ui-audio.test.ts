@@ -70,7 +70,7 @@ describe("UI audio", () => {
 
   it("uses the sound setting independently of music", async () => {
     await engine.ensureAudio();
-    expect(engine.getMusicVolume()).toBe(0);
+    engine.setMusicVolume(0);
     engine.playUISound("select");
     expect(tone.trigger).toHaveBeenCalledTimes(1);
 

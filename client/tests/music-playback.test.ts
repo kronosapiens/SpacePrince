@@ -97,11 +97,14 @@ describe("music playback", () => {
     expect(engine.currentTheme()).toBe("Venus");
   });
 
+  it("plays music and sound for a fresh visitor", () => {
+    expect(engine.getMusicVolume()).toBe(1);
+    expect(engine.getSoundVolume()).toBe(1);
+  });
+
   it("cancels a pending planet swap on mute and disposes only the old score after a quick restart", async () => {
     await engine.ensureAudio();
     engine.setTheme("Moon");
-    expect(createScore).not.toHaveBeenCalled();
-    engine.setMusicVolume(1);
     const old = createScore.mock.results[0]!.value;
 
     engine.setTheme("Saturn");

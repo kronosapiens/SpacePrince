@@ -26,9 +26,9 @@ let initPromise: Promise<void> | null = null;
 // combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
-// Music opt-in, sound opt-out: a fresh visitor gets the reactive layer
-// (propagation, combustion, the bell) but chooses the score deliberately.
-let musicVolume = 0;
+// Both on for a fresh visitor; a saved preference (set from the dev console)
+// is honored over the defaults.
+let musicVolume = 1;
 let soundVolume = 1;
 let musicOutput: import("tone").Gain | null = null;
 let soundOutput: import("tone").Gain | null = null;
@@ -36,7 +36,7 @@ try {
   const raw = localStorage.getItem(AUDIO_KEY);
   if (raw) {
     const saved = JSON.parse(raw) as { music?: number | boolean; sound?: number | boolean };
-    musicVolume = typeof saved.music === "number" ? saved.music : saved.music === true ? 1 : 0;
+    musicVolume = typeof saved.music === "number" ? saved.music : saved.music === false ? 0 : 1;
     soundVolume = typeof saved.sound === "number" ? saved.sound : saved.sound === false ? 0 : 1;
   }
 } catch {
