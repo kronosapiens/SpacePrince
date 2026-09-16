@@ -79,17 +79,17 @@ function normalizeLongitude(value: number): number {
  * with quadrant adjustment so the result is the *rising* ecliptic point.
  */
 function computeAscendant(time: ReturnType<typeof MakeTime>, latitude: number, longitudeDeg: number): number {
-  // LST in degrees: GMST (hours from astronomy-engine) → degrees + east longitude.
-  const gmstHours = SiderealTime(time);
-  const lstDeg = normalizeLongitude(gmstHours * 15 + longitudeDeg);
+  // Apparent sidereal time → degrees + east longitude, matching true obliquity.
+  const gastHours = SiderealTime(time);
+  const lstDeg = normalizeLongitude(gastHours * 15 + longitudeDeg);
   const obliquityDeg = e_tilt(time).tobl; // true obliquity of date in degrees
   const phi = (Math.max(-66.5, Math.min(66.5, latitude)) * Math.PI) / 180;
   const eps = (obliquityDeg * Math.PI) / 180;
   const lst = (lstDeg * Math.PI) / 180;
 
-  // Asc = atan2(-cos LST, sin(eps)*tan(phi) + cos(eps)*sin(LST))
-  const y = -Math.cos(lst);
-  const x = Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(lst);
+  // Choose the eastern intersection; the opposite signs give the descendant.
+  const y = Math.cos(lst);
+  const x = -(Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(lst));
   const ascRad = Math.atan2(y, x);
   return normalizeLongitude((ascRad * 180) / Math.PI);
 }

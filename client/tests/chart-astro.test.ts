@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import {
+  EquatorFromVector, Horizon, MakeTime, Observer, RotateVector,
+  Rotation_ECT_EQD, Spherical, VectorFromSphere,
+} from "astronomy-engine";
 import { computeBirthChart } from "@/astronomy/compute";
 import { signFromLongitude } from "@/game/chart";
 
@@ -22,10 +26,29 @@ describe("computeBirthChart — known dates", () => {
     expect(["Sagittarius", "Capricorn"]).toContain(sign);
   });
 
-  it("returns a valid ascendant longitude in [0, 360)", () => {
-    const { ascendantLongitude } = computeBirthChart("1990-06-15T15:30:00Z", 51.5, -0.13);
-    expect(ascendantLongitude).toBeGreaterThanOrEqual(0);
-    expect(ascendantLongitude).toBeLessThan(360);
+  it("places the ascendant in Scorpio for 1989-02-12 at 00:35 in Los Angeles", () => {
+    // PST is UTC−8; coordinates match the city's 0.1° mint rounding.
+    const { ascendantLongitude } = computeBirthChart("1989-02-12T08:35:00Z", 34.1, -118.2);
+    expect(signFromLongitude(ascendantLongitude)).toBe("Scorpio");
+  });
+
+  it("places the ascendant on the eastern horizon throughout the day", () => {
+    for (const [lat, lon] of [[34.1, -118.2], [-33.9, 151.2], [0, 0]] as const) {
+      for (const hour of [0, 6, 12, 18]) {
+        const iso = new Date(Date.UTC(2000, 5, 21, hour)).toISOString();
+        const { ascendantLongitude } = computeBirthChart(iso, lat, lon);
+        const time = MakeTime(new Date(iso));
+        const ecliptic = VectorFromSphere(new Spherical(0, ascendantLongitude, 1), time);
+        const equatorial = EquatorFromVector(RotateVector(Rotation_ECT_EQD(time), ecliptic));
+        const horizon = Horizon(time, new Observer(lat, lon, 0), equatorial.ra, equatorial.dec);
+
+        expect(ascendantLongitude).toBeGreaterThanOrEqual(0);
+        expect(ascendantLongitude).toBeLessThan(360);
+        expect(horizon.altitude).toBeCloseTo(0, 6);
+        expect(horizon.azimuth).toBeGreaterThan(0);
+        expect(horizon.azimuth).toBeLessThan(180);
+      }
+    }
   });
 
   it("isDiurnal is true at noon, false at midnight (broadly)", () => {
