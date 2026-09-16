@@ -643,6 +643,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       </div>
 
       <div className="combat-side" data-guide="chart-self">
+        <div className="combat-side-label" data-guide="label-self">SELF</div>
         <Chart
           chart={prince.chart}
           state={displayPlayerState}
@@ -675,10 +676,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           inviteInteraction={!animation && !encounter.resolved && !selected}
           ringVerb={selected ? indicatedVerb : null}
         />
-        <div className="combat-side-label" data-guide="label-self">SELF</div>
       </div>
 
       <div className="combat-side" data-guide="chart-other">
+        <div className="combat-side-label" data-guide="label-other">OTHER</div>
         <Chart
           chart={encounter.opponentChart}
           state={displayOpponentState}
@@ -708,11 +709,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           incoming={incomingOther}
           animationEpoch={animationEpoch}
         />
-        <div className="combat-side-label" data-guide="label-other">OTHER</div>
       </div>
 
-      {/* What is fixed for the whole encounter, under the wheels between the
-          SELF and OTHER labels: the planet that rules it — the colour its node
+      {/* What is fixed for the whole encounter, under the wheels:
+          the planet that rules it — the colour its node
           carried on the map — and the rule it sets. What moves (the turn, the
           score, the other's move) reads above the charts; this reads below. */}
       <div className="combat-foot">

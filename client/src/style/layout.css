@@ -549,10 +549,9 @@
    top edge. */
 .combat {
   --combat-pad: 48px;
-  /* How far the strip reaches down into the wheels' boxes: the sentence's
-     slot and its gap (42 + 12), so the sentence sits in the V between the two
-     rings and the readouts sit on the boxes' top edge, above the ring tops. */
-  --combat-overlap: 54px;
+  /* Reach past the label and its gap (24 + 8), then 54px into the wheels. */
+  --combat-overlap: 86px;
+  --combat-foot-overlap: 49px;
   position: relative;
   z-index: 1;
   min-height: 100vh;
@@ -631,13 +630,8 @@
   gap: 12px;
 }
 /* The ruler and its rule — fixed for the whole encounter — under the wheels,
-   the strip's mirror. Pulled up between the SELF/OTHER labels and into the
-   wheels' bottom corners, where the two lower arcs leave a gap: the caption
-   sits a little above the labels' line (its 36px line box 13px above their
-   centre), the readout stacks above it. The 81px is the label row (8 + 24)
-   plus 49 of the box. Aligned to its row's start so the margin moves it
-   one-for-one — centred in the zero-height track the margin leaves, half of
-   the lift would be given back. Only its children take the pointer: the
+   pulled into their empty bottom corners. Aligned to its row's start so the
+   margin moves it one-for-one. Only its children take the pointer: the
    group's full-width box reaches over the bottom of both charts. */
 .combat-foot {
   grid-column: 1 / -1;
@@ -646,7 +640,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-top: -81px;
+  margin-top: calc(-1 * var(--combat-foot-overlap));
   z-index: 2;
   pointer-events: none;
 }
@@ -674,11 +668,10 @@
    budget is the viewport less the two `--combat-pad`s (top and bottom border)
    less the chrome the wheel shares its column with:
 
-     30  the strip (readouts, sentence slot, their gap: 84) less
-         `--combat-overlap`, the part of it inside the wheel's box
-      8  the label's gap above
-     24  the SELF/OTHER label
-      0  the ruler and rule, pulled up wholly onto the label row = 62px
+      0  the strip, pulled into the label row and wheels by `--combat-overlap`
+      8  the gap between label and wheel
+      24  the SELF/OTHER label
+     30  the ruler and rule below the wheels after their overlap = 62px
 
    Horizontally there is nothing to compute: `100%` is the grid column, which has
    already had the border taken out of it.
@@ -1047,9 +1040,8 @@
      narrow enough to avoid — the doublings track was what needed the width. */
   .combat-topbar { gap: 8px; margin-bottom: 0; }
   .combat-readouts { gap: 4px 18px; }
-  /* Stacked there is no row of labels to share: the ruler and rule go back
-     under the strip, read before the charts rather than after scrolling past
-     both. */
+  /* In the stacked layout, the ruler and rule sit under the strip so they
+     can be read before scrolling through the charts. */
   .combat-foot { grid-row: 2; margin-top: 0; gap: 4px; }
   .combat-announce { font-size: 23px; }
   .combat-side { height: auto; gap: 4px; }
