@@ -8,6 +8,7 @@ import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { BeginButton } from "@/components/BeginButton";
+import { WordmarkGlow } from "@/components/WordmarkGlow";
 import { ChartInspection } from "@/components/ChartInspection";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
@@ -82,7 +83,10 @@ export function TitleScreen() {
         )}
       </div>
       <div className="chart-layout-content title-content">
-        <h1 className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</h1>
+        <h1 className="title-wordmark">
+          <WordmarkGlow />
+          SPACE&nbsp;&nbsp;PRINCE
+        </h1>
         <BeginButton onClick={handleBegin} disabled={leaving}>
           {label}
         </BeginButton>
