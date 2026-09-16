@@ -1489,6 +1489,7 @@
   background: var(--bone);
   color: var(--void);
   border-color: var(--bone);
+  box-shadow: 0 0 var(--invite-glow-blur) var(--bone);
 }
 .screen-help-button:focus-visible {
   outline: 1px solid var(--gold);
@@ -1502,7 +1503,6 @@
   font-family: var(--sans);
   color: var(--mist);
   /* The stage is the fixed chart-shaped square; type at this scale is what
-  box-shadow: 0 0 var(--invite-glow-blur) var(--bone);
      fills it — sized so three short paragraphs sit comfortably. */
   font-size: 18px;
   line-height: 1.65;
