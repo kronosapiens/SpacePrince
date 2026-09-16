@@ -10,8 +10,9 @@
 export const PRIMER_FRAMING: string[] = [
   "Astrology is one of humanity's oldest systems of knowledge. For four thousand years, astrologers have been making sense of the stars.",
   "Space Prince is a game about relationships.",
-  "It's not like other games you've played.",
-  "Instead of playing **as a character**, you play as **yourself** — your birth chart is your stats sheet. Instead of getting stronger and dominating, you play by **creating and relieving tension** — in relationship with others.",
+  "But it's not like other games you've played.",
+  "Instead of playing as a character, you play as yourself: your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by creating and relieving tension.",
+  "**You are a cosmic entity, traveling the universe gathering light.**",
   "The goal isn't to win, but to better understand yourself, and the inner architecture that sustains you.",
 ];
 
