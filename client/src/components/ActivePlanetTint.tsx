@@ -4,8 +4,7 @@ import { useTuning } from "@/svg/tuning";
 
 /** Single full-viewport radial gradient overlay. Color shifts to the
  *  active planet when one is set; falls back to a warm bone neutral so
- *  every screen carries the same breathing atmospheric layer (map, end-
- *  of-run, etc. don't go flat-black). */
+ *  every screen carries the same breathing atmospheric layer. */
 export function ActivePlanetTint() {
   const { active } = useActivePlanet();
   const { showGlow } = useTuning();

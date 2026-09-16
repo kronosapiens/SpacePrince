@@ -161,7 +161,7 @@ describe("Run loop integration", () => {
     expect(r.mapsCompleted).toBe(MAPS_PER_RUN);
     expect(r.events).toHaveLength(MAPS_PER_RUN - 1);
     expect(r.map).toBe(finalMap);
-    // End-of-Run reads events + current map → exactly seven maps.
+    // The archive and current map together hold all seven maps.
     expect([...r.events.map((e) => e.map), r.map]).toHaveLength(MAPS_PER_RUN);
   });
 

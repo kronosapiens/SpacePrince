@@ -12,7 +12,7 @@ Everything here stays inside established constraints: no power progression, no p
 
 The conceptual architecture is strong; the gaps are in the middle layer between concept and screen.
 
-- The metaprogression loop is broken in the prototype: `EndOfRunScreen.beginNew` dispatches `clear`, wiping the Prince, so `numEncounters`, unlocks, and `runs[]` never accumulate.
+- At review, starting again wiped the Prince, so `numEncounters`, unlocks, and `runs[]` never accumulated.
 - The star-field — the game's central artifact promise (`NFT.md`, "The Star-Field") — is rendered nowhere.
 - There is no audio at all, despite `VIBES.md §Sound Design` and `MUSIC.md` specifying the direction.
 - The emotional ceremonies (combustion, planet unlock, star inscription) are specced but unbuilt; the mint ceremony proves the register.
@@ -30,7 +30,7 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
   `EncounterNarrative.handleOption` and `chorus.pickFragment` use `Math.random()`; thread seeded rng through both.
   Seed-derivability is what makes shareable run states and eventual contract binding work.
 - [x] **Lossless run history.**
-  `run.events` is stripped on save, so the End-of-run map browser is lossy after reload.
+  `run.events` is stripped on save, so prior maps are lost after reload.
   Persist per-map seed + walk path + node outcomes; re-derive topology and content from seed.
 
 ## Phase 1 — The felt layer
@@ -49,8 +49,8 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
   The newly unlocked planet emerges from ghost on the map chart anchor when a Macrobian threshold is crossed.
 - [x] **Star-field rendering** (`NFT.md`).
   Derive from `runs[].light`: deterministic position and brightness per star; render behind the chart on Title and Chart Study.
-- [x] **Star inscription** (`SCREENS.md §6.1`).
-  At End-of-run the player watches the new star take its place in the field.
+- **Star inscription — deferred** (`SCREENS.md §6`).
+  End-of-run presentation is deferred.
 - [x] **Run-ending differentiation.**
   Combust-out gets the slower ~1800ms weighted fade and the silence of a fully-thinned soundscape; completion stays lighter.
   Same screen, different weight — failure is acknowledgment, not punishment.
@@ -75,8 +75,8 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 ## Phase 3 — The run's shape
 
-- [x] **Run journal** (`SCREENS.md §6.4`).
-  One quiet line per run — maps completed, final Light — on End-of-run and Chart Study.
+- **Run journal — deferred** (`SCREENS.md §6`).
+  How to present run history remains open.
 - [ ] **Map-as-strategy legibility.**
   A glance at a narrative node should answer "a place to earn or a place to heal" (house valence is fixed and public).
   Partially served by the existing map study drop-downs; a valence-at-a-glance cue on the node itself remains open.

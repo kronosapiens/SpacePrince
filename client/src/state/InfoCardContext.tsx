@@ -9,7 +9,7 @@ export type InfoCardRef = { kind: "planet-intro"; planet: PlanetName };
 interface InfoCardContextValue {
   /** Head of the queue — the card the host should present, if any. */
   current: InfoCardRef | null;
-  /** Queue a card; it presents at the next stable surface (map, end). */
+  /** Queue a card; it presents on returning to the map. */
   enqueueCard: (ref: InfoCardRef) => void;
   /** Dismiss the presented card, advancing the queue. */
   dismissCard: () => void;

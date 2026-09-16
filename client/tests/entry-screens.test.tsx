@@ -5,11 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { StartScreen } from "@/screens/StartScreen";
 import { MapScreen } from "@/screens/MapScreen";
+import { PlaySurface } from "@/screens/PlaySurface";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
-import { beginRun } from "@/game/run";
+import { beginRun, MAPS_PER_RUN } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
-import { eligibleNext } from "@/game/map-gen";
+import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
+import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
 import { PRIMER_FRAMING } from "@/copy/primer";
 import { playUISound, setTheme } from "@/audio/engine";
@@ -117,5 +119,65 @@ describe("entry screens", () => {
     const run = loadPrince()!.runs[0]!;
     expect(run.map.currentNodeId).toBe(next);
     expect(run.encounter).not.toBeNull();
+  });
+
+  it("keeps a combusted run inspectable on a passive map and starts again on the same Prince", () => {
+    const prince = createStubPrince();
+    const run = beginRun(42, prince.numEncounters);
+    for (const planet of PLANETS) {
+      run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+    }
+    run.light = 96;
+    const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+    prince.runs = [run];
+    savePrince(prince);
+    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+
+    expect(element(".map-screen .chart-svg").getAttribute("aria-label")).toBe("Stub natal chart");
+    expect(element(".begin-btn").textContent).toBe("New Run");
+    const map = element('[data-guide="map"]');
+    expect(map.querySelector('[role="button"]')).toBeNull();
+    expect(map.querySelector(".invite-ring")).toBeNull();
+    const node = element(`[data-guide="node-${next}"]`);
+    click(node);
+    act(() => node.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })));
+    expect(loadPrince()).toEqual(prince);
+    click(element('[role="button"][aria-label="Moon"]'));
+    expect(element(".ps-ratio").textContent).toBe(`Resolve0/${combustionCeiling(prince.chart.planets.Moon)}`);
+
+    vi.mocked(playUISound).mockClear();
+    click(element(".begin-btn"));
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
+    const restarted = loadPrince()!;
+    expect({ ...restarted, runs: prince.runs }).toEqual(prince);
+    expect(restarted.runs).toHaveLength(2);
+    expect(restarted.runs[0]).toEqual(run);
+    expect(restarted.runs[1]!.state).toEqual(beginRun(0).state);
+    expect(restarted.runs[1]!.light).toBe(0);
+    expect(container.querySelector(".begin-btn")).toBeNull();
+    expect(element(".map-index-v").textContent).toBe("I");
+    expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
+  });
+
+  it("finishes the seventh map in place and keeps that completed map after reload", () => {
+    const prince = createStubPrince();
+    const run = beginRun(42, prince.numEncounters);
+    run.mapsCompleted = MAPS_PER_RUN - 1;
+    run.map.currentNodeId = TERMINAL_NODE_ID;
+    run.map.visitedNodeIds.push(TERMINAL_NODE_ID);
+    prince.runs = [run];
+    savePrince(prince);
+    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+
+    const completed = loadPrince()!;
+    expect(completed.runs[0]).toEqual({ ...run, mapsCompleted: MAPS_PER_RUN });
+    expect(element(".map-index-v").textContent).toBe("VII");
+    expect(element(".begin-btn").textContent).toBe("New Run");
+    act(() => root.unmount());
+    root = createRoot(container);
+    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+    expect(loadPrince()).toEqual(completed);
+    expect(element(".map-index-v").textContent).toBe("VII");
+    expect(element(".begin-btn").textContent).toBe("New Run");
   });
 });

@@ -5,17 +5,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CityPicker } from "@/components/CityPicker";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { StartScreen } from "@/screens/StartScreen";
-import { EndOfRunScreen } from "@/screens/EndOfRunScreen";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
-import { beginRun } from "@/game/run";
 import { createStubPrince } from "./fixtures";
 
 vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
 vi.mock("@/components/Chart", () => ({ Chart: () => null }));
 vi.mock("@/components/PlanetBands", () => ({ PlanetBands: () => null }));
-vi.mock("@/components/MapDiagram", () => ({ MapDiagram: () => null }));
 vi.mock("@/assets/cities.json", () => ({ default: [
   ["New York", "NY", "US", 40.7, -74, 8000000, "America/New_York"],
   ["Newcastle", "England", "GB", 55, -1.6, 300000, "Europe/London"],
@@ -117,19 +114,6 @@ describe("navigation feedback", () => {
     expect(loadPrince()!.runs).toHaveLength(1);
   });
 
-  it("sounds end-map toggles only when accepted and commits New Run", () => {
-    savePrince(createStubPrince({ runs: [beginRun(42, 64)] }));
-    render(<EndOfRunScreen />);
-    click(".eor-card");
-    hover(".eor-card");
-    click(".eor-card");
-    expect(cues()).toEqual(["dismiss"]);
-    act(() => vi.advanceTimersByTime(250));
-    click(".eor-card");
-    click(".begin-btn");
-    expect(cues()).toEqual(["dismiss", "select", "commit"]);
-    expect(loadPrince()!.runs).toHaveLength(2);
-  });
 });
 
 describe("city feedback", () => {

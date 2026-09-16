@@ -23,7 +23,7 @@ FTL keeps the player's ship visible at all times — combat, narrative, and expl
 
 Space Prince inherits FTL's logic. The player's natal chart is who they are, and most surfaces of the game are about the chart in a particular state. Combat encounters and house narrative encounters are *modes of the same encounter screen*, not separate screens — see §3.
 
-This produces a small screen set: two main surfaces (encounter, map) and a handful of supporting ones for entry and exit (mint, end-of-run, chart study, prince select).
+This produces a small screen set: two main surfaces (encounter, map) and a handful of supporting ones (mint, chart study, prince select).
 
 ### 1.1 Client honesty
 
@@ -74,7 +74,6 @@ Listed roughly in the order a player encounters them.
 | Title (lobby)   | Entry point; Prince selection (dropdown); Begin          | Designed (§9)    |
 | Map             | Walk the Sephirot tree; one map per L1→L7 traversal      | Designed (§4)    |
 | Encounter       | Combat (symmetric) or narrative (asymmetric column)      | Designed (§3)    |
-| End-of-run      | Browsable history of the run's maps                      | Designed (§6)    |
 | Chart Study     | Inspect own chart between runs (earned annotations)      | Stub (§7)        |
 | Primer          | Framing at first arrival; codex summoned on demand       | Designed (§9.6)  |
 
@@ -269,7 +268,7 @@ The primer keeps its own gated flow (§9.6) for now; whether it ever presents in
 A card opens one of two ways:
 
 - **Summoned** — the player asks for it (the map's chart anchor opens chart study inside the card).
-- **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents at the next **stable surface** (map or end screen), one at a time, never over a running encounter.
+- **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents on returning to the map, one at a time, never over a running encounter.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold (`MECHANICS.md §11.1`) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
 The introduction celebrates the **position, not a person**: no voice, no chorus fragment — the concept/PRIMER.md accessibility decision (planets stay an ambient chorus) applies here with full force.
@@ -293,7 +292,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 - **Light.** The run's accumulating score (per `MECHANICS.md §12`), shown as a numeral.
   Light has no upper bound anywhere in the design, so it cannot be drawn as a fraction of anything without inventing one — and that would be the first dishonest number in the game.
   A numeral invents nothing: it has no denominator to imply and nothing to decode.
-  It reads the same here, on the narrative screen, and as the star it becomes at end of run.
+  It reads the same here and on the narrative screen.
   While a verb is indicated for a previewed planet, the numeral carries the projected gain for that move in the verb's colour, computed by the same function that will award it — verb-dependent information, so it appears only once a verb is indicated (§3.6), and it shows `+0` plainly on a node the planet cannot score on.
   A pulse behind the digits, tinted by whichever planet is resolving, is the only feedback that Light moved during a resolution wave.
 
@@ -303,7 +302,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 - **Turn.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
-  The final chart and Light total remain briefly after resolution finishes, then the screen advances to the map or the end-of-run screen.
+  The final chart and Light total remain briefly after resolution finishes, then the screen advances to the map.
   A tap skips that final pause.
 
   Rejected: a row of pips, filled to the current turn.
@@ -383,9 +382,9 @@ The progression from faint (distant) through translucent (eligible) to full satu
 Hover or keyboard focus highlights an eligible node and its incoming route.
 One activation enters the node; there is no separate selection or confirmation ring.
 The map guide permits route previews while blocking travel.
-Passive map thumbnails remain noninteractive.
+The finished run’s map remains noninteractive, without invitations to travel.
 
-Click/tap on a traversed node will eventually reveal an outcome detail popup (especially relevant in the end-of-run map browser, per `§6.1`). Treatment TBD.
+Outcome inspection on traversed nodes is an open question (§4.7).
 
 ### 4.2.1 Determinism
 
@@ -444,7 +443,7 @@ The map takes the colour of the node the player stands on — its ruler, the pla
 
 ### 4.7 Open questions
 
-- Outcome-detail popup treatment for traversed nodes (when clicked in the end-of-run map browser).
+- Whether traversed nodes need outcome inspection, and how to present it.
 
 ---
 
@@ -494,46 +493,11 @@ The NFT renders the player's chart at its current unlock state — Moon visible,
 
 ---
 
-## 6. End-of-Run Screen
+## 6. End of Run
 
-What the player sees when a run ends — on whichever comes first: **full combustion** (all seven of the player's planets combust) or **completion** (the seventh map is finished), per `MECHANICS.md §11`. *"Failure is not punishment; it is acknowledgment. When a run ends, the world remembers."*
-
-A run spans up to seven maps. End-of-run is the wrap of the entire arc, not the end of any single map.
-
-### 6.1 The star, and the map browser
-
-The run's permanent output is its remaining **Light**, inscribed as a new **star** in the Prince's NFT field (`NFT.md`, "The Star-Field").
-End-of-run is where the player watches that star take its place — the quiet payoff of the passage, whether the run completed or combusted out.
-
-Beneath that, end-of-run is **the run's map history, browsable**. The player can page through every map they walked, in order, with the path-trace and outcomes preserved on each.
-
-The current chart is not the focus — a combusted-out run is all-dark, a completed one is not, but re-showing it adds nothing the player doesn't already know. The star and the walked maps are the record.
-
-- Maps appear as a horizontal carousel or sequence — first map leftmost, last (where final combust occurred) rightmost.
-- Each map renders at full fidelity when selected. The player can revisit each, click through, and see what happened at each node (traces per `§4.2`).
-- The interaction is paginating between maps and inspecting nodes.
-
-Reads as: *here is what you walked. Walk it again, in your mind.*
-
-### 6.2 Constraints
-
-- Quiet, not theatrical. No "GAME OVER" register.
-- The map browser is the dominant register.
-  Small chrome can carry final Light and achievements (per `§3.7`), but they don't earn their own zone.
-
-### 6.3 Affordances
-
-- **Begin new run.** Generates a new starting map and resets chart state (afflictions and combusts cleared). The player's accumulated encounter count and unlocks persist — that's the lifetime layer.
-- **Return to Title.** Step out, decide later.
-
-There is no "restart this run" or "abandon run" affordance — at end-of-run, the run is already over.
-
-### 6.4 Open questions
-
-- **Run journal.** A visible record of past runs (one line each: # maps completed, final Light, etc.)?
-  Candidate lifetime-progression surface.
-  Out of scope for v1; flagged.
-- **Chorus on end-of-run.** Currently deferred — possible later detail (e.g. the planet that delivered the final combust speaks one fragment).
+End-of-run presentation is deferred.
+For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
+Starting again preserves the Prince's identity, encounter count, unlocks, and run records.
 
 ---
 
@@ -608,8 +572,8 @@ A combined lobby surface — the player's entry point, also serving as Prince se
 
 The Begin affordance's meaning depends on game state:
 
-- **If a run is in progress** (no end-of-run has fired), Begin = *continue* — drops the player back at the Map (their last surface in that run).
-- **If no run is in progress** (post-end-of-run, or never run), Begin = *new run* — generates a fresh starting map and begins.
+- **If a run is in progress** (the run has not ended), Begin = *continue* — drops the player back at the Map (their last surface in that run).
+- **If no run is in progress** (the previous run ended, or no run has begun), Begin = *new run* — generates a fresh starting map and begins.
 
 The button does not label its branches. The world tells the player which they did, by where they land.
 
@@ -648,13 +612,16 @@ The game's explanatory copy lives in `PRIMER.md` and surfaces in two places, by 
 
 ## 10. Navigation
 
-The screen graph is small enough to draw in a sentence: *Mint → Title (lobby) → (Map ↔ Encounter, looping; new maps generate after each L7 completion) → End-of-run (on combust or completion) → Title*. On first arrival the framing (§9.6) precedes Mint. Chart Study and the codex are reachable from the Title; Chart Study also from End-of-run.
+The play loop alternates between Map and Encounter, generating a new map after each non-final L7 completion.
+When a run ends, the final chart and map remain visible with a New Run action (§6).
+On first arrival the framing (§9.6) precedes Mint.
+Chart Study and the codex are reachable from the Title.
 
 ### Routing and identity
 
 The client runs at **two routes only**: `/` (the Title/lobby) and `/play`.
-Everything else — Mint, Map, Encounter, End-of-run — is a single **state-derived surface** at `/play`: the screen shown is a pure function of the active run, not the URL.
-Map → Encounter → End-of-run all fall out of run state (an encounter is set; the run is over); only `/` ↔ `/play` is a route change.
+Mint, Map, and Encounter share a single **state-derived surface** at `/play`: the screen shown is a pure function of the active run, not the URL.
+Map and Encounter follow run state; a finished run stays on the map, and only `/` ↔ `/play` is a route change.
 This removes the URL-vs-state mismatch a screen-per-route design invites, makes refresh-during-play resume correctly, and sets up the "chart is always present, surfaces flow through it" goal — the chart can persist across surfaces instead of remounting per route.
 
 **Identity lives in the URL; the screen does not.**

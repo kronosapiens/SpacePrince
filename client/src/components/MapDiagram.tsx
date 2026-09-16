@@ -164,6 +164,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const color = nodeColor(n.id);
     const isNarrative = content?.kind === "narrative";
     const isCombat = content?.kind === "combat";
+    const selectNode = onSelectNode && isEligible
+      ? () => onSelectNode(n.id)
+      : undefined;
+    const isClickable = !!selectNode;
+    const isIndicated = isClickable && (indicatedNodeId === n.id || focusedNodeId === n.id);
 
     // Content opacity by temporal tier. The whole map's content renders from
     // the start — a map's fate is fixed at creation (VRF seed onchain), so
@@ -179,9 +184,9 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     // the same state language as every node: current pulses, history is quiet.
     const isFortune = n.id === ROOT_NODE_ID;
 
-    // Halo gradient for the current node and for eligible nodes (the latter use
+    // Halo gradient for the current node and for clickable nodes (the latter use
     // it for the breathing "you can go here" glow, mirroring combat planets).
-    if (isCurrent || isEligible) {
+    if (isCurrent || isClickable) {
       haloDefs.push(
         <radialGradient key={`mh-${n.id}`} id={`m2-halo-${n.id}`}>
           <stop offset="0%" stopColor={color} stopOpacity="0.7" />
@@ -189,12 +194,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         </radialGradient>,
       );
     }
-
-    const selectNode = onSelectNode && isEligible
-      ? () => onSelectNode(n.id)
-      : undefined;
-    const isClickable = !!selectNode;
-    const isIndicated = isClickable && (indicatedNodeId === n.id || focusedNodeId === n.id);
 
     return (
       <g
@@ -229,8 +228,8 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
               stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
           </>
         )}
-        {/* Eligible nodes breathe until hover or focus makes the invitation steady. */}
-        {isEligible && (
+        {/* Clickable nodes breathe until hover or focus makes the invitation steady. */}
+        {isClickable && (
           <>
             {/* Resting opacity comes from the class (the shared --breath clock);
                 inline opacity only during preview, so it doesn't shadow the calc. */}

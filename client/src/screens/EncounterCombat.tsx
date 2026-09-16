@@ -51,7 +51,7 @@ interface CombatScreenProps {
    *  resolved). Persistence + lifetime-bump + outcome construction happen
    *  inside the implementation (real or dev). */
   onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => CommitTurnResult | null;
-  /** Clear `run.encounter` and return to the map or end-of-run screen. */
+  /** Clear `run.encounter` and return to the map. */
   onClearEncounter: () => void;
   devUnlockAll: boolean;
   /** Dev only: show the animation console — fire any gesture on demand
@@ -548,7 +548,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           {/* The score, plainly. Light has no upper bound, so the numeral is
               the one rendering that invents nothing: no denominator, no ceiling,
               nothing to decode. It reads the same here as on the narrative
-              screen and as the star it becomes at end of run.
+              screen.
               Rejected: the doublings track (a tick per doubling banked plus a
               bar for the run at the current one, `game/light-scale.ts`). It also
               implied no ceiling, but it stated the score in a code that had to

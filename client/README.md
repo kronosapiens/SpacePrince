@@ -166,5 +166,5 @@ It uses `useRef` + `useId` for the gradient — never `document.getElementById`.
 
 - `pnpm exec tsc -b --noEmit` — typecheck
 - `pnpm test` — Vitest (game logic + reducers)
-- Manual playthrough: Title → Start (mint) → Map → Encounter (combat + narrative) → End-of-Run → Begin again
+- Manual playthrough: Title → Start (mint) → Map → Encounter (combat + narrative) → Finished map → New Run
 - Reset button on Index clears both stores; refresh during an encounter resumes from the same state

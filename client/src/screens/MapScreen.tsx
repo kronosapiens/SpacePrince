@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChartInspection } from "@/components/ChartInspection";
+import { BeginButton } from "@/components/BeginButton";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { playUISound, setTheme } from "@/audio/engine";
-import { isOver } from "@/game/run";
-import { useRolloverMap } from "@/state/store-actions";
+import { isOver, MAPS_PER_RUN } from "@/game/run";
+import { useRolloverMap, useStartRun } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, hashString } from "@/game/rng";
@@ -31,9 +32,11 @@ export function MapScreen() {
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const rolloverMap = useRolloverMap();
+  const startRun = useStartRun();
   const { setActive } = useActivePlanet();
   const [guideOpen, setGuideOpen] = useState(false);
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
+  const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numEncounters);
 
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
@@ -59,7 +62,7 @@ export function MapScreen() {
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
-      if (!run || !prince) return;
+      if (!run || !prince || runOver) return;
       let nextRun: Run = { ...run };
       // Content is pre-rolled at map creation; the dev force cheats re-roll
       // the node here so "the next node you enter" is the forced kind. The
@@ -130,22 +133,25 @@ export function MapScreen() {
       dispatch({ kind: "commitRun", run: nextRun });
       playUISound("commit");
     },
-    [run, prince, settings, dispatch],
+    [run, prince, runOver, settings, playerUnlocked, dispatch],
   );
 
   useEffect(() => {
-    if (!run || !prince) return;
-    if (isOver(run, prince.chart, prince.numEncounters)) return; // ended (combust or completion)
+    if (!run || !prince || runOver) return;
     if (run.encounter) return;
     if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
     // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
     // uncombust rolls, then the barrage, both seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);
-  }, [run, prince, playerUnlocked, rolloverMap]);
+  }, [run, prince, runOver, playerUnlocked, rolloverMap]);
 
-  // PlaySurface only renders Map for a live, non-over run with no encounter;
-  // this is a defensive null-guard for TS narrowing.
   if (!prince || !run) return null;
+
+  const mapIndex = Math.min(run.mapsCompleted, MAPS_PER_RUN - 1);
+  const beginNew = () => {
+    startRun();
+    playUISound("commit");
+  };
 
   // The boundary record shows only while standing at the root — what the
   // crossing did (§11.3), before the first step commits.
@@ -162,7 +168,7 @@ export function MapScreen() {
         phase={guidePhase}
         map={run.map}
         examplePlanet={playerUnlocked[0] ?? "Moon"}
-        mapsCompleted={run.mapsCompleted}
+        mapsCompleted={mapIndex}
         showBoundary={showBoundary}
         onOpen={() => { setGuidePhase("map"); setGuideOpen(true); }}
         onClose={() => setGuideOpen(false)}
@@ -178,14 +184,14 @@ export function MapScreen() {
       </div>
       <div className="map-content">
         <div className="map-diagram-wrap">
-          <MapDiagram map={run.map} onSelectNode={guideOpen ? noop : handleNodeSelect} />
+          <MapDiagram map={run.map} onSelectNode={runOver ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
         <div className="map-index" data-guide="map-index">
-          <span className="map-index-v">{ROMAN[run.mapsCompleted] ?? String(run.mapsCompleted + 1)}</span>
+          <span className="map-index-v">{ROMAN[mapIndex]}</span>
         </div>
         {showBoundary && boundary && (
           <div className="map-boundary" data-guide="map-boundary">
-            <span className="eyebrow">MAP {ROMAN[run.mapsCompleted] ?? run.mapsCompleted + 1}</span>
+            <span className="eyebrow">MAP {ROMAN[mapIndex]}</span>
             {boundary.uncombusts.map((u) => (
               <div key={`u-${u.planet}`} className="map-boundary-line">
                 <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[u.planet] }}>
@@ -205,6 +211,7 @@ export function MapScreen() {
             ))}
           </div>
         )}
+        {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>New Run</BeginButton>}
       </div>
     </div>
   );

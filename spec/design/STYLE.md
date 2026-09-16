@@ -121,7 +121,7 @@ The tint is the place, not the event: it belongs to whichever planet owns the su
 - **Encounter, combat and narrative alike:** the encounter's **ruler** (`MECHANICS.md §11`) — the planet whose colour the node carried on the map and whose theme the score plays.
   The other's acting planet is not repeated here; the sentence, the corona and the resolution flashes already carry it (`SCREENS.md §3.7`).
 - **Map:** the ruler of the node the player stands on, so walking into an encounter continues the light.
-- **Title and end of run:** neutral.
+- **Title:** neutral.
 
 The opacity and the shift between tints live in `tokens.css` and `motion.css`; the shift is slow enough to feel like the light changing in a room.
 

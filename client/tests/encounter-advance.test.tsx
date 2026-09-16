@@ -15,7 +15,6 @@ import { createStubPrince } from "./fixtures";
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
 vi.mock("@/screens/MapScreen", () => ({ MapScreen: () => <div data-screen="map" /> }));
-vi.mock("@/screens/EndOfRunScreen", () => ({ EndOfRunScreen: () => <div data-screen="end" /> }));
 vi.mock("@/components/InfoCardHost", () => ({
   InfoCardHost: () => {
     const { current } = useInfoCards();
@@ -153,7 +152,7 @@ describe("encounter advancement", () => {
     expect(loadPrince()!.numEncounters).toBe(64);
   });
 
-  it("finishes combustion playback and advances to the end-of-run screen", () => {
+  it("finishes run-ending combustion playback before returning to the map", () => {
     const { prince, run, encounter } = combat();
     for (const planet of PLANETS) run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
     run.state.Moon.affliction -= 12;
@@ -165,7 +164,7 @@ describe("encounter advancement", () => {
     advanceTime(2799);
     expect(container.querySelector("[data-screen]")).toBeNull();
     advanceTime(1);
-    expect(container.querySelector('[data-screen="end"]')).not.toBeNull();
+    expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(loadPrince()!.numEncounters).toBe(65);
   });
 

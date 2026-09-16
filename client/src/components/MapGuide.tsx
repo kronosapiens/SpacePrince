@@ -33,7 +33,7 @@ interface MapGuideProps {
   onPhaseChange: (phase: MapGuidePhase) => void;
 }
 
-/** Which map the player is on, as the End screen's rainbow labels it. */
+/** Roman numerals for the current map. */
 export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 
 const COPY = GUIDE_COPY.map;

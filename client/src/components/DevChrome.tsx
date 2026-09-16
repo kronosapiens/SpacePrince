@@ -26,7 +26,7 @@ const PAGES: Page[] = [
   { label: "Map", kind: "map" },
   { label: "Encounter", kind: "combat" },
   { label: "Narrative", kind: "narrative" },
-  { label: "End of Run", kind: "end" },
+  { label: "Finished Map", kind: "end" },
 ];
 
 /** Dev chrome (gated to dev builds by App): four keys, and a small legend for
@@ -176,10 +176,10 @@ const SURFACE_LABEL: Record<Surface, string> = {
   map: "Map",
   combat: "Encounter",
   narrative: "Narrative",
-  end: "End of Run",
+  end: "Finished Map",
 };
 
-/** Which surface is showing — mirrors PlaySurface's derivation for /play. */
+/** Which surface is showing, distinguishing finished maps for dev re-rolls. */
 function currentSurface(pathname: string, prince: Prince | null, run: Run | null): Surface {
   if (pathname === ROUTES.index) return "index";
   if (pathname !== ROUTES.play) return "title";

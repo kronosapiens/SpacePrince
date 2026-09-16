@@ -20,8 +20,8 @@ export function EncounterScreen() {
   if (!prince || !run || !run.encounter) return null;
   const enc = run.encounter;
 
-  // Clearing the encounter returns the surface to Map — or to End if the run
-  // ended (PlaySurface derives that from `isOver`). The lifetime layer
+  // Clearing the encounter returns to the map, including when the run ends.
+  // The lifetime layer
   // advances HERE, on leaving a resolved encounter — never mid-surface, so a
   // new planet can't pop in un-ghosted during the final turn's playback.
   // Crossing a Macrobian threshold queues the planet introduction, which

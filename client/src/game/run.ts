@@ -121,8 +121,7 @@ export function rollMapBoundary(
  *  the finished map to the event log, generates a fresh one, and passes the
  *  chart through the map boundary (§11.3) — uncombust rolls, then the barrage,
  *  both seeded by the new map. The seventh completion ends the run: the final
- *  map stays current (not archived), so the End screen's
- *  `[...events.map(e => e.map), run.map]` is exactly seven. */
+ *  map stays current (not archived). */
 export function rolloverMap(
   run: Run,
   chart: Chart,

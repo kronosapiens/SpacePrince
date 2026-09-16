@@ -157,7 +157,7 @@ export type NodeContent =
 export interface NodeOutcome {
   nodeId: string;
   kind: "combat" | "narrative";
-  // free-form summary for End-of-Run inspection
+  // Free-form summary of the encounter's outcome.
   summary: string;
   lightDelta: number;
   combusts: PlanetName[];
@@ -188,9 +188,8 @@ export interface MapState {
 // ── Run / Prince (STATE.md) ──────────────────────────────────────────────────
 
 /** Append-only, in-memory log of finished maps (each carries its own per-node
- *  `outcomes`). The End-of-Run screen reads it; it is NOT persisted — a real
- *  client would read these from chain events. The in-memory replacement for the
- *  old `mapHistory`. See `STATE.md`. */
+ *  `outcomes`). Not persisted — a real client would read these from chain
+ *  events. See `STATE.md`. */
 export type RunEvent = { kind: "map-completed"; map: MapState };
 
 export interface Run {
@@ -209,7 +208,7 @@ export interface Run {
   /** No-repeat bookkeeping — active-run-only (STATE.md). */
   seenFragmentIds: string[];
   seenScenarioIds: string[];
-  /** In-memory run history for the End screen; not persisted. */
+  /** In-memory history of finished maps; not persisted. */
   events: RunEvent[];
 }
 

@@ -1,28 +1,26 @@
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
-import { isOver } from "@/game/run";
 import { InfoCardHost } from "@/components/InfoCardHost";
 import { StartScreen } from "./StartScreen";
 import { MapScreen } from "./MapScreen";
 import { EncounterScreen } from "./EncounterScreen";
-import { EndOfRunScreen } from "./EndOfRunScreen";
 
 /**
  * The whole game lives at /play as one **state-derived surface**: the screen is
- * a function of the Prince's active run, not the URL (SCREENS.md). Map →
- * Encounter → End all fall out of run state — no navigation between them; only
- * `/` ↔ `/play` is a route change. `encounter` takes precedence over `isOver`
- * so a run-ending combat stays on screen (showing its result) until cleared.
+ * a function of the Prince's active run, not the URL (SCREENS.md). Map and
+ * Encounter follow run state — no navigation between them; only `/` ↔ `/play`
+ * is a route change. A run-ending encounter stays on screen until cleared,
+ * then the map remains visible with the finished chart.
  */
 export function PlaySurface() {
   const prince = usePrince();
   const run = useActiveRun();
   if (!prince || !run) return <StartScreen />;
   if (run.encounter) return <EncounterScreen />;
-  // Map and End are the stable surfaces — queued info cards (e.g. a planet
+  // The map is the stable surface — queued info cards (e.g. a planet
   // introduction earned by the encounter just cleared) present here.
   return (
     <>
-      {isOver(run, prince.chart, prince.numEncounters) ? <EndOfRunScreen /> : <MapScreen />}
+      <MapScreen />
       <InfoCardHost />
     </>
   );
