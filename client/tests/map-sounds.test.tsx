@@ -6,7 +6,7 @@ import { MapScreen } from "@/screens/MapScreen";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
-import { eligibleNext } from "@/game/map-gen";
+import { buildMapGraph, eligibleNext } from "@/game/map-gen";
 import { beginRun } from "@/game/run";
 import { createStubPrince } from "./fixtures";
 
@@ -40,8 +40,8 @@ function get(selector: string) {
 function click(selector: string) {
   act(() => get(selector).dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
-function press(selector: string, repeat = false) {
-  const event = new KeyboardEvent("keydown", { key: " ", repeat, bubbles: true, cancelable: true });
+function press(selector: string, key: string, repeat = false) {
+  const event = new KeyboardEvent("keydown", { key, repeat, bubbles: true, cancelable: true });
   act(() => get(selector).dispatchEvent(event));
   expect(event.defaultPrevented).toBe(true);
 }
@@ -51,33 +51,75 @@ function setup() {
   prince.runs = [run];
   savePrince(prince);
   const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
-  return { prince, map: run.map, node: `[data-guide="node-${next}"]` };
+  return { prince, map: run.map, next, node: `[data-guide="node-${next}"]` };
 }
 const cues = () => vi.mocked(playUISound).mock.calls.map(([cue]) => cue);
 
 describe("map feedback", () => {
-  it("uses the same preview/commit cues for keyboard activation without committing on key repeat", () => {
-    const { prince, node } = setup();
+  it.each(["Enter", " "])("travels on the first %j activation and ignores key repeat", (key) => {
+    const { prince, node, next } = setup();
     act(() => root.render(<PrinceStoreProvider><MapScreen /></PrinceStoreProvider>));
-    press(node);
-    press(node, true);
-    expect(cues()).toEqual(["select"]);
+    press(node, key, true);
+    expect(cues()).toEqual([]);
     expect(loadPrince()).toEqual(prince);
-    press(node);
-    expect(cues()).toEqual(["select", "commit"]);
+    press(node, key);
+    expect(cues()).toEqual(["commit"]);
+    expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
     expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
   });
 
-  it("dismisses a selected node once and leaves passive thumbnails silent", () => {
+  it("travels on the first click with one commit cue", () => {
+    const { node, next } = setup();
+    act(() => root.render(<PrinceStoreProvider><MapScreen /></PrinceStoreProvider>));
+    click(node);
+    expect(cues()).toEqual(["commit"]);
+    expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
+    expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
+  });
+
+  it("previews a route on hover or focus, preserving focus when the pointer leaves", () => {
+    const { map } = setup();
+    map.graph = buildMapGraph(42, { forced: [2, 1, 1, 1, 1] });
+    const node = '[data-guide="node-2L"]';
+    const onSelectNode = vi.fn();
+    act(() => root.render(<MapDiagram map={map} onSelectNode={onSelectNode} />));
+    const control = get(node).closest('[role="button"]')!;
+    const previewedRoute = () => container.querySelector('line[stroke-opacity="0.75"]');
+    const ring = () => control.querySelector('.invite-ring')!;
+    expect(previewedRoute()).toBeNull();
+    act(() => control.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    expect(previewedRoute()).not.toBeNull();
+    expect(ring().classList.contains("anim-invite-ring")).toBe(false);
+    act(() => control.dispatchEvent(new MouseEvent("mouseout", { bubbles: true })));
+    expect(previewedRoute()).toBeNull();
+    act(() => control.dispatchEvent(new FocusEvent("focusin", { bubbles: true })));
+    expect(previewedRoute()).not.toBeNull();
+    act(() => control.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    act(() => control.dispatchEvent(new MouseEvent("mouseout", { bubbles: true })));
+    expect(previewedRoute()).not.toBeNull();
+    expect(ring().classList.contains("anim-invite-ring")).toBe(false);
+    const other = [...container.querySelectorAll('[role="button"]')].find((el) => el !== control)!;
+    act(() => other.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    expect(ring().classList.contains("anim-invite-ring")).toBe(false);
+    act(() => other.dispatchEvent(new MouseEvent("mouseout", { bubbles: true })));
+    act(() => control.dispatchEvent(new FocusEvent("focusout", { bubbles: true })));
+    expect(previewedRoute()).toBeNull();
+    expect(ring().classList.contains("anim-invite-ring")).toBe(true);
+    expect(onSelectNode).not.toHaveBeenCalled();
+  });
+
+  it("leaves background clicks and passive thumbnails silent", () => {
     const { map, node } = setup();
-    act(() => root.render(<MapDiagram map={map} onSelectNode={vi.fn()} />));
+    const onSelectNode = vi.fn();
+    act(() => root.render(<MapDiagram map={map} onSelectNode={onSelectNode} />));
     click(node);
+    expect(onSelectNode).toHaveBeenCalledOnce();
+    expect(get(node).closest('[role="button"]')?.hasAttribute("aria-pressed")).toBe(false);
     click('[data-guide="map"]');
-    click('[data-guide="map"]');
-    expect(cues()).toEqual(["select", "dismiss"]);
+    expect(cues()).toEqual([]);
     act(() => root.render(<MapDiagram map={map} />));
-    vi.mocked(playUISound).mockClear();
     click(node);
+    expect(onSelectNode).toHaveBeenCalledOnce();
     expect(cues()).toEqual([]);
     expect(get(node).closest('[role="button"]')).toBeNull();
   });
@@ -88,8 +130,8 @@ describe("map feedback", () => {
     click('.screen-help-button');
     vi.mocked(playUISound).mockClear();
     click(node);
-    click(node);
-    expect(cues()).toEqual(["select"]);
+    press(node, "Enter");
+    expect(cues()).toEqual([]);
     expect(loadPrince()).toEqual(prince);
   });
 });

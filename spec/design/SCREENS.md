@@ -122,8 +122,10 @@ The border, the overlap, and the height budget the wheel is sized from are decid
 The aria remains steady while the player selects targets and the decision resolves.
 There is one fragment for the whole encounter.
 
-### 3.3 Mobile portrait
+### 3.3 Mobile portrait (deferred)
 
+Mobile adaptation is deferred while desktop takes priority.
+These layout sketches can inform later work without constraining desktop interactions.
 Both layouts stack vertically.
 
 - **Combat:** player's chart on top, the other's chart below. The chrome stays above both, so the turn and the encounter's rule are read before scrolling.
@@ -167,7 +169,7 @@ A normalized arc reads as a fraction, which needs a complete-circle track to rea
 It also flattens the resting chart, since every undamaged planet would look identical, and the chart is the character sheet and the NFT as well as the board.
 
 **The projected span is focused only.**
-It appears on the planet under consideration — hovered, inspected, or armed — and nowhere else.
+It appears on the planet under consideration — hovered, focused, or inspected — and nowhere else.
 A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (this one dies) rather than a comparison of lengths.
 
 Rejected: the precommit's bite drawn on every live candidate at rest.
@@ -181,35 +183,48 @@ The arc is always on, on every live planet, where badges showed only above zero:
 
 ### 3.6 Interaction grammar
 
-The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per `MECHANICS.md §5`). The grammar is the same on touch and desktop.
+The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per `MECHANICS.md §5`).
+Desktop previews use hover or keyboard focus; one activation executes a fully specified action.
+Mobile adaptation is deferred.
 
-- **First tap on a planet:** inspect. The chart highlights the planet's aspect web, narrows the defensive preview to that planet (below), and opens the inspect panel with its two actions. The inspected planet's ring goes steady.
+- **Activate a planet:** inspect.
+  The chart highlights the planet's aspect web, narrows the defensive preview to that planet (below), and opens the inspect panel with its two actions.
+  The inspected planet's ring goes steady.
+- **Hover or focus an action (Afflict / Testify):** preview the full turn and Light gain.
+  Activate the action once to resolve the turn.
+- **Activate a different planet:** switch inspection without committing.
+- **Activate an opponent planet:** inspect the same information as an own planet.
+  Opponent planets are not actable.
+- **Hover or focus a planet:** preview without committing.
+  While a planet is selected, its inspection stays pinned so the player can reach the action buttons.
 
 There is one interaction ring per planet, not two.
-It breathes while the planet is merely tappable and sits steady once hovered, selected, or acting — selection is the invite answered, not a different ring.
+It breathes while the planet is available and sits steady once hovered, focused, selected, or acting — selection is the invite answered, not a different ring.
 Its colour is **mist** until a verb is determined for that planet, and the verb's colour then (`STYLE.md §5`); it never carries the planet's own hue, which the disc, glyph and halo already state three times over.
-Rejected: separate invite and select rings at different radii. They were already mutually exclusive — selecting clears the invite on every planet and suppresses hover — so the second radius bought nothing and spent room the arc needed.
-- **Tap an action (afflict / testify):** arm. The full preview appears for that verb. A second tap on the armed action commits; the turn resolves.
-- **Tap a different planet:** inspection switches to that planet (not a commit).
-- **Tap an opponent planet:** preview-only. Surfaces the same information as own planets. No commit; opponent planets are not actable.
-- **Hover (desktop only):** ambient preview. Same information as tap-inspection, but free. Hover is additive — never a commit gesture and never a substitute for tap. While a planet is selected, hover is inert on both charts: the held preview doesn't compete with stray pointer movement.
+Rejected: separate invite and select rings at different radii.
+They were already mutually exclusive — selecting clears the invite on every planet and suppresses hover — so the second radius bought nothing and spent room the arc needed.
 
 **Previews show only what is determined.**
-Verb-dependent information appears only while a verb is indicated — hovered (desktop) or armed; verb-free information is free everywhere.
+Verb-dependent information appears only while a verb is indicated by hover or focus; verb-free information is free everywhere.
 The *defensive* read — the opponent's precommitted action — is verb-free, so it needs no verb indicated; it still needs a planet, and appears only on the one under consideration, propagation included (§3.5.1).
 The sentence (§3.7) carries the part of it that is planet-free: which of the other's planets acts, with which verb, and for how much.
-The *offensive* read (the effect on the opponent's chart) appears only while an action is indicated — armed, or hovered while nothing is armed: the client never asserts the outcome of a choice not yet made.
-Indication follows the same holding rule on both axes: an armed verb, like a selected planet, makes hover inert — commitment holds, and only a click switches it.
-Armed previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
+The *offensive* read (the effect on the opponent's chart) appears while the action is hovered or focused.
+The preview clears when neither indicates it; pointer exit preserves a preview still supplied by keyboard focus.
+Previews are exact — they model the full phase order of `MECHANICS.md §6`, including preemption and the combustion propagation short-circuit (`§9`).
 
-In narrative encounters, tap an option to arm it.
-A targeted effect uses the encounter center mark to invite planet selection on the chart.
-Tap a planet to preview the consequence, then confirm through the shared planet readout.
-An option without a requested target commits on a second tap of that option.
+In narrative encounters, hover or focus an option to preview its determined effects.
+An option without a requested target resolves on its first activation.
+Activate an option that needs a target to enter targeting; repeating that activation keeps targeting active.
+The encounter center mark invites eligible planets on the chart.
+Hover or focus a planet to preview its exact consequence in the shared readout, then activate the planet once to resolve the choice.
+The readout shows the actual effect amount, including clamped recovery, without a confirmation button.
+Previewing another option leaves the selected targeting option unchanged; returning to the chart restores that option's preview.
+Choosing another option replaces the selection; background click or Escape cancels targeting.
+Outside targeting, planet activation remains safe inspection.
 Only eligible targets invite selection; revival can select combusted planets without enabling them in combat.
 Determined effects project on the chart through the same resolver used at commit.
 Unavailable purchases remain visible with an explanation.
-The guide permits previews and target selection but prevents commitment.
+Guides permit demonstrations but prevent gameplay commitment and commit sounds.
 
 ### 3.6.1 Study annotations (the inspect "i")
 
@@ -326,7 +341,6 @@ The durations live in `client/src/style/motion.css`.
 
 - Whether the player's chart should pulse, idle, or stay completely still during the *fragment fade-in* moment specifically (distinct from the broader decision phase, which is settled — gating planets pulse).
 - How a **zero-effect ripple** should read. On an afflict turn a hard aspect inverts to testimony, and a target already at zero affliction has nothing to heal — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence. The retired projection badge covered this by showing a violet zero.
-- Map traversal interaction model (separate from encounter interaction — see §4).
 - Accessibility (color-channel parallel signal).
 
 ---
@@ -366,6 +380,11 @@ The tiers grade *attention*, not information: meaning concentrates near the play
 
 The progression from faint (distant) through translucent (eligible) to full saturation + halo (current), with the walked path solid behind the player, reads as the map becoming real as it is walked.
 
+Hover or keyboard focus highlights an eligible node and its incoming route.
+One activation enters the node; there is no separate selection or confirmation ring.
+The map guide permits route previews while blocking travel.
+Passive map thumbnails remain noninteractive.
+
 Click/tap on a traversed node will eventually reveal an outcome detail popup (especially relevant in the end-of-run map browser, per `§6.1`). Treatment TBD.
 
 ### 4.2.1 Determinism
@@ -393,9 +412,10 @@ Both were dropped: under a per-map VRF seed the fog reflected no real uncertaint
 A "no immediate repeat" rule and position-derived house assignment (upper layers = elevated houses, lower = grounded) are deferred to v2 if they earn their weight in playtesting.
 - **Combat opponent assignment:** the matchmaker pulls a real other-player Prince per `§3.4`.
 
-### 4.4 Mobile
+### 4.4 Mobile (deferred)
 
-Map scales down to width. Vertical scrolling is acceptable here (unlike encounter screens), since map navigation is inherently slow and exploratory. The chart anchor relocates to the top of the screen, above the map.
+A future mobile layout could scale the map to width, allow vertical scrolling, and place the chart above it.
+Existing responsive layouts remain while desktop interactions take priority.
 
 ### 4.5 House → ruler mapping (color rule)
 
@@ -529,11 +549,11 @@ A "quiet mode" of the Title screen for sitting with one's chart.
 
 ### 7.2 Inspection grammar
 
-Chart Study supports the same **tap-to-inspect / hover-to-preview** grammar as combat (per `§3.6`), minus the commit step:
+Chart Study supports the same inspection and hover/focus previews as combat (per `§3.6`):
 
-- Tap a planet → its aspect lines highlight, the planet receives its inspection ring.
-- Hover (desktop) → ambient preview, same surface.
-- Tap elsewhere → preview clears.
+- Activate a planet → its aspect lines highlight, the planet receives its inspection ring.
+- Hover or keyboard focus → ambient preview, same surface.
+- Click elsewhere → inspection clears.
 
 There is no commit. The point of Chart Study is to look at the web, not to act on it.
 

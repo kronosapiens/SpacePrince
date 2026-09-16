@@ -134,12 +134,13 @@ Three orthogonal signals share the chart and must read apart:
 
 - **Aspect mood** — the resting aspect graph and its propagation pulse are colored by harmony/tension, not by planet: **green** (`#8FBC8F`) for harmonious (trine, sextile, conjunction), **red** (`#E15555`) for tense (square, opposition). The astrological convention. The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Heavy when hovered, selected, or propagating (§3), the same weight the propagation pulse rides. The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives. The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
 - **Effect polarity (heal/harm)** — afflict/testify, the projected span on the affliction arc, and the interaction ring use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
-The ring is **mist** until a verb is determined for its planet — the opponent's precommit, or the player's armed choice — and takes the verb's colour then, the same grammar as the arc inside it.
+The ring is **mist** until a verb is determined for its planet — the opponent's precommit, or the player's action preview — and takes the verb's colour then, the same grammar as the arc inside it.
 Mist rather than bone because the arc is bone, and a bone ring just outside a bone arc reads as one double ring on an undamaged planet.
 Mist separates them and puts the two neutrals where the scale already defines them: bone is state, mist is affordance.
 A dimmer ring does not weaken the invite, because the breath is what marks the tappable (§7), not the brightness.
 It does not carry the planet's own colour: the disc, the glyph and the halo already state identity three times, so the ring's hue was decoration, and spending it on the verb is what lets a precommit read at its source rather than only through its consequences on the other chart.
-**The corona.** An acting planet — the opponent's precommitted actor, or the player's own once a verb is armed — carries its verb as streamers: radial line segments beginning just outside the interaction ring, in the verb's colour.
+**The corona.**
+An acting planet — the opponent's precommitted actor, or the player's own while an action is hovered or focused — carries its verb as streamers: radial line segments beginning just outside the interaction ring, in the verb's colour.
 Colour alone was not enough to separate the two verbs at a glance, so they differ in silhouette as well, on the reference's own logic — a real corona is irregular and long-streamered at solar maximum, smooth and symmetric at minimum.
 **Afflict flares:** fewer rays, reaching well past the halo, alternate ones falling short so the outline breaks up.
 **Testify gathers:** more rays, all equal, hugging the rim.
@@ -217,19 +218,20 @@ Animation is part of the symbolic vocabulary.
 ### One clock
 
 Every ambient pulse rides one shared breath (`--breath` in `client/src/style/motion.css`); there is never a second rhythm.
-The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath, the armed pulse — and their durations and easings live in that file beside their keyframes, each with a line on what it is for.
+The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath — and their durations and easings live in that file beside their keyframes, each with a line on what it is for.
 
 ### The next click is always legible
 
-At any moment it should be obvious what the player can — or should — tap next.
-The signal is motion: every ambient glow is static, so a slow breath (the invite) is what marks the tappable.
+At any moment it should be obvious what the player can — or should — activate next.
+The signal is motion: every ambient glow is static, so a slow breath (the invite) marks available controls.
 It is one grammar everywhere — a breathing ring on a planet or map node, a breathing verb in the stats panel.
-Hover snaps a ring's breath to a steady full glow (the verbs keep breathing); selecting collapses the invites to the chosen element.
-Arming (the first tap of tap-to-commit) promotes exactly one next click: the armed element pulses harder while its alternatives fall still.
-Stillness remains the default for everything that cannot be tapped right now.
+Hover or keyboard focus makes a ring steady and previews determined consequences.
+Planet inspection stays selected while the player reaches its actions; narrative targeting marks the eligible planets.
+One activation executes a fully specified action, without an arming pulse or a repeated confirmation.
+Stillness remains the default for unavailable controls.
 
-Hover is subordinate in this grammar: it may intensify or preview what is already legible, never carry anything alone.
-Mobile has no hover, so every affordance, reveal, and action must be reachable by taps alone — hover is strictly additive polish for pointer devices.
+Desktop interaction takes priority: hover and keyboard focus carry previews, and focus remains visible.
+Mobile adaptation is deferred; it does not require extra desktop confirmation.
 
 ### Combat turn composition
 
@@ -345,15 +347,14 @@ The visual analogue to `VIBES.md §What the Client Must Never Do`.
 - **Never animate at rest.** Stillness is a state, not an absence of state.
 - **Never introduce a color outside the palette plus neutrals.** Including for "just this one error state."
 - **Never use a typeface outside the two specified faces.** Including for "just this one tooltip."
-- **Never gate an action or a reveal behind hover.** Hover is additive polish for pointer devices (§7); taps alone must reach everything.
 
 ---
 
 ## 13. Layout and Viewport
 
-The client targets **desktop as canonical** — the surface where design decisions are validated first and where the visual register is most fully expressed. Mobile (specifically iPhone portrait) is a documented secondary layout, designed to coexist with the canonical layout without requiring re-architecture later.
-
-The principle: *don't lock in desktop assumptions that mobile can't escape.* Two charts in a horizontal flex container is a desktop layout, not a universal one. Orientation should be a first-class layout decision, not a CSS-only resize.
+The client targets **desktop as canonical** — the surface where design decisions are validated and where the visual register is most fully expressed.
+Mobile adaptation is deferred until demand warrants it.
+Existing responsive layouts remain, but touch parity and future mobile layout needs do not constrain desktop interaction design.
 
 ### Canonical (desktop / landscape)
 
@@ -361,25 +362,20 @@ The principle: *don't lock in desktop assumptions that mobile can't escape.* Two
 - The map screen is centered with margins; chrome lives at the top.
 - Chart wheels render at full proportion per §11.
 
-### Mobile portrait
+### Mobile portrait (deferred)
 
-- The encounter screen stacks vertically: player's chart on top, the right-hand slot below. The "two charts face each other" framing translates from horizontal to vertical without semantic change.
-- The map retains its diagrammatic shape but reduces in scale to fit the available width. Vertical scrolling is acceptable on the map; not in encounters.
+These earlier layout sketches can inform a later mobile client:
+
+- The encounter screen stacks vertically: player's chart on top, the right-hand slot below.
+  The "two charts face each other" framing translates from horizontal to vertical without semantic change.
+- The map retains its diagrammatic shape but reduces in scale to fit the available width.
+  Vertical scrolling is acceptable on the map; not in encounters.
 - Chrome that sits above and below the wheels on desktop stacks with them on mobile, the live chrome first.
 
 ### Switching rule
 
-Layout is selected by orientation and viewport width, not by user-agent string. A desktop browser at narrow width adopts the mobile layout; a tablet in landscape adopts the canonical one. Exact breakpoints are TBD — pick during prototype validation, not in advance.
-
-### What this constrains today
-
-Mobile is not the focus, but design decisions that bake in horizontal-only assumptions are forbidden:
-
-- No encounter chrome positioned strictly to the left or right of a single chart in a way that wouldn't survive stacking.
-- No chart-wheel sizing in absolute pixels that assumes a desktop viewport.
-- No interactions that rely on hover with no touch equivalent. Hover's role is settled (§7): strictly additive, never necessary.
-
-The mobile layout doesn't have to be polished yet. It has to be possible.
+Responsive layouts use orientation and viewport width, not user-agent strings.
+Breakpoints can be tuned during desktop validation; a future mobile client can adapt layout and controls separately.
 
 ---
 

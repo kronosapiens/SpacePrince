@@ -96,7 +96,7 @@ describe("chart feedback", () => {
     expect(container.querySelector(".ps-card")).toBeNull();
   });
 
-  it("keeps a rejected commit silent and dismisses an armed action when its planet is clicked again", () => {
+  it("keeps a rejected first activation silent and leaves inspection available", () => {
     const prince = createStubPrince();
     const run = beginRun(42, prince.numEncounters);
     const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
@@ -106,11 +106,13 @@ describe("chart feedback", () => {
       onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />));
     click(moon);
     click('[data-guide="action-testimony"]');
-    click('[data-guide="action-testimony"]');
     expect(onCommitTurn).toHaveBeenCalledTimes(1);
-    expect(cues()).toEqual(["select", "select"]);
+    expect(cues()).toEqual(["select"]);
     click(moon);
-    expect(cues()).toEqual(["select", "select", "dismiss"]);
-    expect(get('[data-guide="action-testimony"]').getAttribute("aria-pressed")).toBe("false");
+    expect(cues()).toEqual(["select"]);
+    expect(get('[data-guide="action-testimony"]').hasAttribute("aria-pressed")).toBe(false);
+    click(".combat");
+    expect(cues()).toEqual(["select", "dismiss"]);
+    expect(container.querySelector(".ps-card")).toBeNull();
   });
 });

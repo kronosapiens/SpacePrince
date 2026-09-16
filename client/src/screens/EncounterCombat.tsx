@@ -69,23 +69,20 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Study mode (the inspect "i") — sticky across inspections, so a learner can
   // sweep the chart without re-toggling. Commit-safe: a pure display flag.
   const [study, setStudy] = useState(false);
-  // The armed verb — first click on an action button arms it, a second
-  // commits. Identical on pointer and touch.
-  const [pendingAction, setPendingAction] = useState<Polarity | null>(null);
-  // The verb under the pointer in the panel — the free desktop preview while
-  // nothing is armed. Once a verb is armed it holds, matching the planet axis:
-  // commitment makes hover inert, and only a click switches. Never part of the
-  // commit gesture.
-  const [hoveredAction, setHoveredAction] = useState<Polarity | null>(null);
+  const [previewAction, setPreviewAction] = useState<Polarity | null>(null);
   const [hoveredOpponent, setHoveredOpponent] = useState<PlanetName | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guidePhase, setGuidePhase] = useState<CombatGuidePhase>("read");
+  const [guideAction, setGuideAction] = useState<Polarity | null>(null);
   const guideSnapshot = useRef<{
     selected: PlanetName | null;
-    pendingAction: Polarity | null;
     study: boolean;
   } | null>(null);
   const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
+
+  useEffect(() => {
+    setPreviewAction(null);
+  }, [encounter.id, encounter.turnIndex]);
 
   // `over` is derived (STATE.md): the run ended once every fielded planet combust.
   const runEnded = isOver(run, prince.chart, prince.numEncounters);
@@ -174,29 +171,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [prince.chart, encounter.opponentChart],
   );
 
-  // The panel (with its action buttons) is click-only: hovering the chart
-  // highlights a planet but never pops the panel, so nothing modal flickers as
-  // the mouse moves. Tap a planet to inspect, tap to commit.
+  // Inspection pins the panel so its action buttons remain reachable.
   const inspected = selected;
 
-  // The projection badges, though, are hover-free on desktop (SCREENS.md §3.6:
-  // hover is the tap-preview's information at no cost). Selection wins, and
-  // wholly: while the panel is up, hover is inert on both charts (the
-  // `hoveredPlanet` props gate on `selected`) — otherwise a stray hover paints
-  // one planet's aspect lines under another planet's projection chips, a false
-  // composite. Browsing previews freely; considering holds one candidate's
-  // complete truth until a tap switches or clears. Touch, with no hover, keeps
-  // the tap-only flow.
+  // Selection holds one planet's complete preview while its panel is open.
   const previewPlanet = selected ?? hovered;
 
-  // One rule governs the preview: verb-dependent information appears only
-  // while a verb is indicated — armed in the panel, or hovered while nothing
-  // is armed (armed wins, like selection wins on the planet axis). The
-  // defensive read is verb-free and appears everywhere. With no verb the
-  // valence input is an inert placeholder — only the self side is displayed
-  // then, and with modelPreemption off that side doesn't depend on the
-  // player's verb: the blow is shown landing.
-  const indicatedVerb = pendingAction ?? hoveredAction;
+  // Hover/focus supplies the action; the guide keeps an example visible.
+  // Without a verb only the defensive preview is determined.
+  const indicatedVerb = previewAction ?? (guideOpen && guidePhase === "act" ? guideAction : null);
   const projection = useMemo(() => {
     if (animation) return null;
     if (!previewPlanet || !opponentTurn) return null;
@@ -260,7 +243,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [animation, encounter, opponentTurn, opponentAction, playerUnlocked, run.state, prince.chart]);
 
   // The warnings stay conservative under any preview — their meaning is "dies
-  // if the blow lands," which holds. An armed afflict that preempts tells its
+  // if the blow lands," which holds. An afflict preview that preempts tells its
   // own story through the exact projection: their actor shows the kill and no
   // incoming chips appear.
   const selfWarnings = combustWarnings?.self ?? null;
@@ -326,8 +309,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         }
       : null;
 
-  // Click/tap a planet to select it — this is the only way the panel opens, and
-  // it stays put (the commit path) until commit or another planet is clicked.
+  // Planet activation opens inspection without committing a turn.
   const handlePlayerClick = useCallback(
     (planet: PlanetName) => {
       if (encounter.resolved) return;
@@ -335,21 +317,19 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         skipAnimation();
         playUISound("dismiss");
         setSelected(null);
-        setPendingAction(null);
-        setHoveredAction(null);
+        setPreviewAction(null);
         return;
       }
       if (guideOpen && guidePhase !== "act") return;
       if (!playerUnlocked.includes(planet)) return;
       if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
       if (selected !== planet) playUISound("select");
-      else if (pendingAction !== (guideOpen ? "Testimony" : null)) playUISound(guideOpen ? "select" : "dismiss");
       setSelected(planet);
       setHovered(null);
-      setPendingAction(guideOpen ? "Testimony" : null);
-      setHoveredAction(null);
+      if (guideOpen) setGuideAction("Testimony");
+      setPreviewAction(null);
     },
-    [animation, encounter.resolved, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase, selected, pendingAction],
+    [animation, encounter.resolved, prince.chart, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase, selected],
   );
 
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
@@ -359,7 +339,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Commit the chosen action for a specific planet (the one whose panel is open).
   const handleCommit = useCallback(
     (planet: PlanetName, action: Polarity) => {
-      if (animation || encounter.resolved || !opponentTurn) return;
+      if (guideOpen || animation || encounter.resolved || !opponentTurn) return;
       if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
       // Deterministic per (run, encounter, turn) — same seed produces the
       // same fight every time, which is the point of `/encounter/<seed>`.
@@ -369,8 +349,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       const previousRun = run;
       const previousEncounter = encounter;
       // Snapshot the projection for the *chosen* action so the badges shown
-      // during playback match the committed turn (the live projection previews
-      // the planet's default verb, which may differ from what was clicked).
+      // during playback match the committed turn, independent of hover/focus.
       const projectionSnapshot = computeProjectedEffects({
         playerChart: prince.chart,
         opponentChart: encounter.opponentChart,
@@ -396,10 +375,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       });
       setSelected(null);
       setHovered(null);
-      setPendingAction(null);
-      setHoveredAction(null);
+      setPreviewAction(null);
     },
-    [animation, encounter, run, opponentTurn, opponentAction, prince.chart, onCommitTurn, startAnimation],
+    [guideOpen, animation, encounter, run, opponentTurn, opponentAction, prince.chart, onCommitTurn, startAnimation],
   );
 
   // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
@@ -442,8 +420,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     [animation, skipAnimation, encounter, run, prince.chart, startAnimation],
   );
 
-  // The action fan-out rides the bottom of the stats panel — local to the
-  // planet. Shown for the inspected planet (hover or select) when committable.
+  // Actions belong to the inspected planet; activation supplies the verb.
   const playerActions: PlanetStatsActions | undefined =
     inspected && !animation && !encounter.resolved &&
     !isCombusted(prince.chart.planets[inspected], run.state[inspected])
@@ -452,23 +429,16 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             { verb: "Testimony", value: getEffectiveStats(prince.chart, inspected).witness },
             { verb: "Affliction", value: getEffectiveStats(prince.chart, inspected).impact },
           ],
-          pending: pendingAction,
-          // First click/tap arms the action (and previews its spread); a second
-          // on the same action confirms. Uniform across pointer and touch.
+          preview: indicatedVerb,
           onChoose: (v) => {
-            if (!guideOpen && pendingAction === v) handleCommit(inspected, v);
-            else if (pendingAction !== v) {
-              playUISound("select");
-              setPendingAction(v);
+            if (guideOpen) {
+              if (guideAction !== v) playUISound("select");
+              setGuideAction(v);
+            } else {
+              handleCommit(inspected, v);
             }
           },
-          onClearPending: () => {
-            if (!guideOpen && pendingAction) {
-              playUISound("dismiss");
-              setPendingAction(null);
-            }
-          },
-          onHoverAction: setHoveredAction,
+          onPreview: setPreviewAction,
         }
       : undefined;
 
@@ -479,46 +449,45 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       playUISound("dismiss");
       setSelected(null);
       setHovered(null);
-      setPendingAction(null);
-      setHoveredAction(null);
+      setPreviewAction(null);
     }
   }, [animation, guideOpen, selected]);
 
   const openGuide = useCallback(() => {
     if (animation) skipAnimation();
-    guideSnapshot.current = { selected, pendingAction, study };
+    guideSnapshot.current = { selected, study };
     setSelected(null);
-    setPendingAction(null);
+    setGuideAction(null);
     setHovered(null);
-    setHoveredAction(null);
+    setPreviewAction(null);
     setStudy(false);
     setGuidePhase("chart");
     setGuideOpen(true);
-  }, [animation, pendingAction, selected, skipAnimation, study]);
+  }, [animation, selected, skipAnimation, study]);
 
   const closeGuide = useCallback(() => {
     const snapshot = guideSnapshot.current;
     setGuideOpen(false);
     setSelected(snapshot?.selected ?? null);
-    setPendingAction(snapshot?.pendingAction ?? null);
+    setGuideAction(null);
     setStudy(snapshot?.study ?? false);
     setHovered(null);
-    setHoveredAction(null);
+    setPreviewAction(null);
     guideSnapshot.current = null;
   }, []);
 
   const changeGuidePhase = useCallback((next: CombatGuidePhase) => {
     setGuidePhase(next);
     setHovered(null);
-    setHoveredAction(null);
+    setPreviewAction(null);
     setStudy(false);
     if (next === "act" && guidePlanet && !encounter.resolved) {
       setSelected(guidePlanet);
-      setPendingAction("Testimony");
+      setGuideAction("Testimony");
       return;
     }
     setSelected(null);
-    setPendingAction(null);
+    setGuideAction(null);
   }, [encounter.resolved, guidePlanet]);
 
   return (
@@ -541,7 +510,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           examplePlanet={guidePlanet}
           exampleAspect={guideAspect}
           selectedPlanet={selected}
-          pendingAction={pendingAction}
+          previewAction={indicatedVerb}
           projectedLight={projectedLight?.value ?? null}
           onOpen={openGuide}
           onClose={closeGuide}
@@ -672,6 +641,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           onToggleStudy={guideOpen ? undefined : () => {
             playUISound(study ? "dismiss" : "select");
             setStudy(!study);
+            setPreviewAction(null);
           }}
           inviteInteraction={!animation && !encounter.resolved && !selected}
           ringVerb={selected ? indicatedVerb : null}

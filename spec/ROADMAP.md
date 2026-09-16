@@ -109,7 +109,8 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
   Explore behind a dev toggle after the testify-spam playtest settles.
 - **Shareable run states** (`SCREENS.md §4.2.1`).
   Depends on lossless history; a URL-shareable map walk is the social artifact for a single-player game.
-- **Accessibility color channel** (`STYLE.md §14`) and the mobile portrait pass — audit that nothing bakes in horizontal-only assumptions.
+- **Accessibility color channel** (`STYLE.md §14`).
+- **Mobile adaptation** is deferred while desktop interaction and legibility take priority.
 - **House wedges on the chart** (`STYLE.md §11` describes them; not yet drawn) — prerequisite for the houses-encountered flourish above.
 - **Testify-spam watch** (combat model, pending playtest).
   The first lever is pulled: opponent spawn affliction is three absolute tiers of `12`/`24`/`36` (`MECHANICS.md` §11), shallow enough that the pool drains mid-encounter and afflict-to-set-up becomes necessary rather than optional.

@@ -96,7 +96,7 @@ describe("entry screens", () => {
     expect(loadPrince()).toEqual(prince);
   });
 
-  it("inspects knocked-out planets and retains study details without moving, while route selection still needs two taps", () => {
+  it("inspects knocked-out planets safely and enters a route on its first click", () => {
     const prince = mount("map");
     act(() => element('[role="button"][aria-label="Moon"]').dispatchEvent(
       new KeyboardEvent("keydown", { key: " ", bubbles: true }),
@@ -113,10 +113,7 @@ describe("entry screens", () => {
     const next = eligibleNext(map.graph, map.currentNodeId, map.visitedNodeIds)[0]!;
     vi.mocked(playUISound).mockClear();
     click(element(`[data-guide="node-${next}"]`));
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
-    expect(loadPrince()).toEqual(prince);
-    click(element(`[data-guide="node-${next}"]`));
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     const run = loadPrince()!.runs[0]!;
     expect(run.map.currentNodeId).toBe(next);
     expect(run.encounter).not.toBeNull();

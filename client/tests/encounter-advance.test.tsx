@@ -71,7 +71,6 @@ function commit(verb = "Afflict") {
   click(get('[data-guide="planet-self-moon"]'));
   const action = Array.from(container.querySelectorAll(".ps-action")).find(el => el.textContent?.startsWith(verb))!;
   click(action);
-  click(action);
 }
 function settle() {
   let steps = 0;
@@ -94,9 +93,7 @@ describe("encounter advancement", () => {
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     const action = get('[data-guide="action-testimony"]');
     click(action);
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["select"]]);
-    click(action);
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["select"], ["commit"]]);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
   });
 
   it("waits for the full propagation playback and final pause before returning to the map", () => {
@@ -201,7 +198,6 @@ describe("encounter advancement", () => {
     run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: "livelihood-coin", fragmentId: "test" });
     prince.runs = [run];
     mount(prince);
-    click(get('[data-guide="option-1"]'));
     click(get('[data-guide="option-1"]'));
     expect(container.querySelector(".narrative.is-resolved")).not.toBeNull();
     advanceTime(1799);

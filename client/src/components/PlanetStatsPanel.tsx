@@ -12,15 +12,9 @@ import { playFocusSound, playHoverSound } from "@/audio/interaction";
 /** The panel owns action layout; the encounter owns preview and commit. */
 export interface PlanetStatsActions {
   choices: Array<{ verb: Polarity; value: number }>;
-  pending: Polarity | null;
+  preview: Polarity | null;
   onChoose: (v: Polarity) => void;
-  /** Clear the armed verb without dismissing the panel — fired when a click
-   *  lands on the card but off the action buttons. */
-  onClearPending: () => void;
-  /** The verb under the pointer (null on leave) — the free desktop preview of
-   *  what a click there would do. Touch-synthesized mouse events are harmless:
-   *  they converge on the verb the tap arms. */
-  onHoverAction?: (v: Polarity | null) => void;
+  onPreview: (v: Polarity | null) => void;
 }
 
 interface PlanetStatsPanelProps {
@@ -38,6 +32,8 @@ interface PlanetStatsPanelProps {
    *  measured from content; this is the placement reserve and first-paint value. */
   height: number;
   actions?: PlanetStatsActions;
+  /** Actual narrative effect, computed by the encounter's resolver. */
+  effect?: { verb: Polarity; value: number };
   /** Study mode on — the card drops open to the gloss + stat table. */
   study?: boolean;
   /** When provided, the panel shows the study "i" toggle. */
@@ -91,9 +87,16 @@ export function PlanetStatsPanel({
   cy,
   height,
   actions,
+  effect,
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
+  const hoveredAction = useRef<Polarity | null>(null);
+  const focusedAction = useRef<Polarity | null>(null);
+  useEffect(() => {
+    hoveredAction.current = null;
+    focusedAction.current = null;
+  }, [planet, study]);
   // Tap a disclosure triangle — a stat row's (provenance) or a Core/Place
   // column head's (what the column means) — to drop prose below the table;
   // one open at a time.
@@ -134,23 +137,16 @@ export function PlanetStatsPanel({
 
   return (
     <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
-      {/* Swallow clicks on the card itself (padding, gloss, read-outs) so they
-          don't bubble to the combat container's clear-selection handler — only
-          clicking off the panel should dismiss it. A card click does un-arm a
-          pending verb, though: backing out of a choice shouldn't require
-          leaving the panel. */}
+      {/* Reading the card never dismisses inspection or commits an action. */}
       <div
         className="ps-card"
         data-guide="planet-panel"
         onClick={(e) => {
           e.stopPropagation();
-          if (actions?.pending) actions.onClearPending();
         }}
       >
         <div className="ps-content" ref={contentRef}>
-          {/* The disclosure triangle alone is the toggle target (here and on
-              rows/column heads below) — the surrounding text stays inert so
-              stray clicks fall through to the card's un-arm/deselect swallow. */}
+          {/* Only the disclosure triangle toggles study; its label stays inert. */}
           <div className={`ps-title ${study ? "is-open" : ""}`}>
             {/* Name and remaining-of-Resolve share the line. The panel is where
                 numbers live, so this is the one place the arc's quantity is
@@ -267,22 +263,40 @@ export function PlanetStatsPanel({
                     <button
                       type="button"
                       key={a.verb}
-                      className={`ps-action ${actions.pending === a.verb ? "is-on" : ""}`}
-                      aria-pressed={actions.pending === a.verb}
+                      className={`ps-action ${actions.preview === a.verb ? "is-previewed" : ""}`}
                       data-guide={`action-${a.verb.toLowerCase()}`}
                       style={{ "--vc": VALENCE_COLOR[a.verb] } as CSSProperties}
                       onClick={(e) => {
                         e.stopPropagation();
                         actions.onChoose(a.verb);
                       }}
-                      onMouseEnter={() => actions.onHoverAction?.(a.verb)}
-                      onMouseLeave={() => actions.onHoverAction?.(null)}
+                      onMouseEnter={() => {
+                        hoveredAction.current = a.verb;
+                        actions.onPreview(a.verb);
+                      }}
+                      onMouseLeave={() => {
+                        hoveredAction.current = null;
+                        actions.onPreview(focusedAction.current);
+                      }}
                       onPointerEnter={playHoverSound}
-                      onFocus={playFocusSound}
+                      onFocus={(e) => {
+                        focusedAction.current = a.verb;
+                        actions.onPreview(a.verb);
+                        playFocusSound(e);
+                      }}
+                      onBlur={() => {
+                        focusedAction.current = null;
+                        actions.onPreview(hoveredAction.current);
+                      }}
                     >
                       {a.verb === "Testimony" ? "Testify" : "Afflict"} {a.value}
                     </button>
                   ))}
+                </div>
+              )}
+              {effect && (
+                <div className="ps-effect" style={{ color: VALENCE_COLOR[effect.verb] }}>
+                  {effect.verb === "Testimony" ? "Testify" : "Afflict"} {effect.value}
                 </div>
               )}
             </div>

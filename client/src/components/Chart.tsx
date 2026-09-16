@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import { combustionCeiling, isCombusted, wouldCombust } from "@/game/combust";
@@ -129,7 +129,7 @@ export interface ChartProps {
   state?: Partial<Record<PlanetName, PlanetStatus>>;
   /** Planets the player has not yet revealed. Render as ghost (dashed outline, faded glyph). */
   unlockedPlanets?: PlanetName[];
-  /** Tap-preview selection. Highlights planet with gold selection ring, brightens its aspects. */
+  /** Inspected planet. Holds its ring and aspect emphasis. */
   selectedPlanet?: PlanetName | null;
   /** Always-active planet (e.g. opponent-of-the-turn). Pulses with full halo. */
   activePlanet?: PlanetName | null;
@@ -160,7 +160,7 @@ export interface ChartProps {
   /** Explicit narrative targets; may include combusted planets for revival. */
   interactionPlanets?: ReadonlySet<PlanetName>;
   /** The verb determined for whichever planet is wearing the ring — the
-   *  opponent's precommit, or the player's armed/indicated choice. Colours the
+   *  opponent's precommit, or the player's indicated choice. Colours the
    *  ring; without one it stays neutral. Only ever one planet at a time wears a
    *  steady ring, and an inviting planet has no verb yet, so a single value
    *  covers the chart. */
@@ -203,6 +203,7 @@ export interface ChartProps {
   statsPanelPlanet?: PlanetName | null;
   /** When set, render the combat action fan-out under the stats panel. */
   statsPanelActions?: PlanetStatsActions;
+  statsPanelEffect?: { verb: Polarity; value: number };
   /** Reserve the taller (action-row) panel height when placing, so the panel
    *  doesn't shift between hover (stats only) and select (stats + actions). */
   statsPanelReserveActions?: boolean;
@@ -248,10 +249,19 @@ export function Chart(props: ChartProps) {
     animationEpoch,
     statsPanelPlanet,
     statsPanelActions,
+    statsPanelEffect,
     statsPanelReserveActions,
     statsPanelStudy,
     onToggleStudy,
   } = props;
+
+  const pointerPlanet = useRef<PlanetName | null>(null);
+  const focusPlanet = useRef<PlanetName | null>(null);
+  const canPreview = !!onPlanetHover && !passive;
+  useEffect(() => {
+    pointerPlanet.current = null;
+    focusPlanet.current = null;
+  }, [canPreview]);
 
   const tuning = useTuning();
   const points = useMemo(() => buildPlanetPoints(chart, PLANET_R_REST), [chart]);
@@ -372,7 +382,15 @@ export function Chart(props: ChartProps) {
     : null;
 
   const handleClick = onPlanetClick && !passive ? onPlanetClick : undefined;
-  const handleHover = onPlanetHover && !passive ? onPlanetHover : undefined;
+  // A new hover or focus supplies the preview; leaving restores the other input.
+  const handleHover = canPreview ? (planet: PlanetName | null) => {
+    pointerPlanet.current = planet;
+    onPlanetHover?.(planet ?? focusPlanet.current);
+  } : undefined;
+  const handleFocus = canPreview ? (planet: PlanetName | null) => {
+    focusPlanet.current = planet;
+    onPlanetHover?.(planet ?? pointerPlanet.current);
+  } : undefined;
 
   // Sacred-geometry ground (static hexagram + vesica), shown by default.
   const substrate = showSubstrate ? renderSubstrate() : null;
@@ -456,6 +474,7 @@ export function Chart(props: ChartProps) {
             hovered={isHovered}
             onClick={handleClick}
             onHover={handleHover}
+            onFocus={handleFocus}
             passive={passive}
             eligible={interactionPlanets ? interactionPlanets.has(p.planet) : !combusted}
             invite={inviteInteraction}
@@ -526,6 +545,7 @@ export function Chart(props: ChartProps) {
           cy={panelPlacement.cy}
           height={panelHeight}
           actions={statsPanelActions}
+          effect={statsPanelEffect}
           study={statsPanelStudy}
           onToggleStudy={onToggleStudy}
         />
@@ -544,7 +564,7 @@ function PlanetGlyph({
   tuning,
   point, combusted, ghost,
   selected, active, hovered,
-  onClick, onHover, passive, eligible, invite, ringVerb,
+  onClick, onHover, onFocus, passive, eligible, invite, ringVerb,
   actionPulse, combusting,
   impactPolarity,
   animationEpoch,
@@ -559,6 +579,7 @@ function PlanetGlyph({
   hovered: boolean;
   onClick?: (p: PlanetName) => void;
   onHover?: (p: PlanetName | null) => void;
+  onFocus?: (p: PlanetName | null) => void;
   passive: boolean;
   eligible: boolean;
   invite: boolean;
@@ -653,9 +674,13 @@ function PlanetGlyph({
       onPointerEnter={handleEnter ? playHoverSound : undefined}
       onFocus={(e) => {
         setFocused(true);
+        if (interactive) onFocus?.(point.planet);
         if (handleEnter) playFocusSound(e);
       }}
-      onBlur={() => setFocused(false)}
+      onBlur={() => {
+        setFocused(false);
+        if (interactive) onFocus?.(null);
+      }}
       style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}
     >

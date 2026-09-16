@@ -125,15 +125,17 @@ Each scene has one prompt and at most three visible choices, including any exit.
 The default is two substantive offers and a way to decline.
 Chart-conditioned offers replace their standard counterparts within that limit.
 There are no child nodes, intermediate rewards, cash-outs, or traversal state.
-Selecting targets and inspecting previews are preparation for the decision, with no gameplay effects.
+Choosing an option that needs a target and inspecting previews are preparation for the decision, with no gameplay effects.
 
 ### 5.2 Commitment
 
-Tap an option to arm it.
-For a targeted effect, the shared encounter center mark invites selection on the chart.
-Tap an eligible planet to preview its exact consequence, then confirm beneath its readout.
-An option without a requested target commits on a second tap of that option.
-Hover adds a preview without committing; selecting a planet holds the preview until the player changes or clears it.
+Hover or keyboard focus previews an option's determined effects without committing.
+Activate an option without a requested target once to resolve it.
+An option that needs a target enters targeting and invites eligible planets on the chart.
+Hover or focus a planet to preview its exact consequence in the shared readout; activate that planet once to resolve the choice.
+Previewing another option leaves the selected targeting option unchanged.
+Choosing another option replaces it; background click or Escape cancels targeting.
+Outside targeting, planet activation remains safe inspection.
 A resolved encounter cannot resolve again.
 Its consequence is shown before returning to the map; the lifetime encounter count advances on leaving the resolved scene.
 
@@ -184,7 +186,7 @@ The alpha schema resets old tree-based saves rather than migrating them.
 - **Consequence:** one specific sentence for the immediate result.
 
 Mechanics belong in the aside, not in the scene's prose.
-Planet previews and confirmation amounts show the actual changes from the shared resolver, including recovery clamped to current affliction.
+Planet previews and read-only effect amounts show the actual changes from the shared resolver, including recovery clamped to current affliction.
 Player-facing text uses encounter, self, and other; named Light and Resolve follow the shared copy register.
 
 ## 10. Validation

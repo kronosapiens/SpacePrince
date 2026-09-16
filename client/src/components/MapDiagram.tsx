@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { playUISound } from "@/audio/engine";
+import { useMemo, useState, type CSSProperties } from "react";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
@@ -34,17 +33,9 @@ const TIER = {
 } as const;
 
 export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
-  // Tap-to-preview / tap-again-to-commit, mirroring the encounter screen's
-  // grammar. First click on an eligible node highlights it; a second click
-  // on the same node fires onSelectNode. Clicking a different eligible node
-  // switches the highlight without committing.
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-
-  // Reset preview when the player actually moves (current node changes).
-  useEffect(() => {
-    setSelectedNodeId(null);
-  }, [map.currentNodeId]);
+  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
+  const indicatedNodeId = onSelectNode ? hoveredNodeId ?? focusedNodeId : null;
 
   const positioned = useMemo(() => {
     const raw = layoutNodes(map.graph.nodes);
@@ -130,13 +121,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const eligibleEdge =
       (e.from === map.currentNodeId && eligible.has(e.to)) ||
       (e.to === map.currentNodeId && eligible.has(e.from));
-    // The eligible-edge highlight is reserved for the *engaged* state: when
-    // the player has tap-previewed a specific eligible node, the edge to it
-    // brightens. At rest the eligible nodes themselves carry the "options"
-    // signal; edges stay quiet so the chart doesn't chatter.
-    const isSelectedEdge = eligibleEdge && selectedNodeId !== null &&
-      (e.from === selectedNodeId || e.to === selectedNodeId);
-    const inReach = traversedEdge || isSelectedEdge;
+    // Hover or focus highlights the route to an eligible node.
+    // At rest the nodes carry the invitation and edges stay quiet.
+    const isIndicatedEdge = eligibleEdge && indicatedNodeId !== null &&
+      (e.from === indicatedNodeId || e.to === indicatedNodeId);
+    const inReach = traversedEdge || isIndicatedEdge;
     const cA = nodeColor(e.from);
     const cB = nodeColor(e.to);
     const gid = `m2-edge-${i}`;
@@ -151,9 +140,9 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     );
     // Tier:
     //   - Traversed: your committed past — gradient + TIER.traversed
-    //   - Selected: the eligible edge you've tap-previewed — gradient + TIER.eligible
-    //   - Everything else (background or unselected eligible): faint bone + TIER.background
-    const tier = traversedEdge ? TIER.traversed : isSelectedEdge ? TIER.eligible : TIER.background;
+    //   - Hovered/focused: the previewed route — gradient + TIER.eligible
+    //   - Everything else: faint bone + TIER.background
+    const tier = traversedEdge ? TIER.traversed : isIndicatedEdge ? TIER.eligible : TIER.background;
     const opacity = tier.opacity;
     const sw = tier.stroke;
     return (
@@ -201,20 +190,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       );
     }
 
-    const isSelected = isEligible && n.id === selectedNodeId;
     const selectNode = onSelectNode && isEligible
-      ? () => {
-          if (selectedNodeId === n.id) {
-            onSelectNode(n.id);
-            setSelectedNodeId(null);
-          } else {
-            playUISound("select");
-            setSelectedNodeId(n.id);
-          }
-        }
+      ? () => onSelectNode(n.id)
       : undefined;
     const isClickable = !!selectNode;
-    const isHovered = isClickable && hoveredNodeId === n.id;
+    const isIndicated = isClickable && (indicatedNodeId === n.id || focusedNodeId === n.id);
 
     return (
       <g
@@ -223,7 +203,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         role={isClickable ? "button" : undefined}
         tabIndex={isClickable ? 0 : undefined}
         aria-label={isClickable ? isNarrative ? `House ${romanHouse(content.house)}` : `${r ?? "Planet"} encounter` : undefined}
-        aria-pressed={isClickable ? isSelected : undefined}
         onClick={selectNode ? (e) => { e.stopPropagation(); selectNode(); } : undefined}
         onKeyDown={selectNode ? (e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -235,8 +214,12 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
         onMouseEnter={isClickable ? () => setHoveredNodeId(n.id) : undefined}
         onMouseLeave={isClickable ? () => setHoveredNodeId(null) : undefined}
         onPointerEnter={isClickable ? playHoverSound : undefined}
-        onFocus={isClickable ? (e) => { setHoveredNodeId(n.id); playFocusSound(e); } : undefined}
-        onBlur={isClickable ? () => setHoveredNodeId(null) : undefined}
+        onFocus={isClickable ? (e) => {
+          setHoveredNodeId(null);
+          setFocusedNodeId(n.id);
+          playFocusSound(e);
+        } : undefined}
+        onBlur={isClickable ? () => setFocusedNodeId(null) : undefined}
         style={{ cursor: isClickable ? "pointer" : "default", color }}
       >
         {isCurrent && (
@@ -246,28 +229,19 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
               stroke={color} strokeOpacity="0.95" strokeWidth={1.2} />
           </>
         )}
-        {/* Eligible (not yet previewed): the breathing "you can go here" glow —
-            halo + ring in the node's color, snapping to full brightness on hover.
-            Ceases on every node once any node is previewed (focus collapses to
-            the chosen one), mirroring the combat chart's invite affordance. */}
-        {isEligible && !isSelected && !selectedNodeId && (
+        {/* Eligible nodes breathe until hover or focus makes the invitation steady. */}
+        {isEligible && (
           <>
             {/* Resting opacity comes from the class (the shared --breath clock);
-                inline opacity only on hover, so it doesn't shadow the calc. */}
+                inline opacity only during preview, so it doesn't shadow the calc. */}
             <circle r={NODE_R * 1.8} fill={`url(#m2-halo-${n.id})`}
-              className={isHovered ? undefined : "anim-invite-glow"}
-              style={{ opacity: isHovered ? 1 : undefined, pointerEvents: "none" }} />
+              className={isIndicated ? undefined : "anim-invite-glow"}
+              style={{ opacity: isIndicated ? 1 : undefined, pointerEvents: "none" }} />
             {/* Stroke 3 ≈ the chart invite's heavy ring scaled to node radius. */}
             <circle r={NODE_R + 6} fill="none" stroke={color} strokeWidth={3}
-              className={isHovered ? "invite-ring" : "invite-ring anim-invite-ring"}
-              style={{ opacity: isHovered ? 1 : undefined, pointerEvents: "none" }} />
+              className={isIndicated ? "invite-ring" : "invite-ring anim-invite-ring"}
+              style={{ opacity: isIndicated ? 1 : undefined, pointerEvents: "none" }} />
           </>
-        )}
-        {/* Tap-previewed: the distinctive commit ring (same role as the combat
-            selection ring). */}
-        {isSelected && (
-          <circle r={NODE_R + 10} fill="none"
-            stroke={color} strokeOpacity="1" strokeWidth={2.4} />
         )}
         <circle r={NODE_R}
           data-guide={`node-${n.id}`}
@@ -332,10 +306,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
       style={{ width: "100%", height: "100%", ...style }}
       role="img"
       aria-label="Map"
-      onClick={() => {
-        if (selectedNodeId) playUISound("dismiss");
-        setSelectedNodeId(null);
-      }}
     >
       <defs>{edgeDefs}{haloDefs}</defs>
       {edgeEls}

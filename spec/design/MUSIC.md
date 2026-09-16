@@ -196,7 +196,6 @@ The ruler governs the pitch collection throughout an encounter; actors and targe
 
 The shared-tonic decision is made now *because* (b) needs it, but v1 ships the jukebox.
 In practice this means composing each battle core so it can also stand as an isolated, loopable stem over the common drone — the same material, deployed either way.
-This mirrors `STYLE.md`'s mobile stance: (b) does not have to be built yet, only to stay *possible*.
 
 ---
 

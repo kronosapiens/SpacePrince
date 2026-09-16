@@ -909,24 +909,29 @@
   filter: drop-shadow(0 0 calc(5px + 5px * var(--breath)) var(--vc));
   transform: scale(calc(1 + 0.04 * var(--breath)));
 }
-/* No hover state: the verbs keep breathing under the pointer (unlike the
-   rings, whose breath snaps steady on hover). */
-/* Once a verb is armed, its sibling falls still — the armed verb is the one
-   promoted next click. The sibling stays clickable; it just stops asking. */
-.ps-actions:has(.is-on) .ps-action:not(.is-on) {
+/* Indicating an action holds both buttons steady while its effect is read. */
+.ps-actions:has(.is-previewed) .ps-action {
   filter: drop-shadow(0 0 5px var(--vc));
   transform: none;
 }
-/* Armed: filled, glowing harder than the pre-arm breath; the swell carries
-   over from the base rule, still on the shared clock. */
-.ps-action.is-on {
+.ps-action.is-previewed {
   background: var(--vc);
   color: var(--void);
-  filter: drop-shadow(0 0 calc(8px + 6px * var(--breath)) var(--vc));
+  filter: drop-shadow(0 0 8px var(--vc));
+}
+.ps-action:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 4px;
+}
+.ps-effect {
+  margin-top: 20px;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-style: italic;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ps-action,
-  .ps-action.is-on { animation: none; }
+  .ps-action { transform: none; }
 }
 
 /* Open: the symbolic gloss + the derivation table. */
@@ -1171,12 +1176,16 @@
      to solid on hover. It follows the chart's shared breath. */
   box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) calc(22% + 38% * var(--breath)), transparent);
 }
-.option:hover {
+.option:hover,
+.option.is-preview {
   background: rgba(232, 226, 212, 0.04);
   box-shadow: inset 2px 0 0 0 var(--vc);
 }
-/* First tap arms an option (mirrors combat's armed action): a soft glow in the
-   aria planet's color. Targeted choices continue on the chart. */
+.option:focus-visible {
+  outline: 2px solid var(--vc);
+  outline-offset: 3px;
+}
+/* The selected option supplies the action while choosing a target. */
 .option.is-selected {
   background: color-mix(in srgb, var(--vc) 8%, transparent);
   box-shadow: inset 3px 0 0 0 var(--vc);
@@ -1188,9 +1197,8 @@
 .narrative-options.is-resolved .option { box-shadow: none; text-shadow: none; }
 .narrative-options.is-resolved .option.is-selected { box-shadow: inset 3px 0 0 0 var(--vc); }
 .narrative-options.is-resolved .option:not(.is-selected) { opacity: 0.4; }
-/* Once an option is armed, the other options' invite pulse ceases — focus
-   collapses to the armed choice (mirrors combat clearing the chart glow on select). */
-.narrative-options.is-arming .option:not(.is-selected) { box-shadow: none; }
+/* Other options stay available while the selected choice awaits a target. */
+.narrative-options.is-targeting .option:not(.is-selected):not(.is-preview):not(:hover) { box-shadow: none; }
 .option-index {
   font-family: var(--serif);
   color: var(--mist);

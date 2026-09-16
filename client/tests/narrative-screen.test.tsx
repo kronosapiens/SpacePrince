@@ -47,9 +47,14 @@ function mount(id: string) {
   const encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id, fragmentId: "test" });
   run.encounter = encounter;
   const onCommit = vi.fn();
-  act(() => root.render(<EncounterNarrativeScreen prince={prince} run={run} encounter={encounter}
-    onCommit={onCommit} onClearEncounter={vi.fn()} />));
-  return { run, onCommit };
+  const render = (nextRun = run) => {
+    if (nextRun.encounter?.kind !== "narrative") throw new Error("Expected narrative encounter");
+    const nextEncounter = nextRun.encounter;
+    act(() => root.render(<EncounterNarrativeScreen prince={prince} run={nextRun} encounter={nextEncounter}
+      onCommit={onCommit} onClearEncounter={vi.fn()} />));
+  };
+  render();
+  return { run, onCommit, render };
 }
 const element = (selector: string) => {
   const found = document.querySelector(selector);
@@ -62,62 +67,79 @@ const click = (selector: string) => act(() => {
 const choose = (planet: string) => act(() => {
   element(`[data-guide="planet-self-${planet}"]`).dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
 });
+const hoverPlanet = (planet: string) => act(() => {
+  element(`[data-guide="planet-self-${planet}"]`).dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+});
+const focus = (selector: string) => act(() => {
+  element(selector).dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+});
+const hoverOption = (index: number) => act(() => {
+  element(`[data-guide="option-${index}"]`).dispatchEvent(new MouseEvent("pointerover", { bubbles: true }));
+});
+const leaveOption = (index: number) => act(() => {
+  element(`[data-guide="option-${index}"]`).dispatchEvent(new MouseEvent("pointerout", { bubbles: true }));
+});
 
 describe("narrative chart interaction", () => {
-  it("previews revival on an eligible planet and commits once through its readout", () => {
-    const { run, onCommit } = mount("transformation-rite");
+  it("previews revival by focus and commits once on target activation", () => {
+    const { run, onCommit, render } = mount("transformation-rite");
+    const options = [...document.querySelectorAll(".option")].map((option) => option.textContent);
+    hoverOption(1);
+    expect(document.querySelector(".option.is-selected")).toBeNull();
+    expect(element('[data-guide="planet-self-moon"]').closest('[role="button"]')).not.toBeNull();
     click('[data-guide="option-1"]');
     expect(document.querySelector("select")).toBeNull();
     expect(document.querySelector('[data-guide="incoming"]')).not.toBeNull();
-    expect(element('[data-guide="planet-self-moon"]').getAttribute("role")).toBeNull();
+    expect(element('[data-guide="planet-self-moon"]').closest('[role="button"]')).toBeNull();
     click('[data-guide="option-1"]');
     expect(onCommit).not.toHaveBeenCalled();
-    choose("venus");
-    expect(playUISound).toHaveBeenLastCalledWith("select");
+    focus('[data-guide="planet-self-venus"]');
     expect(document.querySelector('[data-guide="arc-self-venus"] .arc-diff')).not.toBeNull();
-    expect(element(".ps-action").textContent).toBe(`Testify ${run.state.Venus.affliction / 2}`);
+    expect(element(".ps-effect").textContent).toBe(`Testify ${run.state.Venus.affliction / 2}`);
+    expect(document.querySelector(".ps-action")).toBeNull();
     expect(onCommit).not.toHaveBeenCalled();
     act(() => {
-      const action = element(".ps-action");
-      action.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      action.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      const target = element('[data-guide="planet-self-venus"]');
+      target.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      target.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     });
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(vi.mocked(playUISound).mock.calls.filter(([cue]) => cue === "commit")).toHaveLength(1);
     const next = onCommit.mock.calls[0]![0];
     expect(next.light).toBe(36);
     expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction / 2);
+    render(next);
+    expect([...document.querySelectorAll(".option")].map((option) => option.textContent)).toEqual(options);
+    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-1");
   });
 
-  it("holds a selected preview through hover and applies only the replacement target", () => {
+  it("previews multiple targets and applies the activated planet without a preceding hover", () => {
     const { onCommit } = mount("home-buried");
     const aside = element('[data-guide="option-aside-2"]').textContent;
     expect(aside).toBe("Testify 36 on a chosen planet");
     click('[data-guide="option-2"]');
-    act(() => element('[data-guide="planet-self-moon"]').dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    hoverPlanet("moon");
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
-    expect(element(".ps-action").textContent).toBe("Testify 10");
-    choose("moon");
-    act(() => element('[data-guide="planet-self-mars"]').dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
-    expect(element(".ps-name").textContent).toContain("MOON");
-    expect(element(".ps-action").textContent).toBe("Testify 10");
-    choose("mars");
+    expect(element(".ps-effect").textContent).toBe("Testify 10");
+    hoverPlanet("mars");
     expect(element(".ps-name").textContent).toContain("MARS");
-    expect(element(".ps-action").textContent).toBe("Testify 24");
+    expect(element(".ps-effect").textContent).toBe("Testify 24");
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
-    click(".ps-action");
+    expect(onCommit).not.toHaveBeenCalled();
+    click('[data-guide="planet-self-moon"]');
     const next = onCommit.mock.calls[0]![0];
-    expect(next.state.Mars.affliction).toBe(0);
-    expect(next.state.Moon.affliction).toBe(10);
+    expect(next.state.Mars.affliction).toBe(24);
+    expect(next.state.Moon.affliction).toBe(0);
   });
 
   it("keeps group healing at its authored amount while previewing and applying individual recovery", () => {
     const { run, onCommit } = mount("home-hearth");
     const aside = "Testify 24 on each lit planet · Lose 24 Light";
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
-    click('[data-guide="option-2"]');
     choose("sun");
+    hoverOption(2);
     expect(element(".ps-name").textContent).toContain("SUN");
+    expect(element(".ps-effect").textContent).toBe("Testify 10");
     expect(document.querySelector('[data-guide="arc-self-sun"] .arc-diff')).not.toBeNull();
     expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
     expect(onCommit).not.toHaveBeenCalled();
@@ -130,45 +152,107 @@ describe("narrative chart interaction", () => {
     expect(next.light).toBe(96);
   });
 
-  it("clears the target when changing the option or backing out of its readout", () => {
+  it("keeps the selected target action separate from option previews", () => {
     const { onCommit } = mount("home-buried");
     click('[data-guide="option-2"]');
-    choose("moon");
-    click('[data-guide="option-1"]');
-    expect(document.querySelector(".ps-action")).toBeNull();
-    expect(document.querySelector('[data-guide="incoming"]')).not.toBeNull();
+    hoverPlanet("moon");
+    hoverOption(1);
+    expect(element('.option.is-selected').getAttribute("data-guide")).toBe("option-2");
+    expect(element(".ps-effect").textContent).toBe("Afflict 48");
+    leaveOption(1);
+    hoverPlanet("moon");
+    expect(element(".ps-effect").textContent).toBe("Testify 10");
+    hoverOption(1);
     choose("mars");
-    click(".ps-card");
-    expect(document.querySelector(".ps-action")).toBeNull();
+    expect(onCommit.mock.calls[0]![0].state.Mars.affliction).toBe(0);
+    expect(onCommit.mock.calls[0]![0].light).toBe(120);
+  });
+
+  it("keeps focus previews after pointer exit and restores the selected action over the chart", () => {
+    const { onCommit } = mount("home-buried");
+    click('[data-guide="option-2"]');
+    focus('[data-guide="option-1"]');
+    hoverOption(2);
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-2");
+    leaveOption(2);
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-1");
+    hoverPlanet("moon");
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-2");
+    expect(element(".ps-effect").textContent).toBe("Testify 10");
+    act(() => element('[data-guide="planet-self-moon"]').dispatchEvent(new MouseEvent("mouseout", {
+      bubbles: true, relatedTarget: element('[data-guide="option-1"]'),
+    })));
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-1");
+    hoverOption(2);
+    focus('[data-guide="option-1"]');
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-1");
+    hoverOption(1);
+    focus('[data-guide="planet-self-mars"]');
+    expect(element('.option.is-preview').getAttribute("data-guide")).toBe("option-2");
+    expect(element(".ps-effect").textContent).toBe("Testify 24");
     expect(onCommit).not.toHaveBeenCalled();
+  });
+
+  it("clears target previews when changing options and cancels through Escape or background", () => {
+    const { onCommit } = mount("home-buried");
+    click('[data-guide="option-2"]');
+    hoverPlanet("moon");
+    click('[data-guide="option-1"]');
+    expect(document.querySelector(".ps-effect")).toBeNull();
+    expect(document.querySelector('[data-guide="incoming"]')).not.toBeNull();
+    act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
+    expect(document.querySelector(".option.is-selected")).toBeNull();
+    expect(document.querySelector('[data-guide="incoming"]')).toBeNull();
+    choose("mars");
+    expect(element(".ps-name").textContent).toContain("MARS");
+    expect(onCommit).not.toHaveBeenCalled();
+    click('[data-guide="option-2"]');
     click(".narrative");
     expect(document.querySelector(".option.is-selected")).toBeNull();
   });
 
-  it("blocks commitment in the guide and preserves the selection when closing it", () => {
+  it("blocks target commitment in the guide and preserves targeting when closing it", () => {
     const { onCommit } = mount("transformation-rite");
     click('[data-guide="option-1"]');
-    choose("venus");
     click('[aria-label="Study this scene"]');
+    focus('[data-guide="planet-self-venus"]');
+    expect(element(".ps-effect").textContent).toContain("Testify");
     vi.mocked(playUISound).mockClear();
-    click(".ps-action");
+    choose("venus");
     expect(onCommit).not.toHaveBeenCalled();
     expect(playUISound).not.toHaveBeenCalled();
     click('[aria-label="Close scene guide"]');
-    expect(element(".ps-action").getAttribute("aria-pressed")).toBe("true");
-    click(".ps-action");
+    expect(element('[data-guide="option-1"]').getAttribute("aria-pressed")).toBe("true");
+    choose("venus");
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(playUISound).toHaveBeenLastCalledWith("commit");
   });
 
-  it("confirms an untargeted option on its second tap", () => {
-    const { onCommit } = mount("livelihood-coin");
+  it("commits an untargeted option on first activation and keeps its result highlighted", () => {
+    const { onCommit, render } = mount("livelihood-coin");
+    const aside = element('[data-guide="option-aside-1"]').textContent;
     click('[data-guide="option-1"]');
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     expect(document.querySelector(".ps-action")).toBeNull();
-    expect(onCommit).not.toHaveBeenCalled();
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    const next = onCommit.mock.calls[0]![0];
+    expect(next.light).toBe(132);
+    render(next);
+    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-1");
+    expect(element('[data-guide="option-aside-1"]').textContent).toBe(aside);
+  });
+
+  it("blocks untargeted commitment and its sound while the guide is open", () => {
+    const { onCommit } = mount("livelihood-coin");
+    click('[aria-label="Study this scene"]');
+    vi.mocked(playUISound).mockClear();
     click('[data-guide="option-1"]');
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(playUISound).not.toHaveBeenCalled();
+    click('[aria-label="Close scene guide"]');
+    vi.mocked(playUISound).mockClear();
+    click('[data-guide="option-1"]');
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit.mock.calls[0]![0].light).toBe(132);
   });

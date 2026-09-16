@@ -35,7 +35,7 @@ export const GUIDE_COPY = {
     notes: {
       self: {
         label: "Self",
-        body: "This is your chart: seven planets with fixed positions. Pulsing rings mark planets available to act; tap to select.",
+        body: "This is your chart: seven planets with fixed positions. Pulsing rings mark planets available to act; click to inspect.",
       },
       other: {
         label: "Other",
@@ -71,7 +71,7 @@ export const GUIDE_COPY = {
       },
       actions: {
         label: "Damage or heal",
-        body: "Either action can earn Light, depending on the ruler. Tap once to preview the action, then again to confirm. Healing cannot revive combusted planets.",
+        body: "Either action can earn Light, depending on the ruler. Hover or focus to preview; click once to act. Healing cannot revive combusted planets.",
       },
       projection: {
         label: "{action} preview",
@@ -90,7 +90,7 @@ export const GUIDE_COPY = {
     notes: {
       here: {
         label: "You are here",
-        body: "Gather Light, your run's score. This node marks your location; lit nodes are next destinations. Tap once to preview, again to travel.",
+        body: "Gather Light, your run's score. This node marks your location. Hover or focus a lit node to see its route; click once to travel.",
       },
       encounter: {
         label: "An encounter",
@@ -102,7 +102,7 @@ export const GUIDE_COPY = {
       },
       chart: {
         label: "Your chart",
-        body: "Tap a planet to inspect it. Affliction is damage taken and persists between encounters. Combusted planets are knocked out until revived.",
+        body: "Click a planet to inspect it. Affliction is damage taken and persists between encounters. Combusted planets are knocked out until revived.",
       },
       crossing: {
         label: "The crossing",
@@ -136,8 +136,8 @@ export const GUIDE_COPY = {
         body: "The chorus is flavour text voiced by {ruler}. It sets the mood and reveals the planet's character.",
       },
       commit: {
-        label: "Preview, then confirm",
-        body: "Tap an option to preview, then tap again to confirm. Confirming ends the scene.",
+        label: "Preview, then choose",
+        body: "Hover or focus an option or target to preview. Click the option, then a planet if it needs a target. The choice ends the scene.",
       },
       aside: {
         label: "Costs and effects",

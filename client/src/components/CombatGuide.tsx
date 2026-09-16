@@ -38,7 +38,7 @@ interface CombatGuideProps {
   /** The far end of one of the example planet's aspect lines, if it has any. */
   exampleAspect: PlanetName | null;
   selectedPlanet: PlanetName | null;
-  pendingAction: Polarity | null;
+  previewAction: Polarity | null;
   projectedLight: number | null;
   onOpen: () => void;
   onClose: () => void;
@@ -78,7 +78,7 @@ export function CombatGuide({
   examplePlanet,
   exampleAspect,
   selectedPlanet,
-  pendingAction,
+  previewAction,
   projectedLight,
   onOpen,
   onClose,
@@ -172,7 +172,7 @@ export function CombatGuide({
     }
 
     if (!actingPlanet) return [];
-    const actionName = pendingAction === "Affliction" ? "Afflict" : "Testify";
+    const actionName = previewAction === "Affliction" ? "Afflict" : "Testify";
     return [
       {
         key: "example",
@@ -197,7 +197,7 @@ export function CombatGuide({
         body: <TermText text={COPY.notes.projection.body} vars={{ light: projectedLight ?? 0 }} />,
       },
     ];
-  }, [phase, turn, ruler, rule, opponentPlanet, examplePlanet, exampleAspect, actingPlanet, pendingAction, projectedLight]);
+  }, [phase, turn, ruler, rule, opponentPlanet, examplePlanet, exampleAspect, actingPlanet, previewAction, projectedLight]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // The other's acting planet always carries its corona; in the act phase
@@ -229,7 +229,7 @@ export function CombatGuide({
       phaseLabel={COPY.phases}
       notes={notes}
       shapes={shapes}
-      revision={`${pendingAction}:${projectedLight}`}
+      revision={`${previewAction}:${projectedLight}`}
       openLabel={COPY.open}
       closeLabel={COPY.close}
       onOpen={onOpen}

@@ -1,7 +1,6 @@
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { Chart, type ProjectionChips } from "@/components/Chart";
-import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
@@ -104,6 +103,9 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
   const resolved = encounter.resolved;
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [hoveredOptionId, setHoveredOptionId] = useState<string | null>(null);
+  const [focusedOptionId, setFocusedOptionId] = useState<string | null>(null);
+  const [chartHovered, setChartHovered] = useState(false);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetName | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -116,9 +118,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   } | null>(null);
   const committedRef = useRef(false);
   const chartRef = useRef<HTMLDivElement>(null);
-  const inspectedPlanet = selectedPlanet ?? hoveredPlanet;
-  const selection = useMemo<Selection>(() => inspectedPlanet ? { chosen: inspectedPlanet } : {}, [inspectedPlanet]);
-
   const options = useMemo(() => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(ctx)), [scenario, ctx]);
   const rows = useMemo(() => options.map((option) => {
     const assignments = availableSelections(run, ctx, option);
@@ -134,25 +133,42 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const selectedRow = rows.find((row) => row.option.id === selectedOptionId);
   const selectedOption = selectedRow?.option;
   const targeting = !!selectedOption && requiresPlanet(selectedOption);
-  const preview = selectedOption ? previewOption(run, ctx, selectedOption, selection) : null;
+  const previewOptionId = hoveredOptionId ?? (chartHovered ? null : focusedOptionId) ?? selectedOptionId;
+  const indicatedOption = rows.find((row) => row.option.id === previewOptionId)?.option;
+  const inspectedPlanet = targeting ? hoveredPlanet : selectedPlanet ?? hoveredPlanet;
+  const preview = indicatedOption ? previewOption(run, ctx, indicatedOption, inspectedPlanet ? { chosen: inspectedPlanet } : {}) : null;
   const eligiblePlanets = new Set(targeting
     ? selectedRow!.assignments.flatMap((s) => s.chosen ? [s.chosen] : [])
     : playerUnlocked);
-  const targetEffect = selectedOption?.result.effects.find((e) => "target" in e && e.target === "chosen");
+  const targetEffect = indicatedOption?.result.effects.find((e) => "target" in e && e.target === "chosen");
   const verb: Polarity = targetEffect?.kind === "affliction" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
   const choosePlanet = (planet: PlanetName) => {
-    if (resolved || !eligiblePlanets.has(planet)) return;
+    if (resolved || committedRef.current || !eligiblePlanets.has(planet)) return;
+    if (targeting) {
+      handleOption(selectedOption.id, { chosen: planet });
+      return;
+    }
     playUISound(selectedPlanet === planet ? "dismiss" : "select");
     setSelectedPlanet((p) => p === planet ? null : planet);
     setHoveredPlanet(null);
   };
-  const resetChoice = () => {
+  const resetChoice = useCallback(() => {
     if (guideOpen) return;
     if (selectedOptionId || selectedPlanet) playUISound("dismiss");
     setSelectedOptionId(null);
     setSelectedPlanet(null);
     setHoveredPlanet(null);
-  };
+    setHoveredOptionId(null);
+    setFocusedOptionId(null);
+  }, [guideOpen, selectedOptionId, selectedPlanet]);
+  useEffect(() => {
+    if (resolved) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") resetChoice();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [resolved, resetChoice]);
   const projection: ProjectionChips = { deltas: {} };
   if (!resolved && preview?.ok) {
     for (const p of playerUnlocked) {
@@ -161,12 +177,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     }
   }
 
-  const handleOption = (optionId: string) => {
+  const handleOption = (optionId: string, selection: Selection) => {
     if (resolved || committedRef.current || guideOpen) return;
     const nextRun = resolveNarrative(run, prince, scenario, optionId, selection, devUnlockAll);
     if (!nextRun) return;
     committedRef.current = true;
     playUISound("commit");
+    setSelectedOptionId(optionId);
     setFrozenRows(rows);
 
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
@@ -201,25 +218,11 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     onCommit(nextRun);
   };
 
-  const planetActions: PlanetStatsActions | undefined =
-    targeting && inspectedPlanet && preview?.ok && !resolved ? {
-      choices: [{
-        verb,
-        value: Math.abs(preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction),
-      }],
-      pending: selectedPlanet ? verb : null,
-      onChoose: () => {
-        if (!selectedPlanet) {
-          playUISound("select");
-          setSelectedPlanet(inspectedPlanet);
-        } else handleOption(selectedOption!.id);
-      },
-      onClearPending: () => {
-        if (selectedPlanet) playUISound("dismiss");
-        setSelectedPlanet(null);
-        setHoveredPlanet(null);
-      },
-    } : undefined;
+  const planetDelta = inspectedPlanet && preview?.ok
+    ? preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction : 0;
+  const planetEffect = !resolved && preview?.ok && inspectedPlanet && (targetEffect || planetDelta)
+    ? { verb: planetDelta > 0 ? "Affliction" as const : "Testimony" as const, value: Math.abs(planetDelta) }
+    : undefined;
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
   const runEnded = isOver(run, prince.chart, prince.numEncounters);
@@ -248,7 +251,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           onPhaseChange={setGuidePhase}
         />
       )}
-      <div className="narrative-chart" ref={chartRef}>
+      <div className="narrative-chart" ref={chartRef}
+        onMouseEnter={() => setChartHovered(true)}
+        onMouseLeave={() => setChartHovered(false)}
+      >
         <Chart
           chart={prince.chart}
           state={run.state}
@@ -256,17 +262,23 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           activePlanet={!targeting && joyPresent(ctx) ? joyPlanet : null}
           selectedPlanet={selectedPlanet}
           hoveredPlanet={selectedPlanet ? null : hoveredPlanet}
-          onPlanetHover={resolved || selectedPlanet ? undefined : setHoveredPlanet}
+          onPlanetHover={resolved || selectedPlanet ? undefined : (planet) => {
+            setHoveredPlanet(planet);
+            if (planet) {
+              setHoveredOptionId(null);
+              setChartHovered(true);
+            }
+          }}
           onPlanetClick={resolved ? undefined : (p) => choosePlanet(p)}
           interactionPlanets={eligiblePlanets}
           inviteInteraction={!resolved && targeting && !selectedPlanet}
-          incoming={!resolved && targeting ? {
+          incoming={!resolved && targetEffect ? {
             verb,
             amount: targetEffect?.kind === "affliction" ? Math.abs(targetEffect.delta) : undefined,
           } : null}
           projection={projection}
           statsPanelPlanet={resolved ? null : inspectedPlanet}
-          statsPanelActions={planetActions}
+          statsPanelEffect={planetEffect}
           statsPanelReserveActions={targeting}
           side="self"
           entrance="left"
@@ -310,30 +322,44 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           <p>{resolved ? (encounter.resolutionText ?? "It is finished.") : scenario.text}</p>
         </div>
 
-        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${selectedOptionId ? "is-arming" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
+        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${targeting ? "is-targeting" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
           {shownRows.map(({ option: o, aside, reason, assignments }, i) => {
             const isSelected = selectedOptionId === o.id;
             const commit = () => {
-              if (!assignments.length) return;
+              if (!assignments.length || committedRef.current) return;
+              if (!requiresPlanet(o)) {
+                handleOption(o.id, {});
+                return;
+              }
               if (!isSelected) {
                 playUISound("select");
                 setSelectedOptionId(o.id);
                 setSelectedPlanet(null);
                 setHoveredPlanet(null);
-                if (requiresPlanet(o) && window.matchMedia("(max-width: 899px)").matches) {
+                if (window.matchMedia("(max-width: 899px)").matches) {
                   chartRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
                 }
-              } else if (!requiresPlanet(o)) handleOption(o.id);
+              }
             };
             return (
               <div key={o.id} className="narrative-option">
                 <button
-                  className={`option ${isSelected ? "is-selected" : ""}`}
+                  className={`option ${isSelected ? "is-selected" : ""} ${!resolved && previewOptionId === o.id ? "is-preview" : ""}`}
                   data-guide={`option-${i + 1}`}
                   onClick={resolved ? advance : (e) => { e.stopPropagation(); commit(); }}
-                  onPointerEnter={playHoverSound}
-                  onFocus={playFocusSound}
-                  aria-pressed={isSelected}
+                  onPointerEnter={(event) => { playHoverSound(event); setHoveredOptionId(o.id); }}
+                  onPointerLeave={() => setHoveredOptionId(null)}
+                  onFocus={(event) => {
+                    playFocusSound(event);
+                    setHoveredOptionId(null);
+                    setChartHovered(false);
+                    setFocusedOptionId(o.id);
+                  }}
+                  onBlur={() => setFocusedOptionId(null)}
+                  onKeyDown={(event) => {
+                    if (event.repeat && (event.key === "Enter" || event.key === " ")) event.preventDefault();
+                  }}
+                  aria-pressed={requiresPlanet(o) ? isSelected : undefined}
                   disabled={!resolved && !assignments.length}
                   type="button"
                 >

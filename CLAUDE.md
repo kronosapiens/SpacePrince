@@ -96,12 +96,17 @@ The spec is divided by what kind of question each document answers.
 - **The chart is never a corner HUD.** Surfaces flow through the chart, not on top of it (`spec/design/SCREENS.md`).
 - **No martial language on player surfaces.** Players see encounter / self / other — tension held and relieved; combat, adversary, opponent are internal vocabulary only (`spec/design/SCREENS.md §1.2`).
 - **Client honesty.** Never present derivable information as unknowable, and never frame a determined outcome as a gamble (`spec/design/SCREENS.md §1.1`).
-- **Interaction grammar is parity-first.** Tap-preview and tap-commit work identically on touch and desktop; hover is desktop-only and additive — never the sole carrier of information, never a commit (`spec/design/SCREENS.md §3.6`).
-- **Previews show only what is determined.** Verb-dependent information appears once a verb is indicated (hovered or armed); verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
+- **Desktop interactions.**
+  Hover or keyboard focus previews; one activation executes a fully specified action.
+  Planet inspection and narrative target choice remain separate steps; mobile adaptation is deferred (`spec/design/SCREENS.md §3.6`).
+- **Previews show only what is determined.**
+  Verb-dependent information appears once a verb is indicated by hover or focus; verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
 - **The affliction arc is the chart's primary channel.** Affliction is an arc at 1 point = 1°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock. Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
 - **What is arriving is drawn at the chart's centre.** The corona again, around the magnitude instead of a planet — the blow has no target until the player commits, so it belongs to the chart, not to anything in it. Both charts carry it; yours from the top of the turn, theirs once you indicate a verb (`spec/design/STYLE.md §11`).
-- **One interaction ring, and its colour is the verb.** Breathing = tappable, steady = hovered/selected/acting. Mist until a verb is determined for that planet, the verb's colour then — never the planet's own hue, which the disc, glyph and halo already carry (`spec/design/SCREENS.md §3.6`).
+- **One interaction ring, and its colour is the verb.**
+  Breathing = available, steady = hovered/focused/selected/acting.
+  Mist until a verb is determined for that planet, the verb's colour then — never the planet's own hue, which the disc, glyph and halo already carry (`spec/design/SCREENS.md §3.6`).
 - **Chrome sits above and below the wheels, never beside them.** What moves this turn above, what is fixed for the encounter below, each reaching into the empty corners of the wheels' square boxes rather than reserving a band; the wheel is sized from the viewport with no maximum (`spec/design/SCREENS.md §3.7`, §3.1.1).
 - **Don't compulsively record decisions.** Most choices are just the process of arriving at an answer, and writing each one into the spec or a comment turns the repo into a tar pit where every later suggestion has to be argued past an entry that may no longer hold. If something genuinely reads as a core principle worth recording, propose it as a separate edit and wait for explicit confirmation.
 - **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (four rungs, **chart viewBox units only** — the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
