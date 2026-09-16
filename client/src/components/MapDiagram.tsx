@@ -325,6 +325,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
 
   return (
     <svg
+      className="map-svg"
       data-guide="map"
       viewBox={`${minX} ${minY} ${w} ${h}`}
       preserveAspectRatio="xMidYMid meet"

@@ -47,8 +47,9 @@
 /* Default chart sizing. Chart.tsx renders <svg class="chart-svg">; consumers
    override via more-specific selectors (e.g. `.combat-side > svg { width: ... }`). */
 .chart-svg { display: block; width: 100%; height: auto; }
-/* PlanetGlyph carries keyboard focus through its circular interaction ring. */
-.chart-svg g[role="button"] { outline: none; }
+/* PlanetGlyph and the map's nodes carry keyboard focus through their own rings. */
+.chart-svg g[role="button"],
+.map-svg g[role="button"] { outline: none; }
 
 /* The player's chart holds the left column; the current activity sits beside it. */
 .chart-layout,
@@ -1466,7 +1467,10 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+  /* A steady trace of the invite glow marks it tappable — no second rhythm. */
+  box-shadow: 0 0 var(--invite-glow-blur)
+    color-mix(in srgb, currentColor calc(100% * var(--invite-glow-min)), transparent);
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
 }
 .screen-help-button:hover {
   background: var(--bone);
@@ -1485,6 +1489,7 @@
   font-family: var(--sans);
   color: var(--mist);
   /* The stage is the fixed chart-shaped square; type at this scale is what
+  box-shadow: 0 0 var(--invite-glow-blur) var(--bone);
      fills it — sized so three short paragraphs sit comfortably. */
   font-size: 18px;
   line-height: 1.65;
