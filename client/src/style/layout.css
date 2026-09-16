@@ -156,12 +156,14 @@
   position: absolute;
   z-index: -1;
   top: 50%;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  width: var(--wordmark-glow-width);
   height: auto;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
+
+.wordmark-glow circle { r: var(--wordmark-glow-radius); }
 
 .title-content {
   container-type: inline-size;
