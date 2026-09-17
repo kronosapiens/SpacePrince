@@ -1,9 +1,8 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { PlaySurface } from "@/screens/PlaySurface";
-import { PrinceStoreProvider } from "@/state/PrinceStore";
-import { InfoCardProvider, useInfoCards } from "@/state/InfoCardContext";
+import { GameTest } from "./game-layout";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
@@ -57,7 +56,7 @@ function combat(turns = 1, count = 64) {
 }
 function mount(prince: ReturnType<typeof createStubPrince>) {
   savePrince(prince);
-  act(() => root!.render(<PrinceStoreProvider><InfoCardProvider><PlaySurface /></InfoCardProvider></PrinceStoreProvider>));
+  act(() => root!.render(<GameTest path="/play" />));
 }
 const get = (selector: string) => {
   const el = container.querySelector(selector);

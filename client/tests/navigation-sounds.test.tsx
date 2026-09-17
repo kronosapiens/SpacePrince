@@ -1,11 +1,8 @@
-import { act, type ReactNode } from "react";
+import { GameTest } from "./game-layout";
+import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CityPicker } from "@/components/CityPicker";
-import { TitleScreen } from "@/screens/TitleScreen";
-import { StartScreen } from "@/screens/StartScreen";
-import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
@@ -40,8 +37,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function render(screen: ReactNode) {
-  act(() => root.render(<MemoryRouter><PrinceStoreProvider>{screen}</PrinceStoreProvider></MemoryRouter>));
+function render(path = "/") {
+  act(() => root.render(<GameTest path={path} />));
 }
 
 function get(selector: string) {
@@ -74,7 +71,7 @@ function key(value: string) {
 
 describe("navigation feedback", () => {
   it("ticks on Begin hover and sounds navigation once during the title fade", () => {
-    render(<TitleScreen />);
+    render();
     hover(".begin-btn", "touch");
     hover(".begin-btn");
     click(".begin-btn");
@@ -85,7 +82,7 @@ describe("navigation feedback", () => {
 
   it("uses a commitment cue when Begin creates a run for an existing Prince", () => {
     savePrince(createStubPrince());
-    render(<TitleScreen />);
+    render();
     click(".begin-btn");
     click(".begin-btn");
     expect(cues()).toEqual(["commit"]);
@@ -93,7 +90,7 @@ describe("navigation feedback", () => {
   });
 
   it("keeps invalid casts silent and distinguishes the framing step from casting and starting", () => {
-    render(<StartScreen />);
+    render("/play");
     click(".begin-btn");
     click(".begin-btn");
     act(() => vi.advanceTimersByTime(400));

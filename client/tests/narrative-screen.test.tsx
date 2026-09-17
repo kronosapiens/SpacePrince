@@ -1,3 +1,4 @@
+import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,8 +51,10 @@ function mount(id: string) {
   const render = (nextRun = run) => {
     if (nextRun.encounter?.kind !== "narrative") throw new Error("Expected narrative encounter");
     const nextEncounter = nextRun.encounter;
-    act(() => root.render(<EncounterNarrativeScreen prince={prince} run={nextRun} encounter={nextEncounter}
-      onCommit={onCommit} onClearEncounter={vi.fn()} />));
+    act(() => root.render(<PlayerChartLayout className="narrative" chart={prince.chart} unlockedPlanets={[]}>
+      <EncounterNarrativeScreen prince={prince} run={nextRun} encounter={nextEncounter}
+      onCommit={onCommit} onClearEncounter={vi.fn()} />
+    </PlayerChartLayout>));
   };
   render();
   return { run, onCommit, render };

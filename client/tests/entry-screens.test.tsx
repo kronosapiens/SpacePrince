@@ -1,16 +1,12 @@
+import { GameTest } from "./game-layout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TitleScreen } from "@/screens/TitleScreen";
-import { StartScreen } from "@/screens/StartScreen";
-import { MapScreen } from "@/screens/MapScreen";
-import { PlaySurface } from "@/screens/PlaySurface";
-import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
+import { PLANET_GLYPH } from "@/svg/glyphs";
 import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
 import { PRIMER_FRAMING } from "@/copy/primer";
@@ -47,11 +43,7 @@ function mount(screen: "title" | "map") {
   run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
   prince.runs = [run];
   savePrince(prince);
-  act(() => root.render(
-    <MemoryRouter>
-      <PrinceStoreProvider>{screen === "title" ? <TitleScreen /> : <MapScreen />}</PrinceStoreProvider>
-    </MemoryRouter>,
-  ));
+  act(() => root.render(<GameTest path={screen === "title" ? "/" : "/play"} />));
   return prince;
 }
 
@@ -64,18 +56,80 @@ function click(target: Element) {
   act(() => target.dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
 
+function input(selector: string, value: string) {
+  act(() => {
+    const control = element(selector) as HTMLInputElement;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(control, value);
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+}
+
+function planetPositions() {
+  return [...container.querySelectorAll('.chart-svg text')]
+    .filter((text) => Object.values(PLANET_GLYPH).includes(text.textContent ?? ""))
+    .map((planet) => planet.closest("g[transform]")!.getAttribute("transform"));
+}
+
 describe("entry screens", () => {
+  it("keeps one chart through a live casting preview, the ceremony, and entry to Map", () => {
+    act(() => root.render(<GameTest />));
+    const chart = element(".chart-svg");
+    const samplePositions = planetPositions();
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(420));
+    expect(element(".chart-svg")).toBe(chart);
+    expect(planetPositions()).toEqual(samplePositions);
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(400));
+
+    click(element(".city-compass"));
+    input('[placeholder="Lat"]', "4070");
+    input('[placeholder="Lon"]', "-7400");
+    expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(0);
+    const initialPositions = planetPositions();
+    expect(initialPositions).toHaveLength(7);
+    expect(initialPositions).not.toEqual(samplePositions);
+    expect(loadPrince()).toBeNull();
+    input('[type="date"]', "2000-01-01");
+    const previewPositions = planetPositions();
+    expect(previewPositions).not.toEqual(initialPositions);
+    input('[type="date"]', "");
+    expect(planetPositions()).toEqual(previewPositions);
+    expect((element(".mint-submit") as HTMLButtonElement).disabled).toBe(true);
+    input('[type="date"]', "2000-01-01");
+
+    click(element(".mint-submit"));
+    expect(planetPositions()).toEqual(previewPositions);
+    for (let i = 0; i < 7; i++) {
+      act(() => vi.advanceTimersByTime(2500));
+      expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(i + 1);
+      expect(element(".chart-svg")).toBe(chart);
+    }
+    act(() => vi.advanceTimersByTime(1500));
+    act(() => vi.advanceTimersByTime(1500));
+    expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(1);
+    expect(container.querySelector('[data-guide="planet-self-moon"]')).not.toBeNull();
+    const settledPositions = planetPositions();
+    click(element(".begin-btn"));
+    expect(element(".map-screen .chart-svg")).toBe(chart);
+    expect(planetPositions()).toEqual(settledPositions);
+    expect(loadPrince()!.runs).toHaveLength(1);
+    click(element('[role="button"][aria-label="Moon"]'));
+    expect(element(".ps-name").textContent).toContain("MOON");
+  });
+
+  it("keeps the saved chart and an open inspection when continuing from Title to Map", () => {
+    mount("title");
+    const chart = element(".chart-svg");
+    click(element('[role="button"][aria-label="Moon"]'));
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(420));
+    expect(element(".map-screen .chart-svg")).toBe(chart);
+    expect(element(".ps-name").textContent).toContain("MOON");
+  });
+
   it("selects Main on Title and keeps that selection through Prince creation", () => {
-    act(() => root.render(
-      <MemoryRouter>
-        <PrinceStoreProvider>
-          <Routes>
-            <Route path="/" element={<TitleScreen />} />
-            <Route path="/play" element={<StartScreen />} />
-          </Routes>
-        </PrinceStoreProvider>
-      </MemoryRouter>,
-    ));
+    act(() => root.render(<GameTest />));
     expect(vi.mocked(setTheme).mock.calls).toEqual([["Main"]]);
     click(element(".begin-btn"));
     act(() => vi.advanceTimersByTime(500));
@@ -131,7 +185,7 @@ describe("entry screens", () => {
     const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
     prince.runs = [run];
     savePrince(prince);
-    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
 
     expect(element(".map-screen .chart-svg").getAttribute("aria-label")).toBe("Stub natal chart");
     expect(element(".begin-btn").textContent).toBe("New Run");
@@ -167,7 +221,7 @@ describe("entry screens", () => {
     run.map.visitedNodeIds.push(TERMINAL_NODE_ID);
     prince.runs = [run];
     savePrince(prince);
-    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
 
     const completed = loadPrince()!;
     expect(completed.runs[0]).toEqual({ ...run, mapsCompleted: MAPS_PER_RUN });
@@ -175,7 +229,7 @@ describe("entry screens", () => {
     expect(element(".begin-btn").textContent).toBe("New Run");
     act(() => root.unmount());
     root = createRoot(container);
-    act(() => root.render(<PrinceStoreProvider><PlaySurface /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
     expect(loadPrince()).toEqual(completed);
     expect(element(".map-index-v").textContent).toBe("VII");
     expect(element(".begin-btn").textContent).toBe("New Run");

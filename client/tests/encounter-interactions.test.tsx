@@ -1,3 +1,4 @@
+import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -63,8 +64,10 @@ function setup() {
     const result = resolveTurn(run, prince.chart, planet, verb, rng);
     return result ? { ...result, nextRun: result.run } : null;
   });
-  const render = () => act(() => root.render(<EncounterCombatScreen prince={prince} run={run} encounter={encounter}
-    onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />));
+  const render = () => act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
+      <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
+    onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
+    </PlayerChartLayout>));
   render();
   return { prince, run, encounter, onCommitTurn, render };
 }

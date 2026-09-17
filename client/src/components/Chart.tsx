@@ -265,6 +265,7 @@ export function Chart(props: ChartProps) {
 
   const tuning = useTuning();
   const points = useMemo(() => buildPlanetPoints(chart, PLANET_R_REST), [chart]);
+  const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
   // Place the panel in the emptiest interior wedge — the wheel's middle isn't
   // reliably clear (same-sign planets cluster toward the center). Reserve the
   // taller action height so the spot doesn't shift when buttons appear.
@@ -282,7 +283,6 @@ export function Chart(props: ChartProps) {
     for (const p of points) m[p.planet] = p;
     return m;
   }, [points]);
-  const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
 
   // allActive overrides unlock-gating: every planet renders in full state.
   const isUnlocked = (p: PlanetName) =>
@@ -313,7 +313,7 @@ export function Chart(props: ChartProps) {
 
   // Aspect lines, colored by source planet's harmony.
   const aspectLines = showAspects
-    ? aspects.map((a, i) => {
+    ? aspects.map((a) => {
         if (!isUnlocked(a.from) || !isUnlocked(a.to)) return null;
         // A combusted planet is dead — drop its aspect lines to others.
         if (planetCombusted(a.from) || planetCombusted(a.to)) return null;
@@ -347,7 +347,7 @@ export function Chart(props: ChartProps) {
         const ra = from.glyphR + 4;
         const rb = to.glyphR + 4;
         return (
-          <line key={`aspect_${i}`}
+          <line key={aspectKey(a.from, a.to)}
             data-guide={side ? `aspect-${side}-${a.from.toLowerCase()}-${a.to.toLowerCase()}` : undefined}
             x1={from.cx + ux * ra} y1={from.cy + uy * ra}
             x2={to.cx - ux * rb} y2={to.cy - uy * rb}

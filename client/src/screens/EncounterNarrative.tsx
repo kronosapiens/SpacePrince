@@ -1,6 +1,7 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
-import { Chart, type ProjectionChips } from "@/components/Chart";
+import type { ProjectionChips } from "@/components/Chart";
+import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
@@ -117,7 +118,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     light: number;
   } | null>(null);
   const committedRef = useRef(false);
-  const chartRef = useRef<HTMLDivElement>(null);
   const options = useMemo(() => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(ctx)), [scenario, ctx]);
   const rows = useMemo(() => options.map((option) => {
     const assignments = availableSelections(run, ctx, option);
@@ -231,13 +231,49 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     resolved, onClearEncounter, runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800,
   );
 
+  const chartRef = usePlayerChart({
+    props: {
+      chart: prince.chart,
+      state: run.state,
+      unlockedPlanets: playerUnlocked,
+      activePlanet: !targeting && joyPresent(ctx) ? joyPlanet : null,
+      selectedPlanet,
+      hoveredPlanet: selectedPlanet ? null : hoveredPlanet,
+      onPlanetHover: resolved || selectedPlanet ? undefined : (planet) => {
+        setHoveredPlanet(planet);
+        if (planet) {
+          setHoveredOptionId(null);
+          setChartHovered(true);
+        }
+      },
+      onPlanetClick: resolved ? undefined : choosePlanet,
+      interactionPlanets: eligiblePlanets,
+      inviteInteraction: !resolved && targeting && !selectedPlanet,
+      incoming: !resolved && targetEffect ? {
+        verb,
+        amount: targetEffect.kind === "affliction" ? Math.abs(targetEffect.delta) : undefined,
+      } : null,
+      projection,
+      statsPanelPlanet: resolved ? null : inspectedPlanet,
+      statsPanelEffect: planetEffect,
+      statsPanelReserveActions: targeting,
+      side: "self",
+      showColorField: true,
+      passive: resolved,
+      impactPlanets: flash?.impact,
+      combustingPlanets: flash?.combusting,
+      animationEpoch: flash?.epoch,
+    },
+    onBackgroundClick: resolved ? advance : resetChoice,
+    onMouseEnter: () => setChartHovered(true),
+    onMouseLeave: () => setChartHovered(false),
+    className: resolved ? "is-resolved" : "",
+  });
+
   const fragmentLines = (fragment?.text ?? "").split(/\n+/);
 
   return (
-    <div
-      className={`narrative ${resolved ? "is-resolved" : ""}`}
-      onClick={resolved ? advance : resetChoice}
-    >
+    <>
       {/* A resolved scene carries itself onward within seconds — nothing left
           to study, so the guide comes down with the choices. */}
       {!resolved && (
@@ -251,46 +287,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           onPhaseChange={setGuidePhase}
         />
       )}
-      <div className="narrative-chart" ref={chartRef}
-        onMouseEnter={() => setChartHovered(true)}
-        onMouseLeave={() => setChartHovered(false)}
-      >
-        <Chart
-          chart={prince.chart}
-          state={run.state}
-          unlockedPlanets={playerUnlocked}
-          activePlanet={!targeting && joyPresent(ctx) ? joyPlanet : null}
-          selectedPlanet={selectedPlanet}
-          hoveredPlanet={selectedPlanet ? null : hoveredPlanet}
-          onPlanetHover={resolved || selectedPlanet ? undefined : (planet) => {
-            setHoveredPlanet(planet);
-            if (planet) {
-              setHoveredOptionId(null);
-              setChartHovered(true);
-            }
-          }}
-          onPlanetClick={resolved ? undefined : (p) => choosePlanet(p)}
-          interactionPlanets={eligiblePlanets}
-          inviteInteraction={!resolved && targeting && !selectedPlanet}
-          incoming={!resolved && targetEffect ? {
-            verb,
-            amount: targetEffect?.kind === "affliction" ? Math.abs(targetEffect.delta) : undefined,
-          } : null}
-          projection={projection}
-          statsPanelPlanet={resolved ? null : inspectedPlanet}
-          statsPanelEffect={planetEffect}
-          statsPanelReserveActions={targeting}
-          side="self"
-          entrance="left"
-          showColorField
-          passive={resolved}
-          impactPlanets={flash?.impact}
-          combustingPlanets={flash?.combusting}
-          animationEpoch={flash?.epoch}
-        />
-      </div>
-
-      <div className="narrative-column">
+      <div className="narrative-column anim-surface-in">
         <div className="narrative-composition">
           <KandinskyComposition planet={ariaPlanet} size={280} />
         </div>
@@ -394,6 +391,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           </span>
         </div>
       </div>
-    </div>
+    </>
   );
 }

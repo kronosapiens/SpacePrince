@@ -1,3 +1,4 @@
+import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -102,8 +103,10 @@ describe("chart feedback", () => {
     const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
     run.encounter = encounter;
     const onCommitTurn = vi.fn(() => null);
-    act(() => root.render(<EncounterCombatScreen prince={prince} run={run} encounter={encounter}
-      onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />));
+    act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
+      <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
+      onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
+    </PlayerChartLayout>));
     click(moon);
     click('[data-guide="action-testimony"]');
     expect(onCommitTurn).toHaveBeenCalledTimes(1);

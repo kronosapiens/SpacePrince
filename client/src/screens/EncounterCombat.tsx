@@ -1,5 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
+import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
 import { PlanetBands } from "@/components/PlanetBands";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
@@ -490,8 +491,47 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     setGuideAction(null);
   }, [encounter.resolved, guidePlanet]);
 
+  usePlayerChart({
+    props: {
+      chart: prince.chart,
+      state: displayPlayerState,
+      unlockedPlanets: playerUnlocked,
+      selectedPlanet: selected,
+      hoveredPlanet: encounter.resolved || selected ? null : hovered,
+      passive: encounter.resolved,
+      side: "self",
+      onPlanetClick: handlePlayerClick,
+      onPlanetHover: !animation && !selected && (!guideOpen || guidePhase === "act") ? handlePlayerHover : undefined,
+      projection: displayProjection.self ? { deltas: displayProjection.self } : undefined,
+      activePlanet: animation?.playerPlanet ?? null,
+      activePropagationKeys: activePropagationKeys.self,
+      actionPulsePlanet: actionPulsePlayer,
+      impactPlanets: impactPlayer,
+      combustingPlanets: combustingPlayer,
+      mergingPlanets: mergingPlayer,
+      warningPlanets: selfWarnings ?? undefined,
+      incoming: incomingSelf,
+      animationEpoch,
+      statsPanelPlanet: inspected,
+      statsPanelActions: playerActions,
+      statsPanelReserveActions: true,
+      statsPanelStudy: study,
+      onToggleStudy: guideOpen ? undefined : () => {
+        playUISound(study ? "dismiss" : "select");
+        setStudy(!study);
+        setPreviewAction(null);
+      },
+      inviteInteraction: !animation && !encounter.resolved && !selected,
+      ringVerb: selected ? indicatedVerb : null,
+    },
+    onBackgroundClick: settled ? advance : handleClearSelection,
+    label: "SELF",
+    guideId: "chart-self",
+    className: settled ? "is-resolved" : "",
+  });
+
   return (
-    <div className={`combat${settled ? " is-resolved" : ""}`} onClick={settled ? advance : handleClearSelection}>
+    <>
       {/* The mint's bands, struck per resolution beat — self down the left edge,
           other down the right, matching the two charts. */}
       <PlanetBands className="combat-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
@@ -517,189 +557,149 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           onPhaseChange={changeGuidePhase}
         />
       )}
-      {/* Run- and encounter-level state, lifted out of the centre column so the
-          two charts can have the room. Nothing here is chart data — Light is
-          the run's score, the pips are where we are in this encounter — so it
-          reads as chrome without becoming a HUD sitting over the wheels. */}
-      <div className="combat-topbar">
-        <div className="combat-readouts">
-          {/* Position in the encounter's turn sequence. Unlike Light this has
-              a real denominator — the sequence length — so a fraction states it
-              exactly rather than inventing a ceiling. Live, the numerator is the
-              turn being answered; settled, it is the turns actually taken, so an
-              encounter that ended early (every opposing planet combust before
-              the sequence ran out) reads 2 of 3 rather than 3 of 3.
-              Rejected: a row of pips, filled per turn spent and ringed on the
-              current one. They separated spent / current / remaining, which a
-              fraction cannot, but at three turns that distinction bought little
-              and cost the strip a second visual language — the pips carried no
-              baseline of their own, so they could not sit with the type beside
-              them. */}
-          <div className="combat-turns" data-guide="turn">
-            <span className="eyebrow">TURN</span>
-            <span className="combat-turns-v">
-              {settled
-                ? displayTurnIndex
-                : Math.min(displayTurnIndex + 1, encounter.sequence.length)}
-              <span className="combat-turns-sep">/</span>
-              {encounter.sequence.length}
-            </span>
-          </div>
-          {/* The score, plainly. Light has no upper bound, so the numeral is
-              the one rendering that invents nothing: no denominator, no ceiling,
-              nothing to decode. It reads the same here as on the narrative
-              screen.
-              Rejected: the doublings track (a tick per doubling banked plus a
-              bar for the run at the current one, `game/light-scale.ts`). It also
-              implied no ceiling, but it stated the score in a code that had to
-              be learned before it said anything, and the bar read as progress
-              toward a maximum regardless — the exact misread it was built to
-              avoid. */}
-          <div className="combat-light" data-guide="light">
-            <span className="eyebrow">LIGHT</span>
-            <span
-              className="combat-light-v"
-              style={
-                lightFlashColor
-                  ? ({ "--flash-color": lightFlashColor } as CSSProperties)
-                  : undefined
-              }
-            >
-              {/* The per-beat gain pulse — the only feedback that Light moved
-                  during resolution, tinted by the planet resolving on it. */}
-              {lightFlashEpoch > 0 && (
-                <span
-                  key={lightFlashEpoch}
-                  className="combat-light-flash anim-light-flash"
-                  aria-hidden
-                />
-              )}
+      <div className="combat-content anim-surface-in">
+        <div className="combat-topbar">
+          <div className="combat-readouts">
+            {/* Position in the encounter's turn sequence. Unlike Light this has
+                a real denominator — the sequence length — so a fraction states it
+                exactly rather than inventing a ceiling. Live, the numerator is the
+                turn being answered; settled, it is the turns actually taken, so an
+                encounter that ended early (every opposing planet combust before
+                the sequence ran out) reads 2 of 3 rather than 3 of 3.
+                Rejected: a row of pips, filled per turn spent and ringed on the
+                current one. They separated spent / current / remaining, which a
+                fraction cannot, but at three turns that distinction bought little
+                and cost the strip a second visual language — the pips carried no
+                baseline of their own, so they could not sit with the type beside
+                them. */}
+            <div className="combat-turns" data-guide="turn">
+              <span className="eyebrow">TURN</span>
+              <span className="combat-turns-v">
+                {settled
+                  ? displayTurnIndex
+                  : Math.min(displayTurnIndex + 1, encounter.sequence.length)}
+                <span className="combat-turns-sep">/</span>
+                {encounter.sequence.length}
+              </span>
+            </div>
+            {/* The score, plainly. Light has no upper bound, so the numeral is
+                the one rendering that invents nothing: no denominator, no ceiling,
+                nothing to decode. It reads the same here as on the narrative
+                screen.
+                Rejected: the doublings track (a tick per doubling banked plus a
+                bar for the run at the current one, `game/light-scale.ts`). It also
+                implied no ceiling, but it stated the score in a code that had to
+                be learned before it said anything, and the bar read as progress
+                toward a maximum regardless — the exact misread it was built to
+                avoid. */}
+            <div className="combat-light" data-guide="light">
+              <span className="eyebrow">LIGHT</span>
               <span
-                key={`n-${lightFlashEpoch}`}
-                className={
-                  lightFlashEpoch > 0
-                    ? "combat-light-n anim-light-pop"
-                    : "combat-light-n"
+                className="combat-light-v"
+                style={
+                  lightFlashColor
+                    ? ({ "--flash-color": lightFlashColor } as CSSProperties)
+                    : undefined
                 }
               >
-                {Math.round(displayedRunLight)}
-              </span>
-              {/* What the indicated gesture would add. */}
-              {projectedLight && (
-                <span className="combat-light-delta" data-guide-part style={{ color: projectedLight.color }}>
-                  +{projectedLight.value}
+                {/* The per-beat gain pulse — the only feedback that Light moved
+                    during resolution, tinted by the planet resolving on it. */}
+                {lightFlashEpoch > 0 && (
+                  <span
+                    key={lightFlashEpoch}
+                    className="combat-light-flash anim-light-flash"
+                    aria-hidden
+                  />
+                )}
+                <span
+                  key={`n-${lightFlashEpoch}`}
+                  className={
+                    lightFlashEpoch > 0
+                      ? "combat-light-n anim-light-pop"
+                      : "combat-light-n"
+                  }
+                >
+                  {Math.round(displayedRunLight)}
                 </span>
-              )}
-            </span>
+                {/* What the indicated gesture would add. */}
+                {projectedLight && (
+                  <span className="combat-light-delta" data-guide-part style={{ color: projectedLight.color }}>
+                    +{projectedLight.value}
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
+          {/* The sentence is the caption that teaches the marks — the ring's
+              colour and the bites on the candidates say the same thing wordlessly,
+              and nothing else says which of them is Saturn. */}
+          <div className="combat-announce">
+            {!settled && displayOpponentTurn && displayOpponentAction && (
+              <p className="combat-announce-line" data-guide="opponent-move">
+                <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
+                  {displayOpponentTurn}
+                </span>{" "}
+                <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
+                  {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
+                  {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
+                </span>
+              </p>
+            )}
           </div>
         </div>
-        {/* The sentence is the caption that teaches the marks — the ring's
-            colour and the bites on the candidates say the same thing wordlessly,
-            and nothing else says which of them is Saturn. */}
-        <div className="combat-announce">
-          {!settled && displayOpponentTurn && displayOpponentAction && (
-            <p className="combat-announce-line" data-guide="opponent-move">
-              <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
-                {displayOpponentTurn}
-              </span>{" "}
-              <span style={{ color: VALENCE_COLOR[displayOpponentAction] }}>
-                {displayOpponentAction === "Testimony" ? "testifies" : "afflicts"}
-                {displayOpponentAmount != null && ` ${displayOpponentAmount}`}
-              </span>
-            </p>
-          )}
+
+        <div className="combat-side" data-guide="chart-other">
+          <div className="combat-side-label" data-guide="label-other">OTHER</div>
+          <Chart
+            chart={encounter.opponentChart}
+            state={displayOpponentState}
+            unlockedPlanets={encounter.roster}
+            activePlanet={displayOpponentTurn}
+            ringVerb={displayOpponentAction}
+            hoveredPlanet={encounter.resolved || selected ? null : hoveredOpponent}
+            entrance="right"
+            side="other"
+            onPlanetHover={setHoveredOpponent}
+            // Offense chips need an indicated verb (or committed playback) —
+            // selection alone hasn't chosen one, so this side would assert an
+            // outcome of a decision not yet made. Until then the preview is the
+            // defensive (self) side only.
+            projection={
+              (indicatedVerb || animation) && displayProjection.other
+                ? { deltas: displayProjection.other }
+                : undefined
+            }
+            passive
+            activePropagationKeys={activePropagationKeys.other}
+            actionPulsePlanet={actionPulseOpponent}
+            impactPlanets={impactOpponent}
+            combustingPlanets={combustingOpponent}
+            mergingPlanets={mergingOpponent}
+            warningPlanets={otherWarnings ?? undefined}
+            incoming={incomingOther}
+            animationEpoch={animationEpoch}
+          />
+        </div>
+
+        {/* What is fixed for the whole encounter, under the wheels:
+            the planet that rules it — the colour its node
+            carried on the map — and the rule it sets. What moves (the turn, the
+            score, the other's move) reads above the charts; this reads below. */}
+        <div className="combat-foot">
+          <div className="combat-ruler" data-guide="ruler">
+            <span className="eyebrow">RULER</span>
+            <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
+              {ruler}
+            </span>
+          </div>
+          <p className="combat-rule" data-guide="rule">
+            {/* The rule in the ruler's colour, under the name in the same colour.
+                Light itself stays neutral — no colour stands for it anywhere
+                else. */}
+            Gain Light from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
+          </p>
         </div>
       </div>
-
-      <div className="combat-side" data-guide="chart-self">
-        <div className="combat-side-label" data-guide="label-self">SELF</div>
-        <Chart
-          chart={prince.chart}
-          state={displayPlayerState}
-          unlockedPlanets={playerUnlocked}
-          selectedPlanet={selected}
-          hoveredPlanet={encounter.resolved || selected ? null : hovered}
-          passive={encounter.resolved}
-          entrance="left"
-          side="self"
-          onPlanetClick={handlePlayerClick}
-          onPlanetHover={!animation && !selected && (!guideOpen || guidePhase === "act") ? handlePlayerHover : undefined}
-          projection={displayProjection.self ? { deltas: displayProjection.self } : undefined}
-          activePlanet={animation?.playerPlanet ?? null}
-          activePropagationKeys={activePropagationKeys.self}
-          actionPulsePlanet={actionPulsePlayer}
-          impactPlanets={impactPlayer}
-          combustingPlanets={combustingPlayer}
-          mergingPlanets={mergingPlayer}
-          warningPlanets={selfWarnings ?? undefined}
-          incoming={incomingSelf}
-          animationEpoch={animationEpoch}
-          statsPanelPlanet={inspected}
-          statsPanelActions={playerActions}
-          statsPanelReserveActions
-          statsPanelStudy={study}
-          onToggleStudy={guideOpen ? undefined : () => {
-            playUISound(study ? "dismiss" : "select");
-            setStudy(!study);
-            setPreviewAction(null);
-          }}
-          inviteInteraction={!animation && !encounter.resolved && !selected}
-          ringVerb={selected ? indicatedVerb : null}
-        />
-      </div>
-
-      <div className="combat-side" data-guide="chart-other">
-        <div className="combat-side-label" data-guide="label-other">OTHER</div>
-        <Chart
-          chart={encounter.opponentChart}
-          state={displayOpponentState}
-          unlockedPlanets={encounter.roster}
-          activePlanet={displayOpponentTurn}
-          ringVerb={displayOpponentAction}
-          hoveredPlanet={encounter.resolved || selected ? null : hoveredOpponent}
-          entrance="right"
-          side="other"
-          onPlanetHover={setHoveredOpponent}
-          // Offense chips need an indicated verb (or committed playback) —
-          // selection alone hasn't chosen one, so this side would assert an
-          // outcome of a decision not yet made. Until then the preview is the
-          // defensive (self) side only.
-          projection={
-            (indicatedVerb || animation) && displayProjection.other
-              ? { deltas: displayProjection.other }
-              : undefined
-          }
-          passive
-          activePropagationKeys={activePropagationKeys.other}
-          actionPulsePlanet={actionPulseOpponent}
-          impactPlanets={impactOpponent}
-          combustingPlanets={combustingOpponent}
-          mergingPlanets={mergingOpponent}
-          warningPlanets={otherWarnings ?? undefined}
-          incoming={incomingOther}
-          animationEpoch={animationEpoch}
-        />
-      </div>
-
-      {/* What is fixed for the whole encounter, under the wheels:
-          the planet that rules it — the colour its node
-          carried on the map — and the rule it sets. What moves (the turn, the
-          score, the other's move) reads above the charts; this reads below. */}
-      <div className="combat-foot">
-        <div className="combat-ruler" data-guide="ruler">
-          <span className="eyebrow">RULER</span>
-          <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
-            {ruler}
-          </span>
-        </div>
-        <p className="combat-rule" data-guide="rule">
-          {/* The rule in the ruler's colour, under the name in the same colour.
-              Light itself stays neutral — no colour stands for it anywhere
-              else. */}
-          Gain Light from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
-        </p>
-      </div>
-
 
       {devAnimationControls && (
         <DevAnimationPanel
@@ -710,7 +710,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           onSkip={skipAnimation}
         />
       )}
-    </div>
+    </>
   );
 }
 

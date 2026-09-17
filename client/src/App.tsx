@@ -7,6 +7,7 @@ import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { PlaySurface } from "@/screens/PlaySurface";
 import { IndexScreen } from "@/screens/IndexScreen";
+import { GameLayout } from "@/screens/GameLayout";
 import { installAudioUnlock } from "@/audio/engine";
 
 export function App() {
@@ -18,8 +19,10 @@ export function App() {
       <Starfield />
       <ActivePlanetTint />
       <Routes>
-        <Route path={ROUTES.title} element={<TitleScreen />} />
-        <Route path={ROUTES.play} element={<PlaySurface />} />
+        <Route element={<GameLayout />}>
+          <Route path={ROUTES.title} element={<TitleScreen />} />
+          <Route path={ROUTES.play} element={<PlaySurface />} />
+        </Route>
         <Route path={ROUTES.index} element={<IndexScreen />} />
         <Route path="*" element={<Navigate to={ROUTES.title} replace />} />
       </Routes>

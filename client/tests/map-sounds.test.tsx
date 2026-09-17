@@ -2,8 +2,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MapDiagram } from "@/components/MapDiagram";
-import { MapScreen } from "@/screens/MapScreen";
-import { PrinceStoreProvider } from "@/state/PrinceStore";
+import { GameTest } from "./game-layout";
 import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
 import { buildMapGraph, eligibleNext } from "@/game/map-gen";
@@ -58,7 +57,7 @@ const cues = () => vi.mocked(playUISound).mock.calls.map(([cue]) => cue);
 describe("map feedback", () => {
   it.each(["Enter", " "])("travels on the first %j activation and ignores key repeat", (key) => {
     const { prince, node, next } = setup();
-    act(() => root.render(<PrinceStoreProvider><MapScreen /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
     press(node, key, true);
     expect(cues()).toEqual([]);
     expect(loadPrince()).toEqual(prince);
@@ -70,7 +69,7 @@ describe("map feedback", () => {
 
   it("travels on the first click with one commit cue", () => {
     const { node, next } = setup();
-    act(() => root.render(<PrinceStoreProvider><MapScreen /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
     click(node);
     expect(cues()).toEqual(["commit"]);
     expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
@@ -126,7 +125,7 @@ describe("map feedback", () => {
 
   it("never sounds a commitment while the map guide blocks entering a node", () => {
     const { prince, node } = setup();
-    act(() => root.render(<PrinceStoreProvider><MapScreen /></PrinceStoreProvider>));
+    act(() => root.render(<GameTest path="/play" />));
     click('.screen-help-button');
     vi.mocked(playUISound).mockClear();
     click(node);

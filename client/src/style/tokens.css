@@ -42,6 +42,10 @@
   --begin-btn-font-size: 24px;
   --begin-btn-padding: 8px 20px;
 
+  --chart-pad-block: 80px;
+  --chart-pad-inline: 60px;
+  --chart-gap: 32px;
+
   /* Chart-casting form */
   --mint-form-width: 480px;
   --mint-form-gap: 20px;
@@ -51,8 +55,6 @@
   --mint-input-padding: 8px;
   --mint-compass-size: 20px;
   --mint-compass-offset-x: -3.5px;
-
-  --map-pad-block: 24px;
 
   /* Stroke scale */
   --stroke-hairline: 0.5;

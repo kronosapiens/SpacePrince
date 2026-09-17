@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChartInspection } from "@/components/ChartInspection";
+import { useOutletContext } from "react-router-dom";
+import type { GameLayoutContext } from "./GameLayout";
 import { BeginButton } from "@/components/BeginButton";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
@@ -34,7 +35,7 @@ export function MapScreen() {
   const rolloverMap = useRolloverMap();
   const startRun = useStartRun();
   const { setActive } = useActivePlanet();
-  const [guideOpen, setGuideOpen] = useState(false);
+  const { guideOpen, setGuideOpen } = useOutletContext<GameLayoutContext>();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
   const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numEncounters);
 
@@ -162,7 +163,7 @@ export function MapScreen() {
     (boundary.uncombusts.length > 0 || boundary.barrage.length > 0);
 
   return (
-    <div className="chart-layout map-screen">
+    <>
       <MapGuide
         open={guideOpen}
         phase={guidePhase}
@@ -174,15 +175,7 @@ export function MapScreen() {
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
-      <div className="chart-layout-chart map-chart" data-guide="chart">
-        <ChartInspection
-          chart={prince.chart}
-          state={run.state}
-          unlockedPlanets={playerUnlocked}
-          disabled={guideOpen}
-        />
-      </div>
-      <div className="map-content">
+      <div className="map-content anim-surface-in">
         <div className="map-diagram-wrap">
           <MapDiagram map={run.map} onSelectNode={runOver ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
@@ -213,7 +206,7 @@ export function MapScreen() {
         )}
         {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>New Run</BeginButton>}
       </div>
-    </div>
+    </>
   );
 }
 
