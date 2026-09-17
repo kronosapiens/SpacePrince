@@ -15,16 +15,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes encounter-open-left {
-  from { opacity: 0; transform: translateX(-32px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes encounter-open-right {
-  from { opacity: 0; transform: translateX(32px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
 @keyframes encounter-open-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -334,7 +324,6 @@
   .wordmark-glow circle,
   .planet-corona,
   .anim-surface-in,
-  .chart-layout .anim-encounter-open-right,
   .chart-layout .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
@@ -346,10 +335,6 @@
   .chart-layout .title-content,
   .chart-layout .mint-framing { transition: none; }
 }
-
-.anim-encounter-open-left  { animation: encounter-open-left  var(--m-encounter-open) var(--ease-out) both; }
-.anim-encounter-open-right { animation: encounter-open-right var(--m-encounter-open) var(--ease-out) both; }
-.anim-encounter-open-fade  { animation: encounter-open-fade  var(--m-encounter-open) var(--ease-out) both; }
 
 .anim-map-arrival { animation: map-node-arrival var(--m-map-arrival) var(--ease-out) both; }
 

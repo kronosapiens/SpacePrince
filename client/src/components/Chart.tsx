@@ -150,7 +150,6 @@ export interface ChartProps {
    *  gameplay screens don't set it. */
   hideAffliction?: boolean;
   scale?: number;
-  entrance?: "left" | "right" | "none";
   side?: "self" | "other";
   onPlanetClick?: (p: PlanetName) => void;
   onPlanetHover?: (p: PlanetName | null) => void;
@@ -227,7 +226,6 @@ export function Chart(props: ChartProps) {
     showSubstrate = true,
     showAspects = true,
     hideAffliction = false,
-    entrance = "none",
     side,
     onPlanetClick,
     onPlanetHover,
@@ -293,11 +291,6 @@ export function Chart(props: ChartProps) {
     const affliction = state?.[p]?.affliction;
     return affliction != null && isCombusted(chart.planets[p], { affliction });
   };
-
-  const entranceClass =
-    entrance === "left" ? "anim-encounter-open-left" :
-    entrance === "right" ? "anim-encounter-open-right" :
-    "";
 
   // Color-field blooms — one radial gradient per visible non-combust planet.
   const fieldBlooms = showColorField && tuning.showGlow
@@ -398,7 +391,7 @@ export function Chart(props: ChartProps) {
   return (
     <svg
       viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-      className={["chart-svg", tuning.showGlow ? "" : "no-glow", entranceClass, className ?? ""].filter(Boolean).join(" ")}
+      className={["chart-svg", tuning.showGlow ? "" : "no-glow", className ?? ""].filter(Boolean).join(" ")}
       style={style}
       data-guide={side ? `wheel-${side}` : undefined}
       role="img"

@@ -657,7 +657,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             activePlanet={displayOpponentTurn}
             ringVerb={displayOpponentAction}
             hoveredPlanet={encounter.resolved || selected ? null : hoveredOpponent}
-            entrance="right"
             side="other"
             onPlanetHover={setHoveredOpponent}
             // Offense chips need an indicated verb (or committed playback) —
