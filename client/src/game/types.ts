@@ -117,7 +117,6 @@ export interface NarrativeEncounter {
   id: string;
   house: number; // 1..12
   scenarioId: string;
-  fragmentId: string;
   resolved: boolean;
   resolutionText?: string;
 }
@@ -206,7 +205,6 @@ export interface Run {
   mapsCompleted: number;
   encounter: EncounterState | null;
   /** No-repeat bookkeeping — active-run-only (STATE.md). */
-  seenFragmentIds: string[];
   seenScenarioIds: string[];
   /** In-memory history of finished maps; not persisted. */
   events: RunEvent[];

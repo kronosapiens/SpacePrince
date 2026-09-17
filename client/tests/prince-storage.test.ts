@@ -26,7 +26,7 @@ describe("Prince storage", () => {
     const prince = createStubPrince();
     const run = beginRun(7, prince.numEncounters);
     const scenario = getScenario("livelihood-coin");
-    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: scenario.scenarioId, fragmentId: "fragment" });
+    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: scenario.scenarioId });
     prince.runs = [run];
     savePrince(prince);
     const restored = loadPrince()!;

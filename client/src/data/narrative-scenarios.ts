@@ -21,7 +21,7 @@ const canShelter = (ctx: NarrativeContext) => rulerStrong(ctx) && anyCombusted(c
 // the targets, and mechanical asides are derived from these effects.
 export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
   {
-    scenarioId: "self-still-water", house: 1, fragmentMood: "opening",
+    scenarioId: "self-still-water", house: 1,
     text: "A portrait painter has given you the face she imagines a prince should have. She waits with her brush raised while you study the stranger on the canvas.",
     options: [
       ...conditioned(joyPresent,
@@ -33,7 +33,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "self-stake", house: 1, fragmentMood: "declaration",
+    scenarioId: "self-stake", house: 1,
     text: "A wrestling master asks you to take the stance you learned as a child. He puts a purse beside the mat and reaches for your shoulder to test it.",
     options: [
       ...conditioned(joyStrong,
@@ -45,7 +45,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "livelihood-coin", house: 2, fragmentMood: "warning",
+    scenarioId: "livelihood-coin", house: 2,
     text: "A grain seller offers you the coins spilled beneath his scales. He will pay more if you can free his wagon from a mound of fallen sacks.",
     options: [
       choice("take", "Gather the loose coins.", "You count them twice before closing your purse.", [L(12)]),
@@ -54,7 +54,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "livelihood-lender", house: 2, fragmentMood: "warning",
+    scenarioId: "livelihood-lender", house: 2,
     text: "At the pawnbroker's, embroidered robes are being unpicked for their silver thread. He pays by weight, and the next buyer arrives at sunset.",
     options: [
       choice("lift", "Unpick a whole robe before sunset.", "Your fingers are swollen when he weighs the coil of silver and pays you.", [A("chosen", 60), L(48)]),
@@ -63,7 +63,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "communication-letter", house: 3, fragmentMood: "longing",
+    scenarioId: "communication-letter", house: 3,
     text: "At the inn, a letter from your sister waits beneath the room key. She has filled the margins with village news and crossed out the sentence that begins with your name.",
     options: [
       ...conditioned(joyPresent,
@@ -75,7 +75,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "communication-bridge", house: 3, fragmentMood: "paradox",
+    scenarioId: "communication-bridge", house: 3,
     text: "The footbridge has washed away on market morning. On the far bank, a woman lifts a basket above her head so her brother can see she has brought his bread.",
     options: [
       ...conditioned(joyPresent,
@@ -87,7 +87,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "home-hearth", house: 4, fragmentMood: "stillness",
+    scenarioId: "home-hearth", house: 4,
     text: "An elderly host turns down a bed kept ready since her son left. Around the hearth, chairs have been drawn close enough for every guest to reach the warmth.",
     options: [
       ...conditioned(canShelter,
@@ -99,7 +99,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "home-buried", house: 4, fragmentMood: "concealment",
+    scenarioId: "home-buried", house: 4,
     text: "Your family's old house is being taken apart around the hearth. A purse is caught under the hearthstone, and your childhood blanket lies folded on the mantel.",
     options: [
       choice("take", "Lift the hearthstone and take the purse.", "You prise the purse free with scraped knuckles, then replace the stone where generations rested their feet.", [A("chosen", 48), L(48)]),
@@ -108,7 +108,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "creativity-dice", house: 5, fragmentMood: "longing",
+    scenarioId: "creativity-dice", house: 5,
     text: "At the festival, a child offers to paint your face with a borrowed brush. A queue of dancers waits beside the paint pots while supper is laid on long tables.",
     options: [
       ...conditioned(joyPresent,
@@ -120,7 +120,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "creativity-song", house: 5, fragmentMood: "longing",
+    scenarioId: "creativity-song", house: 5,
     text: "At a family feast, a child has made a song for her grandfather, but every verse follows a different tune. She holds out the fiddle as he settles into the front row.",
     options: [
       choice("finish", "Fit the verses to one tune.", "Your fingers ache by the final verse, and her grandfather asks to hear it once more.", [A("chosen", 48), L(48)]),
@@ -132,7 +132,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "labor-field", house: 6, fragmentMood: "labor",
+    scenarioId: "labor-field", house: 6,
     text: "The last shearer has split his palm, and the flock is still waiting in the pen. The steward offers his wages to whoever finishes before the evening bell.",
     options: [
       ...conditioned(joyPresent,
@@ -144,7 +144,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "labor-fever", house: 6, fragmentMood: "labor",
+    scenarioId: "labor-fever", house: 6,
     text: "At the laundry, your hands begin to shake each time you lift a wet sheet. Beside the furnace, the keeper has set out a bowl of salve and a chair nobody is using.",
     options: [
       choice("push", "Finish the sheets before sitting down.", "The keeper puts your wages on the bench because your hands are still shaking too hard to hold them.", [A("chosen", 48), L(36)]),
@@ -156,7 +156,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "relationships-stranger", house: 7, fragmentMood: "longing",
+    scenarioId: "relationships-stranger", house: 7,
     text: "A traveler who argued with you at the last crossing has hired the only boat on this bank. They shift their bags to make a place and ask whether you can agree on a pace.",
     options: [
       choice("shift", "Accept the seat and let them row.", "Your shoulder rests against the gunwale while your old opponent rows you across.", [A("chosen", -36)]),
@@ -165,7 +165,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "relationships-bargain", house: 7, fragmentMood: "declaration",
+    scenarioId: "relationships-bargain", house: 7,
     text: "At a crossroads, two porters dispute a contract: equal pay, though one carries twice the weight. They offer you a share of the work, or passage with your own bags carried for a fee.",
     options: [
       choice("carry", "Carry the disputed load to the next fork.", "They settle the bill while you ease the borrowed straps away from your shoulders.", [A("chosen", 48), L(48)]),
@@ -177,7 +177,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "transformation-inheritance", house: 8, fragmentMood: "warning",
+    scenarioId: "transformation-inheritance", house: 8,
     text: "The woman who once sheltered you has left you her strongbox. Her executor offers to force its rusted lock for a share.",
     options: [
       choice("take", "Force the lock yourself.", "The chisel bruises your palm before the lock yields, revealing coins wrapped in her handkerchief.", [A("chosen", 60), L(60)]),
@@ -186,7 +186,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "transformation-rite", house: 8, fragmentMood: "concealment",
+    scenarioId: "transformation-rite", house: 8,
     text: "At the mortuary, each lamp bears a name spoken by someone still living. Beside an unlit wick, the keeper has laid out the bowl used in the rite of return.",
     options: [
       ...conditioned(anyCombusted,
@@ -198,7 +198,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "pilgrimage-teacher", house: 9, fragmentMood: "declaration",
+    scenarioId: "pilgrimage-teacher", house: 9,
     text: "In a distant school, your homeland appears at the margin of the map. The teacher asks you to explain the roads you know while a student moves the lamp to see them.",
     options: [
       ...conditioned(joyPresent,
@@ -210,7 +210,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "pilgrimage-vigil", house: 9, fragmentMood: "declaration",
+    scenarioId: "pilgrimage-vigil", house: 9,
     text: "At a mountain shrine, the dawn watch faces west. The keeper pays those who stay awake through the night and rents rooms beneath the steps.",
     options: [
       ...conditioned(joyStrong,
@@ -222,7 +222,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "achievement-summit", house: 10, fragmentMood: "declaration",
+    scenarioId: "achievement-summit", house: 10,
     text: "The council has set a chair for you above the people who repaired the road. Beside it lies the survey you must explain before they announce your reward.",
     options: [
       choice("praise", "Defend every measure before the council.", "By the time they approve the survey, your voice is hoarse and the room knows who answered for it.", [A("chosen", 48), L(60)]),
@@ -234,7 +234,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "achievement-monument", house: 10, fragmentMood: "stillness",
+    scenarioId: "achievement-monument", house: 10,
     text: "At a new bridge, the mason offers a place on the dedication stone to anyone who finishes the paving. A larger inscription is reserved for whoever completes the arch above the approach.",
     options: [
       choice("stone", "Set the last paving stone and sign the roll.", "The mason reads your name aloud as the first cart crosses.", [L(12)]),
@@ -243,7 +243,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "friendship-gift", house: 11, fragmentMood: "longing",
+    scenarioId: "friendship-gift", house: 11,
     text: "Your friends have collected money for the road and laid supper on a borrowed table. One has brought the dish you always asked for and says it will not travel well.",
     options: [
       choice("coins", "Accept the money for the road.", "Several hands have knotted the purse shut, and your friends argue cheerfully about whose knot will hold.", [L(24)]),
@@ -255,7 +255,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "friendship-favor", house: 11, fragmentMood: "declaration",
+    scenarioId: "friendship-favor", house: 11,
     text: "Travelers have pooled their money for a courtyard where anyone on the road can eat. They are hanging the first cooking pot when they recognize you at the gate.",
     options: [
       ...conditioned(joyStrong,
@@ -267,7 +267,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "hidden-weight", house: 12, fragmentMood: "concealment",
+    scenarioId: "hidden-weight", house: 12,
     text: "Outside the city wall, an exile offers you a fee to read a letter he is forbidden to answer. His lips form the news about his daughter's wedding before you reach it.",
     options: [
       ...conditioned(joyPresent,
@@ -279,7 +279,7 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
     ],
   },
   {
-    scenarioId: "hidden-door", house: 12, fragmentMood: "concealment",
+    scenarioId: "hidden-door", house: 12,
     text: "A former prisoner has returned to find his cell sealed, with the name he carved just visible through a gap in the masonry. He offers you payment for a rubbing of the letters, or for the stone itself.",
     options: [
       ...conditioned(joyPresent,

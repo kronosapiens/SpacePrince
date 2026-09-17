@@ -45,7 +45,7 @@ function mount(id: string) {
   run.state.Sun.affliction = 10;
   run.state.Mars.affliction = 24;
   run.state.Venus.affliction = combustionCeiling(prince.chart.planets.Venus);
-  const encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id, fragmentId: "test" });
+  const encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
   run.encounter = encounter;
   const onCommit = vi.fn();
   const render = (nextRun = run) => {

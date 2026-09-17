@@ -15,7 +15,6 @@ This file describes the *implementation* — how the client is wired together an
 - React Router 7 — URLs are state for dev seed routes (`/encounter/<seed>`)
 - Vitest — pure logic + reducers tested
 - `astronomy-engine` (Don Cross) — real ephemeris for Mint
-- `js-yaml` + Vite `?raw` — chorus fragments loaded from `planets/*.yaml`
 - pnpm — `pnpm dev`, `pnpm test`, `pnpm exec tsc -b --noEmit`
 
 ## Folder layout
@@ -26,7 +25,7 @@ Layers are listed lowest-first; each layer imports only from layers above it.
 client/src/
   svg/                  Constants only — palette, glyph maps, viewBox geometry, stroke scale
   game/                 Pure game logic — no React, no storage, no DOM
-  data/                 Static reference data (houses, narrative trees, chorus loader)
+  data/                 Static reference data (houses, narrative scenarios)
   astronomy/            astronomy-engine wrapper for Mint
   state/                Reducers, providers, thunk hooks, persistence
   components/           Reusable presentation pieces (Chart, MapDiagram, etc.)

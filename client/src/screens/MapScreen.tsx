@@ -18,7 +18,6 @@ import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
-import { pickFragment } from "@/data/chorus";
 import { pickScenario } from "@/data/narrative-scenarios";
 import { chartRuler, seededChart } from "@/game/chart";
 import type {
@@ -107,20 +106,12 @@ export function MapScreen() {
           devUnlockAll: settings.unlockAll,
         });
       } else {
-        const house = HOUSES[content.house - 1]!;
         const rng = mulberry32(hashString(`${run.id}_${content.house}_${nodeId}`));
         const scenario = pickScenario(content.house, nextRun.seenScenarioIds ?? [], rng);
-        const fragment = pickFragment({
-          planet: house.ruler,
-          mood: scenario.fragmentMood,
-          exclude: nextRun.seenFragmentIds,
-          rng,
-        });
         encounter = beginNarrativeEncounter({
           run: nextRun,
           house: content.house,
           scenarioId: scenario.scenarioId,
-          fragmentId: fragment?.id ?? `${house.ruler.toLowerCase()}-stub`,
         });
         nextRun = {
           ...nextRun,

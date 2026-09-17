@@ -60,7 +60,6 @@ export function beginRun(
     map: newMapState(mapSeed, combatRulers),
     mapsCompleted: 0,
     encounter: null,
-    seenFragmentIds: [],
     seenScenarioIds: [],
     events: [],
   };

@@ -14,10 +14,8 @@ import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario } from "@/data/narrative-scenarios";
-import { getFragmentById, pickFragment, fragmentTitle } from "@/data/chorus";
 import { playCombust, playStrike, playUISound, setTheme } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
-import { mulberry32 } from "@/game/rng";
 import type {
   NarrativeEncounter,
   PlanetName,
@@ -31,10 +29,6 @@ const EFFECT_COLORS = {
   ...VALENCE_COLOR,
   Light: "color-mix(in srgb, var(--gold) 55%, var(--bone))",
 };
-
-const HOUSE_ROMAN = [
-  "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII",
-];
 
 const HOUSE_NAMES = [
   "First House", "Second House", "Third House", "Fourth House",
@@ -61,7 +55,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     () => getScenario(encounter.scenarioId),
     [encounter.scenarioId],
   );
-  const ariaPlanet: PlanetName = house.ruler;
+  const rulerPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
   const playerUnlocked = useMemo(
     () => unlockedPlanets(prince.numEncounters, devUnlockAll),
@@ -69,26 +63,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   );
 
   useEffect(() => {
-    setActive(ariaPlanet);
-  }, [ariaPlanet, setActive]);
+    setActive(rulerPlanet);
+  }, [rulerPlanet, setActive]);
 
-  // The score: narrative sits close to the ruler's theme bed — the aria's
-  // planet carries the room (MUSIC.md: theme by planet, variant by surface).
+  // The house ruler carries the score and the planetary artwork.
   useEffect(() => {
-    setTheme(ariaPlanet, "narrative");
-  }, [ariaPlanet]);
-
-  const fragment = useMemo(() => {
-    const fixed = getFragmentById(encounter.fragmentId);
-    if (fixed) return fixed;
-    const rng = mulberry32(encounter.house * 1000 + run.seed);
-    return pickFragment({
-      planet: ariaPlanet,
-      mood: scenario.fragmentMood,
-      exclude: run.seenFragmentIds,
-      rng,
-    });
-  }, [encounter.fragmentId, encounter.house, run.seed, run.seenFragmentIds, ariaPlanet, scenario.fragmentMood]);
+    setTheme(rulerPlanet, "narrative");
+  }, [rulerPlanet]);
 
   const ctx = useMemo(
     () =>
@@ -270,8 +251,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     className: resolved ? "is-resolved" : "",
   });
 
-  const fragmentLines = (fragment?.text ?? "").split(/\n+/);
-
   return (
     <>
       {/* A resolved scene carries itself onward within seconds — nothing left
@@ -288,38 +267,20 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
         />
       )}
       <div className="narrative-column anim-surface-in">
-        <div className="narrative-composition">
-          <KandinskyComposition planet={ariaPlanet} size={280} />
-        </div>
-
-        <div className="narrative-text anim-fragment-in" data-guide="narrative-text">
-          {fragment && (
-            <>
-              <div className="narrative-fragment">
-                {fragmentLines.map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    {i < fragmentLines.length - 1 ? <br /> : null}
-                  </span>
-                ))}
-              </div>
-              <div className="narrative-attrib">
-                {fragment.author?.toUpperCase() ?? ""}
-                {fragmentTitle(fragment) ? ` · ${fragmentTitle(fragment).toUpperCase()}` : ""}
-              </div>
-            </>
-          )}
-        </div>
-
         <div className="narrative-body">
-          <div className="narrative-house" data-guide="narrative-house">
-            <span className="narrative-house-num">{HOUSE_ROMAN[house.num - 1]}:</span> {HOUSE_NAMES[house.num - 1]}
-            <span className="narrative-house-gloss"> — {house.gloss}</span>
+          <div className="narrative-heading">
+            <div className="narrative-composition">
+              <KandinskyComposition planet={rulerPlanet} />
+            </div>
+            <div className="narrative-house" data-guide="narrative-house">
+              {HOUSE_NAMES[house.num - 1]}
+              <span className="narrative-house-gloss">{house.gloss}</span>
+            </div>
           </div>
           <p>{resolved ? (encounter.resolutionText ?? "It is finished.") : scenario.text}</p>
         </div>
 
-        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${targeting ? "is-targeting" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[ariaPlanet] } as CSSProperties}>
+        <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${targeting ? "is-targeting" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[rulerPlanet] } as CSSProperties}>
           {shownRows.map(({ option: o, aside, reason, assignments }, i) => {
             const isSelected = selectedOptionId === o.id;
             const commit = () => {

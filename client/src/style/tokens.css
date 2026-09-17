@@ -46,6 +46,9 @@
   --chart-pad-inline: 60px;
   --chart-gap: 32px;
 
+  --narrative-composition-size: clamp(112px, 18svh, 180px);
+  --narrative-gap: 20px;
+
   /* Chart-casting form */
   --mint-form-width: 480px;
   --mint-form-gap: 20px;
@@ -71,7 +74,6 @@
   --m-combust: 1800ms;
   --m-tint-shift: 2000ms;
   --m-map-arrival: 400ms;
-  --m-fragment: 800ms;
   --m-leave: 600ms;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -84,6 +86,13 @@
 
   --pad: 24px;
   --pad-tight: 12px;
+}
+
+@media (max-width: 1399px), (max-height: 850px) {
+  :root {
+    --narrative-composition-size: 96px;
+    --narrative-gap: 16px;
+  }
 }
 
 * { box-sizing: border-box; }
@@ -152,7 +161,6 @@ svg text,
     --m-combust: 1ms;
     --m-tint-shift: 1ms;
     --m-map-arrival: 1ms;
-    --m-fragment: 1ms;
     --m-leave: 1ms;
   }
 }

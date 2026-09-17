@@ -66,13 +66,6 @@ export function NarrativeGuide({
             ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
             : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
         },
-        {
-          key: "chorus",
-          anchor: "narrative-text",
-          placement: "top",
-          label: COPY.notes.chorus.label,
-          body: <TermText text={COPY.notes.chorus.body} vars={{ ruler: planetName(house.ruler) }} />,
-        },
       ];
     }
 

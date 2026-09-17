@@ -1,4 +1,3 @@
-import type { Mood } from "@/data/chorus";
 import { HOUSES } from "@/data/houses";
 import { cloneSideState } from "./chart";
 import { combustionCeiling, isCombusted, newlyCombusted, uncombust } from "./combust";
@@ -30,7 +29,6 @@ export interface NarrativeScenario {
   scenarioId: string;
   house: number;
   text: string;
-  fragmentMood?: Mood;
   options: Option[];
 }
 
@@ -161,7 +159,6 @@ export function resolveNarrative(
   return {
     ...next,
     encounter: { ...encounter, resolved: true, resolutionText: result.text },
-    seenFragmentIds: run.seenFragmentIds.includes(encounter.fragmentId) ? run.seenFragmentIds : [...run.seenFragmentIds, encounter.fragmentId],
     map: {
       ...run.map,
       outcomes: {

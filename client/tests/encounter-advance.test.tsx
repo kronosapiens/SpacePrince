@@ -193,7 +193,7 @@ describe("encounter advancement", () => {
   it("preserves narrative auto-advance through the same exit path", () => {
     const prince = createStubPrince();
     const run = beginRun(42, prince.numEncounters);
-    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: "livelihood-coin", fragmentId: "test" });
+    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: "livelihood-coin" });
     prince.runs = [run];
     mount(prince);
     click(get('[data-guide="option-1"]'));

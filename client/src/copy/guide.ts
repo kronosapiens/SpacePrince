@@ -131,10 +131,6 @@ export const GUIDE_COPY = {
         label: "The house",
         body: "A house is a story event: your choice can change health or Light, your run's score. Its ruler, {ruler}, sets the stage.",
       },
-      chorus: {
-        label: "The chorus",
-        body: "The chorus is flavour text voiced by {ruler}. It sets the mood and reveals the planet's character.",
-      },
       commit: {
         label: "Preview, then choose",
         body: "Hover or focus an option or target to preview. Click the option, then a planet if it needs a target. The choice ends the scene.",

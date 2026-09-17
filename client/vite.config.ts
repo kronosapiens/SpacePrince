@@ -7,7 +7,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
-      "@planets": path.resolve(__dirname, "../planets"),
     },
   },
   server: {

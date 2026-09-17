@@ -3,9 +3,8 @@ import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 import { STAT_LABEL } from "./combat";
 
 // Study-mode copy — the opt-in foothold for a player new to astrology
-// (spec/design/SCREENS.md §3.6.1). Authored, never generated. These are study
-// annotations, NOT chorus fragments: a fragment never explains, but a gloss may
-// name the symbol plainly (spec/concept/PLANETS.md §1).
+// (spec/design/SCREENS.md §3.6.1). Authored, never generated.
+// Study annotations name the symbol plainly.
 
 /** One grounded line per planet — its core astrological significations in a
  *  plain, textbook register (drawn from spec/concept/PLANETS.md archetypes).

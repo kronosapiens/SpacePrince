@@ -15,7 +15,7 @@ function setup(id = "self-still-water", numEncounters = 64) {
   const prince = createStubPrince({ numEncounters });
   const scenario = getScenario(id);
   const run = { ...beginRun(42, numEncounters), light: 120 };
-  run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id, fragmentId: "test-fragment" });
+  run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
   const context = () => {
     const house = HOUSES[scenario.house - 1]!;
     return buildNarrativeContext({ prince, run, joyPlanet: house.joy, rulerPlanet: house.ruler, unlocked: unlockedPlanets(numEncounters) });
@@ -216,7 +216,6 @@ describe("single-decision narrative", () => {
     expect(next.encounter?.resolved).toBe(true);
     expect(next.encounter?.kind === "narrative" && next.encounter.resolutionText).toBe(scenario.options[0]!.result.text);
     expect(next.map.outcomes[run.map.currentNodeId]?.lightDelta).toBe(12);
-    expect(next.seenFragmentIds).toEqual(["test-fragment"]);
     expect(resolveNarrative(next, prince, scenario, "take", {})).toBeNull();
     expect(resolveNarrative({ ...run, encounter: null }, prince, scenario, "take", {})).toBeNull();
     expect(resolveNarrative(run, prince, getScenario("home-hearth"), "take", {})).toBeNull();

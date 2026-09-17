@@ -18,8 +18,7 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@planets/*": ["../planets/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src", "tests"]

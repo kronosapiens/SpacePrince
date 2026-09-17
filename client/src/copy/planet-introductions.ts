@@ -2,7 +2,6 @@ import type { PlanetName, SignName } from "@/game/types";
 
 // Original placement portraits informed by spec/concept/PLANET_MATRIX.md.
 // Read each planet's framework and placement notes when revising its copy.
-// These introductions are separate from the sourced planetary chorus.
 export const PLANET_INTRODUCTIONS: Record<PlanetName, Record<SignName, string>> = {
   Sun: {
     Aries: "You come alive in the moment of beginning. You may not know what waits beyond the door, but there is something unmistakably yours in the hand that opens it.",

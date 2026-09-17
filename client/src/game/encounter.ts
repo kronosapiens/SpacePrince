@@ -108,17 +108,15 @@ export interface BeginNarrativeInput {
   run: Run;
   house: number;
   scenarioId: string;
-  fragmentId: string;
 }
 
 export function beginNarrativeEncounter(input: BeginNarrativeInput): NarrativeEncounter {
-  const { run, house, scenarioId, fragmentId } = input;
+  const { run, house, scenarioId } = input;
   return {
     kind: "narrative",
     id: `enc_narr_${run.id}_${house}_${Date.now()}`,
     house,
     scenarioId,
-    fragmentId,
     resolved: false,
   };
 }

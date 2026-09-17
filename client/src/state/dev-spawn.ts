@@ -6,9 +6,7 @@ import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { mulberry32, hashString, randomSeed } from "@/game/rng";
 import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
-import { HOUSES } from "@/data/houses";
 import { pickScenario } from "@/data/narrative-scenarios";
-import { pickFragment } from "@/data/chorus";
 import type {
   Chart,
   CombatEncounter,
@@ -112,15 +110,12 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   const base = beginRun(seed, tier);
   const rng = mulberry32(seed);
   const house = opts.house ?? 1 + Math.floor(rng() * 12);
-  const houseDef = HOUSES[house - 1]!;
   const scenario = pickScenario(house, [], rng);
-  const fragment = pickFragment({ planet: houseDef.ruler, mood: scenario.fragmentMood, exclude: [], rng });
   // Narrative encounters open on one decision; the house and chart vary.
   const encounter = beginNarrativeEncounter({
     run: base,
     house,
     scenarioId: scenario.scenarioId,
-    fragmentId: fragment?.id ?? `${houseDef.ruler.toLowerCase()}-stub`,
   });
   const run: Run = {
     ...base,
@@ -154,7 +149,6 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
     map: finalMap,
     mapsCompleted: MAPS_PER_RUN,
     encounter: null,
-    seenFragmentIds: [],
     seenScenarioIds: [],
     events,
   };

@@ -6,8 +6,8 @@
  *    2. two-three sentences — goals and affordances in one breath;
  *    3. a slightly longer close — the concepts that change decisions,
  *       never a systems manual (previews teach the numbers).
- *  Chrome register: plain second-person help, accurate to MECHANICS.md; no
- *  chorus voice. Player-facing vocabulary is encounter / self / other —
+ *  Chrome register: plain second-person help, accurate to MECHANICS.md.
+ *  Player-facing vocabulary is encounter / self / other —
  *  tension held and relieved; combat and adversary are internal dev
  *  metaphors and never appear here. Casing per SCREENS.md §1.2: named
  *  quantities capped (Resolve, Fortune, Light — TermText golds these);

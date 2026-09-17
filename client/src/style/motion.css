@@ -335,7 +335,6 @@
   .planet-corona,
   .anim-surface-in,
   .chart-layout .anim-encounter-open-right,
-  .chart-layout .anim-fragment-in,
   .chart-layout .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
@@ -347,15 +346,6 @@
   .chart-layout .title-content,
   .chart-layout .mint-framing { transition: none; }
 }
-
-.anim-fragment-in {
-  animation: fragment-in var(--m-fragment) var(--ease-out) both;
-}
-
-.anim-fragment-in-1 { animation-delay: 0ms; }
-.anim-fragment-in-2 { animation-delay: 200ms; }
-.anim-fragment-in-3 { animation-delay: 400ms; }
-.anim-fragment-in-4 { animation-delay: 600ms; }
 
 .anim-encounter-open-left  { animation: encounter-open-left  var(--m-encounter-open) var(--ease-out) both; }
 .anim-encounter-open-right { animation: encounter-open-right var(--m-encounter-open) var(--ease-out) both; }
