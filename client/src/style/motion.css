@@ -74,6 +74,21 @@
   animation-iteration-count: infinite;
 }
 
+/* The title's glows rise in an overlapping sweep, then rest before repeating. */
+.wordmark-glow {
+  --wordmark-ripple-period: 14s;
+  --wordmark-ripple-stagger: 1.1s;
+}
+@keyframes wordmark-ripple {
+  0%, 30%, 100% { opacity: 0.72; transform: scale(1); }
+  15%           { opacity: 1;    transform: scale(1.04); }
+}
+.wordmark-glow circle {
+  animation: wordmark-ripple var(--wordmark-ripple-period) ease-in-out infinite both;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
 /* Slow, gentle breath on the map's current-node halo — same family as
    the tint-overlay breath but applied to an SVG circle. */
 @keyframes map-current-halo-breath {
@@ -316,6 +331,7 @@
   .anim-light-pop,
   .anim-map-current-halo,
   .anim-star-twinkle,
+  .wordmark-glow circle,
   .planet-corona,
   .anim-surface-in,
   .chart-layout .anim-encounter-open-right,

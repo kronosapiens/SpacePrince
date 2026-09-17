@@ -17,7 +17,13 @@ export function WordmarkGlow() {
         ))}
       </defs>
       {MACROBIAN_ORDER.map((planet, index) => (
-        <circle key={planet} cx={80 + index * 90} cy={80} fill={`url(#${id}-${planet})`} />
+        <circle
+          key={planet}
+          cx={80 + index * 90}
+          cy={80}
+          fill={`url(#${id}-${planet})`}
+          style={{ animationDelay: `calc(${index} * var(--wordmark-ripple-stagger))` }}
+        />
       ))}
     </svg>
   );
