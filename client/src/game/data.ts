@@ -12,12 +12,8 @@ export const SIGNS: SignName[] = [
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
 ];
 
+// Macrobian order — also the order in which planets unlock.
 export const PLANETS: PlanetName[] = [
-  "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn",
-];
-
-// Macrobian descent — order in which planets unlock.
-export const MACROBIAN_ORDER: PlanetName[] = [
   "Moon", "Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn",
 ];
 
@@ -25,7 +21,7 @@ export const MACROBIAN_ORDER: PlanetName[] = [
 // unlocks. The Moon is present from the first encounter (threshold 0, since the
 // count starts at 0 and increments after each encounter); each subsequent
 // planet unlocks at 2^i encounters.
-export const MACROBIAN_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
+export const UNLOCK_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 
 // Multiples of 12 on a 12-48 scale (MECHANICS.md §2, the sexagesimal lattice).
 // 12-lattice base + 12-lattice buffs keeps every effective stat divisible by

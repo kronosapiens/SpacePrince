@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { MACROBIAN_ORDER } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
 
 export function WordmarkGlow() {
@@ -8,7 +8,7 @@ export function WordmarkGlow() {
   return (
     <svg className="wordmark-glow" viewBox="0 0 700 160" aria-hidden="true" focusable="false">
       <defs>
-        {MACROBIAN_ORDER.map((planet) => (
+        {PLANETS.map((planet) => (
           <radialGradient key={planet} id={`${id}-${planet}`}>
             <stop offset="0%" stopColor={PLANET_PRIMARY[planet]} stopOpacity="var(--wordmark-glow-core)" />
             <stop offset="50%" stopColor={PLANET_PRIMARY[planet]} stopOpacity="var(--wordmark-glow-mid)" />
@@ -16,7 +16,7 @@ export function WordmarkGlow() {
           </radialGradient>
         ))}
       </defs>
-      {MACROBIAN_ORDER.map((planet, index) => (
+      {PLANETS.map((planet, index) => (
         <circle
           key={planet}
           cx={80 + index * 90}

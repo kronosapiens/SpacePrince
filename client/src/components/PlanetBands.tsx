@@ -1,4 +1,4 @@
-import { MACROBIAN_ORDER } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import type { PlanetName } from "@/game/types";
 
@@ -13,7 +13,7 @@ export function PlanetBands({ on, current, className }: {
 }) {
   return (
     <div className={className ? `planet-bands ${className}` : "planet-bands"} aria-hidden="true">
-      {MACROBIAN_ORDER.map((p) => (
+      {PLANETS.map((p) => (
         <div
           key={p}
           className={`planet-band${on?.has(p) ? " is-on" : ""}${current?.has(p) ? " is-current" : ""}`}

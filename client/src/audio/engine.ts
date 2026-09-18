@@ -1,5 +1,5 @@
 import type { PlanetName } from "@/game/types";
-import { MACROBIAN_ORDER } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
@@ -255,7 +255,7 @@ export function playStar(): void {
 const MIX_RAMP_S = 2.2;
 const SWAP_FADE_S = 1.1;
 const SCORE_VOLUME = 0.9;
-const THEME_ORDER: ThemeName[] = ["Main", ...MACROBIAN_ORDER];
+const THEME_ORDER: ThemeName[] = ["Main", ...PLANETS];
 
 let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
 let playing: { theme: ThemeName; score: ReturnType<typeof createScore> } | null = null;

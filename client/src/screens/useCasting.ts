@@ -4,7 +4,7 @@ import { derivePlacements } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
 import { useStartRun } from "@/state/store-actions";
 import { hashString } from "@/game/rng";
-import { TIME_BUCKET_MS, MACROBIAN_ORDER } from "@/game/data";
+import { TIME_BUCKET_MS, PLANETS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { playUISound, setTheme } from "@/audio/engine";
 import type { Chart as ChartType, Prince, SignName } from "@/game/types";
@@ -78,11 +78,11 @@ export function useCasting(enabled: boolean) {
   useEffect(() => {
     if (!enabled || stage !== "revealing") return;
     const delay = ghosted ? GHOST_FADE_MS
-      : revealedCount >= MACROBIAN_ORDER.length ? HELD_MOMENT_MS
+      : revealedCount >= PLANETS.length ? HELD_MOMENT_MS
       : REVEAL_INTERVAL_MS;
     const timer = window.setTimeout(() => {
       if (ghosted) setStage("settled");
-      else if (revealedCount >= MACROBIAN_ORDER.length) {
+      else if (revealedCount >= PLANETS.length) {
         setGhosted(true);
         setActive(null);
       } else setRevealedCount((n) => n + 1);
@@ -93,7 +93,7 @@ export function useCasting(enabled: boolean) {
   useEffect(() => {
     if (!enabled || stage !== "revealing") return;
     if (revealedCount === 0) return;
-    const last = MACROBIAN_ORDER[revealedCount - 1] ?? null;
+    const last = PLANETS[revealedCount - 1] ?? null;
     setActive(last);
   }, [enabled, stage, revealedCount, setActive]);
 
@@ -103,7 +103,7 @@ export function useCasting(enabled: boolean) {
     if (enabled && (stage === "framing" || stage === "input" || stage === "settled")) setActive(null);
   }, [enabled, stage, setActive]);
 
-  const currentRevealing = revealedCount > 0 ? MACROBIAN_ORDER[revealedCount - 1] : null;
+  const currentRevealing = revealedCount > 0 ? PLANETS[revealedCount - 1] : null;
   const currentSign: SignName | null = currentRevealing && computed
     ? computed.planets[currentRevealing].sign
     : null;
@@ -138,13 +138,13 @@ export function useCasting(enabled: boolean) {
   };
 
   const showCeremony = stage === "revealing" || stage === "settled";
-  const revealedPlanets = ghosted ? MACROBIAN_ORDER.slice(0, 1)
-    : showCeremony ? MACROBIAN_ORDER.slice(0, revealedCount) : [];
+  const revealedPlanets = ghosted ? PLANETS.slice(0, 1)
+    : showCeremony ? PLANETS.slice(0, revealedCount) : [];
 
   // The bands fill in step with the reveal: everything painted so far rests
   // dim, the planet arriving sits bright.
   const bandsOn = useMemo(
-    () => new Set(showCeremony ? MACROBIAN_ORDER.slice(0, revealedCount) : []),
+    () => new Set(showCeremony ? PLANETS.slice(0, revealedCount) : []),
     [showCeremony, revealedCount],
   );
   const bandsCurrent = useMemo(

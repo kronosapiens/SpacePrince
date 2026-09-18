@@ -1,4 +1,4 @@
-import { MACROBIAN_ORDER, MACROBIAN_THRESHOLDS } from "./data";
+import { PLANETS, UNLOCK_THRESHOLDS } from "./data";
 import type { PlanetName } from "./types";
 
 /**
@@ -11,15 +11,15 @@ export function unlockedPlanets(
   lifetimeCount: number,
   devUnlockAll = false,
 ): PlanetName[] {
-  if (devUnlockAll) return [...MACROBIAN_ORDER];
-  return MACROBIAN_ORDER.filter((_, i) => lifetimeCount >= MACROBIAN_THRESHOLDS[i]!);
+  if (devUnlockAll) return [...PLANETS];
+  return PLANETS.filter((_, i) => lifetimeCount >= UNLOCK_THRESHOLDS[i]!);
 }
 
 /** Returns the planet that crosses a threshold from `prev` → `next`, or null. */
 export function thresholdCrossedBy(prev: number, next: number): PlanetName | null {
-  for (let i = 0; i < MACROBIAN_THRESHOLDS.length; i++) {
-    const t = MACROBIAN_THRESHOLDS[i]!;
-    if (prev < t && next >= t) return MACROBIAN_ORDER[i]!;
+  for (let i = 0; i < UNLOCK_THRESHOLDS.length; i++) {
+    const t = UNLOCK_THRESHOLDS[i]!;
+    if (prev < t && next >= t) return PLANETS[i]!;
   }
   return null;
 }

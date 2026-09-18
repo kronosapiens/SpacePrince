@@ -13,17 +13,13 @@ export const SIGNS: SignName[] = [
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
 ];
 
+// Macrobian order — also the order in which planets unlock.
 export const PLANETS: PlanetName[] = [
-  "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn",
-];
-
-// Macrobian descent — order in which planets unlock.
-export const MACROBIAN_ORDER: PlanetName[] = [
   "Moon", "Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn",
 ];
 
 // Cumulative lifetime encounter thresholds at which each Macrobian planet unlocks.
-export const MACROBIAN_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
+export const UNLOCK_THRESHOLDS = [1, 2, 4, 8, 16, 32, 64] as const;
 
 export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
   Sun:     { damage: 3, healing: 2, durability: 3, luck: 2 },

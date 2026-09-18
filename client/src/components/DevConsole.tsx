@@ -5,7 +5,7 @@ import { AudioControls } from "@/components/AudioControls";
 import type { PlanetName } from "@/game/types";
 import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
-import { MACROBIAN_THRESHOLDS } from "@/game/data";
+import { UNLOCK_THRESHOLDS } from "@/game/data";
 import {
   currentTheme,
   getMusicVolume,
@@ -44,7 +44,7 @@ export function DevConsole({ open }: { open: boolean }) {
   // Macrobian threshold. A live combat is re-mirrored so the opponent re-fields
   // to the new tier alongside the player (Moon v Moon, 2v2, …).
   const setPlanets = (n: number) => {
-    const count = MACROBIAN_THRESHOLDS[n - 1] ?? 0;
+    const count = UNLOCK_THRESHOLDS[n - 1] ?? 0;
     dispatch({ kind: "setEncounters", count });
     if (run?.encounter?.kind === "combat") {
       dispatch({

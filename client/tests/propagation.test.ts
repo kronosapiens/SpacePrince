@@ -8,7 +8,7 @@ import { beginRun } from "@/game/run";
 import { beginCombatEncounter } from "@/game/encounter";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
-import type { Chart, CombatEncounter, PlanetName, Run } from "@/game/types";
+import type { CombatEncounter, PlanetName, Run } from "@/game/types";
 
 describe("propagation projections", () => {
   it("returns no effects when source planet is combusted", () => {
@@ -93,9 +93,8 @@ describe("propagation projections", () => {
   it("a catcher combusted by the blow spares its neighbours the ripple", () => {
     const chart = seededChart(7);
     const opp = seededChart(11);
-    const aspect = getAspects(chart)[0];
-    if (!aspect) throw new Error("seed 7 chart has no aspects");
-    const catcher = aspect.from;
+    // Sun has a web and enough Resolve to survive the clean hit in these charts.
+    const catcher = "Sun";
     const base: ComputeProjectedEffectsInput = {
       playerChart: chart,
       opponentChart: opp,
@@ -148,11 +147,9 @@ describe("propagation — only the fielded roster conducts", () => {
     const prince = createStubPrince({ seed: 7 });
     const run = beginRun(42);
     const full = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 64 });
-    // A planet with a web on both charts, so the full roster has somewhere to
+    // Sun has a web on both charts, so the full roster has somewhere to
     // ripple; the same fight, that planet against itself, at the two rosters.
-    const aspected = (chart: Chart, p: PlanetName) => getAspects(chart).some((a) => a.from === p);
-    const planet = PLANETS.find((p) => aspected(prince.chart, p) && aspected(full.opponentChart, p));
-    if (!planet) throw new Error("seeds 7/99 share no aspected planet");
+    const planet = "Sun";
     const withRoster = (roster: PlanetName[]): Run => {
       const sequence = [...full.sequence];
       sequence[full.turnIndex] = planet;

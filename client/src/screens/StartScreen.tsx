@@ -2,7 +2,7 @@ import { useOutletContext } from "react-router-dom";
 import { BeginButton } from "@/components/BeginButton";
 import { CityPicker } from "@/components/CityPicker";
 import { TermText } from "@/components/TermText";
-import { MACROBIAN_ORDER } from "@/game/data";
+import { PLANETS } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import { PRIMER_CAST, PRIMER_FRAMING } from "@/copy/primer";
@@ -91,7 +91,7 @@ export function StartScreen() {
       {/* Progress pips — Macrobian sequence as planet glyphs */}
       {showCeremony && (
         <div className="mint-progress">
-          {MACROBIAN_ORDER.map((p, i) => {
+          {PLANETS.map((p, i) => {
             const isOn = i < revealedCount;
             return (
               <span
