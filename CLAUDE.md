@@ -82,6 +82,11 @@ The spec is divided by what kind of question each document answers.
 - `swatches/` — color swatches per planet
 - `tree.html` — Sephirot tree prototype
 
+### `spec/research/` — what other games did
+
+- `FTL.md`, `STS.md` — event-by-event inventories of FTL and Slay the Spire (options, costs, odds, gating, shape tags)
+- `SURVEY.md` — what those corpora say about Space Prince's narrative encounters; proposals, not decisions
+
 ### `spec/v1/` — archived earlier pass
 
 - `DESIGN.md`, `CONTRACTS.md`, `ONBOARD.md` — superseded by the documents above. Kept for reference; do not treat as current.
