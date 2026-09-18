@@ -23,19 +23,6 @@ export const PLANETS: PlanetName[] = [
 // planet unlocks at 2^i encounters.
 export const UNLOCK_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 
-// Multiples of 12 on a 12-48 scale (MECHANICS.md §2, the sexagesimal lattice).
-// 12-lattice base + 12-lattice buffs keeps every effective stat divisible by
-// every circle-fraction aspect denominator (§9), so magnitudes stay integer.
-export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
-  Sun:     { impact: 36, witness: 24, durability: 36, luck: 24 },
-  Moon:    { impact: 12, witness: 48, durability: 12, luck: 24 },
-  Mercury: { impact: 24, witness: 24, durability: 24, luck: 48 },
-  Venus:   { impact: 12, witness: 48, durability: 24, luck: 36 },
-  Mars:    { impact: 48, witness: 12, durability: 24, luck: 12 },
-  Jupiter: { impact: 24, witness: 36, durability: 36, luck: 36 },
-  Saturn:  { impact: 24, witness: 12, durability: 48, luck: 12 },
-};
-
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
 // read on what the planet is for. See `spec/mechanics/MECHANICS.md §2`.
 export const PLANET_ROLE: Record<PlanetName, string> = {
@@ -48,10 +35,29 @@ export const PLANET_ROLE: Record<PlanetName, string> = {
   Saturn:  "the boundary",
 };
 
+// Unscaled base stats for tuning. Chart derivation multiplies these by 12
+// before adding placement buffs, keeping aspect magnitudes whole.
+export const PLANET_BASE_STATS: Record<PlanetName, PlanetBaseStats> = {
+  Sun:     { affliction: 3, testimony: 3, resolve: 8,  luck: 2 }, // total 16
+  Moon:    { affliction: 1, testimony: 4, resolve: 4,  luck: 3 }, // total 12
+  Mercury: { affliction: 2, testimony: 2, resolve: 6,  luck: 4 }, // total 14
+  Venus:   { affliction: 1, testimony: 4, resolve: 6,  luck: 1 }, // total 12
+  Mars:    { affliction: 4, testimony: 1, resolve: 6,  luck: 1 }, // total 12
+  Jupiter: { affliction: 2, testimony: 3, resolve: 7,  luck: 3 }, // total 15
+  Saturn:  { affliction: 3, testimony: 1, resolve: 10, luck: 1 }, // total 15
+};
+
 export const SIGN_ELEMENT: Record<SignName, ElementType> = {
   Aries: "Fire", Taurus: "Earth", Gemini: "Air", Cancer: "Water",
   Leo: "Fire", Virgo: "Earth", Libra: "Air", Scorpio: "Water",
   Sagittarius: "Fire", Capricorn: "Earth", Aquarius: "Air", Pisces: "Water",
+};
+
+export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
+  Fire:  { affliction: 12, testimony: 0, resolve: 0, luck: 0 },
+  Earth: { affliction: 0, testimony: 0, resolve: 12, luck: 0 },
+  Water: { affliction: 0, testimony: 12, resolve: 0, luck: 0 },
+  Air:   { affliction: 0, testimony: 0, resolve: 0, luck: 12 },
 };
 
 export const SIGN_MODALITY: Record<SignName, ModalityType> = {
@@ -61,16 +67,9 @@ export const SIGN_MODALITY: Record<SignName, ModalityType> = {
 };
 
 export const MODALITY_BUFFS: Record<ModalityType, PlanetBaseStats> = {
-  Cardinal: { impact: 12, witness: 0, durability: 0, luck: 0 },
-  Fixed:    { impact: 0, witness: 0, durability: 12, luck: 0 },
-  Mutable:  { impact: 0, witness: 12, durability: 0, luck: 0 },
-};
-
-export const ELEMENT_BUFFS: Record<ElementType, PlanetBaseStats> = {
-  Fire:  { impact: 12, witness: 0, durability: 0, luck: 0 },
-  Earth: { impact: 0, witness: 0, durability: 12, luck: 0 },
-  Water: { impact: 0, witness: 12, durability: 0, luck: 0 },
-  Air:   { impact: 0, witness: 0, durability: 0, luck: 12 },
+  Cardinal: { affliction: 12, testimony: 0, resolve: 0, luck: 0 },
+  Fixed:    { affliction: 0, testimony: 0, resolve: 12, luck: 0 },
+  Mutable:  { affliction: 0, testimony: 12, resolve: 0, luck: 0 },
 };
 
 export const RULERSHIP: Record<SignName, PlanetName> = {

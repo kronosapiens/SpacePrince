@@ -12,7 +12,7 @@ export const MAPS_PER_RUN = 7;
 
 /** Per map completed, the barrage's ceiling-fraction span grows by this much:
  *  entering map k+1 rolls up to `k × 3/60` of each ceiling (MECHANICS §11.3).
- *  The bound is exact — ceilings are multiples of 60. */
+ *  Each rolled share is rounded to a whole affliction point. */
 export const BARRAGE_CEILING_FRACTION_PER_MAP = 3 / 60;
 
 export function newMapState(
@@ -106,7 +106,7 @@ export function rollMapBoundary(
     const halved = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
     let amount = Math.round(ceiling * frac);
     if (halved) amount = Math.round(amount / 2);
-    // The barrage wounds but never combusts (§11.3) — same guard as spawns.
+    // The barrage wounds but never combusts (§11.3).
     amount = Math.max(0, Math.min(amount, ceiling - 1 - ps.affliction));
     if (amount > 0) {
       ps.affliction += amount;

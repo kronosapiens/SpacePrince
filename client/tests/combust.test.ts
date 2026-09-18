@@ -1,18 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { combustionCeiling, isCombusted, newlyCombusted, uncombust, wouldCombust } from "@/game/combust";
-import { seededChart } from "@/game/chart";
+import { derivePlacements, seededChart } from "@/game/chart";
+import { getEffectiveStatsFromPlacement } from "@/game/combat";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
 
-// Effective durability = base.durability (buffs are zero in these fixtures).
-function placement(durability: number): PlanetPlacement {
+// Fixtures supply Resolve directly.
+function placement(resolve: number): PlanetPlacement {
   return {
     planet: "Sun",
     sign: "Leo",
     element: "Fire",
     modality: "Fixed",
     dignity: "Neutral",
-    base: { impact: 0, witness: 0, durability, luck: 0 },
-    buffs: { impact: 0, witness: 0, durability: 0, luck: 0 },
+    base: { affliction: 0, testimony: 0, resolve, luck: 0 },
+    buffs: { affliction: 0, testimony: 0, resolve: 0, luck: 0 },
   };
 }
 
@@ -21,11 +22,11 @@ function state(affliction: number): PlanetState {
 }
 
 describe("combustionCeiling", () => {
-  // ceiling = durability × 5 (MECHANICS §10); durability is a multiple of 12,
-  // so ceilings land on the 60-lattice. Dignity no longer feeds it.
-  it("is durability × 5", () => {
-    expect(combustionCeiling(placement(48))).toBe(240);
-    expect(combustionCeiling(placement(12))).toBe(60);
+  it("is base Resolve plus placement bonuses", () => {
+    const planet = placement(48);
+    planet.buffs.resolve = 12;
+    expect(combustionCeiling(planet)).toBe(60);
+    expect(combustionCeiling(placement(24))).toBe(24);
   });
 });
 
@@ -34,29 +35,35 @@ describe("isCombusted", () => {
   // ceiling, so at-the-ceiling *is* combusted.
   it("false at zero and below the ceiling — a recoverable margin", () => {
     expect(isCombusted(placement(48), state(0))).toBe(false);
-    expect(isCombusted(placement(48), state(239))).toBe(false);
+    expect(isCombusted(placement(48), state(47))).toBe(false);
   });
 
   it("true the moment affliction reaches the ceiling", () => {
-    expect(isCombusted(placement(48), state(240))).toBe(true);
-    expect(isCombusted(placement(48), state(300))).toBe(true);
+    expect(isCombusted(placement(48), state(48))).toBe(true);
+    expect(isCombusted(placement(48), state(60))).toBe(true);
   });
 });
 
 describe("wouldCombust", () => {
   it("true when the blow reaches the ceiling, false while margin remains", () => {
-    expect(wouldCombust(placement(12), state(12), 48)).toBe(true);  // 12+48 = 60
-    expect(wouldCombust(placement(12), state(11), 48)).toBe(false); // 11+48 = 59
+    expect(wouldCombust(placement(60), state(12), 48)).toBe(true);  // 12+48 = 60
+    expect(wouldCombust(placement(60), state(11), 48)).toBe(false); // 11+48 = 59
   });
 
-  it("a fragile planet can be flagged from zero affliction", () => {
-    // Min ceiling 60 sits under the top blows (up to 72), so a fresh planet can warn.
-    expect(wouldCombust(placement(12), state(0), 60)).toBe(true);
+  it("a strong Mars combusts a clean ordinary Moon while a sturdy Saturn survives", () => {
+    const { planets } = derivePlacements({
+      longitudes: { Sun: 0, Moon: 60, Mercury: 60, Venus: 30, Mars: 0, Jupiter: 120, Saturn: 30 },
+      ascendantLongitude: 0,
+      isDiurnal: true,
+    });
+    const affliction = getEffectiveStatsFromPlacement(planets.Mars).affliction;
+    expect(wouldCombust(planets.Moon, state(0), affliction)).toBe(true);
+    expect(wouldCombust(planets.Saturn, state(0), affliction)).toBe(false);
   });
 
   it("a combusted planet or a zero blow never warns", () => {
-    expect(wouldCombust(placement(12), state(60), 48)).toBe(false);
-    expect(wouldCombust(placement(12), state(59), 0)).toBe(false);
+    expect(wouldCombust(placement(60), state(60), 48)).toBe(false);
+    expect(wouldCombust(placement(60), state(59), 0)).toBe(false);
   });
 });
 
@@ -81,9 +88,9 @@ describe("newlyCombusted", () => {
 
 describe("uncombust", () => {
   it("returns the planet at half its ceiling — back, but scarred (§10)", () => {
-    const s = state(240);
+    const s = state(48);
     uncombust(placement(48), s);
     expect(isCombusted(placement(48), s)).toBe(false);
-    expect(s.affliction).toBe(120);
+    expect(s.affliction).toBe(24);
   });
 });

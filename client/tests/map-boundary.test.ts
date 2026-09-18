@@ -44,6 +44,7 @@ describe("map boundary (MECHANICS §11.3)", () => {
       );
       for (const p of roster) {
         const ceiling = combustionCeiling(prince.chart.planets[p]);
+        expect(Number.isInteger(crossed.state[p].affliction)).toBe(true);
         expect(crossed.state[p].affliction).toBeLessThan(ceiling);
       }
     }

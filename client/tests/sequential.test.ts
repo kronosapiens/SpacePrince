@@ -42,11 +42,12 @@ describe("sequential resolution — preemption", () => {
   it("without a phase-1 combust, the opponent's action still lands on the player", () => {
     const { prince, run } = setup();
     const enc = run.encounter as CombatEncounter;
-    const active = enc.sequence[enc.turnIndex]!;
+    const active = "Saturn";
+    enc.sequence[enc.turnIndex] = active;
     enc.opponentState[active].affliction = 0;
     enc.opponentActions[enc.turnIndex] = "Affliction";
 
-    // From zero affliction, one hit stays far below any ceiling — no combust.
+    // A clean Saturn can withstand this Mars's affliction.
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0.99)!;
     expect(
       isCombusted(enc.opponentChart.planets[active], result.encounter.opponentState[active]),

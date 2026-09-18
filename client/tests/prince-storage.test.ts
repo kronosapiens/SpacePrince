@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
 import { loadPrince, savePrince } from "@/state/prince";
 import { getScenario } from "@/data/narrative-scenarios";
-import { beginNarrativeEncounter } from "@/game/encounter";
+import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { resolveNarrative } from "@/game/narrative";
+import { combustionCeiling } from "@/game/combust";
 import { createStubPrince } from "./fixtures";
 
 describe("Prince storage", () => {
@@ -37,6 +38,52 @@ describe("Prince storage", () => {
     expect(reloaded.runs[0]!.encounter).toEqual(resolved.encounter);
     expect(reloaded.runs[0]!.light).toBe(12);
     expect(resolveNarrative(reloaded.runs[0]!, reloaded, scenario, "take", {})).toBeNull();
+  });
+
+  it("rebuilds saved player and opponent stats without changing run progress", () => {
+    const prince = createStubPrince();
+    const run = beginRun(7, prince.numEncounters);
+    run.light = 72;
+    run.state.Moon.affliction = 24;
+    run.encounter = beginCombatEncounter({
+      run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters,
+    });
+    prince.runs = [run];
+
+    // Simulate a saved chart whose cached stats lack the current field names.
+    // Sect luck is saved because individual planet longitudes are not.
+    const raw = JSON.stringify(prince, (key, value) =>
+      key === "base" || key === "buffs" ? { luck: value.luck } : value,
+    );
+    localStorage.setItem("sp:prince:v4", raw);
+
+    const restored = loadPrince()!;
+    expect(restored).toEqual(prince);
+    savePrince(restored);
+    expect(loadPrince()).toEqual(prince);
+  });
+
+  it("caps saved affliction at the current Resolve on both charts", () => {
+    const prince = createStubPrince();
+    const run = beginRun(7, prince.numEncounters);
+    run.light = 72;
+    const encounter = beginCombatEncounter({
+      run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters,
+    });
+    run.state.Moon.affliction = 180;
+    encounter.opponentState.Moon.affliction = 180;
+    run.encounter = encounter;
+    prince.runs = [run];
+    savePrince(prince);
+
+    const restored = loadPrince()!;
+    const savedRun = restored.runs[0]!;
+    expect(savedRun.state.Moon.affliction).toBe(combustionCeiling(restored.chart.planets.Moon));
+    const savedEncounter = savedRun.encounter;
+    if (savedEncounter?.kind !== "combat") throw new Error("Expected a saved combat encounter");
+    expect(savedEncounter.opponentState.Moon.affliction)
+      .toBe(combustionCeiling(savedEncounter.opponentChart.planets.Moon));
+    expect(savedRun.light).toBe(72);
   });
 
   it("round-trips historical and active v4 Light state", () => {

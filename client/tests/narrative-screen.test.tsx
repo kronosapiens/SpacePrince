@@ -158,7 +158,7 @@ describe("narrative chart interaction", () => {
   it("keeps the selected target action separate from option previews", () => {
     const { onCommit } = mount("home-buried");
     click('[data-guide="option-2"]');
-    hoverPlanet("moon");
+    hoverPlanet("sun");
     hoverOption(1);
     expect(element('.option.is-selected').getAttribute("data-guide")).toBe("option-2");
     expect(element(".ps-effect").textContent).toBe("Afflict 48");

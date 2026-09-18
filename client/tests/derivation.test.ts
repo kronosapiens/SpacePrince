@@ -30,9 +30,9 @@ describe("deriveStatTable", () => {
         const table = deriveStatTable(placement);
         const byKey = (k: keyof PlanetStats) =>
           table.rows.find((r) => r.key === k)!.total;
-        expect(table.afflict).toBe(byKey("impact"));
-        expect(table.testify).toBe(byKey("witness"));
-        expect(table.resolve).toBe(byKey("durability"));
+        expect(table.afflict).toBe(byKey("affliction"));
+        expect(table.testify).toBe(byKey("testimony"));
+        expect(table.resolve).toBe(byKey("resolve"));
         expect(table.fortune).toBe(byKey("luck"));
       }
     }

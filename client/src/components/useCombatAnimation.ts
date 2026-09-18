@@ -23,11 +23,11 @@ import type {
 
 export const ANIMATION_TIMINGS = {
   primaryDelay: 200,
-  /** Lead before an impact's apply beat to start the projection badge sliding
+  /** Lead before an effect's apply beat to start the projection badge sliding
    *  into the affliction badge, so it lands just as the count ticks. Matches the
    *  `badge-merge` keyframe duration in motion.css. */
   mergeLead: 200,
-  primaryImpactClear: 360,
+  primaryEffectClear: 360,
   primaryGlowClear: 600,
   propagationStart: 800,
   propagationStep: 520,
@@ -50,7 +50,7 @@ interface FlagPair<T> {
 /** Planets that took an effect this beat, mapped to the polarity they
  *  received. Heal (testimony) vs harm (affliction) drive the glyph's
  *  in-place valence bloom; presence alone drives the badge pulse. */
-export type ImpactMap = ReadonlyMap<PlanetName, Polarity>;
+export type EffectMap = ReadonlyMap<PlanetName, Polarity>;
 
 export type ProjectionDeltas = Partial<Record<PlanetName, ProjectedEffect>>;
 
@@ -75,13 +75,13 @@ export interface CombatAnimationState {
   lightFlashPlanet: PlanetName | null;
   activePropagationKeys: FlagPair<string>;
   actionPulse: { player: PlanetName | null; opponent: PlanetName | null };
-  impactPlanets: { self: ImpactMap; other: ImpactMap };
+  effectPlanets: { self: EffectMap; other: EffectMap };
   combustingPlanets: FlagPair<PlanetName>;
   /** Snapshot of the per-planet projection deltas captured at commit, so
    *  the projection badges can persist through the animation rather than
    *  vanishing all at once. */
   projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
-  /** Planets whose projection has been "consumed" — once their impact
+  /** Planets whose projection has been "consumed" — once their effect
    *  pulse fires, the projection badge for that planet stops rendering.
    *  Accumulates only; never cleared until the animation ends. */
   consumedProjections: FlagPair<PlanetName>;
@@ -97,7 +97,7 @@ export const EMPTY_PROPAGATION_KEYS: FlagPair<string> = {
   other: new Set(),
 };
 export const EMPTY_PLANET_SET: ReadonlySet<PlanetName> = new Set();
-export const EMPTY_IMPACT_MAP: ImpactMap = new Map();
+export const EMPTY_EFFECT_MAP: EffectMap = new Map();
 
 // ── Hook ────────────────────────────────────────────────────────────────
 
@@ -177,13 +177,13 @@ function removeFromFlag<T>(set: ReadonlySet<T>, value: T): ReadonlySet<T> {
   return next;
 }
 
-function addToImpact(map: ImpactMap, planet: PlanetName, polarity: Polarity): ImpactMap {
+function addToEffect(map: EffectMap, planet: PlanetName, polarity: Polarity): EffectMap {
   const next = new Map(map);
   next.set(planet, polarity);
   return next;
 }
 
-function removeFromImpact(map: ImpactMap, planet: PlanetName): ImpactMap {
+function removeFromEffect(map: EffectMap, planet: PlanetName): EffectMap {
   if (!map.has(planet)) return map;
   const next = new Map(map);
   next.delete(planet);
@@ -266,7 +266,7 @@ function runScheduler(args: {
     lightFlashPlanet: null,
     activePropagationKeys: EMPTY_PROPAGATION_KEYS,
     actionPulse: { player: null, opponent: null },
-    impactPlanets: { self: EMPTY_IMPACT_MAP, other: EMPTY_IMPACT_MAP },
+    effectPlanets: { self: EMPTY_EFFECT_MAP, other: EMPTY_EFFECT_MAP },
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     projectedDeltas,
     consumedProjections: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
@@ -313,7 +313,7 @@ function runScheduler(args: {
       }));
     }, base + ANIMATION_TIMINGS.primaryDelay - ANIMATION_TIMINGS.mergeLead);
 
-    // Primary direct phase — apply delta, light action-glow, impact.
+    // Primary direct phase — apply delta, light action-glow, effect.
     schedule(() => {
       playStrike(ruler, actionPlanet, "landing");
       updateAnimation((state) => {
@@ -331,9 +331,9 @@ function runScheduler(args: {
         next.actionPulse = isSelf
           ? { ...next.actionPulse, player: actionPlanet }
           : { ...next.actionPulse, opponent: actionPlanet };
-        next.impactPlanets = {
-          ...next.impactPlanets,
-          [side]: addToImpact(next.impactPlanets[side], actionPlanet, receivedPolarity),
+        next.effectPlanets = {
+          ...next.effectPlanets,
+          [side]: addToEffect(next.effectPlanets[side], actionPlanet, receivedPolarity),
         };
         next.consumedProjections = {
           ...next.consumedProjections,
@@ -343,16 +343,16 @@ function runScheduler(args: {
       });
     }, base + ANIMATION_TIMINGS.primaryDelay);
 
-    // Clear primary impact pulse before propagation begins.
+    // Clear primary effect pulse before propagation begins.
     schedule(() => {
       updateAnimation((state) => ({
         ...state,
-        impactPlanets: {
-          ...state.impactPlanets,
-          [side]: removeFromImpact(state.impactPlanets[side], actionPlanet),
+        effectPlanets: {
+          ...state.effectPlanets,
+          [side]: removeFromEffect(state.effectPlanets[side], actionPlanet),
         },
       }));
-    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryImpactClear);
+    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryEffectClear);
 
     // Clear action glow.
     schedule(() => {
@@ -434,9 +434,9 @@ function runScheduler(args: {
             });
             // Bloom only on non-combust hits — a combusting planet gets the
             // ripple instead, not a heal/harm pulse.
-            next.impactPlanets = {
-              ...next.impactPlanets,
-              [side]: addToImpact(next.impactPlanets[side], step.target, step.polarity),
+            next.effectPlanets = {
+              ...next.effectPlanets,
+              [side]: addToEffect(next.effectPlanets[side], step.target, step.polarity),
             };
           }
           next.consumedProjections = {
@@ -455,9 +455,9 @@ function runScheduler(args: {
               ...state.activePropagationKeys,
               [side]: removeFromFlag(state.activePropagationKeys[side], key),
             },
-            impactPlanets: {
-              ...state.impactPlanets,
-              [side]: removeFromImpact(state.impactPlanets[side], step.target),
+            effectPlanets: {
+              ...state.effectPlanets,
+              [side]: removeFromEffect(state.effectPlanets[side], step.target),
             },
           }));
         }, delay + ANIMATION_TIMINGS.propagationClearOffset);

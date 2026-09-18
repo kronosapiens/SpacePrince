@@ -58,7 +58,7 @@ function setup() {
   const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
   encounter.sequence = ["Moon", "Mars"];
   encounter.opponentActions = ["Affliction", "Testimony"];
-  encounter.opponentState.Moon.affliction = 24;
+  encounter.opponentState.Moon.affliction = 12;
   run.encounter = encounter;
   const onCommitTurn = vi.fn((planet: PlanetName, verb: Polarity, rng: () => number): CommitTurnResult | null => {
     const result = resolveTurn(run, prince.chart, planet, verb, rng);
@@ -86,7 +86,7 @@ describe("encounter interactions", () => {
     const expected = resolveTurn(run, prince.chart, "Moon", "Testimony", () => 0)!;
     expect(get(".combat-light-delta").textContent).toBe(`+${expected.log.lightGain}`);
     expect(get(otherIncoming).querySelectorAll(".invite-ring circle").length)
-      .toBe(getEffectiveStats(prince.chart, "Moon").witness / 12);
+      .toBe(getEffectiveStats(prince.chart, "Moon").testimony / 12);
     hover(affliction);
     expect(get(affliction).classList.contains("is-previewed")).toBe(true);
     leave(affliction);

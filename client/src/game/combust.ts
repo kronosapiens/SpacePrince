@@ -1,21 +1,13 @@
 import { PLANETS } from "./data";
 import type { Chart, PlanetName, PlanetPlacement, PlanetState, SideState } from "./types";
 
-/** Resolve (the combustion ceiling) per point of durability. Durability is a
- *  multiple of 12, so ceilings are multiples of 60 — the sexagesimal lattice
- *  (MECHANICS.md §10); the maximum, a fixed earth-sign Saturn, is 360. Kept as
- *  a named constant so the math, the spec, and any UI copy stay in sync. */
-export const RESOLVE_PER_DURABILITY = 5;
-
 /**
  * Combustion ceiling (MECHANICS.md §10) — the affliction a planet absorbs
- * before it goes out, surfaced in the UI as "Resolve". Set by durability alone
- * (core + sign buffs).
- *
- *   ceiling = durability × RESOLVE_PER_DURABILITY
+ * before it goes out: base Resolve plus placement bonuses, in the same units
+ * as affliction. Ceilings are multiples of 12.
  */
 export function combustionCeiling(placement: PlanetPlacement): number {
-  return (placement.base.durability + placement.buffs.durability) * RESOLVE_PER_DURABILITY;
+  return placement.base.resolve + placement.buffs.resolve;
 }
 
 /**

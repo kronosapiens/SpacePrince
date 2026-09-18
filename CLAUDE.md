@@ -15,7 +15,7 @@ The full design lives in `spec/`; this file is a map.
 - **Alpha.** Mechanics and screens are still settling; playtesting drives changes.
 - **Prioritize legibility of mechanics and debuggability over production polish.** Making game state readable beats making it pretty.
 - Visual tuning knobs are centralized in `client/src/svg/chart-style.ts` and `client/src/svg/palette.ts`; prefer turning knobs to restructuring.
-- Balance is deferred (`spec/mechanics/MECHANICS.md §14`); don't tune numbers for fairness yet.
+- Base stats are being tuned through playtesting; final balance remains open (`spec/mechanics/MECHANICS.md §2`).
 
 ## Architecture
 
@@ -107,7 +107,9 @@ The spec is divided by what kind of question each document answers.
 - **Previews show only what is determined.**
   Verb-dependent information appears once a verb is indicated by hover or focus; verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
-- **The affliction arc is the chart's primary channel.** Affliction is an arc at 1 point = 1°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock. Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
+- **The affliction arc is the chart's primary channel.**
+  Affliction is an arc at 1 point = 1°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock.
+  Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
 - **What is arriving is drawn at the chart's centre.** The corona again, around the magnitude instead of a planet — the blow has no target until the player commits, so it belongs to the chart, not to anything in it. Both charts carry it; yours from the top of the turn, theirs once you indicate a verb (`spec/design/STYLE.md §11`).
 - **One interaction ring, and its colour is the verb.**
   Breathing = available, steady = hovered/focused/selected/acting.
@@ -117,7 +119,7 @@ The spec is divided by what kind of question each document answers.
 - **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (four rungs, **chart viewBox units only** — the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
 - **The landing chart follows the client's.** `landing/` carries its own trimmed copy of the chart (resting + hover only — no combat state, so no arc, badges, corona, or propagation), and `landing/src/svg/chart-style.ts` mirrors the client's token values. The client is the source; when its chart styling moves, re-sync the landing.
 - **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
-- **The sexagesimal lattice.** Stats are multiples of 12, ceilings multiples of 60, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
+- **The sexagesimal lattice.** Stats and Resolve ceilings are multiples of 12, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
 - **Harvest upward, on request.** A settled design rule may be worth writing into the relevant spec with a one-line pointer here — propose it, don't do it unasked. Code comments hold only what's local to the site.
 
 ## Tooling

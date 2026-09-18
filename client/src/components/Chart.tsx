@@ -171,14 +171,14 @@ export interface ChartProps {
   projection?: ProjectionChips;
   /** Directed aspect keys (`Source->Target`) currently propagating. The
    *  pulse just brightens the existing aspect-line color; heal/harm signal
-   *  lives on the projection badge and the planet's impact pulse. */
+   *  lives on the projection badge and the planet's effect pulse. */
   activePropagationKeys?: ReadonlySet<string>;
   /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
   actionPulsePlanet?: PlanetName | null;
   /** Planets that took a hit this beat, mapped to the polarity received.
    *  Drives the badge pulse (presence) and the glyph's in-place valence
    *  bloom (heal = testimony/violet, harm = affliction/amber). */
-  impactPlanets?: ReadonlyMap<PlanetName, Polarity>;
+  effectPlanets?: ReadonlyMap<PlanetName, Polarity>;
   /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
   combustingPlanets?: ReadonlySet<PlanetName>;
   /** Planets whose projection badge is sliding into the affliction badge this beat. */
@@ -239,7 +239,7 @@ export function Chart(props: ChartProps) {
     projection,
     activePropagationKeys,
     actionPulsePlanet,
-    impactPlanets,
+    effectPlanets,
     combustingPlanets,
     mergingPlanets,
     warningPlanets,
@@ -454,7 +454,7 @@ export function Chart(props: ChartProps) {
         const isHovered = hoveredPlanet === p.planet;
         const isActionPulse = actionPulsePlanet === p.planet;
         const isCombusting = combustingPlanets?.has(p.planet) ?? false;
-        const impactPolarity = impactPlanets?.get(p.planet);
+        const effectPolarity = effectPlanets?.get(p.planet);
         return (
           <PlanetGlyph
             key={p.planet}
@@ -474,7 +474,7 @@ export function Chart(props: ChartProps) {
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
             combusting={isCombusting}
-            impactPolarity={impactPolarity}
+            effectPolarity={effectPolarity}
             animationEpoch={animationEpoch}
             guideId={side ? `planet-${side}-${p.planet.toLowerCase()}` : undefined}
           />
@@ -516,7 +516,7 @@ export function Chart(props: ChartProps) {
             affliction={state?.[p.planet]?.affliction ?? 0}
             hideAfflictionBadge={hideAffliction}
             projection={projection?.deltas[p.planet]}
-            impact={impactPlanets?.has(p.planet) ?? false}
+            effect={effectPlanets?.has(p.planet) ?? false}
             merging={mergingPlanets?.has(p.planet) ?? false}
             warning={warningPlanets?.has(p.planet) ?? false}
             animationEpoch={animationEpoch}
@@ -559,7 +559,7 @@ function PlanetGlyph({
   selected, active, hovered,
   onClick, onHover, onFocus, passive, eligible, invite, ringVerb,
   actionPulse, combusting,
-  impactPolarity,
+  effectPolarity,
   animationEpoch,
   guideId,
 }: {
@@ -579,7 +579,7 @@ function PlanetGlyph({
   ringVerb?: Polarity | null;
   actionPulse: boolean;
   combusting: boolean;
-  impactPolarity?: Polarity;
+  effectPolarity?: Polarity;
   animationEpoch?: number;
   guideId?: string;
 }) {
@@ -715,12 +715,12 @@ function PlanetGlyph({
           planet takes testimony (heal) or affliction (harm) this beat. Behind
           the glyph so the symbol stays readable; an opacity bloom, not an
           outward ring, so it reads apart from the combust burst. */}
-      {impactPolarity && !combusting && (
+      {effectPolarity && !combusting && (
         <circle
-          key={`bloom-${epoch}-${impactPolarity}`}
+          key={`bloom-${epoch}-${effectPolarity}`}
           r={r + 9}
-          fill={`url(#v2-valence-${impactPolarity})`}
-          className="anim-impact-bloom"
+          fill={`url(#v2-valence-${effectPolarity})`}
+          className="anim-effect-bloom"
           style={{ pointerEvents: "none" }}
         />
       )}
@@ -772,9 +772,9 @@ function PlanetGlyph({
 
 /**
  * Affliction arc — the planet's Resolve drawn at 1 point of affliction = 1°.
- * Ceilings are multiples of 60 with a maximum of 360 (combust.ts), so the
- * mapping is exact and needs no scale factor. Absolute rather than normalized:
- * arc length *is* durability, so a resting chart shows which planets are sturdy
+ * Ceilings are multiples of 12 (combust.ts).
+ * The mapping is absolute rather than normalized:
+ * arc length is proportional to Resolve, so a resting chart shows which planets are sturdy
  * without a number, and one incoming magnitude draws the same sweep on every
  * planet — the player learns what 48 looks like once and can then scan seven
  * gaps against it.
@@ -864,8 +864,8 @@ function PlanetArc({
 
 /** One arc of a circle centered on the local origin, `from`→`to` in the same
  *  degree convention as `polar` (0 = 3 o'clock, increasing counterclockwise on
- *  screen). A 360° sweep has no arc path — both endpoints coincide — so the one
- *  placement that reaches it (a fixed-earth Saturn) draws a circle instead. */
+ *  screen). A 360° sweep has no arc path — both endpoints coincide — so a full
+ *  sweep draws a circle instead. */
 function ArcStroke({
   r, from, to, full, stroke, opacity, width,
 }: {
@@ -974,7 +974,7 @@ function IncomingMark({ verb, amount }: { verb: Polarity; amount?: number }) {
 function PlanetBadges({
   point, combusted, affliction,
   hideAfflictionBadge,
-  projection, impact, merging, warning, animationEpoch,
+  projection, effect, merging, warning, animationEpoch,
 }: {
   point: PlanetPoint;
   combusted: boolean;
@@ -982,7 +982,7 @@ function PlanetBadges({
   hideAfflictionBadge: boolean;
   projection?: ProjectionChip;
   merging: boolean;
-  impact: boolean;
+  effect: boolean;
   warning: boolean;
   animationEpoch?: number;
 }) {
@@ -1006,11 +1006,10 @@ function PlanetBadges({
     Math.max(2 * pillR, measureBadgeText(text, fontSize) + fontSize * 0.8);
 
   const epoch = animationEpoch ?? 0;
-  const badgeClass = impact ? "anim-impact" : undefined;
+  const badgeClass = effect ? "anim-effect" : undefined;
 
-  // A combust warning surfaces the pill even at zero affliction — with ceilings
-  // at durability × 6, a top blow can cover the most fragile ceiling, so the
-  // warning can no longer assume an existing badge to ride (SCREENS.md).
+  // A combust warning surfaces the pill even at zero affliction: one blow can
+  // exceed a fragile planet's Resolve, before it has an affliction badge.
   const showAffliction = !hideAfflictionBadge && !combusted && (affliction > 0 || warning);
   // Show the projection badge whenever there's any projected effect —
   // including testimony at zero delta (planet already at 0 affliction).
@@ -1028,7 +1027,7 @@ function PlanetBadges({
   if (showProjection && projection) {
     const isHarm = projection.polarity !== "Testimony";
     // Sign prefix + valence color both carry direction — amber "+N" adds
-    // affliction, violet "−N" heals it — so the impact reads at a glance.
+    // affliction, violet "−N" heals it — so the effect reads at a glance.
     // The sign renders as a smaller, lighter prefix (see below) so the digit —
     // the thing the player reads — sits centered in the pill rather than shoved
     // right by a full-size operator.
@@ -1077,7 +1076,7 @@ function PlanetBadges({
         >
           <g
             className={badgeClass}
-            key={`badge-${epoch}-${impact ? 1 : 0}`}
+            key={`badge-${epoch}-${effect ? 1 : 0}`}
           >
             {/* Combust warning: blurred ember underlay breathing on the shared
                 clock, ember digits; the pill itself keeps its resting gold

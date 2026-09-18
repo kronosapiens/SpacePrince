@@ -50,10 +50,11 @@ Generated other-charts are named `Other N`, never `Adversary`.
 
 **Combat, adversary, and opponent are internal vocabulary only** — the developers' easy metaphor for the interaction (`MECHANICS.md`, code identifiers, this spec's internals).
 They never reach a player surface: not in copy, labels, summaries, or aria text.
-The mechanical terms the player does see are register-safe by construction: the verbs Afflict/Testify, the operational readouts Resolve and Fortune, Light, and the stats **Impact / Witness / Durability / Luck** — impact and witness replaced the RPG-inherited damage and healing (witness is the Hellenistic term behind testimony: planets bear witness to one another).
+The mechanical terms the player sees are the verbs Afflict/Testify, the operational readouts Resolve and Fortune, and Light.
+The underlying stats are **affliction, testimony, Resolve, and luck**.
 
 **Casing.** Named quantities are capitalized in prose — **Resolve, Fortune, Light** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").
-Substances and processes stay lowercase — affliction, testimony, tension, combustion, aspects, and the four stats (impact, witness, durability, luck) in flowing text; the fortune roll is a process and stays lowercase.
+Other substances, processes, and stats stay lowercase — affliction, testimony, tension, combustion, aspects, and luck in flowing text; the fortune roll is a process and stays lowercase.
 Verbs follow mention vs use: named as actions they are capped ("choose Afflict or Testify"); used as English they are not ("afflict their actor before it swings").
 Display labels — table headers, stat lines, the uppercase micro-type (SELF, OTHER) — take title or upper case as chrome styling, independent of prose casing.
 Personification rides the capitalized form ("Fortune turns at the crossing").
@@ -155,9 +156,10 @@ The total turn animation budget is roughly **3–4 seconds**, intentionally long
 ### 3.5.1 The affliction arc
 
 Affliction is drawn as an arc around each planet, at **1 point = 1°**.
-Ceilings are multiples of 60 with a maximum of 360 (`MECHANICS.md §10`), so the mapping is exact and needs no scale factor.
+Ceilings are multiples of 12 (`MECHANICS.md §10`).
 
-- The **faint track** is the planet's whole ceiling. Its length is therefore its Resolve, which means a resting chart shows which planets are sturdy without a number.
+- The **faint track** is the planet's whole ceiling.
+  Its length is proportional to Resolve, so a resting chart shows which planets are sturdy without a number.
 - The **bright span** is what the planet can still absorb.
 - The **combustion end is pinned at 6 o'clock**, and affliction accumulates toward it, so the bright span shortens by its free end descending into the anchor and every planet dies at the same point on the dial.
 - The **projected span** is the change the declared blow would make to the boundary — amber for harm, violet for heal, ember when it would close the span (`STYLE.md §5`).
@@ -238,11 +240,12 @@ With study **off**, the panel shows only **operational numbers** — what matter
 
 - **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out.
   Now that combustion is deterministic, this is literally its HP.
-  "Resolve" stays in a bespoke, character register (the operational sibling of Afflict/Testify, not the generic "HP") and maps cleanly to its underlying stat, Durability.
+  It is the planet's base Resolve plus placement bonuses, shown directly.
 - **Fortune %** — the fortune roll, `luck / 120` (`MECHANICS.md §7`): the planet's odds at map boundaries (uncombusting, or halving its barrage share). Not a combat number — combat is deterministic — but shown here so luck stays a legible stat.
-- **Afflict / Testify** — the planet's impact and witness, carried by the two action buttons.
+- **Afflict / Testify** — the planet's affliction and testimony amounts, carried by the two action buttons.
 
-These re-express the four core stats operationally: impact → afflict, witness → testify, durability → Resolve, luck → Fortune.
+Afflict and Testify show their matching stat amounts directly.
+Resolve is also shown directly; luck determines Fortune.
 
 With study **on**, the box **drops open downward** (its top fixed) and the action buttons clear to make room for two things:
 

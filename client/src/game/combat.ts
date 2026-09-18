@@ -6,15 +6,15 @@ import type {
   Polarity,
 } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
-import { RESOLVE_PER_DURABILITY, combustionCeiling } from "./combust";
+import { combustionCeiling } from "./combust";
 
-/** Stat-weighted action draw — `P(afflict) = impact / (impact + witness)`.
+/** Stat-weighted action draw — `P(afflict) = affliction / (affliction + testimony)`.
  *  Used to precommit the opponent's verb each turn (the player chooses theirs).
  *  No planet has a zero in either stat, so no draw is fully deterministic. */
 export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
-  const total = stats.impact + stats.witness;
+  const total = stats.affliction + stats.testimony;
   if (total <= 0) return "Affliction";
-  return rng() < stats.impact / total ? "Affliction" : "Testimony";
+  return rng() < stats.affliction / total ? "Affliction" : "Testimony";
 }
 
 /** The fortune roll (MECHANICS.md §7) — `luck / 120`, i.e. `(luck/2)` sixtieths
@@ -34,9 +34,9 @@ export function fortuneSixtieths(luck: number): number {
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
   return {
-    impact: Math.max(0, p.base.impact + p.buffs.impact),
-    witness: Math.max(0, p.base.witness + p.buffs.witness),
-    durability: Math.max(0, p.base.durability + p.buffs.durability),
+    affliction: Math.max(0, p.base.affliction + p.buffs.affliction),
+    testimony: Math.max(0, p.base.testimony + p.buffs.testimony),
+    resolve: Math.max(0, p.base.resolve + p.buffs.resolve),
     luck: Math.max(0, p.base.luck + p.buffs.luck),
   };
 }
@@ -46,27 +46,15 @@ export function getEffectiveStats(chart: Chart, planet: PlanetName): PlanetStats
 }
 
 // Testify leads, matching the verb pair in the panel's action buttons.
-const STAT_KEYS = ["witness", "impact", "durability", "luck"] as const;
+const STAT_KEYS = ["testimony", "affliction", "resolve", "luck"] as const;
 
 /** The one player-facing name per stat — there is no second, "inner" vocabulary.
  *  These are the words on the buttons, the headline, and the table alike. */
 export const STAT_LABEL: Record<keyof PlanetStats, string> = {
-  impact: "Afflict",
-  witness: "Testify",
-  durability: "Resolve",
+  affliction: "Afflict",
+  testimony: "Testify",
+  resolve: "Resolve",
   luck: "Fortune",
-};
-
-/** Display units per point of raw stat. Both transforms are linear, so scaling
- *  every column — rather than just the total — keeps `core + placement = total`
- *  exact while making each row's total the operational number the panel
- *  headlines. Resolve is the combustion ceiling (×5); Fortune is the roll in
- *  sixtieths (÷2). Stats are multiples of 12, so both stay whole. */
-const STAT_DISPLAY_SCALE: Record<keyof PlanetStats, number> = {
-  impact: 1,
-  witness: 1,
-  durability: RESOLVE_PER_DURABILITY,
-  luck: 1 / 2,
 };
 
 export interface StatRow {
@@ -85,8 +73,8 @@ export interface StatTable {
    *  same units, as the matching row totals. */
   resolve: number; // combustion ceiling
   fortune: number; // the fortune roll, in sixtieths
-  afflict: number; // impact
-  testify: number; // witness
+  afflict: number;
+  testify: number;
 }
 
 /** The stat table behind the operational numbers (the study drop-down,
@@ -100,7 +88,8 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
   const sectLuck = p.buffs.luck - element.luck - modality.luck;
 
   const rows = STAT_KEYS.map((key): StatRow => {
-    const scale = STAT_DISPLAY_SCALE[key];
+    // Fortune is luck in sixtieths; the other stats already use display units.
+    const scale = key === "luck" ? 1 / 2 : 1;
     const core = p.base[key] * scale;
     const placement =
       (element[key] + modality[key] + (key === "luck" ? sectLuck : 0)) * scale;
@@ -113,18 +102,17 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
     rows,
     resolve: combustionCeiling(p),
     fortune: fortuneSixtieths(eff.luck),
-    afflict: eff.impact,
-    testify: eff.witness,
+    afflict: eff.affliction,
+    testify: eff.testimony,
   };
 }
 
-/** What a verb sends, in one direction: the acting planet's witness for
- *  testimony, its impact for affliction, floored at zero. The single expression
- *  of that mapping — the resolver (`turn.ts` `resolveAction`), the exchange
+/** What a verb sends, in one direction: the acting planet's matching stat,
+ *  floored at zero. The resolver (`turn.ts` `resolveAction`), the exchange
  *  preview below, and the encounter's readouts all call it, so no display can
  *  drift from the outcome. */
 export function directAmount(stats: PlanetStats, valence: Polarity): number {
-  return Math.max(0, valence === "Testimony" ? stats.witness : stats.impact);
+  return Math.max(0, valence === "Testimony" ? stats.testimony : stats.affliction);
 }
 
 export function computeDirectExchange(

@@ -21,7 +21,7 @@ import { isCombusted, wouldCombust } from "@/game/combust";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
-  EMPTY_IMPACT_MAP,
+  EMPTY_EFFECT_MAP,
   EMPTY_PLANET_SET,
   EMPTY_PROPAGATION_KEYS,
   useCombatAnimation,
@@ -119,22 +119,22 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const activePropagationKeys = animation?.activePropagationKeys ?? EMPTY_PROPAGATION_KEYS;
   const actionPulsePlayer = animation?.actionPulse.player ?? null;
   const actionPulseOpponent = animation?.actionPulse.opponent ?? null;
-  const impactPlayer = animation?.impactPlanets.self ?? EMPTY_IMPACT_MAP;
-  const impactOpponent = animation?.impactPlanets.other ?? EMPTY_IMPACT_MAP;
+  const effectPlayer = animation?.effectPlanets.self ?? EMPTY_EFFECT_MAP;
+  const effectOpponent = animation?.effectPlanets.other ?? EMPTY_EFFECT_MAP;
   const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;
   const combustingOpponent = animation?.combustingPlanets.other ?? EMPTY_PLANET_SET;
   const mergingPlayer = animation?.mergingPlanets.self ?? EMPTY_PLANET_SET;
   const mergingOpponent = animation?.mergingPlanets.other ?? EMPTY_PLANET_SET;
   const animationEpoch = animation?.epoch ?? encounter.turnIndex;
   // The edge bands' bright level: every planet taking an effect on this beat,
-  // whether it blooms (impact) or combusts (ripple).
+  // whether it blooms (effect) or combusts (ripple).
   const struckSelf = useMemo(
-    () => new Set([...impactPlayer.keys(), ...combustingPlayer]),
-    [impactPlayer, combustingPlayer],
+    () => new Set([...effectPlayer.keys(), ...combustingPlayer]),
+    [effectPlayer, combustingPlayer],
   );
   const struckOther = useMemo(
-    () => new Set([...impactOpponent.keys(), ...combustingOpponent]),
-    [impactOpponent, combustingOpponent],
+    () => new Set([...effectOpponent.keys(), ...combustingOpponent]),
+    [effectOpponent, combustingOpponent],
   );
 
   const playerUnlocked = useMemo(
@@ -222,7 +222,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const combustWarnings = useMemo(() => {
     if (animation || encounter.resolved || !opponentTurn) return null;
     if (opponentAction !== "Affliction") return null;
-    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).impact;
+    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).affliction;
     const candidates = playerUnlocked.filter(
       (p) => !isCombusted(prince.chart.planets[p], run.state[p]),
     );
@@ -231,7 +231,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     );
     const maxAnswer = Math.max(
       0,
-      ...candidates.map((p) => getEffectiveStats(prince.chart, p).impact),
+      ...candidates.map((p) => getEffectiveStats(prince.chart, p).affliction),
     );
     const other = wouldCombust(
       encounter.opponentChart.planets[opponentTurn],
@@ -253,7 +253,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection, and nothing at all until a planet is under consideration.
   // Mid-animation: the snapshot captured at commit, with each planet filtered
-  // out as its impact pulse fires (see useCombatAnimation).
+  // out as its effect pulse fires (see useCombatAnimation).
   //
   // Rejected: the precommit drawn on every candidate at rest (SCREENS.md
   // §3.5.1). It is determined information and it made the seven-way comparison
@@ -427,8 +427,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     !isCombusted(prince.chart.planets[inspected], run.state[inspected])
       ? {
           choices: [
-            { verb: "Testimony", value: getEffectiveStats(prince.chart, inspected).witness },
-            { verb: "Affliction", value: getEffectiveStats(prince.chart, inspected).impact },
+            { verb: "Testimony", value: getEffectiveStats(prince.chart, inspected).testimony },
+            { verb: "Affliction", value: getEffectiveStats(prince.chart, inspected).affliction },
           ],
           preview: indicatedVerb,
           onChoose: (v) => {
@@ -506,7 +506,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       activePlanet: animation?.playerPlanet ?? null,
       activePropagationKeys: activePropagationKeys.self,
       actionPulsePlanet: actionPulsePlayer,
-      impactPlanets: impactPlayer,
+      effectPlanets: effectPlayer,
       combustingPlanets: combustingPlayer,
       mergingPlanets: mergingPlayer,
       warningPlanets: selfWarnings ?? undefined,
@@ -671,7 +671,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             passive
             activePropagationKeys={activePropagationKeys.other}
             actionPulsePlanet={actionPulseOpponent}
-            impactPlanets={impactOpponent}
+            effectPlanets={effectOpponent}
             combustingPlanets={combustingOpponent}
             mergingPlanets={mergingOpponent}
             warningPlanets={otherWarnings ?? undefined}

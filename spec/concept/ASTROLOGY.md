@@ -7,6 +7,12 @@ The goal is not to defend astrology as true or dismiss it as superstition, but t
 
 For sourced themes and symbols used in game writing, see the [planet and sign matrix](PLANET_MATRIX.md) and [house matrix](HOUSE_MATRIX.md).
 
+### Earlier game terminology
+
+Earlier mechanical drafts called affliction strength **impact** and testimony strength **witness**.
+The witness metaphor treats planets as bearing witness to one another.
+These names remain here as reference material; current mechanics use affliction and testimony.
+
 ### A note on perspective
 
 This document is written for the **SpacePrince** project, and its through-line reflects that purpose:
@@ -69,7 +75,7 @@ The primary textual source is the *Enūma Anu Enlil*, a series of roughly 70 cun
 Astrology's core grammar is already present.
 
 So is its arithmetic: the 360-degree circle is sexagesimal — built from a base-60 system whose divisibility (by 2, 3, 4, 5, 6, 10, 12…) is why halves, thirds, and quarters of the sky come out whole.
-Space Prince's mechanics adopt the same arithmetic: stats are multiples of 12, combustion ceilings multiples of 60, aspect multipliers circle fractions, probabilities sixtieths (`MECHANICS.md`, "Number model").
+Space Prince's mechanics adopt the same arithmetic: stats and Resolve ceilings are multiples of 12, aspect multipliers circle fractions, probabilities sixtieths (`MECHANICS.md`, "Number model").
 The game's numbers work the way they do for the same reason the Babylonians' did.
 
 ---

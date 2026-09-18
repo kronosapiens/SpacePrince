@@ -1,16 +1,34 @@
-import type { Prince } from "@/game/types";
+import type { Chart, Prince, SideState } from "@/game/types";
+import { refreshChartStats } from "@/game/chart";
+import { combustionCeiling } from "@/game/combust";
+import { PLANETS } from "@/game/data";
 
 // v4: narrative encounters hold a single decision, with no tree traversal.
 const PRINCE_KEY = "sp:prince:v4";
 // Obsolete prototype shapes; cleared on first load (no migration).
 const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3"];
 
+function capSavedAffliction(chart: Chart, state: SideState): void {
+  for (const planet of PLANETS) {
+    state[planet].affliction = Math.min(state[planet].affliction, combustionCeiling(chart.planets[planet]));
+  }
+}
+
 export function loadPrince(): Prince | null {
   try {
     for (const k of LEGACY_KEYS) localStorage.removeItem(k);
     const raw = localStorage.getItem(PRINCE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as Prince;
+    const prince = JSON.parse(raw) as Prince;
+    refreshChartStats(prince.chart);
+    for (const run of prince.runs) {
+      capSavedAffliction(prince.chart, run.state);
+      if (run.encounter?.kind === "combat") {
+        refreshChartStats(run.encounter.opponentChart);
+        capSavedAffliction(run.encounter.opponentChart, run.encounter.opponentState);
+      }
+    }
+    return prince;
   } catch {
     return null;
   }

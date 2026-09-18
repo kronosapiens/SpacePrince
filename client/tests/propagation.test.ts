@@ -125,16 +125,16 @@ describe("propagation — only the fielded roster conducts", () => {
   it("the projection reaches no planet outside the roster", () => {
     const chart = seededChart(7);
     const opp = seededChart(11);
-    // Moon v Moon — the first encounter's matchup.
+    // Testimony keeps the other Moon lit so both sides send an effect.
     const projected = computeProjectedEffects({
       playerChart: chart,
       opponentChart: opp,
       playerPlanet: "Moon",
       opponentPlanet: "Moon",
-      playerValence: "Affliction",
+      playerValence: "Testimony",
       opponentValence: "Affliction",
       playerState: blankSideState(),
-      opponentState: blankSideState(),
+      opponentState: { ...blankSideState(), Moon: { affliction: 12 } },
       playerAspects: getAspects(chart),
       opponentAspects: getAspects(opp),
       roster: ["Moon"],

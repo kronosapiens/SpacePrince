@@ -44,11 +44,34 @@ function oppositeSign(s: SignName): SignName {
 
 function addStats(a: PlanetBaseStats, b: PlanetBaseStats): PlanetBaseStats {
   return {
-    impact: a.impact + b.impact,
-    witness: a.witness + b.witness,
-    durability: a.durability + b.durability,
+    affliction: a.affliction + b.affliction,
+    testimony: a.testimony + b.testimony,
+    resolve: a.resolve + b.resolve,
     luck: a.luck + b.luck,
   };
+}
+
+function deriveBaseStats(planet: PlanetName): PlanetBaseStats {
+  const base = PLANET_BASE_STATS[planet];
+  return {
+    affliction: base.affliction * 12,
+    testimony: base.testimony * 12,
+    resolve: base.resolve * 12,
+    luck: base.luck * 12,
+  };
+}
+
+/** Rebuild cached stats from placements when loading saved charts.
+ *  Sect luck depends on longitude, so retain its saved contribution. */
+export function refreshChartStats(chart: Chart): void {
+  for (const planet of PLANETS) {
+    const placement = chart.planets[planet];
+    placement.base = deriveBaseStats(planet);
+    placement.buffs = {
+      ...addStats(ELEMENT_BUFFS[placement.element], MODALITY_BUFFS[placement.modality]),
+      luck: placement.buffs.luck,
+    };
+  }
 }
 
 function normalizeLongitude(value: number): number {
@@ -91,7 +114,7 @@ export function derivePlacements({
     const sign = signFromLongitude(longitude);
     const element = SIGN_ELEMENT[sign];
     const modality = SIGN_MODALITY[sign];
-    const base = PLANET_BASE_STATS[planet];
+    const base = deriveBaseStats(planet);
     const buffs = addStats(ELEMENT_BUFFS[element], MODALITY_BUFFS[modality]);
     const planetSect = resolvePlanetSect(planet, longitude, sunLong);
     if (planetSect === chartSect) buffs.luck += IN_SECT_LUCK_BONUS;

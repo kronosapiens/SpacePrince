@@ -139,7 +139,7 @@ The hook seeds animation state with the *previous* values, then schedules timeou
 While `animation` is non-null, the screen reads display values from it; when it becomes null, the screen falls back to the live `run` / `encounter` props (which by then reflect the resolved turn).
 The store always holds the truth; animation only controls what the player sees and when.
 
-Per-planet visual tells are flag maps on animation state — `actionPulse`, `impactPlanets`, `critPlanets`, `combustingPlanets` — read by `Chart.tsx` and translated into CSS class toggles (`anim-action-glow`, `anim-impact`, `anim-crit-burst`, `anim-combust-ripple`).
+Per-planet visual tells are flag maps on animation state — `actionPulse`, `effectPlanets`, `critPlanets`, `combustingPlanets` — read by `Chart.tsx` and translated into CSS class toggles (`anim-action-glow`, `anim-effect`, `anim-crit-burst`, `anim-combust-ripple`).
 Keyframes live in `style/motion.css`.
 The schedule's longest-running phase is the combust ripple (1000ms); the end delay extends to wait for it before clearing animation state.
 

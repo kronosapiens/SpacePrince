@@ -69,7 +69,7 @@ describe("single-decision narrative", () => {
     prince.chart.planets.Moon.dignity = "Domicile";
     const offered = () => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(context())).map((o) => o.id);
     expect(offered()).toEqual(["bed", "hearth", "move"]);
-    run.state.Moon.affliction = 24;
+    run.state.Moon.affliction = 12;
     darken("Venus");
     expect(offered()).toEqual(["shelter", "hearth", "move"]);
     expect(resolveNarrative(run, prince, scenario, "bed", { chosen: "Moon" })).toBeNull();
@@ -96,7 +96,7 @@ describe("single-decision narrative", () => {
 
   it("requires the full price before healing and leaves failed purchases untouched", () => {
     const { run, context, option } = setup("self-still-water", 0);
-    run.state.Moon.affliction = 48;
+    run.state.Moon.affliction = 12;
     run.light = 12;
     const before = structuredClone(run);
     expect(previewOption(run, context(), option("rest"), { chosen: "Moon" })).toEqual({ ok: false, reason: "Requires 24 Light; you have 12." });
@@ -107,7 +107,7 @@ describe("single-decision narrative", () => {
     if (!preview.ok) throw new Error(preview.reason);
     expect(preview.success.light).toBe(0);
     expect(preview.success.state.Moon.affliction).toBe(0);
-    expect(run.state.Moon.affliction).toBe(48);
+    expect(run.state.Moon.affliction).toBe(12);
     expect(describeOption(context(), option("rest"), { chosen: "Moon" })).toBe("Testify 60 on Moon · Lose 24 Light");
   });
 
@@ -150,22 +150,22 @@ describe("single-decision narrative", () => {
 
   it("requires the full affliction cost, allowing exact-ceiling combustion", () => {
     const { run, context, option, prince } = setup("creativity-song");
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
-    run.state.Moon.affliction = ceiling - 24;
-    expect(previewOption(run, context(), option("finish"), { chosen: "Moon" }).ok).toBe(false);
-    run.state.Moon.affliction = ceiling - 48;
-    const preview = previewOption(run, context(), option("finish"), { chosen: "Moon" });
-    expect(preview.ok && preview.success.state.Moon.affliction).toBe(ceiling);
-    expect(describeOption(context(), option("finish"), { chosen: "Moon" })).toBe("Afflict 48 on Moon · Gain 48 Light");
+    const ceiling = combustionCeiling(prince.chart.planets.Saturn);
+    run.state.Saturn.affliction = ceiling - 24;
+    expect(previewOption(run, context(), option("finish"), { chosen: "Saturn" }).ok).toBe(false);
+    run.state.Saturn.affliction = ceiling - 48;
+    const preview = previewOption(run, context(), option("finish"), { chosen: "Saturn" });
+    expect(preview.ok && preview.success.state.Saturn.affliction).toBe(ceiling);
+    expect(describeOption(context(), option("finish"), { chosen: "Saturn" })).toBe("Afflict 48 on Saturn · Gain 48 Light");
   });
 
   it("healthiest means greatest remaining combustion margin", () => {
     const { prince, run, context } = setup();
     const ctx = { ...context(), unlocked: ["Moon", "Saturn"] as typeof PLANETS[number][] };
-    prince.chart.planets.Moon.base.durability = 12;
-    prince.chart.planets.Moon.buffs.durability = 0;
-    prince.chart.planets.Saturn.base.durability = 60;
-    prince.chart.planets.Saturn.buffs.durability = 0;
+    prince.chart.planets.Moon.base.resolve = 24;
+    prince.chart.planets.Moon.buffs.resolve = 0;
+    prince.chart.planets.Saturn.base.resolve = 120;
+    prince.chart.planets.Saturn.buffs.resolve = 0;
     run.state.Saturn.affliction = 72;
     expect(resolveTargets("healthiest", ctx)).toEqual(["Saturn"]);
   });

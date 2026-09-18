@@ -41,8 +41,9 @@ const article = (s: string) => (/^[aeiou]/i.test(s) ? "an" : "a");
 export function describeStat(p: PlanetPlacement, key: keyof PlanetStats): string {
   const word = STAT_LABEL[key];
   const core = p.base[key];
-  // Base stats live on the 12–48 lattice (MECHANICS §2).
-  const coreQual = core >= 36 ? "strong" : core <= 12 ? "slight" : "modest";
+  const strong = key === "resolve" ? 72 : 36;
+  const slight = key === "resolve" ? 24 : 12;
+  const coreQual = core >= strong ? "strong" : core <= slight ? "slight" : "modest";
   // Qualitative only — the numbers sit in the table right above this prose.
   const parts = [`${p.planet}'s ${word} is ${coreQual} by nature.`];
 

@@ -1,4 +1,5 @@
 import { blankSideState, chartRuler, seededChart } from "./chart";
+import { combustionCeiling } from "./combust";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { eligibleOpponentSeed } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
@@ -59,15 +60,17 @@ export function rollOpponentTurns(
 
 /** The opponent spawns already afflicted (MECHANICS §11): only resolution
  *  scores (§12), so a blank chart gives a short fight nothing to resolve.
- *  The tiers are absolute rather than a fraction of the ceiling — the spawn
- *  pool is a harvest quantity, not a durability one — and the top sits below
- *  the smallest ceiling (60), so no planet spawns combusted without a clamp. */
+ *  Absolute tiers are capped one 12-point step below Resolve so fragile
+ *  planets still arrive lit. */
 export const SPAWN_AFFLICTION_TIERS = [12, 24, 36];
 
-export function afflictedSideState(roster: PlanetName[], rng: () => number): SideState {
+export function afflictedSideState(chart: Chart, roster: PlanetName[], rng: () => number): SideState {
   const state = blankSideState();
   for (const planet of roster) {
-    state[planet].affliction = pickWeighted(SPAWN_AFFLICTION_TIERS, rng);
+    state[planet].affliction = Math.min(
+      pickWeighted(SPAWN_AFFLICTION_TIERS, rng),
+      combustionCeiling(chart.planets[planet]) - 12,
+    );
   }
   return state;
 }
@@ -94,7 +97,7 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
     kind: "combat",
     id: `enc_combat_${run.id}_${acceptedSeed}`,
     opponentChart,
-    opponentState: afflictedSideState(roster, stateRng),
+    opponentState: afflictedSideState(opponentChart, roster, stateRng),
     roster,
     sequence,
     opponentActions,

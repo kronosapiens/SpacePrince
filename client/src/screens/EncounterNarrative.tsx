@@ -95,7 +95,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const [guidePhase, setGuidePhase] = useState<NarrativeGuidePhase>("scene");
   const [flash, setFlash] = useState<{
     epoch: number;
-    impact: Map<PlanetName, Polarity>;
+    effect: Map<PlanetName, Polarity>;
     combusting: Set<PlanetName>;
     light: number;
   } | null>(null);
@@ -170,17 +170,17 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
     // a candle-out ripple for any combust, and a Light pulse (SCREENS.md §3.5).
-    const impact = new Map<PlanetName, Polarity>();
+    const effect = new Map<PlanetName, Polarity>();
     const combusting = new Set<PlanetName>(newlyCombusted(prince.chart, run.state, nextRun.state));
     for (const p of PLANETS) {
       const before = run.state[p];
       const after = nextRun.state[p];
-      if (after.affliction < before.affliction) impact.set(p, "Testimony");
-      else if (after.affliction > before.affliction) impact.set(p, "Affliction");
+      if (after.affliction < before.affliction) effect.set(p, "Testimony");
+      else if (after.affliction > before.affliction) effect.set(p, "Affliction");
     }
     setFlash({
       epoch: 1,
-      impact,
+      effect,
       combusting,
       light: nextRun.light - run.light,
     });
@@ -188,7 +188,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     // mode (MUSIC.md, "The strike grid") — relief lands, harm hangs — so an
     // outcome that touches several sounds as a chord. Combustion adds a
     // breath to the planet's note, as in combat.
-    for (const [p, polarity] of impact) {
+    for (const [p, polarity] of effect) {
       if (combusting.has(p)) continue;
       playStrike(house.ruler, p, polarity === "Affliction" ? "inverts" : "flows");
     }
@@ -242,7 +242,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       side: "self",
       showColorField: true,
       passive: resolved,
-      impactPlanets: flash?.impact,
+      effectPlanets: flash?.effect,
       combustingPlanets: flash?.combusting,
       animationEpoch: flash?.epoch,
     },

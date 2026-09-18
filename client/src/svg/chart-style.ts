@@ -144,7 +144,7 @@ export const CHART_STYLE = {
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc
    *  can stay quiet and still never read as tappable. `track` is the whole
-   *  ceiling (so arc length is durability, visible with no number);
+   *  ceiling (so arc length is proportional to Resolve, visible with no number);
    *  `remaining` is what the planet can still absorb; `diff` is the projected
    *  change to that span. */
   afflictionArc: {

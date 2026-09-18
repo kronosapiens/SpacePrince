@@ -7,7 +7,7 @@ import { createScore, type ThemeSurface } from "./score";
 export type { ThemeSurface } from "./score";
 
 /**
- * The sound layer: ruler-relative impact and propagation tones, combustion
+ * The sound layer: ruler-relative effect and propagation tones, combustion
  * breaths, the star bell, and quiet UI cues (MUSIC.md, VIBES.md §Sound Design).
  *
  * Module singleton, gesture-gated: Tone.js is imported and the AudioContext
@@ -153,7 +153,7 @@ function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
-/** Shared soft voice for impacts, propagation, and the star. */
+/** Shared soft voice for effects, propagation, and the star. */
 function fxSynth(): AnyInstrument | null {
   if (!T || !reverb) return null;
   const existing = instruments.get("_fx");

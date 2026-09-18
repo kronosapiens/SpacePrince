@@ -19,7 +19,7 @@ import type {
   TurnLogEntry,
 } from "./types";
 
-const ZERO_STATS = { impact: 0, witness: 0, durability: 0, luck: 0 };
+const ZERO_STATS = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
 
 interface TurnResult {
   run: Run;

@@ -77,8 +77,8 @@ describe("RULER_RULES — each ruler pays for what that planet values", () => {
     expect(
       scoreBeats("Saturn", BEATS.filter((b) => b.kind === "hit"), charts, opponentAction),
     ).toBe(0);
-    expect(otherMarsCeiling % 60).toBe(0);
-    expect(selfSaturnCeiling % 60).toBe(0);
+    expect(otherMarsCeiling % 12).toBe(0);
+    expect(selfSaturnCeiling % 12).toBe(0);
   });
 });
 
