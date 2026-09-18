@@ -1039,18 +1039,21 @@
 }
 .narrative-heading {
   display: grid;
-  grid-template-columns: var(--narrative-composition-size) minmax(0, max-content);
-  gap: var(--narrative-gap);
-  justify-content: center;
+  grid-template-columns: minmax(0, calc(var(--narrative-heading-split) - var(--narrative-heading-gap) / 2)) minmax(0, 1fr);
+  gap: var(--narrative-heading-gap);
   align-items: center;
+  /* The 32-unit halo extends 8 units past the coin's 48-unit viewBox. */
+  padding-top: calc(var(--narrative-coin-size) / 6);
 }
-.narrative-composition {
-  justify-self: center;
-  width: var(--narrative-composition-size);
+.narrative-coin {
+  display: block;
+  justify-self: end;
+  width: var(--narrative-coin-size);
+  height: auto;
   max-width: 100%;
   aspect-ratio: 1;
+  overflow: visible;
 }
-.narrative-composition svg { width: 100%; height: 100%; }
 .kandinsky-orbit {
   animation: kandinsky-orbit 36s linear infinite;
 }

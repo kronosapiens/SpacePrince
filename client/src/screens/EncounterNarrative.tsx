@@ -5,7 +5,8 @@ import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
-import { KandinskyComposition } from "@/components/KandinskyComposition";
+import { HouseCoin } from "@/components/HouseCoin";
+import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { unlockedPlanets } from "@/game/unlocks";
 import { availableSelections, buildNarrativeContext, joyPresent, previewOption, resolveNarrative, requiresPlanet, type Selection } from "@/game/narrative";
 import { describeOptionParts } from "@/copy/narrative";
@@ -66,7 +67,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     setActive(rulerPlanet);
   }, [rulerPlanet, setActive]);
 
-  // The house ruler carries the score and the planetary artwork.
+  // The house ruler carries the score and the coin's color.
   useEffect(() => {
     setTheme(rulerPlanet, "narrative");
   }, [rulerPlanet]);
@@ -269,9 +270,17 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       <div className="narrative-column anim-surface-in">
         <div className="narrative-body">
           <div className="narrative-heading">
-            <div className="narrative-composition">
-              <KandinskyComposition planet={rulerPlanet} />
-            </div>
+            <svg className="narrative-coin" viewBox="-24 -24 48 48" aria-hidden="true">
+              <defs>
+                <radialGradient id="narrative-coin-glow">
+                  <stop offset="0%" stopColor={PLANET_PRIMARY[rulerPlanet]} stopOpacity={HOUSE_COIN_GLOW.core} />
+                  <stop offset="70%" stopColor={PLANET_PRIMARY[rulerPlanet]} stopOpacity={HOUSE_COIN_GLOW.mid} />
+                  <stop offset="100%" stopColor={PLANET_PRIMARY[rulerPlanet]} stopOpacity={0} />
+                </radialGradient>
+              </defs>
+              <circle r={HOUSE_COIN_GLOW.radius} fill="url(#narrative-coin-glow)" />
+              <HouseCoin house={house.num} color={PLANET_PRIMARY[rulerPlanet]} />
+            </svg>
             <div className="narrative-house" data-guide="narrative-house">
               {HOUSE_NAMES[house.num - 1]}
               <span className="narrative-house-gloss">{house.gloss}</span>

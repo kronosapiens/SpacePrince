@@ -46,7 +46,9 @@
   --chart-pad-inline: 60px;
   --chart-gap: 32px;
 
-  --narrative-composition-size: clamp(112px, 18svh, 180px);
+  --narrative-coin-size: clamp(80px, 12svh, 120px);
+  --narrative-heading-split: 40%;
+  --narrative-heading-gap: 28px;
   --narrative-gap: 20px;
 
   /* Chart-casting form */
@@ -90,7 +92,8 @@
 
 @media (max-width: 1399px), (max-height: 850px) {
   :root {
-    --narrative-composition-size: 96px;
+    --narrative-coin-size: 80px;
+    --narrative-heading-gap: 24px;
     --narrative-gap: 16px;
   }
 }

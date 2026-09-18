@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NODE_R } from "@/components/MapDiagram";
+import { NODE_R } from "@/svg/map-style";
 import { GUIDE_COPY } from "@/copy/guide";
 import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";

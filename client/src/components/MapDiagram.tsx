@@ -3,8 +3,9 @@ import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
 import { chartRuler, seededChart } from "@/game/chart";
 import { HOUSES } from "@/data/houses";
+import { HouseCoin, romanHouse } from "@/components/HouseCoin";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
-import { FORTUNE_STYLE, HOUSE_BORDER, MAP_PADDING } from "@/svg/map-style";
+import { FORTUNE_STYLE, HOUSE_BORDER, MAP_PADDING, NODE_R } from "@/svg/map-style";
 import { hexagramPoints } from "@/svg/geometry";
 import type { MapState, PlanetName } from "@/game/types";
 
@@ -16,7 +17,6 @@ interface MapDiagramProps {
   bottomUp?: boolean;
 }
 
-export const NODE_R = 22;
 const ENCOUNTER_TRIANGLES = hexagramPoints(0, 0, NODE_R);
 // Tiered visual scale used by both the edge web and the nodes themselves.
 // Semantic: solid past, translucent next-steps, faint distance.
@@ -183,6 +183,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     // fortune roll acts at each crossing (MECHANICS §11.3). Its glow follows
     // the same state language as every node: current pulses, history is quiet.
     const isFortune = n.id === ROOT_NODE_ID;
+    const strokeWidth = isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8;
 
     // Halo gradient for the current node and for clickable nodes (the latter use
     // it for the breathing "you can go here" glow, mirroring combat planets).
@@ -242,13 +243,19 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
               style={{ opacity: isIndicated ? 1 : undefined, pointerEvents: "none" }} />
           </>
         )}
-        <circle r={NODE_R}
-          data-guide={`node-${n.id}`}
-          fill={isNarrative || isFortune ? color : "transparent"}
-          fillOpacity={isFortune ? op : isNarrative ? (isCurrent ? 0.98 : op) : 0}
-          stroke={color}
-          strokeOpacity={op}
-          strokeWidth={isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8} />
+        {isNarrative ? (
+          <HouseCoin house={content.house} color={color} opacity={op}
+            fillOpacity={isCurrent ? 0.98 : op} strokeWidth={strokeWidth}
+            guideId={`node-${n.id}`} />
+        ) : (
+          <circle r={NODE_R}
+            data-guide={`node-${n.id}`}
+            fill={isFortune ? color : "transparent"}
+            fillOpacity={isFortune ? op : 0}
+            stroke={color}
+            strokeOpacity={op}
+            strokeWidth={strokeWidth} />
+        )}
         {/* Dark cross and inner rim divide the solid gold Fortune disc. */}
         {isFortune && (() => {
           // Match the outside edge of the house's dark rim, leaving the same colored band.
@@ -263,22 +270,6 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             </g>
           );
         })()}
-        {isNarrative && r && (
-          <>
-            <circle r={HOUSE_BORDER.rimR} fill="none"
-              stroke={NEUTRAL.void} strokeOpacity={op}
-              strokeWidth={HOUSE_BORDER.stroke} style={{ pointerEvents: "none" }} />
-            <text textAnchor="middle" dominantBaseline="central"
-              fontSize={14}
-              fill={NEUTRAL.void}
-              fillOpacity={op}
-              fontFamily="'Cormorant Garamond', Garamond, serif"
-              fontWeight={700}
-              style={{ pointerEvents: "none", userSelect: "none" }}>
-              {romanHouse(content.house)}
-            </text>
-          </>
-        )}
         {isCombat && (() => {
           const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
@@ -315,9 +306,4 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
 
 function edgeKey(a: string, b: string): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
-}
-
-function romanHouse(house: number): string {
-  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-  return numerals[house - 1] ?? String(house);
 }
