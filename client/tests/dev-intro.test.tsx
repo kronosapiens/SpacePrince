@@ -13,6 +13,7 @@ vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
   currentTheme: () => null,
   subscribeTheme: () => () => {},
+  subscribeVolume: () => () => {},
   getMusicVolume: () => 0,
   getSoundVolume: () => 0,
   setMusicVolume: vi.fn(),

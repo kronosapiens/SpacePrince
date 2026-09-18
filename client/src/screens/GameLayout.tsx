@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { PlanetBands } from "@/components/PlanetBands";
+import { SettingsMenu } from "@/components/SettingsMenu";
 import { PLANETS } from "@/game/data";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
@@ -47,18 +48,21 @@ export function GameLayout() {
   const surface = isTitle ? "title" : isCasting ? "mint-screen" : run?.encounter?.kind ?? "map-screen";
 
   return (
-    <PlayerChartLayout
-      className={surface}
-      chart={chart}
-      state={isCasting ? undefined : run?.state}
-      unlockedPlanets={unlocked}
-      mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
-      disabled={!isTitle && guideOpen}
-      activePlanet={isCasting && !casting.ghosted ? casting.currentRevealing : null}
-      hideAffliction={isTitle || isCasting}
-    >
-      {isCasting && <PlanetBands on={casting.bandsOn} current={casting.bandsCurrent} />}
-      <Outlet context={context} />
-    </PlayerChartLayout>
+    <>
+      <PlayerChartLayout
+        className={surface}
+        chart={chart}
+        state={isCasting ? undefined : run?.state}
+        unlockedPlanets={unlocked}
+        mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
+        disabled={!isTitle && guideOpen}
+        activePlanet={isCasting && !casting.ghosted ? casting.currentRevealing : null}
+        hideAffliction={isTitle || isCasting}
+      >
+        {isCasting && <PlanetBands on={casting.bandsOn} current={casting.bandsCurrent} />}
+        <Outlet context={context} />
+      </PlayerChartLayout>
+      <SettingsMenu key={pathname} />
+    </>
   );
 }

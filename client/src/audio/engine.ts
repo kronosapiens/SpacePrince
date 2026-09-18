@@ -21,17 +21,22 @@ type ToneModule = typeof import("tone");
 let T: ToneModule | null = null;
 let initPromise: Promise<void> | null = null;
 
-// Two independent volumes (dev-controllable from the DevConsole): `music` is the
-// score; `sound` is everything else — impacts, propagation,
-// combustion, the star bell, and UI cues.
+// Independent volumes: `music` is the score; `sound` is everything else —
+// effects, propagation, combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
-// Both on for a fresh visitor; a saved preference (set from the dev console)
-// is honored over the defaults.
+// Both on for a fresh visitor; saved preferences override the defaults.
 let musicVolume = 1;
 let soundVolume = 1;
 let musicOutput: import("tone").Gain | null = null;
 let soundOutput: import("tone").Gain | null = null;
+const volumeListeners = new Set<() => void>();
+
+export function subscribeVolume(listener: () => void): () => void {
+  volumeListeners.add(listener);
+  return () => { volumeListeners.delete(listener); };
+}
+
 try {
   const raw = localStorage.getItem(AUDIO_KEY);
   if (raw) {
@@ -49,6 +54,7 @@ function persistAudio(): void {
   } catch {
     /* storage unavailable — session-only */
   }
+  volumeListeners.forEach((listener) => listener());
 }
 
 export function getMusicVolume(): number {

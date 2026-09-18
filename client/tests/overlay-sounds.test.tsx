@@ -9,15 +9,20 @@ import { DevConsole } from "@/components/DevConsole";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { playUISound, setMusicVolume, setSoundVolume, nextTheme } from "@/audio/engine";
 
+const volume = vi.hoisted(() => ({ music: 1, sound: 1, listeners: new Set<() => void>() }));
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
   playUISound: vi.fn(),
   currentTheme: () => "Moon",
   subscribeTheme: () => () => {},
-  getMusicVolume: () => 1,
-  getSoundVolume: () => 1,
-  setMusicVolume: vi.fn(),
-  setSoundVolume: vi.fn(),
+  getMusicVolume: () => volume.music,
+  getSoundVolume: () => volume.sound,
+  subscribeVolume: (listener: () => void) => {
+    volume.listeners.add(listener);
+    return () => volume.listeners.delete(listener);
+  },
+  setMusicVolume: vi.fn((value: number) => { volume.music = value; volume.listeners.forEach((listener) => listener()); }),
+  setSoundVolume: vi.fn((value: number) => { volume.sound = value; volume.listeners.forEach((listener) => listener()); }),
   nextTheme: vi.fn(),
 }));
 
@@ -27,6 +32,7 @@ let frames: Map<number, FrameRequestCallback>;
 beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
+  volume.music = volume.sound = 1;
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
   frames = new Map();
@@ -149,7 +155,7 @@ describe("developer feedback", () => {
     expect(setSoundVolume).toHaveBeenLastCalledWith(0.35);
     adjust("Music", 60);
     expect(setMusicVolume).toHaveBeenLastCalledWith(0.6);
-    expect(get(".dev-console").textContent).toContain("Music 60%");
+    expect(get(".dev-console").textContent).toContain("Music60%");
     adjust("Music", 0);
     click(".dev-console > .dev-chrome-button");
     expect(nextTheme).not.toHaveBeenCalled();

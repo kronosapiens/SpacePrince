@@ -1237,6 +1237,7 @@
   align-items: center;
   justify-content: center;
 }
+.info-card-stage:focus { outline: none; }
 .info-card-close,
 .info-card-help {
   position: absolute;
@@ -1288,7 +1289,8 @@
 }
 
 /* Screen help — the "?" corner affordance + its card content. */
-.screen-help-button {
+.screen-help-button,
+.screen-settings-button {
   position: fixed;
   top: 20px;
   left: 24px;
@@ -1312,16 +1314,128 @@
     color-mix(in srgb, currentColor calc(100% * var(--invite-glow-min)), transparent);
   transition: background 220ms ease, border-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
 }
-.screen-help-button:hover {
+.screen-help-button:hover,
+.screen-settings-button:hover {
   background: var(--bone);
   color: var(--void);
   border-color: var(--bone);
   box-shadow: 0 0 var(--invite-glow-blur) var(--bone);
 }
-.screen-help-button:focus-visible {
+.screen-help-button:focus-visible,
+.screen-settings-button:focus-visible {
   outline: 1px solid var(--gold);
   outline-offset: 2px;
 }
+.screen-settings-button { left: auto; right: 24px; }
+
+.screen-settings-button[aria-expanded="true"] { color: var(--gold); border-color: var(--gold); }
+.settings-dropdown {
+  position: fixed;
+  top: 66px;
+  right: 24px;
+  z-index: 200;
+  width: min(320px, calc(100vw - 48px));
+  max-height: calc(100svh - 90px);
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--void);
+  border: 1px solid var(--smoke);
+  border-radius: 16px;
+}
+.settings-dropdown:focus { outline: none; }
+.settings-content h2 {
+  margin: 0 0 24px;
+  color: var(--bone);
+  font: 400 28px / 1.1 var(--serif);
+}
+.audio-controls { display: grid; gap: var(--settings-option-gap); }
+.audio-control { display: grid; gap: 8px; }
+.audio-control-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--sans);
+  font-size: var(--settings-label-size);
+}
+.audio-control-value {
+  color: var(--mist);
+  font: 12px var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.audio-control input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  cursor: pointer;
+  background: transparent;
+}
+.audio-control input::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(to right, var(--gold) var(--volume), var(--smoke) var(--volume));
+}
+.audio-control input::-moz-range-track {
+  height: 2px;
+  background: var(--smoke);
+}
+.audio-control input::-moz-range-progress { height: 2px; background: var(--gold); }
+.audio-control input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: var(--void);
+}
+.audio-control input::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: var(--void);
+}
+.audio-control input:focus-visible,
+.prince-inspect-button:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 4px;
+}
+.settings-prince {
+  margin-top: var(--settings-option-gap);
+}
+.prince-inspect-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: var(--settings-label-size);
+}
+.prince-inspect-button:hover:not(:disabled) { color: var(--bone); }
+.prince-inspect-button:disabled { color: var(--mist); opacity: 0.5; cursor: default; }
+.settings-prince p { margin: 12px 0 0; color: var(--mist); font: 12px / 1.6 var(--sans); }
+.prince-modal .info-card-stage {
+  width: min(1100px, calc(100vw - 48px), calc((100svh - 48px) * var(--prince-aspect-ratio)));
+  aspect-ratio: var(--prince-aspect-ratio);
+  padding: 0;
+  background: var(--void);
+  box-shadow: none;
+}
+.prince-artwork {
+  width: calc(100% - 2 * var(--prince-artwork-inset));
+  height: auto;
+}
+.prince-modal .info-card-close {
+  top: calc(var(--prince-artwork-inset) / var(--prince-aspect-ratio) + var(--prince-close-inset));
+  right: calc(var(--prince-artwork-inset) + var(--prince-close-inset));
+}
+.dev-console .audio-controls { gap: 10px; }
+.dev-console .audio-control { gap: 2px; }
+.dev-console .audio-control-label { font-size: inherit; }
 .screen-help {
   display: flex;
   flex-direction: column;

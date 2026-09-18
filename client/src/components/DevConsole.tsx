@@ -1,6 +1,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { PlanetIntroCard } from "@/components/PlanetIntroCard";
+import { AudioControls } from "@/components/AudioControls";
 import type { PlanetName } from "@/game/types";
 import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -8,10 +9,8 @@ import { MACROBIAN_THRESHOLDS } from "@/game/data";
 import {
   currentTheme,
   getMusicVolume,
-  getSoundVolume,
   playUISound,
-  setMusicVolume,
-  setSoundVolume,
+  subscribeVolume,
   nextTheme,
   subscribeTheme,
 } from "@/audio/engine";
@@ -33,8 +32,7 @@ export function DevConsole({ open }: { open: boolean }) {
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
   const [introPlanet, setIntroPlanet] = useState<PlanetName | null>(null);
-  const [music, setMusic] = useState(getMusicVolume);
-  const [sound, setSound] = useState(getSoundVolume);
+  const music = useSyncExternalStore(subscribeVolume, getMusicVolume);
   // Which theme the score is pointed at — retargets whenever a surface mounts,
   // so the label subscribes to the engine rather than reading once per render.
   const track = useSyncExternalStore(subscribeTheme, currentTheme);
@@ -103,44 +101,7 @@ export function DevConsole({ open }: { open: boolean }) {
           <div className="dev-console-divider" />
           <ChartTuner />
           <div className="dev-console-divider" />
-          <div className="dev-console-block">
-            <label className="dev-tuner-knob">
-              <span>Music <strong>{Math.round(music * 100)}%</strong></span>
-              <input
-                type="range"
-                aria-label="Music volume"
-                min={0}
-                max={100}
-                step={1}
-                value={Math.round(music * 100)}
-                onPointerEnter={playHoverSound}
-                onFocus={playFocusSound}
-                onChange={(e) => {
-                  const volume = Number(e.target.value) / 100;
-                  setMusicVolume(volume);
-                  setMusic(volume);
-                }}
-              />
-            </label>
-            <label className="dev-tuner-knob">
-              <span>Sound <strong>{Math.round(sound * 100)}%</strong></span>
-              <input
-                type="range"
-                aria-label="Sound volume"
-                min={0}
-                max={100}
-                step={1}
-                value={Math.round(sound * 100)}
-                onPointerEnter={playHoverSound}
-                onFocus={playFocusSound}
-                onChange={(e) => {
-                  const volume = Number(e.target.value) / 100;
-                  setSoundVolume(volume);
-                  setSound(volume);
-                }}
-              />
-            </label>
-          </div>
+          <AudioControls />
           <button
             type="button"
             className="dev-chrome-button"
