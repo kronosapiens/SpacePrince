@@ -771,7 +771,7 @@ function PlanetGlyph({
 }
 
 /**
- * Affliction arc — the planet's Resolve drawn at 1 point of affliction = 1°.
+ * Affliction arc — the planet's Resolve drawn at 1 point of affliction = 2°.
  * Ceilings are multiples of 12 (combust.ts).
  * The mapping is absolute rather than normalized:
  * arc length is proportional to Resolve, so a resting chart shows which planets are sturdy
@@ -803,8 +803,10 @@ function PlanetArc({
   if (ceiling <= 0) return null;
   const r = AFFLICTION_ARC_R;
   const stroke = CHART_STYLE.afflictionArc.stroke;
-  // Position `a` on the track sits `ceiling - a` degrees back from the anchor.
-  const at = (a: number) => AFFLICTION_ARC_ANCHOR_DEG - ceiling + clamp(a, 0, ceiling);
+  const degreesPerPoint = CHART_STYLE.afflictionArc.degreesPerPoint;
+  // Remaining Resolve sets the angular distance back from the combustion anchor.
+  const at = (a: number) =>
+    AFFLICTION_ARC_ANCHOR_DEG - (ceiling - clamp(a, 0, ceiling)) * degreesPerPoint;
   const spent = clamp(affliction, 0, ceiling);
 
   // The projected span runs between the current boundary and where the blow
@@ -837,10 +839,10 @@ function PlanetArc({
     <g data-guide={guideId} transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
       {/* The whole ceiling, faint. What shows through is the affliction already
           spent, and the full extent is the planet's Resolve. */}
-      <ArcStroke r={r} from={at(0)} to={at(ceiling)} full={ceiling >= 360}
+      <ArcStroke r={r} from={at(0)} to={at(ceiling)}
         stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
       {spent < ceiling && (
-        <ArcStroke r={r} from={at(spent)} to={at(ceiling)} full={spent <= 0 && ceiling >= 360}
+        <ArcStroke r={r} from={at(spent)} to={at(ceiling)}
           stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.remainingOpacity} width={stroke} />
       )}
       {diff && (
@@ -853,7 +855,7 @@ function PlanetArc({
             "--arc-diff-glow": `${tuning.arcDiffGlow}px`,
           } as CSSProperties}
         >
-          <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)} full={false}
+          <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)}
             stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity}
             width={tuning.arcDiffStroke} />
         </g>
@@ -864,12 +866,12 @@ function PlanetArc({
 
 /** One arc of a circle centered on the local origin, `from`→`to` in the same
  *  degree convention as `polar` (0 = 3 o'clock, increasing counterclockwise on
- *  screen). A 360° sweep has no arc path — both endpoints coincide — so a full
- *  sweep draws a circle instead. */
+ *  screen). A full sweep draws a circle because the arc endpoints coincide.
+ *  This applies to the track, remaining span, and projection alike. */
 function ArcStroke({
-  r, from, to, full, stroke, opacity, width,
+  r, from, to, stroke, opacity, width,
 }: {
-  r: number; from: number; to: number; full: boolean;
+  r: number; from: number; to: number;
   stroke: string; opacity: number; width: number;
 }) {
   const shared = {
@@ -878,7 +880,7 @@ function ArcStroke({
     strokeOpacity: opacity,
     strokeWidth: width,
   };
-  if (full) return <circle r={r} {...shared} />;
+  if (to - from >= 360) return <circle r={r} {...shared} />;
   const a = polar(0, 0, r, from);
   const b = polar(0, 0, r, to);
   const large = to - from > 180 ? 1 : 0;

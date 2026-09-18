@@ -108,7 +108,7 @@ The spec is divided by what kind of question each document answers.
   Verb-dependent information appears once a verb is indicated by hover or focus; verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
 - **The affliction arc is the chart's primary channel.**
-  Affliction is an arc at 1 point = 1°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock.
+  Affliction is an arc at 1 point = 2°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock.
   Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
 - **What is arriving is drawn at the chart's centre.** The corona again, around the magnitude instead of a planet — the blow has no target until the player commits, so it belongs to the chart, not to anything in it. Both charts carry it; yours from the top of the turn, theirs once you indicate a verb (`spec/design/STYLE.md §11`).
 - **One interaction ring, and its colour is the verb.**

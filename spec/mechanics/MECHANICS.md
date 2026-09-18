@@ -203,6 +203,9 @@ A planet combusts **the moment its affliction reaches the ceiling** — determin
 - `ceiling = base.resolve + buffs.resolve` (§4), in the same units as affliction and testimony.
 - combust when `affliction >= ceiling`
 
+**Provisional maximum for future run upgrades: 180 Resolve per planet**, including base stats, placement bonuses, and run bonuses.
+At 2° per point, this fills one affliction arc.
+
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
@@ -239,7 +242,7 @@ Per encounter:
   Each fielded planet draws uniformly from three tiers — `12`, `24`, `36` — deterministically from the node's opponent seed.
   Starting affliction is capped at `Resolve − 12`, so every opponent arrives lit and the result remains on the 12-point lattice.
   The absolute tiers supply roughly one planet's testimony; fragile Moons may start with less because of the cap.
-  Three tiers rather than a continuous band, so the spawn state reads off the affliction arc (1 point = 1°) as a legible tier rather than an arbitrary number.
+  Three tiers rather than a continuous band, so the spawn state reads off the affliction arc (1 point = 2°) as a legible tier rather than an arbitrary number.
   The floor of `12` keeps every planet worth testifying.
   Rejected: a uniform draw from `0` to `ceiling − 1` — under the earlier balance, it banked more affliction than seven turns of testimony could drain, so testify-always dominated and afflict-to-set-up stayed optional; and its floor of `0` let a map-1 opponent spawn nearly clean, making the run's single first turn score almost nothing.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).

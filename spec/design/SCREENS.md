@@ -155,8 +155,9 @@ The total turn animation budget is roughly **3–4 seconds**, intentionally long
 
 ### 3.5.1 The affliction arc
 
-Affliction is drawn as an arc around each planet, at **1 point = 1°**.
+Affliction is drawn as an arc around each planet, at **1 point = 2°**.
 Ceilings are multiples of 12 (`MECHANICS.md §10`).
+A full circle represents 180 Resolve, the provisional per-planet maximum for future run upgrades (`MECHANICS.md §10`).
 
 - The **faint track** is the planet's whole ceiling.
   Its length is proportional to Resolve, so a resting chart shows which planets are sturdy without a number.

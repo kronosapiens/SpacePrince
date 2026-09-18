@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Chart } from "@/components/Chart";
 import { PLANETS } from "@/game/data";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext } from "@/game/map-gen";
@@ -8,6 +9,7 @@ import { beginRun } from "@/game/run";
 import { loadPrince, savePrince } from "@/state/prince";
 import { createStubPrince } from "./fixtures";
 import { GameTest } from "./game-layout";
+import { AFFLICTION_ARC_R } from "@/svg/viewbox";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({
@@ -137,5 +139,41 @@ describe("shared player chart", () => {
     expect(playerChart()).toBe(chart);
     expect(planetPositions()).not.toEqual(positions);
     expect(frame).not.toHaveBeenCalled();
+  });
+});
+
+describe("affliction arcs", () => {
+  it("uses two degrees per point for capacity, remaining Resolve, and projections", () => {
+    const chart = createStubPrince().chart;
+    chart.planets.Moon.base.resolve = 180;
+    chart.planets.Moon.buffs.resolve = 0;
+    const arc = '[data-guide="arc-self-moon"]';
+    act(() => root.render(<Chart chart={chart} side="self"
+      projection={{ deltas: { Moon: { delta: 180, polarity: "Affliction" } } }} />));
+
+    // Full capacity, remaining Resolve, and a lethal preview all fill the circle.
+    expect(container.querySelectorAll(`${arc} > circle`)).toHaveLength(2);
+    expect(element(`${arc} .arc-diff circle`)).toBeDefined();
+    expect(element(arc).querySelector("path")).toBeNull();
+
+    act(() => root.render(<Chart chart={chart} side="self"
+      state={{ Moon: { affliction: 90 } }}
+      projection={{ deltas: { Moon: { delta: 45, polarity: "Affliction" } } }} />));
+
+    // 90 remaining points sweep a semicircle from noon to the combustion anchor.
+    const coordinates = (selector: string) => element(selector).getAttribute("d")!
+      .match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi)!.map(Number);
+    const remaining = coordinates(`${arc} > path`);
+    expect(remaining[0]).toBeCloseTo(0);
+    expect(remaining[1]).toBeCloseTo(-AFFLICTION_ARC_R);
+    expect(remaining[7]).toBeCloseTo(0);
+    expect(remaining[8]).toBeCloseTo(AFFLICTION_ARC_R);
+
+    // A 45-point preview covers the first quarter-circle of that remaining span.
+    const projected = coordinates(`${arc} .arc-diff path`);
+    expect(projected[0]).toBeCloseTo(0);
+    expect(projected[1]).toBeCloseTo(-AFFLICTION_ARC_R);
+    expect(projected[7]).toBeCloseTo(-AFFLICTION_ARC_R);
+    expect(projected[8]).toBeCloseTo(0);
   });
 });

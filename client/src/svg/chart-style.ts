@@ -140,7 +140,7 @@ export const CHART_STYLE = {
     Affliction: { rays: 12, reach: 78, flare: 0.55, stroke: STROKE_HEAVY, opacity: 0.85, cap: "butt", turn: "48s", spin: "normal" },
     Testimony: { rays: 24, reach: 54, flare: 1, stroke: STROKE_MEDIUM, opacity: 0.8, cap: "round", turn: "84s", spin: "reverse" },
   },
-  /** Diagram — the affliction arc: a planet's Resolve at 1 point = 1°, drawn
+  /** Diagram — the affliction arc: a planet's Resolve at 1 point = 2°, drawn
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc
    *  can stay quiet and still never read as tappable. `track` is the whole
@@ -148,6 +148,7 @@ export const CHART_STYLE = {
    *  `remaining` is what the planet can still absorb; `diff` is the projected
    *  change to that span. */
   afflictionArc: {
+    degreesPerPoint: 2,
     stroke: STROKE_HEAVY,
     trackOpacity: 0.3,
     // Full, matching the interaction ring's steady opacity. The arc is state and
@@ -165,21 +166,16 @@ export const CHART_STYLE = {
     remainingOpacity: 1,
     diffOpacity: 1,
     /** The diff is the one mark that says what a blow will do, and it is short
-     *  by construction — 1 point = 1°, so a 12-point blow is 12° of a radius-30
-     *  arc, about 6 units of line. It cannot win on length against a lit aspect
+     *  by construction — a 12-point blow is 24° of a radius-30
+     *  arc, about 13 units of line. It cannot win on length against a lit aspect
      *  that crosses the whole wheel, so it wins on light: the same drop-shadow
      *  the interaction ring carries, in the diff's own colour. Kept well under
      *  that ring's 8, since the diff already has the brighter tint under it and
      *  the two together tipped into a smear. */
     diffGlow: 3,
-    /** The diff drawn thicker than the arc it sits on. Once colour separation
-     *  was fixed the only thing left was area: at 12 points the diff is 12° of
-     *  a radius-30 arc, about 6 units by 4, against a remaining span of several
-     *  hundred — roughly 5% of the ring's ink, competing at the same radius and
-     *  the same weight. Width is the one lever that adds area without touching
-     *  1 point = 1°, since length stays proportional to magnitude and only the
-     *  radial thickness moves, so the diff bulges out of the band rather than
-     *  recolouring part of it.
+    /** The diff is drawn thicker than the arc it sits on. Width gives small
+     *  effects more area while length stays proportional to magnitude, so the
+     *  diff bulges out of the band rather than recolouring part of it.
      *
      *  Both values stay on the stroke schedule rather than becoming a loose
      *  number: the arc dropped to HEAVY and the diff took EXTRA_HEAVY, which
