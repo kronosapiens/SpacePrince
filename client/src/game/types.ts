@@ -222,7 +222,7 @@ export interface Prince {
   chart: Chart;
   /** Cumulative lifetime encounters; gates the unlock ramp (MECHANICS §11.1). */
   numEncounters: number;
-  /** Reserved bitmap of unlocked achievements (deferred, §11.2). */
+  /** Earned achievement bitmap; rendered on the Prince, earning logic deferred. */
   achievements: number;
   /** Every run this Prince has played. The active run is the tail iff it is not
    *  over (STATE.md). Historical runs (incl. their Light) are read off this. */

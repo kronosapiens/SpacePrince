@@ -1429,6 +1429,12 @@
   width: calc(100% - 2 * var(--prince-artwork-inset));
   height: auto;
 }
+.achievement-mark { cursor: help; }
+.achievement-mark:focus { outline: none; }
+.achievement-mark:focus-visible > circle:first-of-type {
+  stroke: var(--bone);
+  stroke-width: 1;
+}
 .prince-modal .info-card-close {
   top: calc(var(--prince-artwork-inset) / var(--prince-aspect-ratio) + var(--prince-close-inset));
   right: calc(var(--prince-artwork-inset) + var(--prince-close-inset));

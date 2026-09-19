@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AudioControls } from "./AudioControls";
 import { InfoCard } from "./InfoCard";
-import { Chart } from "./Chart";
-import { unlockedPlanets } from "@/game/unlocks";
-import { NEUTRAL } from "@/svg/palette";
-import { PRINCE_CHART_INSET } from "@/svg/viewbox";
+import { PrinceArtwork } from "./PrinceArtwork";
+import { ALL_ACHIEVEMENTS } from "@/data/achievements";
 import { usePrince } from "@/state/PrinceStore";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -71,24 +69,8 @@ export function SettingsMenu() {
       </button>
       {inspecting && (
         <InfoCard ariaLabel="Prince" className="prince-modal" onClose={close}>
-          <svg className="prince-artwork" viewBox="0 0 800 1000">
-            <svg
-              x={PRINCE_CHART_INSET}
-              y={100 + PRINCE_CHART_INSET}
-              width={800 - 2 * PRINCE_CHART_INSET}
-              height={800 - 2 * PRINCE_CHART_INSET}
-              viewBox="0 0 1000 1000"
-            >
-              <Chart
-                chart={prince.chart}
-                unlockedPlanets={unlockedPlanets(prince.numEncounters)}
-                passive
-                hideAffliction
-              />
-            </svg>
-            <rect x="1" y="1" width="798" height="998" fill="none"
-              stroke={NEUTRAL.gold} strokeOpacity="0.28" vectorEffect="non-scaling-stroke" />
-          </svg>
+          {/* Show the full visual draft until achievement earning is implemented. */}
+          <PrinceArtwork prince={prince} achievements={ALL_ACHIEVEMENTS} />
         </InfoCard>
       )}
       {view === "settings" && (
