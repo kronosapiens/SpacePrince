@@ -2,18 +2,6 @@ import { ACHIEVEMENTS, achievementBit, type Achievement } from "@/data/achieveme
 import { NEUTRAL } from "@/svg/palette";
 import { ACHIEVEMENT_STYLE as STYLE } from "@/svg/prince-style";
 
-const POSITIONS = STYLE.rows.flatMap((columns, row) => columns.map((column) => {
-  const firstRow = Math.min(column, 7 - column);
-  const lastRow = STYLE.rows.length - 1;
-  const top = STYLE.columnTops[firstRow]!;
-  const bottom = STYLE.columnTops[lastRow]!;
-  const steps = lastRow - firstRow;
-  return {
-    x: 400 + (column - 3.5) * STYLE.columnGap,
-    y: steps === 0 ? bottom : top + (bottom - top) * (row - firstRow) / steps,
-  };
-}));
-
 /** Circular placeholders with geometric glyphs. */
 function AchievementGlyph({ achievement }: { achievement: Achievement }) {
   const variant = (achievement.id - 1) % 5;
@@ -38,7 +26,8 @@ export function AchievementMarks({ achievements }: { achievements: number }) {
     <g aria-label="Achievements">
       {ACHIEVEMENTS.map((achievement, index) => {
         if ((achievements & achievementBit(achievement.id)) === 0) return null;
-        const { x, y } = POSITIONS[index]!;
+        const x = 400 + (index % STYLE.columns - (STYLE.columns - 1) / 2) * STYLE.gap;
+        const y = STYLE.top + Math.floor(index / STYLE.columns) * STYLE.gap;
         const description = `${achievement.category} · ${achievement.condition}`;
         return (
           <g
