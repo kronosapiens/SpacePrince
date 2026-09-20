@@ -123,8 +123,19 @@ export function DevChrome() {
         if (page) go(page);
       }
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    // Grid inspection also works inside modals, which stop bubbling shortcuts.
+    const onGridKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === "g") onKeyDown(event);
+    };
+    const onOtherKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "g") onKeyDown(event);
+    };
+    window.addEventListener("keydown", onGridKeyDown, true);
+    window.addEventListener("keydown", onOtherKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onGridKeyDown, true);
+      window.removeEventListener("keydown", onOtherKeyDown);
+    };
   }, []);
 
   return (

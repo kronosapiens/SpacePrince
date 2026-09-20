@@ -1,23 +1,24 @@
 @namespace html url("http://www.w3.org/1999/xhtml");
 
 /* Gate outlines on toggle state even if hot reload retains this stylesheet.
-   Include HTML inside SVG foreignObjects, but only the outer SVG canvases. */
+   Include HTML inside SVG foreignObjects, outer SVG canvases, and marked SVG layout regions. */
 :root.dev-grid {
   --dev-grid-color: color-mix(in srgb, var(--gold) 60%, transparent);
 }
 :root.dev-grid,
 :root.dev-grid html|*,
-:root.dev-grid svg:not(svg svg) {
+:root.dev-grid svg:not(svg svg),
+:root.dev-grid [data-dev-grid] {
   outline: 1px solid var(--dev-grid-color) !important;
 }
 
-/* Successive layout levels inherit distinct colors from the planetary palette. */
-.dev-grid #root > * {
+/* Match layout depth colors in the app and portaled dialogs. */
+.dev-grid :is(#root, .info-card-overlay) > * {
   --dev-grid-color: color-mix(in srgb, var(--moon) 60%, transparent);
 }
-.dev-grid #root > * > * {
+.dev-grid :is(#root, .info-card-overlay) > * > * {
   --dev-grid-color: color-mix(in srgb, var(--venus) 60%, transparent);
 }
-.dev-grid #root > * > * > * {
+.dev-grid :is(#root, .info-card-overlay) > * > * > * {
   --dev-grid-color: color-mix(in srgb, var(--mercury) 60%, transparent);
 }

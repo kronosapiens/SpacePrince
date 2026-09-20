@@ -4,7 +4,7 @@ export const CHART_SIZE = 1000;
 export const CHART_CENTER = 500;
 
 // Chart inset within the Prince preview's 800×1000 artwork.
-export const PRINCE_CHART_INSET = 32;
+export const PRINCE_CHART_INSET = 16;
 
 // Ring radii: outer carries labels, inner is the chart proper.
 // Every sign's outermost planet sits at 335 (CLUSTER_PATTERNS) and its

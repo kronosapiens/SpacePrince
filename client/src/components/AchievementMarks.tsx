@@ -23,7 +23,7 @@ export function AchievementMarks({ achievements }: { achievements: number }) {
   if (achievements === 0) return null;
 
   return (
-    <g aria-label="Achievements">
+    <g aria-label="Achievements" data-dev-grid>
       {ACHIEVEMENTS.map((achievement, index) => {
         if ((achievements & achievementBit(achievement.id)) === 0) return null;
         const x = 400 + (index % STYLE.columns - (STYLE.columns - 1) / 2) * STYLE.gap;
