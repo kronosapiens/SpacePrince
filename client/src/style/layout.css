@@ -1436,8 +1436,8 @@
   stroke-width: 1;
 }
 .prince-modal .info-card-close {
-  top: calc(var(--prince-artwork-inset) / var(--prince-aspect-ratio) + var(--prince-close-inset));
-  right: calc(var(--prince-artwork-inset) + var(--prince-close-inset));
+  top: var(--prince-close-inset);
+  right: var(--prince-close-inset);
 }
 .dev-console .audio-controls { gap: 10px; }
 .dev-console .audio-control { gap: 2px; }

@@ -58,11 +58,11 @@ export function DevChrome() {
   const tier = prince?.numEncounters;
   const surface = currentSurface(location.pathname, prince, run);
 
-  // Re-rolling applies to the spawnable game screens only.
+  // The title's Prince can also be re-rolled while staying on the title.
   const regenKind: SpawnKind | null =
     surface === "map" || surface === "combat" || surface === "narrative" || surface === "end"
       ? surface
-      : null;
+      : surface === "title" && prince ? "map" : null;
 
   const launch = (kind: SpawnKind) => {
     dispatch({ kind: "mint", prince: spawn(kind, { tier }) });
@@ -83,7 +83,7 @@ export function DevChrome() {
   const regenerate = () => {
     if (!regenKind) return;
     playUISound("commit");
-    launch(regenKind);
+    dispatch({ kind: "mint", prince: spawn(regenKind, { tier }) });
   };
 
   // The list and the console share the corner, so opening one shuts the other.
@@ -123,17 +123,20 @@ export function DevChrome() {
         if (page) go(page);
       }
     };
-    // Grid inspection also works inside modals, which stop bubbling shortcuts.
-    const onGridKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === "g") onKeyDown(event);
+    // Modals stop bubbling shortcuts; the Prince preview also permits re-rolls.
+    const captureShortcut = (event: KeyboardEvent) =>
+      event.key.toLowerCase() === "g" ||
+      (event.key === "r" && !!(event.target as Element | null)?.closest?.(".prince-modal"));
+    const onPreviewKeyDown = (event: KeyboardEvent) => {
+      if (captureShortcut(event)) onKeyDown(event);
     };
     const onOtherKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() !== "g") onKeyDown(event);
+      if (!captureShortcut(event)) onKeyDown(event);
     };
-    window.addEventListener("keydown", onGridKeyDown, true);
+    window.addEventListener("keydown", onPreviewKeyDown, true);
     window.addEventListener("keydown", onOtherKeyDown);
     return () => {
-      window.removeEventListener("keydown", onGridKeyDown, true);
+      window.removeEventListener("keydown", onPreviewKeyDown, true);
       window.removeEventListener("keydown", onOtherKeyDown);
     };
   }, []);

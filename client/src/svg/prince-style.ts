@@ -11,6 +11,13 @@ export const STAR_FIELD_BOUNDS = {
   height: 100 - wheelInset,
 } as const;
 
+export const STAR_STYLE = {
+  radius: 1.5,
+  minOpacity: 0.3,
+  maxOpacity: 0.9,
+  lightScale: 512,
+} as const;
+
 /** Prince artwork units (800 × 1000), separate from the chart's stroke scale. */
 export const ACHIEVEMENT_STYLE = {
   columns: 12,

@@ -181,13 +181,24 @@ function devPlayerChart(seed: number): Chart {
 }
 
 function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
+  const rng = mulberry32(hashString(`${seed}_history`));
+  const history = Array.from({ length: 8 + Math.floor(rng() * 73) }, (_, index): Run => {
+    const pastSeed = hashString(`${seed}_history_${index}`);
+    return {
+      ...beginRun(pastSeed, tier),
+      map: walkMap(pastSeed, true, tier),
+      mapsCompleted: MAPS_PER_RUN,
+      // Sample doublings to expose both faint and bright stars in the preview.
+      light: Math.round(2 ** (rng() * 13) - 1),
+    };
+  });
   return {
     id: `dev_${seed}`,
     position: { iso: "1970-01-01T00:00:00.000Z", lat: 0, lon: 0 },
     chart: devPlayerChart(seed),
     numEncounters: tier,
     achievements: 0,
-    runs: [run],
+    runs: [...history, run],
   };
 }
 

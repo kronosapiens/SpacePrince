@@ -1,11 +1,14 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SettingsMenu } from "@/components/SettingsMenu";
+import { DevChrome } from "@/components/DevChrome";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
 import { loadPrince, savePrince } from "@/state/prince";
 import { getMusicVolume, getSoundVolume, setMusicVolume, setSoundVolume } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
+import { beginRun } from "@/game/run";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 
@@ -33,6 +36,10 @@ function get<T extends HTMLElement = HTMLElement>(selector: string): T {
   return element;
 }
 const click = (selector: string) => act(() => get(selector).click());
+function LocationProbe() {
+  return <span data-location>{useLocation().pathname}</span>;
+}
+
 function mount() {
   act(() => root.render(<PrinceStoreProvider><SettingsMenu /></PrinceStoreProvider>));
   const trigger = get('[aria-label="Open settings"]');
@@ -42,6 +49,32 @@ function mount() {
 }
 
 describe("settings menu", () => {
+  it.each(["/", "/play"])("re-rolls the Prince inside its preview from %s without navigating or closing it", (path) => {
+    const prince = createStubPrince({ numEncounters: 4, runs: [beginRun(1, 4)] });
+    savePrince(prince);
+    act(() => root.render(
+      <MemoryRouter initialEntries={[path]}>
+        <PrinceStoreProvider>
+          <SettingsMenu />
+          <DevChrome />
+          <LocationProbe />
+        </PrinceStoreProvider>
+      </MemoryRouter>,
+    ));
+    click('[aria-label="Open settings"]');
+    click(".prince-inspect-button");
+    const preview = get(".prince-modal");
+
+    act(() => document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key: "r", bubbles: true })));
+
+    const rerolled = loadPrince()!;
+    expect(rerolled.id).not.toBe(prince.id);
+    expect(rerolled.numEncounters).toBe(prince.numEncounters);
+    expect(get(".prince-modal")).toBe(preview);
+    expect(get("[data-location]").textContent).toBe(path);
+    expect(preview.querySelectorAll('[aria-label="Past runs"] circle')).toHaveLength(rerolled.runs.length - 1);
+  });
+
   it("adjusts independent saved audio levels and reflects changes made outside the menu", () => {
     mount();
     const adjust = (label: string, value: number) => act(() => {

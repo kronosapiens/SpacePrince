@@ -44,8 +44,8 @@
   --settings-label-size: 18px;
   --settings-option-gap: 24px;
   --prince-aspect-ratio: 0.8;
-  --prince-artwork-inset: 16px;
-  --prince-close-inset: 12px;
+  --prince-artwork-inset: 35px;
+  --prince-close-inset: 8px;
 
   --chart-pad-block: 80px;
   --chart-pad-inline: 60px;
