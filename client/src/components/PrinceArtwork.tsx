@@ -17,7 +17,7 @@ export function PrinceArtwork({ prince, achievements = prince.achievements }: { 
         y={100 + PRINCE_CHART_INSET}
         width={800 - 2 * PRINCE_CHART_INSET}
         height={800 - 2 * PRINCE_CHART_INSET}
-        viewBox="0 0 1000 1000"
+        overflow="visible"
       >
         <Chart
           chart={prince.chart}

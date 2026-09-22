@@ -2,7 +2,7 @@ import { useMemo, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import {
-  CHART_CENTER, CHART_SIZE,
+  CHART_CENTER, CHART_VIEWBOX,
   INNER_RING_R, INVITE_HALO_R, INTERACTION_RING_R, OUTER_RING_R,
   PLANET_R_REST,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
@@ -138,7 +138,8 @@ export function Chart({ chart, hoveredPlanet, onPlanetHover }: ChartProps) {
 
   return (
     <svg
-      viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+      viewBox={CHART_VIEWBOX}
+      overflow="visible"
       className="chart-svg"
       role="img"
       aria-label={`${chart.name} natal chart`}

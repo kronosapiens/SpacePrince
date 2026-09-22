@@ -55,7 +55,7 @@ The vocabulary should feel like a Hilma af Klint plate or a Renaissance armillar
 
 ## 3. Stroke Scale
 
-Stroke weights are units on the **chart's** 1000x1000 viewBox, and only that.
+Stroke weights are units on the **chart's** `20 20 960 960` viewBox, and only that.
 They do not travel: the run map and the encounter seam render at their own unit scales (~1.4px and 1px per unit against the chart's ~0.67), so the same number is a different line there.
 `MapDiagram`'s `TIER` is tuned in its own units and stays that way.
 
@@ -81,7 +81,9 @@ Mixing weights inside a single drawn element is forbidden. A node ring is one we
 
 The drawn forms relate to each other through a small set of ratios. Like the stroke scale, this exists so that two renderers drawing the same artifact — the client and the onchain SVG — don't drift.
 
-The ratios live in `client/src/svg/viewbox.ts`, in units of the chart's 1000×1000 viewBox, and the onchain renderer mirrors them.
+The ratios live in `client/src/svg/viewbox.ts`, in units of the chart's `20 20 960 960` viewBox, and the onchain renderer mirrors them.
+The outer ring stays centred at `(500, 500)` with radius 480 and fills the viewport; spacing around a chart belongs to its container.
+The client and landing page share this construction.
 Aspect lines begin and end at the planet's edge, not its center.
 
 The map and encounter screens use proportionally derived versions of the same ratios. A node on the map is the same visual object as a planet on the chart, sized for its container.

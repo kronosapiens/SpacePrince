@@ -3,7 +3,7 @@ import { STROKE_EXTRA_HEAVY, STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@
 /**
  * Every opacity / stroke-weight knob the Chart draws with, gathered in one
  * place so a brightness pass edits here instead of hunting through ~900 lines
- * of JSX. Grouped by element; values are chart viewBox units (1000×1000).
+ * of JSX. Grouped by element; values are in chart viewBox units.
  * Elements that change on interaction carry rest/active (or rest/hover) pairs.
  * Every stroke is a rung of the four-step schedule in viewbox.ts — ground,
  * structure, under attention, the affliction arc — never a loose number.

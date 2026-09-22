@@ -13,7 +13,7 @@ import { SvgRotation } from "@/components/SvgRotation";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
   AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
-  CHART_CENTER, CHART_SIZE,
+  CHART_CENTER, CHART_VIEWBOX,
   CORONA_INNER_R, INCOMING_RING_PITCH,
   INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
   PLANET_R_ACTIVE, PLANET_R_REST,
@@ -390,7 +390,8 @@ export function Chart(props: ChartProps) {
 
   return (
     <svg
-      viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+      viewBox={CHART_VIEWBOX}
+      overflow="visible"
       className={["chart-svg", tuning.showGlow ? "" : "no-glow", className ?? ""].filter(Boolean).join(" ")}
       style={style}
       data-guide={side ? `wheel-${side}` : undefined}

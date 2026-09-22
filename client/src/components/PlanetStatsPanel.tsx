@@ -1,5 +1,5 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { CHART_SIZE } from "@/svg/viewbox";
+import { CHART_CENTER, OUTER_RING_R } from "@/svg/viewbox";
 import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
@@ -130,10 +130,10 @@ export function PlanetStatsPanel({
   const table = deriveStatTable(chart.planets[planet]);
   const x0 = cx - W / 2;
   // Top fixed; study grows downward — unless the grown box would run off the
-  // chart's bottom edge (SVG clips at the viewBox), in which case the panel
+  // chart's bottom edge, in which case the panel
   // slides up just enough to stay visible. `y` animates alongside `height`.
   const EDGE_MARGIN = 10;
-  const yTop = Math.min(cy - height / 2, CHART_SIZE - EDGE_MARGIN - boxH);
+  const yTop = Math.min(cy - height / 2, CHART_CENTER + OUTER_RING_R - EDGE_MARGIN - boxH);
 
   return (
     <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>

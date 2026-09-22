@@ -1,7 +1,6 @@
-// Canonical chart viewBox is 1000×1000. Mirrors client/src/svg/viewbox.ts,
+// The viewport fits the outer ring. Mirrors client/src/svg/viewbox.ts,
 // trimmed to what the landing chart draws (no affliction arc, no corona).
 
-export const CHART_SIZE = 1000;
 export const CHART_CENTER = 500;
 
 // Ring radii: outer carries labels, inner is the chart proper.
@@ -14,6 +13,10 @@ export const CHART_CENTER = 500;
 // and in by half that to stay centred on 435, and the ticks shorten from 40 to
 // 36 in proportion.
 export const OUTER_RING_R = 480;
+export const CHART_SIZE = 2 * OUTER_RING_R;
+const chartMin = CHART_CENTER - OUTER_RING_R;
+export const CHART_VIEWBOX = `${chartMin} ${chartMin} ${CHART_SIZE} ${CHART_SIZE}`;
+
 export const INNER_RING_R = 390;
 export const SIGN_LABEL_R = 435;     // sign labels sit between inner and outer rings
 export const TICK_INNER_R = 417;     // tick marks straddle the gap between rings
