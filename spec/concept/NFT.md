@@ -185,40 +185,54 @@ The visual system mirrors the mechanical structure of the game.
 
 ### The Star-Field
 
-Every run inscribes a **star** into the field behind the chart.
+Every completed run inscribes one **star** into the space above the chart wheel.
+The active run has no star until it ends.
 
-When a run ends — whether by completing its seven maps or by full combustion before then (`MECHANICS.md §11`) — its remaining **Light** (`MECHANICS.md §12`) determines one permanent star, with position and color derived deterministically from the score.
-More Light leaves a brighter, differently placed star; less leaves a fainter one.
-Completion and failure are recorded the same way, on one axis — the star the run made.
+When a run ends — whether by completing its seven maps or by full combustion before then (`MECHANICS.md §11`) — its remaining **Light** (`MECHANICS.md §12`) determines the star's radius and opacity.
+Position is deterministic and pseudorandom, seeded by Prince identity and run index independently of score.
+Stars use the same neutral bone color as the client's ornamental stars.
 
-The points accumulate. Over a Prince's life the field fills from a dark sky into a populated one: a visible, non-comparative record of every passage. Reputation without ranking — a sky to read, not a scoreboard to top.
+Run count gives the sky density; higher scores give it larger, brighter stars.
+The visual emphasis favors exceptional runs over accumulating many mediocre ones.
+Each star keeps its position and appearance as later runs are added.
 
 There are **no scars and no entropy-darkening.**
 The only thing a run leaves behind is the star shaped by the Light it carried out.
 
-#### Placement (working model, not settled)
+#### Placement
 
-The field is a grid **100 stars wide by 12 tall**, and a run's final Light places its star in it.
+Stars occupy the upper **spandrel**, the space between the inset frame bounds and the curve above the wheel.
+The corresponding lower space is reserved for achievements, currently arranged in a row.
 
-- **Height is `log2(Light)`** — one row per doubling, so the twelfth row is 4096.
-  Height is therefore countable rather than merely comparative: two rows apart is two doublings, not a vague "better".
-- **Horizontal is `Light % 100`.**
-  This decorrelates from the score above 100 — 60, 71, 84, 99, 116, 137, 162 land at 60, 71, 84, 99, 16, 37, 62 — so the field reads as a sky rather than as a graph of the scoring function.
+The prototype divides the upper spandrel into **44 equal-area rectangles**, 22 on each side mirrored about the centre.
+They are wide and shallow near the centre, narrow and tall toward the edges, with their lower inner corners touching the curve.
+Fractional boundaries allow equal areas and curve contact; the stepped edges leave small gaps beside the curve.
 
-The two axes use the same number at two resolutions: exact Light scatters stars horizontally, while `log2(Light)` places their vertical band.
-The live readout remains a numeral; `client/src/game/light-scale.ts` retains the `log2` derivation for the future star-field (`SCREENS.md §3.7`).
-Base 2 rather than 10 because it is already the game's own base — the Macrobian unlock schedule is `2^i` (`MECHANICS.md §11.1`) — and because base 10 gives only two or three bands across a realistic score range where base 2 gives six.
+Each star uses three pseudorandom draws: choose a rectangle uniformly, then choose its horizontal and vertical position uniformly within it.
+Equal rectangle areas give uniform density over the covered region, with constant-time placement and no curve evaluation or rejection sampling per star.
+Run index distinguishes equal scores; accidental overlap remains possible.
+The prototype constrains star centres only, without clearance for their radii or collision avoidance.
 
-Three things are deliberately unresolved:
+#### Radius and brightness
 
-- **Exact ties collide.**
-  Two runs with identical final Light land on the same point and stack, so the field would show one star for two passages — which contradicts "a record of every passage" above.
-  Over fifty runs a tie is likelier than not.
-  The cheap fix is breaking ties by run index, already onchain as the star count, at the cost of making position a function of score *and* ordinal rather than score alone.
-- **The top row.** `log2` never stops growing (100,000 is row 16.6), so a run past 4096 either pins at the top or the field grows. Pinning is honest while it stays rare.
-- **The bottom is degenerate.** Below 100 the horizontal is the score itself, and the lowest rows are only a few points apart, so a Prince's first passages cluster low and left in a way later ones never do. Possibly correct — early runs *should* look tentative — but it is a property to choose, not to discover.
+For final Light `L`, the current mapping in `client/src/svg/prince-style.ts` and `client/src/components/RunStars.tsx` is:
 
-Rejected: deriving the horizontal from the position *within* the current doubling. Any such remainder gives the same value for scores an octave apart — 150 and 1500 both sit at 0.176 — so stars stack into vertical columns instead of scattering.
+```text
+radius  = max(0.75, sqrt(L / 256))
+opacity = 0.1 + 0.9 × L / (L + 256)
+```
+
+Radius is the star's outer extent in NFT artwork units: 256 Light gives radius 1, and 1,024 Light gives radius 2.
+The solid bone core occupies the inner half of the radius; the halo fills the outer half and fades to transparent at the edge.
+Both core and halo grow with score.
+Above the minimum radius, both areas are proportional to score; increasing opacity gives higher scores additional visual weight.
+The minimum radius and opacity leave a faint mark even for zero Light.
+Opacity approaches 1 as score increases; radius currently has no upper cap.
+Each star draws a glow circle using a shared radial gradient, then a core circle of half the radius above it.
+The glow uses the planet halo's steep fade, with a brighter profile: 0.5 opacity at the core's edge, 0.14 halfway through the halo, and zero at the outer edge.
+The core retains the full score-derived opacity, so it reads as a sharp point within the faint halo.
+The score-derived SVG `opacity` applies to the group, so the core and glow are composited together before dimming over the background.
+Both use fixed bone RGB.
 
 ### Evolution Rules
 
@@ -250,6 +264,35 @@ This ensures:
 - No broken metadata
 - No reliance on offchain storage for canon
 
+### Star-field geometry
+
+The current artwork uses `viewBox="0 0 800 1000"` with a shared inset of 16 units.
+The wheel is centred at `(400, 500)` with diameter 768, filling its container at `(16, 116)`.
+The shared chart viewport fits its outer ring; it contributes no additional internal padding (`STYLE.md §4`).
+The upper spandrel keeps 16 units of radial clearance from the wheel, using an arc of radius 400 with endpoints `(16, 388)` and `(784, 388)`:
+
+```svg
+<path d="M 16 16 H 784 V 388 A 400 400 0 0 0 16 388 Z" />
+```
+
+The lower spandrel mirrors this path with `translate(0 1000) scale(1 -1)`.
+Spandrel and rectangle outlines appear only with the developer `g` overlay.
+
+For the onchain renderer, star-field geometry will use **fixed-point integers with scale 10,000**, representing 0.0001 SVG units per integer step.
+Precompute the 23 cumulative horizontal boundaries for one half and the shared rectangle area as source constants; mirror the other half without per-NFT geometry storage.
+Cumulative boundaries give both position and width directly, avoiding a sum over preceding rectangles.
+
+```text
+edgeQ[i] = round(edge[i] × 10,000)
+areaQ    = round(area × 10,000²)
+widthQ   = edgeQ[i + 1] - edgeQ[i]
+heightQ  = areaQ / widthQ  (unsigned integer division, rounded down)
+```
+
+Coordinates scale once and area scales twice, so the derived height uses the same fixed-point scale as the boundaries.
+Quantization makes equal areas and curve contact approximate at this precision.
+The client prototype still uses floating-point boundaries and division; the fixed-point conversion is planned for the onchain implementation.
+
 ---
 
 ## Social Meaning & Interpretation
@@ -260,7 +303,7 @@ Because the Prince is abstract and symbolic:
 
 Observers may notice:
 - Depth vs simplicity
-- The density and color of the star-field
+- The density, size, and brightness of the star-field
 - Structural completeness
 - Planetary dominance
 

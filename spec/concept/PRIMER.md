@@ -72,7 +72,7 @@ The game is about attention and balance, not conquest.
 
 And nothing resets.
 Every run is kept, permanently, written into the world.
-Each one leaves a single **star** in your sky — its brightness shaped by the Light you carried out.
+Each one leaves a single **star** in your sky — its size and brightness shaped by the Light you carried out.
 Over time the sky fills: a record, in light, of how you paid attention.
 
 The chart is already complete.

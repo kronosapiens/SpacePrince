@@ -302,7 +302,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 
   Rejected: a bar for the current doubling.
   It measured a span of *log* rather than a fraction of any maximum, but a partial bar reads as progress toward a maximum whatever it measures, which is the misread it was built to avoid.
-  The `log2` derivation survives in `client/src/game/light-scale.ts` because it still places the run's star in the NFT field (`NFT.md`); it is simply no longer a live readout.
+  On the NFT, final Light determines star radius and opacity; position is pseudorandom (`NFT.md`, "The Star-Field").
 - **Turn.** Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.

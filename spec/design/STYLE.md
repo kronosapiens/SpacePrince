@@ -5,7 +5,7 @@
 `VIBES.md` describes how the game should feel.
 This document defines what it is drawn with — the primitives, the stroke scale, the palette, the two faces, the motion grammar — so that two engineers and one illustrator working in different rooms produce a coherent object, and so the client and the onchain renderer draw the same one.
 It holds the vocabulary and its rules, not the tuned values.
-Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `palette.ts`, `viewbox.ts`, and `client/src/style/tokens.css` and `motion.css`.
+Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `prince-style.ts`, `palette.ts`, `viewbox.ts`, and `client/src/style/tokens.css` and `motion.css`.
 
 The guiding principle:
 
@@ -84,6 +84,7 @@ The drawn forms relate to each other through a small set of ratios. Like the str
 The ratios live in `client/src/svg/viewbox.ts`, in units of the chart's `20 20 960 960` viewBox, and the onchain renderer mirrors them.
 The outer ring stays centred at `(500, 500)` with radius 480 and fills the viewport; spacing around a chart belongs to its container.
 The client and landing page share this construction.
+The Prince artwork uses a separate 800×1000 coordinate space; its spandrels and star geometry are described in `NFT.md`, "Star-field geometry".
 Aspect lines begin and end at the planet's edge, not its center.
 
 The map and encounter screens use proportionally derived versions of the same ratios. A node on the map is the same visual object as a planet on the chart, sized for its container.
@@ -110,8 +111,9 @@ Neutrals are warm-cool balanced toward the cool side so they sit cleanly against
 ### Solid vs gradient
 
 - **Solid fills** are the default. Most marks are solid.
-- **Radial gradients** are permitted only on planet halos and on the ambient screen tint, and run from a single color at the center to transparent at the edge — never from one palette color to another.
+- **Radial gradients** are permitted on planet halos, star glows, and the ambient screen tint, and run from a single color at the center to transparent at the edge — never from one palette color to another.
 That color is the planet's primary in the identity halo, and the valence amber or violet in the receive-pulse behind a planet taking a hit.
+NFT stars use bone for both their solid cores and fading glows (`NFT.md`, "Radius and brightness").
 - **Linear gradients** are forbidden. They read as digital and break the painterly register.
 - **Mesh gradients** (SVG2) are forbidden until SVG2 support is universal. Approximate with layered radial gradients if needed.
 

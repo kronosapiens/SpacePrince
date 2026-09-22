@@ -85,7 +85,9 @@ Three tiers, separated by who needs to read the data.
 
 **Derived** — computed at read time, never written:
 
-- `starField` = `runs.filter(over).map(r => r.light)` — read by the NFT render; no separate array, since the Light already lives on each run.
+- The star-field derives from completed runs: Prince identity and original run index seed position, while final `light` determines radius and opacity (`NFT.md`, "The Star-Field").
+  All earlier runs are finished; the tail contributes only after it ends.
+  No separate star array or stored coordinates are needed.
 - A planet is **combusted** when `affliction >= ceiling` (MECHANICS §10): affliction caps at the ceiling and combustion triggers there, so the affliction lane carries the flag for free.
   Rejected: a stored per-planet combust bit — it widened `state` lanes to 10 bits (u128) to duplicate what the cap already encodes.
 - A run is **over** when `mapsCompleted == 7` or all seven planets have combusted — a pure function of stored fields, so no status flag is stored.

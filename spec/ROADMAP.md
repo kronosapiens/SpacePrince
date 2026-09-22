@@ -13,7 +13,7 @@ Everything here stays inside established constraints: no power progression, no p
 The conceptual architecture is strong; the gaps are in the middle layer between concept and screen.
 
 - At review, starting again wiped the Prince, so `numEncounters`, unlocks, and `runs[]` never accumulated.
-- The star-field — the game's central artifact promise (`NFT.md`, "The Star-Field") — is rendered nowhere.
+- At review, the star-field — the game's central artifact promise (`NFT.md`, "The Star-Field") — was rendered nowhere.
 - There is no audio at all, despite `VIBES.md §Sound Design` and `MUSIC.md` specifying the direction.
 - The emotional ceremonies (combustion, planet unlock, star inscription) are specced but unbuilt; the mint ceremony proves the register.
 - After cumulative encounter 32 the Macrobian ascent is complete and no lifetime horizon exists; `ECONOMICS.md` imagines ~1000 runs to maturity with no system spanning the gap.
@@ -48,7 +48,8 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 - [x] **Unlock ceremony** (`SCREENS.md §4.1`).
   The newly unlocked planet emerges from ghost on the map chart anchor when a Macrobian threshold is crossed.
 - [x] **Star-field rendering** (`NFT.md`).
-  Derive from `runs[].light`: deterministic position and brightness per star; render behind the chart on Title and Chart Study.
+  The Inspect Prince preview places one star per completed run in the upper spandrel, using equal-area rectangles and deterministic pseudorandom positions.
+  Final Light determines radius and opacity; the onchain renderer and fixed-point conversion remain to be implemented.
 - **Star inscription — deferred** (`SCREENS.md §6`).
   End-of-run presentation is deferred.
 - [x] **Run-ending differentiation.**

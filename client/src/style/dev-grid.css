@@ -1,15 +1,21 @@
 @namespace html url("http://www.w3.org/1999/xhtml");
 
 /* Gate outlines on toggle state even if hot reload retains this stylesheet.
-   Include HTML inside SVG foreignObjects, outer SVG canvases, and marked SVG layout regions. */
+   Include HTML inside SVG foreignObjects and outer SVG canvases. */
 :root.dev-grid {
   --dev-grid-color: color-mix(in srgb, var(--gold) 60%, transparent);
 }
 :root.dev-grid,
 :root.dev-grid html|*,
-:root.dev-grid svg:not(svg svg),
-:root.dev-grid [data-dev-grid] {
+:root.dev-grid svg:not(svg svg) {
   outline: 1px solid var(--dev-grid-color) !important;
+}
+
+/* Trace SVG layout regions along their actual boundary. */
+:root.dev-grid [data-dev-grid="shape"] {
+  stroke: var(--dev-grid-color);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
 }
 
 /* Match layout depth colors in the app and portaled dialogs. */

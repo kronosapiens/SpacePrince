@@ -72,7 +72,7 @@ describe("settings menu", () => {
     expect(rerolled.numEncounters).toBe(prince.numEncounters);
     expect(get(".prince-modal")).toBe(preview);
     expect(get("[data-location]").textContent).toBe(path);
-    expect(preview.querySelectorAll('[aria-label="Past runs"] circle')).toHaveLength(rerolled.runs.length - 1);
+    expect(preview.querySelectorAll('[aria-label="Past runs"] > g')).toHaveLength(rerolled.runs.length - 1);
   });
 
   it("adjusts independent saved audio levels and reflects changes made outside the menu", () => {
