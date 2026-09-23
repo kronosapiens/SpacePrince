@@ -42,7 +42,7 @@ export const STAR_RECTANGLES = (() => {
 
 export const STAR_STYLE = {
   minRadius: 0.75,
-  coreRadiusRatio: 0.5,
+  coreRadius: 1,
   minOpacity: 0.1,
   lightScale: 256,
   glow: { core: 0.5, mid: 0.14 },

@@ -16,8 +16,8 @@ export function RunStars({ prince }: { prince: Prince }) {
     <g fill={NEUTRAL.bone} aria-label="Past runs">
       <defs>
         <radialGradient id={glowId}>
-          <stop offset={STYLE.coreRadiusRatio} stopColor={NEUTRAL.bone} stopOpacity={STYLE.glow.core} />
-          <stop offset={(1 + STYLE.coreRadiusRatio) / 2} stopColor={NEUTRAL.bone} stopOpacity={STYLE.glow.mid} />
+          <stop offset="0%" stopColor={NEUTRAL.bone} stopOpacity={STYLE.glow.core} />
+          <stop offset="50%" stopColor={NEUTRAL.bone} stopOpacity={STYLE.glow.mid} />
           <stop offset="100%" stopColor={NEUTRAL.bone} stopOpacity="0" />
         </radialGradient>
       </defs>
@@ -29,20 +29,21 @@ export function RunStars({ prince }: { prince: Prince }) {
         const y = rectangle.y + rng() * rectangle.height;
         // Fixed across the Prince's lifetime; new records never dim older stars.
         const brightness = run.light / (run.light + STYLE.lightScale);
+        const coreOpacity = STYLE.minOpacity + brightness * (1 - STYLE.minOpacity);
+        const haloOpacity = brightness * brightness;
         const radius = Math.max(STYLE.minRadius, Math.sqrt(run.light / STYLE.lightScale));
         return (
-          <g
-            key={run.id}
-            opacity={STYLE.minOpacity + brightness * (1 - STYLE.minOpacity)}
-          >
+          <g key={run.id} opacity={coreOpacity}>
             <title>{`Run ${index + 1} · ${run.light} Light`}</title>
             <circle
               cx={x}
               cy={y}
               r={radius}
               fill={`url(#${glowId})`}
+              // Cancel group opacity so the halo follows its own score curve.
+              fillOpacity={haloOpacity / coreOpacity}
             />
-            <circle cx={x} cy={y} r={radius * STYLE.coreRadiusRatio} />
+            <circle cx={x} cy={y} r={STYLE.coreRadius} />
           </g>
         );
       })}

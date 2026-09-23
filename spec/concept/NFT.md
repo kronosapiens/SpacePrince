@@ -218,20 +218,23 @@ The prototype constrains star centres only, without clearance for their radii or
 For final Light `L`, the current mapping in `client/src/svg/prince-style.ts` and `client/src/components/RunStars.tsx` is:
 
 ```text
-radius  = max(0.75, sqrt(L / 256))
-opacity = 0.1 + 0.9 × L / (L + 256)
+q           = L / (L + 256)
+coreRadius  = 1
+haloRadius  = max(0.75, sqrt(L / 256))
+coreOpacity = 0.1 + 0.9 × q
+haloOpacity = q²
 ```
 
-Radius is the star's outer extent in NFT artwork units: 256 Light gives radius 1, and 1,024 Light gives radius 2.
-The solid bone core occupies the inner half of the radius; the halo fills the outer half and fades to transparent at the edge.
-Both core and halo grow with score.
-Above the minimum radius, both areas are proportional to score; increasing opacity gives higher scores additional visual weight.
-The minimum radius and opacity leave a faint mark even for zero Light.
-Opacity approaches 1 as score increases; radius currently has no upper cap.
-Each star draws a glow circle using a shared radial gradient, then a core circle of half the radius above it.
-The glow uses the planet halo's steep fade, with a brighter profile: 0.5 opacity at the core's edge, 0.14 halfway through the halo, and zero at the outer edge.
-The core retains the full score-derived opacity, so it reads as a sharp point within the faint halo.
-The score-derived SVG `opacity` applies to the group, so the core and glow are composited together before dimming over the background.
+Every star has a crisp bone core 2 SVG units across, with score controlling its opacity and the surrounding halo.
+The halo's outer radius is in NFT artwork units: 256 Light gives radius 1, and 1,024 Light gives radius 2.
+Above the minimum radius, the outer disc's area is proportional to score.
+The squared halo response suppresses glows around ordinary runs while giving high scores more surrounding light.
+Zero Light leaves a faint core with no halo.
+Core opacity and halo strength approach 1 as score increases; halo radius currently has no upper cap.
+Each star draws a glow circle using a shared radial gradient, then a fixed-size core circle above it.
+The gradient fades from 0.5 opacity at its centre to 0.14 at half its radius and zero at the edge, multiplied by `haloOpacity`.
+The group uses `coreOpacity`; the halo's fill opacity compensates for that group opacity so its final strength follows `q²` independently.
+The solid core covers the underlying halo before group compositing, keeping the core's apparent opacity independent of halo strength.
 Both use fixed bone RGB.
 
 ### Evolution Rules
