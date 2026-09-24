@@ -2,7 +2,6 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AudioControls } from "./AudioControls";
 import { InfoCard } from "./InfoCard";
 import { PrinceArtwork } from "./PrinceArtwork";
-import { ALL_ACHIEVEMENTS } from "@/data/achievements";
 import { usePrince } from "@/state/PrinceStore";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -69,8 +68,7 @@ export function SettingsMenu() {
       </button>
       {inspecting && (
         <InfoCard ariaLabel="Prince" className="prince-modal" onClose={close}>
-          {/* Show the full visual draft until achievement earning is implemented. */}
-          <PrinceArtwork prince={prince} achievements={ALL_ACHIEVEMENTS} />
+          <PrinceArtwork prince={prince} draft />
         </InfoCard>
       )}
       {view === "settings" && (

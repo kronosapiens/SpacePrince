@@ -50,12 +50,25 @@ export const STAR_STYLE = {
 
 /** Prince artwork units (800 × 1000), separate from the chart's stroke scale. */
 export const ACHIEVEMENT_STYLE = {
-  columns: 12,
-  top: 926,
-  gap: 644 / 11,
-  scale: 0.65,
+  scale: 0.55,
   radius: 21,
   stroke: 1.6,
-  outlineOpacity: 0.8,
-  markOpacity: 0.9,
+  outlineOpacity: 0.5,
+  markOpacity: 0.6,
+  emptyOpacity: 0.35,
 } as const;
+
+// Hex-packed courses clipped by the wheel: a full bottom row of twelve, then
+// four per side in the staggered row above, overhanging the bottom row toward
+// the frame, and two per side above that. Columns 58 apart, rows 50; the
+// bottom row starts 81 in from the frame corner so the overhang clears it.
+// Slots come in four runs of six, one per category: left bottom row, left
+// upper courses, then the same on the right, each run ordered from the outer
+// end inward and upward.
+export const ACHIEVEMENT_SLOTS: readonly (readonly [x: number, y: number])[] = [
+  [81, 954], [139, 954], [197, 954], [255, 954], [313, 954], [371, 954],
+  [52, 904], [110, 904], [168, 904], [226, 904], [81, 854], [139, 854],
+  [719, 954], [661, 954], [603, 954], [545, 954], [487, 954], [429, 954],
+  [748, 904], [690, 904], [632, 904], [574, 904], [719, 854], [661, 854],
+];
+

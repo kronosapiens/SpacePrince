@@ -7,7 +7,8 @@ import { NEUTRAL } from "@/svg/palette";
 import { PRINCE_CHART_INSET } from "@/svg/viewbox";
 import { SPANDREL_PATH, STAR_RECTANGLES } from "@/svg/prince-style";
 
-export function PrinceArtwork({ prince, achievements = prince.achievements }: { prince: Prince; achievements?: number }) {
+/** `draft` shows every assigned achievement as earned until earning is implemented. */
+export function PrinceArtwork({ prince, draft = false }: { prince: Prince; draft?: boolean }) {
   return (
     <svg className="prince-artwork" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" aria-label={`${prince.chart.name} Prince artwork`}>
       <rect width="800" height="1000" fill={NEUTRAL.void} />
@@ -26,7 +27,7 @@ export function PrinceArtwork({ prince, achievements = prince.achievements }: { 
           hideAffliction
         />
       </svg>
-      <AchievementMarks achievements={achievements} />
+      <AchievementMarks achievements={prince.achievements} draft={draft} />
       <g fill="none" pointerEvents="none" aria-hidden="true">
         {STAR_RECTANGLES.map((rectangle) => (
           <rect key={rectangle.x} {...rectangle} data-dev-grid="shape" />

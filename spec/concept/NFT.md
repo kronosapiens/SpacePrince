@@ -202,7 +202,8 @@ The only thing a run leaves behind is the star shaped by the Light it carried ou
 #### Placement
 
 Stars occupy the upper **spandrel**, the space between the inset frame bounds and the curve above the wheel.
-The corresponding lower space is reserved for achievements, currently arranged in a row.
+The corresponding lower space holds the achievement marks in horizontal courses clipped by the wheel, a full row of twelve with six more stepping in above on each side, at fixed slot positions (`ACHIEVEMENT_SLOTS` in `client/src/svg/prince-style.ts`).
+Every slot draws: a gold ring with the achievement's bone glyph once earned, an empty mist ring until then, so the base keeps its shape and fills in with play.
 
 The prototype divides the upper spandrel into **44 equal-area rectangles**, 22 on each side mirrored about the centre.
 They are wide and shallow near the centre, narrow and tall toward the edges, with their lower inner corners touching the curve.

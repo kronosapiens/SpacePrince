@@ -16,9 +16,13 @@ export const ACHIEVEMENTS = [
 ] as const;
 
 export type Achievement = (typeof ACHIEVEMENTS)[number];
+export type AchievementCategory = Achievement["category"];
+
+/** Region order in the artwork: each category owns one run of slots. */
+export const ACHIEVEMENT_CATEGORIES: readonly AchievementCategory[] = [
+  "Milestones", "Mastery", "Exploration", "Consequential choices",
+];
 
 export function achievementBit(id: Achievement["id"]): number {
   return 1 << (id - 1);
 }
-
-export const ALL_ACHIEVEMENTS = ACHIEVEMENTS.reduce((mask, { id }) => mask | achievementBit(id), 0);
