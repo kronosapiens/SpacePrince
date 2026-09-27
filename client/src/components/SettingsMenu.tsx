@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AudioControls } from "./AudioControls";
+import { Codex } from "./Codex";
 import { InfoCard } from "./InfoCard";
 import { PrinceArtwork } from "./PrinceArtwork";
 import { usePrince } from "@/state/PrinceStore";
@@ -11,9 +12,20 @@ export function SettingsMenu() {
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<"settings" | "prince" | null>(null);
+  const [view, setView] = useState<"settings" | "prince" | "codex" | null>(null);
   const close = useCallback(() => setView(null), []);
   const inspecting = view === "prince" && !!prince;
+  const openView = (next: "prince" | "codex") => {
+    playUISound("select");
+    triggerRef.current?.focus();
+    setView(next);
+  };
+  const arrow = (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" />
+      <path d="M8 12h8m-4-4 4 4-4 4" />
+    </svg>
+  );
 
   useEffect(() => {
     if (view !== "settings") return;
@@ -71,6 +83,11 @@ export function SettingsMenu() {
           <PrinceArtwork prince={prince} draft />
         </InfoCard>
       )}
+      {view === "codex" && (
+        <InfoCard ariaLabel="Astral Codex" className="codex-modal" onClose={close}>
+          <Codex />
+        </InfoCard>
+      )}
       {view === "settings" && (
         <div
           ref={panelRef}
@@ -87,24 +104,27 @@ export function SettingsMenu() {
         >
           <h2>Settings</h2>
           <AudioControls />
-          <div className="settings-prince">
+          <div className="settings-menu">
             <button
               type="button"
-              className="prince-inspect-button"
+              className="settings-menu-button"
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
+              onClick={() => openView("codex")}
+            >
+              <span>Astral Codex</span>
+              {arrow}
+            </button>
+            <button
+              type="button"
+              className="settings-menu-button"
               disabled={!prince}
               onPointerEnter={playHoverSound}
               onFocus={playFocusSound}
-              onClick={() => {
-                playUISound("select");
-                triggerRef.current?.focus();
-                setView("prince");
-              }}
+              onClick={() => openView("prince")}
             >
               <span>Inspect Prince</span>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <circle cx="12" cy="12" r="8" />
-                <path d="M8 12h8m-4-4 4 4-4 4" />
-              </svg>
+              {arrow}
             </button>
             {!prince && <p>Create a Prince to inspect it here.</p>}
           </div>

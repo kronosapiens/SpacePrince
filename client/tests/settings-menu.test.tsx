@@ -36,6 +36,9 @@ function get<T extends HTMLElement = HTMLElement>(selector: string): T {
   return element;
 }
 const click = (selector: string) => act(() => get(selector).click());
+const menuButton = (label: string) =>
+  Array.from(document.querySelectorAll<HTMLButtonElement>(".settings-menu-button")).find((b) => b.textContent === label)!;
+const inspect = () => act(() => menuButton("Inspect Prince").click());
 function LocationProbe() {
   return <span data-location>{useLocation().pathname}</span>;
 }
@@ -62,7 +65,7 @@ describe("settings menu", () => {
       </MemoryRouter>,
     ));
     click('[aria-label="Open settings"]');
-    click(".prince-inspect-button");
+    inspect();
     const preview = get(".prince-modal");
 
     act(() => document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key: "r", bubbles: true })));
@@ -99,7 +102,7 @@ describe("settings menu", () => {
     const prince = createStubPrince();
     savePrince(prince);
     const trigger = mount();
-    click(".prince-inspect-button");
+    inspect();
     const dialog = get('[role="dialog"]');
     expect(dialog.getAttribute("aria-label")).toBe("Prince");
     expect(document.querySelectorAll('[role="dialog"]')).toHaveLength(1);
@@ -117,9 +120,23 @@ describe("settings menu", () => {
     expect(loadPrince()).toEqual(prince);
   });
 
+  it("opens the codex without a Prince and follows index and related-term links", () => {
+    mount();
+    act(() => menuButton("Astral Codex").click());
+    const dialog = get('[role="dialog"]');
+    expect(dialog.getAttribute("aria-label")).toBe("Astral Codex");
+    const term = (selector: string, label: string) =>
+      Array.from(dialog.querySelectorAll<HTMLButtonElement>(selector)).find((b) => b.textContent === label)!;
+    act(() => term(".codex-index-term", "Aspect").click());
+    expect(get(".codex-entry h2").textContent).toBe("Aspect");
+    act(() => term(".codex-see-term", "Aversion").click());
+    expect(get(".codex-entry h2").textContent).toBe("Aversion");
+    expect(term(".codex-index-term", "Aversion").getAttribute("aria-current")).toBe("true");
+  });
+
   it("dismisses the dropdown with Escape and the gear, with inspection disabled before creation", () => {
     const trigger = mount();
-    expect(get<HTMLButtonElement>(".prince-inspect-button").disabled).toBe(true);
+    expect(menuButton("Inspect Prince").disabled).toBe(true);
     const escapeBehind = vi.fn();
     window.addEventListener("keydown", escapeBehind);
     try {
