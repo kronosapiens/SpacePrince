@@ -145,7 +145,7 @@ describe("propagation — only the fielded roster conducts", () => {
 
   it("the resolver logs no hop into a ghost and leaves its affliction alone", () => {
     const prince = createStubPrince({ seed: 7 });
-    const run = beginRun(42);
+    const run = beginRun(prince.chart, 42);
     const full = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 64 });
     // Sun has a web on both charts, so the full roster has somewhere to
     // ripple; the same fight, that planet against itself, at the two rosters.

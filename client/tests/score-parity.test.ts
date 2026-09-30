@@ -12,7 +12,7 @@ import type { CombatEncounter, PlanetName, Polarity, Run } from "@/game/types";
 
 function setup(opponentSeed: number) {
   const prince = createStubPrince({ seed: 7 });
-  const base = beginRun(42);
+  const base = beginRun(prince.chart, 42);
   const enc = beginCombatEncounter({
     run: base,
     opponentSeed,

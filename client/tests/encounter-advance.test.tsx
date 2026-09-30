@@ -46,7 +46,7 @@ afterEach(() => {
 
 function combat(turns = 1, count = 64) {
   const prince = createStubPrince({ numEncounters: count });
-  const run = beginRun(42, count);
+  const run = beginRun(prince.chart, 42, count);
   const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: count });
   encounter.sequence = Array.from({ length: turns }, () => "Moon");
   encounter.opponentActions = Array.from({ length: turns }, () => "Testimony");
@@ -192,7 +192,7 @@ describe("encounter advancement", () => {
 
   it("preserves narrative auto-advance through the same exit path", () => {
     const prince = createStubPrince();
-    const run = beginRun(42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
     run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: "livelihood-coin" });
     prince.runs = [run];
     mount(prince);

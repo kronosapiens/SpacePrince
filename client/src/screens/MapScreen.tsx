@@ -133,7 +133,7 @@ export function MapScreen() {
     if (run.encounter) return;
     if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
     // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
-    // uncombust rolls, then the barrage, both seeded by the new map.
+    // uncombust rolls, then necessity, both seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);
   }, [run, prince, runOver, playerUnlocked, rolloverMap]);
 
@@ -146,12 +146,12 @@ export function MapScreen() {
   };
 
   // The boundary record shows only while standing at the root — what the
-  // crossing did (§11.3), before the first step commits.
+  // map opening did, before the first step commits.
   const boundary = run.map.boundary;
   const showBoundary =
     !!boundary &&
     run.map.currentNodeId === ROOT_NODE_ID &&
-    (boundary.uncombusts.length > 0 || boundary.barrage.length > 0);
+    (boundary.uncombusts.length > 0 || boundary.necessity.length > 0);
 
   return (
     <>
@@ -175,7 +175,7 @@ export function MapScreen() {
         </div>
         {showBoundary && boundary && (
           <div className="map-boundary" data-guide="map-boundary">
-            <span className="eyebrow">MAP {ROMAN[mapIndex]}</span>
+            <span className="eyebrow">MAP {ROMAN[mapIndex]} · NECESSITY</span>
             {boundary.uncombusts.map((u) => (
               <div key={`u-${u.planet}`} className="map-boundary-line">
                 <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[u.planet] }}>
@@ -185,12 +185,12 @@ export function MapScreen() {
                 {Math.round(u.chance * 100)}%
               </div>
             ))}
-            {boundary.barrage.map((b) => (
-              <div key={`b-${b.planet}`} className="map-boundary-line">
-                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[b.planet] }}>
-                  {PLANET_GLYPH[b.planet]}
+            {boundary.necessity.map((n) => (
+              <div key={`n-${n.planet}`} className="map-boundary-line">
+                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[n.planet] }}>
+                  {PLANET_GLYPH[n.planet]}
                 </span>
-                {b.planet} +{b.amount} affliction{b.halved ? " · halved" : ""}
+                {n.planet} +{n.amount} affliction{n.halved ? " · halved by Fortune" : ""}
               </div>
             ))}
           </div>

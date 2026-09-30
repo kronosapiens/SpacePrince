@@ -36,9 +36,10 @@ describe("run stars", () => {
   });
 
   it("places star centres across both corners within the rectangles", () => {
-    const prince = createStubPrince({ runs: Array.from({ length: 80 }, (_, seed) => ({
-      ...beginRun(seed), mapsCompleted: MAPS_PER_RUN,
-    })) });
+    const prince = createStubPrince();
+    prince.runs = Array.from({ length: 80 }, (_, seed) => ({
+      ...beginRun(prince.chart, seed), mapsCompleted: MAPS_PER_RUN,
+    }));
     const rendered = stars(prince);
     expect(rendered).toHaveLength(80);
     const positions = rendered.map((star) => {
@@ -58,12 +59,12 @@ describe("run stars", () => {
 
   it("shows every finished run, including early combustion and zero Light, with brightness ordered by Light", () => {
     const prince = createStubPrince();
-    const earlyRun = beginRun(1);
+    const earlyRun = beginRun(prince.chart, 1);
     earlyRun.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
     const completed = [64, 512, 4096].map((light, index) => ({
-      ...beginRun(index + 2), light, mapsCompleted: MAPS_PER_RUN,
+      ...beginRun(prince.chart, index + 2), light, mapsCompleted: MAPS_PER_RUN,
     }));
-    prince.runs = [earlyRun, ...completed, beginRun(5)];
+    prince.runs = [earlyRun, ...completed, beginRun(prince.chart, 5)];
 
     const rendered = stars(prince);
     expect(rendered).toHaveLength(4);
@@ -77,9 +78,10 @@ describe("run stars", () => {
   });
 
   it("keeps stars stable through reloads and new runs while equal scores occupy different positions", () => {
-    const prince = createStubPrince({ runs: [1, 2].map((seed) => ({
-      ...beginRun(seed), light: 512, mapsCompleted: MAPS_PER_RUN,
-    })) });
+    const prince = createStubPrince();
+    prince.runs = [1, 2].map((seed) => ({
+      ...beginRun(prince.chart, seed), light: 512, mapsCompleted: MAPS_PER_RUN,
+    }));
     const original = stars(prince).map((star) => star.outerHTML);
     expect(stars(JSON.parse(JSON.stringify(prince)) as Prince).map((star) => star.outerHTML)).toEqual(original);
     const positions = stars(prince).map((star) => {
@@ -88,7 +90,7 @@ describe("run stars", () => {
     });
     expect(positions[0]).not.toEqual(positions[1]);
 
-    prince.runs.push({ ...beginRun(3), light: 100000, mapsCompleted: MAPS_PER_RUN });
+    prince.runs.push({ ...beginRun(prince.chart, 3), light: 100000, mapsCompleted: MAPS_PER_RUN });
     expect(stars(prince).slice(0, 2).map((star) => star.outerHTML)).toEqual(original);
   });
 });

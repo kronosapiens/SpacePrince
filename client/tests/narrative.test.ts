@@ -14,7 +14,7 @@ import { createStubPrince } from "./fixtures";
 function setup(id = "self-still-water", numEncounters = 64) {
   const prince = createStubPrince({ numEncounters });
   const scenario = getScenario(id);
-  const run = { ...beginRun(42, numEncounters), light: 120 };
+  const run = { ...beginRun(prince.chart, 42, numEncounters), light: 120 };
   run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
   const context = () => {
     const house = HOUSES[scenario.house - 1]!;
@@ -126,6 +126,7 @@ describe("single-decision narrative", () => {
 
   it("does not sell healing to a clean or combusted target", () => {
     const { run, context, option, darken } = setup("self-still-water", 0);
+    run.state.Moon.affliction = 0;
     expect(previewOption(run, context(), option("rest"), { chosen: "Moon" }).ok).toBe(false);
     darken("Moon");
     expect(previewOption(run, context(), option("rest"), { chosen: "Moon" }).ok).toBe(false);

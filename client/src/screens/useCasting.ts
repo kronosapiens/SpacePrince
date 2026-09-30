@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
-import { useStartRun } from "@/state/store-actions";
+import { beginRun } from "@/game/run";
+import { loadDevSettings } from "@/state/settings";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, PLANETS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -28,7 +29,6 @@ const FRAMING_FADE_MS = 400;
 export function useCasting(enabled: boolean) {
   const { setActive } = useActivePlanet();
   const dispatchPrince = usePrinceDispatch();
-  const startRun = useStartRun();
   const [stage, setStage] = useState<Stage>("framing");
   const [form, setForm] = useState<FormState>({
     name: "",
@@ -129,11 +129,9 @@ export function useCasting(enabled: boolean) {
       chart: computed,
       numEncounters: 0,
       achievements: 0,
-      runs: [],
+      runs: [beginRun(computed, undefined, 0, loadDevSettings().unlockAll)],
     };
     dispatchPrince({ kind: "mint", prince });
-    // Append a fresh run; PlaySurface then renders the map (we're on /play).
-    startRun();
     playUISound("commit");
   };
 

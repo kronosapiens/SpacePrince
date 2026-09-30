@@ -38,11 +38,12 @@ export function useStartRun() {
   const lifetimeEncounterCount = prince?.numEncounters ?? 0;
   return useCallback(
     (seed: number = randomSeed()): Run => {
-      const run = beginRun(seed, lifetimeEncounterCount, devUnlockAll);
+      if (!prince) throw new Error("A Prince is required to start a run");
+      const run = beginRun(prince.chart, seed, lifetimeEncounterCount, devUnlockAll);
       dispatch({ kind: "startRun", run });
       return run;
     },
-    [dispatch, lifetimeEncounterCount, devUnlockAll],
+    [dispatch, prince, lifetimeEncounterCount, devUnlockAll],
   );
 }
 
@@ -94,7 +95,7 @@ export function useCommitTurn() {
 }
 
 /** Roll over to a fresh map (terminal node reached). The fielded roster gates
- *  its combat rulers and feeds the boundary's uncombust rolls and barrage. */
+ *  its combat rulers and feeds the boundary's uncombust rolls and necessity. */
 export function useRolloverMap() {
   const dispatch = usePrinceDispatch();
   return useCallback(

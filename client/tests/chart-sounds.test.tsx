@@ -99,7 +99,7 @@ describe("chart feedback", () => {
 
   it("keeps a rejected first activation silent and leaves inspection available", () => {
     const prince = createStubPrince();
-    const run = beginRun(42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
     const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
     run.encounter = encounter;
     const onCommitTurn = vi.fn(() => null);

@@ -1,4 +1,4 @@
-import type { Chart, Prince, SideState } from "@/game/types";
+import type { Chart, MapBoundary, Prince, SideState } from "@/game/types";
 import { refreshChartStats } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
@@ -22,6 +22,12 @@ export function loadPrince(): Prince | null {
     const prince = JSON.parse(raw) as Prince;
     refreshChartStats(prince.chart);
     for (const run of prince.runs) {
+      // Older v4 saves already applied their boundary; only rename the record.
+      const boundary = run.map.boundary as (MapBoundary & { barrage?: MapBoundary["necessity"] }) | undefined;
+      if (boundary?.barrage) {
+        boundary.necessity ??= boundary.barrage;
+        delete boundary.barrage;
+      }
       capSavedAffliction(prince.chart, run.state);
       if (run.encounter?.kind === "combat") {
         refreshChartStats(run.encounter.opponentChart);

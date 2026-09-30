@@ -46,7 +46,7 @@ function press(selector: string, key: string, repeat = false) {
 }
 function setup() {
   const prince = createStubPrince();
-  const run = beginRun(42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numEncounters);
   prince.runs = [run];
   savePrince(prince);
   const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;

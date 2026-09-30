@@ -53,7 +53,8 @@ function mount() {
 
 describe("settings menu", () => {
   it.each(["/", "/play"])("re-rolls the Prince inside its preview from %s without navigating or closing it", (path) => {
-    const prince = createStubPrince({ numEncounters: 4, runs: [beginRun(1, 4)] });
+    const prince = createStubPrince({ numEncounters: 4 });
+    prince.runs = [beginRun(prince.chart, 1, 4)];
     savePrince(prince);
     act(() => root.render(
       <MemoryRouter initialEntries={[path]}>

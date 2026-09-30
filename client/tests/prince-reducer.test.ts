@@ -31,8 +31,8 @@ describe("princeReducer", () => {
 
   it("startRun appends a run to the tail", () => {
     const p = createStubPrince();
-    const a = beginRun(1);
-    const b = beginRun(2);
+    const a = beginRun(p.chart, 1);
+    const b = beginRun(p.chart, 2);
     const afterA = princeReducer(p, { kind: "startRun", run: a })!;
     expect(afterA.runs).toEqual([a]);
     const afterB = princeReducer(afterA, { kind: "startRun", run: b })!;
@@ -41,8 +41,8 @@ describe("princeReducer", () => {
 
   it("commitRun replaces the tail run, leaving earlier runs untouched", () => {
     const p = createStubPrince();
-    const a = beginRun(1);
-    const b = beginRun(2);
+    const a = beginRun(p.chart, 1);
+    const b = beginRun(p.chart, 2);
     let state = princeReducer(p, { kind: "startRun", run: a })!;
     state = princeReducer(state, { kind: "startRun", run: b })!;
     const bMoved = { ...b, light: 42 };
@@ -52,7 +52,7 @@ describe("princeReducer", () => {
 
   it("commitRun is a no-op when there are no runs", () => {
     const p = createStubPrince();
-    const after = princeReducer(p, { kind: "commitRun", run: beginRun(1) })!;
+    const after = princeReducer(p, { kind: "commitRun", run: beginRun(p.chart, 1) })!;
     expect(after.runs).toEqual([]);
   });
 });

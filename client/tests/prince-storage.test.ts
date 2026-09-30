@@ -25,7 +25,7 @@ describe("Prince storage", () => {
 
   it("restores an unresolved scene and keeps a resolved result from paying twice", () => {
     const prince = createStubPrince();
-    const run = beginRun(7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numEncounters);
     const scenario = getScenario("livelihood-coin");
     run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: scenario.scenarioId });
     prince.runs = [run];
@@ -42,7 +42,7 @@ describe("Prince storage", () => {
 
   it("rebuilds saved player and opponent stats without changing run progress", () => {
     const prince = createStubPrince();
-    const run = beginRun(7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numEncounters);
     run.light = 72;
     run.state.Moon.affliction = 24;
     run.encounter = beginCombatEncounter({
@@ -65,7 +65,7 @@ describe("Prince storage", () => {
 
   it("caps saved affliction at the current Resolve on both charts", () => {
     const prince = createStubPrince();
-    const run = beginRun(7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numEncounters);
     run.light = 72;
     const encounter = beginCombatEncounter({
       run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters,
@@ -86,10 +86,29 @@ describe("Prince storage", () => {
     expect(savedRun.light).toBe(72);
   });
 
+  it("renames legacy boundary records without rerolling either chart or old first maps", () => {
+    const prince = createStubPrince();
+    const run = beginRun(prince.chart, 7, prince.numEncounters);
+    run.encounter = beginCombatEncounter({ run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters });
+    prince.runs = [run];
+    const legacy = JSON.parse(JSON.stringify(prince).replaceAll('"necessity":', '"barrage":'));
+    localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
+    expect(loadPrince()).toEqual(prince);
+    savePrince(loadPrince()!);
+    expect(localStorage.getItem("sp:prince:v4")).not.toContain('"barrage"');
+    expect(loadPrince()).toEqual(prince);
+
+    delete legacy.runs[0].map.boundary;
+    legacy.runs[0].state.Moon.affliction = 0;
+    localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
+    expect(loadPrince()).toEqual(legacy);
+  });
+
   it("round-trips historical and active v4 Light state", () => {
-    const historical = { ...beginRun(6), light: 36, mapsCompleted: MAPS_PER_RUN };
-    const active = { ...beginRun(7), light: 72 };
-    const prince = createStubPrince({ runs: [historical, active] });
+    const prince = createStubPrince();
+    const historical = { ...beginRun(prince.chart, 6), light: 36, mapsCompleted: MAPS_PER_RUN };
+    const active = { ...beginRun(prince.chart, 7), light: 72 };
+    prince.runs = [historical, active];
 
     savePrince(prince);
 

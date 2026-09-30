@@ -58,7 +58,7 @@ function planetPositions() {
 describe("shared player chart", () => {
   it("keeps the same wheel through combat, narrative choices, and both returns to Map", () => {
     const prince = createStubPrince();
-    const run = beginRun(42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
     const combatNode = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
     const narrativeNode = eligibleNext(run.map.graph, combatNode, [...run.map.visitedNodeIds, combatNode])[0]!;
     run.map.rolledNodes[combatNode] = { kind: "combat", opponentSeed: 99 };

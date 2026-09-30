@@ -15,7 +15,7 @@ import { createStubPrince } from "./fixtures";
 describe("Run loop integration", () => {
   it("resolves a combat encounter and persists run state across turns", () => {
     const prince = createStubPrince({ seed: 7 });
-    const run = beginRun(42);
+    const run = beginRun(prince.chart, 42);
     const enc = beginCombatEncounter({
       run,
       opponentSeed: 99,
@@ -85,7 +85,7 @@ describe("Run loop integration", () => {
       (seed) => chartRuler(seededChart(seed, "Other")) !== "Moon",
     )!;
     const encounter = beginCombatEncounter({
-      run: beginRun(42, 0),
+      run: beginRun(createStubPrince().chart, 42, 0),
       opponentSeed: rejectedSeed,
       lifetimeEncounterCount: 0,
     });
@@ -94,7 +94,7 @@ describe("Run loop integration", () => {
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {
-    const run = beginRun(17);
+    const run = beginRun(createStubPrince().chart, 17);
     const startId = run.map.currentNodeId;
     const startLayer = run.map.graph.nodes.find((n) => n.id === startId)!.layer;
     const next = eligibleNext(run.map.graph, startId, run.map.visitedNodeIds);
@@ -106,7 +106,7 @@ describe("Run loop integration", () => {
   });
 
   it("eligibleNext excludes already-visited neighbors", () => {
-    const run = beginRun(17);
+    const run = beginRun(createStubPrince().chart, 17);
     const startId = run.map.currentNodeId;
     const firstNeighbor = eligibleNext(run.map.graph, startId, [])[0]!;
     // After "visiting" firstNeighbor, calling eligibleNext from it with a
@@ -117,7 +117,7 @@ describe("Run loop integration", () => {
   });
 
   it("combat length equals the map number; the opponent fields the player's tier (mirror)", () => {
-    const run = beginRun(42);
+    const run = beginRun(createStubPrince().chart, 42);
     const begin = (lifetimeEncounterCount: number, mapsCompleted = 0) =>
       beginCombatEncounter({
         run: { ...run, mapsCompleted },
@@ -144,7 +144,7 @@ describe("Run loop integration", () => {
   it("a run ends by completion when the seventh map is finished", () => {
     const prince = createStubPrince({ seed: 3 });
     const roster = unlockedPlanets(prince.numEncounters);
-    let r = beginRun(9);
+    let r = beginRun(prince.chart, 9);
     // Six rollovers: each archives the current map and begins a fresh one,
     // never ending the run.
     for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
@@ -167,7 +167,7 @@ describe("Run loop integration", () => {
 
   it("isOver true iff every fielded player planet is combusted", () => {
     const prince = createStubPrince({ seed: 13 });
-    const run = beginRun(1);
+    const run = beginRun(prince.chart, 1);
     expect(isOver(run, prince.chart, prince.numEncounters)).toBe(false);
     const dead = { ...run, state: { ...run.state } };
     for (const p of PLANETS) {

@@ -26,7 +26,7 @@ interface MapGuideProps {
   examplePlanet: PlanetName;
   /** Maps already crossed — the index the screen prints under the diagram. */
   mapsCompleted: number;
-  /** The screen is showing the crossing's record below the map. */
+  /** The screen is showing the map's opening record below the map. */
   showBoundary: boolean;
   onOpen: () => void;
   onClose: () => void;

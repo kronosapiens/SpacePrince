@@ -39,7 +39,7 @@ afterEach(() => {
 
 function mount(screen: "title" | "map") {
   const prince = createStubPrince();
-  const run = beginRun(42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numEncounters);
   run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
   prince.runs = [run];
   savePrince(prince);
@@ -113,7 +113,13 @@ describe("entry screens", () => {
     click(element(".begin-btn"));
     expect(element(".map-screen .chart-svg")).toBe(chart);
     expect(planetPositions()).toEqual(settledPositions);
-    expect(loadPrince()!.runs).toHaveLength(1);
+    const minted = loadPrince()!;
+    expect(minted.runs).toHaveLength(1);
+    const first = minted.runs[0]!;
+    expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numEncounters).state);
+    expect(first.state.Moon.affliction).toBeGreaterThan(0);
+    expect(first.map.boundary!.necessity.map((entry) => entry.planet)).toEqual(["Moon"]);
+    expect(container.textContent).toContain("MAP I · NECESSITY");
     click(element('[role="button"][aria-label="Moon"]'));
     expect(element(".ps-name").textContent).toContain("MOON");
   });
@@ -177,7 +183,7 @@ describe("entry screens", () => {
 
   it("keeps a combusted run inspectable on a passive map and starts again on the same Prince", () => {
     const prince = createStubPrince();
-    const run = beginRun(42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
     for (const planet of PLANETS) {
       run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
     }
@@ -206,7 +212,10 @@ describe("entry screens", () => {
     expect({ ...restarted, runs: prince.runs }).toEqual(prince);
     expect(restarted.runs).toHaveLength(2);
     expect(restarted.runs[0]).toEqual(run);
-    expect(restarted.runs[1]!.state).toEqual(beginRun(0).state);
+    const fresh = restarted.runs[1]!;
+    expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numEncounters).state);
+    expect(fresh.state.Moon.affliction).toBeGreaterThan(0);
+    expect(container.textContent).toContain("NECESSITY");
     expect(restarted.runs[1]!.light).toBe(0);
     expect(container.querySelector(".begin-btn")).toBeNull();
     expect(element(".map-index-v").textContent).toBe("I");
@@ -215,7 +224,7 @@ describe("entry screens", () => {
 
   it("finishes the seventh map in place and keeps that completed map after reload", () => {
     const prince = createStubPrince();
-    const run = beginRun(42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
     run.mapsCompleted = MAPS_PER_RUN - 1;
     run.map.currentNodeId = TERMINAL_NODE_ID;
     run.map.visitedNodeIds.push(TERMINAL_NODE_ID);

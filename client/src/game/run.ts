@@ -1,6 +1,7 @@
 import { blankSideState, cloneSideState } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
-import { combustionCeiling, isCombusted, uncombust } from "./combust";
+import { isCombusted, uncombust } from "./combust";
+import { applyNecessity } from "./necessity";
 import { rollNodeContent } from "./map-content";
 import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
 import { hashString, mulberry32, randomSeed } from "./rng";
@@ -9,11 +10,6 @@ import type { Chart, MapBoundary, MapState, NodeContent, PlanetName, Run, SideSt
 
 /** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
 export const MAPS_PER_RUN = 7;
-
-/** Per map completed, the barrage's ceiling-fraction span grows by this much:
- *  entering map k+1 rolls up to `k × 3/60` of each ceiling (MECHANICS §11.3).
- *  Each rolled share is rounded to a whole affliction point. */
-export const BARRAGE_CEILING_FRACTION_PER_MAP = 3 / 60;
 
 export function newMapState(
   seed: number,
@@ -45,6 +41,7 @@ export function newMapState(
 }
 
 export function beginRun(
+  chart: Chart,
   seed = randomSeed(),
   lifetimeEncounterCount = 0,
   devUnlockAll = false,
@@ -52,12 +49,16 @@ export function beginRun(
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
   const combatRulers = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
+  const crossed = rollMapBoundary(
+    chart, blankSideState(), combatRulers,
+    mulberry32(hashString(`${mapSeed}_boundary`)),
+  );
   return {
     id: `run_${seed}`,
     seed,
-    state: blankSideState(),
+    state: crossed.state,
     light: 0,
-    map: newMapState(mapSeed, combatRulers),
+    map: { ...newMapState(mapSeed, combatRulers), boundary: crossed.boundary },
     mapsCompleted: 0,
     encounter: null,
     seenScenarioIds: [],
@@ -76,21 +77,19 @@ export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
 }
 
 /**
- * The map boundary (MECHANICS §11.3), rolled from the new map's seed. Two steps,
+ * The map boundary, rolled from the new map's seed. Two steps,
  * in order: each combusted fielded planet rolls fortune to uncombust, then each
- * lit planet — relit ones included — takes its barrage share. Returns the
+ * lit planet — relit ones included — takes its necessity. Returns the
  * crossed state and the record the map screen shows on entry.
  */
 export function rollMapBoundary(
   chart: Chart,
   state: SideState,
   roster: PlanetName[],
-  mapsCompleted: number,
   rng: () => number,
 ): { state: SideState; boundary: MapBoundary } {
   const next = cloneSideState(state);
   const uncombusts: MapBoundary["uncombusts"] = [];
-  const barrage: MapBoundary["barrage"] = [];
   for (const planet of roster) {
     if (!isCombusted(chart.planets[planet], next[planet])) continue;
     const chance = fortuneChance(getEffectiveStats(chart, planet).luck);
@@ -98,27 +97,13 @@ export function rollMapBoundary(
     if (success) uncombust(chart.planets[planet], next[planet]);
     uncombusts.push({ planet, chance, success });
   }
-  for (const planet of roster) {
-    const ps = next[planet];
-    if (isCombusted(chart.planets[planet], ps)) continue;
-    const ceiling = combustionCeiling(chart.planets[planet]);
-    const frac = rng() * mapsCompleted * BARRAGE_CEILING_FRACTION_PER_MAP;
-    const halved = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
-    let amount = Math.round(ceiling * frac);
-    if (halved) amount = Math.round(amount / 2);
-    // The barrage wounds but never combusts (§11.3).
-    amount = Math.max(0, Math.min(amount, ceiling - 1 - ps.affliction));
-    if (amount > 0) {
-      ps.affliction += amount;
-      barrage.push({ planet, amount, halved });
-    }
-  }
-  return { state: next, boundary: { uncombusts, barrage } };
+  const applied = applyNecessity(chart, next, roster, rng);
+  return { state: applied.state, boundary: { uncombusts, necessity: applied.necessity } };
 }
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
  *  the finished map to the event log, generates a fresh one, and passes the
- *  chart through the map boundary (§11.3) — uncombust rolls, then the barrage,
+ *  chart through the map boundary — uncombust rolls, then necessity,
  *  both seeded by the new map. The seventh completion ends the run: the final
  *  map stays current (not archived). */
 export function rolloverMap(
@@ -133,7 +118,7 @@ export function rolloverMap(
   }
   const events = [...run.events, { kind: "map-completed" as const, map: run.map }];
   const crossed = rollMapBoundary(
-    chart, run.state, roster, mapsCompleted,
+    chart, run.state, roster,
     mulberry32(hashString(`${seed}_boundary`)),
   );
   const map: MapState = { ...newMapState(seed, roster), boundary: crossed.boundary };

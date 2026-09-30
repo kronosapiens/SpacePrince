@@ -61,7 +61,7 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so encounters entered from here exercise every length.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
-  const base = { ...beginRun(seed, tier), mapsCompleted };
+  const base = { ...beginRun(devPlayerChart(seed), seed, tier), mapsCompleted };
   // Park the player partway through a rolled map (never on the terminal).
   const map = walkMap(seed, false, tier);
   const run: Run = {
@@ -80,7 +80,7 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
   // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so every length gets exercised.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
-  const base = { ...beginRun(seed, tier), mapsCompleted };
+  const base = { ...beginRun(devPlayerChart(seed), seed, tier), mapsCompleted };
   const fresh = beginCombatEncounter({ run: base, opponentSeed: seed, lifetimeEncounterCount: tier });
   // Mid-fight: a random turn and lived-in boards. Keep the opponent's acting
   // planet alive so the seam reads a real "their turn".
@@ -107,7 +107,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const fielded = unlockedPlanets(tier);
-  const base = beginRun(seed, tier);
+  const base = beginRun(devPlayerChart(seed), seed, tier);
   const rng = mulberry32(seed);
   const house = opts.house ?? 1 + Math.floor(rng() * 12);
   const scenario = pickScenario(house, [], rng);
@@ -185,7 +185,7 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
   const history = Array.from({ length: 8 + Math.floor(rng() * 73) }, (_, index): Run => {
     const pastSeed = hashString(`${seed}_history_${index}`);
     return {
-      ...beginRun(pastSeed, tier),
+      ...beginRun(devPlayerChart(seed), pastSeed, tier),
       map: walkMap(pastSeed, true, tier),
       mapsCompleted: MAPS_PER_RUN,
       // Sample doublings to expose both faint and bright stars in the preview.

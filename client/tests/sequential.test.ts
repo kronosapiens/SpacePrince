@@ -8,7 +8,7 @@ import type { CombatEncounter, Run } from "@/game/types";
 
 function setup(opponentSeed = 99) {
   const prince = createStubPrince({ seed: 7 });
-  const run = beginRun(42);
+  const run = beginRun(prince.chart, 42);
   const enc = beginCombatEncounter({
     run,
     opponentSeed,

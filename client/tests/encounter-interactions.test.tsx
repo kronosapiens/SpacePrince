@@ -54,7 +54,7 @@ const leave = (selector: string) => act(() => get(selector).dispatchEvent(new Mo
 
 function setup() {
   const prince = createStubPrince();
-  const run = beginRun(42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numEncounters);
   const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
   encounter.sequence = ["Moon", "Mars"];
   encounter.opponentActions = ["Affliction", "Testimony"];

@@ -39,7 +39,7 @@ export const GUIDE_COPY = {
       },
       other: {
         label: "Other",
-        body: "The opposing chart, which follows the same rules as yours. Your action affects its acting planet.",
+        body: "The other chart begins each encounter with affliction from necessity. Each planet's Fortune may halve it. Your action affects its acting planet.",
       },
       activePlanet: {
         label: "Incoming move",
@@ -106,15 +106,15 @@ export const GUIDE_COPY = {
       },
       crossing: {
         label: "The crossing",
-        body: "Crossings lead to the next map. Combusted planets may revive, and available planets take some damage. Each planet's Fortune affects its outcome.",
+        body: "Crossings lead to the next map. Combusted planets roll Fortune to revive before necessity brings new affliction.",
       },
       index: {
         label: "Map {n} of VII",
         body: "Each map adds one turn to encounters. Your run ends after seven maps, or when all your planets combust.",
       },
       boundary: {
-        label: "Crossing results",
-        body: "These are your crossing results: planets revived and damage taken.",
+        label: "Map opening",
+        body: "Every map, including the first, opens with necessity: 12, 24, or 36 affliction per available planet. Fortune may halve it; the amount stops short of combustion. These results are already applied.",
       },
     },
   },

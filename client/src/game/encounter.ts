@@ -1,5 +1,5 @@
 import { blankSideState, chartRuler, seededChart } from "./chart";
-import { combustionCeiling } from "./combust";
+import { applyNecessity } from "./necessity";
 import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { eligibleOpponentSeed } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
@@ -11,7 +11,6 @@ import type {
   PlanetName,
   Polarity,
   Run,
-  SideState,
 } from "./types";
 
 /** The encounter's ruler — the planet ruling the opponent chart's Ascendant.
@@ -58,23 +57,6 @@ export function rollOpponentTurns(
   return { sequence, opponentActions };
 }
 
-/** The opponent spawns already afflicted (MECHANICS §11): only resolution
- *  scores (§12), so a blank chart gives a short fight nothing to resolve.
- *  Absolute tiers are capped one 12-point step below Resolve so fragile
- *  planets still arrive lit. */
-export const SPAWN_AFFLICTION_TIERS = [12, 24, 36];
-
-export function afflictedSideState(chart: Chart, roster: PlanetName[], rng: () => number): SideState {
-  const state = blankSideState();
-  for (const planet of roster) {
-    state[planet].affliction = Math.min(
-      pickWeighted(SPAWN_AFFLICTION_TIERS, rng),
-      combustionCeiling(chart.planets[planet]) - 12,
-    );
-  }
-  return state;
-}
-
 export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
@@ -90,14 +72,14 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   const { sequence, opponentActions } = rollOpponentTurns(
     opponentChart, roster, rng, combatTurnCount(run.mapsCompleted),
   );
-  // Separate stream for the spawn affliction so its draws don't perturb the
+  // Separate stream for the necessity so its draws don't perturb the
   // turn-sequence rolls above.
   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
   return {
     kind: "combat",
     id: `enc_combat_${run.id}_${acceptedSeed}`,
     opponentChart,
-    opponentState: afflictedSideState(opponentChart, roster, stateRng),
+    opponentState: applyNecessity(opponentChart, blankSideState(), roster, stateRng).state,
     roster,
     sequence,
     opponentActions,
