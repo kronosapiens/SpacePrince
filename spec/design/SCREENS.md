@@ -277,6 +277,7 @@ A card opens one of two ways:
 - **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents on returning to the map, one at a time, never over a running encounter.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold (`MECHANICS.md §11.1`) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
+The Moon has no threshold to cross; its card presents at the end of the mint reveal instead (§5.2).
 The introduction celebrates the **position, not a person**: no voice, no chorus fragment — the concept/PRIMER.md accessibility decision (planets stay an ambient chorus) applies here with full force.
 
 **Screen-help cards** — the corner "?" on each gameplay surface, plus the chart study's in-card "?" — run three beats: one sentence of purpose carrying the screen's stakes (the test: it survives with the title deleted); two-three sentences of goals and affordances in one breath; a slightly longer close holding only the concepts that change decisions.
@@ -477,9 +478,13 @@ Each planet appears at its computed sign placement, in its glyph and color, sepa
 
 This is the **only time** the player sees their full chart until cumulative encounter 32 (Saturn, the final unlock — `MECHANICS.md §11.1`).
 
-The chart then **gates back** to its starting state: the Moon remains in full visual treatment, the other six planets recede to **ghost** (hairline outline, no color), per `NFT.md` and `MECHANICS.md §11.1`. The player is left with what they currently have access to.
+The chart then **dims whole**: all seven planets recede to **ghost** (hairline outline, no color), the Moon included, and the planet-colored bands down the screen edge go dark and stay dark — past the reveal they only mark planets acting in an encounter.
+After a beat, the Moon's **planet introduction** (§3.6.2) presents, and the Moon stands lit behind it in its computed sign.
+It is the same card every later planet arrives through, so the first card earned in play is one the player has already seen.
+Dismissing it leaves the chart in its starting state (per `NFT.md` and `MECHANICS.md §11.1`) and a single Continue into the first map.
 
-Future unlocks (per `MECHANICS.md §11.1`) reveal one planet at a time *between encounters*, not in a single ceremony. The mint is the only staged unfolding in the game.
+Later unlocks (per `MECHANICS.md §11.1`) arrive the same way, one card at a time *between encounters*, not in a single ceremony.
+The mint is the only staged unfolding in the game.
 
 ### 5.3 NFT artifact
 
