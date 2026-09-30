@@ -25,8 +25,9 @@ let initPromise: Promise<void> | null = null;
 // effects, propagation, combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
-// Both on for a fresh visitor; saved preferences override the defaults.
-let musicVolume = 1;
+// Both on for a fresh visitor, music at half; saved preferences override the defaults.
+const DEFAULT_MUSIC_VOLUME = 0.5;
+let musicVolume = DEFAULT_MUSIC_VOLUME;
 let soundVolume = 1;
 let musicOutput: import("tone").Gain | null = null;
 let soundOutput: import("tone").Gain | null = null;
@@ -41,7 +42,7 @@ try {
   const raw = localStorage.getItem(AUDIO_KEY);
   if (raw) {
     const saved = JSON.parse(raw) as { music?: number | boolean; sound?: number | boolean };
-    musicVolume = typeof saved.music === "number" ? saved.music : saved.music === false ? 0 : 1;
+    musicVolume = typeof saved.music === "number" ? saved.music : saved.music === false ? 0 : DEFAULT_MUSIC_VOLUME;
     soundVolume = typeof saved.sound === "number" ? saved.sound : saved.sound === false ? 0 : 1;
   }
 } catch {
