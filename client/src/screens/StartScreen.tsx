@@ -1,6 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import { BeginButton } from "@/components/BeginButton";
 import { CityPicker } from "@/components/CityPicker";
+import { PlanetIntroCard } from "@/components/PlanetIntroCard";
 import { TermText } from "@/components/TermText";
 import { PLANETS } from "@/game/data";
 import { PLANET_PRIMARY } from "@/svg/palette";
@@ -11,9 +12,9 @@ import type { GameLayoutContext } from "./GameLayout";
 export function StartScreen() {
   const { casting } = useOutletContext<GameLayoutContext>();
   const {
-    stage, form, setForm, computed, leavingFraming, revealedCount,
+    stage, form, setForm, computed, leavingFraming, painted,
     currentRevealing, currentSign, showCeremony,
-    continueFraming, handleConfirm, handleEnter,
+    continueFraming, handleConfirm, closeIntroduction, handleEnter,
   } = casting;
 
   return (
@@ -81,28 +82,24 @@ export function StartScreen() {
         </div>
       )}
 
-      {stage === "settled" && (
-        <>
-          <div className="mint-caption-italic">The Moon rises in the east. The rest, in time.</div>
-          <BeginButton onClick={handleEnter}>Continue</BeginButton>
-        </>
+      {stage === "introducing" && computed && (
+        <PlanetIntroCard chart={computed} planet="Moon" onClose={closeIntroduction} />
       )}
+
+      {stage === "settled" && <BeginButton onClick={handleEnter}>Continue</BeginButton>}
 
       {/* Progress pips — Macrobian sequence as planet glyphs */}
       {showCeremony && (
         <div className="mint-progress">
-          {PLANETS.map((p, i) => {
-            const isOn = i < revealedCount;
-            return (
-              <span
-                key={p}
-                className={`mint-pip ${isOn ? "is-on" : ""}`}
-                style={{ ["--c" as any]: PLANET_PRIMARY[p] }}
-              >
-                {PLANET_GLYPH[p]}
-              </span>
-            );
-          })}
+          {PLANETS.map((p) => (
+            <span
+              key={p}
+              className={`mint-pip ${painted.includes(p) ? "is-on" : ""}`}
+              style={{ ["--c" as any]: PLANET_PRIMARY[p] }}
+            >
+              {PLANET_GLYPH[p]}
+            </span>
+          ))}
         </div>
       )}
     </div>

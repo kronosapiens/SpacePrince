@@ -106,8 +106,9 @@ describe("navigation feedback", () => {
     for (let i = 0; i < 7; i++) act(() => vi.advanceTimersByTime(2500));
     act(() => vi.advanceTimersByTime(1500));
     act(() => vi.advanceTimersByTime(1500));
+    act(() => document.querySelector(".info-card-close")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click(".begin-btn");
-    expect(cues()).toEqual(["select", "select", "commit", "commit"]);
+    expect(cues()).toEqual(["select", "select", "commit", "dismiss", "commit"]);
     expect(loadPrince()!.runs).toHaveLength(1);
   });
 

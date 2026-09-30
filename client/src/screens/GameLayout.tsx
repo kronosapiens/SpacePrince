@@ -71,7 +71,7 @@ export function GameLayout() {
         unlockedPlanets={unlocked}
         mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
         disabled={opening.active || (!isTitle && guideOpen)}
-        activePlanet={isCasting && !casting.ghosted ? casting.currentRevealing : null}
+        activePlanet={isCasting ? casting.currentRevealing : null}
         hideAffliction={isTitle || isCasting}
       >
         {isCasting && <PlanetBands on={casting.bandsOn} current={casting.bandsCurrent} />}

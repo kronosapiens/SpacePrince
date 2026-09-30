@@ -10,7 +10,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { playUISound, setTheme } from "@/audio/engine";
 import type { Chart as ChartType, Prince, SignName } from "@/game/types";
 
-type Stage = "framing" | "input" | "revealing" | "settled";
+type Stage = "framing" | "input" | "revealing" | "dimmed" | "introducing" | "settled";
 
 interface FormState {
   name: string;
@@ -23,7 +23,7 @@ interface FormState {
 
 const REVEAL_INTERVAL_MS = 2500;
 const HELD_MOMENT_MS = 1500;
-const GHOST_FADE_MS = 1500;
+const DIMMED_MS = 1500;
 const FRAMING_FADE_MS = 400;
 
 export function useCasting(enabled: boolean) {
@@ -39,7 +39,6 @@ export function useCasting(enabled: boolean) {
     tz: "",
   });
   const [revealedCount, setRevealedCount] = useState(0);
-  const [ghosted, setGhosted] = useState(false);
   const [leavingFraming, setLeavingFraming] = useState(false);
   const [lastComputed, setLastComputed] = useState<ChartType | null>(null);
 
@@ -75,35 +74,31 @@ export function useCasting(enabled: boolean) {
     }
   }, [form]);
 
+  // The whole chart paints in, holds, then dims to nothing; after a beat the
+  // Moon arrives through the same introduction card every later planet uses.
   useEffect(() => {
-    if (!enabled || stage !== "revealing") return;
-    const delay = ghosted ? GHOST_FADE_MS
-      : revealedCount >= PLANETS.length ? HELD_MOMENT_MS
-      : REVEAL_INTERVAL_MS;
+    if (!enabled) return;
+    if (stage === "dimmed") {
+      const timer = window.setTimeout(() => setStage("introducing"), DIMMED_MS);
+      return () => window.clearTimeout(timer);
+    }
+    if (stage !== "revealing") return;
+    const delay = revealedCount >= PLANETS.length ? HELD_MOMENT_MS : REVEAL_INTERVAL_MS;
     const timer = window.setTimeout(() => {
-      if (ghosted) setStage("settled");
-      else if (revealedCount >= PLANETS.length) {
-        setGhosted(true);
-        setActive(null);
-      } else setRevealedCount((n) => n + 1);
+      if (revealedCount >= PLANETS.length) setStage("dimmed");
+      else setRevealedCount((n) => n + 1);
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [enabled, stage, revealedCount, ghosted, setActive]);
+  }, [enabled, stage, revealedCount]);
 
+  const currentRevealing = stage === "revealing" && revealedCount > 0 ? PLANETS[revealedCount - 1]! : null;
+
+  // The canvas takes the tint of the planet arriving, and stays neutral
+  // outside the reveal — no carry-over from the previous screen.
   useEffect(() => {
-    if (!enabled || stage !== "revealing") return;
-    if (revealedCount === 0) return;
-    const last = PLANETS[revealedCount - 1] ?? null;
-    setActive(last);
-  }, [enabled, stage, revealedCount, setActive]);
+    if (enabled) setActive(currentRevealing);
+  }, [enabled, currentRevealing, setActive]);
 
-  // Keep the canvas neutral on the input + settled stages — no carry-over tint
-  // from the previous screen.
-  useEffect(() => {
-    if (enabled && (stage === "framing" || stage === "input" || stage === "settled")) setActive(null);
-  }, [enabled, stage, setActive]);
-
-  const currentRevealing = revealedCount > 0 ? PLANETS[revealedCount - 1] : null;
   const currentSign: SignName | null = currentRevealing && computed
     ? computed.planets[currentRevealing].sign
     : null;
@@ -135,19 +130,24 @@ export function useCasting(enabled: boolean) {
     playUISound("commit");
   };
 
-  const showCeremony = stage === "revealing" || stage === "settled";
-  const revealedPlanets = ghosted ? PLANETS.slice(0, 1)
-    : showCeremony ? PLANETS.slice(0, revealedCount) : [];
+  const closeIntroduction = () => {
+    if (stage === "introducing") setStage("settled");
+  };
+
+  const showCeremony = stage !== "framing" && stage !== "input";
+  const painted = useMemo(
+    () => (stage === "revealing" ? PLANETS.slice(0, revealedCount) : []),
+    [stage, revealedCount],
+  );
+  const revealedPlanets = stage === "introducing" || stage === "settled" ? PLANETS.slice(0, 1) : painted;
 
   // The bands fill in step with the reveal: everything painted so far rests
-  // dim, the planet arriving sits bright.
-  const bandsOn = useMemo(
-    () => new Set(showCeremony ? PLANETS.slice(0, revealedCount) : []),
-    [showCeremony, revealedCount],
-  );
+  // dim, the planet arriving sits bright. They go dark with the chart and stay
+  // dark — past the reveal they only mark planets acting in an encounter.
+  const bandsOn = useMemo(() => new Set(painted), [painted]);
   const bandsCurrent = useMemo(
-    () => new Set(stage === "revealing" && !ghosted && currentRevealing ? [currentRevealing] : []),
-    [stage, ghosted, currentRevealing],
+    () => new Set(currentRevealing ? [currentRevealing] : []),
+    [currentRevealing],
   );
 
   useEffect(() => {
@@ -172,8 +172,8 @@ export function useCasting(enabled: boolean) {
 
   return {
     stage, form, setForm, computed, chart: computed ?? lastComputed,
-    ghosted, leavingFraming, revealedCount, currentRevealing, currentSign,
-    showCeremony, revealedPlanets, bandsOn, bandsCurrent, continueFraming, handleConfirm, handleEnter,
+    leavingFraming, currentRevealing, currentSign, showCeremony, painted,
+    revealedPlanets, bandsOn, bandsCurrent, continueFraming, handleConfirm, closeIntroduction, handleEnter,
   };
 }
 

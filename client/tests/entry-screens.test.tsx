@@ -142,9 +142,18 @@ describe("entry screens", () => {
       expect(element(".chart-svg")).toBe(chart);
     }
     act(() => vi.advanceTimersByTime(1500));
+    expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(0);
+    expect(container.querySelector(".planet-band.is-on")).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     act(() => vi.advanceTimersByTime(1500));
+    expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-label")).toBe("Moon unlocked");
+    expect(container.querySelector(".begin-btn")).toBeNull();
+    click(document.querySelector(".info-card-close")!);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(1);
     expect(container.querySelector('[data-guide="planet-self-moon"]')).not.toBeNull();
+    expect(container.querySelector(".planet-band.is-on")).toBeNull();
+    expect(loadPrince()).toBeNull();
     const settledPositions = planetPositions();
     click(element(".begin-btn"));
     expect(element(".map-screen .chart-svg")).toBe(chart);
