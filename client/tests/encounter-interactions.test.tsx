@@ -8,11 +8,12 @@ import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { getEffectiveStats } from "@/game/combat";
 import { playUISound } from "@/audio/engine";
+import { NEUTRAL, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetName, Polarity } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -52,7 +53,12 @@ const focus = (selector: string) => act(() => {
 const hover = (selector: string) => act(() => get(selector).dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
 const leave = (selector: string) => act(() => get(selector).dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body })));
 
-function setup() {
+function finishOpening() {
+  act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  expect(container.querySelector(".necessity-opening")).toBeNull();
+}
+
+function setup(settleOpening = true) {
   const prince = createStubPrince();
   const run = beginRun(prince.chart, 42, prince.numEncounters);
   const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
@@ -69,10 +75,42 @@ function setup() {
     onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
     </PlayerChartLayout>));
   render();
+  if (settleOpening) finishOpening();
   return { prince, run, encounter, onCommitTurn, render };
 }
 
 describe("encounter interactions", () => {
+  it("skips the other chart opening without selecting or acting and retains results without replaying on turn changes", () => {
+    const { encounter, render, onCommitTurn } = setup(false);
+    const other = '[data-guide="chart-other"]';
+    const record = encounter.necessity!.find((entry) => entry.planet === "Moon")!;
+    expect(get(`${other} .necessity-opening`).textContent).toBe("Click to skip");
+    expect(container.querySelector(".chart-layout-chart .necessity-opening")).toBeNull();
+    expect(container.querySelector(".chart-layout-chart .necessity-arc")).toBeNull();
+    click(moon);
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(container.querySelector(testimony)).toBeNull();
+    expect(container.querySelector(affliction)).toBeNull();
+    expect(onCommitTurn).not.toHaveBeenCalled();
+
+    finishOpening();
+    click(`${other} [data-guide="planet-other-moon"]`);
+    click(`${other} [aria-label="Study Moon"]`);
+    expect(get(`${other} .ps-necessity`).textContent).toBe(
+      `Necessity: +${record.amount}${record.halved ? " · halved by Fortune" : ""}`,
+    );
+    click(moon);
+    expect(container.querySelector(testimony)).not.toBeNull();
+    encounter.turnIndex = 1;
+    render();
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(container.querySelector(".necessity-arc")).toBeNull();
+    expect(get(`${other} .ps-necessity`).textContent).toContain(`Necessity: +${record.amount}`);
+    click(moon);
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledExactlyOnceWith("Moon", "Testimony", expect.any(Function));
+  });
+
   it("previews exact effects on hover/focus and restores a focused action when the pointer leaves", () => {
     const { prince, run, onCommitTurn } = setup();
     focus(moon);
@@ -95,6 +133,29 @@ describe("encounter interactions", () => {
     act(() => (get(testimony) as HTMLElement).blur());
     expect(container.querySelector(otherIncoming)).toBeNull();
     expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(onCommitTurn).not.toHaveBeenCalled();
+  });
+
+  it("shows one neutral ring while inspecting the other chart and restores its announced actor on dismissal", () => {
+    const { onCommitTurn } = setup();
+    const other = '[data-guide="chart-other"]';
+    const ring = () => get(`${other} circle.invite-ring`);
+    const actor = get(`${other} [data-guide="planet-other-moon"]`).closest('[role="button"]')!;
+    const inspected = get(`${other} [data-guide="planet-other-mars"]`).closest('[role="button"]')!;
+    expect(actor.contains(ring())).toBe(true);
+    expect(ring().getAttribute("stroke")).toBe(VALENCE_COLOR.Affliction);
+
+    click(`${other} [data-guide="planet-other-mars"]`);
+    expect(container.querySelectorAll(`${other} circle.invite-ring`)).toHaveLength(1);
+    expect(inspected.contains(ring())).toBe(true);
+    expect(ring().getAttribute("stroke")).toBe(NEUTRAL.mist);
+    expect(get(`${other} .ps-name`).textContent).toContain("MARS");
+
+    click(`${other} [data-guide="planet-other-mars"]`);
+    expect(container.querySelectorAll(`${other} circle.invite-ring`)).toHaveLength(1);
+    expect(actor.contains(ring())).toBe(true);
+    expect(ring().getAttribute("stroke")).toBe(VALENCE_COLOR.Affliction);
+    expect(container.querySelector(`${other} .ps-card`)).toBeNull();
     expect(onCommitTurn).not.toHaveBeenCalled();
   });
 

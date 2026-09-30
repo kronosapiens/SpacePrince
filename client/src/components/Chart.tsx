@@ -8,6 +8,7 @@ import {
   panelHeightFor,
   type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
+import { NECESSITY_ANIMATION_TIMINGS, type NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
 import { PropagationLine } from "@/components/PropagationLine";
 import { SvgRotation } from "@/components/SvgRotation";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -26,6 +27,7 @@ import { hexagramPoints } from "@/svg/geometry";
 import { useTuning, type ChartTuning } from "@/svg/tuning";
 import type {
   AspectConnection,
+  NecessityEntry,
   Chart as ChartType,
   PlanetName,
   PlanetPlacement,
@@ -126,6 +128,9 @@ export interface ProjectionChips {
 
 export interface ChartProps {
   chart: ChartType;
+  opening?: NecessityAnimationPresentation;
+  /** Last opening result, retained for Study after play resumes. */
+  necessity?: NecessityEntry[];
   state?: Partial<Record<PlanetName, PlanetStatus>>;
   /** Planets the player has not yet revealed. Render as ghost (dashed outline, faded glyph). */
   unlockedPlanets?: PlanetName[];
@@ -216,6 +221,8 @@ export interface ChartProps {
 export function Chart(props: ChartProps) {
   const {
     chart,
+    opening,
+    necessity,
     state,
     unlockedPlanets,
     selectedPlanet,
@@ -255,7 +262,7 @@ export function Chart(props: ChartProps) {
 
   const pointerPlanet = useRef<PlanetName | null>(null);
   const focusPlanet = useRef<PlanetName | null>(null);
-  const canPreview = !!onPlanetHover && !passive;
+  const canPreview = !!onPlanetHover && !passive && !opening;
   useEffect(() => {
     pointerPlanet.current = null;
     focusPlanet.current = null;
@@ -270,7 +277,7 @@ export function Chart(props: ChartProps) {
   // Placement reserves the *closed* height only — study mode anchors this box's
   // top and grows downward, so the location stays put when it opens.
   const panelHeight = panelHeightFor({ actions: !!statsPanelReserveActions });
-  const reserveCenter = !!incoming;
+  const reserveCenter = !!incoming || !!opening;
   const panelPlacement = useMemo(
     () => computePanelPlacement(points, panelHeight, reserveCenter),
     [points, panelHeight, reserveCenter],
@@ -316,13 +323,13 @@ export function Chart(props: ChartProps) {
         if (!from || !to) return null;
         // Aspect highlights only follow hover/select/active. Dimmed by default
         // even when allActive is true — keeps the resting Title chart calm.
-        const isPropagating =
+        const isPropagating = !opening && (
           activePropagationKeys?.has(aspectKey(a.from, a.to)) ||
-          activePropagationKeys?.has(aspectKey(a.to, a.from));
-        const isActive = isPropagating ||
+          activePropagationKeys?.has(aspectKey(a.to, a.from)));
+        const isActive = !opening && (isPropagating ||
                          activePlanet === a.from || activePlanet === a.to ||
                          hoveredPlanet === a.from || hoveredPlanet === a.to ||
-                         selectedPlanet === a.from || selectedPlanet === a.to;
+                         selectedPlanet === a.from || selectedPlanet === a.to);
         // Two orthogonal signals: aspect mood (harmony/tension) and effect
         // polarity (heal/harm). Aspects use the red/green of astrological
         // convention; polarity uses amber/violet — different hue families, so
@@ -350,7 +357,7 @@ export function Chart(props: ChartProps) {
       })
     : null;
 
-  const propagationLines = activePropagationKeys
+  const propagationLines = !opening && activePropagationKeys
     ? aspects.map((a) => {
         const key = aspectKey(a.from, a.to);
         if (!activePropagationKeys.has(key)) return null;
@@ -374,7 +381,7 @@ export function Chart(props: ChartProps) {
       })
     : null;
 
-  const handleClick = onPlanetClick && !passive ? onPlanetClick : undefined;
+  const handleClick = onPlanetClick && !passive && !opening ? onPlanetClick : undefined;
   // A new hover or focus supplies the preview; leaving restores the other input.
   const handleHover = canPreview ? (planet: PlanetName | null) => {
     pointerPlanet.current = planet;
@@ -450,12 +457,12 @@ export function Chart(props: ChartProps) {
       {points.map((p) => {
         const combusted = planetCombusted(p.planet);
         const unlocked = isUnlocked(p.planet);
-        const isSelected = selectedPlanet === p.planet;
-        const isActive = (allActive && !combusted) || activePlanet === p.planet;
-        const isHovered = hoveredPlanet === p.planet;
-        const isActionPulse = actionPulsePlanet === p.planet;
-        const isCombusting = combustingPlanets?.has(p.planet) ?? false;
-        const effectPolarity = effectPlanets?.get(p.planet);
+        const isSelected = !opening && selectedPlanet === p.planet;
+        const isActive = !opening && ((allActive && !combusted) || activePlanet === p.planet);
+        const isHovered = !opening && hoveredPlanet === p.planet;
+        const isActionPulse = !opening && actionPulsePlanet === p.planet;
+        const isCombusting = !opening && (combustingPlanets?.has(p.planet) ?? false);
+        const effectPolarity = opening ? undefined : effectPlanets?.get(p.planet);
         return (
           <PlanetGlyph
             key={p.planet}
@@ -469,11 +476,12 @@ export function Chart(props: ChartProps) {
             onClick={handleClick}
             onHover={handleHover}
             onFocus={handleFocus}
-            passive={passive}
+            passive={passive || !!opening}
             eligible={interactionPlanets ? interactionPlanets.has(p.planet) : !combusted}
-            invite={inviteInteraction}
+            invite={inviteInteraction && !opening}
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
+            necessityAccent={opening?.phase === "accent" && opening.entries.some((entry) => entry.planet === p.planet)}
             combusting={isCombusting}
             effectPolarity={effectPolarity}
             animationEpoch={animationEpoch}
@@ -482,6 +490,13 @@ export function Chart(props: ChartProps) {
         );
       })}
 
+      {opening?.phase === "revival" && points.map((p) =>
+        isUnlocked(p.planet) && opening.revived?.includes(p.planet) ? (
+          <circle key={`revival-${p.planet}`} cx={p.cx} cy={p.cy} r={p.glyphR + 9}
+            fill={`url(#v2-halo-${p.planet})`} className="necessity-revival" pointerEvents="none" />
+        ) : null,
+      )}
+
       {/* Arc layer: above every planet's halo, same as the badges — the arc is
           the primary read of how much a planet can still absorb, so a
           neighbour's bloom must not sit on top of it. A combusted planet has
@@ -489,7 +504,7 @@ export function Chart(props: ChartProps) {
           showing a spent track. */}
       {!hideAffliction && points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
-        const projected = projection?.deltas[p.planet];
+        const projected = opening ? undefined : projection?.deltas[p.planet];
         if (planetCombusted(p.planet) && !(projected?.polarity === "Testimony" && projected.delta > 0)) return null;
         return (
           <PlanetArc
@@ -498,7 +513,9 @@ export function Chart(props: ChartProps) {
             point={p}
             placement={chart.planets[p.planet]}
             affliction={state?.[p.planet]?.affliction ?? 0}
-            projection={projection?.deltas[p.planet]}
+            projection={opening ? undefined : projection?.deltas[p.planet]}
+            openingPhase={opening?.phase}
+            necessity={opening?.entries.find((entry) => entry.planet === p.planet)}
             guideId={side ? `arc-${side}-${p.planet.toLowerCase()}` : undefined}
           />
         );
@@ -507,7 +524,7 @@ export function Chart(props: ChartProps) {
       {/* Badge layer: above every planet's halo. Off by default — the arc
           carries this now — and kept only so the dev console can put the
           numbers back while the arc is still being trusted. */}
-      {tuning.showBadges && points.map((p) => {
+      {tuning.showBadges && !opening && points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
         return (
           <PlanetBadges
@@ -526,14 +543,23 @@ export function Chart(props: ChartProps) {
       })}
 
       {/* What is arriving here stays at the centre; the readout leaves it clear. */}
-      {incoming && <IncomingMark verb={incoming.verb} amount={incoming.amount} />}
+      {!opening && incoming && <IncomingMark verb={incoming.verb} amount={incoming.amount} />}
+
+      {opening && (
+        <g className="necessity-opening"
+          transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} pointerEvents="none"
+          role="status" aria-label="Chart opening. Click to skip.">
+          <text textAnchor="middle" className="necessity-skip" y={28}>Click to skip</text>
+        </g>
+      )}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
           chart, the panel sits on top — it's the focused read. */}
-      {statsPanelPlanet && (
+      {!opening && statsPanelPlanet && (
         <PlanetStatsPanel
           chart={chart}
           planet={statsPanelPlanet}
+          necessity={necessity?.find((entry) => entry.planet === statsPanelPlanet)}
           affliction={state?.[statsPanelPlanet]?.affliction ?? 0}
           cx={panelPlacement.cx}
           cy={panelPlacement.cy}
@@ -559,7 +585,7 @@ function PlanetGlyph({
   point, combusted, ghost,
   selected, active, hovered,
   onClick, onHover, onFocus, passive, eligible, invite, ringVerb,
-  actionPulse, combusting,
+  actionPulse, necessityAccent, combusting,
   effectPolarity,
   animationEpoch,
   guideId,
@@ -579,6 +605,7 @@ function PlanetGlyph({
   invite: boolean;
   ringVerb?: Polarity | null;
   actionPulse: boolean;
+  necessityAccent?: boolean;
   combusting: boolean;
   effectPolarity?: Polarity;
   animationEpoch?: number;
@@ -627,7 +654,7 @@ function PlanetGlyph({
   // envelope (.anim-combust) lives on the inner glyph wrapper so the burst /
   // ripple overlays don't desaturate with it.
   const epoch = animationEpoch ?? 0;
-  const outerClass = actionPulse ? "anim-action-glow" : undefined;
+  const outerClass = necessityAccent ? "necessity-accent" : actionPulse ? "anim-action-glow" : undefined;
   const glyphClass = combusted || combusting ? "anim-combust" : undefined;
 
   const ringShown = active || selected || ((invite || focused) && interactive);
@@ -675,7 +702,8 @@ function PlanetGlyph({
         setFocused(false);
         if (interactive) onFocus?.(null);
       }}
-      style={{ cursor: interactive ? "pointer" : "default", color: c }}
+      style={{ cursor: interactive ? "pointer" : "default", color: c,
+        animationDuration: necessityAccent ? `${NECESSITY_ANIMATION_TIMINGS.map.accent}ms` : undefined }}
       className={outerClass}
     >
       {active && tuning.showGlow && (
@@ -791,13 +819,15 @@ function PlanetGlyph({
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  tuning, point, placement, affliction, projection, guideId,
+  tuning, point, placement, affliction, projection, guideId, openingPhase, necessity,
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
   placement: PlanetPlacement;
   affliction: number;
   projection?: ProjectionChip;
+  openingPhase?: NecessityAnimationPresentation["phase"];
+  necessity?: NecessityEntry;
   guideId?: string;
 }) {
   const ceiling = combustionCeiling(placement);
@@ -820,7 +850,17 @@ function PlanetArc({
   // rather than a comparison of two lengths. The predicate is `wouldCombust`
   // itself, not a second reading of the same arithmetic.
   let diff: { from: number; to: number; color: string } | null = null;
-  if (projection) {
+  if (necessity && openingPhase && openingPhase !== "revival" && openingPhase !== "accent") {
+    // Before settlement the base arc still holds its pre-necessity state.
+    // Old records lack the raw draw; their actual amount is all we can show.
+    const from = openingPhase === "settle" ? Math.max(0, spent - necessity.amount) : spent;
+    const draw = necessity.draw ?? necessity.amount;
+    const amount = openingPhase === "necessity" ? draw
+      : openingPhase === "fortune" && necessity.draw !== undefined
+        ? draw / (necessity.halved ? 2 : 1) : necessity.amount;
+    const to = clamp(from + amount, from, Math.max(from, ceiling - 1));
+    if (to > from) diff = { from, to, color: VALENCE_COLOR.Affliction };
+  } else if (projection) {
     const harm = projection.polarity !== "Testimony";
     const signed = harm ? Math.abs(projection.delta) : -Math.abs(projection.delta);
     const projected = clamp(spent + signed, 0, ceiling);
@@ -850,7 +890,8 @@ function PlanetArc({
         // `color` feeds the class's currentColor drop-shadow, so the glow
         // follows the verb — and the ember, when the blow is fatal.
         <g
-          className="arc-diff"
+          key={openingPhase ?? "projection"}
+          className={`arc-diff ${openingPhase ? `necessity-arc necessity-${openingPhase}` : ""}`}
           style={{
             color: diff.color,
             "--arc-diff-glow": `${tuning.arcDiffGlow}px`,

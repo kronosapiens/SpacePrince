@@ -10,12 +10,13 @@ import { beginRun } from "@/game/run";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.useFakeTimers();
   localStorage.clear();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
@@ -27,6 +28,8 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   container.remove();
+  vi.clearAllTimers();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   localStorage.clear();
 });
@@ -58,6 +61,7 @@ describe("map feedback", () => {
   it.each(["Enter", " "])("travels on the first %j activation and ignores key repeat", (key) => {
     const { prince, node, next } = setup();
     act(() => root.render(<GameTest path="/play" />));
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     press(node, key, true);
     expect(cues()).toEqual([]);
     expect(loadPrince()).toEqual(prince);
@@ -70,6 +74,7 @@ describe("map feedback", () => {
   it("travels on the first click with one commit cue", () => {
     const { node, next } = setup();
     act(() => root.render(<GameTest path="/play" />));
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click(node);
     expect(cues()).toEqual(["commit"]);
     expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
@@ -126,6 +131,7 @@ describe("map feedback", () => {
   it("never sounds a commitment while the map guide blocks entering a node", () => {
     const { prince, node } = setup();
     act(() => root.render(<GameTest path="/play" />));
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click('.screen-help-button');
     vi.mocked(playUISound).mockClear();
     click(node);

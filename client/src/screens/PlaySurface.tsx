@@ -3,6 +3,8 @@ import { InfoCardHost } from "@/components/InfoCardHost";
 import { StartScreen } from "./StartScreen";
 import { MapScreen } from "./MapScreen";
 import { EncounterScreen } from "./EncounterScreen";
+import { useOutletContext } from "react-router-dom";
+import type { GameLayoutContext } from "./GameLayout";
 
 /**
  * The whole game lives at /play as one **state-derived surface**: the screen is
@@ -14,6 +16,7 @@ import { EncounterScreen } from "./EncounterScreen";
 export function PlaySurface() {
   const prince = usePrince();
   const run = useActiveRun();
+  const { openingActive } = useOutletContext<GameLayoutContext>();
   if (!prince || !run) return <StartScreen />;
   if (run.encounter) return <EncounterScreen />;
   // The map is the stable surface — queued info cards (e.g. a planet
@@ -21,7 +24,7 @@ export function PlaySurface() {
   return (
     <>
       <MapScreen />
-      <InfoCardHost />
+      {!openingActive && <InfoCardHost />}
     </>
   );
 }

@@ -90,8 +90,13 @@ describe("Prince storage", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 7, prince.numEncounters);
     run.encounter = beginCombatEncounter({ run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters });
+    delete run.encounter.necessity;
+    for (const entry of run.map.boundary!.necessity) delete entry.draw;
     prince.runs = [run];
-    const legacy = JSON.parse(JSON.stringify(prince).replaceAll('"necessity":', '"barrage":'));
+    const legacy = JSON.parse(JSON.stringify(prince));
+    const boundary = legacy.runs[0].map.boundary;
+    boundary.barrage = boundary.necessity;
+    delete boundary.necessity;
     localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
     expect(loadPrince()).toEqual(prince);
     savePrince(loadPrince()!);

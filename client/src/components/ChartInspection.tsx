@@ -3,7 +3,7 @@ import { Chart, type ChartProps } from "@/components/Chart";
 import { playUISound } from "@/audio/engine";
 import type { Chart as ChartType, PlanetName, SideState } from "@/game/types";
 
-export interface ChartInspectionProps extends Pick<ChartProps, "activePlanet" | "hideAffliction"> {
+export interface ChartInspectionProps extends Pick<ChartProps, "activePlanet" | "hideAffliction" | "opening" | "necessity"> {
   chart: ChartType;
   state?: SideState;
   unlockedPlanets: PlanetName[];

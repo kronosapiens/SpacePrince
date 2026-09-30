@@ -12,7 +12,7 @@ import { GameTest } from "./game-layout";
 import { AFFLICTION_ARC_R } from "@/svg/viewbox";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
   setTheme: vi.fn(), playUISound: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(),
 }));
 
@@ -68,6 +68,7 @@ describe("shared player chart", () => {
     savePrince(prince);
     act(() => root.render(<GameTest path="/play" />));
 
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     const chart = playerChart();
     const positions = planetPositions();
     const expectStableChart = () => {
@@ -79,6 +80,7 @@ describe("shared player chart", () => {
     expectStableChart();
     expect(element('[data-guide="chart-other"] .chart-svg')).not.toBe(chart);
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(2);
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click('[data-guide="planet-self-moon"]');
     click('[data-guide="action-testimony"]');
     const combat = loadPrince()!.runs[0]!.encounter;

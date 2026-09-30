@@ -498,27 +498,6 @@
   min-height: 280px;
   display: flex;
 }
-/* Map-boundary record (MECHANICS §11.3) — what the crossing did, shown while
-   standing at the root, beneath the route map. */
-.map-boundary {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
-.map-boundary-line {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  font-family: var(--sans);
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  color: var(--mist);
-}
-.map-boundary-glyph {
-  font-family: 'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif;
-  font-size: 14px;
-}
 @media (max-width: 899px) {
   .map-content { height: auto; overflow: visible; }
   .map-diagram-wrap { flex: none; height: min(600px, 75svh); min-height: 0; }
@@ -2192,4 +2171,15 @@ body:has(.guide-overlay) .dev-keys { display: none; }
   color: var(--bone);
   font-family: var(--sans);
   padding: 4px 6px;
+}
+
+/* Opening words occupy the chart's centre without reserving layout space. */
+.necessity-skip { font-family: var(--sans); font-size: 14px; fill: var(--mist); }
+.ps-necessity {
+  margin-top: 16px;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--mist);
+  text-align: center;
 }

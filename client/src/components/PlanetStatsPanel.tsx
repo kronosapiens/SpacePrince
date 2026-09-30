@@ -1,6 +1,6 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CHART_CENTER, OUTER_RING_R } from "@/svg/viewbox";
-import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
+import type { Chart, NecessityEntry, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
 import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
@@ -20,6 +20,7 @@ export interface PlanetStatsActions {
 interface PlanetStatsPanelProps {
   chart: Chart;
   planet: PlanetName;
+  necessity?: NecessityEntry;
   /** Affliction taken so far. The title line shows what's left of Resolve
    *  rather than this directly, so it reads as the arc's bright span — the
    *  chart carries that geometrically and nothing else states it as a number. */
@@ -82,6 +83,7 @@ type BlurbKey = keyof PlanetStats | "core" | "placement";
 export function PlanetStatsPanel({
   chart,
   planet,
+  necessity,
   affliction,
   cx,
   cy,
@@ -181,6 +183,11 @@ export function PlanetStatsPanel({
           {study ? (
             <div className="ps-study">
               <div className="ps-gloss">{PLANET_GLOSS[planet]}</div>
+              {necessity && (
+                <div className="ps-necessity" aria-label="Opening result">
+                  Necessity: +{necessity.amount}{necessity.halved ? " · halved by Fortune" : ""}
+                </div>
+              )}
               <table className="ps-table">
                 {/* Named columns so the widths in layout.css can follow each
                     column's own content rather than splitting evenly. */}

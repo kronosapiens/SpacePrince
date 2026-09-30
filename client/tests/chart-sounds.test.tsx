@@ -11,12 +11,13 @@ import { beginRun } from "@/game/run";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.useFakeTimers();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
   container = document.createElement("div");
@@ -26,6 +27,8 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   container.remove();
+  vi.clearAllTimers();
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -107,6 +110,7 @@ describe("chart feedback", () => {
       <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
       onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
     </PlayerChartLayout>));
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click(moon);
     click('[data-guide="action-testimony"]');
     expect(onCommitTurn).toHaveBeenCalledTimes(1);

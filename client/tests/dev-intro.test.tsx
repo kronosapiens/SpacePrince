@@ -10,7 +10,7 @@ import { PLANET_INTRODUCTIONS } from "@/copy/planet-introductions";
 import { createStubPrince } from "./fixtures";
 
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
-vi.mock("@/audio/engine", () => ({
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
   currentTheme: () => null,
   subscribeTheme: () => () => {},
   subscribeVolume: () => () => {},

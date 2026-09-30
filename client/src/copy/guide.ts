@@ -112,9 +112,9 @@ export const GUIDE_COPY = {
         label: "Map {n} of VII",
         body: "Each map adds one turn to encounters. Your run ends after seven maps, or when all your planets combust.",
       },
-      boundary: {
-        label: "Map opening",
-        body: "Every map, including the first, opens with necessity: 12, 24, or 36 affliction per available planet. Fortune may halve it; the amount stops short of combustion. These results are already applied.",
+      necessity: {
+        label: "Necessity",
+        body: "Every map opens with 12, 24, or 36 affliction per available planet. Fortune may halve it; the amount stops short of combustion. The arcs show it arriving. Inspect a planet and open its study notes to review the result.",
       },
     },
   },

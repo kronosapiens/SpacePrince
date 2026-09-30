@@ -13,9 +13,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { mulberry32, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
-import { ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { PLANET_PRIMARY } from "@/svg/palette";
-import { PLANET_GLYPH } from "@/svg/glyphs";
+import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickScenario } from "@/data/narrative-scenarios";
@@ -34,7 +32,7 @@ export function MapScreen() {
   const rolloverMap = useRolloverMap();
   const startRun = useStartRun();
   const { setActive } = useActivePlanet();
-  const { guideOpen, setGuideOpen } = useOutletContext<GameLayoutContext>();
+  const { guideOpen, setGuideOpen, openingActive } = useOutletContext<GameLayoutContext>();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
   const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numEncounters);
 
@@ -62,7 +60,7 @@ export function MapScreen() {
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
-      if (!run || !prince || runOver) return;
+      if (!run || !prince || runOver || openingActive) return;
       let nextRun: Run = { ...run };
       // Content is pre-rolled at map creation; the dev force cheats re-roll
       // the node here so "the next node you enter" is the forced kind. The
@@ -125,7 +123,7 @@ export function MapScreen() {
       dispatch({ kind: "commitRun", run: nextRun });
       playUISound("commit");
     },
-    [run, prince, runOver, settings, playerUnlocked, dispatch],
+    [run, prince, runOver, openingActive, settings, playerUnlocked, dispatch],
   );
 
   useEffect(() => {
@@ -145,14 +143,6 @@ export function MapScreen() {
     playUISound("commit");
   };
 
-  // The boundary record shows only while standing at the root — what the
-  // map opening did, before the first step commits.
-  const boundary = run.map.boundary;
-  const showBoundary =
-    !!boundary &&
-    run.map.currentNodeId === ROOT_NODE_ID &&
-    (boundary.uncombusts.length > 0 || boundary.necessity.length > 0);
-
   return (
     <>
       <MapGuide
@@ -161,40 +151,17 @@ export function MapScreen() {
         map={run.map}
         examplePlanet={playerUnlocked[0] ?? "Moon"}
         mapsCompleted={mapIndex}
-        showBoundary={showBoundary}
-        onOpen={() => { setGuidePhase("map"); setGuideOpen(true); }}
+        onOpen={() => { if (!openingActive) { setGuidePhase("map"); setGuideOpen(true); } }}
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
       <div className="map-content anim-surface-in">
         <div className="map-diagram-wrap">
-          <MapDiagram map={run.map} onSelectNode={runOver ? undefined : guideOpen ? noop : handleNodeSelect} />
+          <MapDiagram map={run.map} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
         <div className="map-index" data-guide="map-index">
           <span className="map-index-v">{ROMAN[mapIndex]}</span>
         </div>
-        {showBoundary && boundary && (
-          <div className="map-boundary" data-guide="map-boundary">
-            <span className="eyebrow">MAP {ROMAN[mapIndex]} · NECESSITY</span>
-            {boundary.uncombusts.map((u) => (
-              <div key={`u-${u.planet}`} className="map-boundary-line">
-                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[u.planet] }}>
-                  {PLANET_GLYPH[u.planet]}
-                </span>
-                {u.success ? `${u.planet} uncombusts` : `${u.planet} stays combust`} ·{" "}
-                {Math.round(u.chance * 100)}%
-              </div>
-            ))}
-            {boundary.necessity.map((n) => (
-              <div key={`n-${n.planet}`} className="map-boundary-line">
-                <span className="map-boundary-glyph" style={{ color: PLANET_PRIMARY[n.planet] }}>
-                  {PLANET_GLYPH[n.planet]}
-                </span>
-                {n.planet} +{n.amount} affliction{n.halved ? " · halved by Fortune" : ""}
-              </div>
-            ))}
-          </div>
-        )}
         {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>New Run</BeginButton>}
       </div>
     </>

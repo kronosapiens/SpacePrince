@@ -11,7 +11,7 @@ import { playUISound, setMusicVolume, setSoundVolume, nextTheme } from "@/audio/
 
 const volume = vi.hoisted(() => ({ music: 1, sound: 1, listeners: new Set<() => void>() }));
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
-vi.mock("@/audio/engine", () => ({
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
   playUISound: vi.fn(),
   currentTheme: () => "Moon",
   subscribeTheme: () => () => {},

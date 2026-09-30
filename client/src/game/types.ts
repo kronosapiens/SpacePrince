@@ -98,6 +98,8 @@ export interface CombatEncounter {
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
+  /** Opening rolls; absent on encounters saved before necessity animation. */
+  necessity?: NecessityEntry[];
   /** Fielded planets — the roster both sides draw from, mirroring the player's
    *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
    *  placements; only these are sent and rendered solid. */
@@ -162,6 +164,14 @@ export interface NodeOutcome {
   combusts: PlanetName[];
 }
 
+export interface NecessityEntry {
+  planet: PlanetName;
+  amount: number;
+  halved: boolean;
+  /** Original tier, before Fortune and the combustion cap; absent in old saves. */
+  draw?: number;
+}
+
 /** What the map boundary did to the player's chart, rolled
  *  from the map seed at creation and shown on entry. Two steps, in order:
  *  uncombust rolls for combusted planets, then necessity on lit ones. */
@@ -169,7 +179,7 @@ export interface MapBoundary {
   /** One entry per planet combusted at the crossing; failed rolls included. */
   uncombusts: Array<{ planet: PlanetName; chance: number; success: boolean }>;
   /** Planets necessity actually wounded (zero-amount rolls are omitted). */
-  necessity: Array<{ planet: PlanetName; amount: number; halved: boolean }>;
+  necessity: NecessityEntry[];
 }
 
 export interface MapState {

@@ -26,7 +26,7 @@ export function applyNecessity(
     ));
     if (amount > 0) {
       ps.affliction += amount;
-      necessity.push({ planet, amount, halved });
+      necessity.push({ planet, amount, halved, draw });
     }
   }
   return { state: next, necessity };

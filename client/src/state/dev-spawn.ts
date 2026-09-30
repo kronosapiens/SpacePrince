@@ -93,7 +93,7 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
     const ceiling = combustionCeiling(fresh.opponentChart.planets[acting]);
     opponentState[acting] = { affliction: Math.min(opponentState[acting].affliction, ceiling - 1) };
   }
-  const encounter: CombatEncounter = { ...fresh, turnIndex, opponentState };
+  const encounter: CombatEncounter = { ...fresh, turnIndex, opponentState, necessity: undefined };
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), roster),

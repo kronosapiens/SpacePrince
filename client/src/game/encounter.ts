@@ -75,11 +75,13 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   // Separate stream for the necessity so its draws don't perturb the
   // turn-sequence rolls above.
   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
+  const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng);
   return {
     kind: "combat",
     id: `enc_combat_${run.id}_${acceptedSeed}`,
     opponentChart,
-    opponentState: applyNecessity(opponentChart, blankSideState(), roster, stateRng).state,
+    opponentState: opening.state,
+    necessity: opening.necessity,
     roster,
     sequence,
     opponentActions,

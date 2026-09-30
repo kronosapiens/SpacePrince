@@ -26,8 +26,6 @@ interface MapGuideProps {
   examplePlanet: PlanetName;
   /** Maps already crossed — the index the screen prints under the diagram. */
   mapsCompleted: number;
-  /** The screen is showing the map's opening record below the map. */
-  showBoundary: boolean;
   onOpen: () => void;
   onClose: () => void;
   onPhaseChange: (phase: MapGuidePhase) => void;
@@ -75,7 +73,6 @@ export function MapGuide({
   map,
   examplePlanet,
   mapsCompleted,
-  showBoundary,
   onOpen,
   onClose,
   onPhaseChange,
@@ -151,17 +148,17 @@ export function MapGuide({
       label: fillLabel(COPY.notes.index.label, { n: ROMAN[mapsCompleted] ?? mapsCompleted + 1 }),
       body: <TermText text={COPY.notes.index.body} />,
     });
-    if (showBoundary) {
+    if (map.boundary) {
       chartNotes.push({
-        key: "boundary",
-        anchor: "map-boundary",
-        placement: "left",
-        label: COPY.notes.boundary.label,
-        body: <TermText text={COPY.notes.boundary.body} />,
+        key: "necessity",
+        anchor: planetAnchor("self", examplePlanet),
+        placement: "right",
+        label: COPY.notes.necessity.label,
+        body: <TermText text={COPY.notes.necessity.body} />,
       });
     }
     return chartNotes;
-  }, [phase, map, examplePlanet, mapsCompleted, showBoundary]);
+  }, [phase, map, examplePlanet, mapsCompleted]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // The chart's outer ring sits at 96% of its box; the circle clears it.

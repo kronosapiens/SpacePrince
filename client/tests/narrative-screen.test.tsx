@@ -14,7 +14,7 @@ vi.hoisted(() => {
   // Chart's optional numeric badges measure text through canvas.
   HTMLCanvasElement.prototype.getContext = () => null;
 });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;

@@ -153,16 +153,18 @@ function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
+const FX_VOICE = {
+  oscillator: { type: "sine" as const },
+  envelope: { attack: 0.02, decay: 0.08, sustain: 0.5, release: 0.6 },
+  volume: -10,
+};
+
 /** Shared soft voice for effects, propagation, and the star. */
 function fxSynth(): AnyInstrument | null {
   if (!T || !reverb) return null;
   const existing = instruments.get("_fx");
   if (existing) return existing;
-  const inst = new T.PolySynth(T.Synth, {
-    oscillator: { type: "sine" },
-    envelope: { attack: 0.02, decay: 0.08, sustain: 0.5, release: 0.6 },
-    volume: -10,
-  }).connect(reverb);
+  const inst = new T.PolySynth(T.Synth, FX_VOICE).connect(reverb);
   instruments.set("_fx", inst);
   return inst;
 }
@@ -222,6 +224,28 @@ export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeS
   } else {
     fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
   }
+}
+
+/** One sustained planetary voice; its release fits inside the visual cadence. */
+export function playNecessityNote(ruler: PlanetName, target: PlanetName, durationSeconds: number): () => void {
+  if (!T || !soundOutput || soundVolume === 0 || T.getContext().state !== "running") return () => {};
+  const release = Math.min(0.15, durationSeconds / 2);
+  // A dedicated, dry voice can be silenced without cutting other effects or leaving a reverb tail.
+  const voice = new T.Synth({
+    ...FX_VOICE,
+    envelope: { ...FX_VOICE.envelope, release },
+  }).connect(soundOutput);
+  // Match the visual accent and disposal timer without the score's scheduling lookahead.
+  voice.triggerAttackRelease(midiToFreq(strikeMidi(ruler, target)), durationSeconds - release, T.immediate(), 0.24);
+  let disposed = false;
+  const cancel = () => {
+    window.clearTimeout(timer);
+    if (disposed) return;
+    disposed = true;
+    voice.dispose();
+  };
+  const timer = window.setTimeout(cancel, durationSeconds * 1000);
+  return cancel;
 }
 
 /** A short pink-noise breath accompanies the combustion strike. */

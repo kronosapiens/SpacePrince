@@ -5,6 +5,7 @@ const tone = vi.hoisted(() => ({
   time: 1,
   createSynth: vi.fn(),
   trigger: vi.fn(),
+  voices: [] as { trigger: ReturnType<typeof vi.fn>; dispose: ReturnType<typeof vi.fn>; release: number }[],
 }));
 
 vi.mock("tone", () => {
@@ -26,9 +27,17 @@ vi.mock("tone", () => {
     getDestination: () => ({ volume: { value: 0 } }),
     getTransport: () => ({ start: vi.fn() }),
     now: () => tone.time,
+    immediate: () => tone.time - 0.1,
     Reverb: AudioNode,
     Gain: AudioNode,
-    Synth: class {},
+    Synth: class extends AudioNode {
+      triggerAttackRelease = vi.fn();
+      dispose = vi.fn();
+      constructor(options: { envelope: { release: number } }) {
+        super();
+        tone.voices.push({ trigger: this.triggerAttackRelease, dispose: this.dispose, release: options.envelope.release });
+      }
+    },
     PolySynth,
   };
 });
@@ -42,6 +51,7 @@ beforeEach(async () => {
   localStorage.clear();
   tone.state = "running";
   tone.time = 1;
+  tone.voices = [];
   engine = await import("@/audio/engine");
 });
 
@@ -111,5 +121,59 @@ describe("UI audio", () => {
     tone.time += 0.1;
     engine.playUISound("hover");
     expect(tone.trigger).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("necessity audio", () => {
+  it("uses the ruler mode and target register with release inside the duration", async () => {
+    const { strikeMidi } = await import("@/audio/pitches");
+    const { PLANETS } = await import("@/game/data");
+    await engine.ensureAudio();
+    engine.setMusicVolume(0);
+    for (const planet of PLANETS) {
+      engine.playNecessityNote("Saturn", planet, 0.95);
+      const voice = tone.voices[tone.voices.length - 1]!;
+      expect(voice.trigger).toHaveBeenCalledExactlyOnceWith(
+        440 * 2 ** ((strikeMidi("Saturn", planet) - 69) / 12),
+        0.95 - voice.release, 0.9, 0.24,
+      );
+      vi.advanceTimersByTime(949);
+      expect(voice.dispose).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1);
+      expect(voice.dispose).toHaveBeenCalledOnce();
+    }
+  });
+
+  it("cancels only its own voice and clears scheduled disposal", async () => {
+    await engine.ensureAudio();
+    engine.playStrike("Sun", "Mars", "landing");
+    const cancel = engine.playNecessityNote("Sun", "Moon", 0.95);
+    const first = tone.voices[0]!;
+    engine.playNecessityNote("Sun", "Venus", 0.95);
+    const second = tone.voices[1]!;
+    cancel();
+    cancel();
+    expect(first.dispose).toHaveBeenCalledOnce();
+    expect(second.dispose).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(1);
+    engine.playStrike("Sun", "Mars", "landing");
+    expect(tone.createSynth).toHaveBeenCalledOnce();
+    expect(tone.trigger).toHaveBeenCalledTimes(2);
+    vi.advanceTimersByTime(950);
+    expect(first.dispose).toHaveBeenCalledOnce();
+    expect(second.dispose).toHaveBeenCalledOnce();
+  });
+
+  it("returns safe cancellation without queuing muted, locked, or suspended notes", async () => {
+    engine.playNecessityNote("Sun", "Moon", 0.95)();
+    await engine.ensureAudio();
+    tone.state = "suspended";
+    engine.playNecessityNote("Sun", "Moon", 0.95)();
+    tone.state = "running";
+    engine.setSoundVolume(0);
+    engine.playNecessityNote("Sun", "Moon", 0.95)();
+    engine.setSoundVolume(1);
+    vi.runAllTimers();
+    expect(tone.voices).toHaveLength(0);
   });
 });

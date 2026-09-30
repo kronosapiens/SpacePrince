@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { PlanetBands } from "@/components/PlanetBands";
 import { SettingsMenu } from "@/components/SettingsMenu";
 import { PLANETS } from "@/game/data";
-import { seededChart } from "@/game/chart";
+import { blankSideState, seededChart } from "@/game/chart";
+import { ROOT_NODE_ID } from "@/game/map-gen";
+import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { randomSeed } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
@@ -16,6 +18,7 @@ export interface GameLayoutContext {
   casting: ReturnType<typeof useCasting>;
   guideOpen: boolean;
   setGuideOpen: (open: boolean) => void;
+  openingActive: boolean;
 }
 
 const RECHART_INTERVAL_MS = 3000;
@@ -43,7 +46,17 @@ export function GameLayout() {
   const chart = isCasting ? casting.chart ?? sample : prince?.chart ?? sample;
   const unlocked = isCasting ? casting.revealedPlanets
     : prince ? unlockedPlanets(prince.numEncounters, loadDevSettings().unlockAll) : PLANETS;
-  const context: GameLayoutContext = { casting, guideOpen, setGuideOpen };
+  const emptyState = useMemo(blankSideState, []);
+  const opening = useNecessityAnimation({
+    id: run ? `${run.id}/${run.map.id}` : "",
+    chart,
+    state: run?.state ?? emptyState,
+    necessity: run?.map.boundary?.necessity,
+    uncombusts: run?.map.boundary?.uncombusts,
+    enabled: !isTitle && !isCasting && !isEncounter && run?.map.currentNodeId === ROOT_NODE_ID,
+    kind: "map",
+  });
+  const context: GameLayoutContext = { casting, guideOpen, setGuideOpen, openingActive: opening.active };
 
   const surface = isTitle ? "title" : isCasting ? "mint-screen" : run?.encounter?.kind ?? "map-screen";
 
@@ -52,10 +65,12 @@ export function GameLayout() {
       <PlayerChartLayout
         className={surface}
         chart={chart}
-        state={isCasting ? undefined : run?.state}
+        state={isCasting ? undefined : opening.state}
+        opening={opening.opening}
+        necessity={run?.map.boundary?.necessity}
         unlockedPlanets={unlocked}
         mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
-        disabled={!isTitle && guideOpen}
+        disabled={opening.active || (!isTitle && guideOpen)}
         activePlanet={isCasting && !casting.ghosted ? casting.currentRevealing : null}
         hideAffliction={isTitle || isCasting}
       >

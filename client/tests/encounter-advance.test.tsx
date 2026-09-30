@@ -12,7 +12,7 @@ import { playCombust, playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
 vi.mock("@/screens/MapScreen", () => ({ MapScreen: () => <div data-screen="map" /> }));
 vi.mock("@/components/InfoCardHost", () => ({
   InfoCardHost: () => {
@@ -57,6 +57,10 @@ function combat(turns = 1, count = 64) {
 function mount(prince: ReturnType<typeof createStubPrince>) {
   savePrince(prince);
   act(() => root!.render(<GameTest path="/play" />));
+  if (container.querySelector(".necessity-opening")) {
+    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+  }
 }
 const get = (selector: string) => {
   const el = container.querySelector(selector);
@@ -134,7 +138,10 @@ describe("encounter advancement", () => {
       planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
-    advanceTime(5000);
+    expect(container.querySelector(".necessity-opening")).not.toBeNull();
+    expect(container.querySelector("[data-intro]")).toBeNull();
+    click(get(".necessity-opening"));
+    expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(get("[data-intro]").textContent).toBe("Mercury");
     expect(loadPrince()!.numEncounters).toBe(1);
@@ -148,6 +155,9 @@ describe("encounter advancement", () => {
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     expect(container.querySelector(".combat")).not.toBeNull();
     expect(container.querySelector(".combat.is-resolved")).toBeNull();
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(container.querySelector(".necessity-arc")).toBeNull();
+    expect(loadPrince()!.runs[0]!.encounter).toMatchObject({ turnIndex: 1 });
     expect(loadPrince()!.numEncounters).toBe(64);
   });
 

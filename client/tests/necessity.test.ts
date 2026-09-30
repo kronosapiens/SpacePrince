@@ -21,7 +21,7 @@ describe("necessity", () => {
         const result = applyNecessity(chart, blankSideState(), ["Moon"], rng);
         const amount = (tier + 1) * (fortunate ? 6 : 12);
         expect(result.state.Moon.affliction).toBe(amount);
-        expect(result.necessity).toEqual([{ planet: "Moon", amount, halved: fortunate }]);
+        expect(result.necessity).toEqual([{ planet: "Moon", amount, halved: fortunate, draw: (tier + 1) * 12 }]);
         expect(rng).toHaveBeenCalledTimes(2);
       }
     }
@@ -37,8 +37,16 @@ describe("necessity", () => {
       expect(result.state.Moon.affliction).toBe(expected);
       expect(state.Moon.affliction).toBe(initial);
       expect(result.necessity).toEqual(expected > initial
-        ? [{ planet: "Moon", amount: expected - initial, halved: false }] : []);
+        ? [{ planet: "Moon", amount: expected - initial, halved: false, draw: 36 }] : []);
     }
+  });
+
+  it("retains the raw Fortune draw when the final amount is capped", () => {
+    const state = blankSideState();
+    state.Moon.affliction = combustionCeiling(chart.planets.Moon) - 2;
+    const rng = vi.fn().mockReturnValueOnce(0.999).mockReturnValueOnce(0);
+    const result = applyNecessity(chart, state, ["Moon"], rng);
+    expect(result.necessity).toEqual([{ planet: "Moon", amount: 1, halved: true, draw: 36 }]);
   });
 
   it("skips combusted and unfielded planets without consuming their rolls", () => {
@@ -61,8 +69,10 @@ describe("necessity", () => {
       mulberry32(hashString(`${mapSeed}_boundary`))).state);
     for (const encounterIdSeed of [13, 99]) {
       const enc = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 32, encounterIdSeed });
-      expect(enc.opponentState).toEqual(applyNecessity(enc.opponentChart, blankSideState(), roster,
-        mulberry32(hashString(`${encounterIdSeed}_affliction`))).state);
+      const opening = applyNecessity(enc.opponentChart, blankSideState(), roster,
+        mulberry32(hashString(`${encounterIdSeed}_affliction`)));
+      expect(enc.opponentState).toEqual(opening.state);
+      expect(enc.necessity).toEqual(opening.necessity);
       expect({ sequence: enc.sequence, opponentActions: enc.opponentActions })
         .toEqual(rollOpponentTurns(enc.opponentChart, roster, mulberry32(encounterIdSeed), 1));
       expect(beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 32, encounterIdSeed })).toEqual(enc);

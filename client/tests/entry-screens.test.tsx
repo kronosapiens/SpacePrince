@@ -13,7 +13,7 @@ import { PRIMER_FRAMING } from "@/copy/primer";
 import { playUISound, setTheme } from "@/audio/engine";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -64,6 +64,11 @@ function input(selector: string, value: string) {
   });
 }
 
+function finishOpening() {
+  act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  expect(container.querySelector(".necessity-opening")).toBeNull();
+}
+
 function planetPositions() {
   return [...container.querySelectorAll('.chart-svg text')]
     .filter((text) => Object.values(PLANET_GLYPH).includes(text.textContent ?? ""))
@@ -71,6 +76,37 @@ function planetPositions() {
 }
 
 describe("entry screens", () => {
+  it("skips the chart opening without traveling on the same click and retains its results in study", () => {
+    const prince = createStubPrince();
+    const run = beginRun(prince.chart, 42, prince.numEncounters);
+    prince.runs = [run];
+    savePrince(prince);
+    act(() => root.render(<GameTest path="/play" />));
+    const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+    const node = `[data-guide="node-${next}"]`;
+    const record = run.map.boundary!.necessity.find((entry) => entry.planet === "Moon")!;
+
+    expect(container.querySelector(".map-boundary")).toBeNull();
+    expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("Click to skip");
+    expect(container.querySelector(".necessity-accent")).not.toBeNull();
+    expect(container.querySelector(".necessity-arc")).toBeNull();
+    expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
+    click(element(node));
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(loadPrince()).toEqual(prince);
+
+    expect(element(node).closest('[role="button"]')).not.toBeNull();
+    expect(loadPrince()).toEqual(prince);
+    click(element('[data-guide="planet-self-moon"]'));
+    click(element('[aria-label="Study Moon"]'));
+    expect(element(".ps-necessity").textContent).toBe(
+      `Necessity: +${record.amount}${record.halved ? " · halved by Fortune" : ""}`,
+    );
+    click(element(node));
+    expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
+    expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
+  });
+
   it("keeps one chart through a live casting preview, the ceremony, and entry to Map", () => {
     act(() => root.render(<GameTest />));
     const chart = element(".chart-svg");
@@ -119,7 +155,10 @@ describe("entry screens", () => {
     expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numEncounters).state);
     expect(first.state.Moon.affliction).toBeGreaterThan(0);
     expect(first.map.boundary!.necessity.map((entry) => entry.planet)).toEqual(["Moon"]);
-    expect(container.textContent).toContain("MAP I · NECESSITY");
+    expect(container.querySelector(".map-boundary")).toBeNull();
+    expect(element(".map-screen .chart-svg .necessity-opening").textContent).toBe("Click to skip");
+    expect(container.querySelector(".necessity-title")).toBeNull();
+    finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
     expect(element(".ps-name").textContent).toContain("MOON");
   });
@@ -131,6 +170,7 @@ describe("entry screens", () => {
     click(element(".begin-btn"));
     act(() => vi.advanceTimersByTime(420));
     expect(element(".map-screen .chart-svg")).toBe(chart);
+    finishOpening();
     expect(element(".ps-name").textContent).toContain("MOON");
   });
 
@@ -160,6 +200,7 @@ describe("entry screens", () => {
 
   it("inspects knocked-out planets safely and enters a route on its first click", () => {
     const prince = mount("map");
+    finishOpening();
     act(() => element('[role="button"][aria-label="Moon"]').dispatchEvent(
       new KeyboardEvent("keydown", { key: " ", bubbles: true }),
     ));
@@ -202,6 +243,7 @@ describe("entry screens", () => {
     click(node);
     act(() => node.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })));
     expect(loadPrince()).toEqual(prince);
+    finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
     expect(element(".ps-ratio").textContent).toBe(`Resolve0/${combustionCeiling(prince.chart.planets.Moon)}`);
 
@@ -215,7 +257,9 @@ describe("entry screens", () => {
     const fresh = restarted.runs[1]!;
     expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numEncounters).state);
     expect(fresh.state.Moon.affliction).toBeGreaterThan(0);
-    expect(container.textContent).toContain("NECESSITY");
+    expect(element(".necessity-opening").textContent).toBe("Click to skip");
+    expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
+    finishOpening();
     expect(restarted.runs[1]!.light).toBe(0);
     expect(container.querySelector(".begin-btn")).toBeNull();
     expect(element(".map-index-v").textContent).toBe("I");

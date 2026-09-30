@@ -7,7 +7,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
-vi.mock("@/audio/engine", () => ({ setTheme: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
 vi.mock("@/components/Chart", () => ({ Chart: () => null }));
 vi.mock("@/components/PlanetBands", () => ({ PlanetBands: () => null }));
 vi.mock("@/assets/cities.json", () => ({ default: [
