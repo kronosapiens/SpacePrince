@@ -22,7 +22,7 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 ## Phase 0 — Make the loop true
 
-- [x] Land the in-flight combat rework: opponent-chart-only scoring + pre-afflicted opponent spawns (committed on this branch).
+- [x] Land the in-flight combat rework: opponent-chart-only scoring + initially afflicted other charts (committed on this branch).
 - [x] **Prince persistence.**
   New Game starts a new run on the same Prince; wiping identity becomes dev-only.
   Prerequisite for feeling any metaprogression.
@@ -114,6 +114,8 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 - **Mobile adaptation** is deferred while desktop interaction and legibility take priority.
 - **House wedges on the chart** (`STYLE.md §11` describes them; not yet drawn) — prerequisite for the houses-encountered flourish above.
 - **Testify-spam watch** (combat model, pending playtest).
-  The first lever is pulled: opponent spawn affliction is three absolute tiers of `12`/`24`/`36` (`MECHANICS.md` §11), shallow enough that the pool drains mid-encounter and afflict-to-set-up becomes necessary rather than optional.
-  If playtest says that isn't enough, the next lever is raising opponent aggression, and either lever could ride `mapsCompleted` instead of applying globally — generous on map 1, austere on map 7.
-  The run already ramps on turn count and the map-boundary barrage, so reach for a third axis only if those two prove insufficient.
+  Necessity now draws `12`/`24`/`36` affliction at every map opening and for the other chart at every encounter opening, with Fortune able to halve the draw (`MECHANICS.md` §11.3).
+  Playtest whether this leaves enough to resolve in short encounters without making testimony dominate longer ones.
+  If testimony still dominates, consider increasing opponent aggression or reducing initial affliction.
+  Encounter length already increases with map number, and the player's affliction carries forward through repeated necessity.
+  Necessity currently has no depth multiplier; revisit scaling only if playtesting calls for it.

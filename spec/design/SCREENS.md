@@ -242,7 +242,9 @@ With study **off**, the panel shows only **operational numbers** — what matter
 - **Resolve** — the combustion ceiling (`MECHANICS.md §10`): how much affliction the planet endures before it gives out.
   Now that combustion is deterministic, this is literally its HP.
   It is the planet's base Resolve plus placement bonuses, shown directly.
-- **Fortune %** — the fortune roll, `luck / 120` (`MECHANICS.md §7`): the planet's odds at map boundaries (uncombusting, or halving its barrage share). Not a combat number — combat is deterministic — but shown here so luck stays a legible stat.
+- **Fortune %** — the fortune roll, `luck / 120` (`MECHANICS.md §7`): the planet's odds of uncombusting at map openings or halving its necessity draw.
+  Necessity applies to your chart at every map opening, including the first, and to the other chart at each encounter opening.
+  These rolls settle before play; action resolution remains deterministic.
 - **Afflict / Testify** — the planet's affliction and testimony amounts, carried by the two action buttons.
 
 Afflict and Testify show their matching stat amounts directly.

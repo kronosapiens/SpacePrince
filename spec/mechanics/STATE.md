@@ -66,9 +66,11 @@ A single RNG primitive supplies true randomness on demand (VRF-style).
 Combat and narrative resolution are deterministic.
 It is spent deliberately:
 
-- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it.
-- **Once per map rollover** — the next map's seed; from it derive node content and the map-boundary uncombust rolls + barrage (MECHANICS §11.3), all shown on entry.
-- **At encounter arrival** — the adversary's chart and its spawn afflictions.
+- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it, including its necessity rolls.
+- **Once per map rollover** — the next map's seed; from it derive node content and the opening uncombust rolls followed by necessity (MECHANICS §11.3), all shown on entry.
+  Opening rolls use a separate seeded stream from node content and do not scale with map depth.
+- **At encounter arrival** — the other chart and its necessity rolls, using the same rule as map openings.
+  In the prototype, necessity uses a separate seeded stream from the other chart's turn sequence.
 - **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
 
 Everything else is **pseudorandom**: a deterministic function of committed state that the client computes to render and the contract re-derives to bind, storing nothing.

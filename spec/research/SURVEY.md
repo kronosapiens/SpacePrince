@@ -164,7 +164,7 @@ Balance is deferred in Space Prince, but that is the direction to shrink from wh
 - **Combat as an event outcome.**
   Two thirds of FTL's events can start a fight; Space Prince's map already separates the two node types, and the one-decision scene should stay fight-free.
 - **A second currency.**
-  FTL's fleet clock is what makes its decisions bite, but Space Prince's run already ramps through the barrage and the finite seven maps, and `ENCOUNTERS.md §11` rules out a new run currency.
+  FTL's fleet clock is what makes its decisions bite, but Space Prince already has increasing encounter length, recurring necessity, and a finite seven-map run; `ENCOUNTERS.md §11` rules out a new run currency.
 
 ## 7. Proposals
 
@@ -175,7 +175,9 @@ Each is tied to a finding above and to an existing constraint, and none is decid
    `STATE.md` reserves headroom for eight scenarios per house; the alternative is a lower narrative-node share so each run sees fewer.
    The cheapest multiplier is one that changes what the player reads, not only what is offered.
 2. **Scale scene amounts with map number.**
-   Both games scale by depth and Space Prince's barrage already does (`MECHANICS.md §11.3`); scenes could ride the same `mapsCompleted` step on the lattice, so a Press on map 6 stakes more and a Tend heals more.
+   Both reference games scale by depth, and Space Prince's encounter length already increases with map number.
+   Scenes could use `mapsCompleted` to increase amounts on the lattice, so a Press on map 6 stakes more and a Tend heals more.
+   This would add scaling beyond necessity, whose draws do not increase with depth (`MECHANICS.md §11.3`).
 3. **Show the lock.**
    When a conditioned offer is absent, the aside could say what would have revealed it ("with Venus lit", "with Mercury in domicile"), as Tomb of Lord Red Mask does.
    It teaches the chart, which is the accessibility goal, and stays inside the three-option limit because it is a note, not a row.
