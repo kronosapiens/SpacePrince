@@ -1010,6 +1010,8 @@
   grid-template-columns: minmax(0, 1fr);
   gap: var(--narrative-gap);
   align-items: center;
+  justify-self: center;
+  width: 100%;
   min-width: 0;
   max-width: 720px;
   max-height: calc(100svh - 2 * var(--chart-pad-block));
