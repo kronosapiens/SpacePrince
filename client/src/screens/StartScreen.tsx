@@ -57,6 +57,7 @@ export function StartScreen() {
             </Field>
             <Field label="Place">
               <CityPicker
+                initialCityLabel="Los Angeles, CA · United States"
                 lat={Number(form.lat)}
                 lon={Number(form.lon)}
                 tz={form.tz}

@@ -32,11 +32,11 @@ export function useCasting(enabled: boolean) {
   const [stage, setStage] = useState<Stage>("framing");
   const [form, setForm] = useState<FormState>({
     name: "",
-    date: "1990-01-01",
-    time: "12:00",
-    lat: "",
-    lon: "",
-    tz: "",
+    date: "2000-01-01",
+    time: "00:00",
+    lat: "34.1",
+    lon: "-118.2",
+    tz: "America/Los_Angeles",
   });
   const [revealedCount, setRevealedCount] = useState(0);
   const [leavingFraming, setLeavingFraming] = useState(false);
@@ -171,7 +171,8 @@ export function useCasting(enabled: boolean) {
   };
 
   return {
-    stage, form, setForm, computed, chart: computed ?? lastComputed,
+    stage, form, setForm, computed,
+    chart: stage === "framing" ? null : computed ?? lastComputed,
     leavingFraming, currentRevealing, currentSign, showCeremony, painted,
     revealedPlanets, bandsOn, bandsCurrent, continueFraming, handleConfirm, closeIntroduction, handleEnter,
   };
@@ -184,7 +185,7 @@ function roundLat(v: number): number { return Math.round(v * 10) / 10; }
 function roundLon(v: number): number { return Math.round(v * 10) / 10; }
 
 // Convert a wall-clock (date, time) in IANA `tz` to a UTC ms timestamp.
-// Empty tz: input is treated as UTC (used before a city has been picked).
+// Empty tz: input is treated as UTC (used for manual coordinates).
 // Two-pass to handle DST boundaries; ambiguous fall-back hours resolve to the
 // first occurrence (DST → standard), which is acceptable at sign-level chart
 // resolution.

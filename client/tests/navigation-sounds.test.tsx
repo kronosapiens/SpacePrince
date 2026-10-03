@@ -94,9 +94,11 @@ describe("navigation feedback", () => {
     click(".begin-btn");
     click(".begin-btn");
     act(() => vi.advanceTimersByTime(400));
+    type('[type="date"]', "");
     click(".mint-submit");
     expect(cues()).toEqual(["select"]);
 
+    type('[type="date"]', "2000-01-01");
     click(".city-compass");
     type('[placeholder="Lat"]', "4070");
     type('[placeholder="Lon"]', "-7400");

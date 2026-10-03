@@ -118,6 +118,10 @@ describe("entry screens", () => {
     click(element(".begin-btn"));
     act(() => vi.advanceTimersByTime(400));
 
+    expect((element('[type="date"]') as HTMLInputElement).value).toBe("2000-01-01");
+    expect((element('[type="time"]') as HTMLInputElement).value).toBe("00:00");
+    expect(element(".city-input").getAttribute("placeholder")).toBe("Los Angeles, CA · United States");
+    expect((element(".mint-submit") as HTMLButtonElement).disabled).toBe(false);
     click(element(".city-compass"));
     input('[placeholder="Lat"]', "4070");
     input('[placeholder="Lon"]', "-7400");
@@ -126,13 +130,13 @@ describe("entry screens", () => {
     expect(initialPositions).toHaveLength(7);
     expect(initialPositions).not.toEqual(samplePositions);
     expect(loadPrince()).toBeNull();
-    input('[type="date"]', "2000-01-01");
+    input('[type="date"]', "2001-01-01");
     const previewPositions = planetPositions();
     expect(previewPositions).not.toEqual(initialPositions);
     input('[type="date"]', "");
     expect(planetPositions()).toEqual(previewPositions);
     expect((element(".mint-submit") as HTMLButtonElement).disabled).toBe(true);
-    input('[type="date"]', "2000-01-01");
+    input('[type="date"]', "2001-01-01");
 
     click(element(".mint-submit"));
     expect(planetPositions()).toEqual(previewPositions);

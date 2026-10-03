@@ -8,6 +8,7 @@ interface Props {
   lat: number;
   lon: number;
   tz: string;
+  initialCityLabel?: string;
   onChange: (lat: number, lon: number, tz: string) => void;
 }
 
@@ -69,12 +70,12 @@ function CompassGlyph() {
   );
 }
 
-export function CityPicker({ lat, lon, onChange }: Props) {
+export function CityPicker({ lat, lon, initialCityLabel, onChange }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [dataset, setDataset] = useState<CityRow[] | null>(null);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<CityRow | null>(null);
+  const [selected, setSelected] = useState<string | null>(initialCityLabel ?? null);
   const [highlight, setHighlight] = useState(0);
   const [manual, setManual] = useState(false);
   const [manLat, setManLat] = useState("");
@@ -117,7 +118,7 @@ export function CityPicker({ lat, lon, onChange }: Props) {
   }, [closeResults]);
 
   const pick = (c: CityRow) => {
-    setSelected(c);
+    setSelected(formatCity(c));
     setQuery("");
     setOpen(false);
     onChange(round1(c[3]), round1(c[4]), c[6]);
@@ -196,7 +197,7 @@ export function CityPicker({ lat, lon, onChange }: Props) {
               <input
                 type="text"
                 className={`city-input invite-text ${selected ? "has-city" : ""}`}
-                placeholder={selected ? formatCity(selected) : "City"}
+                placeholder={selected ?? "City"}
                 value={query}
                 onFocus={() => {
                   ensureDataset();
