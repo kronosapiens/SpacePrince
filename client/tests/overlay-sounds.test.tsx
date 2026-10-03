@@ -150,8 +150,8 @@ describe("developer feedback", () => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, String(value));
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    adjust("Sound", 35);
-    expect(setSoundVolume).toHaveBeenLastCalledWith(0.35);
+    adjust("Sound", 40);
+    expect(setSoundVolume).toHaveBeenLastCalledWith(0.4);
     adjust("Music", 60);
     expect(setMusicVolume).toHaveBeenLastCalledWith(0.6);
     expect(get(".audio-controls").textContent).toContain("Music60%");

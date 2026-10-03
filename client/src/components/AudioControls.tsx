@@ -35,7 +35,7 @@ function VolumeSlider({ label, volume, onChange }: {
         aria-valuetext={percent === 0 ? "Muted" : `${percent}%`}
         min={0}
         max={100}
-        step={1}
+        step={10}
         value={percent}
         style={{ "--volume": `${percent}%` } as CSSProperties}
         onPointerEnter={playHoverSound}

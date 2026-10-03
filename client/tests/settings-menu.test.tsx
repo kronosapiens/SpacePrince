@@ -86,14 +86,14 @@ describe("settings menu", () => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, String(value));
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    adjust("Sound", 35);
+    adjust("Sound", 40);
     adjust("Music", 0);
-    expect(getSoundVolume()).toBe(0.35);
+    expect(getSoundVolume()).toBe(0.4);
     expect(getMusicVolume()).toBe(0);
-    expect(JSON.parse(localStorage.getItem("sp:audio:v1")!)).toEqual({ sound: 0.35, music: 0 });
+    expect(JSON.parse(localStorage.getItem("sp:audio:v1")!)).toEqual({ sound: 0.4, music: 0 });
     click('[aria-label="Close settings"]');
     click('[aria-label="Open settings"]');
-    expect(get<HTMLInputElement>('[aria-label="Sound volume"]').value).toBe("35");
+    expect(get<HTMLInputElement>('[aria-label="Sound volume"]').value).toBe("40");
     expect(get<HTMLInputElement>('[aria-label="Music volume"]').value).toBe("0");
     act(() => setMusicVolume(0.6));
     expect(get<HTMLInputElement>('[aria-label="Music volume"]').value).toBe("60");
