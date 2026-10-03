@@ -222,30 +222,34 @@
   position: fixed;
   inset: 0 auto 0 0;
 }
-.mint-content { text-align: center; }
+.mint-content {
+  container-type: inline-size;
+  text-align: center;
+}
 
 /* The framing — the mint's opening intent-and-stakes beat (SCREENS.md §9.6). */
 .mint-framing {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  max-width: 560px;
+  gap: var(--mint-framing-gap);
+  max-width: var(--mint-framing-width);
   font-family: var(--serif);
   color: var(--bone);
   text-align: center;
 }
 .mint-framing p {
   margin: 0;
-  font-size: clamp(15px, 1.5vw, 19px);
-  line-height: 1.65;
+  font-size: var(--mint-framing-size);
+  line-height: var(--mint-framing-leading);
+  text-wrap: pretty;
   opacity: 0.9;
 }
 .mint-framing strong {
   font-weight: 600;
 }
 .mint-framing .begin-btn {
-  margin-top: 10px;
+  margin-top: var(--mint-framing-button-margin);
   align-self: center;
 }
 
@@ -316,7 +320,7 @@
 
 .mint-caption-italic {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--mint-caption-size);
   color: var(--bone);
   font-style: italic;
   letter-spacing: 0.01em;
@@ -325,12 +329,12 @@
 
 .mint-progress {
   display: flex;
-  gap: 28px;
+  gap: var(--mint-progress-gap);
   align-items: center;
 }
 .mint-pip {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--mint-pip-size);
   color: var(--mist);
   opacity: 0.25;
   transition: color 600ms ease, opacity 600ms ease, text-shadow 600ms ease;
