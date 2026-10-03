@@ -35,10 +35,6 @@
     animation: none;
     transform: none;
   }
-
-  .chart-layout .kandinsky-orbit {
-    animation: none;
-  }
 }
 
 .screen { position: relative; z-index: 1; min-height: 100vh; padding: var(--pad); display: flex; flex-direction: column; }
@@ -1035,9 +1031,6 @@
   aspect-ratio: 1;
   overflow: visible;
 }
-.kandinsky-orbit {
-  animation: kandinsky-orbit 36s linear infinite;
-}
 .narrative-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1756,24 +1749,65 @@
   .codex-entry { padding: 28px 24px; }
 }
 
-/* Planet introduction — an illustrated reading. */
+/* Planet introduction — a ceremonial plate around an illustrated reading. */
 .planet-intro-modal .info-card-stage {
   display: block;
   width: min(720px, 100%);
   aspect-ratio: auto;
   max-height: calc(100svh - 48px);
   overflow-y: auto;
-  padding: 44px clamp(24px, 5vw, 64px) 40px;
+  padding: 0;
+}
+.planet-intro-modal .info-card-close {
+  top: var(--planet-intro-close-inset);
+  right: var(--planet-intro-close-inset);
+  z-index: 1;
 }
 .planet-intro {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  padding: 40px clamp(28px, 6vw, 68px) 38px;
+}
+.planet-intro::before {
+  content: "";
+  position: absolute;
+  inset: var(--planet-intro-frame-inset);
+  border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+  border-radius: var(--planet-intro-frame-radius);
+  pointer-events: none;
+}
+.planet-intro-corner {
+  --corner-inset: calc(var(--planet-intro-frame-inset) - 3px);
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  color: var(--gold);
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.75;
+}
+.planet-intro-corner-top-left { top: var(--corner-inset); left: var(--corner-inset); }
+.planet-intro-corner-top-right { top: var(--corner-inset); right: var(--corner-inset); transform: rotate(90deg); }
+.planet-intro-corner-bottom-left { bottom: var(--corner-inset); left: var(--corner-inset); transform: rotate(-90deg); }
+.planet-intro-corner-bottom-right { bottom: var(--corner-inset); right: var(--corner-inset); transform: rotate(180deg); }
+.planet-intro svg { pointer-events: none; }
+.planet-intro-header {
+  margin: 0 20px 4px;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 .planet-intro-figure {
-  width: min(280px, 100%);
-  margin: -24px 0 -28px;
+  width: min(310px, 34svh, 100%);
+  margin: 0 0 -14px;
 }
 .planet-intro-figure svg {
   width: 100%;
@@ -1783,7 +1817,7 @@
   margin: 0;
   color: var(--bone);
   font-family: var(--serif);
-  font-size: clamp(44px, 6vw, 56px);
+  font-size: clamp(48px, 7vw, 68px);
   font-weight: 400;
   line-height: 1.1;
 }
@@ -1792,35 +1826,45 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px 10px;
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   color: var(--mist);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
 }
 .planet-intro-role {
   color: var(--gold);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   align-self: center;
 }
+.planet-intro-divider {
+  width: 144px;
+  height: 18px;
+  margin-top: 20px;
+  color: var(--gold);
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.65;
+}
 .planet-intro-portrait {
   max-width: 460px;
-  margin: 28px 0 0;
+  margin: 18px 0 0;
   color: var(--bone);
   font-family: var(--serif);
-  font-size: clamp(21px, 3vw, 25px);
-  line-height: 1.45;
+  font-size: clamp(20px, 2.5vw, 23px);
+  line-height: 1.5;
   text-wrap: pretty;
 }
 @media (max-width: 480px) {
   .planet-intro-modal { padding: 16px; }
   .planet-intro-modal .info-card-stage {
     max-height: calc(100svh - 32px);
-    padding: 40px 24px 28px;
   }
-  .planet-intro-figure { width: 220px; }
+  .planet-intro { padding: 64px 28px 32px; }
+  .planet-intro-header { margin-inline: 0; font-size: 11px; }
+  .planet-intro-figure { width: 260px; }
 }
 
 /* ── Dev chrome: page dropdown (top-right) + dev console (top-left) ──────

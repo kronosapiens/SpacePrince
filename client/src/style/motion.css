@@ -20,16 +20,27 @@
   to   { opacity: 1; }
 }
 
-/* The image arrives first; the placement and its reading follow, then settle. */
+/* The header and image arrive first, followed by the name and reading. */
+.planet-intro-header {
+  animation: encounter-open-fade 600ms var(--ease-out) both;
+}
 .planet-intro-figure {
-  animation: encounter-open-fade 1000ms var(--ease-out) both;
+  animation: encounter-open-fade 1000ms var(--ease-out) 100ms both;
+}
+@keyframes kandinsky-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.kandinsky-orbit {
+  animation: kandinsky-orbit 36s linear infinite;
 }
 .planet-intro-name,
 .planet-intro-placement {
-  animation: fragment-in 800ms var(--ease-out) 200ms both;
+  animation: fragment-in 900ms var(--ease-out) 450ms both;
 }
+.planet-intro-divider,
 .planet-intro-portrait {
-  animation: fragment-in 1000ms var(--ease-out) 450ms both;
+  animation: fragment-in 1000ms var(--ease-out) 750ms both;
 }
 
 @keyframes map-node-arrival {
@@ -84,11 +95,6 @@
 @keyframes map-current-halo-breath {
   0%, 100% { opacity: 0.7;  transform: scale(0.96); }
   50%      { opacity: 1.0;  transform: scale(1.04); }
-}
-
-@keyframes kandinsky-orbit {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
 }
 
 /* Propagation — a bright head sweeps source → target along the aspect line,
@@ -307,9 +313,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .planet-intro-modal.anim-info-card-fade,
+  .planet-intro-header,
   .planet-intro-figure,
+  .kandinsky-orbit,
   .planet-intro-name,
   .planet-intro-placement,
+  .planet-intro-divider,
   .planet-intro-portrait,
   .anim-action-glow,
   .anim-effect,
