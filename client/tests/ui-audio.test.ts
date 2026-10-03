@@ -146,7 +146,7 @@ describe("necessity audio", () => {
 
   it("cancels only its own voice and clears scheduled disposal", async () => {
     await engine.ensureAudio();
-    engine.playStrike("Sun", "Mars", "landing");
+    engine.playStrike("Sun", "Mars");
     const cancel = engine.playNecessityNote("Sun", "Moon", 0.95);
     const first = tone.voices[0]!;
     engine.playNecessityNote("Sun", "Venus", 0.95);
@@ -156,7 +156,7 @@ describe("necessity audio", () => {
     expect(first.dispose).toHaveBeenCalledOnce();
     expect(second.dispose).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(1);
-    engine.playStrike("Sun", "Mars", "landing");
+    engine.playStrike("Sun", "Mars");
     expect(tone.createSynth).toHaveBeenCalledOnce();
     expect(tone.trigger).toHaveBeenCalledTimes(2);
     vi.advanceTimersByTime(950);

@@ -185,16 +185,16 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       light: nextRun.light - run.light,
     });
     // Each planet the outcome touches rings its degree in the house ruler's
-    // mode (MUSIC.md, "The strike grid") — relief lands, harm hangs — so an
+    // mode (MUSIC.md, "The strike grid"), so an
     // outcome that touches several sounds as a chord. Combustion adds a
     // breath to the planet's note, as in combat.
-    for (const [p, polarity] of effect) {
+    for (const p of effect.keys()) {
       if (combusting.has(p)) continue;
-      playStrike(house.ruler, p, polarity === "Affliction" ? "inverts" : "flows");
+      playStrike(house.ruler, p);
     }
     for (const p of combusting) {
       playCombust();
-      playStrike(house.ruler, p, "landing");
+      playStrike(house.ruler, p);
     }
 
     onCommit(nextRun);

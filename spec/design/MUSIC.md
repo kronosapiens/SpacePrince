@@ -130,7 +130,7 @@ The music's emotional arc as the chart fills in is built into the unlock schedul
 Every combat encounter has a ruler (`MECHANICS.md §11`), and the combat score already plays the ruler's theme, so the encounter sits in one mode from its first turn to its last.
 The resolution strikes ring in that same mode: every beat that strikes a planet — the direct hit, each propagation hop, each combust — sounds that planet's **degree** in the ruler's mode, on the shared D.
 It is the same set of beats that lights the edge bands, so band and note are one event, the key struck.
-The narrative screen strikes the same way at its house's natural ruler: each planet an outcome touches rings its degree — relief lands, harm hangs — so an outcome that touches several planets sounds as a chord.
+The narrative screen strikes the same way at its house's natural ruler: each planet an outcome touches rings its degree, so an outcome that touches several planets sounds as a chord.
 
 Each planet's degree is where its mode starts in the shared collection — the seven modes are the seven rotations of one set of notes, Ionian from the first, Dorian from the second, through Locrian from the seventh.
 So the degree comes with the mode, chosen by nobody: Sun 1, Mercury 2, Mars 3, Jupiter 4, Venus 5, Moon 6, Saturn 7.
@@ -163,9 +163,8 @@ Each row down the brightness ladder flattens one more degree, and the astrology 
 A propagation wave sounds as a chord inside the ruler's mode, chosen by the aspect web.
 
 An action is a short phrase inside the ruler's mode: the acting planet's degree opens and the target planet's degree lands.
-Testimony and Affliction determine contour and articulation rather than selecting another pitch collection.
-A harmonious propagation approaches and resolves onto the target's note.
-An inverted propagation may use a controlled chromatic neighbor to hang against the target; the dissonance is an explicit semantic exception, not a second planetary mode.
+Testimony and Affliction use the same planetary notes.
+Each propagation sounds only the target's assigned note, regardless of aspect.
 Combustion begins the target's ruler-relative voice, chokes it, and releases a breath.
 The event register follows the canonical anchors above, with Saturn on the floor and Mercury on top.
 Music is opt-in while sound is on by default, so the strikes must read alone, and a melody of degrees over silence does.

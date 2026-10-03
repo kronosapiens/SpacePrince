@@ -137,8 +137,7 @@ Sound should reinforce the planetary color system.
 - Each planet has a **sonic identity** expressed through its mode, ruler-relative degree, register, rhythm, and timbral character.
 - The encounter's ruler establishes the mode; the acting planet opens from its degree and the affected planet lands on its degree.
 - Aspect propagation is *audible*.
-  A trine propagation is a resolution.
-  A square propagation is a dissonance that hangs.
+  Each affected planet sounds its assigned degree in the encounter's mode.
 - A planet combusting is the most significant sound event — its ruler-relative voice cuts off mid-phrase.
 - House encounters have ambient sound shaped by their ruling planet.
 - The future layered score gets **sparser as planets combust**.

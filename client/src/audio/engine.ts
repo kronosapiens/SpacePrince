@@ -212,30 +212,18 @@ export function playUISound(cue: UISound): void {
   uiSynth.triggerAttackRelease(sound.note, sound.duration, now, sound.velocity);
 }
 
-export type StrikeShape = "landing" | "flows" | "inverts";
-
 /**
  * A strike is audible (MUSIC.md, "The strike grid"): the struck planet rings
  * its degree in the ruler's mode, at the planet's register, so the
- * whole encounter sounds in one mode. A harmonious hop approaches that note
- * from a fourth below and lands; an inverted hop (square/opposition) hangs a
- * minor second against it that never settles.
+ * whole encounter sounds in one mode.
  */
-export function playStrike(ruler: PlanetName, target: PlanetName, shape: StrikeShape): void {
+export function playStrike(ruler: PlanetName, target: PlanetName): void {
   if (!T || soundVolume === 0) return;
   const fx = fxSynth();
   if (!fx) return;
   const now = T.now();
   const n = strikeMidi(ruler, target);
-  if (shape === "inverts") {
-    fx.triggerAttackRelease(midiToFreq(n), 0.5, now, 0.24);
-    fx.triggerAttackRelease(midiToFreq(n + 1), 0.55, now + 0.02, 0.2); // ♭2 against it, held
-  } else if (shape === "flows") {
-    fx.triggerAttackRelease(midiToFreq(n - 5), 0.15, now, 0.24); // a fourth below
-    fx.triggerAttackRelease(midiToFreq(n), 0.35, now + 0.12, 0.22); // → home
-  } else {
-    fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
-  }
+  fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
 }
 
 /** One sustained planetary voice; its release fits inside the visual cadence. */

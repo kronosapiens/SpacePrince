@@ -315,7 +315,7 @@ function runScheduler(args: {
 
     // Primary direct phase — apply delta, light action-glow, effect.
     schedule(() => {
-      playStrike(ruler, actionPlanet, "landing");
+      playStrike(ruler, actionPlanet);
       updateAnimation((state) => {
         const next = cloneAnimation(state);
         if (isSelf) applyDelta(next.selfState, actionPlanet, actionDelta * sign);
@@ -401,16 +401,10 @@ function runScheduler(args: {
       }
 
       schedule(() => {
-        // The hop rings the target's degree in the ruler's mode: harmonious it
-        // approaches from a fourth below, inverted (square/opposition — the
-        // polarity flipped) it hangs a minor second against the note. A combust
-        // marker rings the same note with a short breath.
-        if (step.note === "Combusts") {
-          playCombust();
-          playStrike(ruler, step.target, "landing");
-        } else {
-          playStrike(ruler, step.target, step.polarity !== receivedPolarity ? "inverts" : "flows");
-        }
+        // Each hop rings the target's degree in the ruler's mode.
+        // A combust marker adds a short breath.
+        if (step.note === "Combusts") playCombust();
+        playStrike(ruler, step.target);
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           const targetState = isSelf ? next.selfState : next.otherState;
@@ -486,7 +480,7 @@ function runScheduler(args: {
     if (actionCombust) {
       schedule(() => {
         playCombust();
-        playStrike(ruler, actionPlanet, "landing");
+        playStrike(ruler, actionPlanet);
         updateAnimation((state) => {
           const next = cloneAnimation(state);
           next.combustingPlanets = {
