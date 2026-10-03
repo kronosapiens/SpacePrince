@@ -84,7 +84,7 @@ describe("encounter interactions", () => {
     const { encounter, render, onCommitTurn } = setup(false);
     const other = '[data-guide="chart-other"]';
     const record = encounter.necessity!.find((entry) => entry.planet === "Moon")!;
-    expect(get(`${other} .necessity-opening`).textContent).toBe("Click to skip");
+    expect(get(`${other} .necessity-opening`).textContent).toBe("");
     expect(container.querySelector(".chart-layout-chart .necessity-opening")).toBeNull();
     expect(container.querySelector(".chart-layout-chart .necessity-arc")).toBeNull();
     click(moon);

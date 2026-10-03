@@ -2227,8 +2227,6 @@ body:has(.guide-overlay) .dev-keys { display: none; }
   padding: 4px 6px;
 }
 
-/* Opening words occupy the chart's centre without reserving layout space. */
-.necessity-skip { font-family: var(--sans); font-size: 14px; fill: var(--mist); }
 .ps-necessity {
   margin-top: 16px;
   font-family: var(--sans);

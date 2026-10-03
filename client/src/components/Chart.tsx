@@ -547,10 +547,7 @@ export function Chart(props: ChartProps) {
 
       {opening && (
         <g className="necessity-opening"
-          transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`} pointerEvents="none"
-          role="status" aria-label="Chart opening. Click to skip.">
-          <text textAnchor="middle" className="necessity-skip" y={28}>Click to skip</text>
-        </g>
+          role="status" aria-label="Chart opening. Click to skip." />
       )}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy

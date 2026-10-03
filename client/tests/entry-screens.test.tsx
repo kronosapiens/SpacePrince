@@ -87,7 +87,7 @@ describe("entry screens", () => {
     const record = run.map.boundary!.necessity.find((entry) => entry.planet === "Moon")!;
 
     expect(container.querySelector(".map-boundary")).toBeNull();
-    expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("Click to skip");
+    expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("");
     expect(container.querySelector(".necessity-accent")).not.toBeNull();
     expect(container.querySelector(".necessity-arc")).toBeNull();
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
@@ -169,7 +169,7 @@ describe("entry screens", () => {
     expect(first.state.Moon.affliction).toBeGreaterThan(0);
     expect(first.map.boundary!.necessity.map((entry) => entry.planet)).toEqual(["Moon"]);
     expect(container.querySelector(".map-boundary")).toBeNull();
-    expect(element(".map-screen .chart-svg .necessity-opening").textContent).toBe("Click to skip");
+    expect(element(".map-screen .chart-svg .necessity-opening").textContent).toBe("");
     expect(container.querySelector(".necessity-title")).toBeNull();
     finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
@@ -270,7 +270,7 @@ describe("entry screens", () => {
     const fresh = restarted.runs[1]!;
     expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numEncounters).state);
     expect(fresh.state.Moon.affliction).toBeGreaterThan(0);
-    expect(element(".necessity-opening").textContent).toBe("Click to skip");
+    expect(element(".necessity-opening").textContent).toBe("");
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
     finishOpening();
     expect(restarted.runs[1]!.light).toBe(0);
