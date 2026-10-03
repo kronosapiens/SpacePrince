@@ -1762,11 +1762,17 @@
 }
 .planet-intro {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 40px clamp(28px, 6vw, 68px) 38px;
+}
+.planet-intro > .starfield {
+  position: absolute;
+  z-index: -1;
+  opacity: var(--planet-intro-starfield-opacity);
 }
 .planet-intro::before {
   content: "";

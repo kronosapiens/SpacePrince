@@ -1,6 +1,7 @@
 import type { Chart, PlanetName } from "@/game/types";
 import { InfoCard } from "@/components/InfoCard";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
+import { Starfield } from "@/components/Starfield";
 import { PLANET_INTRODUCTIONS } from "@/copy/planet-introductions";
 import { PLANET_ROLE } from "@/game/data";
 
@@ -17,6 +18,7 @@ export function PlanetIntroCard({ chart, planet, onClose }: PlanetIntroCardProps
   return (
     <InfoCard className="planet-intro-modal" ariaLabel={`${planet} unlocked`} onClose={onClose}>
       <div className="planet-intro" key={planet}>
+        <Starfield />
         {["top-left", "top-right", "bottom-left", "bottom-right"].map((corner) => (
           <svg key={corner} className={`planet-intro-corner planet-intro-corner-${corner}`}
             viewBox="0 0 64 64" fill="none" aria-hidden="true">
