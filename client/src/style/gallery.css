@@ -58,12 +58,27 @@
 .gallery-type-display { font: 36px / 1.2 var(--serif); padding-top: 12px; }
 .gallery-type-chrome { font: 14px / 1.6 var(--sans); padding-top: 12px; }
 
+.gallery-section-heading > .audio-controls { width: 240px; max-width: 100%; gap: 12px; }
+.gallery-music-themes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+.gallery-music-theme { display: grid; grid-template-columns: 48px 1fr; align-items: center; gap: 2px 16px; text-align: left; border: 1px solid var(--smoke); border-radius: 8px; padding: 16px; }
+.gallery-music-theme > svg { width: 48px; height: 48px; grid-row: span 2; }
+.gallery-music-name { font: 24px var(--serif); }
+.gallery-music-theme .eyebrow { font-size: 9px; }
+.gallery-music-theme:hover,
+.gallery-music-theme[aria-pressed="true"] { background: color-mix(in srgb, var(--smoke) 30%, transparent); }
+.gallery-music-theme[aria-pressed="true"] { border-color: var(--gold); }
+.gallery-music-status { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 20px; }
+.gallery-music-stop { font: 12px var(--sans); color: var(--bone); border: 1px solid var(--smoke); border-radius: 4px; padding: 8px 12px; }
+.gallery-music-stop:hover:not(:disabled) { border-color: var(--mist); }
+.gallery-music-stop:disabled { opacity: 0.4; cursor: default; }
+
 @media (max-width: 1200px) {
   .gallery-screen { padding-inline: 28px; }
   .gallery-planets { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .gallery-symbols { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .gallery-planet-symbols { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .gallery-compositions { gap: 32px; }
+  .gallery-music-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {
@@ -76,4 +91,7 @@
   .gallery-compositions,
   .gallery-type { grid-template-columns: 1fr; }
   .gallery-map { height: 440px; }
+  .gallery-music-theme { grid-template-columns: 32px 1fr; gap: 2px 8px; padding: 12px; }
+  .gallery-music-theme > svg { width: 32px; height: 32px; }
+  .gallery-music-name { font-size: 21px; }
 }

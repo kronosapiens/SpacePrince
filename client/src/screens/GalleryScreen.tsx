@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Link } from "react-router-dom";
-import { playUISound } from "@/audio/engine";
+import { currentTheme, getMusicVolume, playUISound, setTheme, subscribeTheme, subscribeVolume } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
+import { AudioControls } from "@/components/AudioControls";
 import { HouseCoin } from "@/components/HouseCoin";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { MapDiagram } from "@/components/MapDiagram";
@@ -32,6 +33,8 @@ const prince: Prince = {
 export default function GalleryScreen() {
   const [planet, setPlanet] = useState<PlanetName | null>(null);
   const [sign, setSign] = useState<SignName>("Pisces");
+  const theme = useSyncExternalStore(subscribeTheme, currentTheme);
+  const musicVolume = useSyncExternalStore(subscribeVolume, getMusicVolume);
   // The placement override is only for the reveal's copy, never the chart artwork.
   const revealChart = planet ? {
     ...chart,
@@ -44,7 +47,7 @@ export default function GalleryScreen() {
         <div>
           <p className="eyebrow">Space Prince · Development</p>
           <h1>Design gallery</h1>
-          <p className="gallery-note">The visual language of the game, gathered in one place.</p>
+          <p className="gallery-note">The sights and sounds of the game, gathered in one place.</p>
         </div>
         <Link className="gallery-link" to={ROUTES.title}>Back to game ↗</Link>
       </header>
@@ -54,6 +57,7 @@ export default function GalleryScreen() {
         <a href="#symbols">Symbols & houses</a>
         <a href="#compositions">Chart & map</a>
         <a href="#palette">Palette & type</a>
+        <a href="#music">Music</a>
       </nav>
 
       <section id="planets" className="gallery-section" aria-labelledby="gallery-planets-title">
@@ -167,6 +171,47 @@ export default function GalleryScreen() {
         <div className="gallery-type">
           <div><p className="eyebrow">Cormorant Garamond · Voice</p><p className="gallery-type-display">A planet comes into view</p></div>
           <div><p className="eyebrow">Inter · Chrome</p><p className="gallery-type-chrome">Identity, attention, and irreversible choice.</p></div>
+        </div>
+      </section>
+
+      <section id="music" className="gallery-section" aria-labelledby="gallery-music-title">
+        <div className="gallery-section-heading">
+          <div>
+            <p className="eyebrow">05 · Music</p>
+            <h2 id="gallery-music-title">Planet themes</h2>
+            <p className="gallery-note">Select a theme to hear its map arrangement.</p>
+          </div>
+          <AudioControls />
+        </div>
+        <div className="gallery-music-themes">
+          {(["Main", ...PLANETS] as const).map((name) => (
+            <button key={name} type="button" className="gallery-music-theme"
+              aria-label={`Play ${name} theme`} aria-pressed={theme === name}
+              onPointerEnter={playHoverSound} onFocus={playFocusSound}
+              onClick={() => { playUISound("select"); setTheme(name); }}>
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                {name === "Main" ? (
+                  <circle cx="24" cy="24" r="11" fill="none" stroke={NEUTRAL.gold} />
+                ) : (
+                  <text x="24" y="24" dominantBaseline="central" textAnchor="middle"
+                    fontSize="28" fill={PLANET_PRIMARY[name]}>{PLANET_GLYPH[name]}</text>
+                )}
+              </svg>
+              <span className="gallery-music-name" style={{ color: name === "Main" ? NEUTRAL.gold : PLANET_PRIMARY[name] }}>
+                {name === "Main" ? "Main Theme" : name}
+              </span>
+              <span className="eyebrow">{theme === name ? "Selected" : "Play theme"}</span>
+            </button>
+          ))}
+        </div>
+        <div className="gallery-music-status">
+          <p className="gallery-note" role="status">
+            {theme ? `Selected: ${theme === "Main" ? "Main Theme" : theme}` : "No theme selected"}
+            {musicVolume === 0 ? " · Music is muted" : ""}
+          </p>
+          <button type="button" className="gallery-music-stop" disabled={!theme}
+            onPointerEnter={playHoverSound} onFocus={playFocusSound}
+            onClick={() => { playUISound("dismiss"); setTheme(null); }}>Stop music</button>
         </div>
       </section>
 

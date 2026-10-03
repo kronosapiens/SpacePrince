@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GuideOverlay } from "@/components/GuideOverlay";
 import { InfoCard } from "@/components/InfoCard";
 import { DevChrome } from "@/components/DevChrome";
-import { DevConsole } from "@/components/DevConsole";
+import { AudioControls } from "@/components/AudioControls";
 import { PrinceStoreProvider } from "@/state/PrinceStore";
-import { playUISound, setMusicVolume, setSoundVolume, nextTheme } from "@/audio/engine";
+import { playUISound, setMusicVolume, setSoundVolume } from "@/audio/engine";
 
 const volume = vi.hoisted(() => ({ music: 1, sound: 1, listeners: new Set<() => void>() }));
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
@@ -23,7 +23,6 @@ vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
   },
   setMusicVolume: vi.fn((value: number) => { volume.music = value; volume.listeners.forEach((listener) => listener()); }),
   setSoundVolume: vi.fn((value: number) => { volume.sound = value; volume.listeners.forEach((listener) => listener()); }),
-  nextTheme: vi.fn(),
 }));
 
 let root: Root;
@@ -144,8 +143,8 @@ describe("developer feedback", () => {
     expect(cues()).toEqual(["select", "select", "dismiss", "select", "dismiss", "select"]);
   });
 
-  it("adjusts audio levels with sliders and disables track changes at zero music volume", () => {
-    act(() => root.render(<PrinceStoreProvider><DevConsole open /></PrinceStoreProvider>));
+  it("adjusts audio levels silently through the shared sliders", () => {
+    act(() => root.render(<AudioControls />));
     const adjust = (label: string, value: number) => act(() => {
       const input = get(`input[aria-label="${label} volume"]`);
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, String(value));
@@ -155,13 +154,11 @@ describe("developer feedback", () => {
     expect(setSoundVolume).toHaveBeenLastCalledWith(0.35);
     adjust("Music", 60);
     expect(setMusicVolume).toHaveBeenLastCalledWith(0.6);
-    expect(get(".dev-console").textContent).toContain("Music60%");
+    expect(get(".audio-controls").textContent).toContain("Music60%");
     adjust("Music", 0);
-    click(".dev-console > .dev-chrome-button");
-    expect(nextTheme).not.toHaveBeenCalled();
+    expect(setMusicVolume).toHaveBeenLastCalledWith(0);
     expect(cues()).toEqual([]);
     adjust("Music", 20);
-    click(".dev-console > .dev-chrome-button");
-    expect(nextTheme).toHaveBeenCalledOnce();
+    expect(setMusicVolume).toHaveBeenLastCalledWith(0.2);
   });
 });

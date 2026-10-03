@@ -98,23 +98,30 @@ describe("music playback", () => {
   });
 
   it("plays music and sound for a fresh visitor", () => {
-    expect(engine.getMusicVolume()).toBe(1);
+    expect(engine.getMusicVolume()).toBe(0.5);
     expect(engine.getSoundVolume()).toBe(1);
   });
 
-  it("cancels a pending planet swap on mute and disposes only the old score after a quick restart", async () => {
+  it.each(["stop", "mute"])("finishes the old score before starting another after a quick %s and restart", async (action) => {
     await engine.ensureAudio();
     engine.setTheme("Moon");
     const old = createScore.mock.results[0]!.value;
 
     engine.setTheme("Saturn");
-    engine.setMusicVolume(0);
-    engine.setMusicVolume(1);
-    const resumed = createScore.mock.results[1]!.value;
+    if (action === "mute") {
+      engine.setMusicVolume(0);
+      engine.setMusicVolume(1);
+    } else {
+      engine.setTheme(null);
+      engine.setTheme("Saturn");
+    }
+    expect(createScore).toHaveBeenCalledTimes(1);
     vi.runAllTimers();
 
+    const resumed = createScore.mock.results[1]!.value;
     expect(createScore).toHaveBeenCalledTimes(2);
     expect(old.dispose).toHaveBeenCalledOnce();
+    expect(old.dispose.mock.invocationCallOrder[0]).toBeLessThan(createScore.mock.invocationCallOrder[1]!);
     expect(resumed.dispose).not.toHaveBeenCalled();
     expect(engine.currentTheme()).toBe("Saturn");
   });
@@ -123,7 +130,7 @@ describe("music playback", () => {
     localStorage.setItem("sp:audio:v1", JSON.stringify({ music: true, sound: false }));
     vi.resetModules();
     engine = await import("@/audio/engine");
-    expect(engine.getMusicVolume()).toBe(1);
+    expect(engine.getMusicVolume()).toBe(0.5);
     expect(engine.getSoundVolume()).toBe(0);
 
     engine.setMusicVolume(0.35);

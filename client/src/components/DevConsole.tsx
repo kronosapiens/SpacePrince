@@ -1,43 +1,17 @@
-import { useState, useSyncExternalStore } from "react";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
-import { PlanetIntroCard } from "@/components/PlanetIntroCard";
-import { AudioControls } from "@/components/AudioControls";
-import type { PlanetName } from "@/game/types";
 import { remirrorCombat } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
 import { UNLOCK_THRESHOLDS } from "@/game/data";
-import {
-  currentTheme,
-  getMusicVolume,
-  playUISound,
-  subscribeVolume,
-  nextTheme,
-  subscribeTheme,
-} from "@/audio/engine";
+import { playUISound } from "@/audio/engine";
 import { ChartTuner } from "@/components/ChartTuner";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-/**
- * Dev-only console (rendered only under `import.meta.env.DEV`). Three zones:
- * a 7-stop slider that scrubs the Prince's planet-unlock tier (one stop per
- * planet, snapping to its Macrobian threshold); audio volumes (music = score,
- * sound = everything else) plus a sequential Change Track button; and a Delete Prince
- * button. Prince mutations go through the store, so the chart fills in on the
- * anchor as you drag, and a live combat re-mirrors so the opponent re-fields
- * to match. Opened with `d`; screen-spawning and re-rolling live in DevChrome.
- * Not production UI.
- */
+/** Dev-only unlock tier, chart tuning, and Prince reset. Opened with `d`;
+ *  screen-spawning and re-rolling live in DevChrome. */
 export function DevConsole({ open }: { open: boolean }) {
   const prince = usePrince();
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
-  const [introPlanet, setIntroPlanet] = useState<PlanetName | null>(null);
-  const music = useSyncExternalStore(subscribeVolume, getMusicVolume);
-  // Which theme the score is pointed at — retargets whenever a surface mounts,
-  // so the label subscribes to the engine rather than reading once per render.
-  const track = useSyncExternalStore(subscribeTheme, currentTheme);
-  const canChangeTrack = !!track && music > 0;
-
   const unlocked = prince ? unlockedPlanets(prince.numEncounters) : [];
 
   // Set the unlock tier from a planet count (1–7): jump to that planet's
@@ -54,87 +28,49 @@ export function DevConsole({ open }: { open: boolean }) {
     }
   };
 
+  if (!open) return null;
+
   return (
-    <>
-      {prince && introPlanet && (
-        <PlanetIntroCard key={introPlanet} chart={prince.chart} planet={introPlanet} onClose={() => setIntroPlanet(null)} />
+    <div className="dev-console">
+      {prince ? (
+        <div className="dev-console-block">
+          <div>
+            Planets <strong>{unlocked.length} / 7</strong>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={7}
+            step={1}
+            value={Math.min(Math.max(unlocked.length, 1), 7)}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
+            onChange={(e) => setPlanets(Number(e.target.value))}
+          />
+          <div>{unlocked.join(" · ") || "(none)"}</div>
+        </div>
+      ) : (
+        <div>No Prince — mint one from the Title.</div>
       )}
-      {open && (
-        <div className="dev-console">
-          {prince ? (
-            <div className="dev-console-block">
-              <div>
-                Planets <strong>{unlocked.length} / 7</strong>
-              </div>
-              <input
-                type="range"
-                min={1}
-                max={7}
-                step={1}
-                value={Math.min(Math.max(unlocked.length, 1), 7)}
-                onPointerEnter={playHoverSound}
-                onFocus={playFocusSound}
-                onChange={(e) => setPlanets(Number(e.target.value))}
-              />
-              <div>{unlocked.join(" · ") || "(none)"}</div>
-              {/* Preview immediately on any surface. Scrub the slider to pick. */}
-              <button
-                type="button"
-                className="dev-chrome-button"
-                disabled={unlocked.length === 0}
-                onPointerEnter={playHoverSound}
-                onFocus={playFocusSound}
-                onClick={() => {
-                  const planet = unlocked.at(-1);
-                  if (planet && planet !== introPlanet) {
-                    playUISound("select");
-                    setIntroPlanet(planet);
-                  }
-                }}
-              >
-                Intro Card{unlocked.length ? ` · ${unlocked.at(-1)}` : ""}
-              </button>
-            </div>
-          ) : (
-            <div>No Prince — mint one from the Title.</div>
-          )}
+      <div className="dev-console-divider" />
+      <ChartTuner />
+      {prince && (
+        <>
           <div className="dev-console-divider" />
-          <ChartTuner />
-          <div className="dev-console-divider" />
-          <AudioControls />
           <button
             type="button"
-            className="dev-chrome-button"
-            disabled={!canChangeTrack}
+            className="dev-chrome-button is-danger"
             onPointerEnter={playHoverSound}
             onFocus={playFocusSound}
             onClick={() => {
-              if (!canChangeTrack) return;
-              playUISound("select");
-              nextTheme();
+              playUISound("commit");
+              dispatch({ kind: "clear" });
             }}
           >
-            {track ? `Track · ${track === "Main" ? "Main Theme" : track}` : "Change Track"}
+            Delete Prince
           </button>
-          {prince && (
-            <>
-              <div className="dev-console-divider" />
-              <button
-                type="button"
-                className="dev-chrome-button is-danger"
-                onPointerEnter={playHoverSound}
-                onFocus={playFocusSound}
-                onClick={() => {
-                  playUISound("commit");
-                  dispatch({ kind: "clear" });
-                }}
-              >
-                Delete Prince
-              </button>
-            </>
-          )}
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

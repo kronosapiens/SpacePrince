@@ -1,5 +1,4 @@
 import type { PlanetName } from "@/game/types";
-import { PLANETS } from "@/game/data";
 import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
@@ -20,6 +19,8 @@ type ToneModule = typeof import("tone");
 
 let T: ToneModule | null = null;
 let initPromise: Promise<void> | null = null;
+let disposed = false;
+const unlockCleanups = new Set<() => void>();
 
 // Independent volumes: `music` is the score; `sound` is everything else —
 // effects, propagation, combustion, the star bell, and UI cues.
@@ -86,14 +87,18 @@ export function setSoundVolume(next: number): void {
  *  until the context is confirmed running — a single refused resume (stricter
  *  browsers time the gesture window tightly around a dynamic import) must not
  *  mean silence forever. */
-export function installAudioUnlock(): void {
-  if (typeof window === "undefined") return;
+export function installAudioUnlock(): () => void {
+  if (typeof window === "undefined" || disposed) return () => {};
+  const cleanup = () => {
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("keydown", unlock);
+    unlockCleanups.delete(cleanup);
+  };
   const unlock = () => {
     ensureAudio()
       .then(() => {
         if (T && T.getContext().state === "running") {
-          window.removeEventListener("pointerdown", unlock);
-          window.removeEventListener("keydown", unlock);
+          cleanup();
         }
       })
       .catch(() => {
@@ -102,10 +107,13 @@ export function installAudioUnlock(): void {
   };
   window.addEventListener("pointerdown", unlock);
   window.addEventListener("keydown", unlock);
+  unlockCleanups.add(cleanup);
+  return cleanup;
 }
 
 /** Boot (or re-resume) the engine. Safe to call from any gesture handler. */
 export async function ensureAudio(): Promise<void> {
+  if (disposed) return;
   if (T) {
     // Built, but a prior resume may have been refused outside a gesture —
     // retry inside this one.
@@ -120,6 +128,7 @@ async function init(): Promise<void> {
   initPromise = (async () => {
     const tone = await import("tone");
     await tone.start();
+    if (disposed) return;
     T = tone;
     T.getDestination().volume.value = 0;
     musicOutput = new T.Gain(musicVolume).toDestination();
@@ -140,6 +149,7 @@ async function init(): Promise<void> {
 let reverb: import("tone").Reverb | null = null;
 
 type AnyInstrument = {
+  dispose: () => unknown;
   triggerAttackRelease: (
     note: number | string,
     duration: number,
@@ -280,7 +290,6 @@ export function playStar(): void {
 const MIX_RAMP_S = 2.2;
 const SWAP_FADE_S = 1.1;
 const SCORE_VOLUME = 0.9;
-const THEME_ORDER: ThemeName[] = ["Main", ...PLANETS];
 
 let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
 let playing: { theme: ThemeName; score: ReturnType<typeof createScore> } | null = null;
@@ -302,14 +311,6 @@ export function currentTheme(): ThemeName | null {
 export function subscribeTheme(listener: () => void): () => void {
   themeListeners.add(listener);
   return () => themeListeners.delete(listener);
-}
-
-/** Dev audition: cycle through Main and the planets in Macrobian order. */
-export function nextTheme(): void {
-  const cur = desired;
-  if (!cur) return;
-  const next = THEME_ORDER[(THEME_ORDER.indexOf(cur.theme) + 1) % THEME_ORDER.length]!;
-  setTheme(next, cur.surface);
 }
 
 function cancelSwap(): void {
@@ -350,10 +351,36 @@ function startScore(theme: ThemeName, surface: ThemeSurface): void {
 
 function haltTheme(fadeS: number): void {
   cancelSwap();
-  const held = playing;
+  if (!playing) return;
+  playing.score.fade(0, fadeS);
+  // Keep ownership through the fade so a new selection cannot overlap it.
+  swapTimer = window.setTimeout(() => {
+    swapTimer = null;
+    playing?.score.dispose();
+    playing = null;
+  }, fadeS * 1000 + 100);
+}
+
+function disposeAudio(): void {
+  if (disposed) return;
+  disposed = true;
+  cancelSwap();
+  playing?.score.dispose();
   playing = null;
-  if (!held) return;
-  held.score.fade(0, fadeS);
-  // A quick off/on gets a separate score, so this tail cannot enter its mix.
-  window.setTimeout(() => held.score.dispose(), fadeS * 1000 + 100);
+  for (const cleanup of unlockCleanups) cleanup();
+  for (const instrument of instruments.values()) instrument.dispose();
+  instruments.clear();
+  uiSynth?.dispose();
+  reverb?.dispose();
+  musicOutput?.dispose();
+  soundOutput?.dispose();
+  T = null;
+}
+
+if (import.meta.hot?.data) {
+  // Updates can propagate to a React boundary without disposing this module.
+  // Retire the previous engine whenever this module is evaluated again.
+  import.meta.hot.data.disposeAudio?.();
+  import.meta.hot.data.disposeAudio = disposeAudio;
+  import.meta.hot.dispose(disposeAudio);
 }

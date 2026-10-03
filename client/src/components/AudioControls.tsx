@@ -4,7 +4,7 @@ import {
 } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-/** The menu and dev console control the same saved audio levels. */
+/** The menu and gallery control the same saved audio levels. */
 export function AudioControls() {
   const sound = useSyncExternalStore(subscribeVolume, getSoundVolume);
   const music = useSyncExternalStore(subscribeVolume, getMusicVolume);

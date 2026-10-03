@@ -9,30 +9,45 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { PLANET_INTRODUCTIONS } from "@/copy/planet-introductions";
 import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
+import { setTheme, setMusicVolume } from "@/audio/engine";
+import type { ThemeName } from "@/audio/themes";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
+const audio = vi.hoisted(() => ({
+  theme: null as ThemeName | null,
+  listeners: new Set<() => void>(),
+}));
 vi.mock("@/components/ChartTuner", () => ({ ChartTuner: () => null }));
 vi.mock("@/audio/engine", () => ({
   playUISound: vi.fn(),
-  currentTheme: () => null,
-  subscribeTheme: () => () => {},
+  currentTheme: () => audio.theme,
+  subscribeTheme: (listener: () => void) => {
+    audio.listeners.add(listener);
+    return () => audio.listeners.delete(listener);
+  },
+  setTheme: vi.fn((theme: ThemeName | null) => {
+    audio.theme = theme;
+    audio.listeners.forEach((listener) => listener());
+  }),
   subscribeVolume: () => () => {},
   getMusicVolume: () => 0,
   getSoundVolume: () => 0,
   setMusicVolume: vi.fn(),
   setSoundVolume: vi.fn(),
-  nextTheme: vi.fn(),
 }));
 
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
   localStorage.clear();
+  vi.clearAllMocks();
+  audio.theme = null;
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
 });
+
 afterEach(() => {
   act(() => root.unmount());
   container.remove();
@@ -77,4 +92,19 @@ it("opens locked planet previews from dev navigation without changing the saved 
   expect(container.querySelector("h1")?.textContent).toBe("Design gallery");
   key("r");
   expect(loadPrince()).toEqual(prince);
+});
+
+it("selects each theme while preserving mute and can stop the selection", () => {
+  act(() => root.render(<MemoryRouter><GalleryScreen /></MemoryRouter>));
+  for (const theme of ["Main", ...PLANETS]) {
+    const button = container.querySelector<HTMLButtonElement>(`[aria-label="Play ${theme} theme"]`)!;
+    act(() => button.click());
+    expect(setTheme).toHaveBeenLastCalledWith(theme);
+    expect(button.getAttribute("aria-pressed")).toBe("true");
+  }
+  expect(setMusicVolume).not.toHaveBeenCalled();
+  const stop = container.querySelector<HTMLButtonElement>('.gallery-music-stop')!;
+  act(() => stop.click());
+  expect(setTheme).toHaveBeenLastCalledWith(null);
+  expect(stop.disabled).toBe(true);
 });

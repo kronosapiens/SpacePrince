@@ -1409,9 +1409,6 @@
   top: var(--prince-close-inset);
   right: var(--prince-close-inset);
 }
-.dev-console .audio-controls { gap: 10px; }
-.dev-console .audio-control { gap: 2px; }
-.dev-console .audio-control-label { font-size: inherit; }
 .screen-help {
   display: flex;
   flex-direction: column;
@@ -1915,8 +1912,7 @@ body:has(.guide-overlay) .dev-keys { display: none; }
 @media (max-width: 899px) {
   .dev-keys { display: none; }
 }
-/* Shared pill for secondary dev-chrome actions (Change Track, Delete
-   Prince, Intro Card). */
+/* Pill for dev-console actions. */
 .dev-chrome-button {
   display: block;
   padding: 7px 12px;
