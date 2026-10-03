@@ -3,6 +3,7 @@ import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
 import { ALL_MUSIC_PARTS, type MusicPart, type MusicPartState } from "./music-parts";
+import { BELL_VOICE } from "./voices";
 
 export type { ThemeSurface } from "./score";
 
@@ -166,17 +167,16 @@ function midiToFreq(midi: number): number {
 }
 
 const FX_VOICE = {
-  oscillator: { type: "sine" as const },
-  envelope: { attack: 0.02, decay: 0.08, sustain: 0.5, release: 0.6 },
+  ...BELL_VOICE,
   volume: -10,
 };
 
-/** Shared soft voice for effects, propagation, and the star. */
+/** Shared bell voice for effects, propagation, and the star. */
 function fxSynth(): AnyInstrument | null {
   if (!T || !reverb) return null;
   const existing = instruments.get("_fx");
   if (existing) return existing;
-  const inst = new T.PolySynth(T.Synth, FX_VOICE).connect(reverb);
+  const inst = new T.PolySynth(T.FMSynth, FX_VOICE).connect(reverb);
   instruments.set("_fx", inst);
   return inst;
 }
@@ -226,12 +226,12 @@ export function playStrike(ruler: PlanetName, target: PlanetName): void {
   fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
 }
 
-/** One sustained planetary voice; its release fits inside the visual cadence. */
+/** One planetary bell note; its release fits inside the visual cadence. */
 export function playNecessityNote(ruler: PlanetName, target: PlanetName, durationSeconds: number): () => void {
   if (!T || !soundOutput || soundVolume === 0 || T.getContext().state !== "running") return () => {};
   const release = Math.min(0.15, durationSeconds / 2);
   // A dedicated, dry voice can be silenced without cutting other effects or leaving a reverb tail.
-  const voice = new T.Synth({
+  const voice = new T.FMSynth({
     ...FX_VOICE,
     envelope: { ...FX_VOICE.envelope, release },
   }).connect(soundOutput);

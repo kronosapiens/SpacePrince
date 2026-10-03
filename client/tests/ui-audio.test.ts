@@ -21,6 +21,14 @@ vi.mock("tone", () => {
     }
     triggerAttackRelease = tone.trigger;
   }
+  class Synth extends AudioNode {
+    triggerAttackRelease = vi.fn();
+    dispose = vi.fn();
+    constructor(options: { envelope: { release: number } }) {
+      super();
+      tone.voices.push({ trigger: this.triggerAttackRelease, dispose: this.dispose, release: options.envelope.release });
+    }
+  }
   return {
     start: vi.fn(async () => {}),
     getContext: () => ({ state: tone.state }),
@@ -30,14 +38,8 @@ vi.mock("tone", () => {
     immediate: () => tone.time - 0.1,
     Reverb: AudioNode,
     Gain: AudioNode,
-    Synth: class extends AudioNode {
-      triggerAttackRelease = vi.fn();
-      dispose = vi.fn();
-      constructor(options: { envelope: { release: number } }) {
-        super();
-        tone.voices.push({ trigger: this.triggerAttackRelease, dispose: this.dispose, release: options.envelope.release });
-      }
-    },
+    Synth,
+    FMSynth: class extends Synth {},
     PolySynth,
   };
 });

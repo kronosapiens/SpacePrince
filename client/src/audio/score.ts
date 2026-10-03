@@ -1,5 +1,6 @@
 import type { ThemeNote, ThemeRole, ThemeSpec } from "./themes";
 import { roleAudible, type MusicPartState } from "./music-parts";
+import { BELL_VOICE } from "./voices";
 
 type ToneModule = typeof import("tone");
 export type ThemeSurface = "map" | "combat" | "narrative";
@@ -70,14 +71,8 @@ export function createScore(
         const echo = own(new T.FeedbackDelay({
           delayTime: 1.5 * spb, feedback: 0.16, wet: 0.12, maxDelay: 3,
         })).connect(output);
-        // The bright attack fades into a rounded, sustained carrier tone.
         inst = own(new T.PolySynth(T.FMSynth, {
-          harmonicity: 2.005,
-          modulationIndex: 1.4,
-          oscillator: { type: "sine" },
-          modulation: { type: "sine" },
-          envelope: { attack: 0.012, decay: 1.5, sustain: 0.55, release: 1.1 },
-          modulationEnvelope: { attack: 0.002, decay: 0.18, sustain: 0.015, release: 0.12 },
+          ...BELL_VOICE,
           volume: 4,
         })).connect(echo);
         break;
