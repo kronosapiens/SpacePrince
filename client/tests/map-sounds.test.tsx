@@ -61,7 +61,7 @@ describe("map feedback", () => {
   it.each(["Enter", " "])("travels on the first %j activation and ignores key repeat", (key) => {
     const { prince, node, next } = setup();
     act(() => root.render(<GameTest path="/play" />));
-    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
     press(node, key, true);
     expect(cues()).toEqual([]);
     expect(loadPrince()).toEqual(prince);
@@ -74,7 +74,7 @@ describe("map feedback", () => {
   it("travels on the first click with one commit cue", () => {
     const { node, next } = setup();
     act(() => root.render(<GameTest path="/play" />));
-    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
     click(node);
     expect(cues()).toEqual(["commit"]);
     expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
@@ -131,7 +131,7 @@ describe("map feedback", () => {
   it("never sounds a commitment while the map guide blocks entering a node", () => {
     const { prince, node } = setup();
     act(() => root.render(<GameTest path="/play" />));
-    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
     click('.screen-help-button');
     vi.mocked(playUISound).mockClear();
     click(node);

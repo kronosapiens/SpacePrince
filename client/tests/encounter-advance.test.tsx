@@ -58,7 +58,7 @@ function mount(prince: ReturnType<typeof createStubPrince>) {
   savePrince(prince);
   act(() => root!.render(<GameTest path="/play" />));
   if (container.querySelector(".necessity-opening")) {
-    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    act(() => vi.runOnlyPendingTimers());
     expect(container.querySelector(".necessity-opening")).toBeNull();
   }
 }
@@ -140,7 +140,7 @@ describe("encounter advancement", () => {
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     expect(container.querySelector(".necessity-opening")).not.toBeNull();
     expect(container.querySelector("[data-intro]")).toBeNull();
-    click(get(".necessity-opening"));
+    act(() => vi.runOnlyPendingTimers());
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(get("[data-intro]").textContent).toBe("Mercury");

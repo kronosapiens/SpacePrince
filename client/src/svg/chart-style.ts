@@ -140,6 +140,11 @@ export const CHART_STYLE = {
     Affliction: { rays: 12, reach: 78, flare: 0.55, stroke: STROKE_HEAVY, opacity: 0.85, cap: "butt", turn: "48s", spin: "normal" },
     Testimony: { rays: 24, reach: 54, flare: 1, stroke: STROKE_MEDIUM, opacity: 0.8, cap: "round", turn: "84s", spin: "reverse" },
   },
+  /** Necessity's asterisk stops short of its enclosing circle. */
+  necessity: {
+    radius: 54, rimGap: 27, rays: 8,
+    stroke: STROKE_MEDIUM, opacity: 0.85, turn: "96s",
+  },
   /** Diagram — the affliction arc: a planet's Resolve at 1 point = 2°, drawn
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc

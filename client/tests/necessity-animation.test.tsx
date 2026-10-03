@@ -155,7 +155,7 @@ it("finishes successful revivals in order before necessity and retains each rest
   expect(result.state.Saturn.affliction).toBe(20);
   expect(result.state.Moon.affliction).toBe(24);
 });
-it.each(["click", "Enter", "Escape"])("consumes %s midway, cancels timers, and does not replay on rerender", (gesture) => {
+it.each(["click", "Enter", "Escape"])("continues through %s and finishes without replaying on rerender", (gesture) => {
   const props = input();
   props.necessity!.push({ planet: "Saturn", amount: 12, halved: false });
   props.state.Saturn.affliction = 24;
@@ -165,7 +165,6 @@ it.each(["click", "Enter", "Escape"])("consumes %s midway, cancels timers, and d
   button.addEventListener(eventType, action);
   document.body.append(button);
   render(props);
-  const skip = result.skip;
   advance(timing.map.accent + timing.map.necessity + timing.map.fortune + timing.map.settle);
   expect(result.state.Moon.affliction).toBe(30);
   expect(result.state.Saturn.affliction).toBe(12);
@@ -173,22 +172,24 @@ it.each(["click", "Enter", "Escape"])("consumes %s midway, cancels timers, and d
     ? new MouseEvent("click", { bubbles: true, cancelable: true })
     : new KeyboardEvent("keydown", { key: gesture, bubbles: true, cancelable: true });
   audio.cancel.mockClear();
-  const skipEvent = event();
-  act(() => { button.dispatchEvent(skipEvent); });
-  expect(audio.cancel).toHaveBeenCalledOnce();
-  const notesAtSkip = audio.play.mock.calls.length;
+  const gestureEvent = event();
+  act(() => { button.dispatchEvent(gestureEvent); });
+  expect(result.active).toBe(true);
+  expect(result.state.Saturn.affliction).toBe(12);
+  expect(audio.cancel).not.toHaveBeenCalled();
+  expect(gestureEvent.defaultPrevented).toBe(false);
+  expect(action).toHaveBeenCalledOnce();
+  const notesBeforeCompletion = audio.play.mock.calls.length;
   advance(10000);
-  expect(audio.play).toHaveBeenCalledTimes(notesAtSkip);
-  expect(skipEvent.defaultPrevented).toBe(true);
-  expect(action).not.toHaveBeenCalled();
+  expect(audio.play).toHaveBeenCalledTimes(notesBeforeCompletion);
+  expect(audio.cancel).toHaveBeenCalledOnce();
   expect(result.active).toBe(false);
   expect(result.state).toBe(props.state);
   expect(vi.getTimerCount()).toBe(0);
   render({ ...props, necessity: [...props.necessity!] });
   expect(result.active).toBe(false);
-  expect(result.skip).toBe(skip);
   act(() => { button.dispatchEvent(event()); });
-  expect(action).toHaveBeenCalledOnce();
+  expect(action).toHaveBeenCalledTimes(2);
   button.remove();
 });
 it("clears scheduled work when disabled and on unmount", () => {

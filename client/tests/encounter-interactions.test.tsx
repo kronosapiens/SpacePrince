@@ -54,7 +54,7 @@ const hover = (selector: string) => act(() => get(selector).dispatchEvent(new Mo
 const leave = (selector: string) => act(() => get(selector).dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body })));
 
 function finishOpening() {
-  act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
   expect(container.querySelector(".necessity-opening")).toBeNull();
 }
 
@@ -80,7 +80,7 @@ function setup(settleOpening = true) {
 }
 
 describe("encounter interactions", () => {
-  it("skips the other chart opening without selecting or acting and retains results without replaying on turn changes", () => {
+  it("finishes the other chart opening before allowing actions and retains results without replaying on turn changes", () => {
     const { encounter, render, onCommitTurn } = setup(false);
     const other = '[data-guide="chart-other"]';
     const record = encounter.necessity!.find((entry) => entry.planet === "Moon")!;
@@ -88,7 +88,8 @@ describe("encounter interactions", () => {
     expect(container.querySelector(".chart-layout-chart .necessity-opening")).toBeNull();
     expect(container.querySelector(".chart-layout-chart .necessity-arc")).toBeNull();
     click(moon);
-    expect(container.querySelector(".necessity-opening")).toBeNull();
+    act(() => get(moon).dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })));
+    expect(container.querySelector(".necessity-opening")).not.toBeNull();
     expect(container.querySelector(testimony)).toBeNull();
     expect(container.querySelector(affliction)).toBeNull();
     expect(onCommitTurn).not.toHaveBeenCalled();

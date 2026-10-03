@@ -110,7 +110,7 @@ describe("chart feedback", () => {
       <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
       onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
     </PlayerChartLayout>));
-    act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
     click(moon);
     click('[data-guide="action-testimony"]');
     expect(onCommitTurn).toHaveBeenCalledTimes(1);

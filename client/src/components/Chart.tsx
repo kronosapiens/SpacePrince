@@ -547,7 +547,9 @@ export function Chart(props: ChartProps) {
 
       {opening && (
         <g className="necessity-opening"
-          role="status" aria-label="Chart opening. Click to skip." />
+          role="status" aria-label="Chart opening.">
+          {opening.phase !== "revival" && <NecessityMark />}
+        </g>
       )}
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
@@ -964,6 +966,23 @@ function PlanetCorona({ verb }: { verb: Polarity }) {
       strokeLinecap={spec.cap}
     >
       {rays}
+    </g>
+  );
+}
+
+function NecessityMark() {
+  const spec = CHART_STYLE.necessity;
+  return (
+    <g transform={`translate(${CHART_CENTER}, ${CHART_CENTER})`}>
+      <g className="planet-corona" style={{ animationDuration: spec.turn }}
+        fill="none" stroke={NEUTRAL.gold} strokeWidth={spec.stroke} strokeOpacity={spec.opacity}>
+        <circle r={spec.radius} />
+        {Array.from({ length: spec.rays }, (_, i) => {
+          const deg = (360 / spec.rays) * i;
+          const end = polar(0, 0, spec.radius - spec.rimGap, deg);
+          return <line key={i} x1={0} y1={0} x2={end.x} y2={end.y} />;
+        })}
+      </g>
     </g>
   );
 }

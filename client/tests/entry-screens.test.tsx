@@ -65,7 +65,7 @@ function input(selector: string, value: string) {
 }
 
 function finishOpening() {
-  act(() => container.querySelector(".necessity-opening")?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
   expect(container.querySelector(".necessity-opening")).toBeNull();
 }
 
@@ -76,7 +76,7 @@ function planetPositions() {
 }
 
 describe("entry screens", () => {
-  it("skips the chart opening without traveling on the same click and retains its results in study", () => {
+  it("finishes the chart opening before allowing travel and retains its results in study", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
     prince.runs = [run];
@@ -92,9 +92,11 @@ describe("entry screens", () => {
     expect(container.querySelector(".necessity-arc")).toBeNull();
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
     click(element(node));
-    expect(container.querySelector(".necessity-opening")).toBeNull();
+    act(() => element(node).dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })));
+    expect(container.querySelector(".necessity-opening")).not.toBeNull();
     expect(loadPrince()).toEqual(prince);
 
+    finishOpening();
     expect(element(node).closest('[role="button"]')).not.toBeNull();
     expect(loadPrince()).toEqual(prince);
     click(element('[data-guide="planet-self-moon"]'));

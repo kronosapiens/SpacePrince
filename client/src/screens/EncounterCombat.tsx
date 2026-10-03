@@ -19,7 +19,7 @@ import { computeProjectedEffects, type ProjectedEffect } from "@/game/projection
 import { getAspects } from "@/game/aspects";
 import { directAmount, getEffectiveStats } from "@/game/combat";
 import { isCombusted, wouldCombust } from "@/game/combust";
-import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
+import { NEUTRAL, PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_EFFECT_MAP,
@@ -649,7 +649,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               colour and the bites on the candidates say the same thing wordlessly,
               and nothing else says which of them is Saturn. */}
           <div className="combat-announce">
-            {!opening.active && !settled && displayOpponentTurn && displayOpponentAction && (
+            {opening.active ? (
+              <p className="combat-announce-line">
+                <span style={{ color: NEUTRAL.gold }}>Necessity</span> settles over the other
+              </p>
+            ) : !settled && displayOpponentTurn && displayOpponentAction && (
               <p className="combat-announce-line" data-guide="opponent-move">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
                   {displayOpponentTurn}
