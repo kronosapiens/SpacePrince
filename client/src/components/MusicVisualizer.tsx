@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useRef, useSyncExternalStore, type KeyboardEvent, type PointerEvent } from "react";
+import { memo, useEffect, useId, useRef, useSyncExternalStore, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import { getMusicParts, seekTheme, subscribeMusicParts, themeBeat, toggleMusicPart } from "@/audio/engine";
 import { MUSIC_PARTS, roleAudible } from "@/audio/music-parts";
 import { surfaceNotes } from "@/audio/score";
@@ -21,9 +21,10 @@ const isRhythm = (role: ThemeRole) => role === "kick" || role === "snare" || rol
 const timeLabel = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 
 /** The map score, with one pitch scale for comparing every composition. */
-export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview = false }: {
+export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview = false, status }: {
   theme: ThemeName;
   overview?: boolean;
+  status?: ReactNode;
 }) {
   const spec = THEMES[theme];
   const parts = useSyncExternalStore(subscribeMusicParts, getMusicParts);
@@ -170,6 +171,7 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
       </figcaption>
       <div className="music-score-scroll">{plot}</div>
       <div className="music-score-key">
+        {status}
         <p ref={seekHint} id={hintId} className="gallery-note music-seek-hint" />
         <div className="music-parts" role="group" aria-label="Music parts">
           {MUSIC_PARTS.filter((part) => notes.some((note) => part.roles.some((role) => role === note.role))).map((part) => (

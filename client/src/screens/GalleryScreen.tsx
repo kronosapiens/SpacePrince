@@ -46,6 +46,17 @@ export default function GalleryScreen() {
     ...chart,
     planets: { ...chart.planets, [planet]: { ...chart.planets[planet], sign } },
   } : chart;
+  const musicStatus = (
+    <div className="gallery-music-status">
+      <p className="gallery-note" role="status">
+        {theme ? `Selected: ${theme === "Main" ? "Main Theme" : theme}` : "No theme selected"}
+        {musicVolume === 0 ? " · Music is muted" : ""}
+      </p>
+      <button type="button" className="gallery-music-stop" disabled={!theme}
+        onPointerEnter={playHoverSound} onFocus={playFocusSound}
+        onClick={() => { playUISound("dismiss"); setTheme(null); }}>Stop music</button>
+    </div>
+  );
 
   return (
     <main className="gallery-screen">
@@ -211,16 +222,7 @@ export default function GalleryScreen() {
             </button>
           ))}
         </div>
-        {theme && <MusicVisualizer theme={theme} />}
-        <div className="gallery-music-status">
-          <p className="gallery-note" role="status">
-            {theme ? `Selected: ${theme === "Main" ? "Main Theme" : theme}` : "No theme selected"}
-            {musicVolume === 0 ? " · Music is muted" : ""}
-          </p>
-          <button type="button" className="gallery-music-stop" disabled={!theme}
-            onPointerEnter={playHoverSound} onFocus={playFocusSound}
-            onClick={() => { playUISound("dismiss"); setTheme(null); }}>Stop music</button>
-        </div>
+        {theme ? <MusicVisualizer theme={theme} status={musicStatus} /> : musicStatus}
       </section>
 
       {planet && <PlanetIntroCard chart={revealChart} planet={planet} onClose={() => setPlanet(null)} />}

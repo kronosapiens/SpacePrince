@@ -129,7 +129,7 @@ it("selects each theme while preserving mute and can stop the selection", () => 
   const stop = container.querySelector<HTMLButtonElement>('.gallery-music-stop')!;
   act(() => stop.click());
   expect(setTheme).toHaveBeenLastCalledWith(null);
-  expect(stop.disabled).toBe(true);
+  expect(container.querySelector<HTMLButtonElement>('.gallery-music-stop')!.disabled).toBe(true);
   expect(container.querySelector(".music-score")).toBeNull();
 });
 
