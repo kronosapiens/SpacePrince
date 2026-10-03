@@ -10,16 +10,15 @@ import type { Prince, Run } from "@/game/types";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-type Surface = "title" | "index" | "mint" | "map" | "combat" | "narrative" | "end";
+type Surface = "title" | "index" | "gallery" | "mint" | "map" | "combat" | "narrative" | "end";
 
 interface Page {
   label: string;
-  kind: "title" | "mint" | SpawnKind;
+  kind: "title" | "gallery" | "mint" | SpawnKind;
 }
 
-// Title is plain navigation; Mint clears to the chart-creation surface; the rest
-// spawn a fresh real game positioned at that surface (see dev-spawn). Everything
-// but Title lands on /play, where PlaySurface derives the screen from state.
+// Title and Gallery are plain navigation; Mint clears to chart creation;
+// the other pages spawn a fresh game on /play (see dev-spawn).
 const PAGES: Page[] = [
   { label: "Title", kind: "title" },
   { label: "Mint", kind: "mint" },
@@ -27,6 +26,7 @@ const PAGES: Page[] = [
   { label: "Encounter", kind: "combat" },
   { label: "Narrative", kind: "narrative" },
   { label: "Finished Map", kind: "end" },
+  { label: "Gallery", kind: "gallery" },
 ];
 
 /** Dev chrome (gated to dev builds by App): four keys, and a small legend for
@@ -71,9 +71,10 @@ export function DevChrome() {
 
   const go = (page: Page) => {
     setPagesOpen(false);
-    if (page.kind === "title" && surface === "title") return;
-    playUISound(page.kind === "title" ? "select" : "commit");
-    if (page.kind === "title") navigate(ROUTES.title);
+    if ((page.kind === "title" || page.kind === "gallery") && surface === page.kind) return;
+    const navigationOnly = page.kind === "title" || page.kind === "gallery";
+    playUISound(navigationOnly ? "select" : "commit");
+    if (page.kind === "title" || page.kind === "gallery") navigate(ROUTES[page.kind]);
     else if (page.kind === "mint") {
       dispatch({ kind: "clear" }); // no active run → PlaySurface shows mint
       navigate(ROUTES.play);
@@ -118,7 +119,7 @@ export function DevChrome() {
       else if (event.key === "p") togglePages();
       else if (event.key.toLowerCase() === "g") toggleGrid();
       else if (event.key === "Escape" && pagesOpen) togglePages();
-      else if (pagesOpen && /^[1-6]$/.test(event.key)) {
+      else if (pagesOpen && /^[1-7]$/.test(event.key)) {
         const page = PAGES[Number(event.key) - 1];
         if (page) go(page);
       }
@@ -186,6 +187,7 @@ export function DevChrome() {
 const SURFACE_LABEL: Record<Surface, string> = {
   title: "Title",
   index: "Index",
+  gallery: "Gallery",
   mint: "Mint",
   map: "Map",
   combat: "Encounter",
@@ -196,6 +198,7 @@ const SURFACE_LABEL: Record<Surface, string> = {
 /** Which surface is showing, distinguishing finished maps for dev re-rolls. */
 function currentSurface(pathname: string, prince: Prince | null, run: Run | null): Surface {
   if (pathname === ROUTES.index) return "index";
+  if (pathname === ROUTES.gallery) return "gallery";
   if (pathname !== ROUTES.play) return "title";
   if (!prince || !run) return "mint";
   if (run.encounter) return run.encounter.kind === "narrative" ? "narrative" : "combat";

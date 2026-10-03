@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import type { PlanetName } from "@/game/types";
@@ -16,7 +17,7 @@ export function KandinskyComposition({ planet, size = 540 }: KandinskyCompositio
   const VB = 540;
   const cx = VB / 2;
   const cy = VB / 2;
-  const gid = `kandinsky-bg-${planet}`;
+  const gid = useId();
   return (
     <svg
       width={size}

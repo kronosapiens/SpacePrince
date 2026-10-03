@@ -6,4 +6,5 @@ export const ROUTES = {
   title: "/",
   play: "/play",
   index: "/__index",
+  gallery: "/gallery",
 } as const;
