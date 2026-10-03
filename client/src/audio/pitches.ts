@@ -17,16 +17,16 @@ export const PLANET_REGISTER = 74;
 /**
  * Chosen degree per planet, stored zero-based and independent of PLANET_MODE.
  * Degrees 5–7 sound below the tonic, giving the low-to-high order
- * Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury.
+ * Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon, reversing the Macrobian ascent.
  */
 export const PLANET_DEGREE: Record<PlanetName, number> = {
   Saturn: 4,
   Jupiter: 5,
   Mars: 6,
   Sun: 0,
-  Moon: 1,
-  Venus: 2,
-  Mercury: 3,
+  Venus: 1,
+  Mercury: 2,
+  Moon: 3,
 };
 
 /** The struck planet's degree in the ruler's mode, voiced around Sun's D5. */

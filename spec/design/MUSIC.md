@@ -82,7 +82,7 @@ Seven planets do not require using every mode or every degree exactly once.
 |---|---|
 | Tonic | D for all planetary modes |
 | Planet → mode | One of the seven modes per planet, using each once; associations are interpretive |
-| Planet → degree | Sun 1, Moon 2, Venus 3, Mercury 4, Saturn 5, Jupiter 6, Mars 7, fixed across rulers |
+| Planet → degree | Sun 1, Venus 2, Mercury 3, Moon 4, Saturn 5, Jupiter 6, Mars 7, fixed across rulers |
 | Active mode | Combat uses the opponent's chart ruler, narrative the house ruler, map necessity the player's chart ruler |
 | Register | Sun at D5, with degrees 5–7 below and degrees 2–4 above, spanning less than one octave |
 | Timbre | One shared `PLANET_VOICE` for strikes and necessity, currently auditioning the existing plucked arpeggio voice |
@@ -159,8 +159,10 @@ It is the same set of beats that lights the edge bands, so band and note are one
 The narrative screen strikes the same way at its house's natural ruler: each planet an outcome touches rings its degree, so an outcome that touches several planets sounds as a chord.
 
 Sun supplies the tonic, D5, at the middle of the seven-note arrangement.
-From low to high, the planets are Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury.
-This is a chosen interpretation of planetary character: Saturn and Jupiter lower, Venus and Mercury higher, with Sun as a stable reference.
+From low to high, the planets are Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon.
+This follows the planetary pitch order described in [Boethius, *Fundamentals of Music*, I.27](https://www.examenapium.it/cs/biblio/Godwin1993.pdf) and reverses the game's Macrobian unlock order.
+The historical alignment concerns planetary ordering; the shared D tonic and seven parallel modes remain design choices.
+[Macrobius's own musical account, II.4](https://dokumen.pub/macrobius-commentary-on-the-dream-of-scipio-9780231880046.html) follows Cicero in placing the Moon lowest, so its pitch direction is opposite to ours.
 The ruler changes the mode and its intervals while the planetary ordering stays the same.
 `PLANET_MODE` and `PLANET_DEGREE` in `client/src/audio/pitches.ts` store the assignments independently.
 
@@ -175,14 +177,14 @@ The lowest sounding note is the bass; the tonic need not be the lowest note.
 | Jupiter | 6 | Below |
 | Mars | 7 | Below |
 | Sun | 1 | Tonic |
-| Moon | 2 | Above |
-| Venus | 3 | Above |
-| Mercury | 4 | Above |
+| Venus | 2 | Above |
+| Mercury | 3 | Above |
+| Moon | 4 | Above |
 
 The ruler selects the row and the affected planet selects the column.
 The ruler's own planet keeps its assigned degree; it does not take the tonic from Sun.
 
-| Ruler's mode | Saturn | Jupiter | Mars | Sun | Moon | Venus | Mercury |
+| Ruler's mode | Saturn | Jupiter | Mars | Sun | Venus | Mercury | Moon |
 |---|---|---|---|---|---|---|---|
 | Jupiter, Lydian | A4 | B4 | C♯5 | D5 | E5 | F♯5 | G♯5 |
 | Sun, Ionian | A4 | B4 | C♯5 | D5 | E5 | F♯5 | G5 |
@@ -192,7 +194,7 @@ The ruler's own planet keeps its assigned degree; it does not take the tonic fro
 | Mars, Phrygian | A4 | B♭4 | C5 | D5 | E♭5 | F5 | G5 |
 | Saturn, Locrian | A♭4 | B♭4 | C5 | D5 | E♭5 | F5 | G5 |
 
-Under these assignments, Saturn voices scale degree 5 below Sun, Venus carries the major or minor third, and Mercury carries the fourth, raised under Jupiter.
+Under these assignments, Saturn voices scale degree 5 below Sun, Venus carries the second, Mercury the major or minor third, and Moon the fourth, raised under Jupiter.
 These planetary relationships are consequences of the current mappings and change if those mappings change.
 Propagation selects a sequence of these notes through the aspect web; overlapping notes also form harmonies within the mode.
 

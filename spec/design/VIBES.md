@@ -136,7 +136,7 @@ Sound should reinforce the planetary color system.
 
 - Planetary themes express character through chosen modes, rhythm, register, and timbre.
   Planetary event sounds use assigned degrees in the active ruler's mode and one shared voice.
-  Their fixed low-to-high order is Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury, spanning less than one octave around Sun's D5 tonic.
+  Their fixed low-to-high order is Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon, spanning less than one octave around Sun's D5 tonic.
 - The encounter's ruler establishes the mode; the acting planet opens from its degree and the affected planet lands on its degree.
 - Aspect propagation is *audible*.
   Each affected planet sounds its assigned degree in the encounter's mode.
