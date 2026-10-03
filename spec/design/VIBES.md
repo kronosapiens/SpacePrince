@@ -134,7 +134,9 @@ More like a candle going out.
 
 Sound should reinforce the planetary color system.
 
-- Each planet has a **sonic identity** expressed through its mode, ruler-relative degree, register, rhythm, and timbral character.
+- Planetary themes express character through chosen modes, rhythm, register, and timbre.
+  Planetary event sounds use assigned degrees in the active ruler's mode and one shared voice.
+  Their fixed low-to-high order is Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury, spanning less than one octave around Sun's D5 tonic.
 - The encounter's ruler establishes the mode; the acting planet opens from its degree and the affected planet lands on its degree.
 - Aspect propagation is *audible*.
   Each affected planet sounds its assigned degree in the encounter's mode.
@@ -143,7 +145,7 @@ Sound should reinforce the planetary color system.
 - The future layered score gets **sparser as planets combust**.
   Early in a run, the fielded chart is full; late in a run, dark planets leave gaps where voices used to be.
 
-`MUSIC.md` is canonical for the tonic, mode table, degree grid, register anchors, and event grammar.
+`MUSIC.md` distinguishes musical structure from the chosen tonic, mode table, degree grid, shared register, and event grammar.
 
 ---
 

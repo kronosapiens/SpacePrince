@@ -1,6 +1,6 @@
 import type { PlanetName } from "@/game/types";
 
-/** Mode per planet as semitone offsets from the shared D tonic (MUSIC.md table). */
+/** Chosen mode per planet as semitone offsets from the shared D tonic. */
 export const PLANET_MODE: Record<PlanetName, readonly number[]> = {
   Jupiter: [0, 2, 4, 6, 7, 9, 11], // Lydian — the ♯4 reaches past its own boundary
   Sun: [0, 2, 4, 5, 7, 9, 11], // Ionian — the home key itself
@@ -11,34 +11,27 @@ export const PLANET_MODE: Record<PlanetName, readonly number[]> = {
   Saturn: [0, 1, 3, 5, 6, 8, 10], // Locrian — the ♭5 denies a stable home
 };
 
-/** D-octave MIDI anchors for event sounds (MUSIC.md, "The strike grid"). */
-export const PLANET_REGISTER: Record<PlanetName, number> = {
-  Sun: 62, // D4
-  Moon: 62, // D4
-  Mercury: 74, // D5
-  Venus: 62, // D4
-  Mars: 50, // D3
-  Jupiter: 50, // D3
-  Saturn: 38, // D2
-};
+/** Shared D5 tonic at the center of the planetary event voices. */
+export const PLANET_REGISTER = 74;
 
 /**
- * Degree per planet — where that planet's mode starts in the shared collection.
- * The seven modes are the seven rotations of one set of notes (Ionian from the
- * first, Dorian from the second, through Locrian from the seventh), so the
- * degree comes with the mode rather than being chosen.
+ * Chosen degree per planet, stored zero-based and independent of PLANET_MODE.
+ * Degrees 5–7 sound below the tonic, giving the low-to-high order
+ * Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury.
  */
 export const PLANET_DEGREE: Record<PlanetName, number> = {
+  Saturn: 4,
+  Jupiter: 5,
+  Mars: 6,
   Sun: 0,
-  Mercury: 1,
-  Mars: 2,
-  Jupiter: 3,
-  Venus: 4,
-  Moon: 5,
-  Saturn: 6,
+  Moon: 1,
+  Venus: 2,
+  Mercury: 3,
 };
 
-/** The struck planet's degree in the ruler's mode, at its own register. */
+/** The struck planet's degree in the ruler's mode, voiced around Sun's D5. */
 export function strikeMidi(ruler: PlanetName, target: PlanetName): number {
-  return PLANET_REGISTER[target] + PLANET_MODE[ruler][PLANET_DEGREE[target]]!;
+  const degree = PLANET_DEGREE[target];
+  const octaveOffset = degree >= 4 ? -12 : 0;
+  return PLANET_REGISTER + PLANET_MODE[ruler][degree]! + octaveOffset;
 }

@@ -3,7 +3,7 @@ import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
 import { ALL_MUSIC_PARTS, type MusicPart, type MusicPartState } from "./music-parts";
-import { BELL_VOICE } from "./voices";
+import { BELL_VOICE, PLANET_VOICE } from "./voices";
 
 export type { ThemeSurface } from "./score";
 
@@ -166,18 +166,17 @@ function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
-const FX_VOICE = {
-  ...BELL_VOICE,
-  volume: -10,
-};
+const FX_VOLUME_DB = -10;
 
-/** Shared bell voice for effects, propagation, and the star. */
-function fxSynth(): AnyInstrument | null {
+/** Cached voices for encounter strikes and the star. */
+function fxSynth(kind: "planet" | "star"): AnyInstrument | null {
   if (!T || !reverb) return null;
-  const existing = instruments.get("_fx");
+  const key = `_fx_${kind}`;
+  const existing = instruments.get(key);
   if (existing) return existing;
-  const inst = new T.PolySynth(T.FMSynth, FX_VOICE).connect(reverb);
-  instruments.set("_fx", inst);
+  const voice = kind === "planet" ? PLANET_VOICE : BELL_VOICE;
+  const inst = new T.PolySynth(T.FMSynth, { ...voice, volume: FX_VOLUME_DB }).connect(reverb);
+  instruments.set(key, inst);
   return inst;
 }
 
@@ -214,26 +213,27 @@ export function playUISound(cue: UISound): void {
 
 /**
  * A strike is audible (MUSIC.md, "The strike grid"): the struck planet rings
- * its degree in the ruler's mode, at the planet's register, so the
+ * its degree in the ruler's mode, in the shared octave, so the
  * whole encounter sounds in one mode.
  */
 export function playStrike(ruler: PlanetName, target: PlanetName): void {
   if (!T || soundVolume === 0) return;
-  const fx = fxSynth();
+  const fx = fxSynth("planet");
   if (!fx) return;
   const now = T.now();
   const n = strikeMidi(ruler, target);
   fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
 }
 
-/** One planetary bell note; its release fits inside the visual cadence. */
+/** One planetary note; its release fits inside the visual cadence. */
 export function playNecessityNote(ruler: PlanetName, target: PlanetName, durationSeconds: number): () => void {
   if (!T || !soundOutput || soundVolume === 0 || T.getContext().state !== "running") return () => {};
   const release = Math.min(0.15, durationSeconds / 2);
   // A dedicated, dry voice can be silenced without cutting other effects or leaving a reverb tail.
   const voice = new T.FMSynth({
-    ...FX_VOICE,
-    envelope: { ...FX_VOICE.envelope, release },
+    ...PLANET_VOICE,
+    volume: FX_VOLUME_DB,
+    envelope: { ...PLANET_VOICE.envelope, release },
   }).connect(soundOutput);
   // Match the visual accent and disposal timer without the score's scheduling lookahead.
   voice.triggerAttackRelease(midiToFreq(strikeMidi(ruler, target)), durationSeconds - release, T.immediate(), 0.24);
@@ -267,7 +267,7 @@ export function playCombust(): void {
 /** A run's star taking its place — a quiet high bell, far away. */
 export function playStar(): void {
   if (!T || soundVolume === 0) return;
-  const fx = fxSynth();
+  const fx = fxSynth("star");
   if (!fx) return;
   const now = T.now();
   fx.triggerAttackRelease(midiToFreq(86), 1.2, now, 0.28); // D6

@@ -1,6 +1,6 @@
 import type { ThemeNote, ThemeRole, ThemeSpec } from "./themes";
 import { roleAudible, type MusicPartState } from "./music-parts";
-import { BELL_VOICE } from "./voices";
+import { BELL_VOICE, PLUCK_VOICE } from "./voices";
 
 type ToneModule = typeof import("tone");
 export type ThemeSurface = "map" | "combat" | "narrative";
@@ -85,12 +85,7 @@ export function createScore(
         })).connect(output);
         const filter = own(new T.Filter({ type: "lowpass", frequency: 4600, Q: 0.5 })).connect(echo);
         inst = own(new T.PolySynth(T.FMSynth, {
-          harmonicity: 3.005,
-          modulationIndex: 2.2,
-          oscillator: { type: "sine" },
-          modulation: { type: "sine" },
-          envelope: { attack: 0.003, decay: 1.2, sustain: 0, release: 0.65 },
-          modulationEnvelope: { attack: 0.002, decay: 0.22, sustain: 0.03, release: 0.2 },
+          ...PLUCK_VOICE,
           volume: 6,
         })).connect(filter);
         break;

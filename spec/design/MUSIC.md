@@ -3,20 +3,20 @@
 *The sonic vocabulary, and how we intend to build it.*
 
 `VIBES.md` describes how the game should feel and `STYLE.md` what it should look like.
-This document is the third surface — what it should *sound* like: the committed creative direction and the working method, ahead of the per-piece composition itself.
+This document is the third surface — what it should *sound* like: the current creative direction and working method.
 
 The guiding principle:
 
 > **The same seven planets you play, in sound.**
 
-**Status:** direction committed; first in-engine realization shipped.
-The cohesion model (parallel modes on a shared tonic), the home pitch, the per-planet mode mapping, and the runtime architecture are decided below.
+**Status:** first in-engine realization shipped; planetary event tones are being tuned.
+The shared tonic, planet-to-mode mapping, planet-to-degree mapping, register, and timbre are design choices described below.
 All seven themes now play in the client (`client/src/audio/themes.ts`, developed from `music-sketches/`) as synchronized bed + down + up layers.
 The surface selects the mix — map breathes the down layer and combat drives the up layer — while one ruler's theme remains active at a time.
 This vertical variation within one theme is distinct from the future multi-planet layered model in Architecture (b).
 Theme selection: the map plays the Prince's chart ruler, combat the opponent's chart ruler, narrative the house ruler.
 The standalone per-planet signature gestures have been removed from the client.
-Event audio will be rebuilt from the ruler-relative degree and register system below.
+Event audio uses the ruler-relative degrees below, voiced within one octave around Sun's D5 tonic.
 The DAW pass (real timbre and mix) remains future work; Venus and Saturn's open mode calls were resolved provisionally in the shipped themes (Venus Mixolydian, Saturn Locrian over a moving toll rather than a static pedal).
 
 ---
@@ -64,37 +64,62 @@ Themes stay **ambient and atmospheric**, not character songs — consistent with
 
 ---
 
+## Musical structure and design choices
+
+Choosing the seven diatonic modes is itself a design choice.
+Within that family, the musical definitions give us:
+
+- Seven pitch classes per octave, with a different interval pattern for each mode.
+- Seven rotations of the major scale's whole-step and half-step pattern: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian.
+- Relative modes that share a pitch collection but have different tonics; parallel modes that share a tonic but have different pitch collections.
+- A determined pitch class once the tonic, mode, and scale degree are specified; an octave placement is still needed to determine the sounding pitch.
+
+The interval patterns and parallel relationship are described in [Open Music Theory](https://pressbooks.nebraska.edu/openmusictheory/chapter/intro-to-diatonic-modes-and-the-chromatic-scale/).
+These definitions impose no planetary associations.
+Seven planets do not require using every mode or every degree exactly once.
+
+| Design choice | Current setting |
+|---|---|
+| Tonic | D for all planetary modes |
+| Planet → mode | One of the seven modes per planet, using each once; associations are interpretive |
+| Planet → degree | Sun 1, Moon 2, Venus 3, Mercury 4, Saturn 5, Jupiter 6, Mars 7, fixed across rulers |
+| Active mode | Combat uses the opponent's chart ruler, narrative the house ruler, map necessity the player's chart ruler |
+| Register | Sun at D5, with degrees 5–7 below and degrees 2–4 above, spanning less than one octave |
+| Timbre | One shared `PLANET_VOICE` for strikes and necessity, currently auditioning the existing plucked arpeggio voice |
+| Event notes | Each affected planet sounds its assigned degree, without aspect-added notes |
+
+The mode and degree assignments can be changed independently.
+For example, assigning Jupiter another mode would change Jupiter-ruled encounters; it need not change Jupiter's degree when sounded as a target.
+The pitch matrix is derived from these choices rather than assigned separately cell by cell.
+Membership in one mode does not guarantee that every sequence or combination will sound pleasing; rhythm, voicing, overlap, and phrasing still matter.
+
+---
+
 ## Cohesion — parallel modes on a shared tonic
 
-Cohesion has several independent levers — a **shared tonic**, a **shared collection** (one pitch set, varying tonics), a **shared chord-color**, a **shared motivic germ** (one cell seeded across all 14), and **shared timbre** (the strongest, but a DAW concern, not a theory one).
-A suite can be tonally varied and still tightly unified when cohesion lives in any of these — FTL changes key track to track and coheres through idiom and timbre alone.
+The current approach uses one home pitch, D, with each planet's theme in a different mode on that tonic.
+The shared tonic gives the themes a common reference and lets the event notes follow the active theme's mode.
+It also parallels the global planetary tint in `STYLE.md`.
 
-We commit to the strongest form anyway: **one home pitch, each planet a different mode on that same tonic** — parallel modes (Lydian / Dorian / Phrygian on one root), not different keys.
+A shared tonic is neither required for simultaneous music nor sufficient to make it consonant.
+For example, D Lydian and D Phrygian contain conflicting pitch classes despite sharing D.
+Any future layering of planetary themes needs compatible musical material and arrangement.
+A drone is one possible arrangement choice, not a requirement of modal music or of the pitch matrix.
 
-The decisive reason is **simultaneity**, not transitions.
-A shared tonic is the precondition for planets to *sound at once*: the chart-as-chord north-star (below) is coherent only if placements share a root, as is any combat texture carrying more than the active planet (the layered model in *Architecture*).
-Different keys would be polytonal mush; one tonic lets the chart be voiced as a single chord.
-Seamless **transitions** are a real but secondary benefit — the drone holds while only the upper structure moves, so explore↔battle crossfades and between-encounter planet swaps don't lurch.
-And it rhymes with the visuals: the ambient tint in `STYLE.md` is one global ground the surface's planet recolors; parallel modes are that structure in sound.
-
-*Caveat.*
-Shared *root* is not automatically shared *consonance* — full Lydian and full Phrygian on one tonic still clash chromatically.
-Simultaneity works because the texture is drone plus register-separated stems, not seven melodies at once: the tonic anchors, voicing does the rest.
-
-**Home pitch: D.**
-A warm modal-drone center — D1 (≈ 37 Hz) gives Saturn real floor without mud and leaves Mercury room to sparkle on top.
-This is pure transposition, trivially changed if the synths prefer otherwise; we are not tuning-mystical about it (no 432 Hz — astrology here is a symbolic system, not woo).
+D is a chosen home pitch; transposing the system preserves its interval relationships.
 
 ---
 
 ## The seven modes
 
-Parallel modes form a **brightness ladder** — Lydian → Ionian → Mixolydian → Dorian → Aeolian → Phrygian → Locrian — that maps onto planetary temperament, and closely onto the traditional benefic→malefic axis, so the assignment is structural rather than decorative.
+Parallel modes can be ordered as a **brightness ladder** — Lydian → Ionian → Mixolydian → Dorian → Aeolian → Phrygian → Locrian — with each step lowering one degree by a semitone.
+The planetary assignments below interpret that ordering through temperament and the benefic–malefic axis.
+They are artistic associations, not consequences of the interval patterns.
 
 | Planet  | Mode       | Rationale |
 |---------|------------|-----------|
 | Jupiter | Lydian     | Greater benefic; the ♯4 reaches past its own boundary — "the frame is larger than the problem." |
-| Sun     | Ionian     | The reference mode *is* the sovereign center — the Sun is the home key, every other mode measured against it. |
+| Sun     | Ionian     | The major reference mode is chosen to express the sovereign center. |
 | Venus   | Mixolydian | Warm major-lean with an unresolved ♭7 ache. *(provisional — see below.)* |
 | Mercury | Dorian     | Dorian's interval pattern is a palindrome, inverting to itself — the self-inverting trickster, "turn it over, and again turn it over." |
 | Moon    | Aeolian    | Natural minor; nocturnal, reflective, soft. |
@@ -105,12 +130,13 @@ Parallel modes form a **brightness ladder** — Lydian → Ionian → Mixolydian
 The ladder is a cohesion/identity device, not a differentiation one — Mars and Saturn are both dark yet nothing alike, and that difference lives in **meter, tempo, register, and rhythm**.
 Holst pre-solves these for the five planets he wrote: Mars's 5/4 ostinato, Mercury's fast bitonal 6/8, Venus serene and slow, Jupiter broad and majestic, Saturn's processional tolling.
 The two we invent fill the gaps — the **Sun** is the steady centered pulse everything else is heard against; the **Moon** is the floating nocturne.
-A planet's mode is constant across its explore and battle variants: you do not change a fingerprint between two states of one theme.
+A planet's mode stays the same across its explore and battle variants as a choice of thematic continuity.
 
-**Two structural wins.**
+**Reasons for two of the assignments.**
 
-- **Sun = Ionian = the home key itself** settles both "which mode for the Sun" and "what is the reference," and is thematically exact; compose it last, as planned, but define the tonic as the Sun's.
-- **Saturn = Locrian, held up by the shared pedal.** The one mode with no stable tonic triad leans on the suite's common drone for its floor — Saturn on borrowed ground is very Saturn, and the pedal supplies what the mode denies, so it stays darkest without an unplayable tonic.
+- **Sun = Ionian** connects the sovereign character with the major reference mode.
+- **Saturn = Locrian** uses the diminished tonic triad as an interpretation of instability and constraint.
+  The current Saturn theme uses a moving toll; Locrian does not require a drone.
 
 **Two open calls.**
 
@@ -132,45 +158,53 @@ The resolution strikes ring in that same mode: every beat that strikes a planet 
 It is the same set of beats that lights the edge bands, so band and note are one event, the key struck.
 The narrative screen strikes the same way at its house's natural ruler: each planet an outcome touches rings its degree, so an outcome that touches several planets sounds as a chord.
 
-Each planet's degree is where its mode starts in the shared collection — the seven modes are the seven rotations of one set of notes, Ionian from the first, Dorian from the second, through Locrian from the seventh.
-So the degree comes with the mode, chosen by nobody: Sun 1, Mercury 2, Mars 3, Jupiter 4, Venus 5, Moon 6, Saturn 7.
-This reads the cohesion model column-wise: the parallel modes on D give the rows, the relative rotation gives the columns.
+Sun supplies the tonic, D5, at the middle of the seven-note arrangement.
+From low to high, the planets are Saturn, Jupiter, Mars, Sun, Moon, Venus, Mercury.
+This is a chosen interpretation of planetary character: Saturn and Jupiter lower, Venus and Mercury higher, with Sun as a stable reference.
+The ruler changes the mode and its intervals while the planetary ordering stays the same.
+`PLANET_MODE` and `PLANET_DEGREE` in `client/src/audio/pitches.ts` store the assignments independently.
 
-The degree and register anchor are permanent coordinates of planetary identity.
-The register anchor is the D octave used to voice a planet's ruler-relative degree, not a fixed event pitch.
+All planetary event notes use D5 as their common tonic anchor.
+Degrees 5–7 are voiced an octave below their ascending-scale positions; degrees 1–4 retain those positions.
+Sun has three voices below and three above, and each mode's arrangement spans ten or eleven semitones.
+The lowest sounding note is the bass; the tonic need not be the lowest note.
 
-| Planet | Degree | Register anchor |
-|---|---:|---:|
-| Sun | 1 | D4 |
-| Mercury | 2 | D5 |
-| Mars | 3 | D3 |
-| Jupiter | 4 | D3 |
-| Venus | 5 | D4 |
-| Moon | 6 | D4 |
-| Saturn | 7 | D2 |
+| Planet | Current degree | Placement relative to D5 |
+|---|---:|---|
+| Saturn | 5 | Below |
+| Jupiter | 6 | Below |
+| Mars | 7 | Below |
+| Sun | 1 | Tonic |
+| Moon | 2 | Above |
+| Venus | 3 | Above |
+| Mercury | 4 | Above |
 
-| Ruler's mode | Sun | Mercury | Mars | Jupiter | Venus | Moon | Saturn |
+The ruler selects the row and the affected planet selects the column.
+The ruler's own planet keeps its assigned degree; it does not take the tonic from Sun.
+
+| Ruler's mode | Saturn | Jupiter | Mars | Sun | Moon | Venus | Mercury |
 |---|---|---|---|---|---|---|---|
-| Jupiter, Lydian | D | E | F♯ | G♯ | A | B | C♯ |
-| Sun, Ionian | D | E | F♯ | G | A | B | C♯ |
-| Venus, Mixolydian | D | E | F♯ | G | A | B | C |
-| Mercury, Dorian | D | E | F | G | A | B | C |
-| Moon, Aeolian | D | E | F | G | A | B♭ | C |
-| Mars, Phrygian | D | E♭ | F | G | A | B♭ | C |
-| Saturn, Locrian | D | E♭ | F | G | A♭ | B♭ | C |
+| Jupiter, Lydian | A4 | B4 | C♯5 | D5 | E5 | F♯5 | G♯5 |
+| Sun, Ionian | A4 | B4 | C♯5 | D5 | E5 | F♯5 | G5 |
+| Venus, Mixolydian | A4 | B4 | C5 | D5 | E5 | F♯5 | G5 |
+| Mercury, Dorian | A4 | B4 | C5 | D5 | E5 | F5 | G5 |
+| Moon, Aeolian | A4 | B♭4 | C5 | D5 | E5 | F5 | G5 |
+| Mars, Phrygian | A4 | B♭4 | C5 | D5 | E♭5 | F5 | G5 |
+| Saturn, Locrian | A♭4 | B♭4 | C5 | D5 | E♭5 | F5 | G5 |
 
-Each row down the brightness ladder flattens one more degree, and the astrology falls out unforced: the Sun never bends; Venus's fifth holds under every mode but Saturn's; Jupiter's fourth is raised only in his own row; Mars's third is major under the three bright rulers and minor under the four dark; Saturn sits on the seventh, the degree that wants to resolve to the Sun.
-A propagation wave sounds as a chord inside the ruler's mode, chosen by the aspect web.
+Under these assignments, Saturn voices scale degree 5 below Sun, Venus carries the major or minor third, and Mercury carries the fourth, raised under Jupiter.
+These planetary relationships are consequences of the current mappings and change if those mappings change.
+Propagation selects a sequence of these notes through the aspect web; overlapping notes also form harmonies within the mode.
 
 An action is a short phrase inside the ruler's mode: the acting planet's degree opens and the target planet's degree lands.
 Testimony and Affliction use the same planetary notes.
 Each propagation sounds only the target's assigned note, regardless of aspect.
 Combustion begins the target's ruler-relative voice, chokes it, and releases a breath.
-The event register follows the canonical anchors above, with Saturn on the floor and Mercury on top.
+Strikes and necessity use the same pitch calculation and shared voice setting.
 Music is opt-in while sound is on by default, so the strikes must read alone, and a melody of degrees over silence does.
 
-Caveat: the column assignment assumes the diatonic set.
-If a planet ever takes harmonic minor, its row still works — any seven-note scale has seven degrees — but its degree can no longer be derived and is kept by choice.
+The matrix can also use another seven-note scale, such as harmonic minor, for a ruler's row.
+That changes the row's interval pattern without requiring a new degree assignment for the ruling planet.
 
 ---
 
@@ -181,9 +215,10 @@ There are two sonic scales.
 - **Music** (here): the themes — the score.
 - **Event sound** (`VIBES.md §Sound Design`): short ruler-relative phrases for actions, propagation, and combustion.
 
-Both scales use the same tonic, mode table, planetary degrees, registers, and broad metric and timbral character.
+The score and event sounds share the tonic and planet-to-mode mapping.
+The score has composed melodies and instrument registers; event sounds use the planet-to-degree mapping and shared octave above.
 There is no separate library of pitched per-planet jingles.
-The ruler governs the pitch collection throughout an encounter; actors and targets remain identifiable through their degrees, registers, articulation, and rhythm.
+The ruler governs the event pitch collection throughout an encounter, and the affected planet selects the degree.
 
 **Combat-music model: implement (a), architect for (b).**
 
@@ -193,8 +228,8 @@ The ruler governs the pitch collection throughout an encounter; actors and targe
   This is the architecture that can make the continuous soundscape grow genuinely sparser as planets go dark.
   It is richer but larger, and it requires every theme to be writable as a simultaneous stem.
 
-The shared-tonic decision is made now *because* (b) needs it, but v1 ships the jukebox.
-In practice this means composing each battle core so it can also stand as an isolated, loopable stem over the common drone — the same material, deployed either way.
+The shared tonic is intended to help a possible layered arrangement; it does not guarantee that independently composed themes will work together.
+That arrangement would need its own composition and listening pass.
 
 ---
 
@@ -240,7 +275,7 @@ We are not pursuing this yet, but it is no longer only aspirational: the shared-
 
 ## Open decisions / next
 
-Resolved above: the parallel-modes cohesion model, the home pitch (D), the per-planet mode mapping, the music/sound-design boundary, and the jukebox/layered architecture.
+Current choices are described above: parallel modes on D, separate planet-to-mode and planet-to-degree mappings, a shared event octave and voice, and the jukebox architecture.
 
 Remaining, roughly in order:
 
