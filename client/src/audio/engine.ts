@@ -2,6 +2,7 @@ import type { PlanetName } from "@/game/types";
 import { strikeMidi } from "./pitches";
 import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
+import { ALL_MUSIC_PARTS, type MusicPart, type MusicPartState } from "./music-parts";
 
 export type { ThemeSurface } from "./score";
 
@@ -289,12 +290,40 @@ export function playStar(): void {
 
 const MIX_RAMP_S = 2.2;
 const SWAP_FADE_S = 1.1;
+const SEEK_FADE_S = 0.04;
 const SCORE_VOLUME = 0.9;
 
 let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
-let playing: { theme: ThemeName; score: ReturnType<typeof createScore> } | null = null;
+let playing: { theme: ThemeName; score: ReturnType<typeof createScore>; seekBeat?: number } | null = null;
 let swapTimer: number | null = null;
 const themeListeners = new Set<() => void>();
+let musicParts = ALL_MUSIC_PARTS;
+const partListeners = new Set<() => void>();
+
+export function getMusicParts(): MusicPartState {
+  return musicParts;
+}
+
+export function subscribeMusicParts(listener: () => void): () => void {
+  partListeners.add(listener);
+  return () => partListeners.delete(listener);
+}
+
+function setMusicParts(next: MusicPartState): void {
+  musicParts = next;
+  playing?.score.parts(next);
+  for (const listener of partListeners) listener();
+}
+
+export function toggleMusicPart(part: MusicPart): void {
+  const muted = musicParts.muted.includes(part)
+    ? musicParts.muted.filter((value) => value !== part) : [...musicParts.muted, part];
+  setMusicParts({ muted });
+}
+
+export function resetMusicParts(): void {
+  setMusicParts(ALL_MUSIC_PARTS);
+}
 
 /** Change the mix in place for the same theme; fade between different themes. */
 export function setTheme(theme: ThemeName | null, surface: ThemeSurface = "map"): void {
@@ -308,12 +337,36 @@ export function currentTheme(): ThemeName | null {
   return desired?.theme ?? null;
 }
 
+/** Loop position; a committed seek stays still until the new audio starts. */
+export function themeBeat(theme: ThemeName): number | null {
+  if (!T || musicVolume === 0 || desired?.theme !== theme || playing?.theme !== theme
+    || T.getContext().state !== "running" || T.getTransport().state !== "started") return null;
+  if (swapTimer !== null && playing.seekBeat !== undefined) return playing.seekBeat;
+  return playing.score.beat() ?? playing.seekBeat ?? null;
+}
+
+/** Replace this score at a loop position without moving the shared transport. */
+export function seekTheme(theme: ThemeName, beat: number): void {
+  if (themeBeat(theme) === null) return;
+  const target = Math.max(0, Math.min(beat, THEMES[theme].beats));
+  const surface = desired!.surface;
+  cancelSwap();
+  playing!.seekBeat = target;
+  playing!.score.fade(0, SEEK_FADE_S);
+  swapTimer = window.setTimeout(() => {
+    swapTimer = null;
+    playing?.score.dispose();
+    startScore(theme, surface, target);
+  }, (SEEK_FADE_S + T!.getContext().lookAhead) * 1000 + 20);
+}
+
 export function subscribeTheme(listener: () => void): () => void {
   themeListeners.add(listener);
   return () => themeListeners.delete(listener);
 }
 
 function cancelSwap(): void {
+  if (playing) delete playing.seekBeat;
   if (swapTimer === null) return;
   window.clearTimeout(swapTimer);
   swapTimer = null;
@@ -342,11 +395,12 @@ function applyTheme(): void {
   }
 }
 
-function startScore(theme: ThemeName, surface: ThemeSurface): void {
+function startScore(theme: ThemeName, surface: ThemeSurface, seekBeat?: number): void {
   if (!T) return;
-  const score = createScore(T, THEMES[theme], surface, musicOutput!);
-  playing = { theme, score };
-  score.fade(SCORE_VOLUME, SWAP_FADE_S);
+  const score = createScore(T, THEMES[theme], surface, musicOutput!, seekBeat);
+  score.parts(musicParts);
+  playing = { theme, score, seekBeat };
+  score.fade(SCORE_VOLUME, seekBeat === undefined ? SWAP_FADE_S : SEEK_FADE_S);
 }
 
 function haltTheme(fadeS: number): void {

@@ -1,11 +1,12 @@
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Link } from "react-router-dom";
-import { currentTheme, getMusicVolume, playUISound, setTheme, subscribeTheme, subscribeVolume } from "@/audio/engine";
+import { currentTheme, getMusicVolume, playUISound, resetMusicParts, setTheme, subscribeTheme, subscribeVolume } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { AudioControls } from "@/components/AudioControls";
 import { HouseCoin } from "@/components/HouseCoin";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
 import { MapDiagram } from "@/components/MapDiagram";
+import { MusicVisualizer } from "@/components/MusicVisualizer";
 import { PlanetIntroCard } from "@/components/PlanetIntroCard";
 import { PrinceArtwork } from "@/components/PrinceArtwork";
 import { HOUSES } from "@/data/houses";
@@ -35,6 +36,11 @@ export default function GalleryScreen() {
   const [sign, setSign] = useState<SignName>("Pisces");
   const theme = useSyncExternalStore(subscribeTheme, currentTheme);
   const musicVolume = useSyncExternalStore(subscribeVolume, getMusicVolume);
+  useEffect(() => {
+    const selected = currentTheme();
+    if (selected) setTheme(selected, "map");
+    return resetMusicParts;
+  }, []);
   // The placement override is only for the reveal's copy, never the chart artwork.
   const revealChart = planet ? {
     ...chart,
@@ -201,9 +207,11 @@ export default function GalleryScreen() {
                 {name === "Main" ? "Main Theme" : name}
               </span>
               <span className="eyebrow">{theme === name ? "Selected" : "Play theme"}</span>
+              <MusicVisualizer theme={name} overview />
             </button>
           ))}
         </div>
+        {theme && <MusicVisualizer theme={theme} />}
         <div className="gallery-music-status">
           <p className="gallery-note" role="status">
             {theme ? `Selected: ${theme === "Main" ? "Main Theme" : theme}` : "No theme selected"}

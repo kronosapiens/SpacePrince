@@ -1,4 +1,5 @@
 import type { ThemeNote, ThemeRole, ThemeSpec } from "./themes";
+import { roleAudible, type MusicPartState } from "./music-parts";
 
 type ToneModule = typeof import("tone");
 export type ThemeSurface = "map" | "combat" | "narrative";
@@ -11,6 +12,11 @@ const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
   combat: { bed: 1, down: 0.25, up: 0.85 },
 };
 
+/** The written notes heard in a surface's arrangement. */
+export function surfaceNotes(spec: ThemeSpec, surface: ThemeSurface): ThemeNote[] {
+  return LAYERS.flatMap((layer) => SURFACE_MIX[surface][layer] > 0 ? spec[layer] : []);
+}
+
 interface Disposable { dispose(): unknown }
 type PlayNote = (note: ThemeNote, time: number) => void;
 
@@ -18,6 +24,7 @@ type PlayNote = (note: ThemeNote, time: number) => void;
 export function createScore(
   T: ToneModule, spec: ThemeSpec, surface: ThemeSurface,
   output: import("tone").ToneAudioNode = T.getDestination(),
+  startBeat = 0,
 ) {
   const resources: Disposable[] = [];
   const own = <N extends Disposable>(node: N): N => {
@@ -25,15 +32,18 @@ export function createScore(
     return node;
   };
   const spb = 60 / spec.bpm;
+  const offset = startBeat % spec.beats;
+  const heldNotes: ((time: number) => void)[] = [];
   const limiter = own(new T.Limiter(-2)).connect(output);
   const master = own(new T.Gain(0)).connect(limiter);
   const gains = {} as Record<ThemeLayer, import("tone").Gain>;
+  const voiceGains: { role: ThemeRole; gain: import("tone").Gain }[] = [];
 
-  function createVoice(role: ThemeRole, dry: import("tone").Gain, room: import("tone").Reverb): PlayNote {
+  function createVoice(role: ThemeRole, output: import("tone").Gain): PlayNote {
     if (role === "snare" || role === "hat") {
       const filter = own(new T.Filter({
         type: "highpass", frequency: role === "hat" ? 6500 : 1100, Q: 0.5,
-      })).connect(dry);
+      })).connect(output);
       const noise = own(new T.NoiseSynth({
         noise: { type: role === "hat" ? "white" : "pink" },
         envelope: { attack: 0.003, decay: role === "hat" ? 0.045 : 0.16, sustain: 0, release: 0.06 },
@@ -47,7 +57,7 @@ export function createScore(
       case "pad": {
         const chorus = own(new T.Chorus({
           frequency: 0.23, delayTime: 3.5, depth: 0.35, feedback: 0, wet: 0.25,
-        })).connect(room).start();
+        })).connect(output).start();
         const filter = own(new T.Filter({ type: "lowpass", frequency: 2200, Q: 0.4 })).connect(chorus);
         inst = own(new T.PolySynth(T.Synth, {
           oscillator: { type: "fattriangle", count: 2, spread: 7 },
@@ -59,7 +69,7 @@ export function createScore(
       case "lead": {
         const echo = own(new T.FeedbackDelay({
           delayTime: 1.5 * spb, feedback: 0.16, wet: 0.12, maxDelay: 3,
-        })).connect(room);
+        })).connect(output);
         // The bright attack fades into a rounded, sustained carrier tone.
         inst = own(new T.PolySynth(T.FMSynth, {
           harmonicity: 2.005,
@@ -77,7 +87,7 @@ export function createScore(
         // stays at its default BPM; score times and delays both use seconds.
         const echo = own(new T.PingPongDelay({
           delayTime: 0.75 * spb, feedback: 0.28, wet: 0.28, maxDelay: 2,
-        })).connect(room);
+        })).connect(output);
         const filter = own(new T.Filter({ type: "lowpass", frequency: 4600, Q: 0.5 })).connect(echo);
         inst = own(new T.PolySynth(T.FMSynth, {
           harmonicity: 3.005,
@@ -100,14 +110,14 @@ export function createScore(
           },
           envelope: { attack: 0.012, decay: 0.45, sustain: 0.55, release: 0.3 },
           volume: 3,
-        })).connect(dry);
+        })).connect(output);
         break;
       case "kick":
         inst = own(new T.MembraneSynth({
           pitchDecay: 0.025, octaves: 2.5,
           envelope: { attack: 0.003, decay: 0.28, sustain: 0, release: 0.1 },
           volume: 2,
-        })).connect(dry);
+        })).connect(output);
         break;
     }
     return (note, time) => inst.triggerAttackRelease(note.n, note.d * spb, time, note.v);
@@ -121,7 +131,16 @@ export function createScore(
     const room = own(new T.Reverb({ decay: 2.6, preDelay: 0.025, wet: 0.18 })).connect(gain);
     const voices = new Map<ThemeRole, PlayNote>();
     for (const note of spec[layer]) {
-      if (!voices.has(note.role)) voices.set(note.role, createVoice(note.role, gain, room));
+      if (!voices.has(note.role)) {
+        const dry = note.role === "bass" || note.role === "kick" || note.role === "snare" || note.role === "hat";
+        const voiceGain = own(new T.Gain(1)).connect(dry ? gain : room);
+        voiceGains.push({ role: note.role, gain: voiceGain });
+        voices.set(note.role, createVoice(note.role, voiceGain));
+      }
+      if (note.t < offset && note.t + note.d > offset
+        && note.role !== "kick" && note.role !== "snare" && note.role !== "hat") {
+        heldNotes.push((time) => voices.get(note.role)!({ ...note, d: note.t + note.d - offset }, time));
+      }
     }
     type TimedNote = ThemeNote & { time: number };
     const part = new T.Part<TimedNote>(
@@ -134,17 +153,31 @@ export function createScore(
   });
 
   // One absolute start keeps all three layers aligned, including after swaps.
-  const start = T.getTransport().seconds + 0.1;
-  parts.forEach((part) => part.start(start));
+  const transport = T.getTransport();
+  const start = transport.seconds + 0.1;
+  parts.forEach((part) => part.start(start, offset * spb));
+  // Part offsets skip earlier attacks; restore only notes still held here.
+  const resume = heldNotes.length ? transport.scheduleOnce((time) => {
+    heldNotes.forEach((play) => play(time));
+  }, start) : null;
 
   return {
+    beat(): number | null {
+      // Transport.seconds includes lookahead; visuals follow the audio clock now.
+      const elapsed = T.getTransport().getSecondsAtTime(T.immediate()) - start;
+      return elapsed < 0 ? null : (offset + elapsed / spb) % spec.beats;
+    },
     mix(next: ThemeSurface, seconds: number) {
       for (const layer of LAYERS) gains[layer].gain.rampTo(SURFACE_MIX[next][layer], seconds);
+    },
+    parts(state: MusicPartState) {
+      for (const { role, gain } of voiceGains) gain.gain.rampTo(roleAudible(state, role) ? 1 : 0, 0.03);
     },
     fade(volume: number, seconds: number) {
       master.gain.rampTo(volume, seconds);
     },
     dispose() {
+      if (resume !== null) transport.clear(resume);
       parts.forEach((part) => { part.stop(); part.dispose(); });
       resources.reverse().forEach((node) => node.dispose());
     },
