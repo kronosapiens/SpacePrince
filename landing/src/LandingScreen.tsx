@@ -35,7 +35,6 @@ export function LandingScreen() {
 
   return (
     <div className="title">
-      <MusicButton />
       <div className="title-wordmark">
         <WordmarkGlow />
         SPACE&nbsp;&nbsp;PRINCE
@@ -51,6 +50,7 @@ export function LandingScreen() {
             onPlanetHover={setHovered}
           />
         </div>
+        <MusicButton />
       </div>
       <div className="title-foot">
         <EmailSignup />

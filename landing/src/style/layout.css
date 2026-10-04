@@ -58,60 +58,40 @@
 }
 .begin-btn:disabled { opacity: 0.45; cursor: not-allowed; animation: none; }
 
-/* Match the client's settings circle, with a larger invisible tap target. */
 .music-button {
-  position: fixed;
-  top: calc(15px + env(safe-area-inset-top));
-  right: calc(19px + env(safe-area-inset-right));
-  z-index: 100;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
   color: var(--mist);
-  border-radius: 50%;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(15px, 0.5vw + 13px, 18px);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transition: color 220ms ease;
 }
-.music-button::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  border: 1px solid var(--smoke);
-  background: rgba(11, 10, 15, 0.75);
-  box-shadow: 0 0 8px color-mix(in srgb, currentColor 28%, transparent);
-  transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-}
-.music-button svg { position: relative; }
-.music-button[data-playing="true"] { color: var(--gold); }
-.music-button[data-playing="true"]::before { border-color: var(--gold); }
 .music-button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .music-button:disabled { opacity: 0.5; cursor: wait; }
 @media (hover: hover) {
-  .music-button:hover:not(:disabled) { color: var(--void); }
-  .music-button:hover:not(:disabled)::before {
-    background: var(--bone);
-    border-color: var(--bone);
-    box-shadow: 0 0 8px var(--bone);
-  }
+  .music-button:hover:not(:disabled) { color: var(--bone); }
 }
 .music-error {
-  position: fixed;
-  top: calc(66px + env(safe-area-inset-top));
-  right: calc(24px + env(safe-area-inset-right));
-  z-index: 100;
-  max-width: 240px;
-  padding: 12px;
-  color: var(--bone);
-  background: var(--void);
-  border: 1px solid var(--smoke);
-  border-radius: 12px;
-  font: 13px / 1.4 var(--sans);
+  max-width: 280px;
+  margin: 0;
+  color: var(--mist);
+  text-align: center;
+  font: italic 16px / 1.4 var(--serif);
 }
 .music-error button {
   display: block;
   min-height: 44px;
+  margin: 0 auto;
   text-decoration: underline;
 }
 
@@ -128,10 +108,6 @@
   flex-direction: column;
   align-items: center;
   padding: clamp(28px, 5vh, 72px) clamp(16px, 4vw, 32px);
-}
-
-@media (max-width: 600px) {
-  .title { padding-top: calc(80px + env(safe-area-inset-top)); }
 }
 
 .title-wordmark {
@@ -177,8 +153,10 @@
   position: relative;
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   width: 100%;
   min-height: 0;
   padding: clamp(16px, 2vh, 28px) 0;
@@ -186,9 +164,9 @@
 .title-chart {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
   width: 100%;
   max-width: 680px;
-  max-height: 100%;
   aspect-ratio: 1 / 1;
 }
 .title-chart > svg { display: block; width: 100%; height: 100%; }

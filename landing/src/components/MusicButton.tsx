@@ -48,17 +48,15 @@ export function MusicButton() {
     }
   }
 
-  const label = loading ? "Loading music" : playing ? "Pause music" : "Play music";
+  const label = loading ? "Loading music…" : playing ? "Pause music" : "Listen";
   return (
     <>
       <button
         className="music-button"
         type="button"
-        aria-label={label}
-        title={label}
+        aria-label={label === "Listen" ? "Listen to the Main theme" : label}
         aria-busy={loading}
         disabled={loading}
-        data-playing={playing}
         onClick={toggle}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -68,6 +66,7 @@ export function MusicButton() {
             <path d="M8 5v14l11-7z" />
           )}
         </svg>
+        <span>{label}</span>
       </button>
       {error && (
         <p className="music-error" role="status">
