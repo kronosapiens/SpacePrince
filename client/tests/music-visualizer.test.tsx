@@ -96,20 +96,25 @@ it("seeks with arrows and Home / End, and disables keyboard seeking when silent"
 
 it("offers the available parts as toggles and dims only the detailed score when parts are muted", () => {
   act(() => root.render(<><MusicVisualizer theme="Main" /><MusicVisualizer theme="Main" overview /></>));
-  const button = (label: string) => [...container.querySelectorAll<HTMLButtonElement>(".music-part")].find((node) => node.textContent === label);
+  const button = (label: string) => [...container.querySelectorAll<HTMLButtonElement>(".music-part")].find((node) => node.querySelector(".music-part-role")?.textContent === label);
   const setParts = (parts: MusicPartState) => act(() => {
     audio.parts = parts;
     audio.listeners.forEach((listener) => listener());
   });
   const opacity = (selector: string) => Number(container.querySelector(selector)!.getAttribute("opacity"));
-  expect(button("Rhythm")).toBeDefined();
+  expect([...container.querySelectorAll(".music-part")].map((node) => [
+    node.querySelector(".music-part-role")?.textContent,
+    node.querySelector(".music-part-sound")?.textContent,
+  ])).toEqual([
+    ["Melody", "Bell"], ["Bass", "Synth"], ["Harmony", "Pad"], ["Arpeggios", "Pluck"], ["Percussion", "Drums"],
+  ]);
   act(() => button("Bass")!.click());
   expect(toggleMusicPart).toHaveBeenCalledWith("bass");
   setParts({ muted: ["bass"] });
   expect(button("Bass")!.getAttribute("aria-pressed")).toBe("false");
   expect(opacity('.music-score [data-role="bass"]')).toBeCloseTo(0.12);
   expect(opacity('.music-overview [data-role="bass"]')).toBe(0.8);
-  act(() => button("Pads")!.click());
+  act(() => button("Harmony")!.click());
   expect(toggleMusicPart).toHaveBeenCalledWith("pads");
   setParts({ muted: ["bass", "pads"] });
   expect(button("Melody")!.getAttribute("aria-pressed")).toBe("true");
@@ -118,7 +123,7 @@ it("offers the available parts as toggles and dims only the detailed score when 
   expect(seekTheme).not.toHaveBeenCalled();
 
   act(() => root.render(<MusicVisualizer theme="Moon" />));
-  expect(button("Rhythm")).toBeUndefined();
+  expect(button("Percussion")).toBeUndefined();
   expect(button("Arpeggios")).toBeDefined();
   expect(container.textContent).not.toContain("Low notes below");
 });

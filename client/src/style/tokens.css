@@ -56,6 +56,10 @@
   --chart-gap: 32px;
   --chart-label-gap: 12px;
 
+  --music-theme-label-gap: 4px 8px;
+  --music-parts-gap: 16px 28px;
+  --music-part-size: 12px;
+
   --narrative-coin-size: clamp(80px, 12svh, 120px);
   --narrative-heading-split: 40%;
   --narrative-heading-gap: 28px;

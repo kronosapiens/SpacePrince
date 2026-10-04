@@ -11,6 +11,7 @@ export type ThemeRole = "pad" | "lead" | "bass" | "arp" | "kick" | "snare" | "ha
 export type ThemeName = PlanetName | "Main";
 export interface ThemeNote { t: number; n: string; d: number; v: number; role: ThemeRole }
 export interface ThemeSpec {
+  mode?: string;
   bpm: number;
   beats: number;
   bed: ThemeNote[];
@@ -61,6 +62,7 @@ function every(start: number, end: number, cycle: number, notes: ThemeNote[]): T
 
 // Mercury · Dorian · 6/8 · quick plucks underneath a slower, lilting melody.
 const mercury: ThemeSpec = {
+  mode: "Dorian",
   bpm: 138, beats: 192,
   bed: [
     ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "G2", ["D3", "G3", "B3"]),
@@ -134,6 +136,7 @@ const mercury: ThemeSpec = {
 
 // Sun · Ionian · 4/4 · settled pulse, generous answers and suspended inner voices.
 const sun: ThemeSpec = {
+  mode: "Ionian",
   bpm: 72, beats: 128,
   bed: [
     ...harmony(0, 8, "D2", ["D3", "A3", "E4"]), ...harmony(8, 8, "G2", ["D3", "G3", "B3"]),
@@ -207,6 +210,7 @@ const sun: ThemeSpec = {
 
 // Moon · Aeolian · 6/8 · wide rests, falling answers and a low rocking figure.
 const moon: ThemeSpec = {
+  mode: "Aeolian",
   bpm: 63, beats: 96,
   bed: [
     ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.24), ...harmony(6, 6, "Bb2", ["D3", "F3", "Bb3"], 0.26),
@@ -270,6 +274,7 @@ const moon: ThemeSpec = {
 
 // Venus · Mixolydian · 3/4 · close, conversational phrases and a softened seventh.
 const venus: ThemeSpec = {
+  mode: "Mixolydian",
   bpm: 72, beats: 96,
   bed: [
     ...harmony(0, 6, "D2", ["D3", "A3", "E4"], 0.26), ...harmony(6, 6, "F#2", ["D3", "F#3", "C4"]),
@@ -337,6 +342,7 @@ const venus: ThemeSpec = {
 
 // Mars · Phrygian · 5/4 · a 3+2 gait, clipped resonance and a tune with teeth.
 const mars: ThemeSpec = {
+  mode: "Phrygian",
   bpm: 138, beats: 200,
   bed: [
     ...harmony(0, 10, "D2", ["D3", "A3", "F4"], 0.3), ...harmony(10, 10, "Eb2", ["Eb3", "Bb3", "G4"], 0.31),
@@ -420,6 +426,7 @@ const mars: ThemeSpec = {
 
 // Jupiter · Lydian · 3/4 · broad phrases; the raised fourth opens the music outward.
 const jupiter: ThemeSpec = {
+  mode: "Lydian",
   bpm: 96, beats: 144,
   bed: [
     ...harmony(0, 12, "D2", ["D3", "A3", "E4"]), ...harmony(12, 12, "E2", ["D3", "G#3", "B3"], 0.3),
@@ -487,6 +494,7 @@ const jupiter: ThemeSpec = {
 
 // Saturn · Locrian · 4/4 · tolling bass; the shared contour bends around Ab.
 const saturn: ThemeSpec = {
+  mode: "Locrian",
   bpm: 50, beats: 64,
   bed: [
     ...harmony(0, 4, "D2", ["D3", "Ab3", "C4"], 0.25), ...harmony(4, 4, "Ab2", ["D3", "Ab3", "F4"], 0.24),

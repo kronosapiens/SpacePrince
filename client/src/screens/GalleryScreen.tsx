@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Link } from "react-router-dom";
 import { currentTheme, getMusicVolume, playUISound, resetMusicParts, setTheme, subscribeTheme, subscribeVolume } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
+import { THEMES } from "@/audio/themes";
 import { AudioControls } from "@/components/AudioControls";
 import { HouseCoin } from "@/components/HouseCoin";
 import { KandinskyComposition } from "@/components/KandinskyComposition";
@@ -48,13 +49,10 @@ export default function GalleryScreen() {
   } : chart;
   const musicStatus = (
     <div className="gallery-music-status">
-      <p className="gallery-note" role="status">
-        {theme ? `Selected: ${theme === "Main" ? "Main Theme" : theme}` : "No theme selected"}
-        {musicVolume === 0 ? " · Music is muted" : ""}
-      </p>
       <button type="button" className="gallery-music-stop" disabled={!theme}
         onPointerEnter={playHoverSound} onFocus={playFocusSound}
         onClick={() => { playUISound("dismiss"); setTheme(null); }}>Stop music</button>
+      {musicVolume === 0 && <p className="gallery-note" role="status">Music is muted</p>}
     </div>
   );
 
@@ -196,7 +194,7 @@ export default function GalleryScreen() {
           <div>
             <p className="eyebrow">05 · Music</p>
             <h2 id="gallery-music-title">Planet themes</h2>
-            <p className="gallery-note">Select a theme to hear its map arrangement.</p>
+            <p className="gallery-note">All themes in the key of D. Select a theme to hear its map arrangement.</p>
           </div>
           <AudioControls />
         </div>
@@ -214,8 +212,11 @@ export default function GalleryScreen() {
                     fontSize="28" fill={PLANET_PRIMARY[name]}>{PLANET_GLYPH[name]}</text>
                 )}
               </svg>
-              <span className="gallery-music-name" style={{ color: name === "Main" ? NEUTRAL.gold : PLANET_PRIMARY[name] }}>
-                {name === "Main" ? "Main Theme" : name}
+              <span className="gallery-music-heading">
+                <span className="gallery-music-name" style={{ color: name === "Main" ? NEUTRAL.gold : PLANET_PRIMARY[name] }}>
+                  {name === "Main" ? "Main Theme" : name}
+                </span>
+                {THEMES[name].mode && <span className="gallery-note">{THEMES[name].mode}</span>}
               </span>
               <span className="eyebrow">{theme === name ? "Selected" : "Play theme"}</span>
               <MusicVisualizer theme={name} overview />

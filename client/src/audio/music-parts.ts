@@ -1,11 +1,11 @@
 import type { ThemeRole } from "./themes";
 
 export const MUSIC_PARTS = [
-  { id: "melody", label: "Melody", roles: ["lead"] },
-  { id: "bass", label: "Bass", roles: ["bass"] },
-  { id: "pads", label: "Pads", roles: ["pad"] },
-  { id: "arpeggios", label: "Arpeggios", roles: ["arp"] },
-  { id: "rhythm", label: "Rhythm", roles: ["kick", "snare", "hat"] },
+  { id: "melody", label: "Melody", sound: "Bell", roles: ["lead"] },
+  { id: "bass", label: "Bass", sound: "Synth", roles: ["bass"] },
+  { id: "pads", label: "Harmony", sound: "Pad", roles: ["pad"] },
+  { id: "arpeggios", label: "Arpeggios", sound: "Pluck", roles: ["arp"] },
+  { id: "rhythm", label: "Percussion", sound: "Drums", roles: ["kick", "snare", "hat"] },
 ] as const;
 
 export type MusicPart = typeof MUSIC_PARTS[number]["id"];

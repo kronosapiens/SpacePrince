@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useRef, useSyncExternalStore, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { memo, useEffect, useRef, useSyncExternalStore, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import { getMusicParts, seekTheme, subscribeMusicParts, themeBeat, toggleMusicPart } from "@/audio/engine";
 import { MUSIC_PARTS, roleAudible } from "@/audio/music-parts";
 import { surfaceNotes } from "@/audio/score";
@@ -43,8 +43,6 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
   const y = (pitch: number) => top + (HIGH_PITCH - pitch) / (HIGH_PITCH - LOW_PITCH) * (bottom - top);
   const playhead = useRef<SVGLineElement>(null);
   const plotRef = useRef<SVGSVGElement>(null);
-  const seekHint = useRef<HTMLParagraphElement>(null);
-  const hintId = useId();
   const dragBeat = useRef<number | null>(null);
 
   function pointerBeat(event: PointerEvent<SVGSVGElement>): number {
@@ -96,9 +94,6 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
       const seconds = Math.floor((beat ?? 0) * 60 / spec.bpm);
       plot.setAttribute("aria-valuenow", String(seconds));
       plot.setAttribute("aria-valuetext", `${timeLabel(seconds)} of ${timeLabel(duration)}`);
-      const hint = playingBeat === null ? "Seeking is available when this theme is playing."
-        : "Click or drag to seek · Arrow keys move 5 seconds · Home / End";
-      if (seekHint.current!.textContent !== hint) seekHint.current!.textContent = hint;
       const line = playhead.current!;
       line.setAttribute("visibility", beat === null ? "hidden" : "visible");
       if (beat !== null) {
@@ -117,7 +112,6 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
       role={overview ? undefined : "slider"} aria-hidden={overview || undefined}
       tabIndex={overview ? undefined : 0}
       aria-label={overview ? undefined : `${theme} map arrangement playback position. Time from left to right, pitch from low to high, note lengths show duration.`}
-      aria-describedby={overview ? undefined : hintId}
       aria-orientation={overview ? undefined : "horizontal"}
       aria-valuemin={overview ? undefined : 0} aria-valuemax={overview ? undefined : duration}
       aria-valuenow={overview ? undefined : 0} aria-disabled={overview ? undefined : true}
@@ -168,11 +162,7 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
       <figcaption className="music-score-caption">
         <span className="music-score-title" style={{ color }}>{theme === "Main" ? "Main Theme" : theme}</span>
         <span>{spec.bpm} BPM · {timeLabel(duration)} loop</span>
-      </figcaption>
-      <div className="music-score-scroll">{plot}</div>
-      <div className="music-score-key">
         {status}
-        <p ref={seekHint} id={hintId} className="gallery-note music-seek-hint" />
         <div className="music-parts" role="group" aria-label="Music parts">
           {MUSIC_PARTS.filter((part) => notes.some((note) => part.roles.some((role) => role === note.role))).map((part) => (
             <button key={part.id} type="button" className="music-part" aria-pressed={!parts.muted.includes(part.id)}
@@ -180,11 +170,13 @@ export const MusicVisualizer = memo(function MusicVisualizer({ theme, overview =
               <svg viewBox="0 0 24 8" aria-hidden="true">
                 <line x1="0" x2="24" y1="4" y2="4" stroke={color} {...NOTE_STYLE[part.roles[0]]} />
               </svg>
-              {part.label}
+              <span className="music-part-role">{part.label}</span>
+              <span className="music-part-sound">{part.sound}</span>
             </button>
           ))}
         </div>
-      </div>
+      </figcaption>
+      <div className="music-score-scroll">{plot}</div>
     </figure>
   );
 });
