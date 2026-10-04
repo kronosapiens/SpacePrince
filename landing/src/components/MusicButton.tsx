@@ -26,6 +26,12 @@ export function MusicButton() {
     setLoading(true);
     setError(false);
     try {
+      // Treat the theme as media so iPhone Silent Mode doesn't mute it.
+      const audioSession = (navigator as Navigator & {
+        audioSession?: { type: string };
+      }).audioSession;
+      if (audioSession) audioSession.type = "playback";
+
       // Unlock audio in the tap itself, before loading Tone, including on iOS.
       const audioContext = context.current ?? new AudioContext();
       context.current = audioContext;

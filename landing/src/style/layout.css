@@ -97,18 +97,21 @@
 
 /* ── Title (landing) ───────────────────────────────────────────────────── */
 
-/* Flex column: wordmark + tagline pair at top, chart absorbs the middle
-   (flex: 1), foot sits at bottom. All sizes use clamp() so they flow
-   continuously between mobile and desktop — no breakpoint stairsteps. */
+/* The chart takes the space left between the title and signup, shrinking
+   with viewport height while the text and controls keep their size. */
 .title {
   position: relative;
   z-index: 1;
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: clamp(28px, 5vh, 72px) clamp(16px, 4vw, 32px);
 }
+
+.title-wordmark,
+.title-tagline,
+.title-foot { flex-shrink: 0; }
 
 .title-wordmark {
   position: relative;
@@ -164,7 +167,8 @@
 .title-chart {
   position: relative;
   z-index: 1;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 0;
   width: 100%;
   max-width: 680px;
   aspect-ratio: 1 / 1;
