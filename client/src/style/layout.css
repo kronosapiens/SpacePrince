@@ -609,7 +609,7 @@
 .chart-layout-label,
 .combat-side > .combat-side-label {
   position: absolute;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + var(--chart-label-gap));
   left: 0;
   right: 0;
   width: max-content;
