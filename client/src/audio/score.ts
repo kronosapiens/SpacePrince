@@ -1,17 +1,16 @@
 import type { ThemeNote, ThemeRole, ThemeSpec } from "./themes";
 import { roleAudible, type MusicPartState } from "./music-parts";
 import { BELL_VOICE, PLUCK_VOICE } from "./voices";
+import {
+  SCORE_LIMITER_DB, MUSIC_VOLUME_DB, SURFACE_MIX,
+  SCORE_REVERB_WET, PAD_CHORUS_WET, LEAD_DELAY_WET, ARP_DELAY_WET,
+  type ThemeSurface, type ThemeLayer,
+} from "./levels";
 
 type ToneModule = typeof import("tone");
-export type ThemeSurface = "map" | "combat" | "narrative";
-type ThemeLayer = "bed" | "down" | "up";
+export type { ThemeSurface } from "./levels";
 
 const LAYERS: ThemeLayer[] = ["bed", "down", "up"];
-const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
-  map: { bed: 0.9, down: 1, up: 0 },
-  narrative: { bed: 0.65, down: 0.4, up: 0 },
-  combat: { bed: 1, down: 0.25, up: 0.85 },
-};
 
 /** The written notes heard in a surface's arrangement. */
 export function surfaceNotes(spec: ThemeSpec, surface: ThemeSurface): ThemeNote[] {
@@ -35,7 +34,7 @@ export function createScore(
   const spb = 60 / spec.bpm;
   const offset = startBeat % spec.beats;
   const heldNotes: ((time: number) => void)[] = [];
-  const limiter = own(new T.Limiter(-2)).connect(output);
+  const limiter = own(new T.Limiter(SCORE_LIMITER_DB)).connect(output);
   const master = own(new T.Gain(0)).connect(limiter);
   const gains = {} as Record<ThemeLayer, import("tone").Gain>;
   const voiceGains: { role: ThemeRole; gain: import("tone").Gain }[] = [];
@@ -48,7 +47,7 @@ export function createScore(
       const noise = own(new T.NoiseSynth({
         noise: { type: role === "hat" ? "white" : "pink" },
         envelope: { attack: 0.003, decay: role === "hat" ? 0.045 : 0.16, sustain: 0, release: 0.06 },
-        volume: role === "hat" ? -9 : -3,
+        volume: MUSIC_VOLUME_DB[role],
       })).connect(filter);
       return (note, time) => noise.triggerAttackRelease(note.d * spb, time, note.v);
     }
@@ -57,23 +56,23 @@ export function createScore(
     switch (role) {
       case "pad": {
         const chorus = own(new T.Chorus({
-          frequency: 0.23, delayTime: 3.5, depth: 0.35, feedback: 0, wet: 0.25,
+          frequency: 0.23, delayTime: 3.5, depth: 0.35, feedback: 0, wet: PAD_CHORUS_WET,
         })).connect(output).start();
         const filter = own(new T.Filter({ type: "lowpass", frequency: 2200, Q: 0.4 })).connect(chorus);
         inst = own(new T.PolySynth(T.Synth, {
           oscillator: { type: "fattriangle", count: 2, spread: 7 },
           envelope: { attack: 0.65, decay: 1.6, sustain: 0.45, release: 1.8 },
-          volume: -3,
+          volume: MUSIC_VOLUME_DB.pad,
         })).connect(filter);
         break;
       }
       case "lead": {
         const echo = own(new T.FeedbackDelay({
-          delayTime: 1.5 * spb, feedback: 0.16, wet: 0.12, maxDelay: 3,
+          delayTime: 1.5 * spb, feedback: 0.16, wet: LEAD_DELAY_WET, maxDelay: 3,
         })).connect(output);
         inst = own(new T.PolySynth(T.FMSynth, {
           ...BELL_VOICE,
-          volume: 4,
+          volume: MUSIC_VOLUME_DB.lead,
         })).connect(echo);
         break;
       }
@@ -81,12 +80,12 @@ export function createScore(
         // A dotted-eighth echo answers the played notes, even though Transport
         // stays at its default BPM; score times and delays both use seconds.
         const echo = own(new T.PingPongDelay({
-          delayTime: 0.75 * spb, feedback: 0.28, wet: 0.28, maxDelay: 2,
+          delayTime: 0.75 * spb, feedback: 0.28, wet: ARP_DELAY_WET, maxDelay: 2,
         })).connect(output);
         const filter = own(new T.Filter({ type: "lowpass", frequency: 4600, Q: 0.5 })).connect(echo);
         inst = own(new T.PolySynth(T.FMSynth, {
           ...PLUCK_VOICE,
-          volume: 6,
+          volume: MUSIC_VOLUME_DB.arp,
         })).connect(filter);
         break;
       }
@@ -99,14 +98,14 @@ export function createScore(
             baseFrequency: 140, octaves: 1.6,
           },
           envelope: { attack: 0.012, decay: 0.45, sustain: 0.55, release: 0.3 },
-          volume: 3,
+          volume: MUSIC_VOLUME_DB.bass,
         })).connect(output);
         break;
       case "kick":
         inst = own(new T.MembraneSynth({
           pitchDecay: 0.025, octaves: 2.5,
           envelope: { attack: 0.003, decay: 0.28, sustain: 0, release: 0.1 },
-          volume: 2,
+          volume: MUSIC_VOLUME_DB.kick,
         })).connect(output);
         break;
     }
@@ -118,7 +117,7 @@ export function createScore(
     gains[layer] = gain;
     // Effects precede the layer gain, so a muted layer also mutes its echoes.
     // Bass and percussion bypass the room to leave the low end defined.
-    const room = own(new T.Reverb({ decay: 2.6, preDelay: 0.025, wet: 0.18 })).connect(gain);
+    const room = own(new T.Reverb({ decay: 2.6, preDelay: 0.025, wet: SCORE_REVERB_WET })).connect(gain);
     const voices = new Map<ThemeRole, PlayNote>();
     for (const note of spec[layer]) {
       if (!voices.has(note.role)) {

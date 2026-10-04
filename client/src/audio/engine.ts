@@ -4,6 +4,11 @@ import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
 import { ALL_MUSIC_PARTS, type MusicPart, type MusicPartState } from "./music-parts";
 import { BELL_VOICE, PLANET_VOICE } from "./voices";
+import {
+  DEFAULT_MUSIC_VOLUME, DEFAULT_SOUND_VOLUME, MASTER_VOLUME_DB, MUSIC_OUTPUT_GAIN,
+  SCORE_VOLUME, FX_VOLUME_DB, UI_VOLUME_DB, COMBUST_VOLUME_DB,
+  STRIKE_VELOCITY, COMBUST_VELOCITY, STAR_VELOCITIES, UI_VELOCITIES, SOUND_REVERB_WET,
+} from "./levels";
 
 export type { ThemeSurface } from "./score";
 
@@ -28,11 +33,8 @@ const unlockCleanups = new Set<() => void>();
 // effects, propagation, combustion, the star bell, and UI cues.
 const AUDIO_KEY = "sp:audio:v1";
 
-// Both on for a fresh visitor, music at half; saved preferences override the defaults.
-const DEFAULT_MUSIC_VOLUME = 0.5;
-const MUSIC_OUTPUT_GAIN = 10 ** (-12 / 20); // -12 dB, applied after the score's limiter.
 let musicVolume = DEFAULT_MUSIC_VOLUME;
-let soundVolume = 1;
+let soundVolume = DEFAULT_SOUND_VOLUME;
 let musicOutput: import("tone").Gain | null = null;
 let soundOutput: import("tone").Gain | null = null;
 const volumeListeners = new Set<() => void>();
@@ -47,7 +49,7 @@ try {
   if (raw) {
     const saved = JSON.parse(raw) as { music?: number | boolean; sound?: number | boolean };
     musicVolume = typeof saved.music === "number" ? saved.music : saved.music === false ? 0 : DEFAULT_MUSIC_VOLUME;
-    soundVolume = typeof saved.sound === "number" ? saved.sound : saved.sound === false ? 0 : 1;
+    soundVolume = typeof saved.sound === "number" ? saved.sound : saved.sound === false ? 0 : DEFAULT_SOUND_VOLUME;
   }
 } catch {
   /* storage unavailable — session-only defaults */
@@ -133,11 +135,11 @@ async function init(): Promise<void> {
     await tone.start();
     if (disposed) return;
     T = tone;
-    T.getDestination().volume.value = 0;
+    T.getDestination().volume.value = MASTER_VOLUME_DB;
     musicOutput = new T.Gain(musicVolume * MUSIC_OUTPUT_GAIN).toDestination();
     soundOutput = new T.Gain(soundVolume).toDestination();
     // Event sounds have their own space; the score owns its mix and effects.
-    reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).connect(soundOutput);
+    reverb = new T.Reverb({ decay: 3.2, wet: SOUND_REVERB_WET }).connect(soundOutput);
     T.getTransport().start();
     applyTheme();
   })().catch((err) => {
@@ -167,8 +169,6 @@ function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
-const FX_VOLUME_DB = -10;
-
 /** Cached voices for encounter strikes and the star. */
 function fxSynth(kind: "planet" | "star"): AnyInstrument | null {
   if (!T || !reverb) return null;
@@ -183,15 +183,14 @@ function fxSynth(kind: "planet" | "star"): AnyInstrument | null {
 
 // ── Event playback ─────────────────────────────────────────────────────
 
-export type UISound = "hover" | "select" | "commit" | "dismiss";
+export type UISound = keyof typeof UI_VELOCITIES;
 
-const UI_SOUNDS: Record<UISound, { note: string; duration: number; velocity: number }> = {
-  hover: { note: "D6", duration: 0.025, velocity: 0.16 },
-  select: { note: "A5", duration: 0.045, velocity: 0.3 },
-  commit: { note: "D5", duration: 0.09, velocity: 0.4 },
-  dismiss: { note: "A4", duration: 0.035, velocity: 0.24 },
+const UI_SOUNDS: Record<UISound, { note: string; duration: number }> = {
+  hover: { note: "D6", duration: 0.025 },
+  select: { note: "A5", duration: 0.045 },
+  commit: { note: "D5", duration: 0.09 },
+  dismiss: { note: "A4", duration: 0.035 },
 };
-const UI_VOLUME_DB = -18;
 const UI_HOVER_COOLDOWN_S = 0.07;
 let uiSynth: import("tone").PolySynth | null = null;
 let lastUISoundAt = -Infinity;
@@ -209,7 +208,7 @@ export function playUISound(cue: UISound): void {
     volume: UI_VOLUME_DB,
   }).connect(soundOutput!);
   const sound = UI_SOUNDS[cue];
-  uiSynth.triggerAttackRelease(sound.note, sound.duration, now, sound.velocity);
+  uiSynth.triggerAttackRelease(sound.note, sound.duration, now, UI_VELOCITIES[cue]);
 }
 
 /**
@@ -223,7 +222,7 @@ export function playStrike(ruler: PlanetName, target: PlanetName): void {
   if (!fx) return;
   const now = T.now();
   const n = strikeMidi(ruler, target);
-  fx.triggerAttackRelease(midiToFreq(n), 0.35, now, 0.24);
+  fx.triggerAttackRelease(midiToFreq(n), 0.35, now, STRIKE_VELOCITY);
 }
 
 /** One planetary note; its release fits inside the visual cadence. */
@@ -237,7 +236,7 @@ export function playNecessityNote(ruler: PlanetName, target: PlanetName, duratio
     envelope: { ...PLANET_VOICE.envelope, release },
   }).connect(soundOutput);
   // Match the visual accent and disposal timer without the score's scheduling lookahead.
-  voice.triggerAttackRelease(midiToFreq(strikeMidi(ruler, target)), durationSeconds - release, T.immediate(), 0.24);
+  voice.triggerAttackRelease(midiToFreq(strikeMidi(ruler, target)), durationSeconds - release, T.immediate(), STRIKE_VELOCITY);
   let disposed = false;
   const cancel = () => {
     window.clearTimeout(timer);
@@ -258,11 +257,11 @@ export function playCombust(): void {
     noise = new T.NoiseSynth({
       noise: { type: "pink" },
       envelope: { attack: 0.01, decay: 0.5, sustain: 0 },
-      volume: -14,
+      volume: COMBUST_VOLUME_DB,
     }).connect(reverb);
     instruments.set(noiseKey, noise as unknown as AnyInstrument);
   }
-  noise?.triggerAttackRelease(0.5, T.now() + 0.4, 0.6);
+  noise?.triggerAttackRelease(0.5, T.now() + 0.4, COMBUST_VELOCITY);
 }
 
 /** A run's star taking its place — a quiet high bell, far away. */
@@ -271,8 +270,8 @@ export function playStar(): void {
   const fx = fxSynth("star");
   if (!fx) return;
   const now = T.now();
-  fx.triggerAttackRelease(midiToFreq(86), 1.2, now, 0.28); // D6
-  fx.triggerAttackRelease(midiToFreq(81), 1.0, now + 0.18, 0.2); // A5 under it
+  fx.triggerAttackRelease(midiToFreq(86), 1.2, now, STAR_VELOCITIES.upper); // D6
+  fx.triggerAttackRelease(midiToFreq(81), 1.0, now + 0.18, STAR_VELOCITIES.lower); // A5 under it
 }
 
 // ── The score ───────────────────────────────────────────────────────────
@@ -280,7 +279,6 @@ export function playStar(): void {
 const MIX_RAMP_S = 2.2;
 const SWAP_FADE_S = 1.1;
 const SEEK_FADE_S = 0.04;
-const SCORE_VOLUME = 0.9;
 
 let desired: { theme: ThemeName; surface: ThemeSurface } | null = null;
 let playing: { theme: ThemeName; score: ReturnType<typeof createScore>; seekBeat?: number } | null = null;
