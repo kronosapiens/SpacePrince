@@ -52,33 +52,34 @@ export function ChartTuner() {
         </button>
       </div>
 
-      <label className="dev-console-check">
-        <input
-          type="checkbox"
-          checked={tuning.showBadges}
-          onPointerEnter={playHoverSound}
-          onFocus={playFocusSound}
-          onChange={(e) => {
-            playUISound("select");
-            setTuning({ showBadges: e.target.checked });
-          }}
-        />
-        Badges
-      </label>
-
-      <label className="dev-console-check">
-        <input
-          type="checkbox"
-          checked={tuning.showGlow}
-          onPointerEnter={playHoverSound}
-          onFocus={playFocusSound}
-          onChange={(e) => {
-            playUISound("select");
-            setTuning({ showGlow: e.target.checked });
-          }}
-        />
-        Glow
-      </label>
+      <div className="dev-console-checks">
+        <label className="dev-console-check">
+          <input
+            type="checkbox"
+            checked={tuning.showBadges}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
+            onChange={(e) => {
+              playUISound("select");
+              setTuning({ showBadges: e.target.checked });
+            }}
+          />
+          Badges
+        </label>
+        <label className="dev-console-check">
+          <input
+            type="checkbox"
+            checked={tuning.showGlow}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
+            onChange={(e) => {
+              playUISound("select");
+              setTuning({ showGlow: e.target.checked });
+            }}
+          />
+          Glow
+        </label>
+      </div>
 
       {TUNING_KNOBS.map((knob) => (
         <label key={knob.key} className="dev-tuner-knob">

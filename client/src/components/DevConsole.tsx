@@ -47,7 +47,6 @@ export function DevConsole({ open }: { open: boolean }) {
             onFocus={playFocusSound}
             onChange={(e) => setPlanets(Number(e.target.value))}
           />
-          <div>{unlocked.join(" · ") || "(none)"}</div>
         </div>
       ) : (
         <div>No Prince — mint one from the Title.</div>
