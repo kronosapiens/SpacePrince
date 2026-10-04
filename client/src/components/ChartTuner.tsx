@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
-  MOTION_KNOBS,
+  CSS_KNOBS,
   TUNING_DEFAULTS,
   TUNING_KNOBS,
-  readMotionKnob,
-  resetMotionKnobs,
+  readCssKnob,
+  resetCssKnobs,
   resetTuning,
-  setMotionKnob,
+  setCssKnob,
   setTuning,
   useTuning,
 } from "@/svg/tuning";
@@ -14,39 +14,37 @@ import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 /**
- * Dev-only chart tuner: live sliders for the concentric radii, the arc, and the
- * invite's breath. These are values that can't be picked by reading a number —
- * a radius only means something against the two radii either side of it, and a
- * breath swing only means something at speed — so they get chosen by dragging
- * and watching the chart behind the panel.
+ * Dev-only chart and title tuner: live sliders for the concentric radii, the
+ * arc, the invite's breath, and the title glow. These values are chosen by
+ * dragging and watching the screen behind the panel.
  *
  * Nothing here persists. Copy the settled numbers into `viewbox.ts`,
- * `chart-style.ts`, and `motion.css`; a reload is the discard.
+ * `chart-style.ts`, `motion.css`, and `tokens.css`; a reload is the discard.
  */
 export function ChartTuner() {
   const tuning = useTuning();
-  // Motion knobs live as CSS custom properties, so the DOM already holds the
+  // CSS knobs live as custom properties, so the DOM already holds the
   // value and this state only mirrors it for the slider position. Seeded from
-  // whatever motion.css declares, so the panel opens where the stylesheet is.
-  const [motion, setMotion] = useState<Record<string, number>>(() =>
-    Object.fromEntries(MOTION_KNOBS.map((k) => [k.prop, readMotionKnob(k.prop)])),
+  // current CSS values, so the panel also retains overrides when reopened.
+  const [css, setCss] = useState<Record<string, number>>(() =>
+    Object.fromEntries(CSS_KNOBS.map((k) => [k.prop, readCssKnob(k.prop)])),
   );
 
   const resetAll = () => {
     const changed = (Object.keys(tuning) as Array<keyof typeof tuning>).some(
       (key) => tuning[key] !== TUNING_DEFAULTS[key],
-    ) || MOTION_KNOBS.some((knob) => document.documentElement.style.getPropertyValue(knob.prop));
+    ) || CSS_KNOBS.some((knob) => document.documentElement.style.getPropertyValue(knob.prop));
     if (!changed) return;
     playUISound("select");
     resetTuning();
-    resetMotionKnobs();
-    setMotion(Object.fromEntries(MOTION_KNOBS.map((k) => [k.prop, readMotionKnob(k.prop)])));
+    resetCssKnobs();
+    setCss(Object.fromEntries(CSS_KNOBS.map((k) => [k.prop, readCssKnob(k.prop)])));
   };
 
   return (
     <div className="dev-console-block">
       <div className="dev-tuner-head">
-        <span>Chart</span>
+        <span>Chart &amp; title</span>
         <button type="button" className="dev-tuner-reset" onClick={resetAll} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
           Reset
         </button>
@@ -99,23 +97,23 @@ export function ChartTuner() {
         </label>
       ))}
 
-      {MOTION_KNOBS.map((knob) => (
+      {CSS_KNOBS.map((knob) => (
         <label key={knob.prop} className="dev-tuner-knob">
           <span>
-            {knob.label} <strong>{motion[knob.prop]}{knob.suffix}</strong>
+            {knob.label} <strong>{css[knob.prop]}{knob.suffix}</strong>
           </span>
           <input
             type="range"
             min={knob.min}
             max={knob.max}
             step={knob.step}
-            value={motion[knob.prop] ?? knob.min}
+            value={css[knob.prop] ?? knob.min}
             onPointerEnter={playHoverSound}
             onFocus={playFocusSound}
             onChange={(e) => {
               const value = Number(e.target.value);
-              setMotionKnob(knob.prop, value, knob.suffix);
-              setMotion((m) => ({ ...m, [knob.prop]: value }));
+              setCssKnob(knob.prop, value, knob.suffix);
+              setCss((values) => ({ ...values, [knob.prop]: value }));
             }}
           />
         </label>

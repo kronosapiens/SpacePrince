@@ -36,9 +36,9 @@
   --sans: var(--chrome);
   --title-wordmark-size: clamp(22px, 9cqi, 64px);
   --wordmark-glow-width: 120%;
-  --wordmark-glow-radius: 60px;
+  --wordmark-glow-radius: 100px;
   --wordmark-glow-core: 0.5;
-  --wordmark-glow-mid: 0.12;
+  --wordmark-glow-mid: 0.25;
   --begin-btn-font-size: 28px;
   --begin-btn-padding: 8px 20px;
   --settings-label-size: 18px;

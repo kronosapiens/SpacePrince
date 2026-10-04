@@ -27,14 +27,14 @@
   transform-origin: center;
 }
 
-/* Each fade spans three of the seven stagger steps, overlapping both neighbors. */
+/* Each halo fades in for 1 second and out for 1 second in the 3.5-second cycle. */
 .wordmark-glow {
-  --wordmark-ripple-stagger: 0.7s;
+  --wordmark-ripple-stagger: 0.5s;
   --wordmark-ripple-period: calc(7 * var(--wordmark-ripple-stagger));
 }
 @keyframes wordmark-ripple {
-  0%, 42.857%, 100% { opacity: 0; }
-  21.4285%          { opacity: 1; }
+  0%, 57.1429%, 100% { opacity: 0; }
+  28.5714%          { opacity: 1; }
 }
 .wordmark-glow circle {
   animation: wordmark-ripple var(--wordmark-ripple-period) ease-in-out infinite both;
