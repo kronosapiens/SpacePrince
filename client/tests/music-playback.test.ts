@@ -102,7 +102,7 @@ describe("music playback", () => {
     expect(score.mix).toHaveBeenLastCalledWith("narrative", expect.any(Number));
     engine.setMusicVolume(0.4);
     engine.setSoundVolume(0.7);
-    expect(gains[0]!.gain.rampTo).toHaveBeenLastCalledWith(0.4, expect.any(Number));
+    expect(gains[0]!.gain.rampTo).toHaveBeenLastCalledWith(expect.closeTo(0.100475, 6), expect.any(Number));
     expect(gains[1]!.gain.rampTo).toHaveBeenLastCalledWith(0.7, expect.any(Number));
     expect(createScore).toHaveBeenCalledTimes(1);
     expect(score.dispose).not.toHaveBeenCalled();

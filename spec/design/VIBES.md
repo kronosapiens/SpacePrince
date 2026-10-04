@@ -133,6 +133,7 @@ More like a candle going out.
 ## Sound Design Direction
 
 Sound should reinforce the planetary color system.
+An ordinary planet strike is the listening reference: music sits behind planetary effects, UI cues are quieter, and significant events have room for stronger accents ([MUSIC.md — Mix and listening reference](MUSIC.md#mix-and-listening-reference)).
 
 - Planetary themes express character through chosen modes, rhythm, register, and timbre.
   Planetary event sounds use assigned degrees in the active ruler's mode and one shared voice.

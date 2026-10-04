@@ -203,10 +203,24 @@ Testimony and Affliction use the same planetary notes.
 Each propagation sounds only the target's assigned note, regardless of aspect.
 Combustion begins the target's ruler-relative voice, chokes it, and releases a breath.
 Strikes and necessity use the same pitch calculation and shared voice setting.
-Music is opt-in while sound is on by default, so the strikes must read alone, and a melody of degrees over silence does.
+Strikes should remain legible with music playing and with music muted.
 
 The matrix can also use another seven-note scale, such as harmonic minor, for a ruler's row.
 That changes the row's interval pattern without requiring a new degree assignment for the ruling planet.
+
+---
+
+## Mix and listening reference
+
+An ordinary planet strike is the listening reference for the mix.
+At the default Sound and Music settings, its pitch and attack should be easy to distinguish throughout an encounter.
+Music provides an audible, expressive background beneath planetary effects.
+UI cues provide quieter confirmation, while significant events have room for stronger accents.
+Necessity notes use the same planetary reference, with their duration shaped by the visual cadence.
+
+Balance the resulting sounds by ear and check their combined output for headroom, including overlapping effects and the busiest musical passages.
+Instrument gain values are adjustments to their sources, not measurements of perceived loudness; the reference does not require a gain setting of 0 dB.
+Check the balance across rulers and surfaces, using the ordinary strike as the comparison each time.
 
 ---
 

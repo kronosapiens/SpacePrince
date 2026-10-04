@@ -30,6 +30,7 @@ const AUDIO_KEY = "sp:audio:v1";
 
 // Both on for a fresh visitor, music at half; saved preferences override the defaults.
 const DEFAULT_MUSIC_VOLUME = 0.5;
+const MUSIC_OUTPUT_GAIN = 10 ** (-12 / 20); // -12 dB, applied after the score's limiter.
 let musicVolume = DEFAULT_MUSIC_VOLUME;
 let soundVolume = 1;
 let musicOutput: import("tone").Gain | null = null;
@@ -69,7 +70,7 @@ export function setMusicVolume(next: number): void {
   const previous = musicVolume;
   musicVolume = next;
   persistAudio();
-  musicOutput?.gain.rampTo(next, 0.05);
+  musicOutput?.gain.rampTo(next * MUSIC_OUTPUT_GAIN, 0.05);
   if (!T) return;
   if (next === 0) haltTheme(0.1);
   else if (previous === 0) applyTheme();
@@ -133,7 +134,7 @@ async function init(): Promise<void> {
     if (disposed) return;
     T = tone;
     T.getDestination().volume.value = 0;
-    musicOutput = new T.Gain(musicVolume).toDestination();
+    musicOutput = new T.Gain(musicVolume * MUSIC_OUTPUT_GAIN).toDestination();
     soundOutput = new T.Gain(soundVolume).toDestination();
     // Event sounds have their own space; the score owns its mix and effects.
     reverb = new T.Reverb({ decay: 3.2, wet: 0.2 }).connect(soundOutput);
