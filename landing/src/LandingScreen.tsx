@@ -3,6 +3,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { EmailSignup } from "@/EmailSignup";
 import { WordmarkGlow } from "@/components/WordmarkGlow";
+import { MusicButton } from "@/components/MusicButton";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
@@ -34,6 +35,7 @@ export function LandingScreen() {
 
   return (
     <div className="title">
+      <MusicButton />
       <div className="title-wordmark">
         <WordmarkGlow />
         SPACE&nbsp;&nbsp;PRINCE

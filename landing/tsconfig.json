@@ -18,7 +18,9 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@client-audio/*": ["../client/src/audio/*"],
+      "tone": ["node_modules/tone"]
     },
     "types": ["vite/client"]
   },

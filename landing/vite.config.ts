@@ -8,6 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      "@client-audio": path.resolve(__dirname, "../client/src/audio"),
     },
+    dedupe: ["tone"],
   },
+  server: { fs: { allow: [path.resolve(__dirname, "..")] } },
 });
