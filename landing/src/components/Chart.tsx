@@ -1,4 +1,4 @@
-import { useMemo, type MouseEvent } from "react";
+import { useMemo, useSyncExternalStore, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import {
@@ -99,6 +99,7 @@ export function Chart({ chart, hoveredPlanet, onPlanetHover }: ChartProps) {
     return m;
   }, [points]);
   const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
+  const reducedMotion = usePrefersReducedMotion();
 
   // Color-field blooms — one radial gradient per planet.
   const fieldBlooms = PLANETS.map((planet) => {
@@ -170,7 +171,7 @@ export function Chart({ chart, hoveredPlanet, onPlanetHover }: ChartProps) {
 
       {/* Field layer */}
       {fieldBlooms}
-      {renderSubstrate()}
+      {renderSubstrate(reducedMotion)}
 
       {/* Diagram layer: rings + ticks + sign labels + aspect web */}
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={OUTER_RING_R}
@@ -306,7 +307,7 @@ function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
   return <g>{out}</g>;
 }
 
-function renderSubstrate() {
+function renderSubstrate(reducedMotion: boolean) {
   const cx = CHART_CENTER, cy = CHART_CENTER;
   const { hexagramR, vesicaR, vesicaOffset, vesicaCircleCount } = CHART_STYLE.substrate;
   // Two interlaced hexagrams (four triangles) → a twelve-point star.
@@ -319,7 +320,7 @@ function renderSubstrate() {
   // Same period, opposite signs — see the client's copy for why the two halves
   // counter-rotate and why they must share one period.
   const turn = (deg: number) =>
-    prefersReducedMotion() ? null : (
+    reducedMotion ? null : (
       <animateTransform attributeName="transform" attributeType="XML" type="rotate"
         from={`0 ${cx} ${cy}`} to={`${deg} ${cx} ${cy}`} dur="120s" repeatCount="indefinite" />
     );
@@ -345,11 +346,20 @@ function renderSubstrate() {
 }
 
 /** Whether the OS asks for reduced motion. SMIL can't read the media query, so
- *  we gate the rotation in JS instead (the NFT SVG just always includes it). */
-function prefersReducedMotion(): boolean {
-  return typeof window !== "undefined"
-    && typeof window.matchMedia === "function"
-    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ *  we gate the rotation in JS instead (the NFT SVG just always includes it).
+ *  The prerendered HTML assumes motion; hydration then reads the real value. */
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false,
+  );
+}
+function subscribeReducedMotion(onChange: () => void): () => void {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
 }
 
 // ─── Geometry ───────────────────────────────────────────────────────────

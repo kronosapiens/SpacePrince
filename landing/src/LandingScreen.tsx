@@ -19,7 +19,9 @@ export function LandingScreen() {
   // Cycle a fresh random sample chart every few seconds so the canvas stays
   // alive — mirrors the client Title screen (TitleScreen.tsx). Only the
   // interval re-rolls it; hover and other state changes during the visit don't.
-  const [chart, setChart] = useState<ChartType>(() => seededChart(randomSeed(), "Sample"));
+  // The first chart is fixed so the prerendered HTML matches hydration; it
+  // shares the OG card's seed, so the page opens on the social preview's chart.
+  const [chart, setChart] = useState<ChartType>(() => seededChart(0xCAFEBABE, "Sample"));
 
   useEffect(() => {
     const id = window.setInterval(
