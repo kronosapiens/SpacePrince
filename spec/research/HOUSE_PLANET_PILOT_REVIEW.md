@@ -1,7 +1,8 @@
 # House and planet pilot review
 
 Research and editorial review for [issue #9](https://github.com/kronosapiens/SpacePrince/issues/9), 2026-10-04.
-The [proposed pilot](../concept/HOUSE_PLANET_PILOT.md) covers eighteen placements; this report records its findings and guidance for the remaining 66.
+The [pilot](../concept/HOUSE_PLANET_PILOT.md) covered eighteen placements; this report preserves its findings and guidance for the remaining 66.
+The [full research review](HOUSE_PLANET_REVIEW.md) records the completed continuation; current entries live in the [84-entry reference](../concept/HOUSE_PLANET_MATRIX.md).
 The comparison baseline is commit `bbb07bb08162173910c33d52a072af86aaa906e3`.
 
 ## Research and synthesis
@@ -116,10 +117,11 @@ This pilot does not establish that the player will feel what the Prince feels, o
 Those questions require encounter design and playtesting.
 The continuation plan and review checkpoints belong in [issue #9](https://github.com/kronosapiens/SpacePrince/issues/9); subsequent batches can test the lessons above before broader guidance is added to [DRIVES](../concept/DRIVES.md).
 
-## Handoff checks
+## Pilot handoff checks
 
 The pilot contains eighteen distinct placements, thirty-six scene seeds, and six selected sign variations.
 Local links, heading anchors, and whitespace were checked separately from the editorial review.
-All 84 original matrix rows remain intact for comparison; its introduction and next-step pointer now identify the pilot.
+At the pilot handoff, all 84 original matrix rows remained intact for comparison.
+The full research pass has since replaced them; the baseline remains available in the commit named above.
 The issue's duplicated drives section now links to the committed guidance.
 This research adds no gameplay or economy changes.
