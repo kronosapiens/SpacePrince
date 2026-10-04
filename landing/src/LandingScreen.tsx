@@ -14,7 +14,7 @@ export function LandingScreen() {
   const { setActive } = useActivePlanet();
 
   useEffect(() => {
-    setActive("Sun");
+    setActive(null);
   }, [setActive]);
 
   // Cycle a fresh random sample chart every few seconds so the canvas stays
