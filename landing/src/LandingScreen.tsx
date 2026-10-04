@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { EmailSignup } from "@/EmailSignup";
+import { WordmarkGlow } from "@/components/WordmarkGlow";
 import { seededChart } from "@/game/chart";
 import { randomSeed } from "@/game/rng";
 import type { Chart as ChartType, PlanetName } from "@/game/types";
@@ -33,7 +34,10 @@ export function LandingScreen() {
 
   return (
     <div className="title">
-      <div className="title-wordmark">SPACE&nbsp;&nbsp;PRINCE</div>
+      <div className="title-wordmark">
+        <WordmarkGlow />
+        SPACE&nbsp;&nbsp;PRINCE
+      </div>
       <div className="title-tagline">
         A fully-onchain astrological roguelike. Winter 2026.
       </div>

@@ -1,6 +1,6 @@
 /* Motion vocabulary used by the landing page (subset of client/style/motion.css).
    Keep: tint-breath (page background), begin-breath (button), .invite-ring
-   (Chart hover ring), reduced-motion guard. */
+   (Chart hover ring), wordmark-ripple (title glow), reduced-motion guard. */
 
 @keyframes begin-breath {
   0%, 100% { opacity: 0.78; }
@@ -25,4 +25,20 @@
   filter: drop-shadow(0 0 8px currentColor);
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* Each fade spans three of the seven stagger steps, overlapping both neighbors. */
+.wordmark-glow {
+  --wordmark-ripple-stagger: 0.7s;
+  --wordmark-ripple-period: calc(7 * var(--wordmark-ripple-stagger));
+}
+@keyframes wordmark-ripple {
+  0%, 42.857%, 100% { opacity: 0; }
+  21.4285%          { opacity: 1; }
+}
+.wordmark-glow circle {
+  animation: wordmark-ripple var(--wordmark-ripple-period) ease-in-out infinite both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-glow circle { animation: none; }
 }

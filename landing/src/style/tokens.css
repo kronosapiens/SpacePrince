@@ -33,6 +33,10 @@
   --chrome: "Inter", system-ui, sans-serif;
   --serif: var(--display);
   --sans: var(--chrome);
+  --wordmark-glow-width: 120%;
+  --wordmark-glow-radius: 60px;
+  --wordmark-glow-core: 0.5;
+  --wordmark-glow-mid: 0.12;
 
   /* Stroke scale */
   --stroke-hairline: 0.5;
