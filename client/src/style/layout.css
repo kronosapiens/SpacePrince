@@ -725,7 +725,6 @@
    provenance prose), replacing the old corner "i". */
 .ps-tri {
   display: inline-block;
-  color: var(--gold);
   font-size: 0.5em;
   vertical-align: middle;
   --tri-gap: 0.4em;
@@ -738,22 +737,14 @@
    the open class sits on an ancestor row rather than the triangle's parent. */
 .is-open .ps-tri { transform: rotate(90deg); opacity: 1; }
 
-/* Row-label and column-head triangles need a floor: 0.5em of a ~20px cell is
+/* Row-label triangles need a floor: 0.5em of a ~20px cell is
    ~10px, which reads as a dot and hides the open/closed rotation. Pin them
    legible. */
-.ps-rowlabel .ps-tri,
-.ps-colhead .ps-tri { font-size: 11px; --tri-gap: 0.3em; }
+.ps-rowlabel .ps-tri { font-size: 11px; --tri-gap: 0.3em; }
 
-/* The triangle alone is the toggle target — a padded hit box around the small
-   glyph, so the rest of the title/row/header stays inert and stray clicks
-   fall through to the card (the un-arm / deselect surface). The negative
-   margins cancel the padding, leaving layout untouched. */
-.ps-tri-tap {
-  cursor: pointer;
-  padding: 10px;
-  margin: -10px calc(var(--tri-gap) - 10px) -10px -10px;
-}
-.ps-tri-tap:hover { opacity: 1; }
+.ps-study-toggle { letter-spacing: inherit; }
+.ps-study-toggle:is(:hover, :focus-visible) { color: var(--gold-hi); }
+.ps-study-toggle:is(:hover, :focus-visible) .ps-tri { opacity: 1; }
 
 .ps-title {
   font-family: var(--serif);
@@ -847,6 +838,7 @@
   color: var(--void);
   filter: drop-shadow(0 0 8px var(--vc));
 }
+.ps-study-toggle:focus-visible,
 .ps-action:focus-visible {
   outline: 2px solid var(--bone);
   outline-offset: 4px;
@@ -885,22 +877,10 @@
   text-align: center;
   padding: 6px 6px;
 }
-/* Four columns holding four different things, so an even split is the wrong
-   default — it starved the labels while TOTAL, the column needing least (no
-   triangle), hoarded the surplus. Widths come from each column's measured
-   natural width, with a few units of slack each:
-     label 91.5u ("Resolve" + triangle) · core 71.1u · place 79u ("PLACE" +
-     triangle, wider than any value beneath it) · total 65u.
-   Whole units rather than percentages: inside the foreignObject a CSS pixel is a
-   chart viewBox unit, so these are the real widths and they sum to the 330u the
-   panel leaves after its border and padding. Fixed layout scales them
-   proportionally if the panel ever changes width, so they still behave as ratios
-   without having to be written as any.
-   Layout stays `fixed` so columns don't shift as values change between planets;
-   `nowrap` makes a future overrun show as overflow rather than silently wrapping
-   onto a second line, which is what hid the first version of this bug. */
+/* Reserve room for each label and keep columns fixed as planets change.
+   Widths total the panel's 330-unit content box; nowrap exposes overflow. */
 .ps-table col.c-label { width: 99px; }
-.ps-table col.c-core { width: 76px; }
+.ps-table col.c-base { width: 76px; }
 .ps-table col.c-place { width: 84px; }
 .ps-table col.c-total { width: 71px; }
 .ps-table thead th,
@@ -938,10 +918,8 @@
    stats table, and the reason the panel could shrink at all: the headers and
    row labels are what set its minimum width, not the numbers. */
 .ps-table tbody td.ps-rowlabel { font-size: 18px; }
-/* Open rows / column heads brighten their label; the toggle itself lives on
-   the .ps-tri-tap triangle (see above), not the row. */
-.ps-statrow.is-open .ps-rowlabel { opacity: 1; }
-.ps-colhead.is-open { opacity: 1; }
+.ps-statrow.is-open .ps-rowlabel,
+.ps-rowlabel:has(.ps-study-toggle:is(:hover, :focus-visible)) { opacity: 1; }
 
 .ps-blurb {
   font-family: var(--sans);
@@ -2229,13 +2207,4 @@ body:has(.guide-overlay) .dev-keys { display: none; }
   color: var(--bone);
   font-family: var(--sans);
   padding: 4px 6px;
-}
-
-.ps-necessity {
-  margin-top: 16px;
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.4;
-  color: var(--mist);
-  text-align: center;
 }

@@ -80,10 +80,9 @@ function setup(settleOpening = true) {
 }
 
 describe("encounter interactions", () => {
-  it("finishes the other chart opening before allowing actions and retains results without replaying on turn changes", () => {
+  it("finishes the other chart opening before allowing actions without replaying on turn changes", () => {
     const { encounter, render, onCommitTurn } = setup(false);
     const other = '[data-guide="chart-other"]';
-    const record = encounter.necessity!.find((entry) => entry.planet === "Moon")!;
     expect(get(`${other} .necessity-opening`).textContent).toBe("");
     expect(container.querySelector(".chart-layout-chart .necessity-opening")).toBeNull();
     expect(container.querySelector(".chart-layout-chart .necessity-arc")).toBeNull();
@@ -97,16 +96,13 @@ describe("encounter interactions", () => {
     finishOpening();
     click(`${other} [data-guide="planet-other-moon"]`);
     click(`${other} [aria-label="Study Moon"]`);
-    expect(get(`${other} .ps-necessity`).textContent).toBe(
-      `Necessity: +${record.amount}${record.halved ? " · halved by Fortune" : ""}`,
-    );
+    expect(get(`${other} .ps-study`).textContent).not.toContain("Necessity");
     click(moon);
     expect(container.querySelector(testimony)).not.toBeNull();
     encounter.turnIndex = 1;
     render();
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector(".necessity-arc")).toBeNull();
-    expect(get(`${other} .ps-necessity`).textContent).toContain(`Necessity: +${record.amount}`);
     click(moon);
     click(testimony);
     expect(onCommitTurn).toHaveBeenCalledExactlyOnceWith("Moon", "Testimony", expect.any(Function));

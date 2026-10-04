@@ -67,7 +67,6 @@ export function GameLayout() {
         chart={chart}
         state={isCasting ? undefined : opening.state}
         opening={opening.opening}
-        necessity={run?.map.boundary?.necessity}
         unlockedPlanets={unlocked}
         mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
         disabled={opening.active || (!isTitle && guideOpen)}

@@ -76,7 +76,7 @@ function planetPositions() {
 }
 
 describe("entry screens", () => {
-  it("finishes the chart opening before allowing travel and retains its results in study", () => {
+  it("finishes the chart opening before allowing travel and study", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
     prince.runs = [run];
@@ -84,7 +84,6 @@ describe("entry screens", () => {
     act(() => root.render(<GameTest path="/play" />));
     const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
     const node = `[data-guide="node-${next}"]`;
-    const record = run.map.boundary!.necessity.find((entry) => entry.planet === "Moon")!;
 
     expect(container.querySelector(".map-boundary")).toBeNull();
     expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("");
@@ -101,9 +100,7 @@ describe("entry screens", () => {
     expect(loadPrince()).toEqual(prince);
     click(element('[data-guide="planet-self-moon"]'));
     click(element('[aria-label="Study Moon"]'));
-    expect(element(".ps-necessity").textContent).toBe(
-      `Necessity: +${record.amount}${record.halved ? " · halved by Fortune" : ""}`,
-    );
+    expect(element(".ps-study").textContent).not.toContain("Necessity");
     click(element(node));
     expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
     expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
@@ -221,7 +218,7 @@ describe("entry screens", () => {
     ));
     expect(element(".ps-name").textContent).toContain("MOON");
     expect(container.querySelector('[role="dialog"]')).toBeNull();
-    click(element(".ps-name .ps-tri-tap"));
+    click(element('[aria-label="Study Moon"]'));
     click(element('[role="button"][aria-label="Mercury"]'));
     expect(element(".ps-name").textContent).toContain("MERCURY");
     expect(container.querySelector(".ps-study")).not.toBeNull();

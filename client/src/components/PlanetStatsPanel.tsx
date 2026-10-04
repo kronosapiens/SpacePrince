@@ -1,9 +1,9 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CHART_CENTER, OUTER_RING_R } from "@/svg/viewbox";
-import type { Chart, NecessityEntry, PlanetName, PlanetStats, Polarity } from "@/game/types";
+import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
 import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
-import { COLUMN_GLOSS, PLANET_GLOSS, describeStat } from "@/game/glossary";
+import { PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { TermText } from "@/components/TermText";
 import { VALENCE_COLOR } from "@/svg/palette";
 import { playUISound } from "@/audio/engine";
@@ -20,7 +20,6 @@ export interface PlanetStatsActions {
 interface PlanetStatsPanelProps {
   chart: Chart;
   planet: PlanetName;
-  necessity?: NecessityEntry;
   /** Affliction taken so far. The title line shows what's left of Resolve
    *  rather than this directly, so it reads as the arc's bright span — the
    *  chart carries that geometrically and nothing else states it as a number. */
@@ -66,16 +65,6 @@ export function panelHeightFor({ actions }: { actions: boolean }): number {
   return actions ? PLANET_STATS_PANEL_H + ACTION_EXTRA : PLANET_STATS_PANEL_H;
 }
 
-const COLS: Array<{ key: "core" | "placement" | "total"; header: string }> = [
-  { key: "core", header: "Core" },
-  { key: "placement", header: "Place" },
-  { key: "total", header: "Total" },
-];
-
-/** Everything the shared blurb area can explain: a stat row's provenance, or
- *  what the Core / Place column means. */
-type BlurbKey = keyof PlanetStats | "core" | "placement";
-
 /** The stats panel — an HTML card inside a `<foreignObject>`, so the browser's
  *  layout engine handles columns, gridlines, spacing, and text wrapping (rather
  *  than hand-computed SVG coordinates). This is client study chrome, not the
@@ -83,7 +72,6 @@ type BlurbKey = keyof PlanetStats | "core" | "placement";
 export function PlanetStatsPanel({
   chart,
   planet,
-  necessity,
   affliction,
   cx,
   cy,
@@ -99,11 +87,9 @@ export function PlanetStatsPanel({
     hoveredAction.current = null;
     focusedAction.current = null;
   }, [planet, study]);
-  // Tap a disclosure triangle — a stat row's (provenance) or a Core/Place
-  // column head's (what the column means) — to drop prose below the table;
-  // one open at a time.
-  const [openKey, setOpenKey] = useState<BlurbKey | null>(null);
-  const toggleKey = (k: BlurbKey) => {
+  // A stat's label toggles its explanation below the table, one at a time.
+  const [openKey, setOpenKey] = useState<keyof PlanetStats | null>(null);
+  const toggleKey = (k: keyof PlanetStats) => {
     playUISound(openKey === k ? "dismiss" : "select");
     setOpenKey(openKey === k ? null : k);
   };
@@ -148,7 +134,6 @@ export function PlanetStatsPanel({
         }}
       >
         <div className="ps-content" ref={contentRef}>
-          {/* Only the disclosure triangle toggles study; its label stays inert. */}
           <div className={`ps-title ${study ? "is-open" : ""}`}>
             {/* Name and remaining-of-Resolve share the line. The panel is where
                 numbers live, so this is the one place the arc's quantity is
@@ -159,18 +144,20 @@ export function PlanetStatsPanel({
                 arc's own clamp, so the two can't disagree. */}
             <div className="ps-head">
               <span className="ps-name">
-                {onToggleStudy && (
+                {onToggleStudy ? (
                   <button
                     type="button"
-                    className="ps-tri ps-tri-tap"
+                    className="ps-study-toggle"
                     aria-label={`Study ${planet}`}
                     aria-expanded={study}
                     onPointerEnter={playHoverSound}
                     onFocus={playFocusSound}
                     onClick={(e) => { e.stopPropagation(); onToggleStudy(); }}
-                  >▶</button>
-                )}
-                {planet.toUpperCase()}
+                  >
+                    <span className="ps-tri" aria-hidden="true">▶</span>
+                    {planet.toUpperCase()}
+                  </button>
+                ) : planet.toUpperCase()}
                 <span className="ps-epithet">{PLANET_ROLE[planet].toUpperCase()}</span>
               </span>
               <span className="ps-ratio">
@@ -183,44 +170,21 @@ export function PlanetStatsPanel({
           {study ? (
             <div className="ps-study">
               <div className="ps-gloss">{PLANET_GLOSS[planet]}</div>
-              {necessity && (
-                <div className="ps-necessity" aria-label="Opening result">
-                  Necessity: +{necessity.amount}{necessity.halved ? " · halved by Fortune" : ""}
-                </div>
-              )}
               <table className="ps-table">
                 {/* Named columns so the widths in layout.css can follow each
                     column's own content rather than splitting evenly. */}
                 <colgroup>
                   <col className="c-label" />
-                  <col className="c-core" />
+                  <col className="c-base" />
                   <col className="c-place" />
                   <col className="c-total" />
                 </colgroup>
                 <thead>
                   <tr>
                     <th aria-hidden />
-                    {COLS.map(({ key, header }) =>
-                      key === "total" ? (
-                        <th key={key}>{header}</th>
-                      ) : (
-                        <th key={key} className={`ps-colhead ${openKey === key ? "is-open" : ""}`}>
-                          <button
-                            type="button"
-                            className="ps-tri ps-tri-tap"
-                            aria-label={`Explain ${header}`}
-                            aria-expanded={openKey === key}
-                            onPointerEnter={playHoverSound}
-                            onFocus={playFocusSound}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleKey(key);
-                            }}
-                          >▶</button>
-                          {header}
-                        </th>
-                      ),
-                    )}
+                    <th scope="col">Base</th>
+                    <th scope="col">Place</th>
+                    <th scope="col">Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,7 +193,7 @@ export function PlanetStatsPanel({
                       <td className="ps-rowlabel">
                         <button
                           type="button"
-                          className="ps-tri ps-tri-tap"
+                          className="ps-study-toggle"
                           aria-label={`Explain ${row.label}`}
                           aria-expanded={openKey === row.key}
                           onPointerEnter={playHoverSound}
@@ -238,8 +202,10 @@ export function PlanetStatsPanel({
                             e.stopPropagation();
                             toggleKey(row.key);
                           }}
-                        >▶</button>
-                        {row.label}
+                        >
+                          <span className="ps-tri" aria-hidden="true">▶</span>
+                          {row.label}
+                        </button>
                       </td>
                       <td>{row.core}</td>
                       <td>{row.placement || ""}</td>
@@ -252,13 +218,7 @@ export function PlanetStatsPanel({
                 <div className="ps-blurb">
                   {/* The blurb now leads with a named term ("Mars's Resolve is
                       …"), so it takes the same gold accent the help copy uses. */}
-                  <TermText
-                    text={
-                      openKey === "core" || openKey === "placement"
-                        ? COLUMN_GLOSS[openKey]
-                        : describeStat(chart.planets[planet], openKey)
-                    }
-                  />
+                  <TermText text={describeStat(chart.planets[planet], openKey)} />
                 </div>
               )}
             </div>

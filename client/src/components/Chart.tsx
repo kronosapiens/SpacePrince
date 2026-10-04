@@ -129,8 +129,6 @@ export interface ProjectionChips {
 export interface ChartProps {
   chart: ChartType;
   opening?: NecessityAnimationPresentation;
-  /** Last opening result, retained for Study after play resumes. */
-  necessity?: NecessityEntry[];
   state?: Partial<Record<PlanetName, PlanetStatus>>;
   /** Planets the player has not yet revealed. Render as ghost (dashed outline, faded glyph). */
   unlockedPlanets?: PlanetName[];
@@ -222,7 +220,6 @@ export function Chart(props: ChartProps) {
   const {
     chart,
     opening,
-    necessity,
     state,
     unlockedPlanets,
     selectedPlanet,
@@ -558,7 +555,6 @@ export function Chart(props: ChartProps) {
         <PlanetStatsPanel
           chart={chart}
           planet={statsPanelPlanet}
-          necessity={necessity?.find((entry) => entry.planet === statsPanelPlanet)}
           affliction={state?.[statsPanelPlanet]?.affliction ?? 0}
           cx={panelPlacement.cx}
           cy={panelPlacement.cy}

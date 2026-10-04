@@ -22,13 +22,6 @@ export const PLANET_GLOSS: Record<PlanetName, string> = {
   Saturn: "Limit and structure — time, discipline, boundaries, and endurance.",
 };
 
-/** What the derivation table's columns mean. "Place" is spelled out here in
- *  full as placement. */
-export const COLUMN_GLOSS: Record<"core" | "placement", string> = {
-  core: "The planet's core nature — the same for every chart.",
-  placement: "The planet's particular placement — effects differ by sign and sect.",
-};
-
 // Per-stat provenance copy — the astrology behind a single number, so a tap
 // teaches which sign quality lifts a stat (MECHANICS.md §4: each element/
 // modality "expresses" one stat). Composed, never hand-authored per combination.

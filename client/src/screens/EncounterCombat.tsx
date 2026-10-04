@@ -530,7 +530,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       statsPanelActions: playerActions,
       statsPanelReserveActions: true,
       statsPanelStudy: study,
-      necessity: run.map.boundary?.necessity,
       onToggleStudy: guideOpen ? undefined : () => {
         playUISound(study ? "dismiss" : "select");
         setStudy(!study);
@@ -673,7 +672,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             chart={encounter.opponentChart}
             state={displayOpponentState}
             opening={opening.opening}
-            necessity={encounter.necessity}
             unlockedPlanets={encounter.roster}
             activePlanet={opening.active || inspectedOpponent || hoveredOpponent ? null : displayOpponentTurn}
             ringVerb={opening.active || inspectedOpponent || hoveredOpponent ? null : displayOpponentAction}

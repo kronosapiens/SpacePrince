@@ -93,8 +93,8 @@ describe("chart feedback", () => {
     click(moon);
     click('[aria-label="Study Moon"]');
     expect(get('[aria-label="Study Moon"]').getAttribute("aria-expanded")).toBe("true");
-    click('[aria-label="Explain Core"]');
-    click('[aria-label="Explain Core"]');
+    click('[aria-label="Explain Resolve"]');
+    click('[aria-label="Explain Resolve"]');
     click(".chart-inspection");
     expect(cues()).toEqual(["select", "select", "select", "dismiss", "dismiss"]);
     expect(container.querySelector(".ps-card")).toBeNull();
