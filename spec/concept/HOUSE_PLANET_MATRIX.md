@@ -5,6 +5,9 @@ Each entry proposes a concern, a concrete scene action, and a tension for a plan
 The [house reference](HOUSE_MATRIX.md) supplies situations; the [planet and sign reference](PLANET_MATRIX.md) supplies planetary domains and ways of expressing them.
 The examples here are original editorial interpretations for discussion, not implemented encounters or a catalogue of predicted life outcomes.
 
+An [18-entry research pilot](HOUSE_PLANET_PILOT.md) proposes revisions for Saturn across all houses and every planet in Achievement, informed by the [drives guidance](DRIVES.md).
+The tables below remain the comparison draft while that pilot awaits review.
+
 Houses: [I Self](#i-self) · [II Livelihood](#ii-livelihood) · [III Communication](#iii-communication) · [IV Home](#iv-home) · [V Creativity](#v-creativity) · [VI Labor](#vi-labor) · [VII Relationships](#vii-relationships) · [VIII Transformation](#viii-transformation) · [IX Pilgrimage](#ix-pilgrimage) · [X Achievement](#x-achievement) · [XI Friendship](#xi-friendship) · [XII The Hidden](#xii-the-hidden).
 
 ## Reading the entries
@@ -280,5 +283,5 @@ When developing an encounter from this reference, check that:
 - Any burden that matters economically is represented in the actual outcome; prose about time, effort, or risk does not by itself balance a free reward.
 - Promises and settlements resolve within the scene unless the game explicitly records a later obligation.
 
-The next useful design step is a small set of complete encounter menus using these entries, with the baseline offer and each placement-conditioned alternative visible together.
-That would let us compare the economic value of access, the frequency of the conditions, and the clarity of the writing before deciding how much additional house–sign material is needed.
+The current next step is review of the [research pilot](HOUSE_PLANET_PILOT.md) before extending its method to the remaining 66 placements.
+Complete encounter menus and their economic comparison belong to a subsequent design phase.
