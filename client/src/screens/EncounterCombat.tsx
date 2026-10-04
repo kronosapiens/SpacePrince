@@ -526,7 +526,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       warningPlanets: selfWarnings ?? undefined,
       incoming: incomingSelf,
       animationEpoch,
-      statsPanelPlanet: inspected,
+      statsPanelPlanet: previewPlanet,
       statsPanelActions: playerActions,
       statsPanelReserveActions: true,
       statsPanelStudy: study,

@@ -110,11 +110,30 @@ describe("encounter interactions", () => {
 
   it("previews exact effects on hover/focus and restores a focused action when the pointer leaves", () => {
     const { prince, run, onCommitTurn } = setup();
+    hover(moon);
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MOON");
+    expect(container.querySelector(".ps-actions")).toBeNull();
+    leave(moon);
+    expect(container.querySelector(".ps-card")).toBeNull();
+
     focus(moon);
     expect(container.querySelector('[data-guide="arc-self-moon"] .arc-diff')).not.toBeNull();
-    expect(container.querySelector(".ps-card")).toBeNull();
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MOON");
+    hover(mars);
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MARS");
+    leave(mars);
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MOON");
+    expect(container.querySelector(".ps-actions")).toBeNull();
     expect(container.querySelector(otherIncoming)).toBeNull();
+
     click(moon);
+    hover(mars);
+    focus(mars);
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MOON");
+    expect(container.querySelector(testimony)).not.toBeNull();
+    expect(container.querySelector(affliction)).not.toBeNull();
+    leave(mars);
+    expect(get('[data-guide="chart-self"] .ps-name').textContent).toContain("MOON");
     hover(affliction);
     focus(testimony);
     expect(get(testimony).classList.contains("is-previewed")).toBe(true);
