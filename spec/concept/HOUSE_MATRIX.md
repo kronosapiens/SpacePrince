@@ -3,6 +3,7 @@
 A reference for writing Space Prince's narrative encounters across all twelve houses.
 Sources consulted on 2026-09-07.
 Use alongside the [planet and sign matrix](PLANET_MATRIX.md) and [encounter authoring spec](../mechanics/ENCOUNTERS.md).
+The [house and planet matrix](HOUSE_PLANET_MATRIX.md) develops all 84 placements into concerns, scene actions, and tensions, with selected sign variations.
 
 ## Using this reference
 

@@ -5,6 +5,7 @@ Scope: seven planets, twelve signs, and all 84 planet–sign placements in Weste
 Sources consulted on 2026-09-07.
 
 For house meanings and narrative encounter material, see the [house matrix](HOUSE_MATRIX.md).
+The [house and planet matrix](HOUSE_PLANET_MATRIX.md) develops all 84 house placements and shows how selected sign interpretations can shape their actions.
 
 Placements: [Sun](#sun-placements) · [Moon](#moon-placements) · [Mercury](#mercury-placements) · [Venus](#venus-placements) · [Mars](#mars-placements) · [Jupiter](#jupiter-placements) · [Saturn](#saturn-placements).
 
