@@ -160,6 +160,9 @@
   outline: none;
   transition: border-color 220ms ease, box-shadow 220ms ease;
 }
+.email-signup-input:placeholder-shown {
+  text-align: center;
+}
 .email-signup-input::placeholder {
   color: var(--mist);
   opacity: 0.7;
