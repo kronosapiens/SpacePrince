@@ -10,10 +10,11 @@ export interface ChartInspectionProps extends Pick<ChartProps, "activePlanet" | 
   disabled?: boolean;
   mode?: "inspect" | "preview" | "passive";
   presentation?: ChartProps;
+  onReroll?: () => void;
 }
 
 /** Inspect planets in place, with the same stats and study toggle as encounters. */
-export function ChartInspection({ chart, state, unlockedPlanets, disabled = false, mode = "inspect", presentation, ...display }: ChartInspectionProps) {
+export function ChartInspection({ chart, state, unlockedPlanets, disabled = false, mode = "inspect", presentation, onReroll, ...display }: ChartInspectionProps) {
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const [study, setStudy] = useState(false);
@@ -22,12 +23,23 @@ export function ChartInspection({ chart, state, unlockedPlanets, disabled = fals
   const inspected = inspect ? selected : null;
 
   return (
-    <div className="chart-inspection" onClick={() => {
-      if (presentation) return;
-      if (inspect && selected) playUISound("dismiss");
-      setSelected(null);
-      setHovered(null);
-    }}>
+    <div className="chart-inspection"
+      role={onReroll ? "button" : undefined}
+      tabIndex={onReroll ? 0 : undefined}
+      aria-label={onReroll ? "Reroll chart" : undefined}
+      onKeyDown={onReroll ? (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (!event.repeat) event.currentTarget.click();
+        }
+      } : undefined}
+      onClick={() => {
+        if (presentation) return;
+        if (inspect && selected) playUISound("dismiss");
+        setSelected(null);
+        setHovered(null);
+        onReroll?.();
+      }}>
       <Chart {...(presentation ?? {
         ...display,
         chart,

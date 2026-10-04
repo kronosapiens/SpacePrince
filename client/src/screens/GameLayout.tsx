@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { PlanetBands } from "@/components/PlanetBands";
@@ -34,12 +34,13 @@ export function GameLayout() {
   const casting = useCasting(isCasting);
   const [sample, setSample] = useState(() => seededChart(randomSeed(), "Sample"));
   const [guideOpen, setGuideOpen] = useState(false);
+  const reroll = useCallback(() => setSample(seededChart(randomSeed(), "Sample")), []);
 
   useEffect(() => {
     if (!isTitle || prince) return;
-    const timer = window.setInterval(() => setSample(seededChart(randomSeed(), "Sample")), RECHART_INTERVAL_MS);
+    const timer = window.setInterval(reroll, RECHART_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [isTitle, prince]);
+  }, [isTitle, prince, reroll]);
 
   useEffect(() => { setGuideOpen(false); }, [pathname, isEncounter]);
 
@@ -72,6 +73,7 @@ export function GameLayout() {
         disabled={opening.active || (!isTitle && guideOpen)}
         activePlanet={isCasting ? casting.currentRevealing : null}
         hideAffliction={isTitle || isCasting}
+        onReroll={isTitle && !prince ? reroll : undefined}
       >
         {isCasting && <PlanetBands on={casting.bandsOn} current={casting.bandsCurrent} />}
         <Outlet context={context} />

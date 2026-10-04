@@ -1,4 +1,4 @@
-import { useMemo, useSyncExternalStore, type MouseEvent } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import {
@@ -210,9 +210,6 @@ function PlanetGlyph({
 
   const handleEnter = onHover ? () => onHover(point.planet) : undefined;
   const handleLeave = onHover ? () => onHover(null) : undefined;
-  const handleClick = onHover
-    ? (e: MouseEvent) => { e.stopPropagation(); onHover(point.planet); }
-    : undefined;
 
   // Glyph in a deep shade of the planet's own color: colored and high-contrast
   // (via value), but on-palette — same hue family, so no complementary clash
@@ -222,7 +219,6 @@ function PlanetGlyph({
   return (
     <g
       transform={`translate(${point.cx}, ${point.cy})`}
-      onClick={handleClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       style={{ cursor: onHover ? "pointer" : "default", color: c }}

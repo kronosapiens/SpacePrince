@@ -76,6 +76,7 @@
 .chart-layout > .map-content { grid-column: 2; grid-row: 1; }
 .chart-layout > .combat-content { grid-column: 1 / -1; grid-row: 1; }
 .chart-inspection { width: 100%; }
+.chart-inspection[role="button"] { cursor: pointer; }
 .chart-layout-content {
   min-width: 0;
   display: flex;

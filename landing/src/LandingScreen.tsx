@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { Chart } from "@/components/Chart";
 import { EmailSignup } from "@/EmailSignup";
@@ -19,19 +19,19 @@ export function LandingScreen() {
   }, [setActive]);
 
   // Cycle a fresh random sample chart every few seconds so the canvas stays
-  // alive — mirrors the client Title screen (TitleScreen.tsx). Only the
-  // interval re-rolls it; hover and other state changes during the visit don't.
+  // alive — mirrors the client Title screen. Clicking also rolls a fresh chart.
   // The first chart is fixed so the prerendered HTML matches hydration; it
   // shares the OG card's seed, so the page opens on the social preview's chart.
   const [chart, setChart] = useState<ChartType>(() => seededChart(0xCAFEBABE, "Sample"));
+  const reroll = useCallback(() => {
+    setHovered(null);
+    setChart(seededChart(randomSeed(), "Sample"));
+  }, []);
 
   useEffect(() => {
-    const id = window.setInterval(
-      () => setChart(seededChart(randomSeed(), "Sample")),
-      RECHART_INTERVAL_MS,
-    );
+    const id = window.setInterval(reroll, RECHART_INTERVAL_MS);
     return () => window.clearInterval(id);
-  }, []);
+  }, [reroll]);
 
   return (
     <div className="title">
@@ -43,13 +43,13 @@ export function LandingScreen() {
         A fully-onchain astrological roguelike. Winter 2026.
       </div>
       <div className="title-stage">
-        <div className="title-chart">
+        <button type="button" className="title-chart" onClick={reroll} aria-label="Reroll chart">
           <Chart
             chart={chart}
             hoveredPlanet={hovered}
             onPlanetHover={setHovered}
           />
-        </div>
+        </button>
         <MusicButton />
       </div>
       <div className="title-foot">
