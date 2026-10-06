@@ -38,7 +38,7 @@ The test is whether the player can explain who needs recovery, who can carry a c
 ### 1.4 Valence and dignity
 
 House valence guides the kinds of offers and their severity.
-Dignity reveals alternative approaches; it does not apply an automatic exchange-rate multiplier.
+Planetary occupants unlock special approaches; dignity shapes their economic terms without an automatic exchange-rate multiplier.
 Exact balance remains deferred.
 
 ## 2. Outcomes and Payment
@@ -60,6 +60,23 @@ Paid healing requires some actual recovery; clean planets cannot consume Light f
 All outcomes are atomic.
 An invalid target or unaffordable planetary cost rejects the whole choice, including any reward.
 Positive affliction must fit within the target's remaining combustion margin; landing exactly at its ceiling is permitted and combusts it.
+
+### 2.1 Exchange value
+
+Light is both a spendable currency and the common reference for valuing encounter exchanges.
+Use the agreed purchase quantities and prices in the [economy table](../../client/src/data/economy.ts) as the baseline.
+An offer can exchange burdens and benefits directly without Light changing hands.
+For example, a Prince could take affliction for a run-long stat increase, or combine a smaller Light payment with an affliction cost.
+The offer identifies which planet bears each burden and receives each benefit.
+
+Value taking affliction separately from the price of removing it; the two need not form a reversible exchange.
+Compare a direct trade, including the cost of later recovery, with buying its benefit at the ordinary Light price.
+Better terms can be an intentional placement bonus, with the advantage explicit in the authored offer.
+Eligibility and payment are separate: an occupant's special approach can still ask for Light, affliction, or both.
+
+Several linked costs and benefits form one choice and resolve together, with their full effects visible before commitment.
+They do not require intermediate Light transactions or additional decisions.
+Run-long stat gains are defined in the economy table but still require resolver support; the implemented outcome types are listed above.
 
 ## 3. Targeting
 
@@ -85,19 +102,43 @@ Early scenes must still work with only the Moon unlocked.
 
 ## 4. Chart Conditioning
 
-### 4.1 Current condition
+House encounters combine four sources of variation:
+
+| Source | Role |
+|---|---|
+| House and sign | Shape the scenario, writing, mood, and ordinary economic offers. |
+| Planet occupying the house | Unlock special approaches grounded in that planet's concerns within the house. |
+| Occupant's dignity | Organize the economic terms and bonuses of those special approaches. |
+| House joy's current condition | Open or close additional approaches, regardless of the joyful planet's natal placement. |
+
+### 4.1 Planetary joys
+
+A house's joyful planet can enable additional options wherever it resides in the natal chart.
+Its unlock status, affliction, and combustion determine whether those options are available.
+This gives players opportunities they can preserve, lose, and restore through their decisions during a run.
 
 A joy is present when it is unlocked, lit, and below 96 affliction.
 At or above that threshold, or when combusted, its special approach disappears.
 This threshold remains provisional.
 
-### 4.2 Dignity
+### 4.2 Occupants and dignity
 
-Domicile and Exaltation are the strong band.
-Neutral, Detriment, and Fall do not reveal strong-dignity approaches.
-A strong ruler must also be unlocked and lit.
+An occupying planet supplies the Prince's particular wants and special approaches.
+Dignity shapes the terms on which those approaches are available.
+Neutral, detriment, and fall placements should still support substantive special options.
 
-### 4.3 Predicates
+Favorable dignity can provide better terms, including lower costs or greater benefits, alongside some alternative exchanges.
+These advantages are authored into individual offers rather than applied through an automatic exchange-rate multiplier.
+
+Dignities are broadly distributed across charts but retain meaningful birth-cohort effects, especially through slower-moving planets.
+Keep dignity bonuses modest enough that their cumulative value does not excessively advantage particular charts or cohorts.
+Assess repeated savings and access to run-long growth as well as the value of a single offer.
+Exact amounts remain subject to encounter design and playtesting.
+
+### 4.3 Current predicates
+
+These predicates describe current client behavior; house–sign variants and occupant approaches are pending implementation.
+For these predicates, Domicile and Exaltation are the strong band.
 
 | Predicate | True when |
 |---|---|
@@ -116,6 +157,20 @@ Benefic joys add help: a free restoration, a gift, or a better way through the s
 Contained malefics reduce harm: Mars or Saturn can absorb a smaller, scoped cost in their own domains.
 Without containment, the ordinary choices may concentrate a larger burden or spread it across the lit chart.
 All costs remain visible and immediate.
+
+### 4.5 House–sign economic balance
+
+Narrative variation should be available throughout the chart, including empty houses.
+Where house–sign combinations change ordinary economic offers, arrange those differences in a cycle or equivalent distribution so that every chart receives equivalent aggregate economic opportunity across the encounter catalogue.
+
+Evaluate each of the twelve Ascendant arrangements separately.
+Every chart containing each sign once does not, by itself, establish equivalence: the particular house–sign pairings also matter.
+Account for encounter frequency, prices, payment methods, benefit types, and target restrictions.
+Use the shared economy table in §2.1 as the valuation reference.
+
+Compare the available choices as alternatives; their benefits cannot simply be added together when only one option can be taken.
+Check that nominally equivalent arrangements remain comparably useful under representative resource levels and planetary conditions.
+Equivalence concerns the opportunities supplied by the catalogue, rather than identical outcomes in every run.
 
 ## 5. Encounter Shape
 
@@ -147,10 +202,10 @@ Usually this is a plain exit; a harsh house can instead impose a small ordinary 
 ## 6. Provisional Amounts
 
 Authored amounts are multiples of 12.
-Ordinary affliction changes currently span 12–72, Light gains up to 96, and healing prices 12–36.
-The standard paid revival costs 84 Light; a strong Home ruler offers a 60-Light alternative.
+Existing scenarios use affliction changes of 12–72, Light gains up to 96, and healing prices of 12–36.
+They price ordinary revival at 84 Light; a strong Home ruler offers a 60-Light alternative.
 Revival always returns a planet at half its own ceiling.
-These values support playtesting; they are not settled balance.
+These existing prices predate the agreed economy table in §2.1; integrating that baseline into the scenarios remains pending.
 
 ## 7. House Blueprints
 
@@ -195,8 +250,10 @@ Every authored scene must remain playable across all unlock tiers and representa
 Preview and commit must agree for every valid target.
 Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, repeated resolution, and save resets.
 Playtests compare choices across chart conditions and upcoming rulers.
+Catalogue reviews check baseline economic equivalence across the twelve Ascendant arrangements and cumulative dignity advantages across charts and birth cohorts, as described in §4.
 
 ## 11. Deferred Decisions
 
 Wagers, deliberate sacrifice, transfers, persistent effects, multi-stage scenes, and final balance remain deferred.
+The precise house–sign economic cycle and numerical limits on dignity bonuses remain to be designed and tested.
 No additional run currency or lasting narrative state is introduced by this version.
