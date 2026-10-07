@@ -4,6 +4,7 @@ import { THEMES, type ThemeName } from "./themes";
 import { createScore, type ThemeSurface } from "./score";
 import { ALL_MUSIC_PARTS, type MusicPart, type MusicPartState } from "./music-parts";
 import { BELL_VOICE, PLANET_VOICE } from "./voices";
+import type { PropagationNote } from "./propagation-phrases";
 import {
   DEFAULT_MUSIC_VOLUME, DEFAULT_SOUND_VOLUME, MASTER_VOLUME_DB, MUSIC_OUTPUT_GAIN,
   SCORE_VOLUME, FX_VOLUME_DB, UI_VOLUME_DB, COMBUST_VOLUME_DB,
@@ -164,6 +165,7 @@ type AnyInstrument = {
 };
 
 const instruments = new Map<string, AnyInstrument>();
+const previewCleanups = new Set<() => void>();
 
 function midiToFreq(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
@@ -223,6 +225,55 @@ export function playStrike(ruler: PlanetName, target: PlanetName): void {
   const now = T.now();
   const n = strikeMidi(ruler, target);
   fx.triggerAttackRelease(midiToFreq(n), 0.35, now, STRIKE_VELOCITY);
+}
+
+/** An isolated gallery phrase: cancellation also cuts scheduled notes and reverb. */
+export function playPropagationPreview(
+  notes: readonly PropagationNote[],
+  onNote: (index: number | null) => void,
+  onEnd: (error?: unknown) => void,
+  sustain = false,
+): () => void {
+  if (!T || !soundOutput || soundVolume === 0 || T.getContext().state !== "running") {
+    onEnd();
+    return () => {};
+  }
+  const tone = T;
+  const space = new tone.Reverb({ decay: 3.2, wet: SOUND_REVERB_WET }).connect(soundOutput);
+  const voice = new tone.PolySynth(tone.FMSynth, {
+    ...PLANET_VOICE,
+    envelope: { ...PLANET_VOICE.envelope, sustain: sustain ? 0.2 : PLANET_VOICE.envelope.sustain },
+    volume: FX_VOLUME_DB,
+  }).connect(space);
+  const timers: number[] = [];
+  let cancelled = false;
+  const cancel = () => {
+    if (cancelled) return;
+    cancelled = true;
+    timers.forEach(window.clearTimeout);
+    voice.dispose();
+    space.dispose();
+    previewCleanups.delete(cancel);
+  };
+  previewCleanups.add(cancel);
+  void space.ready.then(() => {
+    if (cancelled) return;
+    const start = tone.now();
+    const lookAhead = start - tone.immediate();
+    const releaseAt = (notes.at(-1)?.at ?? 0) + (sustain ? 0.8 : 0.35);
+    notes.forEach((note, index) => {
+      voice.triggerAttackRelease(midiToFreq(note.midi), sustain ? releaseAt - note.at : 0.35, start + note.at, STRIKE_VELOCITY);
+      timers.push(window.setTimeout(() => onNote(index), (lookAhead + note.at) * 1000));
+    });
+    const tailAt = lookAhead + releaseAt + PLANET_VOICE.envelope.release;
+    timers.push(window.setTimeout(() => onNote(null), (sustain ? lookAhead + releaseAt : tailAt) * 1000));
+    timers.push(window.setTimeout(() => { cancel(); onEnd(); }, (tailAt + 3.2) * 1000));
+  }).catch((error: unknown) => {
+    if (cancelled) return;
+    cancel();
+    onEnd(error);
+  });
+  return cancel;
 }
 
 /** One planetary note; its release fits inside the visual cadence. */
@@ -408,6 +459,7 @@ function disposeAudio(): void {
   cancelSwap();
   playing?.score.dispose();
   playing = null;
+  for (const cleanup of previewCleanups) cleanup();
   for (const cleanup of unlockCleanups) cleanup();
   for (const instrument of instruments.values()) instrument.dispose();
   instruments.clear();

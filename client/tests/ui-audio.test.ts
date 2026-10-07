@@ -6,11 +6,15 @@ const tone = vi.hoisted(() => ({
   createSynth: vi.fn(),
   trigger: vi.fn(),
   voices: [] as { trigger: ReturnType<typeof vi.fn>; dispose: ReturnType<typeof vi.fn>; release: number }[],
+  previewVoices: [] as { dispose: ReturnType<typeof vi.fn> }[],
+  reverbs: [] as { dispose: ReturnType<typeof vi.fn> }[],
+  reverbReady: Promise.resolve(),
 }));
 
 vi.mock("tone", () => {
   class AudioNode {
     gain = { rampTo: vi.fn() };
+    dispose = vi.fn();
     connect() { return this; }
     toDestination() { return this; }
   }
@@ -18,6 +22,7 @@ vi.mock("tone", () => {
     constructor(...args: unknown[]) {
       super();
       tone.createSynth(...args);
+      tone.previewVoices.push(this);
     }
     triggerAttackRelease = tone.trigger;
   }
@@ -36,7 +41,10 @@ vi.mock("tone", () => {
     getTransport: () => ({ start: vi.fn() }),
     now: () => tone.time,
     immediate: () => tone.time - 0.1,
-    Reverb: AudioNode,
+    Reverb: class extends AudioNode {
+      ready = tone.reverbReady;
+      constructor() { super(); tone.reverbs.push(this); }
+    },
     Gain: AudioNode,
     Synth,
     FMSynth: class extends Synth {},
@@ -54,6 +62,9 @@ beforeEach(async () => {
   tone.state = "running";
   tone.time = 1;
   tone.voices = [];
+  tone.previewVoices = [];
+  tone.reverbs = [];
+  tone.reverbReady = Promise.resolve();
   engine = await import("@/audio/engine");
 });
 
@@ -177,5 +188,94 @@ describe("necessity audio", () => {
     engine.setSoundVolume(1);
     vi.runAllTimers();
     expect(tone.voices).toHaveLength(0);
+  });
+});
+
+describe("propagation preview audio", () => {
+  it("schedules the phrase at encounter levels, aligns highlights, and disposes its private effects", async () => {
+    await engine.ensureAudio();
+    const onNote = vi.fn();
+    const onEnd = vi.fn();
+    engine.playPropagationPreview([{ planet: "Sun", midi: 74, at: 0.2 }, { planet: "Saturn", midi: 81, at: 1.03 }], onNote, onEnd);
+    await Promise.resolve();
+    expect(tone.createSynth.mock.calls[0]![1].envelope.sustain).toBe(0);
+    expect(tone.trigger).toHaveBeenNthCalledWith(1, 440 * 2 ** ((74 - 69) / 12), 0.35, 1.2, 0.24);
+    expect(tone.trigger.mock.calls[1]).toEqual([880, 0.35, expect.closeTo(2.03), 0.24]);
+    vi.advanceTimersByTime(299);
+    expect(onNote).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(onNote).toHaveBeenLastCalledWith(0);
+    vi.advanceTimersByTime(830);
+    expect(onNote).toHaveBeenLastCalledWith(1);
+    vi.runAllTimers();
+    expect(onNote).toHaveBeenLastCalledWith(null);
+    expect(onEnd).toHaveBeenCalledOnce();
+    expect(tone.previewVoices[0]!.dispose).toHaveBeenCalledOnce();
+    expect(tone.reverbs[1]!.dispose).toHaveBeenCalledOnce();
+    expect(tone.reverbs[0]!.dispose).not.toHaveBeenCalled();
+  });
+
+  it("holds all seven plucks at a restrained sustain and releases them together", async () => {
+    const { propagationPhrase } = await import("@/audio/propagation-phrases");
+    const { PLANETS } = await import("@/game/data");
+    const { PLANET_VOICE } = await import("@/audio/voices");
+    await engine.ensureAudio();
+    const notes = propagationPhrase("Sun", "Sun", PLANETS, "Thirds");
+    const onNote = vi.fn();
+    const onEnd = vi.fn();
+    engine.playPropagationPreview(notes, onNote, onEnd, true);
+    await Promise.resolve();
+    expect(tone.createSynth.mock.calls[0]![1]).toEqual({
+      ...PLANET_VOICE,
+      envelope: { ...PLANET_VOICE.envelope, sustain: 0.2 },
+      volume: -10,
+    });
+    expect(tone.trigger).toHaveBeenCalledTimes(7);
+    for (const [index, note] of notes.entries()) {
+      const [frequency, duration, start, velocity] = tone.trigger.mock.calls[index]!;
+      expect(frequency).toBe(440 * 2 ** ((note.midi - 69) / 12));
+      expect(start).toBeCloseTo(1 + note.at);
+      expect(start + duration).toBeCloseTo(1 + notes.at(-1)!.at + 0.8);
+      expect(velocity).toBe(0.24);
+    }
+    const releaseMs = (0.1 + notes.at(-1)!.at + 0.8) * 1000;
+    vi.advanceTimersByTime(releaseMs - 10);
+    expect(onNote).toHaveBeenLastCalledWith(6);
+    vi.advanceTimersByTime(20);
+    expect(onNote).toHaveBeenLastCalledWith(null);
+    expect(onEnd).not.toHaveBeenCalled();
+    vi.runAllTimers();
+    expect(onEnd).toHaveBeenCalledOnce();
+    expect(tone.previewVoices[0]!.dispose).toHaveBeenCalledOnce();
+    engine.playStrike("Sun", "Moon");
+    expect(tone.createSynth.mock.calls[1]![1].envelope.sustain).toBe(0);
+  });
+
+  it("cancels pending reverb readiness and scheduled playback without touching encounter audio", async () => {
+    await engine.ensureAudio();
+    engine.playStrike("Sun", "Moon");
+    const onNote = vi.fn();
+    const onEnd = vi.fn();
+    let ready!: () => void;
+    tone.reverbReady = new Promise<void>((resolve) => { ready = resolve; });
+    const notes = [{ planet: "Sun" as const, midi: 74, at: 0.2 }];
+    const pending = engine.playPropagationPreview(notes, onNote, onEnd, true);
+    pending();
+    ready();
+    await Promise.resolve();
+    expect(tone.trigger).toHaveBeenCalledTimes(1);
+
+    const cancel = engine.playPropagationPreview(notes, onNote, onEnd, true);
+    await Promise.resolve();
+    expect(tone.trigger).toHaveBeenCalledTimes(2);
+    cancel();
+    cancel();
+    vi.runAllTimers();
+    expect(onNote).not.toHaveBeenCalled();
+    expect(onEnd).not.toHaveBeenCalled();
+    expect(tone.previewVoices[0]!.dispose).not.toHaveBeenCalled();
+    expect(tone.previewVoices[1]!.dispose).toHaveBeenCalledOnce();
+    expect(tone.previewVoices[2]!.dispose).toHaveBeenCalledOnce();
+    expect(tone.reverbs[0]!.dispose).not.toHaveBeenCalled();
   });
 });

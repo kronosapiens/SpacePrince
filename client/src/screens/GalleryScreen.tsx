@@ -10,6 +10,7 @@ import { MapDiagram } from "@/components/MapDiagram";
 import { MusicVisualizer } from "@/components/MusicVisualizer";
 import { PlanetIntroCard } from "@/components/PlanetIntroCard";
 import { PrinceArtwork } from "@/components/PrinceArtwork";
+import { PropagationPhrases } from "@/components/PropagationPhrases";
 import { HOUSES } from "@/data/houses";
 import { seededChart } from "@/game/chart";
 import { PLANETS, PLANET_ROLE, SIGNS, UNLOCK_THRESHOLDS } from "@/game/data";
@@ -73,6 +74,7 @@ export default function GalleryScreen() {
         <a href="#compositions">Chart & map</a>
         <a href="#palette">Palette & type</a>
         <a href="#music">Music</a>
+        <a href="#propagation">Propagation phrases</a>
       </nav>
 
       <section id="planets" className="gallery-section" aria-labelledby="gallery-planets-title">
@@ -225,6 +227,8 @@ export default function GalleryScreen() {
         </div>
         {theme ? <MusicVisualizer theme={theme} status={musicStatus} /> : musicStatus}
       </section>
+
+      <PropagationPhrases />
 
       {planet && <PlanetIntroCard chart={revealChart} planet={planet} onClose={() => setPlanet(null)} />}
     </main>
