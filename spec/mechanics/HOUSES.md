@@ -7,6 +7,20 @@ Combat mechanics are specified in `spec/mechanics/MECHANICS.md`.
 Chart construction (whole-sign houses, ASC, rulerships) is specified in `spec/mechanics/CHART.md`.
 Map topology is specified in `spec/mechanics/MAP.md`.
 
+### Reading the encounter references
+
+| Reference | Responsibility |
+|---|---|
+| [ASTROLOGY.md](../concept/ASTROLOGY.md#favorable-and-unfavorable-houses) | Historical concepts, sources, and qualifications |
+| [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md) | Each house's classifications, situations, and original authoring guidance |
+| [HOUSE_PLANET_MATRIX.md](../concept/HOUSE_PLANET_MATRIX.md) and [PLANET_MATRIX.md](../concept/PLANET_MATRIX.md) | Planetary wants in each house and their expression through signs |
+| [DRIVES.md](../concept/DRIVES.md) | Motives, emotional range, and the distinction between Prince and player |
+| This document, §3 | How the sources contribute to the encounter model |
+| [ENCOUNTERS.md](ENCOUNTERS.md) | Scenario composition, economic terms, eligibility, resolution, and review |
+
+Historical claims and original game interpretations remain separately identified in these references.
+The matrices supply writing possibilities; the authoring spec determines which effects can currently resolve.
+
 ---
 
 ## 1. Purpose and Scope
@@ -25,16 +39,17 @@ Map topology is specified in `spec/mechanics/MAP.md`.
 - **Essential dignity as an input.**
   The chart computes dignity (`CHART.md`), which shapes the economic terms of occupant approaches under `ENCOUNTERS.md §4`.
   Dignity is not a combat input (`MECHANICS.md §10`).
-- Twelve house archetypes: theme, native valence, joy.
+- Twelve house archetypes: topics, fixed geometry, favorability, and joy.
 - Outcome vocabulary: what resources narrative encounters can move.
-- Encounter shape: one decision, immediate consequences, visible odds, and exits.
+- Encounter shape: one decision, immediate consequences, previews, and exits.
 
 ### Out of Scope (v1)
 
 - Authored prose / flavor text for each encounter.
 - Exact risk/reward curves (fine-tune later).
-- Map placement logic — whether a node's house is fixed at map-gen or rolled on entry (see Open Questions).
+- Map placement logic — whether a node's house is fixed at map generation or selected on entry.
 - Art direction for narrative screens.
+- Additional influences from planets aspecting the encounter house from elsewhere, and weighting by proximity to the exact angles.
 
 ---
 
@@ -53,60 +68,96 @@ Their storage and gameplay costs require a separate design decision.
 
 ## 3. Chart-Conditioning Model
 
-Each house has three intrinsic structural features, drawn from the Hellenistic tradition, that give it character: its position on the **diurnal cycle**, its **aspect to the ASC**, and its **native joy**.
-These provide the house's shared character across charts.
+Read the inputs separately before combining them in a scene.
+Shared house properties establish the situation; natal placements supply expression and approaches; current condition and the economy determine which offers can be used.
 
-The Prince's house signs and planetary occupants supply individual character, while dignity and joy condition shape the available terms and approaches.
+| Input | What varies | Contribution |
+|---|---|---|
+| House topics | Fixed by house | Human situation and what is at stake |
+| House geometry and angularity | Fixed by house | Position from which action occurs, authority, and constraints on agency |
+| House favorability | Fixed by house | Balance of opportunities and burdens in ordinary offers |
+| House sign | Natal chart | Manner, mood, and possible ordinary tradeoffs |
+| Occupying planet | Natal chart | Particular wants and special approaches |
+| Occupant's dignity | Planet and sign | Economic terms and modest bonuses for those approaches |
+| Planetary joy | Fixed affinity; condition varies during play | House character and additional approaches available through its joyful planet |
+| Economy and run state | Shared valuation; resources vary during play | Prices, targets, affordability, and the usefulness of an offer now |
 
-### 3.1 Diurnal cycle
+These are authoring contributions, not independent numerical modifiers to add together.
+A source can influence the fiction without adding a mechanical effect.
+The Prince's motives and emotions remain distinct from economic advantage and from the player's experience, as described in [DRIVES.md](../concept/DRIVES.md).
 
-Each house sits at a fixed position in the day/night rotation of the sky: rising at the ASC (1st), culminating at the MC (10th), setting at the DSC (7th), hiding at the IC (4th), with the other eight distributed between these four pivots.
+### 3.1 House topics and geometry
 
-A house that sits on one of these four pivots is called **angular**. In this doc, "angular" means only that — sitting on a pivot — not the classical three-tier angular/succedent/cadent taxonomy.
+Start with the house's human situation, using the [house matrix](../concept/HOUSE_MATRIX.md).
+Its fixed position supplies another influence: I is associated with rising, IV with the private foundation, VII with meeting the other, and X with public action.
+The angular, succedent, and cadent classifications describe relationships to these four angles; their historical basis is in [ASTROLOGY.md](../concept/ASTROLOGY.md#favorable-and-unfavorable-houses).
 
-- Encounters should feel rooted in this geometry: the 1st is emergence, the 10th is the public summit, the 7th is the threshold of the other, the 4th is the secret interior.
-- The cycle itself doesn't vary per chart, but proximity of a tenant to an angle weights its narrative voice.
+Our adaptation uses this geometry to ask who can act directly, who holds authority, and what the Prince depends on.
+Apply those questions through each house's topics: angular IV can remain private, and cadent IX can offer consequential understanding.
+An occupant shares its house's classification; this adds no separate angularity bonus or calculation of influence from other planets.
 
-### 3.2 Aspect to the ASC
+### 3.2 Aspect to the ASC and favorability
 
-Every house either does or doesn't form a classical aspect (conjunction, sextile, square, trine, opposition) to the 1st:
+The house matrix records each house's relationship to the rising sign.
+I is the origin; III, IV, V, VII, IX, X, and XI aspect it; II, VI, VIII, and XII are averse.
+This is fixed house geometry, distinct from aspects cast by planets elsewhere in an individual chart.
 
-- **Good places** (1, 3, 4, 5, 7, 9, 10, 11): aspect the ASC. Native valence favorable.
-- **Bad places** (2, 6, 8, 12): averse — no aspect. Native valence hostile.
-
-This contributes to the baseline emotional tone: good places tend to reward, bad places tend to extract.
-House signs, occupants, and joy condition supply the chart variation described in §3.4.
+Historical favorability informs our **valence**: favorable houses tend toward opportunities and assistance; adverse houses toward necessity, constraint, and extraction.
+These are tendencies to test when composing ordinary offers, not guaranteed outcomes or prescribed emotional tones.
+II can concern abundance as well as scarcity; VIII can offer a gain without making a loss beneficial.
+The same economic opportunity can evoke pleasure, envy, relief, or resentment.
+Angularity and favorability stay separate: potency does not itself make an offer generous.
 
 ### 3.3 Joys
 
-Each of the seven planets rejoices in one house: Mercury-1, Moon-3, Venus-5, Mars-6, Sun-9, Jupiter-11, Saturn-12. This assignment is fixed by tradition — a permanent affinity between planet and house, independent of any chart.
+The fixed joy assignments are recorded in the [house matrix](../concept/HOUSE_MATRIX.md#game-correspondences).
+They contribute to house character independently of the occupant: Venus's affinity with V, for example, supplies one influence on its pleasures.
+These affinities do not establish a single historical origin for every house topic.
 
-The joy shapes the house's character in every chart, regardless of where the joy-planet is physically placed. The 5th feels Venusian (pleasure, creativity, play) because Venus joys there. The 6th feels Martial (toil, strife, wearing work) because Mars joys there. The 12th feels Saturnine (sorrow, concealment, slow weight) because Saturn joys there. This tint is baked into each house's theme in §5.
+The game also reads the joyful planet's unlock status, affliction, and combustion wherever it resides.
+Those changing conditions can open or close additional approaches, giving players opportunities they can preserve, lose, and restore during a run.
+Natal placement does not exclude a Prince from those joy options.
+Houses without a joy still have ordinary offers and occupant approaches.
 
-**Chart-conditioning via joy.**
-A joy-house reads its joy-planet's unlock status, affliction, and combustion wherever that planet sits.
-These conditions can open or close additional approaches, giving players opportunities they can preserve, lose, and restore during a run.
-Every chart contains all seven planets, so natal placement does not exclude a Prince from a house's joy options.
-The current availability threshold is recorded in `ENCOUNTERS.md §4.1`.
+The **asymmetric joy rule** is our game adaptation: benefic joy options add help, while Mars and Saturn's options contain a burden in VI and XII.
+Loss of a joy option removes that help or mitigation; it does not prescribe the scene's emotional outcome.
+Availability and economic treatment are specified in [ENCOUNTERS.md §4.1–4.4](ENCOUNTERS.md#4-chart-conditioning).
 
-This preserves the **asymmetric joy rule** from §5.0: a well-conditioned benefic joy-planet intensifies the pleasantness of its joy-house; a well-conditioned malefic joy-planet *contains* the malefice of its joy-house. When the joy-planet is afflicted, benefic joy-houses lose their boon and malefic joy-houses lose their containment.
+### 3.4 House signs
 
-The five houses with no joy (2, 4, 7, 8, 10) acquire character from other sources — primarily the diurnal geometry (4th and 10th as IC/MC, 7th as DSC) and the aspect-to-ASC rule (2nd and 8th as bad places). Joy is one of several ways houses acquire meaning, not the only one.
+The natal sign shapes how the house's situation is expressed, including its writing, mood, and possible ordinary tradeoffs.
+This applies in empty houses as well as occupied ones.
+Use the [planet and sign reference](../concept/PLANET_MATRIX.md) for expression while keeping the house's topics recognizable.
+The sign influences the terms on offer through authored variations, subject to the aggregate balance check in §3.7.
 
-*Historical note.* Classical practice treats "in joy" both as this permanent affinity and as a minor placement dignity (the planet is stronger when actually in its joy-house). We've deliberately collapsed the two into the affinity sense alone: it applies to every chart equally, it's historically the primary sense, and it keeps the mechanic a single clean lever. The placement-dignity sense can be reintroduced later if encounter density needs another axis.
+### 3.5 Occupants
 
-### 3.4 Encounter variation and balance
+An occupying planet supplies a particular concern and unlocks special approaches within the house's shared situation.
+The [house and planet matrix](../concept/HOUSE_PLANET_MATRIX.md) develops these wants and possible responses for all 84 placements.
+Its entries allow mixed motives, enjoyment, refusal, and unresolved feelings; they do not assign a moral personality.
 
-House and sign shape the scenario, writing, mood, and ordinary offers, including in empty houses.
-Where those offers differ economically, distribute them so that each of the twelve Ascendant arrangements receives equivalent aggregate economic opportunity across the catalogue.
-Evaluate the complete arrangements with encounter frequencies and usable choices accounted for; each chart containing every sign once is not sufficient.
+Occupancy, joy, and the fixed game ruler have separate roles even when they name the same planet.
+The fixed ruler supplies color, musical identity, and the opening voice; it is not another source of the Prince's wants.
+Current ruler-based predicates are documented separately from the intended occupant model in `ENCOUNTERS.md §4.3`.
 
-Planetary occupants unlock special approaches grounded in their concerns within the house.
-Dignity organizes the economic terms of those approaches, with substantive options for neutral, detriment, and fall placements as well as favorable dignity.
-Keep bonuses modest and assess their cumulative value across charts and birth cohorts, since dignity retains cohort effects from slower-moving planets.
-Joys add options through the joyful planet's current condition, regardless of its natal placement.
+### 3.6 Dignity
 
-The detailed authoring and balance guidance lives in [ENCOUNTERS.md §4](ENCOUNTERS.md#4-chart-conditioning).
+Essential dignity shapes the economic terms of an occupant's approach.
+Favorable dignity can improve an offer, while neutral, detriment, and fall placements retain substantive approaches.
+It does not replace the planet's concern or settle the emotional meaning of the choice.
+Bonuses remain modest because repeated advantages and birth-cohort effects can accumulate; detailed guidance lives in `ENCOUNTERS.md §4.2`.
+
+### 3.7 Combining influences and checking balance
+
+Compose a coherent situation before selecting the effects it supports.
+Identify which source explains each special approach and which, if any, explains its economic advantage.
+Shared house geometry is accounted for in the house's ordinary offers; do not count it again as a placement bonus.
+The composition and revision process is in [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
+
+Where house signs change ordinary offers, each of the twelve Ascendant arrangements should receive equivalent aggregate economic opportunity across the catalogue.
+Individual houses can differ; assess the complete arrangements with encounter frequency and usable choices accounted for.
+Use the shared economy to value direct exchanges as well as Light payments, then check the cumulative advantage of dignity and joy options.
+The valuation and catalogue checks live in `ENCOUNTERS.md §2.1` and `§4.5`.
 
 ---
 
@@ -136,138 +187,25 @@ This is the primary vehicle for chart-conditioning.
 
 ## 5. The Twelve Houses
 
-Each house is documented below with its **valence** (good place or bad place, per §3.2), its **joy** (the planet that rejoices here, per §3.3), its **kind** (category; see below), and a short note on **theme** (traditional meaning plus modern gloss).
-These concepts frame the mechanical blueprints in `ENCOUNTERS.md §7`.
+The [house matrix](../concept/HOUSE_MATRIX.md#game-correspondences) records each house's geometry, joy, and fixed game ruler together.
+Its individual entries separate source notes from editorial direction, stakes, scenes, and economic applications.
+Use those entries for the shared context of all seven planetary placements in a house.
 
-### 5.0 Categories
+| House | Human situation | Authoring reference |
+|---|---|---|
+| I · Self | Bodily presence and introducing oneself | [Self](../concept/HOUSE_MATRIX.md#i--self) |
+| II · Livelihood | Obtaining, holding, and using resources | [Livelihood](../concept/HOUSE_MATRIX.md#ii--livelihood) |
+| III · Communication | Everyday exchange, siblings, and short journeys | [Communication](../concept/HOUSE_MATRIX.md#iii--communication) |
+| IV · Home | Shelter, ancestry, and private foundations | [Home](../concept/HOUSE_MATRIX.md#iv--home) |
+| V · Creativity | Making, pleasure, children, and play | [Creativity](../concept/HOUSE_MATRIX.md#v--creativity) |
+| VI · Labor | Necessary work, illness, and receiving care | [Labor](../concept/HOUSE_MATRIX.md#vi--labor) |
+| VII · Relationships | Partnership, negotiation, and open opposition | [Relationships](../concept/HOUSE_MATRIX.md#vii--relationships) |
+| VIII · Transformation | Death, endings, inheritance, and others' resources | [Transformation](../concept/HOUSE_MATRIX.md#viii--transformation) |
+| IX · Pilgrimage | Travel, belief, and unfamiliar learning | [Pilgrimage](../concept/HOUSE_MATRIX.md#ix--pilgrimage) |
+| X · Achievement | Public action, recognition, and authority | [Achievement](../concept/HOUSE_MATRIX.md#x--achievement) |
+| XI · Friendship | Allies, shared hopes, and assistance | [Friendship](../concept/HOUSE_MATRIX.md#xi--friendship) |
+| XII · The Hidden | Seclusion, confinement, and what others cannot see | [The Hidden](../concept/HOUSE_MATRIX.md#xii--the-hidden) |
 
-The twelve houses fall into five categories based on which of the three anchoring features — joy, angular position, averse-to-ASC — apply to them. The category captures how each house acquires its character. Every house has at least one anchor; three have two.
-
-- **Double-anchored (1):** joy + angular. The only house with both. Overdetermined by design — it *is* the chart's origin.
-- **Pure angular (4, 7, 10):** no joy, but sit on the diurnal angles (IC, DSC, MC).
-  Their shared themes come from sky geometry: private interior, the other, public summit.
-- **Benefic joys (3, 5, 9, 11):** a benefic (Moon, Venus, Sun, Jupiter) joys here in a good place. The pleasant houses. When the joy-planet is well-conditioned, the house reads at its most favored; when afflicted or combust, the house still carries the benefic tint but the favored voice goes flat.
-- **Contained malefics (6, 12):** a malefic (Mars, Saturn) joys in a bad place. Classical containment — the malefic is given a role that fits its nature. When the joy-planet is well-conditioned, its harshness stays scoped and legible (the malefic has honest employment); when afflicted or combust, containment fails and the house reads at its worst.
-- **Pure bad places (2, 8):** averse to the ASC, no joy, not angular.
-  Their baseline concerns are scarcity and loss.
-  House signs shape their scenes and ordinary offers, and occupants unlock special approaches, as in other houses.
-  They have no additional joy options.
-
-This typology surfaces an **asymmetric joy rule**: *benefic joys add good, malefic joys remove bad.* A well-conditioned Venus intensifies the 5th's pleasure; a well-conditioned Mars *contains* the 6th's toil rather than amplifying it. A well-conditioned Jupiter delivers the 11th's gifts; a well-conditioned Saturn makes the 12th's sorrow legible and scoped. When mechanics are eventually committed, this asymmetry should be preserved — a clean benefic joy is a bonus, a clean malefic joy is a mitigation, and the two shouldn't collapse into the same mechanic.
-
-### Summary
-
-| # | Name | Valence | Joy | Angular | Kind |
-|---|---|---|---|---|---|
-| 1 | Self | Good | Mercury | ASC | Double-anchored |
-| 2 | Livelihood | Bad | — | — | Pure bad place |
-| 3 | Communication | Good | Moon | — | Benefic joy |
-| 4 | Home | Good | — | IC | Pure angular |
-| 5 | Creativity | Good | Venus | — | Benefic joy |
-| 6 | Labor | Bad | Mars | — | Contained malefic |
-| 7 | Relationships | Good | — | DSC | Pure angular |
-| 8 | Transformation | Bad | — | — | Pure bad place |
-| 9 | Pilgrimage | Good | Sun | — | Benefic joy |
-| 10 | Achievement | Good | — | MC | Pure angular |
-| 11 | Friendship | Good | Jupiter | — | Benefic joy |
-| 12 | The Hidden | Bad | Saturn | — | Contained malefic |
-
-### 5.1 First — Self
-*Horoskopos (the "hour-marker," the Ascendant)*
-
-- **Valence:** Good place. The chart's point of view; the house of emergence.
-- **Joy:** Mercury.
-- **Kind:** Double-anchored. The only house with both a joy and an angular position. The self-house is overdetermined by design.
-- **Theme:** The self, the body, vitality, temperament. In modern framing: identity, the "new beginning" one is always arriving at.
-
-### 5.2 Second — Livelihood
-*Haidou Pylē ("Gate of Hades")*
-
-- **Valence:** Bad place. Averse to the ASC. The house of scarcity and substance.
-- **Joy:** None.
-- **Kind:** Pure bad place.
-  It has no joy and sits off the diurnal angles.
-  Its house sign and occupants supply variation and special approaches within the concerns of livelihood.
-- **Theme:** Resources, livelihood, what one must secure to keep going. The "gate of Hades" framing marks this as a narrow passage, not an abundance.
-
-### 5.3 Third — Communication
-*Thea ("Goddess")*
-
-- **Valence:** Good place. Small, intimate, close to home.
-- **Joy:** Moon.
-- **Kind:** Benefic joy. The Moon joys here in a good place. A well-conditioned Moon opens the house's reflective, intimate voice; an afflicted or combust Moon leaves the Lunar tint without the favor.
-- **Theme:** Siblings, short journeys, communication, dreams, daily speech. The Moon's joy gives this house a quality of reflection and ordinary intuition.
-
-### 5.4 Fourth — Home
-*Hypogeion ("Under the Earth") — the IC*
-
-- **Valence:** Good place. The hidden foundation; the private interior.
-- **Joy:** None.
-- **Kind:** Pure angular. Identity comes from the IC — the lowest point of the sky, the midnight-point, what is buried.
-- **Theme:** Home, ancestors, roots, endings. The foundational layer beneath the public self; the counterpart to the 10th.
-
-### 5.5 Fifth — Creativity
-*Agathē Tychē ("Good Fortune")*
-
-- **Valence:** Good place. The most directly joyful of the succedent houses.
-- **Joy:** Venus.
-- **Kind:** Benefic joy. Venus joys here — the goddess of pleasure in the house of pleasure. A well-conditioned Venus is a pure boon; a combust or afflicted Venus is the classical "gift spoiled."
-- **Theme:** Children, pleasure, play, creation, games of chance. Venus's joy here makes this the house of generative delight.
-
-### 5.6 Sixth — Labor
-*Kakē Tychē ("Bad Fortune")*
-
-- **Valence:** Bad place. Averse to the ASC. The house of extracted effort.
-- **Joy:** Mars.
-- **Kind:** Contained malefic. Mars joys in a bad place — classical containment. A well-conditioned Mars gives the malefic honest employment: the harshness is still present but scoped, legible, *his job*. An afflicted or combust Mars is when the 6th is at its worst, because the house's native malefic energy has no custodian to carry it.
-- **Theme:** Illness, servitude, toil, accidents, the body as a site of grinding work. Mars's joy here is a classical "containment" — the malefic given a role that fits its nature.
-
-### 5.7 Seventh — Relationships
-*Dysis (the Descendant)*
-
-- **Valence:** Good place. The threshold of the other; the mirror of the self.
-- **Joy:** None.
-- **Kind:** Pure angular. Identity from the DSC — the setting point, the self-to-other threshold.
-- **Theme:** Partnership, open enemies, contracts, the other. Traditionally ambivalent — any named relationship lives here, whether friendly or hostile.
-
-### 5.8 Eighth — Transformation
-*Argon ("Idle") — the house of death*
-
-- **Valence:** Bad place. Averse to the ASC. The house of transfer and inheritance.
-- **Joy:** None.
-- **Kind:** Pure bad place.
-  Like the 2nd, it has no joy and sits off the diurnal angles.
-  Its house sign and occupants supply variation and special approaches within the concerns of death and inheritance.
-- **Theme:** Death, shared resources, others' money, crisis, transformation. The traditional darkness of this house is the zero-sum nature of inheritance: one gains only because another loses.
-
-### 5.9 Ninth — Pilgrimage
-*Theos ("God")*
-
-- **Valence:** Good place. The house of wisdom, meaning, and the far.
-- **Joy:** Sun.
-- **Kind:** Benefic joy. The Sun joys here — the illuminator in the house of illumination-at-a-distance. A well-conditioned Sun opens the house's favored voice; an afflicted Sun leaves the tint but the pilgrimage runs without its light.
-- **Theme:** Long journeys, foreign lands, religion, philosophy, wisdom. The Sun's joy here is the illumination of distance — what is learned by going far.
-
-### 5.10 Tenth — Achievement
-*Mesouranēma ("Midheaven") — the MC*
-
-- **Valence:** Good place. The public summit; action visible to the world.
-- **Joy:** None.
-- **Kind:** Pure angular. Identity from the MC — the highest point of the sky, the noon-point, maximum visibility.
-- **Theme:** Reputation, career, public life, action in the world. The visible counterpart to the 4th's hidden interior.
-
-### 5.11 Eleventh — Friendship
-*Agathos Daimōn ("Good Spirit")*
-
-- **Valence:** Good place. The most benefic of the succedent houses; the house of grace.
-- **Joy:** Jupiter.
-- **Kind:** Benefic joy. Jupiter (greater benefic) joys here — the most gift-laden of the joy affinities. A well-conditioned Jupiter is the closest thing to a pure "unearned help" bonus; an afflicted or combust Jupiter leaves the house a house-of-gifts with no giver.
-- **Theme:** Friends, allies, hopes, benefactions, unearned blessings. Jupiter's joy here gives the house a quality of gift — help that arrives from outside.
-
-### 5.12 Twelfth — The Hidden
-*Kakos Daimōn ("Bad Spirit")*
-
-- **Valence:** Bad place. Averse to the ASC. The hardest house; what is withheld, concealed, or lost.
-- **Joy:** Saturn.
-- **Kind:** Contained malefic. Saturn joys in a bad place — sorrow and concealment are Saturn's domain, so housing him here gives him honest employment. A well-conditioned Saturn *contains*: costs are still real but become scoped and legible. An afflicted or combust Saturn is when the 12th is worst, because its characteristic weight has no custodian.
-- **Theme:** Hidden enemies, sorrows, confinement, exile, the unseen. Saturn's joy here gives the house a quality of slow, heavy concealment — costs unseen until they arrive.
+The current [client house data](../../client/src/data/houses.ts) still stores good/bad valence and compound kind labels such as contained-malefic and pure-bad-place.
+Those summarize the earlier implementation; new authoring considers geometry, favorability, and joy separately as described in §3.
+The existing mechanical blueprints remain in `ENCOUNTERS.md §7` while the catalogue is refreshed.

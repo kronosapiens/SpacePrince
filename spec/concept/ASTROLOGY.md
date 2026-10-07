@@ -119,7 +119,12 @@ Individuals are treated as **agents entering a system**, not autonomous interior
 * Development of **houses** — twelve divisions of the chart representing domains of life. Initially **Whole Sign**, meaning each house corresponds exactly to one zodiac sign, starting from the Ascendant's sign. The traditional house meanings: (1) self and body, (2) wealth and resources, (3) siblings and short journeys, (4) home and parents, (5) children and pleasure, (6) illness and servitude, (7) marriage and partnerships, (8) death and shared resources, (9) travel and philosophy, (10) career and public standing, (11) friends and aspirations, (12) isolation and hidden enemies
 * Formalization of **aspects** — geometric angles between planets (e.g. opposition at 180°, trine at 120°, square at 90°, sextile at 60°) that describe how planets interact with each other. *Aspect* is literally *aspectus* — beholding: planets in aspect see each other across the circle. The conjunction (planets co-present in one sign) was counted separately as **co-presence** — not a gaze across distance but a fusion of significations, and the most powerful configuration of all. Signs at the unrecognized angles (30° and 150° apart) are in **aversion** — they cannot see each other, and no aspect exists. Space Prince keeps all three distinctions: the four aspects propagate by circle fraction, the conjunction conducts in full, aversion transmits nothing (`MECHANICS.md` §9)
 * Canonical **planetary rulerships** — the assignment of each sign to a ruling planet, establishing which planet has authority over which domain. The scheme has an elegant symmetric structure, formalized in this period from earlier Babylonian affinities: the **Sun** rules Leo and the **Moon** rules Cancer, forming a central axis. The remaining five planets each rule two signs, radiating outward in order of geocentric distance — **Mercury** (Gemini & Virgo), **Venus** (Taurus & Libra), **Mars** (Aries & Scorpio), **Jupiter** (Pisces & Sagittarius), **Saturn** (Aquarius & Capricorn). This pattern is encoded in the **Thema Mundi** — a mythical "birth chart of the world" used as a Hellenistic teaching device to explain the logic of the system
-* **Planetary joys** — a parallel scheme of planet-to-*house* affinity (alongside the planet-to-sign rulerships above). Each of the seven planets "rejoices" in one specific house: **Mercury** in the 1st, **Moon** in the 3rd, **Venus** in the 5th, **Mars** in the 6th, **Sun** in the 9th, **Jupiter** in the 11th, **Saturn** in the 12th. The primary use is as a permanent affinity that grounds each house's topical content — the 5th is about pleasure and creativity *because* Venus joys there, the 12th is about sorrow and concealment *because* Saturn joys there. Secondarily, "in joy" functions as a minor placement dignity (a planet in its joy-house is somewhat strengthened). The assignments follow a geometric logic tied to **sect** (see §7) and the diurnal cycle: the three diurnal planets (Sun, Jupiter, Saturn) joy in houses above the horizon (9th, 11th, 12th), the three nocturnal planets (Moon, Venus, Mars) joy in houses below the horizon (3rd, 5th, 6th), and Mercury — neutral, associated with both — joys on the horizon itself (1st). Two of the joys place malefics in "bad" houses (Mars in the 6th, Saturn in the 12th), a deliberate **containment** pattern: the malefic is given a topic that fits its nature, so its harshness is scoped rather than diffuse. Five houses (2, 4, 7, 8, 10) have no joy-planet and acquire character from other features — the four cardinal angles and averse-to-Ascendant geometry
+* **Planetary joys** — a scheme of planet-to-*house* affinity, distinct from sign rulership.
+  The usual assignments are **Mercury** in I, **Moon** in III, **Venus** in V, **Mars** in VI, **Sun** in IX, **Jupiter** in XI, and **Saturn** in XII.
+  They align with **sect** (see §7): the diurnal planets' joys are above the horizon, the nocturnal planets' below, and Mercury's at the rising horizon.
+  Contemporary historical interpretation connects this scheme with the development of house meanings; it should not be treated as a single proven origin for every topic. ([Brennan, Surtees, and Coppock, discussion of the joys](https://theastrologypodcast.com/transcripts/ep-231-transcript-significations-of-the-twelve-houses-part-1-houses-1-6/))
+  Space Prince's use of the malefic joys as **containment** is a game adaptation; the assignments alone do not establish that Mars or Saturn makes a difficult house safer.
+  The historical distinctions between favorable and unfavorable houses are discussed in §3 below.
 * Classification of signs by **modality** — a tripartite division based on each sign's position within its season. **Cardinal** signs (Aries, Cancer, Libra, Capricorn) begin each season and represent initiation; **fixed** signs (Taurus, Leo, Scorpio, Aquarius) fall mid-season and represent sustaining; **mutable** signs (Gemini, Virgo, Sagittarius, Pisces) close each season and represent transition. This framework depends on the tropical zodiac's alignment to the solstices and equinoxes, and is a Greek innovation — the Babylonians had the 12 signs but not this seasonal logic
 * The **lunar nodes** — the two points where the Moon's orbit crosses the ecliptic, called the **North Node** (ascending) and **South Node** (descending). Eclipses occur near the nodes, giving them an association with fate, disruption, and pivotal change. In Vedic astrology they are personified as **Rahu** (North) and **Ketu** (South) and treated as shadow planets with full interpretive weight
 * The **Lot of Fortune** and other **lots** (later called Arabic parts) — calculated points derived from the positions of two planets and the Ascendant, used to identify sensitive degrees in the chart related to specific life topics
@@ -176,6 +181,36 @@ For understanding what Hellenistic astrologers actually did, Valens is arguably 
 * Physicalized explanations of aspects and influence
 * Proliferation of **time-lord systems** for predicting life phases
 * Development of **transits** as a predictive method — tracking the current positions of planets in the sky and noting when they form aspects to positions in the natal chart. A transit of Saturn over your natal Sun, for example, signals a period of testing or consolidation in areas the Sun governs in your chart. Transits remain the most widely used predictive technique in modern astrology
+
+### Favorable and unfavorable houses
+
+Hellenistic house interpretation includes judgments about favorability and potency alongside topical meanings.
+Firmicus's *Mathesis* II.15–17 documents three groups:
+
+| Group | Houses | Historical description |
+|---|---|---|
+| Angular | I, IV, VII, X | Associated with the four cardinal points: rising, lower culmination, setting, and upper culmination |
+| Other favorable places | III, V, IX, XI | Goddess, Good Fortune, God, and Good Spirit, respectively |
+| Weak or unfavorable places | II, VI, VIII, XII | Lack an aspect to the Ascendant; VI is Bad Fortune and XII is Bad Spirit |
+
+These distinctions are explicit in [Firmicus, *Mathesis* II.15–17](https://penelope.uchicago.edu/Thayer/L/Roman/Texts/Firmicus_Maternus/Mathesis/2%2A.html), also available in [Bram's English translation, pp. 44–47](https://classicalastrologer.com/wp-content/uploads/2017/12/firmicusmaternustheoryandpractice.pdf#page=48).
+In whole-sign terms, II and XII are adjacent to the rising sign, while VI and VIII are five signs away in either direction: the 30° and 150° relationships called **aversion**.
+This geometry belongs to the house positions regardless of which signs or planets occupy them.
+
+**Angularity and favorability are distinct.**
+Angularity concerns potency or prominence, which need not produce pleasant outcomes.
+The house categories are **angular** (I, IV, VII, X), **succedent** (II, V, VIII, XI, succeeding the angles in diurnal rotation), and **cadent** (III, VI, IX, XII, falling away from the angles).
+This is a different grouping from favorable and unfavorable places: III and IX are favorable despite being cadent. ([Houlding, angular, succedent, and cadent houses](https://www.skyscript.co.uk/horary1d.html); [Brennan, Surtees, and Coppock, discussion of angular triads](https://theastrologypodcast.com/transcripts/ep-231-transcript-significations-of-the-twelve-houses-part-1-houses-1-6/))
+Whole-sign house categories and proximity to the exact angles are distinguishable; the Midheaven need not fall in the tenth sign, as Firmicus notes in II.15.4.
+
+The unfavorable places are not interchangeable or uniformly hopeless.
+Firmicus associates II with increasing possessions despite its weakness, and allows favorable planetary configurations to mitigate VI. ([*Mathesis* II.19.3 and II.19.7](https://penelope.uchicago.edu/Thayer/L/Roman/Texts/Firmicus_Maternus/Mathesis/2%2A.html))
+Valens also makes an exception for the waxing Moon in VIII within an otherwise unfavorable account of that house. ([*Anthologies* II.8, Riley translation, Griscti edition](https://raw.githubusercontent.com/janegca/latex-valens/main/book02/08-8th.tex))
+These qualifications caution against turning the historical categories into an unconditional ranking of difficulty.
+
+For Space Prince, this establishes historical background before further gameplay use.
+The [house encounter model](../mechanics/HOUSES.md#3-chart-conditioning-model) describes how we adapt these distinctions and the joys into narrative conditions and economic opportunities.
+The current model uses fixed house categories, without additional calculations for planets aspecting the encounter house from elsewhere or for proximity to the exact angles.
 
 ### A note on the elemental framework
 

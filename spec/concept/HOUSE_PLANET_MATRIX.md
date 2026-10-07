@@ -2,7 +2,7 @@
 
 A researched authoring reference for all 84 combinations of seven planets and twelve houses in Space Prince.
 Each entry gives the Prince a central want, two possible expressions, two scene seeds, and a link to the source reasoning.
-The [house reference](HOUSE_MATRIX.md) supplies situations; the [planet and sign reference](PLANET_MATRIX.md) supplies planetary domains and ways of expressing them.
+The [house reference](HOUSE_MATRIX.md) supplies situations and their structural character; the [planet and sign reference](PLANET_MATRIX.md) supplies planetary domains and ways of expressing them.
 The [research review](../research/HOUSE_PLANET_REVIEW.md) records comparisons, independent checks, fresh writing exercises, and limitations.
 
 Houses: [I Self](#i-self) · [II Livelihood](#ii-livelihood) · [III Communication](#iii-communication) · [IV Home](#iv-home) · [V Creativity](#v-creativity) · [VI Labor](#vi-labor) · [VII Relationships](#vii-relationships) · [VIII Transformation](#viii-transformation) · [IX Pilgrimage](#ix-pilgrimage) · [X Achievement](#x-achievement) · [XI Friendship](#xi-friendship) · [XII The Hidden](#xii-the-hidden).
@@ -10,6 +10,9 @@ Houses: [I Self](#i-self) · [II Livelihood](#ii-livelihood) · [III Communicati
 ## Reading the entries
 
 The house supplies the situation; the occupying planet supplies a concern or form of agency; the sign shapes its expression.
+The house introductions apply [fixed house geometry](HOUSE_MATRIX.md#house-structure) to the surrounding conditions once for all seven entries.
+Angularity informs agency and emphasis; favorability informs available support and burdens, separately from the Prince's feelings.
+The [encounter influences](../mechanics/HOUSES.md#3-chart-conditioning-model) and [composition guidance](../mechanics/ENCOUNTERS.md#46-composing-and-revising-a-scenario) govern how these writing references contribute to options and economic terms.
 The Prince takes the action and can want pleasure, company, power, possession, recognition, relief, or an answer without becoming an example of good conduct.
 The [drives guidance](DRIVES.md) distinguishes his motives from the player's experience.
 Its vocabulary remains provisional; the entries do not allocate each planet a single drive or require every scene to end in growth.
@@ -52,6 +55,7 @@ The notes preserve those differences, including favorable and adverse readings, 
 
 [House basis](HOUSE_MATRIX.md#i--self): presence, bodily life, and how a person introduces themselves.
 The encounter concerns inhabiting an identity before it becomes a public reputation.
+His own gesture can establish how the encounter proceeds.
 
 ### Sun I — Self
 
@@ -155,6 +159,7 @@ The encounter concerns inhabiting an identity before it becomes a public reputat
 
 [House basis](HOUSE_MATRIX.md#ii--livelihood): usable possessions, income, provisions, and material sufficiency.
 Resources here sustain the living traveler; an inheritance belongs to the Eighth and a shared undertaking to the Eleventh.
+An offer can leave choices about acquisition or retention even when resources are abundant.
 
 ### Sun II — Livelihood
 
@@ -259,6 +264,7 @@ The imagined obligation in the first scene is his concern, not a concealed debt.
 
 [House basis](HOUSE_MATRIX.md#iii--communication): neighbors, siblings, everyday messages, and familiar short journeys.
 An ordinary exchange is the immediate stake, even when it carries affection or responsibility.
+Practical help can be close at hand while the exchange depends on another person's response.
 
 ### Sun III — Communication
 
@@ -365,6 +371,7 @@ The authority comes from repeated local contact, rather than a public office.
 
 [House basis](HOUSE_MATRIX.md#iv--home): shelter, roots, household memory, land, and private endings.
 Care here concerns a place and its history, rather than every instance of comfort or kindness.
+Private authority matters: establish who can offer shelter and who sets its immediate terms.
 
 ### Sun IV — Home
 
@@ -469,6 +476,7 @@ These are small acts within an inherited way of living, not instant reconciliati
 
 [House basis](HOUSE_MATRIX.md#v--creativity): play, pleasure, children, courtship, and making something for its own sake.
 The activity can matter without producing useful goods or winning public recognition.
+He can sustain an occasion, join in, or enjoy what others have made.
 
 ### Sun V — Creativity
 
@@ -575,6 +583,7 @@ Skill, embarrassment, and appetite belong to the pleasure itself; neither seed n
 
 [House basis](HOUSE_MATRIX.md#vi--labor): necessary work, service, bodily care, and control over another person's effort.
 The question is how a task is borne and under whose terms, rather than what its completion earns in public.
+Limited authority over the work still permits choices about method, effort, or accepting care.
 
 ### Sun VI — Labor
 
@@ -680,6 +689,7 @@ Reed's enjoyment of service and Alice Sparkly Kat's dedication without enjoyment
 
 [House basis](HOUSE_MATRIX.md#vii--relationships): a particular other person, partnership, agreements, and open disagreement.
 Both parties have a say in the terms; a wider circle of support belongs to the Eleventh.
+Their decisions can directly change what each gives, receives, or agrees to do.
 
 ### Sun VII — Relationships
 
@@ -786,6 +796,7 @@ The other person's stated terms matter; this is not a test of whether the Prince
 
 [House basis](HOUSE_MATRIX.md#viii--transformation): death, bereavement, inheritance, and obligations attached to what passes between people.
 Loss does not have to produce improvement or conceal a reward.
+An ending can leave him choices about accepting, dividing, or relinquishing what remains.
 
 ### Sun VIII — Transformation
 
@@ -895,6 +906,7 @@ The disputed claim and its settlement occur here; neither response creates a lat
 
 [House basis](HOUSE_MATRIX.md#ix--pilgrimage): distant journeys, unfamiliar practices, study, and beliefs tested beyond the familiar world.
 Give the learning a subject and the observance an action.
+Guidance can be generous even where the Prince has little authority over the setting.
 
 ### Sun IX — Pilgrimage
 
@@ -1001,6 +1013,7 @@ The teaching has a subject, and doubt need not end in either conversion or ridic
 
 [House basis](HOUSE_MATRIX.md#x--achievement): public standing, authority, credit, and responsibility for visible work.
 The presence of an audience changes what is at stake.
+A decision can carry public force without receiving an automatic economic advantage.
 
 ### Sun X — Achievement
 
@@ -1110,6 +1123,7 @@ Public charge gives these attachments their setting; company alone would belong 
 
 [House basis](HOUSE_MATRIX.md#xi--friendship): friends, supporters, benefactors, and hopes held in common.
 Assistance can be freely given without creating an unrecorded obligation.
+Support gives him means to take part in a present undertaking, whether he feels welcome, grateful, envious, or uneasy.
 
 ### Sun XI — Friendship
 
@@ -1215,6 +1229,7 @@ These people seek his participation as a member, not his authority as an officeh
 
 [House basis](HOUSE_MATRIX.md#xii--the-hidden): confinement, exclusion, retreat, and lives removed from ordinary access.
 Chosen solitude and imposed isolation call for different encounters.
+Limited access shapes what he can change, leaving room for relief without requiring escape or personal growth.
 
 ### Sun XII — The Hidden
 

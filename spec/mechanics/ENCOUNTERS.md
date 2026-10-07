@@ -3,6 +3,7 @@
 Narrative encounters are single decisions about the chart the player will carry onward.
 House concepts live in `HOUSES.md`, combat rules in `MECHANICS.md`, and presentation in `SCREENS.md §3.2`.
 Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md).
+The [encounter model](HOUSES.md#3-chart-conditioning-model) introduces each source of influence; §4 below applies it to offers, and §4.6 describes composing and revising a scene.
 Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, targeting, previews, and resolution live in `client/src/game/narrative.ts`.
 
 ## 1. The Complementary Loop
@@ -38,6 +39,7 @@ The test is whether the player can explain who needs recovery, who can carry a c
 ### 1.4 Valence and dignity
 
 House valence guides the kinds of offers and their severity.
+House geometry guides agency and narrative emphasis without an additional angularity bonus.
 Planetary occupants unlock special approaches; dignity shapes their economic terms without an automatic exchange-rate multiplier.
 Exact balance remains deferred.
 
@@ -102,14 +104,14 @@ Early scenes must still work with only the Moon unlocked.
 
 ## 4. Chart Conditioning
 
-House encounters combine four sources of variation:
+Apply the separate contributions defined in [HOUSES.md §3](HOUSES.md#3-chart-conditioning-model): house topics, geometry, favorability, sign, occupant, dignity, and joy condition.
+House properties establish the shared situation and ordinary opportunities, including in empty houses.
+The sign varies their expression and may vary ordinary trades; occupants and joy condition supply additional approaches.
+Dignity shapes occupant terms, while the economy and current resources constrain every offer.
 
-| Source | Role |
-|---|---|
-| House and sign | Shape the scenario, writing, mood, and ordinary economic offers. |
-| Planet occupying the house | Unlock special approaches grounded in that planet's concerns within the house. |
-| Occupant's dignity | Organize the economic terms and bonuses of those special approaches. |
-| House joy's current condition | Open or close additional approaches, regardless of the joyful planet's natal placement. |
+Historical potency does not automatically increase rewards, and adverse house character does not require every option to be a loss.
+Geometry, favorability, dignity, and joy are not cumulative multipliers.
+The specific contribution of each is recorded when composing the scenario (§4.6).
 
 ### 4.1 Planetary joys
 
@@ -153,6 +155,7 @@ An offered choice with insufficient Light or no valid targets stays visible with
 
 ### 4.4 Asymmetric joy
 
+This economic treatment is a game adaptation of the historical affinities.
 Benefic joys add help: a free restoration, a gift, or a better way through the scene.
 Contained malefics reduce harm: Mars or Saturn can absorb a smaller, scoped cost in their own domains.
 Without containment, the ordinary choices may concentrate a larger burden or spread it across the lit chart.
@@ -171,6 +174,46 @@ Use the shared economy table in §2.1 as the valuation reference.
 Compare the available choices as alternatives; their benefits cannot simply be added together when only one option can be taken.
 Check that nominally equivalent arrangements remain comparably useful under representative resource levels and planetary conditions.
 Equivalence concerns the opportunities supplied by the catalogue, rather than identical outcomes in every run.
+
+### 4.6 Composing and revising a scenario
+
+Use the following order to make each source's contribution visible while drafting.
+It is a review sequence, not a sequence of additional player decisions or a requirement to express every influence in every option.
+
+1. **Establish the situation.**
+   Select the house's concrete topic, then use its geometry to consider authority and agency and its favorability to consider opportunities and burdens.
+   The house matrix identifies the historical basis and the proposed writing applications separately.
+2. **Write ordinary choices.**
+   Let the sign shape the manner, mood, and any alternative trades.
+   The scene remains usable without an occupant or an available joy option.
+3. **Develop special approaches.**
+   Use an occupant's house–planet entry for a particular want and action; give dignity a separate explanation for any change in terms.
+   Consider joy options through the joyful planet's current condition, independently of occupancy.
+   If the same planet supplies both, identify the eligibility and advantage of each authored offer without automatically combining bonuses.
+4. **Price and constrain the offers.**
+   Apply the shared economy, targets, affordability, immediate resolution, and three-choice limit.
+   A burden in the fiction does not by itself justify an affliction cost; the stated action should explain the actual exchange.
+   Place replacement options beside their ordinary counterparts so the change in opportunity is clear.
+5. **Review the experience and the catalogue.**
+   Read the Prince's motive, likely player experience, and economic value separately.
+   Check playability across current conditions, the aggregate house–sign balance, and cumulative dignity advantages before adopting the scene.
+
+Keep a brief rationale with a proposed scene: which source informs the situation, what changes an option's availability, and what changes its terms.
+A source link and a few sentences or a compact comparison are sufficient; the 84 research entries need no new checklist.
+Record what the current resolver can support separately from proposed effects.
+
+For example, in an original IX scene a visiting Prince can pay for instruction or contribute work at a school.
+The topic is learning abroad; cadency suggests entering another person's institution; favorability supports a useful welcome.
+Mercury occupying IX could supply an approach through comparing translations, with its terms adjusted by Mercury's dignity.
+The Sun's current condition could independently allow a less tiring way to participate through the house's joy.
+The sign can vary the manner of instruction and ordinary tradeoffs, while the economy determines their actual prices.
+These are authoring choices to test, not predictions or approved amounts.
+
+To refine a source's contribution, compare versions that hold the other inputs steady and name the resulting difference in fiction, eligibility, or terms.
+Use valid placements when comparing charts: changing a sign can also change dignity, so identify both effects when they move together.
+Evaluate alternative interpretations of fixed house geometry across the house's scenes; do not pretend it varies between charts.
+If a proposed influence adds no useful distinction, simplify its use and update the relevant guidance rather than adding a token sentence or bonus.
+Keep unresolved writing questions separate from economic or implementation questions so each can be revisited on its own evidence.
 
 ## 5. Encounter Shape
 
@@ -208,6 +251,9 @@ Revival always returns a planet at half its own ceiling.
 These existing prices predate the agreed economy table in §2.1; integrating that baseline into the scenarios remains pending.
 
 ## 7. House Blueprints
+
+These summarize the current catalogue's decisions, before the full narrative refresh.
+Use the [house matrix](../concept/HOUSE_MATRIX.md) and §4.6 to develop revised scenarios; these summaries do not exhaust a house's possible offers.
 
 | House | Immediate decision identity |
 |---|---|
@@ -251,6 +297,7 @@ Preview and commit must agree for every valid target.
 Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, repeated resolution, and save resets.
 Playtests compare choices across chart conditions and upcoming rulers.
 Catalogue reviews check baseline economic equivalence across the twelve Ascendant arrangements and cumulative dignity advantages across charts and birth cohorts, as described in §4.
+Editorial reviews use the scenario rationale in §4.6 to check that historical claims, original interpretations, eligibility, and economic advantages remain distinguishable.
 
 ## 11. Deferred Decisions
 
