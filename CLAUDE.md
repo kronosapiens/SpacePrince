@@ -52,7 +52,9 @@ README.md     Design pitch
 
 ## Spec outline
 
-The spec is divided by what kind of question each document answers.
+The concept, mechanics, and design directories hold current references and design intent, which remain open to revision.
+Research records retain evidence and history; drafts contain unapproved proposals.
+Completed review of a draft does not make it current guidance.
 
 ### `spec/concept/` — what the game *is*
 
@@ -86,13 +88,16 @@ The spec is divided by what kind of question each document answers.
 - `swatches/` — color swatches per planet
 - `tree.html` — Sephirot tree prototype
 
-### `spec/research/` — source notes, comparisons, and reviews
+### `spec/research/` — evidence and historical findings
 
-- `FTL.md`, `STS.md` — event-by-event inventories of FTL and Slay the Spire (options, costs, odds, gating, shape tags)
-- `SURVEY.md` — what those corpora say about Space Prince's narrative encounters; proposals, not decisions
-- `HOUSE_PLANET_*_NOTES.md` — source passages and research proposals, linked from the [matrix's source index](spec/concept/HOUSE_PLANET_MATRIX.md#source-basis)
-- [HOUSE_PLANET_REVIEW.md](spec/research/HOUSE_PLANET_REVIEW.md) — completed research, editorial findings, and lessons from all 84 placements
-- [HOUSE_PLANET_PILOT_REVIEW.md](spec/research/HOUSE_PLANET_PILOT_REVIEW.md) and [HOUSE_PLANET_SCENE_EXERCISE.md](spec/research/HOUSE_PLANET_SCENE_EXERCISE.md) — earlier pilot and independent writing exercises retained as research records
+The [research index](spec/research/README.md) locates source notes, comparisons, and completed research reviews.
+Consult these for evidence or historical reasoning; embedded proposals do not supersede current references.
+
+### `spec/drafts/` — active proposals and archived experiments
+
+The [working draft index](spec/drafts/README.md) identifies active work and its status.
+Read drafts when the task concerns that proposal; archived experiments are historical context rather than default authoring inputs.
+After user approval, incorporate accepted conclusions into the relevant current reference and retire the working proposal.
 
 ### `spec/v1/` — archived earlier pass
 

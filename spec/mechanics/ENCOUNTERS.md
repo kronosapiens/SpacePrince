@@ -187,33 +187,33 @@ Equivalence concerns the opportunities supplied by the catalogue, rather than id
 
 ### 4.6 Composing and revising a scenario
 
-Follow the lookup order in [HOUSES.md §3.4](HOUSES.md#34-composition-and-lookup-order) while drafting.
-Each step below applies a reference or relationship to the scene without requiring every attribute to appear in every option.
+Use the references selected by [HOUSES.md §3.4](HOUSES.md#34-composition-and-lookup-order) in separate narrative, economic, and integration passes.
+Review the narrative before assigning prices or mechanical effects.
 
-1. **Read the house reference and establish the situation.**
-   Select a concrete topic and consider its fixed geometry, favorability, joy affinity, and fixed game ruler together.
-   The house matrix separates the historical basis from proposed writing applications, including questions of agency and opportunity.
-   House geometry is already accounted for in ordinary offers; do not count it again as a placement bonus.
-2. **Resolve the house's sign and write ordinary choices.**
-   Use the Ascendant and house to select the sign reference, including its imagery, element, and modality.
-   Let these shape the manner, mood, and any alternative trades.
-   The scene remains usable without an occupant or an available joy option.
-3. **Resolve occupant references and develop special approaches.**
-   Use each occupant's house–planet entry for a particular want and action, and its planet–sign entry for expression and dignity.
-   Explain any change in terms justified by the resulting dignity.
-4. **Read current condition and price the offers.**
-   Inspect the house's joyful planet wherever it resides to determine joy availability, then read current resources and valid targets for all options.
-   If the same planet supplies both an occupant approach and a joy option, identify the eligibility and advantage of each offer without automatically combining bonuses.
-   Apply the shared economy, targets, affordability, immediate resolution, and three-choice limit.
-   A burden in the fiction does not by itself justify an affliction cost; the stated action should explain the actual exchange.
-   Place replacement options beside their ordinary counterparts so the change in opportunity is clear.
-5. **Review the experience and the catalogue.**
-   Read the Prince's motive, likely player experience, and economic value separately.
-   Check playability across current conditions, the aggregate house–sign balance, and cumulative dignity advantages before adopting the scene.
+1. **Generate and review the narrative.**
+   Read the House's topics, geometry, favorability, joy affinity, and fixed game ruler together, then use Sign to shape the situation's manner and mood.
+   Use house–planet wants and planet–sign expression to develop candidate approaches, including a qualitative joy approach where appropriate.
+   Write concrete situations, competing wants, actions, and immediate fictional consequences that also work without occupants or available joy.
+   Evaluate emotional range, specificity, repetition, and whether the sign and planetary variants change how people act.
+   Keep the Prince's motives distinct from the player's possible experience.
+   Retain the scope of one immediate decision and avoid consequences requiring unsupported lasting obligations or narrative state.
+   Leave prices, stat changes, dignity advantages, exact eligibility, and replacement priorities for the economic pass; the candidates are not yet an assembled menu.
+2. **Compose and review the economic offers.**
+   Assign supported costs, benefits, and targets to suitable actions, using the shared economy and explaining how each exchange follows from the fiction.
+   Derive occupant dignity and inspect the joyful planet's current condition wherever it resides to determine terms and availability.
+   House geometry has already informed the situation and ordinary offers; do not count it again as a placement bonus.
+   If one planet supplies an occupant approach and a joy option, identify each route's eligibility and advantage without automatically combining bonuses.
+   Compare replacements beside their ordinary counterparts and assemble menus within the three-choice limit across representative charts and run states.
+   Check payment, target validity, aggregate house–sign opportunity, and cumulative dignity and joy advantages.
+3. **Review the integrated encounter.**
+   Check that the displayed choices form a coherent scene and that prose, previews, costs, and immediate consequences agree.
+   A fictional burden alone does not justify affliction, and a desired reward does not justify inventing a transaction that weakens the scene.
+   If economic composition changes an action or situation, return that change to narrative review.
+   Playtesting evaluates the player's experience separately from source fidelity and editorial quality.
 
-Keep a brief rationale with a proposed scene: which House, Sign, or Planet attributes inform the situation, which placement or current condition changes availability, and what changes terms.
-A source link and a few sentences or a compact comparison are sufficient; the 84 research entries need no new checklist.
-Record what the current resolver can support separately from proposed effects.
+Keep a brief source rationale with narrative candidates and separate economic notes with proposed offers.
+A source link and a few sentences are sufficient; the 84 research entries need no new checklist.
+Label supported resolver effects separately from proposed effects, and keep unapproved experiments distinct from current guidance.
 
 To refine a reference attribute's contribution, compare alternative interpretations while holding the selected chart and other authoring choices steady.
 For example, VI is always cadent and averse; compare how different VI scenes express those attributes rather than treating them as chart variations.

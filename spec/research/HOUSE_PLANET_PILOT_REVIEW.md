@@ -1,7 +1,7 @@
 # House and planet pilot review
 
 Research and editorial review for [issue #9](https://github.com/kronosapiens/SpacePrince/issues/9), 2026-10-04.
-The [pilot](../concept/HOUSE_PLANET_PILOT.md) covered eighteen placements; this report preserves its findings and guidance for the remaining 66.
+The [pilot](HOUSE_PLANET_PILOT.md) covered eighteen placements; this report preserves its findings and guidance for the remaining 66.
 The [full research review](HOUSE_PLANET_REVIEW.md) records the completed continuation; current entries live in the [84-entry reference](../concept/HOUSE_PLANET_MATRIX.md).
 The comparison baseline is commit `bbb07bb08162173910c33d52a072af86aaa906e3`.
 
