@@ -10,6 +10,7 @@ The framing follows [DRIVES.md](../../concept/DRIVES.md): possible motives and f
 The scenes are original adaptations, not historical astrological claims.
 Candidate responses, mechanical effects, prices, and menu selection are deferred; the role of drives in developing those responses remains under discussion.
 This draft does not require reviewing or adopting the archived encounters.
+Possible later experiments are recorded under [Directions to revisit](#directions-to-revisit).
 
 ## Scene index
 
@@ -273,3 +274,29 @@ She asks you to sit where she can see you peel your plum, saying the sound remin
 
 There is a bench beside the shutter and a small saucer on its ledge.
 The keeper has neither the papers nor the authority to end her confinement.
+
+## Directions to revisit
+
+Discussion recorded 2026-10-08; further exploration is deferred.
+Continue generating and reviewing individual encounters through the existing process to see how far that format can go.
+These notes add no generation steps or implementation requirements.
+
+The [walking-simulator article](https://entaltostudios.com/our-top-5-walking-simulator-games-you-shouldnt-miss/) prompted several possible influences:
+
+- [Gone Home](https://gonehome.com/): objects and their arrangement let players infer relationships and history.
+- [What Remains of Edith Finch](https://www.giantsparrow.com/games/finch/): distinct actions and emotional tones give short stories individual character.
+- [Firewatch](https://www.firewatchgame.com/): interpersonal choices suggest opportunities for conversation whose practical subject carries a personal concern.
+- [The Stanley Parable](https://www.stanleyparable.com/): choice and expectation suggest letting the Prince question or refuse an assigned role.
+- [Dear Esther](https://www.gamedeveloper.com/design/road-to-the-igf-thechineseroom-s-i-dear-esther-i-): partial, ambiguous accounts leave room for interpretation.
+
+These are proposed adaptations for Space Prince.
+An isolated scene can suggest a history; relationships built through shared experience need continuity.
+One decision per encounter could still support a larger experience, but connected stories would expand the current scope.
+
+A possible later experiment is several independently playable encounters sharing a household, workshop, festival, or recurring characters.
+Different houses could reveal different aspects of that setting, allowing familiarity and interpretation to accumulate across encounters read in different orders.
+Existing chart condition and run progress could also shape perspectives, while specific callbacks would require evidence of the earlier action.
+
+Chained encounters remain a separate possibility with additional costs: persistent narrative state, continuation eligibility, contract validation, and consistency across routes and ended runs.
+Compact flags alone would not address that complexity; transaction costs would need measurement.
+Revisit these possibilities if work on individual encounters reveals a limitation worth that added scope.
