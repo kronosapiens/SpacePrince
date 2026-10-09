@@ -64,9 +64,9 @@ Additional aspects from planets elsewhere and precise distance from an angle are
 
 ## Game correspondences
 
-Names, joys, and fixed rulers below match [the house data](../../client/src/data/houses.ts).
+Names, joy assignments, and fixed game rulers below match [the house data](../../client/src/data/houses.ts).
 The joy assignments are also documented in the linked Skyscript entries.
-The fixed ruler column follows the game's natural-zodiac convention; it is separate from the chart's occupants, planetary joy, and a ruler calculated from an actual house cusp.
+The fixed game ruler column follows the game's natural-zodiac convention; it is separate from the chart's occupants, the joyful planet, and the natal sign ruler.
 The geometry columns record traditional classifications; names, fixed rulers, and questions serve the game.
 The First contains the Ascendant and is the origin of these relationships, rather than an aspect to itself.
 

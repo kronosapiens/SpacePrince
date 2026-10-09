@@ -2,7 +2,8 @@
 
 A tracked implementation guide from the 2026-07 whole-game review.
 Six pillars: astrology hitting harder, gameplay engagement, UI tightness, meaningful metaprogression, emotive experience, high engagement.
-Checkboxes track implementation on the `improvements` branch.
+Completed checkboxes record work from that implementation pass; retired behavior is labeled below.
+The diagnosis records conditions at the original review, while the linked specs describe current direction.
 
 Everything here stays inside established constraints: no power progression, no pay advantages, no generated text, no fog of war, no planet personification, aspect red/green untouched, and no re-litigation of rejected combat alternatives (sign-matchup valence, self-resolution scoring).
 
@@ -60,17 +61,20 @@ The conceptual architecture is strong; the gaps are in the middle layer between 
 
 ## Phase 2 — Astrology deeper
 
-- [x] **Dignity wiring** (`ENCOUNTERS.md §1.4, §4.2`).
-  Exchange-rate nudges from the conditioning planet's dignity band, applied identically at display and apply time.
-  Shipped shape: dignity surfaces in the option aside at the decision point ("Mercury exalted: +1 Light"), not in the combat stats panel — `MECHANICS.md §10` deliberately keeps dignity out of combat surfaces.
-- [x] **House-tenant targeting.**
-  Add a targeting-vocabulary entry for the planet standing in the player's own whole-sign house matching the encounter's house.
-  This makes the Prince's houses mechanically real — the classical meaning of houses — and shifts the decision space per chart (`HOUSES.md §3.4`) without touching combat.
+- [x] **Dignity wiring — earlier prototype, retired.**
+  The earlier prototype applied automatic exchange-rate adjustments from dignity.
+  The current resolver uses dignity in joy and fixed game ruler eligibility; it applies no automatic price or reward adjustment.
+- [x] **House-tenant targeting — earlier prototype, retired.**
+  The earlier prototype selected a planet occupying the encounter's house through a target role.
+  That role is absent from the current resolver.
+- [ ] **Narrative encounter refresh.**
+  Use the [encounter model](mechanics/HOUSES.md#3-chart-conditioning-model) for reference dependencies and the [implementation status](mechanics/ENCOUNTERS.md#implementation-status) for current behavior and remaining work.
 - [x] **Study annotations beyond planets** (`SCREENS.md §3.6.1` extension path).
   Shipped shape: the study panel gains an aspects block — the inspected planet's web by name, colored by harmony/tension, each opening a gloss.
   Sign teaching is carried by the existing per-stat provenance prose ("Pisces, a Mutable Water sign, lifts it").
-- [x] **Wager odds visibility** (`SCREENS.md §1.1` client honesty).
-  The push-your-luck roll resolves against a knowable luck stat; the option's aside must carry the odds.
+- [x] **Wager odds visibility — earlier prototype, retired.**
+  The earlier prototype displayed odds for narrative wagers.
+  Current narrative choices resolve determined effects through the [shared preview and resolver](mechanics/ENCOUNTERS.md#10-validation).
 - [x] **Narrative pacing pass.**
   Already satisfied on inspection: resolution holds a 1800–2800ms beat (longer on combusts and run ends) with tap-to-skip.
 

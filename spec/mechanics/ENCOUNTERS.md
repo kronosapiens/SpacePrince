@@ -1,10 +1,23 @@
 # Space Prince — Narrative Encounter Authoring Spec
 
 Narrative encounters are single decisions about the chart the player will carry onward.
-House concepts live in `HOUSES.md`, combat rules in `MECHANICS.md`, and presentation in `SCREENS.md §3.2`.
+House concepts live in [HOUSES.md](HOUSES.md), combat rules in [MECHANICS.md](MECHANICS.md), and presentation in [SCREENS.md §3.2](../design/SCREENS.md#32-narrative-layout-asymmetric).
 Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md).
 The [encounter model](HOUSES.md#3-chart-conditioning-model) groups fixed references, natal relationships, and current state; §4 below applies these lookups to offers, and §4.6 describes composing and revising a scene.
-Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, targeting, previews, and resolution live in `client/src/game/narrative.ts`.
+Authored scenes live in [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts); validation, targeting, previews, and resolution live in [narrative.ts](../../client/src/game/narrative.ts).
+
+### Implementation status
+
+The composition and economic guidance describes the intended refresh.
+The outcome, target, and predicate tables in §2, §3, and §4.3 describe current client behavior.
+
+| Area | Current behavior | Intended behavior | Remaining work |
+|---|---|---|---|
+| House references | [House data](../../client/src/data/houses.ts) stores good/bad valence and compound kind labels | Use the separate attributes grouped under House in [HOUSES.md §3.1](HOUSES.md#31-fixed-references) | Align the representation during the refresh |
+| House–sign variants | Scenarios are selected by house and prior visits, without sign variation | Sign shapes ordinary scenes and offers, including in empty houses | Author and select variants; verify equivalent opportunity across Ascendant arrangements |
+| Occupants and dignity | Special choices use joy and fixed game ruler predicates, including their dignity; occupants do not select approaches | Occupants supply special approaches with dignity shaping their terms; joy options depend on the joyful planet's condition | Implement occupant approaches and terms; reconcile existing gates with the refreshed catalogue |
+| Run-long stat gains | [economy.ts](../../client/src/data/economy.ts) defines purchase amounts and prices; the resolver supports Light, affliction, and revival | Offers can include the defined run-long gains and direct exchanges | Add supported outcomes, state updates, previews, and authored offers |
+| Baseline prices | Scenarios contain earlier prices and do not use `economy.ts` | Use its agreed values as the reference for ordinary offers and authored advantages | Reprice the catalogue and validate its exchanges |
 
 ## 1. The Complementary Loop
 
@@ -44,7 +57,7 @@ Exact balance remains deferred.
 
 ## 2. Outcomes and Payment
 
-Only immediate changes to combat-shared resources are implemented.
+The current resolver supports these immediate outcomes.
 Debts, vows with later consequences, Omen, Lore, and other persistent effects are deferred pending a separate design and storage decision.
 
 | Outcome | Meaning |
@@ -77,7 +90,6 @@ Eligibility and payment are separate: an occupant's special approach can still a
 
 Several linked costs and benefits form one choice and resolve together, with their full effects visible before commitment.
 They do not require intermediate Light transactions or additional decisions.
-Run-long stat gains are defined in the economy table but still require resolver support; the implemented outcome types are listed above.
 
 ## 3. Targeting
 
@@ -89,11 +101,12 @@ Ordinary affliction effects require lit planets; revival requires a combusted pl
 | `chosen` | The player's selected planet. |
 | `allUnlocked` | All currently lit unlocked planets. |
 | `joy` | The house's joy, only if lit and unlocked. |
-| `ruler` | The house's natural ruler, only if lit and unlocked. |
+| `ruler` | The house's fixed game ruler, only if lit and unlocked. |
 | `mostAfflicted` | The lit unlocked planet with greatest affliction. |
 | `healthiest` | The lit unlocked planet with greatest remaining combustion margin. |
 
 Target roles bind against the state before the choice.
+`ruler` binds the fixed `HOUSES[].ruler`, not the traditional ruler of the house's natal sign.
 Authored effects then apply in order to a copy of that state.
 An unavailable themed target never silently drops its cost or redirects it to someone else.
 
@@ -104,13 +117,8 @@ Early scenes must still work with only the Moon unlocked.
 ## 4. Chart Conditioning
 
 Use the grouped references and dependencies defined in [HOUSES.md §3](HOUSES.md#3-chart-conditioning-model).
-The encounter house selects its topics, geometry, favorability, joy assignment, and fixed game ruler together.
-The Ascendant selects that house's sign; planetary placements select occupant wants, sign expression, and dignity.
-Current run state then determines joy availability, valid targets, and affordability.
-
 House and sign establish the shared situation and ordinary offers, including in empty houses.
 Occupants and an available joy supply additional approaches; the occupant's planet–sign dignity shapes its terms.
-The subsections below describe these uses without making each derived property an independent input.
 Historical potency does not automatically increase rewards, and adverse house character does not require every option to be a loss.
 The shared economy and encounter limits constrain all offers; there are no cumulative modifiers for each reference attribute.
 
@@ -126,9 +134,7 @@ This threshold remains provisional.
 
 ### 4.2 Occupants and dignity
 
-Planet–house placement selects the Prince's particular wants and special approaches from the house–planet matrix.
-The same planet's natal sign selects its expression and essential dignity from the planet–sign reference.
-Dignity shapes the terms on which those approaches are available; it is determined by that pair rather than selected separately.
+Dignity derived from an occupant's planet–sign pair shapes its offer's terms, following the [natal relationships](HOUSES.md#32-natal-placements-and-relationships).
 Neutral, detriment, and fall placements should still support substantive special options.
 
 Favorable dignity can provide better terms, including lower costs or greater benefits, alongside some alternative exchanges.
@@ -141,18 +147,19 @@ Exact amounts remain subject to encounter design and playtesting.
 
 ### 4.3 Current predicates
 
-These predicates describe current client behavior; house–sign variants and occupant approaches are pending implementation.
+These are the current client predicates.
 For these predicates, Domicile and Exaltation are the strong band.
 
 | Predicate | True when |
 |---|---|
 | `joyPresent` | The joy is unlocked, lit, and below the affliction threshold. |
 | `joyStrong` | The joy is present and has strong dignity. |
-| `rulerStrong` | The ruler is lit, unlocked, and has strong dignity. |
+| `rulerStrong` | The fixed game ruler is lit, unlocked, and has strong dignity. |
 | `anyCombusted` | At least one unlocked planet is combusted. |
 
 Visibility is distinct from affordability.
 A chart-gated option is absent when its predicate fails.
+Revival is offered only when an unlocked planet is combusted.
 An offered choice with insufficient Light or no valid targets stays visible with an explanation.
 
 ### 4.4 Asymmetric joy
@@ -184,8 +191,9 @@ Follow the lookup order in [HOUSES.md §3.4](HOUSES.md#34-composition-and-lookup
 Each step below applies a reference or relationship to the scene without requiring every attribute to appear in every option.
 
 1. **Read the house reference and establish the situation.**
-   Select a concrete topic and consider its fixed geometry, favorability, joy affinity, and presentation ruler together.
+   Select a concrete topic and consider its fixed geometry, favorability, joy affinity, and fixed game ruler together.
    The house matrix separates the historical basis from proposed writing applications, including questions of agency and opportunity.
+   House geometry is already accounted for in ordinary offers; do not count it again as a placement bonus.
 2. **Resolve the house's sign and write ordinary choices.**
    Use the Ascendant and house to select the sign reference, including its imagery, element, and modality.
    Let these shape the manner, mood, and any alternative trades.
@@ -245,9 +253,8 @@ Usually this is a plain exit; a harsh house can instead impose a small ordinary 
 
 Authored amounts are multiples of 12.
 Existing scenarios use affliction changes of 12–72, Light gains up to 96, and healing prices of 12–36.
-They price ordinary revival at 84 Light; a strong Home ruler offers a 60-Light alternative.
+They price ordinary revival at 84 Light; a strong fixed game ruler of Home offers a 60-Light alternative.
 Revival always returns a planet at half its own ceiling.
-These existing prices predate the agreed economy table in §2.1; integrating that baseline into the scenarios remains pending.
 
 ## 7. House Blueprints
 
@@ -279,7 +286,7 @@ The alpha schema resets old tree-based saves rather than migrating them.
 
 ## 9. Prose and Mechanical Copy
 
-- **Aria:** one fragment in the ruler's voice for the whole encounter.
+- **Aria:** one fragment in the fixed game ruler's voice for the whole encounter.
 - **Prompt:** one or two concrete sentences that establish the immediate situation.
 - **Option:** a short action, with no implied debt or promise that the game does not track.
 - **Aside:** shows the full authored amounts and costs; stays fixed while inspecting planets.
@@ -295,7 +302,7 @@ Every authored scene must remain playable across all unlock tiers and representa
 Preview and commit must agree for every valid target.
 Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, repeated resolution, and save resets.
 Playtests compare choices across chart conditions and upcoming rulers.
-Catalogue reviews check baseline economic equivalence across the twelve Ascendant arrangements and cumulative dignity advantages across charts and birth cohorts, as described in §4.
+Catalogue reviews check baseline economic equivalence across the twelve Ascendant arrangements and cumulative advantages from dignity and joy options, including dignity's birth-cohort effects, as described in §4.
 Editorial reviews use the scenario rationale in §4.6 to check that historical claims, original interpretations, eligibility, and economic advantages remain distinguishable.
 
 ## 11. Deferred Decisions

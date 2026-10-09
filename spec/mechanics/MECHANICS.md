@@ -241,7 +241,7 @@ Per encounter:
 
 - Every combat encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP`, `CHART.md`).
   It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the combat theme (`MUSIC.md`), and the encounter's scoring rule (§12).
-  Narrative encounters carry their house's natural ruler the same way (`HOUSES.md`).
+  Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
 - The other chart begins **already afflicted** through the same necessity rule used at map openings (§11.3), applied to a fresh chart state.
   Under the Moon's rule only resolution scores (§12), so even the first one-turn encounter needs affliction to resolve.
   The three draws and Fortune's halving keep this initial amount bounded and nonzero, while every fielded planet arrives lit.

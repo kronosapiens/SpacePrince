@@ -60,6 +60,10 @@ The spec is divided by what kind of question each document answers.
 - `ASTROLOGY.md` — astrology as a symbolic system, historically grounded
 - `PRIMER.md` — player-facing on-ramp: what astrology is and what you're playing (framing + codex)
 - `PLANETS.md` — the philosophical chorus / voice for each of the seven planets
+- [DRIVES.md](spec/concept/DRIVES.md) — the Prince's motives and emotional range, distinct from the player's experience
+- [HOUSE_MATRIX.md](spec/concept/HOUSE_MATRIX.md) — fixed house attributes, human situations, and writing guidance
+- [HOUSE_PLANET_MATRIX.md](spec/concept/HOUSE_PLANET_MATRIX.md) — wants and scene seeds for all 84 house–planet placements
+- [PLANET_MATRIX.md](spec/concept/PLANET_MATRIX.md) — planet and sign references, dignities, and all 84 planet–sign expressions
 - `NFT.md` — what the Prince NFT is and how it evolves with play
 - `ECONOMICS.md` — economics as commitment reinforcement, not extraction
 - `INFLUENCES.md` — games and genres that shaped Space Prince and where it diverges
@@ -70,8 +74,8 @@ The spec is divided by what kind of question each document answers.
 - `STATE.md` — **data source of truth**: canonical structures for the chart + all game state (onchain-bound, mirrored by the client)
 - `CHART.md` — chart-construction spec (Cairo-first)
 - `MAP.md` — run map topology (Sephirot-pattern node graph)
-- `HOUSES.md` — narrative encounter system organized around the twelve houses
-- `ENCOUNTERS.md` — generation-ready authoring spec for narrative encounters (`HOUSES.md` is the *what*, this is the *how*)
+- [HOUSES.md](spec/mechanics/HOUSES.md) — encounter references grouped by House, Sign, Planet, natal relationships, and current state
+- [ENCOUNTERS.md](spec/mechanics/ENCOUNTERS.md) — scenario composition, economy, eligibility, resolution, and implementation status
 
 ### `spec/design/` — how the game *looks and feels*
 
@@ -82,10 +86,13 @@ The spec is divided by what kind of question each document answers.
 - `swatches/` — color swatches per planet
 - `tree.html` — Sephirot tree prototype
 
-### `spec/research/` — what other games did
+### `spec/research/` — source notes, comparisons, and reviews
 
 - `FTL.md`, `STS.md` — event-by-event inventories of FTL and Slay the Spire (options, costs, odds, gating, shape tags)
 - `SURVEY.md` — what those corpora say about Space Prince's narrative encounters; proposals, not decisions
+- `HOUSE_PLANET_*_NOTES.md` — source passages and research proposals, linked from the [matrix's source index](spec/concept/HOUSE_PLANET_MATRIX.md#source-basis)
+- [HOUSE_PLANET_REVIEW.md](spec/research/HOUSE_PLANET_REVIEW.md) — completed research, editorial findings, and lessons from all 84 placements
+- [HOUSE_PLANET_PILOT_REVIEW.md](spec/research/HOUSE_PLANET_PILOT_REVIEW.md) and [HOUSE_PLANET_SCENE_EXERCISE.md](spec/research/HOUSE_PLANET_SCENE_EXERCISE.md) — earlier pilot and independent writing exercises retained as research records
 
 ### `spec/v1/` — archived earlier pass
 

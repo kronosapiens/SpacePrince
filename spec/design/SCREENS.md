@@ -7,7 +7,9 @@ The chart is the player's anchor. Most of the game happens on the encounter scre
 This document holds the screen architecture: which screens exist, what each one does, and the rules that hold them together.
 It records intent and constraints, not composition.
 Where a surface puts things, how large, how far apart, and how fast is decided in the running client, and each value lives beside the code that uses it (`client/src/style/layout.css` and the token files named in `CLAUDE.md`).
-Visual vocabulary lives in `STYLE.md`. Felt qualities live in `VIBES.md`. Mechanical resolution lives in `MECHANICS.md` and `HOUSES.md`.
+Visual vocabulary lives in `STYLE.md`.
+Felt qualities live in `VIBES.md`.
+Mechanical resolution lives in [MECHANICS.md](../mechanics/MECHANICS.md) for combat and [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md) for narrative encounters.
 
 The guiding principle:
 
@@ -151,7 +153,11 @@ This means:
 
 The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy. The per-motion durations live in `client/src/style/motion.css`.
 
-**Narrative.** During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per `HOUSES.md §4.3` chart-conditioning) carry a soft Field-layer halo so the player can see *why* the option exists. On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied). No propagation through aspect lines — propagation is a combat-only language. The aria does not animate during resolution; it remains the steady framing presence.
+**Narrative.**
+During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.
+On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied).
+No propagation through aspect lines — propagation is a combat-only language.
+The aria does not animate during resolution; it remains the steady framing presence.
 
 ### 3.5.1 The affliction arc
 
@@ -365,9 +371,12 @@ The second main surface. Renders the Sephirot-pattern node graph from `MAP.md` a
 Two content types, distinguished by shape and fill. Both share the same outer disc footprint so the diagram reads as one network of nodes; the *content inside* the disc tells you what kind of beat it is.
 
 - **Combat node:** thin disc-ring outline plus an eight-pointed star inside, filled with the opponent's **chart ruler** color — the planet ruling the opponent's Ascendant sign. The star extends slightly past the disc rim. Reads as *"another chart waits here, anchored by [planet]."*
-- **Narrative node:** filled disc in the color of the house's natural-zodiac ruler (table in §4.5). Reads as *"this is [planet]'s domain."* The house Roman numeral appears at the node center.
+- **Narrative node:** filled disc in the color of the house's fixed game ruler (§4.5).
+  Reads as *"this is [planet]'s domain."*
+  The house Roman numeral appears at the node center.
 
-The color rule is the same on both axes: a single principled astrological lookup picks the identifying planet. For narrative, it's the house's natural ruler; for combat, it's the opponent's chart ruler. See §4.5 for the sign→ruler table both lookups consume.
+Each node's identifying planet supplies its color.
+Narrative nodes use the house's fixed game ruler (§4.5); combat nodes use the traditional ruler of the opponent's Ascendant sign, listed in the [sign matrix](../concept/PLANET_MATRIX.md#sign-matrix).
 
 Each node also has one of four **temporal states** relative to the player's current position. Together with content type, the state determines what's rendered:
 
@@ -425,24 +434,12 @@ Existing responsive layouts remain while desktop interactions take priority.
 
 ### 4.5 House → ruler mapping (color rule)
 
-Narrative nodes are colored by their house's **natural-zodiac ruler** (the classical seven-planet rulership of the sign that naturally corresponds to the house number — Aries=1, Taurus=2, etc.):
+The [house correspondence table](../concept/HOUSE_MATRIX.md#game-correspondences) records each house's **fixed game ruler**.
+This presentation convention uses the traditional ruler of the sign assigned by house number: Aries for I, Taurus for II, and so on.
+It gives every VI node Mercury's color, regardless of the natal sign occupying VI.
 
-| House | Natural sign | Ruler |
-|-------|--------------|-------|
-| 1 | Aries | Mars |
-| 2 | Taurus | Venus |
-| 3 | Gemini | Mercury |
-| 4 | Cancer | Moon |
-| 5 | Leo | Sun |
-| 6 | Virgo | Mercury |
-| 7 | Libra | Venus |
-| 8 | Scorpio | Mars |
-| 9 | Sagittarius | Jupiter |
-| 10 | Capricorn | Saturn |
-| 11 | Aquarius | Saturn |
-| 12 | Pisces | Jupiter |
-
-This is the **rulership** axis, distinct from the **joys** axis used mechanically in `HOUSES.md §3.3`. Rulership is the visual color anchor on the map; joys remain the mechanical character of each house.
+The fixed game ruler and joy assignment are both House attributes with different uses: the ruler supplies the color, while the joyful planet's current condition enables additional options.
+The [encounter model](../mechanics/HOUSES.md#3-chart-conditioning-model) distinguishes both from occupants and the natal sign ruler.
 
 ### 4.6 Map ambient tint
 
@@ -659,7 +656,8 @@ The world does not need a wayfinding overlay. The player knows where they are be
 - `VIBES.md` — felt qualities, voice register, sound design. Drives the tone each screen should hit.
 - `MAP.md` — map topology (rendered on the Map screen).
 - `CHART.md` — chart computation (rendered on the Encounter screen and Chart Study).
-- `HOUSES.md` — house encounter mechanics (drives the narrative mode of the Encounter screen).
-- `MECHANICS.md` — encounter resolution (drives both modes of the Encounter screen).
+- [HOUSES.md](../mechanics/HOUSES.md) — narrative reference attributes and chart dependencies.
+- [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md) — narrative composition, eligibility, and resolution.
+- [MECHANICS.md](../mechanics/MECHANICS.md) — combat resolution.
 - `NFT.md` — the on-chain SVG chart artifact (related to but distinct from the Chart Study surface).
 - `PLANETS.md` — planetary voices (chorus fragments appear in narrative encounters).
