@@ -4,6 +4,10 @@ Drafts are proposals for discussion, separate from the current [encounter refere
 Review completion describes work performed, not user acceptance or readiness for implementation.
 Consult an active draft when continuing that task; consult an archive when investigating its history.
 
+## Active work
+
+- [Narrative encounter scenes](narrative-encounters/NARRATIVES.md) — fresh narrative generation, awaiting user review of the writing before economic composition.
+
 ## Archived experiments
 
 - Combined encounter generation, superseded 2026-10-08: [draft](archive/2026-10-08-combined-encounters/ENCOUNTER_BATCH.md) and [review](archive/2026-10-08-combined-encounters/ENCOUNTER_BATCH_REVIEW.md).
