@@ -1,9 +1,15 @@
 import { PLANETS } from "@/game/data";
-import type { PlanetName } from "@/game/types";
+import type { PlanetName, Polarity } from "@/game/types";
 import { PLANET_DEGREE, strikeMidi } from "./pitches";
 
 export const PHRASE_VARIANTS = ["Current order", "Thirds", "Arch", "Falling thirds"] as const;
 export type PhraseVariant = typeof PHRASE_VARIANTS[number];
+export const ACTION_PHRASES = {
+  Testimony: "Thirds",
+  Affliction: "Falling thirds",
+  Necessity: "Arch",
+} as const satisfies Record<Polarity | "Necessity", PhraseVariant>;
+
 export interface PropagationNote {
   planet: PlanetName;
   midi: number;

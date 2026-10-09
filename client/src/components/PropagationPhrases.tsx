@@ -4,7 +4,7 @@ import {
   subscribeTheme, subscribeVolume,
 } from "@/audio/engine";
 import {
-  PHRASE_VARIANTS, phraseNoteName, propagationPhrase, type PhraseVariant, type PropagationNote,
+  ACTION_PHRASES, phraseNoteName, propagationPhrase, type PhraseVariant, type PropagationNote,
 } from "@/audio/propagation-phrases";
 import { THEMES } from "@/audio/themes";
 import { PLANETS } from "@/game/data";
@@ -19,12 +19,18 @@ const DESCRIPTIONS: Record<PhraseVariant, string> = {
   "Falling thirds": "Reverse the cycle, within the octave below the first note.",
 };
 const INITIAL_RECIPIENTS: PlanetName[] = ["Mercury", "Saturn", "Venus"];
+const ARRANGEMENTS = [
+  { label: "Current order", variant: "Current order" },
+  { label: "Testify", variant: ACTION_PHRASES.Testimony },
+  { label: "Afflict", variant: ACTION_PHRASES.Affliction },
+  { label: "Necessity", variant: ACTION_PHRASES.Necessity },
+] as const;
 
 export function PropagationPhrases() {
   const [ruler, setRuler] = useState<PlanetName>("Sun");
   const [source, setSource] = useState<PlanetName>("Sun");
   const [recipients, setRecipients] = useState<PlanetName[]>(INITIAL_RECIPIENTS);
-  const [sustain, setSustain] = useState(false);
+  const [sustain, setSustain] = useState(true);
   const [playing, setPlaying] = useState<PhraseVariant | null>(null);
   const [sounding, setSounding] = useState<number | null>(null);
   const [error, setError] = useState(false);
@@ -84,8 +90,9 @@ export function PropagationPhrases() {
     }
   }
 
-  const phrases = PHRASE_VARIANTS.map((variant) => ({ variant, notes: propagationPhrase(ruler, source, recipients, variant) }));
+  const phrases = ARRANGEMENTS.map((arrangement) => ({ ...arrangement, notes: propagationPhrase(ruler, source, recipients, arrangement.variant) }));
   const pitches = phrases.flatMap(({ notes }) => notes.map((note) => note.midi));
+  const activePhrase = phrases.find((phrase) => phrase.variant === playing);
   const low = Math.min(...pitches) - 2;
   const high = Math.max(...pitches) + 2;
 
@@ -95,7 +102,7 @@ export function PropagationPhrases() {
         <div>
           <p className="eyebrow">06 · Propagation study</p>
           <h2 id="gallery-propagation-title">Propagation phrases</h2>
-          <p className="gallery-note">One initial hit, then its neighbours. Compare four ways to shape the same notes.</p>
+          <p className="gallery-note">One initial hit, then its neighbours. Compare the action phrases with the current order.</p>
         </div>
         <button type="button" className="gallery-music-stop" disabled={playing === null} onClick={stop}>Stop phrase</button>
       </div>
@@ -144,24 +151,24 @@ export function PropagationPhrases() {
       </div>
 
       <div className="propagation-phrases">
-        {phrases.map(({ variant, notes }) => (
+        {phrases.map(({ label, variant, notes }) => (
           <article className="propagation-phrase" key={variant} data-playing={playing === variant}>
             <div className="propagation-phrase-heading">
-              <h3>{variant}</h3>
-              <button type="button" className="gallery-music-stop" aria-label={`Play ${variant} phrase`}
+              <h3>{label}{label !== variant && <span className="gallery-note"> · {variant}</span>}</h3>
+              <button type="button" className="gallery-music-stop" aria-label={`Play ${label} phrase`}
                 disabled={soundVolume === 0} onClick={() => { void play(variant); }}>
                 {playing === variant ? "Replay ↺" : "Play ▷"}
               </button>
             </div>
             <p className="gallery-note">{DESCRIPTIONS[variant]}</p>
-            <PhrasePlot notes={notes} low={low} high={high} sounding={playing === variant ? sounding : null} sustain={sustain} label={variant} />
+            <PhrasePlot notes={notes} low={low} high={high} sounding={playing === variant ? sounding : null} sustain={sustain} label={label === variant ? label : `${label} · ${variant}`} />
           </article>
         ))}
       </div>
       <p className="gallery-note propagation-caption">Same plucked attack and encounter timing throughout. Planet notes keep their scale degrees; arrangements change order and octave.</p>
       <p className="gallery-note">Gallery study only. Playing a phrase stops the theme. Uses <a href="#music">Sound volume</a>.</p>
       <p className="gallery-note propagation-status" role="status">
-        {soundVolume === 0 ? "Sound is muted. Raise Sound volume above to listen." : error ? "Audio could not start. Try Play again." : playing ? `${playing} · ${sounding === null ? "Listening" : phrases.find((phrase) => phrase.variant === playing)!.notes[sounding]!.planet}` : "Ready to listen"}
+        {soundVolume === 0 ? "Sound is muted. Raise Sound volume above to listen." : error ? "Audio could not start. Try Play again." : activePhrase ? `${activePhrase.label} · ${sounding === null ? "Listening" : activePhrase.notes[sounding]!.planet}` : "Ready to listen"}
       </p>
     </section>
   );

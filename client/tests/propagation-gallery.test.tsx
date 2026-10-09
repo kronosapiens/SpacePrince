@@ -38,7 +38,7 @@ afterEach(() => {
 });
 
 const button = (label: string) => [...container.querySelectorAll<HTMLButtonElement>("button")].find((element) => element.getAttribute("aria-label") === label || element.textContent === label)!;
-async function play(variant = "Thirds") { await act(async () => button(`Play ${variant} phrase`).click()); }
+async function play(action = "Testify") { await act(async () => button(`Play ${action} phrase`).click()); }
 function select(index: number, value: string) {
   act(() => {
     const control = container.querySelectorAll("select")[index]!;
@@ -54,7 +54,7 @@ it("plays the selected ruler, source, and recipients and follows the audible not
   let [notes, onNote, onEnd] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
   expect(notes.map((note) => note.midi)).toEqual([74, 78, 81, 76]);
   act(() => onNote(1));
-  expect(container.querySelector('[data-sounding="true"]')?.getAttribute("data-planet")).toBe("Mercury");
+  expect([...container.querySelectorAll('[data-sounding="true"]')].map((note) => note.getAttribute("data-planet"))).toEqual(["Sun", "Mercury"]);
   act(() => onEnd());
   expect(container.querySelector('[data-sounding="true"]')).toBeNull();
   expect(button("Stop phrase").disabled).toBe(true);
@@ -72,7 +72,7 @@ it("cancels sound on replay, another variant, control changes, stop, and unmount
   await play();
   await play();
   expect(audio.cancel).toHaveBeenCalledTimes(1);
-  await play("Arch");
+  await play("Necessity");
   expect(audio.cancel).toHaveBeenCalledTimes(2);
   select(0, "Moon");
   expect(audio.cancel).toHaveBeenCalledTimes(3);
@@ -100,7 +100,7 @@ it("does not start a phrase after a pending unlock is stopped or replaced", asyn
 
   vi.mocked(ensureAudio).mockImplementationOnce(() => new Promise<void>((resolve) => { finishUnlock = resolve; }));
   await play();
-  await play("Arch");
+  await play("Necessity");
   expect(playPropagationPreview).toHaveBeenCalledOnce();
   await act(async () => finishUnlock());
   expect(playPropagationPreview).toHaveBeenCalledOnce();
@@ -109,7 +109,7 @@ it("does not start a phrase after a pending unlock is stopped or replaced", asyn
 it("shows mute and retry feedback without changing the user's sound setting", async () => {
   audio.sound = 0;
   act(() => root.render(<PropagationPhrases />));
-  expect(button("Play Thirds phrase").disabled).toBe(true);
+  expect(button("Play Testify phrase").disabled).toBe(true);
   expect(container.textContent).toContain("Sound is muted");
   audio.sound = 1;
   act(() => root.render(<PropagationPhrases />));
@@ -135,21 +135,11 @@ it("waits for a selected theme to fade and cancels pending playback on navigatio
   expect(playPropagationPreview).toHaveBeenCalledOnce();
 });
 
-it("can build a chord from sustained notes and clears it on release or a toggle change", async () => {
+it("sustains by default and can compare individual plucks, clearing notes on release or a toggle change", async () => {
   const toggle = container.querySelector<HTMLInputElement>('input[type="checkbox"]')!;
-  expect(toggle.checked).toBe(false);
+  expect(toggle.checked).toBe(true);
   await play();
   let [, onNote, , sustain] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
-  expect(sustain).toBe(false);
-  act(() => onNote(1));
-  expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(1);
-
-  act(() => toggle.click());
-  expect(audio.cancel).toHaveBeenCalledOnce();
-  expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(0);
-  expect(button("Stop phrase").disabled).toBe(true);
-  await play();
-  [, onNote, , sustain] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
   expect(sustain).toBe(true);
   for (let index = 0; index < 4; index++) {
     act(() => onNote(index));
@@ -157,11 +147,39 @@ it("can build a chord from sustained notes and clears it on release or a toggle 
   }
   act(() => onNote(null));
   expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(0);
+
   act(() => toggle.click());
-  expect(audio.cancel).toHaveBeenCalledTimes(2);
+  expect(audio.cancel).toHaveBeenCalledOnce();
+  expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(0);
+  expect(button("Stop phrase").disabled).toBe(true);
   await play();
   [, onNote, , sustain] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
   expect(sustain).toBe(false);
   act(() => onNote(2));
   expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(1);
+  act(() => toggle.click());
+  expect(audio.cancel).toHaveBeenCalledTimes(2);
+  expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(0);
+  await play();
+  [, onNote, , sustain] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
+  expect(sustain).toBe(true);
+  act(() => onNote(2));
+  expect(container.querySelectorAll('[data-sounding="true"]')).toHaveLength(3);
+});
+
+it("plays the phrase assigned to each action and keeps the current-order reference", async () => {
+  const examples = [
+    ["Current order", "Current order", [74, 78, 76, 69]],
+    ["Testify", "Thirds", [74, 78, 81, 76]],
+    ["Afflict", "Falling thirds", [74, 64, 69, 66]],
+    ["Necessity", "Arch", [74, 76, 81, 78]],
+  ] as const;
+  for (const [action, variant, pitches] of examples) {
+    await play(action);
+    const [notes, , , sustain] = vi.mocked(playPropagationPreview).mock.calls.at(-1)!;
+    expect(notes.map((note) => note.midi)).toEqual(pitches);
+    expect(sustain).toBe(true);
+    expect(button(`Play ${action} phrase`).closest("article")?.querySelector("h3")?.textContent)
+      .toBe(action === variant ? action : `${action} · ${variant}`);
+  }
 });

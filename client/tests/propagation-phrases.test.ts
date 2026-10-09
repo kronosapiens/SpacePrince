@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { PHRASE_VARIANTS, phraseNoteName, propagationPhrase } from "@/audio/propagation-phrases";
+import { ACTION_PHRASES, PHRASE_VARIANTS, phraseNoteName, propagationPhrase } from "@/audio/propagation-phrases";
 import { strikeMidi } from "@/audio/pitches";
 import { PLANETS } from "@/game/data";
 
@@ -31,10 +31,10 @@ it("gives the opening example distinct arpeggio, arch, and descending voicings",
   const recipients = ["Mercury", "Saturn", "Venus"] as const;
   const phrase = (variant: typeof PHRASE_VARIANTS[number]) => propagationPhrase("Sun", "Sun", recipients, variant);
   expect(phrase("Current order").map(phraseNoteName)).toEqual(["D5", "F♯5", "E5", "A4"]);
-  expect(phrase("Thirds").map((note) => note.planet)).toEqual(["Sun", "Mercury", "Saturn", "Venus"]);
-  expect(phrase("Thirds").map(phraseNoteName)).toEqual(["D5", "F♯5", "A5", "E5"]);
-  expect(phrase("Arch").map(phraseNoteName)).toEqual(["D5", "E5", "A5", "F♯5"]);
-  expect(phrase("Falling thirds").map(phraseNoteName)).toEqual(["D5", "E4", "A4", "F♯4"]);
+  expect(phrase(ACTION_PHRASES.Testimony).map((note) => note.planet)).toEqual(["Sun", "Mercury", "Saturn", "Venus"]);
+  expect(phrase(ACTION_PHRASES.Testimony).map(phraseNoteName)).toEqual(["D5", "F♯5", "A5", "E5"]);
+  expect(phrase(ACTION_PHRASES.Necessity).map(phraseNoteName)).toEqual(["D5", "E5", "A5", "F♯5"]);
+  expect(phrase(ACTION_PHRASES.Affliction).map(phraseNoteName)).toEqual(["D5", "E4", "A4", "F♯4"]);
   expect(propagationPhrase("Jupiter", "Moon", [], "Thirds").map(phraseNoteName)).toEqual(["G♯5"]);
   expect(propagationPhrase("Saturn", "Saturn", [], "Thirds").map(phraseNoteName)).toEqual(["A♭4"]);
 });
