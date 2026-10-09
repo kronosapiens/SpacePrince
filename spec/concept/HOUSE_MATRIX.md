@@ -11,7 +11,7 @@ The [house and planet matrix](HOUSE_PLANET_MATRIX.md) develops all 84 placements
 The seeds and worked examples are writing reference material; current encounter copy lives in the [scenario data](../../client/src/data/narrative-scenarios.ts).
 Choose a house's human situation first, then use the planetary reference to shape the voice or a chart-conditioned approach.
 The house should remain recognizable when its heading is removed.
-The [encounter influences](../mechanics/HOUSES.md#3-chart-conditioning-model) explain how these house-level choices combine with signs, occupants, dignity, and current condition.
+The [encounter lookup model](../mechanics/HOUSES.md#3-chart-conditioning-model) groups the references by House, Sign, Planet, their placements, and current run state.
 
 Houses, signs, and planets have distinct jobs in this reference: situation, manner, and agency.
 This is our authoring convention, informed by the distinction discussed in [The Astrology Podcast, episode 231, opening discussion of houses and signs](https://theastrologypodcast.com/transcripts/ep-231-transcript-significations-of-the-twelve-houses-part-1-houses-1-6/).
@@ -40,12 +40,17 @@ These are astrological interpretations used as literary material, not claims abo
 
 ## House structure
 
+This reference is indexed by **House number**.
+Topics, diurnal position, angularity, relationship to the Ascendant, favorability, joy assignment, and fixed game ruler are all attributes of that House.
+Selecting VI therefore selects its cadency, aversion, Mars joy, and Mercury game ruler together; those attributes do not vary independently across charts.
+The chart determines which Sign and Planets are associated with VI, and run state determines their current condition.
+
 **Historical basis:** angularity distinguishes angular, succedent, and cadent houses by their position relative to the four angles.
 It concerns potency, separately from favorability.
 Firmicus distinguishes the angles, the other favorable places III/V/IX/XI, and the averse places II/VI/VIII/XII; his treatment also allows qualifications and exceptions.
 The table below records the fixed whole-sign relationships, not aspects from planets elsewhere in an individual chart.
 
-**Game interpretation:** use these two contributions separately when composing a house's situation:
+**Game interpretation:** distinguish the uses of these House attributes when composing its situation:
 
 - **Angularity:** where authority lies, what the Prince can directly affect, and what conditions his agency.
   It supplies narrative emphasis, with no automatic economic multiplier.
@@ -54,7 +59,7 @@ The table below records the fixed whole-sign relationships, not aspects from pla
 
 The applications below are revisable writing directions, not further historical claims or requirements that every scene follow one formula.
 An angular Fourth-house scene can be private, a cadent Ninth-house scene generous, and an averse Second-house scene abundant.
-The occupant's dignity and the joy planet's current condition have separate jobs in [chart conditioning](../mechanics/ENCOUNTERS.md#4-chart-conditioning).
+Dignity comes from the Planet–Sign pairing; joy availability combines the House's joy assignment with that Planet's current condition, as described in [chart conditioning](../mechanics/ENCOUNTERS.md#4-chart-conditioning).
 Additional aspects from planets elsewhere and precise distance from an angle are deferred.
 
 ## Game correspondences

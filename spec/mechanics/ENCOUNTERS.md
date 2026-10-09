@@ -3,7 +3,7 @@
 Narrative encounters are single decisions about the chart the player will carry onward.
 House concepts live in `HOUSES.md`, combat rules in `MECHANICS.md`, and presentation in `SCREENS.md §3.2`.
 Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md).
-The [encounter model](HOUSES.md#3-chart-conditioning-model) introduces each source of influence; §4 below applies it to offers, and §4.6 describes composing and revising a scene.
+The [encounter model](HOUSES.md#3-chart-conditioning-model) groups fixed references, natal relationships, and current state; §4 below applies these lookups to offers, and §4.6 describes composing and revising a scene.
 Authored scenes live in `client/src/data/narrative-scenarios.ts`; validation, targeting, previews, and resolution live in `client/src/game/narrative.ts`.
 
 ## 1. The Complementary Loop
@@ -38,9 +38,8 @@ The test is whether the player can explain who needs recovery, who can carry a c
 
 ### 1.4 Valence and dignity
 
-House valence guides the kinds of offers and their severity.
-House geometry guides agency and narrative emphasis without an additional angularity bonus.
-Planetary occupants unlock special approaches; dignity shapes their economic terms without an automatic exchange-rate multiplier.
+Valence and geometry are house attributes: valence guides offers and their severity, while geometry guides agency and narrative emphasis without an additional angularity bonus.
+Planet–house placement unlocks occupant approaches; planet–sign dignity shapes their economic terms without an automatic exchange-rate multiplier.
 Exact balance remains deferred.
 
 ## 2. Outcomes and Payment
@@ -104,19 +103,21 @@ Early scenes must still work with only the Moon unlocked.
 
 ## 4. Chart Conditioning
 
-Apply the separate contributions defined in [HOUSES.md §3](HOUSES.md#3-chart-conditioning-model): house topics, geometry, favorability, sign, occupant, dignity, and joy condition.
-House properties establish the shared situation and ordinary opportunities, including in empty houses.
-The sign varies their expression and may vary ordinary trades; occupants and joy condition supply additional approaches.
-Dignity shapes occupant terms, while the economy and current resources constrain every offer.
+Use the grouped references and dependencies defined in [HOUSES.md §3](HOUSES.md#3-chart-conditioning-model).
+The encounter house selects its topics, geometry, favorability, joy assignment, and fixed game ruler together.
+The Ascendant selects that house's sign; planetary placements select occupant wants, sign expression, and dignity.
+Current run state then determines joy availability, valid targets, and affordability.
 
+House and sign establish the shared situation and ordinary offers, including in empty houses.
+Occupants and an available joy supply additional approaches; the occupant's planet–sign dignity shapes its terms.
+The subsections below describe these uses without making each derived property an independent input.
 Historical potency does not automatically increase rewards, and adverse house character does not require every option to be a loss.
-Geometry, favorability, dignity, and joy are not cumulative multipliers.
-The specific contribution of each is recorded when composing the scenario (§4.6).
+The shared economy and encounter limits constrain all offers; there are no cumulative modifiers for each reference attribute.
 
 ### 4.1 Planetary joys
 
-A house's joyful planet can enable additional options wherever it resides in the natal chart.
-Its unlock status, affliction, and combustion determine whether those options are available.
+A house's fixed joy assignment identifies the planet to inspect, wherever it resides in the natal chart.
+That planet's current unlock status, affliction, and combustion determine whether the additional options are available.
 This gives players opportunities they can preserve, lose, and restore through their decisions during a run.
 
 A joy is present when it is unlocked, lit, and below 96 affliction.
@@ -125,8 +126,9 @@ This threshold remains provisional.
 
 ### 4.2 Occupants and dignity
 
-An occupying planet supplies the Prince's particular wants and special approaches.
-Dignity shapes the terms on which those approaches are available.
+Planet–house placement selects the Prince's particular wants and special approaches from the house–planet matrix.
+The same planet's natal sign selects its expression and essential dignity from the planet–sign reference.
+Dignity shapes the terms on which those approaches are available; it is determined by that pair rather than selected separately.
 Neutral, detriment, and fall placements should still support substantive special options.
 
 Favorable dignity can provide better terms, including lower costs or greater benefits, alongside some alternative exchanges.
@@ -155,7 +157,8 @@ An offered choice with insufficient Light or no valid targets stays visible with
 
 ### 4.4 Asymmetric joy
 
-This economic treatment is a game adaptation of the historical affinities.
+This economic treatment combines the house's joy assignment with that planet's benefic or malefic character.
+It is a game adaptation of the historical affinities.
 Benefic joys add help: a free restoration, a gift, or a better way through the scene.
 Contained malefics reduce harm: Mars or Saturn can absorb a smaller, scoped cost in their own domains.
 Without containment, the ordinary choices may concentrate a larger burden or spread it across the lit chart.
@@ -177,20 +180,22 @@ Equivalence concerns the opportunities supplied by the catalogue, rather than id
 
 ### 4.6 Composing and revising a scenario
 
-Use the following order to make each source's contribution visible while drafting.
-It is a review sequence, not a sequence of additional player decisions or a requirement to express every influence in every option.
+Follow the lookup order in [HOUSES.md §3.4](HOUSES.md#34-composition-and-lookup-order) while drafting.
+Each step below applies a reference or relationship to the scene without requiring every attribute to appear in every option.
 
-1. **Establish the situation.**
-   Select the house's concrete topic, then use its geometry to consider authority and agency and its favorability to consider opportunities and burdens.
-   The house matrix identifies the historical basis and the proposed writing applications separately.
-2. **Write ordinary choices.**
-   Let the sign shape the manner, mood, and any alternative trades.
+1. **Read the house reference and establish the situation.**
+   Select a concrete topic and consider its fixed geometry, favorability, joy affinity, and presentation ruler together.
+   The house matrix separates the historical basis from proposed writing applications, including questions of agency and opportunity.
+2. **Resolve the house's sign and write ordinary choices.**
+   Use the Ascendant and house to select the sign reference, including its imagery, element, and modality.
+   Let these shape the manner, mood, and any alternative trades.
    The scene remains usable without an occupant or an available joy option.
-3. **Develop special approaches.**
-   Use an occupant's house–planet entry for a particular want and action; give dignity a separate explanation for any change in terms.
-   Consider joy options through the joyful planet's current condition, independently of occupancy.
-   If the same planet supplies both, identify the eligibility and advantage of each authored offer without automatically combining bonuses.
-4. **Price and constrain the offers.**
+3. **Resolve occupant references and develop special approaches.**
+   Use each occupant's house–planet entry for a particular want and action, and its planet–sign entry for expression and dignity.
+   Explain any change in terms justified by the resulting dignity.
+4. **Read current condition and price the offers.**
+   Inspect the house's joyful planet wherever it resides to determine joy availability, then read current resources and valid targets for all options.
+   If the same planet supplies both an occupant approach and a joy option, identify the eligibility and advantage of each offer without automatically combining bonuses.
    Apply the shared economy, targets, affordability, immediate resolution, and three-choice limit.
    A burden in the fiction does not by itself justify an affliction cost; the stated action should explain the actual exchange.
    Place replacement options beside their ordinary counterparts so the change in opportunity is clear.
@@ -198,20 +203,14 @@ It is a review sequence, not a sequence of additional player decisions or a requ
    Read the Prince's motive, likely player experience, and economic value separately.
    Check playability across current conditions, the aggregate house–sign balance, and cumulative dignity advantages before adopting the scene.
 
-Keep a brief rationale with a proposed scene: which source informs the situation, what changes an option's availability, and what changes its terms.
+Keep a brief rationale with a proposed scene: which House, Sign, or Planet attributes inform the situation, which placement or current condition changes availability, and what changes terms.
 A source link and a few sentences or a compact comparison are sufficient; the 84 research entries need no new checklist.
 Record what the current resolver can support separately from proposed effects.
 
-For example, in an original IX scene a visiting Prince can pay for instruction or contribute work at a school.
-The topic is learning abroad; cadency suggests entering another person's institution; favorability supports a useful welcome.
-Mercury occupying IX could supply an approach through comparing translations, with its terms adjusted by Mercury's dignity.
-The Sun's current condition could independently allow a less tiring way to participate through the house's joy.
-The sign can vary the manner of instruction and ordinary tradeoffs, while the economy determines their actual prices.
-These are authoring choices to test, not predictions or approved amounts.
-
-To refine a source's contribution, compare versions that hold the other inputs steady and name the resulting difference in fiction, eligibility, or terms.
-Use valid placements when comparing charts: changing a sign can also change dignity, so identify both effects when they move together.
-Evaluate alternative interpretations of fixed house geometry across the house's scenes; do not pretend it varies between charts.
+To refine a reference attribute's contribution, compare alternative interpretations while holding the selected chart and other authoring choices steady.
+For example, VI is always cadent and averse; compare how different VI scenes express those attributes rather than treating them as chart variations.
+When comparing charts, use valid placements and name which linked references change: holding occupants fixed while changing their house's sign also changes their signs and may change dignity.
+Changing affliction can change joy availability while leaving the natal references intact.
 If a proposed influence adds no useful distinction, simplify its use and update the relevant guidance rather than adding a token sentence or bonus.
 Keep unresolved writing questions separate from economic or implementation questions so each can be revisited on its own evidence.
 

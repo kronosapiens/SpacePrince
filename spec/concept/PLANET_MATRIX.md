@@ -12,6 +12,16 @@ Placements: [Sun](#sun-placements) · [Moon](#moon-placements) · [Mercury](#mer
 ## Using this reference
 
 Read the planet's framework, the sign's matrix row, and its placement entry together.
+
+| Index | Reference | What it supplies |
+|---|---|---|
+| Planet | [Planet frameworks](#planet-frameworks) and [planetary chorus](PLANETS.md) | Domains, forms of agency, and voice |
+| Sign | [Sign matrix](#sign-matrix) | Imagery, element, modality, traditional ruler, and manner of expression |
+| Planet + Sign | [Traditional dignities](#traditional-dignities) and the placement entries | Dignity and the planet's particular expression in that sign |
+
+Element and modality are attributes of Sign; dignity belongs to the Planet–Sign pairing.
+The [encounter lookup model](../mechanics/HOUSES.md#3-chart-conditioning-model) explains how the natal chart selects these references alongside House and current run state.
+
 **Correspondences** record the symbolic vocabulary; **source notes** paraphrase particular authors; **synthesis and copy seeds** are our original editorial interpretations.
 The seeds demonstrate possible writing directions and are not approved replacement copy.
 Describe a part of the Prince that is becoming recognizable, with room for the player to identify with it.
@@ -60,23 +70,6 @@ Our Moon register emphasizes the intimate interior; Mercury, translation and the
 These adaptations follow the game's [planetary archetypes](PLANETS.md), with the portraits written as personal introductions rather than quotations from the chorus.
 Jupiter's opportunity is a narrative theme, not a promise of better game outcomes.
 
-### Traditional dignities
-
-These correspondences use the seven classical planets. [Wikipedia, Classical planet, “Contemporary astrology” table](https://en.wikipedia.org/wiki/Classical_planet#Contemporary_astrology)
-
-| Planet | Domicile | Exaltation | Detriment | Fall |
-| --- | --- | --- | --- | --- |
-| Sun | Leo | Aries | Aquarius | Libra |
-| Moon | Cancer | Taurus | Capricorn | Scorpio |
-| Mercury | Gemini, Virgo | Virgo | Sagittarius, Pisces | Pisces |
-| Venus | Taurus, Libra | Pisces | Aries, Scorpio | Virgo |
-| Mars | Aries, Scorpio | Capricorn | Taurus, Libra | Cancer |
-| Jupiter | Sagittarius, Pisces | Cancer | Gemini, Virgo | Capricorn |
-| Saturn | Capricorn, Aquarius | Libra | Cancer, Leo | Aries |
-
-In this reference, dignity supplies symbolic context rather than a verdict on personality.
-The placement notes describe possible expressions, not an automatic consequence of dignity.
-
 ## Sun framework ☉
 
 **Sourced domain:** conscious identity, expression, creative agency, vitality, pride, and authority. [Wikipedia, Sun](https://en.wikipedia.org/wiki/Planets_in_astrology#Sun)
@@ -120,6 +113,29 @@ Cardinal initiates, fixed sustains, and mutable adapts. [Wikipedia, modality and
 
 **Source discrepancy:** at consultation, the Pisces article's infobox said “Air,” while its Background section, Wikipedia's overview table, and Houlding's essay identified water.
 The matrix follows the latter agreement. [Pisces, Background](https://en.wikipedia.org/wiki/Pisces_(astrology)#Background), [overview](https://en.wikipedia.org/wiki/Astrological_sign#Western_astrological_correspondence_chart), [Houlding](https://www.skyscript.co.uk/pisces.html)
+
+## Planet–sign relationships
+
+Each pairing combines a Planet's concerns with a Sign's manner of expression.
+Its dignity is determined by both identities; it is not an additional choice or a property of the Sign alone.
+The table below records dignity, and the 84 placement entries develop possible expressions.
+
+### Traditional dignities
+
+These correspondences use the seven classical planets. [Wikipedia, Classical planet, “Contemporary astrology” table](https://en.wikipedia.org/wiki/Classical_planet#Contemporary_astrology)
+
+| Planet | Domicile | Exaltation | Detriment | Fall |
+| --- | --- | --- | --- | --- |
+| Sun | Leo | Aries | Aquarius | Libra |
+| Moon | Cancer | Taurus | Capricorn | Scorpio |
+| Mercury | Gemini, Virgo | Virgo | Sagittarius, Pisces | Pisces |
+| Venus | Taurus, Libra | Pisces | Aries, Scorpio | Virgo |
+| Mars | Aries, Scorpio | Capricorn | Taurus, Libra | Cancer |
+| Jupiter | Sagittarius, Pisces | Cancer | Gemini, Virgo | Capricorn |
+| Saturn | Capricorn, Aquarius | Libra | Cancer, Leo | Aries |
+
+In this reference, dignity supplies symbolic context rather than a verdict on personality.
+The placement notes describe possible expressions, not an automatic consequence of dignity.
 
 ## Sun placements
 

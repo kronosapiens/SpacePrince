@@ -10,9 +10,10 @@ Houses: [I Self](#i-self) · [II Livelihood](#ii-livelihood) · [III Communicati
 ## Reading the entries
 
 The house supplies the situation; the occupying planet supplies a concern or form of agency; the sign shapes its expression.
-The house introductions apply [fixed house geometry](HOUSE_MATRIX.md#house-structure) to the surrounding conditions once for all seven entries.
-Angularity informs agency and emphasis; favorability informs available support and burdens, separately from the Prince's feelings.
-The [encounter influences](../mechanics/HOUSES.md#3-chart-conditioning-model) and [composition guidance](../mechanics/ENCOUNTERS.md#46-composing-and-revising-a-scenario) govern how these writing references contribute to options and economic terms.
+This matrix is indexed by **House + Planet**; the Prince's natal chart determines which of its 84 pairings are occupied.
+Each house introduction includes its [fixed House attributes](HOUSE_MATRIX.md#house-structure), such as angularity and favorability, once for all seven entries.
+The occupant's Sign supplies expression through the separate Planet–Sign reference, and that pairing also determines dignity.
+The [encounter lookup model](../mechanics/HOUSES.md#3-chart-conditioning-model) and [composition guidance](../mechanics/ENCOUNTERS.md#46-composing-and-revising-a-scenario) describe how these references contribute to options and economic terms.
 The Prince takes the action and can want pleasure, company, power, possession, recognition, relief, or an answer without becoming an example of good conduct.
 The [drives guidance](DRIVES.md) distinguishes his motives from the player's experience.
 Its vocabulary remains provisional; the entries do not allocate each planet a single drive or require every scene to end in growth.
