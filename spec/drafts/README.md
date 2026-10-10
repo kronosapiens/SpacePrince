@@ -7,12 +7,6 @@ Consult an active draft when continuing that task; consult an archive when inves
 ## Active work
 
 - [Narrative encounter working guide](narrative-encounters/STYLE_GUIDE.md) — the single working document for the writing method, participation directions, useful examples, and review findings; revise in place and remove when the method is incorporated into the existing references.
-- [Earlier narrative scene sketches](narrative-encounters/NARRATIVES.md) — material for possible revision, predating the current writing method; not approved encounters or workflow guidance.
-
-## Archived experiments
-
-- Combined encounter generation, superseded 2026-10-08: [draft](archive/2026-10-08-combined-encounters/ENCOUNTER_BATCH.md) and [review](archive/2026-10-08-combined-encounters/ENCOUNTER_BATCH_REVIEW.md).
-  This experiment combined narrative writing with prices and menu selection; its candidate rules were not adopted and it is not the input to the fresh narrative batch.
 
 ## After review
 

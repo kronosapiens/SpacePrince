@@ -3,12 +3,12 @@
 A reference for writing Space Prince's narrative encounters across all twelve houses.
 Topical sources consulted on 2026-09-07; house geometry added on 2026-10-07.
 Use alongside the [planet and sign matrix](PLANET_MATRIX.md) and [encounter authoring spec](../mechanics/ENCOUNTERS.md).
-The [house and planet matrix](HOUSE_PLANET_MATRIX.md) develops all 84 placements into wants, possible expressions, and scene seeds, with selected sign variations.
+The [house and planet matrix](HOUSE_PLANET_MATRIX.md) develops all 84 placements into wants and possible expressions.
 
 ## Using this reference
 
-**Source notes** summarize the linked readings; **editorial direction, stakes, motifs, and scene seeds** are original writing material.
-The seeds and worked examples are writing reference material; current encounter copy lives in the [scenario data](../../client/src/data/narrative-scenarios.ts).
+**Source notes** summarize the linked readings; **editorial direction, stakes, and game fit** are original writing material.
+Current encounter copy lives in the [scenario data](../../client/src/data/narrative-scenarios.ts).
 Choose a house's human situation first, then use the planetary reference to shape the voice or a chart-conditioned approach.
 The house should remain recognizable when its heading is removed.
 The [encounter lookup model](../mechanics/HOUSES.md#3-chart-conditioning-model) groups the references by House, Sign, Planet, their placements, and current run state.
@@ -99,16 +99,8 @@ Use the existing [conditioning rules](../mechanics/ENCOUNTERS.md#4-chart-conditi
 **Editorial direction:** make the Prince present as a particular person, with a body and a way of introducing himself.
 Let his own gesture establish the terms on which he is met.
 **Stakes:** being recognized; choosing how to appear; admitting that a once-familiar image no longer fits.
-**Motifs:** a portrait sitting, a basin at face height, a name awaiting an answer, clothes fitted to the body standing there.
 
-**Scene seed A:** A painter has sketched you as you stood before the journey: shoulders square, eyes untroubled.
-You are sitting in front of her now, and she has not yet lifted her brush.
-
-**Scene seed B:** A wrestling master asks you to show the stance you learned as a child.
-Your feet remember it before you decide whether it still suits you.
-
-**Game fit:** `self-still-water` can distinguish attending to oneself from maintaining a demanding pose; `self-stake` can distinguish force from an approach discovered through Mercury.
-Keep the attention on embodied identity; the Tenth concerns what an audience makes of it.
+**Game fit:** Keep the attention on embodied identity; the Tenth concerns what an audience makes of it.
 Options can distinguish exertion from attending to the body without rewarding angularity itself.
 
 ## II — Livelihood
@@ -122,16 +114,8 @@ Options can distinguish exertion from attending to the body without rewarding an
 **Editorial direction:** put a usable resource within reach and make the effort of securing it tangible.
 A seller's terms can constrain acquisition while leaving a meaningful choice about what to keep available.
 **Stakes:** enough for today; reserves for scarcity; accepting a smaller return that leaves strength intact.
-**Motifs:** grain measures, a repaired boot sole, a purse counted twice, provisions too heavy for their owner.
 
-**Scene seed A:** A grain seller pays you a handful of coin for sweeping beneath his scales.
-The spilled grain under the wagon is yours too, if you can lift the axle clear.
-
-**Scene seed B:** A widow is selling the winter stores she can no longer carry to her new lodging.
-She has priced each sack, but offers a different price for moving the whole stack before rain reaches it.
-
-**Game fit:** `livelihood-coin` preserves a modest gain beside a costly larger one; `livelihood-lender` makes the strain of earning visible.
-The central question is sufficiency, not whether wanting money reveals a moral flaw.
+**Game fit:** The central question is sufficiency, not whether wanting money reveals a moral flaw.
 Price the particular means of acquisition; shared aversion does not require the same offers as the Eighth.
 
 ## III — Communication
@@ -145,16 +129,8 @@ Price the particular means of acquisition; shared aversion does not require the 
 **Editorial direction:** give a familiar connection a small interruption that can be resolved here.
 Help can arrive through an exchange whose completion depends on another person.
 **Stakes:** being understood by someone close; preserving an ordinary exchange; discovering how much was carried by a daily habit.
-**Motifs:** a sibling's recognizable handwriting, a ferry signal, a neighbor's spare latch, a message worn thin by folding.
 
-**Scene seed A:** A ferryman asks you to read a letter from his sister, who lives within sight on the opposite bank.
-He laughs at the opening line, then asks you to read it again more slowly.
-
-**Scene seed B:** The footbridge has washed away on market morning.
-Across the stream, two neighbors are trying to exchange a basket and a piece of news neither will shout.
-
-**Game fit:** `communication-letter` can offer recovery through an understood message or an immediate errand; `communication-bridge` can turn local familiarity into the Moon's easier crossing.
-Keep journeys close and relationships specific; the Ninth asks what distance changes.
+**Game fit:** Keep journeys close and relationships specific; the Ninth asks what distance changes.
 Ordinary assistance can be useful before the joy condition improves its terms.
 
 ## IV — Home
@@ -171,16 +147,8 @@ Write the actual household relationship without treating either assignment as un
 **Editorial direction:** make shelter carry a history, including histories the Prince did not choose.
 Establish who can set the household terms; the authority can be intimate and private.
 **Stakes:** belonging without explanation; accepting inherited care; deciding what remains when a household ends.
-**Motifs:** heights marked on a doorframe, a familiar hearthstone, a family well, the last bed in an emptied house.
 
-**Scene seed A:** An elderly host turns down a bed that has stood ready since her son left.
-She asks only that you leave the shutters as he liked them.
-
-**Scene seed B:** A house is being dismantled around the hearth where three generations cooked.
-Under its loose stone lies a blanket folded around the key to a door already gone.
-
-**Game fit:** `home-hearth` supports individual or shared shelter and the existing conditional revival; `home-buried` can connect recovery or salvage to the end of a household.
-Revival here is the game's fantasy of being welcomed back, not a sourced promise about this house.
+**Game fit:** Revival here is the game's fantasy of being welcomed back, not a sourced promise about this house.
 Shelter can offer recovery on different immediate terms without making private authority a bonus.
 
 ## V — Creativity
@@ -198,37 +166,9 @@ Our scenes should leave room for play, affection, and participation alongside cr
 **Editorial direction:** let making or enjoying something matter before it becomes useful or impressive.
 Give him room to sustain an occasion, join in, or enjoy what others have made.
 **Stakes:** showing an imperfect creation; making someone delighted; joining in without needing to excel.
-**Motifs:** a child composing a song, festival masks drying on a line, an invitation to dance, a ribbon given without ceremony.
 
-**Scene seed A:** The festival masks have been painted for every face except your own.
-A child offers you her brush while the first dancers gather in the square.
-
-**Scene seed B:** At a family feast, a child has made a song for her grandfather, but every verse follows a different tune.
-She holds out the fiddle as he settles into the front row.
-
-**Game fit:** `creativity-dice` can contrast effort, recovery, and Venus's invitation to play; `creativity-song` can make creative participation the decision itself.
-Keep public rank for the Tenth and shared civic aims for the Eleventh.
+**Game fit:** Keep public rank for the Tenth and shared civic aims for the Eleventh.
 Ordinary participation can bring pleasure or relief without concealing a compulsory burden.
-
-### Worked example: the child's song
-
-Use seed B with the existing `creativity-song` effects.
-The identifiers below are retained for comparison; labels and consequences are original proposed copy.
-
-| Option ID | Action | Immediate consequence | Existing effects |
-| --- | --- | --- | --- |
-| `finish` | Fit the verses to one tune | Your fingers ache by the final verse, and her grandfather asks to hear it once more. | Chosen affliction +48; Light +48 |
-| `rough` | Follow every change of tune | You scramble through the changes while the child sings louder to keep you with her. | Chosen affliction +24; Light +24 |
-| `sleep` | Listen from the table | She sings it unaccompanied, keeping time against her grandfather's knee. | No change |
-
-With `joyStrong` (Venus), `share` replaces `rough`:
-
-| Option ID | Action | Immediate consequence | Existing effects |
-| --- | --- | --- | --- |
-| `share` | Invite her grandfather to join in | He finds a refrain she likes, leaving you room to rest between the verses. | Chosen affliction −48; Light +12 |
-
-The relief comes through an easier way to participate in the scene.
-Declining still permits an ordinary, affectionate outcome.
 
 ## VI — Labor
 
@@ -244,16 +184,8 @@ Service need not be humiliating, and illness need not become a lesson about char
 **Editorial direction:** show the conditions of necessary work and who has the power to change them.
 A limited say over the task can still leave meaningful choices about method, effort, or care.
 **Stakes:** finishing without exhaustion; receiving care while work remains; refusing an unreasonable demand.
-**Motifs:** blunted shears, a ration bell, a washing bench, a stable hand tending a lame animal after the shift.
 
-**Scene seed A:** The last shearer has split his palm, and the flock is still waiting in the pen.
-The steward offers his wages to whoever finishes before the evening bell.
-
-**Scene seed B:** At the laundry, a worker keeps losing her grip on the wet sheets.
-The wash is already paid for, and the keeper has set a chair beside the furnace where the cloth dries.
-
-**Game fit:** `labor-field` makes concentrated or distributed toil concrete; `labor-fever` distinguishes pushing on, paid care, and a limited respite.
-Mars's conditioned approach should change a tool, method, or boundary that reduces the burden.
+**Game fit:** Mars's conditioned approach should change a tool, method, or boundary that reduces the burden.
 Charge for the work or care at hand; cadency supplies no additional penalty.
 
 ## VII — Relationships
@@ -267,16 +199,8 @@ Charge for the work or care at hand; cadency supplies no additional penalty.
 **Editorial direction:** place another person's stated needs across from the Prince's own.
 Make each party capable of changing the immediate agreement.
 **Stakes:** accepting help without surrendering agency; negotiating a fair share; remaining in relation through disagreement.
-**Motifs:** two signatures on one contract, a shared oar, a boundary stone, a rival who keeps an agreement.
 
-**Scene seed A:** A rival traveler has hired the only boat across the inlet.
-They leave the second oar beside you and ask whether you can agree on a pace.
-
-**Scene seed B:** Two partners are dividing their caravan at a crossroads.
-Both want the easier cart, and each offers to pay you to take the other's place at its shafts.
-
-**Game fit:** `relationships-stranger` can make accepted assistance a negotiated meeting; `relationships-bargain` can offer carrying, paying, or a fairer arrangement through the strong ruler.
-The other person's position should be intelligible even when it inconveniences the player.
+**Game fit:** The other person's position should be intelligible even when it inconveniences the player.
 Let the options redistribute immediate effort or payment between the parties.
 
 ## VIII — Transformation
@@ -293,16 +217,8 @@ Our title “Transformation” should leave space for a loss that remains a loss
 **Editorial direction:** make the transfer or ending concrete before giving it a symbolic meaning.
 An ending can leave him a choice about what to accept or relinquish even when he cannot reverse it.
 **Stakes:** accepting what a death leaves behind; separating an inheritance from its burden; wanting a particular presence returned.
-**Motifs:** a disputed will, a dead person's account book, an unclaimed funeral lamp, property divided in front of witnesses.
 
-**Scene seed A:** Your name appears in a stranger's will beside a locked strongbox.
-The executor offers to open it for a share, or hand over the box with its rusted lock intact.
-
-**Scene seed B:** At the mortuary, each lamp bears a name spoken by someone still living.
-The keeper leaves one wick unlit and asks whom you came to remember.
-
-**Game fit:** `transformation-inheritance` preserves the choice between taking the strain or sharing the return; `transformation-rite` gives the existing revival a specific absence to answer.
-Keep debts inside an immediate settlement; later obligations require mechanics the game does not have.
+**Game fit:** Keep debts inside an immediate settlement; later obligations require mechanics the game does not have.
 A return may accompany the ending without compensating emotionally for the loss.
 
 ## IX — Pilgrimage
@@ -316,16 +232,8 @@ A return may accompany the ending without compensating emotionally for the loss.
 **Editorial direction:** let a distant place or practice resist the Prince's existing account of the world.
 Guidance can be readily available while authority over the unfamiliar setting belongs to others.
 **Stakes:** being willing to learn; testing a conviction; taking part before fully understanding.
-**Motifs:** a map centered on another city, pilgrims washing dust from their feet, an unfamiliar observance, two translations of one passage.
 
-**Scene seed A:** In a distant school, your homeland appears at the margin of the map.
-The teacher asks you to explain the roads you know while a student moves the lamp to see them.
-
-**Scene seed B:** At a mountain shrine, the pilgrims keep watch facing away from the sunrise.
-An attendant offers you a place among them and a room if you would rather sleep.
-
-**Game fit:** `pilgrimage-teacher` offers study or demonstration; `pilgrimage-vigil` offers participation, rest, or the Sun's less exhausting understanding of the practice.
-Give a teacher a subject and an observance an action; avoid interchangeable pronouncements of wisdom.
+**Game fit:** Give a teacher a subject and an observance an action; avoid interchangeable pronouncements of wisdom.
 Receiving ordinary help need not depend on mastering the practice or accepting its beliefs.
 
 ## X — Achievement
@@ -342,16 +250,8 @@ Neither assignment is needed to write public responsibility.
 **Editorial direction:** show what becomes visible when work acquires a name, a title, or an audience.
 Establish whose decision has public force and how the Prince can exercise or answer it.
 **Stakes:** receiving deserved recognition; accepting scrutiny; choosing the scale of an undertaking.
-**Motifs:** a seal of office, scaffolding left up for an unveiling, a public ledger, a name cut into finished stone.
 
-**Scene seed A:** The council has set a chair for you above the people who repaired the road.
-Beside it lies the survey you must explain before they announce your reward.
-
-**Scene seed B:** A mason has left room for one more name on the bridge's dedication stone.
-There is also an unfinished arch, for anyone who wants a larger inscription.
-
-**Game fit:** `achievement-summit` can separate recognition, capable authority, and a quiet recovery; `achievement-monument` makes greater public distinction cost greater effort.
-Honor can be welcome and deserved without requiring a warning about vanity.
+**Game fit:** Honor can be welcome and deserved without requiring a warning about vanity.
 Public weight changes what the choice means, with prices still governed by the shared economy.
 
 ## XI — Friendship
@@ -365,16 +265,8 @@ Public weight changes what the choice means, with prices still governed by the s
 **Editorial direction:** allow support to arrive because someone remembers, welcomes, or shares a purpose with the Prince.
 Give that backing a concrete use in the present undertaking.
 **Stakes:** accepting generosity; having a place in an undertaking; discovering that help need not be purchased.
-**Motifs:** a chair pulled into a circle, a purse collected by several hands, a friend's recommendation, a banner mended in company.
 
-**Scene seed A:** Friends have collected enough for your next stretch of road and spread supper on a borrowed table.
-One has brought the dish you used to ask for and says it will not travel well.
-
-**Scene seed B:** A group of travelers is preparing a common meal in a courtyard they have hired together.
-They move their bundles to make room for yours before asking whether you can stay to help.
-
-**Game fit:** `friendship-gift` preserves money or shared recovery as real gifts; `friendship-favor` lets assistance and Jupiter's stronger welcome ease the whole chart.
-Do not conceal a future debt inside generosity when the game records none.
+**Game fit:** Do not conceal a future debt inside generosity when the game records none.
 Individual and shared assistance can be ordinary alternatives before Jupiter adds an option.
 
 ## XII — The Hidden
@@ -393,37 +285,9 @@ These are attributed differences, not a combined universal definition.
 **Editorial direction:** put a particular life behind the concealment, and establish who controls access to it.
 The Prince can change a bounded part of the situation without acquiring power over the whole confinement.
 **Stakes:** being remembered after exclusion; keeping company with an absence; limiting how much sorrow one takes on.
-**Motifs:** a visitor's bench outside a locked cell, a letter that cannot be answered, a retreat bell, a name scratched where nobody reads it.
 
-**Scene seed A:** Outside the city wall, an exile unfolds a letter that he is forbidden to answer.
-He asks you to read it aloud once more, though he mouths every word before you speak.
-
-**Scene seed B:** A former prisoner has returned to find his cell sealed, with the name he carved just visible through a gap in the masonry.
-He offers you payment for a rubbing of the letters, or for the stone itself.
-
-**Game fit:** `hidden-weight` can make the cost of attending to an excluded life specific; `hidden-door` can center a remnant of confinement instead of an unspecified prize.
-Saturn's alternative should establish a workable limit within the situation.
+**Game fit:** Saturn's alternative should establish a workable limit within the situation.
 Tie burdens to the specific action or obstacle, leaving room for wanted solitude and relief.
-The letter belongs here because its recipient is barred from answering, not simply because it contains a secret.
-
-### Worked example: the carved name
-
-Use seed B with the existing `hidden-door` effects.
-
-| Option ID | Action | Immediate consequence | Existing effects |
-| --- | --- | --- | --- |
-| `glance` | Reach in and take a rubbing | You draw your scraped arm back through the gap, and he smooths the paper against his coat. | Chosen affliction +36; Light +24 |
-| `through` | Climb inside and free the stone | He takes the stone from your aching hands and turns the carved face toward the light. | Chosen affliction +60; Light +72 |
-| `back` | Leave the inscription where it is | He sits beside the wall and looks again through the gap. | No change |
-
-With `joyPresent` (Saturn), `measure` replaces `glance`:
-
-| Option ID | Action | Immediate consequence | Existing effects |
-| --- | --- | --- | --- |
-| `measure` | Measure the gap before reaching in | The narrow rubbing comes free with only a scrape, and he traces the letters with one finger. | Joy affliction +12; Light +24 |
-
-The smaller burden remains scoped to Saturn by the existing resolver.
-The objects change hands within this encounter and create no inventory or later obligation.
 
 ## Applying the matrix to scenario copy
 
@@ -438,7 +302,6 @@ For copy revisions that preserve current mechanics:
    New occupant approaches draw on [HOUSE_PLANET_MATRIX.md](HOUSE_PLANET_MATRIX.md) under the encounter spec.
 5. Read the prompt without its house heading and check that its situation still carries the intended meaning.
 
-The worked examples preserve their current effect values; the other seeds are starting points, not complete option specifications.
 When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and at most three visible choices unless a separate mechanics change is agreed.
 Keep the existing valid exit at zero Light and with only the Moon unlocked.
 The [scenario data](../../client/src/data/narrative-scenarios.ts) and [resolver](../../client/src/game/narrative.ts) remain authoritative for those details.

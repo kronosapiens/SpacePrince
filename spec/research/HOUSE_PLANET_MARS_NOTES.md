@@ -4,7 +4,7 @@ Preliminary research for Houses I–IX and XI–XII, with an independent Sun VI 
 The [full matrix](../concept/HOUSE_PLANET_MATRIX.md) contains the lead synthesis after review; proposals here preserve the independent research stage.
 Consulted 2026-10-04 without reading the current house–planet matrix, pilot scenes, or other Sun/Mars research notes.
 The [house reference](../concept/HOUSE_MATRIX.md), [planet framework and signs](../concept/PLANET_MATRIX.md), [Mars voice](../concept/PLANETS.md#7-mars), and [emotional guidance](../concept/DRIVES.md) supply game context.
-Source notes concern natal occupants; adaptations and scenes are original proposals, not predictions or fixed character traits.
+Source notes concern natal occupants; adaptations are original proposals, not predictions or fixed character traits.
 Mars can want, enjoy, compete, abandon, or act without serving as a universal protector.
 
 ## Source record
@@ -39,9 +39,6 @@ One expression is delight in beginning before a role has been assigned.
 Another is impatience with the image others have prepared for him, even when it is flattering.
 The bodily arrival matters more than eventual status.
 
-**Scene A:** At an unfamiliar gathering, an usher rehearses his introduction; he can step forward under his own name or enjoy the force of the offered entrance.
-**Scene B:** A riding instructor asks what sort of rider he is; he can choose a mount and demonstrate, request a difficult turn, or plainly admit what he wants to try.
-
 ## II — Livelihood
 
 **Source notes:** Heese combines earning, appetite, and possession.
@@ -52,9 +49,6 @@ One expression is satisfaction in securing provisions without another person's p
 Another is a sharp wish to keep what he obtained, even when lending it would be easy.
 Possessiveness need not be disguised as prudent stewardship.
 
-**Scene A:** A trader offers him payment or ownership of the tool he repaired; he can take immediate spending power or claim the means of doing the work himself.
-**Scene B:** A fellow traveler asks to borrow his newly bought knife before he has used it; he can lend it, bargain for something he wants, or keep the first use for himself.
-
 ## III — Communication
 
 **Source notes:** Heese emphasizes direct expression, provocative debate, and animated exchanges.
@@ -63,9 +57,6 @@ Possessiveness need not be disguised as prudent stewardship.
 One expression is the fun of a brisk argument both participants understand as play.
 Another is annoyance that someone else keeps supplying the version of events everyone repeats.
 Local relationships and circulating words give this its setting.
-
-**Scene A:** His brother challenges his account of yesterday's market bargain; he can argue each coin with enjoyment or name the part his brother keeps leaving out.
-**Scene B:** Neighbors have chalked rival explanations for the ferry's lateness; he can add a pointed answer, fetch the ferryman, or defend a neighbor whose explanation he finds convincing.
 
 ## IV — Home
 
@@ -77,9 +68,6 @@ One expression is eagerness to make a neglected room usable.
 Another is a wish to prevail over a family habit whose persistence feels like someone else's authority.
 Protection is possible, but the disagreement may simply concern competing domestic preferences.
 
-**Scene A:** His family still keeps his room arranged for the child who left; he can move the bed immediately or ask another resident to help him choose a new arrangement.
-**Scene B:** A cousin proposes opening the courtyard gate during supper; he can insist on closing it, take responsibility for watching it, or enjoy breaking the old rule himself.
-
 ## V — Creativity
 
 **Source notes:** Heese describes pursuit of pleasure, risk, games, and exciting projects.
@@ -88,9 +76,6 @@ Protection is possible, but the disagreement may simply concern competing domest
 One expression is exhilaration at a playful risk without useful consequences.
 Another is the appetite to be the person who receives a particular invitation or wins a particular game.
 The writing can let success be sweet and losing sting without administering a lesson.
-
-**Scene A:** A festival performer offers a turn on the small rope over the sawdust; he can step up, demand a second attempt, or choose the louder pleasure of encouraging a friend.
-**Scene B:** Someone he desires has been waiting beside the musicians; he can ask for the next dance plainly or offer to invent a dance neither of them knows.
 
 ## VI — Labor
 
@@ -103,9 +88,6 @@ One expression is satisfaction in finding a pace that moves the task along.
 Another is competitive irritation when somebody else completes it differently or receives easier treatment.
 Neither endurance nor refusal is automatically the right response.
 
-**Scene A:** At a packing bench, he can finish one crate himself or join the alternating rhythm two workers have established; the work must be done before the cart leaves.
-**Scene B:** A supervisor interrupts his careful sorting to demand speed; he can show the mistake haste would create, change methods, or finish his assigned portion with fierce precision.
-
 ## VII — Relationships
 
 **Source notes:** Heese explicitly values challenging partners.
@@ -115,9 +97,6 @@ Reed adds active pursuit and determination within partnerships.
 One expression is excitement at meeting someone who can answer him with equal force.
 Another is wanting to secure a shared decision before hesitation dissolves the opportunity.
 The other person has their own will; welcomed challenge does not require mistreatment or eventual reconciliation.
-
-**Scene A:** A navigator offers to share his boat if they test both proposed routes against the chart; he can welcome her challenge, stake his case, or accept her better route with renewed interest.
-**Scene B:** A companion offers an honest account of where traveling together has become difficult, provided he answers as frankly; he can enter that exchange or state the one term he wants settled first.
 
 ## VIII — Transformation
 
@@ -130,9 +109,6 @@ One expression is urgency to settle a shared obligation and regain freedom.
 Another is anger that wanting an inherited object strongly cannot make it wholly his.
 Action need not undo loss or produce growth.
 
-**Scene A:** A deceased partner's creditors will release their jointly owned boat for a stated settlement; he can pay, surrender his share, or propose an immediate division of its fittings.
-**Scene B:** Two heirs must consent before a sealed chest is opened; he wants its contents now, while the other wants a witness, so he can fetch one, press his claim, or withdraw his request.
-
 ## IX — Pilgrimage
 
 **Source notes:** Heese connects adventure, debate, and learning through challenge.
@@ -144,9 +120,6 @@ Another is the desire to defend his conviction before people who do not grant it
 The location or teaching must be genuinely outside his familiar frame.
 Neither persuasion nor conversion is guaranteed.
 
-**Scene A:** A distant school permits visitors to defend one proposition before its teachers; he can offer his own, challenge theirs, or request the argument they consider hardest.
-**Scene B:** At a pilgrimage junction, he can take the steep route whose observance he wants to experience or continue toward the shrine where his own tradition keeps its vigil.
-
 ## XI — Friendship
 
 **Source notes:** Heese emphasizes helpful initiative, causes, and energetic friends.
@@ -156,9 +129,6 @@ Reed includes group leadership and power struggles.
 One expression is contagious eagerness to set a collective plan in motion.
 Another is rivalry over who supplies its direction, even among people he likes.
 The undertaking belongs to the circle; public office and institutional authority are unnecessary.
-
-**Scene A:** Friends have talked for months about reopening their abandoned playing ground; he can bring the first tools, recruit another pair of hands, or back a friend's competing plan for the same afternoon.
-**Scene B:** A companion announces the outing he meant to propose; he can join with enthusiasm, argue for his route, or admit he wanted the pleasure of getting everyone started.
 
 ## XII — The Hidden
 
@@ -171,9 +141,6 @@ One expression is absorbed satisfaction in pursuing a private undertaking.
 Another is frustrated urgency to make contact with a person kept outside ordinary life.
 The circumstances must establish concealment or restriction, rather than treating every unspoken desire as Twelfth-house material.
 
-**Scene A:** In a retreat's closed workshop, he can finally attempt the mechanism he keeps abandoning under spectators' advice; he can work alone or admit the one visitor he trusts.
-**Scene B:** An exile barred from the city needs an answer before the gate closes; he can carry the permitted message himself, arrange an exchange outside the wall, or decline the request despite wanting to act.
-
 ## Independent overlap — Sun VI
 
 **Source notes:** Heese connects work with identity and warns against dependence on appreciation.
@@ -185,9 +152,6 @@ One expression is quiet pride in a competent contribution.
 Another is wanting a supervisor or recipient to notice effort that disappears into daily provision.
 He need not transcend that wish for acknowledgement.
 Compared with Mars VI's control of method, this proposal centers recognition of oneself in the work.
-
-**Scene A:** The kitchen uses his careful measurements without remembering who devised them; he can enjoy the result, ask for acknowledgement, or teach the new worker himself.
-**Scene B:** While recovering, he can complete one small task he knows well or accept care and name what he misses about working; neither response proves his worth.
 
 ## Gaps
 

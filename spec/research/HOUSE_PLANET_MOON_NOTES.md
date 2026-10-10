@@ -28,7 +28,7 @@ Source statements describe interpretive traditions; the original adaptations pro
   Read the placement sections and footers, which credit AstroWin's PHP Scripts for Astrology Websites without naming an individual author.
   This is shared script provenance, not established independent testimony; used only for the explicitly identified supplementary points below.
 
-All adaptations and scenes below are original writing proposals.
+All adaptations below are original writing proposals.
 They borrow situations from the house framework and agency from the Moon, without transferring corresponding sign traits onto houses.
 
 ## I — Self
@@ -39,11 +39,6 @@ They borrow situations from the house framework and agency from the Moon, withou
 **Expressions:** He enjoys arriving visibly delighted, with no need to compose a grand entrance; alternatively, he wants to choose whether strangers receive the sadness already audible in his voice.
 Neither feeling determines the person he must become.
 
-**Scene A:** A ceremonial collar makes him hold his chin at an unfamiliar angle, and a laugh keeps escaping during the fitting.
-He can keep trying the formal posture or ask the tailor to fit the collar to how he actually stands.
-**Scene B:** A registrar hears his voice break while asking his name and quietly leaves the pen hovering.
-He can repeat the name, let the pause stand, or offer the shorter name nobody here knows.
-
 ## II — Livelihood
 
 **Source:** Annie links financial reserves with reassurance and variable spending.
@@ -51,11 +46,6 @@ Merlin adds possessions preserving continuity with the past.
 
 **Original dynamic:** What he has available must answer both today's needs and the remembered feeling of going without.
 **Expressions:** He wants the pleasure of opening a well-stocked bag; alternatively, he spends on a small immediate comfort because another prudent purchase would leave the day just as bleak.
-
-**Scene A:** A provisioner can fill his sack with plain traveling food or pack less of the spiced bread he remembers waking to.
-Both offers are honestly priced, and he knows what each will leave for tomorrow.
-**Scene B:** His old drinking cup leaks through a repaired seam.
-A tinker offers a sound replacement or another repair; keeping the familiar weight in his hand has a use the replacement price cannot express.
 
 ## III — Communication
 
@@ -65,11 +55,6 @@ A tinker offers a sound replacement or another repair; keeping the familiar weig
 **Expressions:** He takes mischievous pleasure in reproducing a neighbor's unmistakable greeting; alternatively, he rehearses ordinary news because a sibling will hear worry in the smallest change of wording.
 The particular listener matters more than the elegance of the message.
 
-**Scene A:** Two neighboring stalls have developed a morning call and response, but today's new seller does not know the answering line.
-The Prince can supply the old answer or join the seller in inventing one.
-**Scene B:** His brother's messenger waits while he describes a minor mishap.
-The truthful account can be brisk, tender, or amusing; each tells the brother something different about whether he should worry.
-
 ## IV — Home
 
 **Source:** Annie combines attachment to origins with restless home-seeking.
@@ -77,11 +62,6 @@ The truthful account can be brisk, tender, or amusing; each tells the brother so
 **Original dynamic:** Being welcomed into a household can restore a familiar place or return him to a role he has outgrown.
 **Expressions:** He wants someone else to know where his things belong; alternatively, he feels resentment when affectionate preparations assume he has remained unchanged.
 Comfort and irritation can occupy the same room.
-
-**Scene A:** His former guardian has prepared the small bed by the kitchen because he once disliked sleeping alone.
-He can settle there for the night or ask for the empty upstairs room.
-**Scene B:** At the first supper in a borrowed house, nobody knows where to sit.
-The Prince finds himself arranging everyone as they sat years ago, then notices that the person beside him has already chosen another chair.
 
 ## V — Creativity
 
@@ -91,11 +71,6 @@ The Prince finds himself arranging everyone as they sat years ago, then notices 
 **Expressions:** He enjoys being extravagantly heartbroken in a play; alternatively, he wants a flirtation to continue for one more dance despite knowing the evening has no promised sequel.
 Pleasure can finish as pleasure.
 
-**Scene A:** A puppet maker invites him to supply the rejected lover's voice while children make increasingly impossible suggestions for the next scene.
-He can prolong the delicious misery or give the puppet an absurd escape.
-**Scene B:** The musicians begin packing away just as a partner asks for their favorite dance again.
-He can hum the tune himself, offer to help keep the musicians there, or enjoy the unfinished feeling as they part.
-
 ## VI — Labor
 
 **Source:** Annie emphasizes usefulness; Reed also emphasizes a congenial working environment.
@@ -104,11 +79,6 @@ He can hum the tune himself, offer to help keep the musicians there, or enjoy th
 **Expressions:** He likes noticing what would make another worker's hour bearable; alternatively, he resents being valued chiefly because he always notices.
 The conditions and distribution of work give that resentment an object.
 
-**Scene A:** At the bread ovens, everyone drinks when the Prince brings the jug around, but the overseer keeps assigning him another round instead of his own break.
-He can pass the jug onward, request relief, or finish this round deliberately.
-**Scene B:** A kennel's feeding routine has settled every animal except one that eats only from a familiar bowl.
-The keeper invites him to try the old routine or help devise another before the next task begins.
-
 ## VII — Relationships
 
 **Source:** Annie stresses companionship, responsiveness, and discovering needs through partnership.
@@ -116,11 +86,6 @@ The keeper invites him to try the old routine or help devise another before the 
 **Original dynamic:** An agreement between two people must accommodate the ways each recognizes care.
 **Expressions:** He wants a companion to remember an unspoken preference; alternatively, he feels unexpected relief when the other person asks plainly instead of guessing.
 Either can matter within an otherwise sound partnership.
-
-**Scene A:** Two travelers sharing a room have agreed on expenses but not on the lamp.
-The Prince sleeps better with it burning; his companion needs darkness, and both are already tired.
-**Scene B:** His business partner celebrates a completed sale by inviting him to supper.
-He had expected a private congratulations before the accounts were closed and can name that wish, join the meal, or ask to sit together quietly first.
 
 ## VIII — Transformation
 
@@ -131,11 +96,6 @@ Reed includes inheritance and taxes; Houlding grounds the house in loss and othe
 **Expressions:** He wants another mourner to remember exactly as he does; alternatively, he welcomes the executor's concrete account because practical settlement asks less of him than consolation.
 Neither response has to redeem the death.
 
-**Scene A:** A deceased guarantor's estate must settle the Prince's bond before its keepsakes can be divided.
-He can settle his part now or allow a named item to be sold, while the other heirs wait.
-**Scene B:** After a companion's funeral, their common purse still pays for two places at the inn.
-The innkeeper offers an immediate refund, and another mourner asks whether they can use the empty place for one last supper together.
-
 ## IX — Pilgrimage
 
 **Source:** Merlin stresses unfamiliar experience; Rough stresses returning to a foreign place felt as familiar.
@@ -145,22 +105,12 @@ AstroLibrary adds reassurance found in a philosophy.
 **Expressions:** He delights in becoming a beginner; alternatively, he seeks a remembered observance and finds its local form unsettlingly different.
 The foreign practice need not confirm his expectations or become a lesson.
 
-**Scene A:** At a distant school, students record dreams before discussing what they might mean.
-The Prince is offered a blank page and can contribute a fragment, ask how the practice began, or listen without turning his dream into evidence.
-**Scene B:** He has crossed the sea for a festival whose melody he learned in childhood.
-Here its verses are sung in another order, and the song leader offers to hear his version after the procession.
-
 ## XI — Friendship
 
 **Source:** Annie emphasizes belonging and shared hopes; Reed allows numerous acquaintances rather than close intimates.
 
 **Original dynamic:** Being part of a circle can mean reliable welcome without requiring every member to share the same closeness or future.
 **Expressions:** He enjoys being expected at a gathering even when nobody knows his whole story; alternatively, he wants old friends to keep wanting the project that once held them together.
-
-**Scene A:** A supper club has saved him a seat among people who remember his favorite dish but know little else about his travels.
-He can enjoy that small recognition or bring one new part of himself into the conversation.
-**Scene B:** Friends are voting on what to do with the garden they planted together.
-Some want flowers, others a meeting place, and he discovers that what he misses is their former habit of arriving there every evening.
 
 ## XII — The Hidden
 
@@ -171,11 +121,6 @@ AstroLibrary specifically includes institutions and work kept out of sight.
 **Expressions:** He wants someone excluded to receive ordinary company; alternatively, he wants one evening during which nobody can claim his attention.
 These are different situations, not successive steps toward becoming more available.
 
-**Scene A:** A confined traveler can hear the market through the wall but is forbidden visitors beyond the outer bench.
-The Prince can describe what changed in the square, sit where both can hear the musicians, or leave the requested food without conversation.
-**Scene B:** A retreat keeper gives him the inside bolt and promises not to call him for supper.
-When familiar laughter reaches the corridor, he can keep his chosen privacy or open the door without explaining the change.
-
 ## Independent overlap — Venus VIII
 
 **Source:** Heese emphasizes intense reciprocal devotion and fear of betrayal.
@@ -185,11 +130,6 @@ These differences leave no single required relationship style.
 **Original dynamic:** Affection gives particular value to something whose ownership, availability, or shared use has changed.
 **Expressions:** The Prince takes unabashed pleasure in comfort another person willingly makes available; alternatively, he wants a surviving object to acknowledge a bond nobody else valued equally.
 The original adaptation uses Houlding's concrete transfers and obligations, without promising that loss produces growth.
-
-**Scene A:** While dividing a deceased singer's estate, two heirs want the same instrument for different memories.
-The Prince can take an agreed share in money, keep the instrument by paying the difference, or ask to play it once before its sale.
-**Scene B:** A companion opens their jointly owned chest to fund an evening of pleasure.
-Before they choose what to spend, the steward presents a shared bill due now; the couple can settle it and choose how to enjoy what remains.
 
 ## Gaps and editorial limits
 
@@ -202,5 +142,5 @@ Rough's XII material was inspected but adds little usable here once its medical 
 Alison Price's Starzology article timed out and Dana Gerhardt's Astro.com page blocked access; neither supplies evidence in these notes.
 The source set establishes several authored readings, not historical consensus or evidence of natal causation.
 
-Scene usefulness remains preliminary: choice structure, cost, encounter length, and the player's resulting experience still require writing and testing.
+The adaptations remain preliminary: choice structure, cost, encounter length, and the player's resulting experience still require writing and testing.
 Moon's III joy and the game's fixed IV ruler supply no automatic permission to soften those encounters.

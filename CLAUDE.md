@@ -64,7 +64,7 @@ Completed review of a draft does not make it current guidance.
 - `PLANETS.md` — the philosophical chorus / voice for each of the seven planets
 - [DRIVES.md](spec/concept/DRIVES.md) — the Prince's motives and emotional range, distinct from the player's experience
 - [HOUSE_MATRIX.md](spec/concept/HOUSE_MATRIX.md) — fixed house attributes, human situations, and writing guidance
-- [HOUSE_PLANET_MATRIX.md](spec/concept/HOUSE_PLANET_MATRIX.md) — wants and scene seeds for all 84 house–planet placements
+- [HOUSE_PLANET_MATRIX.md](spec/concept/HOUSE_PLANET_MATRIX.md) — wants and expressions for all 84 house–planet placements
 - [PLANET_MATRIX.md](spec/concept/PLANET_MATRIX.md) — planet and sign references, dignities, and all 84 planet–sign expressions
 - `NFT.md` — what the Prince NFT is and how it evolves with play
 - `ECONOMICS.md` — economics as commitment reinforcement, not extraction
@@ -90,7 +90,7 @@ Completed review of a draft does not make it current guidance.
 
 ### `spec/research/` — evidence and historical findings
 
-The [research index](spec/research/README.md) locates source notes, comparisons, and completed research reviews.
+The [research index](spec/research/README.md) locates source notes and comparisons.
 Consult these for evidence or historical reasoning; embedded proposals do not supersede current references.
 
 ### `spec/drafts/` — active proposals and archived experiments

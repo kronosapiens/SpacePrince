@@ -3,7 +3,6 @@
 A reading of every text event in FTL: Faster Than Light and every event in Slay the Spire, against Space Prince's narrative encounters as they stand on 2026-09-17.
 The inventories are [FTL.md](FTL.md) (289 events) and [STS.md](STS.md) (52 events); this document is the analysis.
 Space Prince's own rules are in `spec/mechanics/HOUSES.md` and `spec/mechanics/ENCOUNTERS.md`, and the twenty-four authored scenes in `client/src/data/narrative-scenarios.ts`.
-Everything under "Proposals" is a proposal, not a decision.
 
 ## 1. The three designs side by side
 
@@ -165,30 +164,3 @@ Balance is deferred in Space Prince, but that is the direction to shrink from wh
   Two thirds of FTL's events can start a fight; Space Prince's map already separates the two node types, and the one-decision scene should stay fight-free.
 - **A second currency.**
   FTL's fleet clock is what makes its decisions bite, but Space Prince already has increasing encounter length, recurring necessity, and a finite seven-map run; `ENCOUNTERS.md §11` rules out a new run currency.
-
-## 7. Proposals
-
-Each is tied to a finding above and to an existing constraint, and none is decided.
-
-1. **Deepen the pool or slow the draw.**
-   Twenty-four scenes against about twenty-four narrative nodes per run is the largest gap between Space Prince and either reference (§4).
-   `STATE.md` reserves headroom for eight scenarios per house; the alternative is a lower narrative-node share so each run sees fewer.
-   The cheapest multiplier is one that changes what the player reads, not only what is offered.
-2. **Scale scene amounts with map number.**
-   Both reference games scale by depth, and Space Prince's encounter length already increases with map number.
-   Scenes could use `mapsCompleted` to increase amounts on the lattice, so a Press on map 6 stakes more and a Tend heals more.
-   This would add scaling beyond necessity, whose draws do not increase with depth (`MECHANICS.md §11.3`).
-3. **Show the lock.**
-   When a conditioned offer is absent, the aside could say what would have revealed it ("with Venus lit", "with Mercury in domicile"), as Tomb of Lord Red Mask does.
-   It teaches the chart, which is the accessibility goal, and stays inside the three-option limit because it is a note, not a row.
-   Against it: `ENCOUNTERS.md §4.3` deliberately hides failed predicates.
-4. **Offer sacrifice plainly.**
-   The biggest moments in Slay the Spire are sacrifices, and Space Prince's rules already allow an option to combust a chosen planet.
-   A scene that says so, for a large Light gain, un-defers "deliberate sacrifice" without new state or new outcome kinds.
-5. **Use the ladder.**
-   One or two houses could offer three depths of the same trade to a chosen planet in one decision (§3.3), which gives the push-your-luck feel Knowing Skull has without a second stage or a roll.
-6. **Price the exit in every bad place.**
-   Four scenes charge to leave, but neither Transformation scene does, and one scene each in Livelihood and The Hidden still exits free.
-   The corpus says a free exit in the darkest houses is the odd one out.
-
-What was not proposed: information as a reward (revealing the adversary chart at a chosen upcoming combat node, FTL's map reveal) is the one novel reward type the corpora suggest, but it needs a new outcome kind and a stored revealed flag, which `STATE.md` would have to accept first.

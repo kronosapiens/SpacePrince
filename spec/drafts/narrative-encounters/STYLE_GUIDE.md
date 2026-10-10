@@ -101,19 +101,6 @@ The childhood detail gives the relationship substance, and the direct request ne
 The dramatic focus is the conflict with the uncle and the Prince's relationship to his family and values.
 Possible participation includes letting the exchange pass or challenging the uncle and refusing his hospitality.
 
-The following economic sketch adds that the uncle has offered the Prince his old room for the night.
-Its amounts remain provisional; each affliction change affects one selected lit planet under the ordinary targeting and payment rules.
-
-| Choice narration | Economic effect |
-| --- | --- |
-| Let it pass and stay under your uncle's roof. | Remove 24 affliction. |
-| Say “Her name is Mara” and decline his hospitality; buy a room at the inn. | Spend 48 Light; remove 24 affliction. |
-| Say “Her name is Mara” and leave on foot tonight with your belongings. | Add 12 affliction. |
-
-Staying is economically preferable to either refusal.
-Paying for another bed or enduring the road makes the sacrifice concrete; leaving is the Prince's decision and needs no threat of expulsion.
-The scene's support for those responses still needs review before implementation.
-
 ## Lena and the sled
 
 **Accepted for the shared history and emotional anchor; participation still under development.**
