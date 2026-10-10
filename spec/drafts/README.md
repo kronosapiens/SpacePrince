@@ -6,7 +6,8 @@ Consult an active draft when continuing that task; consult an archive when inves
 
 ## Active work
 
-- [Narrative encounter scenes](narrative-encounters/NARRATIVES.md) — fresh narrative generation, awaiting user review of the writing before economic composition.
+- [Narrative encounter working guide](narrative-encounters/STYLE_GUIDE.md) — the single working document for the writing method, participation directions, useful examples, and review findings; revise in place and remove when the method is incorporated into the existing references.
+- [Earlier narrative scene sketches](narrative-encounters/NARRATIVES.md) — material for possible revision, predating the current writing method; not approved encounters or workflow guidance.
 
 ## Archived experiments
 

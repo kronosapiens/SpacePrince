@@ -1,6 +1,6 @@
 # Narrative encounter scenes
 
-**Status: Draft for review of scene construction, 2026-10-08.**
+**Status: Earlier scene sketches, 2026-10-08; not approved encounters.**
 Twelve fresh situations, each expressed through two signs, for evaluating setting, mood, relationships, and room for a response.
 The prompts leave the Prince's preferred outcome open and work without an occupant or available joy.
 The sign labels name the sign in the encounter house, not a separate planetary placement.
@@ -8,7 +8,8 @@ The sign labels name the sign in the encounter house, not a separate planetary p
 Two writers generated these scenes from the current [House](../../concept/HOUSE_MATRIX.md), [Sign](../../concept/PLANET_MATRIX.md#sign-matrix), and related concept references without consulting the archived combined experiment.
 The framing follows [DRIVES.md](../../concept/DRIVES.md): possible motives and feelings belong to the Prince, while the player's interpretation and experience remain distinct.
 The scenes are original adaptations, not historical astrological claims.
-Candidate responses, mechanical effects, prices, and menu selection are deferred; the role of drives in developing those responses remains under discussion.
+These sketches contain no candidate responses or economic offers.
+Continue the authoring work in the [working guide](STYLE_GUIDE.md); this collection is material for possible revision rather than workflow guidance.
 This draft does not require reviewing or adopting the archived encounters.
 Possible later experiments are recorded under [Directions to revisit](#directions-to-revisit).
 
