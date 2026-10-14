@@ -32,6 +32,8 @@ export interface PlanetPlacement {
   dignity: Dignity;
   base: PlanetBaseStats;
   buffs: PlanetBaseStats;
+  /** The run's stat gains, set only by `runChart` (chart.ts); natal charts omit it. */
+  gains?: PlanetStats;
 }
 
 /** Per-planet mutable state. Combustion carries no flag — it is derived,
@@ -209,6 +211,9 @@ export interface Run {
   state: SideState;
   /** Cumulative Light — this run's score, its permanent record. */
   light: number;
+  /** Per-planet stat gains from narrative choices; they last the rest of the
+   *  run and reset at run start. Read through `runChart` (chart.ts). */
+  gains: Record<PlanetName, PlanetStats>;
   /** The current map only; finished maps are pushed to `events`. */
   map: MapState;
   /** Maps finished this run (0..MAPS_PER_RUN); the run ends by completion at the cap. */

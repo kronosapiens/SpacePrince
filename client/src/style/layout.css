@@ -885,6 +885,12 @@
 .ps-table col.c-base { width: 76px; }
 .ps-table col.c-place { width: 84px; }
 .ps-table col.c-total { width: 71px; }
+/* The run's gains take a fifth column from the same 330 units. */
+.ps-table.has-gains col.c-base { width: 60px; }
+.ps-table.has-gains col.c-place { width: 64px; }
+.ps-table.has-gains col.c-gains { width: 48px; }
+.ps-table.has-gains col.c-total { width: 59px; }
+.ps-table.has-gains :is(th, td) { padding-inline: 3px; }
 .ps-table thead th,
 .ps-table td.ps-rowlabel {
   white-space: nowrap;
@@ -1026,6 +1032,10 @@
   text-wrap: pretty;
 }
 .narrative-body p { margin: 0; }
+.narrative-body .narrative-occupants {
+  color: var(--mist);
+  font-size: 20px;
+}
 .narrative-house {
   font-family: var(--serif);
   font-size: 26px;

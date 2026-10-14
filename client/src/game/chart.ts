@@ -19,12 +19,34 @@ import type {
   PlanetBaseStats,
   PlanetName,
   PlanetPlacement,
+  PlanetStats,
+  Run,
   SignName,
 } from "./types";
 
 /** The chart's ruler — the planet ruling its Ascendant sign. */
 export function chartRuler(chart: Chart): PlanetName {
   return RULERSHIP[chart.ascendantSign];
+}
+
+/** The sign a house holds under whole-sign houses: house 1 is the Ascendant's sign. */
+export function houseSign(chart: Chart, house: number): SignName {
+  return SIGNS[(SIGNS.indexOf(chart.ascendantSign) + house - 1) % 12]!;
+}
+
+/** The player's chart as a run sees it: the natal placements carrying the run's
+ *  stat gains. Gains are set, never added, so a chart that already carries them
+ *  cannot count them twice. */
+export function runChart(chart: Chart, run: Pick<Run, "gains">): Chart {
+  const planets = {} as Chart["planets"];
+  for (const p of PLANETS) planets[p] = { ...chart.planets[p], gains: run.gains[p] };
+  return { ...chart, planets };
+}
+
+export function blankGains(): Record<PlanetName, PlanetStats> {
+  const out = {} as Record<PlanetName, PlanetStats>;
+  for (const p of PLANETS) out[p] = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
+  return out;
 }
 
 export function getDignity(planet: PlanetName, sign: SignName): Dignity {

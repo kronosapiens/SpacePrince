@@ -6,7 +6,8 @@ Consult an active draft when continuing that task; consult an archive when inves
 
 ## Active work
 
-- [Narrative encounter working guide](narrative-encounters/STYLE_GUIDE.md) — the single working document for the writing method, participation directions, useful examples, and review findings; revise in place and remove when the method is incorporated into the existing references.
+- [Narrative encounter working guide](narrative-encounters/STYLE_GUIDE.md) — the writing and economic method and review findings; revise in place and remove when the method is incorporated into the existing references.
+- [Narrative encounter scenes](narrative-encounters/SCENES.md) — scene briefs and worked examples for the house–sign catalogue.
 
 ## After review
 

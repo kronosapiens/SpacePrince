@@ -2,13 +2,15 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   type Dispatch,
   type ReactNode,
 } from "react";
 import { princeReducer, type PrinceAction } from "./prince-reducer";
 import { clearPrince, loadPrince, savePrince } from "./prince";
-import type { Prince, Run } from "@/game/types";
+import { runChart } from "@/game/chart";
+import type { Chart, Prince, Run } from "@/game/types";
 
 const PrinceContext = createContext<Prince | null>(null);
 const PrinceDispatchContext = createContext<Dispatch<PrinceAction> | null>(null);
@@ -48,4 +50,15 @@ export function usePrinceDispatch(): Dispatch<PrinceAction> {
 export function useActiveRun(): Run | null {
   const prince = usePrince();
   return prince?.runs.at(-1) ?? null;
+}
+
+/** The Prince's chart as the active run sees it (`runChart`), or the natal
+ *  chart before any run. Recomputed only when the run's gains change. */
+export function useRunChart(): Chart | null {
+  const prince = usePrince();
+  const gains = useActiveRun()?.gains;
+  return useMemo(
+    () => (prince && gains ? runChart(prince.chart, { gains }) : prince?.chart ?? null),
+    [prince?.chart, gains],
+  );
 }

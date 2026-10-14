@@ -224,7 +224,7 @@ A strong Mars can combust a clean Moon in one action, while a clean Saturn survi
 Content target: roughly a third to a half of narrative encounters offer an uncombust rite, alongside the boundary rolls.
 Combustion scores only under Saturn's rule (§12); under every other ruler, combusting an opponent planet is a trade: denying its swing against forfeiting the harvest banked on it.
 
-**Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet's competence in its sign is expressed narratively rather than as a stat nudge. The chart still computes each planet's dignity; combat simply does not read it.
+**Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system (`HOUSES.md`), where a planet in the encounter's house makes the terms of its choices better or worse (`ENCOUNTERS.md §4.2`). The chart still computes each planet's dignity; combat simply does not read it.
 
 ## 11. Encounter / Map / Run Flow
 

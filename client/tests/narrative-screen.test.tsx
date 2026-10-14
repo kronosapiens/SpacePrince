@@ -231,6 +231,12 @@ describe("narrative chart interaction", () => {
     expect(playUISound).toHaveBeenLastCalledWith("commit");
   });
 
+  it("names the planets in the house and shows its terms", () => {
+    mount("relationships-stranger"); // the stub's seventh house holds Capricorn, home to its Saturn
+    expect(element(".narrative-occupants").textContent).toBe("Saturn is in this house: the terms are better.");
+    expect(element('[data-guide="option-aside-1"]').textContent).toBe("Testify 48 on a chosen planet");
+  });
+
   it("commits an untargeted option on first activation and keeps its result highlighted", () => {
     const { onCommit, render } = mount("livelihood-coin");
     const aside = element('[data-guide="option-aside-1"]').textContent;

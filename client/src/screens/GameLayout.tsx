@@ -9,7 +9,7 @@ import { ROOT_NODE_ID } from "@/game/map-gen";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { randomSeed } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
-import { usePrince, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, useActiveRun, useRunChart } from "@/state/PrinceStore";
 import { loadDevSettings } from "@/state/settings";
 import { ROUTES } from "@/routes";
 import { useCasting } from "./useCasting";
@@ -28,6 +28,7 @@ export function GameLayout() {
   const { pathname } = useLocation();
   const prince = usePrince();
   const run = useActiveRun();
+  const princeChart = useRunChart();
   const isTitle = pathname === ROUTES.title;
   const isCasting = !isTitle && (!prince || !run);
   const isEncounter = !isTitle && !!run?.encounter;
@@ -44,7 +45,7 @@ export function GameLayout() {
 
   useEffect(() => { setGuideOpen(false); }, [pathname, isEncounter]);
 
-  const chart = isCasting ? casting.chart ?? sample : prince?.chart ?? sample;
+  const chart = isCasting ? casting.chart ?? sample : princeChart ?? sample;
   const unlocked = isCasting ? casting.revealedPlanets
     : prince ? unlockedPlanets(prince.numEncounters, loadDevSettings().unlockAll) : PLANETS;
   const emptyState = useMemo(blankSideState, []);

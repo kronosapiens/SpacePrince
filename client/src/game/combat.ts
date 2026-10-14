@@ -33,11 +33,12 @@ export function fortuneSixtieths(luck: number): number {
 }
 
 export function getEffectiveStatsFromPlacement(p: PlanetPlacement): PlanetStats {
+  const stat = (key: keyof PlanetStats) => Math.max(0, p.base[key] + p.buffs[key] + (p.gains?.[key] ?? 0));
   return {
-    affliction: Math.max(0, p.base.affliction + p.buffs.affliction),
-    testimony: Math.max(0, p.base.testimony + p.buffs.testimony),
-    resolve: Math.max(0, p.base.resolve + p.buffs.resolve),
-    luck: Math.max(0, p.base.luck + p.buffs.luck),
+    affliction: stat("affliction"),
+    testimony: stat("testimony"),
+    resolve: stat("resolve"),
+    luck: stat("luck"),
   };
 }
 
@@ -57,6 +58,11 @@ export const STAT_LABEL: Record<keyof PlanetStats, string> = {
   luck: "Fortune",
 };
 
+/** A stat amount in the unit its label reads: Fortune is luck in sixtieths. */
+export function displayStat(key: keyof PlanetStats, amount: number): number {
+  return key === "luck" ? amount / 2 : amount;
+}
+
 export interface StatRow {
   key: keyof PlanetStats;
   label: string;
@@ -64,6 +70,8 @@ export interface StatRow {
   core: number;
   /** Sign-derived buffs: element + modality, plus in-sect luck. */
   placement: number;
+  /** This run's gains from narrative choices. */
+  gains: number;
   total: number;
 }
 
@@ -79,21 +87,20 @@ export interface StatTable {
 
 /** The stat table behind the operational numbers (the study drop-down,
  *  spec/design/SCREENS.md §3.6.1). `placement` bundles every sign/position buff
- *  (element + modality + in-sect luck). Every column is already in the stat's
- *  display unit, so core + placement = total and each total is the headline
- *  number — the player never meets a raw stat or has to apply a transform. */
+ *  (element + modality + in-sect luck); `gains` is the run's. Every column is
+ *  already in the stat's display unit, so core + placement + gains = total and
+ *  each total is the headline number — the player never meets a raw stat or has
+ *  to apply a transform. */
 export function deriveStatTable(p: PlanetPlacement): StatTable {
   const element = ELEMENT_BUFFS[p.element];
   const modality = MODALITY_BUFFS[p.modality];
   const sectLuck = p.buffs.luck - element.luck - modality.luck;
 
   const rows = STAT_KEYS.map((key): StatRow => {
-    // Fortune is luck in sixtieths; the other stats already use display units.
-    const scale = key === "luck" ? 1 / 2 : 1;
-    const core = p.base[key] * scale;
-    const placement =
-      (element[key] + modality[key] + (key === "luck" ? sectLuck : 0)) * scale;
-    return { key, label: STAT_LABEL[key], core, placement, total: core + placement };
+    const core = displayStat(key, p.base[key]);
+    const placement = displayStat(key, element[key] + modality[key] + (key === "luck" ? sectLuck : 0));
+    const gains = displayStat(key, p.gains?.[key] ?? 0);
+    return { key, label: STAT_LABEL[key], core, placement, gains, total: core + placement + gains };
   });
 
   // The resolver's own effective stats, so the panel can't drift from combat.

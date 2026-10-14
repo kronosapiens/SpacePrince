@@ -1,4 +1,4 @@
-import { blankSideState, cloneSideState } from "./chart";
+import { blankGains, blankSideState, cloneSideState, runChart } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
 import { isCombusted, uncombust } from "./combust";
 import { applyNecessity } from "./necessity";
@@ -58,6 +58,7 @@ export function beginRun(
     seed,
     state: crossed.state,
     light: 0,
+    gains: blankGains(),
     map: { ...newMapState(mapSeed, combatRulers), boundary: crossed.boundary },
     mapsCompleted: 0,
     encounter: null,
@@ -69,11 +70,13 @@ export function beginRun(
 /** Whether a run has ended — derived, never stored (STATE.md). A run is over
  *  when the seventh map is finished (completion) or every planet the player has
  *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
- *  because combustion is itself derived — affliction against each ceiling. */
+ *  because combustion is itself derived — affliction against each ceiling,
+ *  which the run's gains raise. */
 export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
   if (run.mapsCompleted >= MAPS_PER_RUN) return true;
   const tier = unlockedPlanets(numEncounters);
-  return tier.length > 0 && tier.every((p) => isCombusted(chart.planets[p], run.state[p]));
+  const planets = runChart(chart, run).planets;
+  return tier.length > 0 && tier.every((p) => isCombusted(planets[p], run.state[p]));
 }
 
 /**
@@ -103,9 +106,9 @@ export function rollMapBoundary(
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
  *  the finished map to the event log, generates a fresh one, and passes the
- *  chart through the map boundary — uncombust rolls, then necessity,
- *  both seeded by the new map. The seventh completion ends the run: the final
- *  map stays current (not archived). */
+ *  chart, with the run's gains, through the map boundary — uncombust rolls,
+ *  then necessity, both seeded by the new map. The seventh completion ends the
+ *  run: the final map stays current (not archived). */
 export function rolloverMap(
   run: Run,
   chart: Chart,
@@ -118,7 +121,7 @@ export function rolloverMap(
   }
   const events = [...run.events, { kind: "map-completed" as const, map: run.map }];
   const crossed = rollMapBoundary(
-    chart, run.state, roster,
+    runChart(chart, run), run.state, roster,
     mulberry32(hashString(`${seed}_boundary`)),
   );
   const map: MapState = { ...newMapState(seed, roster), boundary: crossed.boundary };
