@@ -47,10 +47,11 @@ export function useStartRun() {
   );
 }
 
-/** Resolve a combat turn and dispatch the result. Records a NodeOutcome on
- *  the map when the encounter ends. The lifetime layer (`numEncounters` and
- *  any unlock ceremony) advances at encounter *clear*, not here — a planet
- *  must not unlock mid-surface (EncounterScreen). */
+/** Resolve a combat turn and dispatch the result. `playerChart` is the run's
+ *  chart (`useRunChart`). Records a NodeOutcome on the map when the encounter
+ *  ends. The lifetime layer (`numEncounters` and any unlock ceremony) advances
+ *  at encounter *clear*, not here — a planet must not unlock mid-surface
+ *  (EncounterScreen). */
 export function useCommitTurn() {
   const dispatch = usePrinceDispatch();
   return useCallback(

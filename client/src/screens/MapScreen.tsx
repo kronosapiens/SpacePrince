@@ -17,7 +17,7 @@ import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
 import { pickScenario } from "@/data/narrative-scenarios";
-import { chartRuler, seededChart } from "@/game/chart";
+import { chartRuler, houseSign, seededChart } from "@/game/chart";
 import type {
   EncounterState,
   MapState,
@@ -105,7 +105,7 @@ export function MapScreen() {
         });
       } else {
         const rng = mulberry32(hashString(`${run.id}_${content.house}_${nodeId}`));
-        const scenario = pickScenario(content.house, nextRun.seenScenarioIds ?? [], rng);
+        const scenario = pickScenario(content.house, houseSign(prince.chart, content.house), nextRun.seenScenarioIds ?? [], rng);
         encounter = beginNarrativeEncounter({
           run: nextRun,
           house: content.house,
@@ -130,8 +130,8 @@ export function MapScreen() {
     if (!run || !prince || runOver) return;
     if (run.encounter) return;
     if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
-    // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
-    // uncombust rolls, then necessity, both seeded by the new map.
+    // The chart (with the run's gains) + fielded roster cross the map boundary
+    // (MECHANICS §11.3): uncombust rolls, then necessity, both seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);
   }, [run, prince, runOver, playerUnlocked, rolloverMap]);
 

@@ -1,4 +1,4 @@
-import { seededChart } from "@/game/chart";
+import { blankGains, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
 import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
@@ -16,6 +16,7 @@ import type {
   Prince,
   Run,
   SideState,
+  SignName,
 } from "@/game/types";
 
 /**
@@ -39,6 +40,8 @@ export interface SpawnOpts {
   tier?: number;
   /** Pin a narrative house; null/undefined rolls a random one. */
   house?: number | null;
+  /** With a pinned house, re-roll the Prince until that house holds this sign. */
+  sign?: SignName;
 }
 
 const DEFAULT_TIER = 32; // Saturn unlocks at 32 → all seven planets shown.
@@ -104,13 +107,15 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
 }
 
 export function spawnNarrative(opts: SpawnOpts = {}): Prince {
-  const seed = randomSeed();
+  let seed = randomSeed();
+  while (opts.house && opts.sign && houseSign(devPlayerChart(seed), opts.house) !== opts.sign) seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const fielded = unlockedPlanets(tier);
-  const base = beginRun(devPlayerChart(seed), seed, tier);
+  const chart = devPlayerChart(seed);
+  const base = beginRun(chart, seed, tier);
   const rng = mulberry32(seed);
   const house = opts.house ?? 1 + Math.floor(rng() * 12);
-  const scenario = pickScenario(house, [], rng);
+  const scenario = pickScenario(house, houseSign(chart, house), [], rng);
   // Narrative encounters open on one decision; the house and chart vary.
   const encounter = beginNarrativeEncounter({
     run: base,
@@ -119,7 +124,7 @@ export function spawnNarrative(opts: SpawnOpts = {}): Prince {
   });
   const run: Run = {
     ...base,
-    state: livedInState(seed, "self", devPlayerChart(seed), fielded),
+    state: livedInState(seed, "self", chart, fielded),
     light: livedInLight(seed),
     encounter,
     seenScenarioIds: [scenario.scenarioId],
@@ -146,6 +151,7 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
     seed,
     state: livedInState(seed, "end", devPlayerChart(seed)),
     light,
+    gains: blankGains(),
     map: finalMap,
     mapsCompleted: MAPS_PER_RUN,
     encounter: null,

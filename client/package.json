@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sim:economy": "vite-node scripts/sim-economy.ts"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
@@ -24,6 +25,7 @@
     "jsdom": "^25.0.1",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
+    "vite-node": "3.2.4",
     "vitest": "^3.2.4"
   }
 }

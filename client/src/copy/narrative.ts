@@ -1,4 +1,5 @@
-import type { NarrativeContext, Option, Outcome, Selection, Target } from "@/game/narrative";
+import { displayStat, STAT_LABEL } from "@/game/combat";
+import { occupantLean, type NarrativeContext, type Occupant, type Option, type Outcome, type Selection, type Target } from "@/game/narrative";
 import type { Polarity } from "@/game/types";
 
 export interface EffectTextPart {
@@ -37,22 +38,38 @@ function targetName(target: Target, ctx: NarrativeContext, selection: Selection)
   }
 }
 
-function effectParts(effect: Outcome, ctx: NarrativeContext, selection: Selection): EffectTextPart[] {
-  if (effect.kind === "light") return lightParts(effect.delta);
-  const name = targetName(effect.target, ctx, selection);
+type PlanetOutcome = Exclude<Outcome, { kind: "light" }>;
+
+function planetParts(effect: PlanetOutcome, name: string, named: boolean): EffectTextPart[] {
   if (effect.kind === "uncombust") return [{ text: `call back ${name} at half Resolve` }];
-  return afflictionParts(effect.delta, name);
+  if (effect.kind === "affliction") return afflictionParts(effect.delta, name);
+  // A gain on the planet the previous effect named reads as the same planet.
+  return [{ text: `+${displayStat(effect.stat, effect.amount)} ${STAT_LABEL[effect.stat]}${named ? "" : ` on ${name}`}` }];
 }
 
-/** Authored amounts stay fixed; the chart preview shows actual changes. */
+/** Authored amounts stay fixed; the chart preview shows actual changes. A
+ *  zero affliction (an occupant's dignity can bring it there) goes unmentioned. */
 export function describeOptionParts(ctx: NarrativeContext, option: Option, selection: Selection = {}): EffectTextPart[] {
+  const planetEffects = option.result.effects.filter((e): e is PlanetOutcome =>
+    e.kind !== "light" && !(e.kind === "affliction" && e.delta === 0));
   return joinEffects([
-    ...option.result.effects.filter((e) => e.kind !== "light").map((e) => effectParts(e, ctx, selection)),
+    ...planetEffects.map((e, i) =>
+      planetParts(e, targetName(e.target, ctx, selection), planetEffects[i - 1]?.target === e.target)),
     ...(option.cost ? [lightParts(-option.cost)] : []),
-    ...option.result.effects.filter((e) => e.kind === "light").map((e) => effectParts(e, ctx, selection)),
+    ...option.result.effects.flatMap((e) => e.kind === "light" ? [lightParts(e.delta)] : []),
   ]);
 }
 
 export function describeOption(ctx: NarrativeContext, option: Option, selection: Selection = {}): string {
   return plainText(describeOptionParts(ctx, option, selection));
+}
+
+const TERMS: Record<number, string> = { 1: "better", 0: "larger", [-1]: "worse" };
+
+/** The planets in the house and how they change its terms (`withOccupants`). */
+export function occupantLine(occupants: readonly Occupant[]): string | null {
+  const names = occupants.map((o) => o.planet);
+  if (!names.length) return null;
+  const who = names.length === 1 ? `${names[0]} is` : `${names.slice(0, -1).join(", ")} and ${names.at(-1)} are`;
+  return `${who} in this house: the terms are ${TERMS[occupantLean(occupants)]}.`;
 }
