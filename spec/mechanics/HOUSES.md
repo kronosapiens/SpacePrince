@@ -109,7 +109,7 @@ Angularity and favorability remain distinct attributes of House: potency does no
 **Joy assignment:** Venus's affinity with V, for example, contributes to its pleasures regardless of occupancy.
 These affinities do not establish a single historical origin for every house topic.
 The assignment is fixed by house; an option's availability is derived from that planet's changing condition (§3.3).
-Houses without a joy still have ordinary offers and occupant approaches.
+Houses without a joy still have ordinary trades, and planets in them still change the terms.
 
 **Fixed game ruler:** this follows the game's natural-zodiac convention and supplies presentation rather than another source of the Prince's wants.
 It is distinct from the house's occupant, joy, and the traditional ruler of its natal sign, even when they name the same planet.
@@ -139,12 +139,13 @@ Use these relationships to select references and approaches; dignity is derived 
 | Relationship | Determined by | Encounter use |
 |---|---|---|
 | House and sign | Ascendant sign and encounter house | Shared situation expressed through the selected sign, including ordinary tradeoffs |
-| Planet and house | Planet's natal sign relative to the Ascendant sign | Occupant wants and special approaches from the 84 [house–planet entries](../concept/HOUSE_PLANET_MATRIX.md) |
+| Planet and house | Planet's natal sign relative to the Ascendant sign | Occupancy, which changes the terms of the house's choices; the 84 [house–planet entries](../concept/HOUSE_PLANET_MATRIX.md) supply wants for writing, including joy choices |
 | Planet and sign | Planet identity and its natal sign | Expression from the 84 [planet–sign entries](../concept/PLANET_MATRIX.md); essential dignity and resulting occupant terms |
 
 An occupant necessarily has the sign of its whole-sign house.
 Its house–planet entry develops what it wants in that situation; its planet–sign entry develops how it expresses that concern.
 The entries allow mixed motives, enjoyment, refusal, and unresolved feelings.
+Occupants are not written into scenes; scenes are written to work for any occupant.
 
 Essential dignity shapes economic terms rather than replacing the planet's concern or settling the emotional meaning of a choice.
 The treatment of each dignity and limits on bonuses live in [ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity).
@@ -174,12 +175,12 @@ For an encounter in VI with Sagittarius rising, Venus in Taurus, and Mars in Aqu
    That sign ruler does not replace Mercury's fixed presentation role.
 3. **Resolve occupants and their references.**
    Venus in Taurus occupies VI, selecting Venus–VI wants and Venus–Taurus expression.
-   Venus–Taurus also determines domicile dignity, which can improve the approach's terms.
+   Venus–Taurus also determines domicile dignity, which improves the terms of the scene's choices.
 4. **Inspect the relevant current state.**
-   Mars in Aquarius occupies III, but its condition can still enable VI's joy option.
+   Mars in Aquarius occupies III, but its condition can still enable VI's joy choice.
    Read the current resources and eligible targets for each proposed choice.
 5. **Compose and validate the offers.**
-   Apply the shared encounter rules to ordinary, occupant, and joy options using [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
+   Apply the shared encounter rules to the trades, exit, and joy choice using [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
 
 ---
 
@@ -187,7 +188,7 @@ For an encounter in VI with Sagittarius rising, Venus in Taurus, and Mars in Aqu
 
 ### 4.1 Structure
 
-Each encounter has one prompt and at most three visible options, including any exit.
+Each encounter has one prompt, two trades, and an exit, with joy and revival choices added when they apply.
 The [one-decision rules](ENCOUNTERS.md#51-one-decision) define preparation and resolution.
 
 ### 4.2 Direct effects
@@ -197,7 +198,7 @@ Targeting and commitment follow [ENCOUNTERS.md §3](ENCOUNTERS.md#3-targeting) a
 
 ### 4.3 Offered vs always-present
 
-Chart-conditioned offers replace standard counterparts under the [eligibility](ENCOUNTERS.md#43-current-predicates) and [encounter shape](ENCOUNTERS.md#5-encounter-shape) rules.
+Joy and revival choices are added to the standard ones under the [eligibility](ENCOUNTERS.md#43-current-predicates) and [encounter shape](ENCOUNTERS.md#5-encounter-shape) rules.
 
 ---
 

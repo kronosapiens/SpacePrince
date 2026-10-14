@@ -299,7 +299,7 @@ For copy revisions that preserve current mechanics:
 2. Establish it through a person, place, or object the player can picture.
 3. Map actions and immediate consequences onto the existing scenario's effects and predicates.
 4. Use [PLANET_MATRIX.md](PLANET_MATRIX.md) for the planetary voice behind a current joy or ruler option.
-   New occupant approaches draw on [HOUSE_PLANET_MATRIX.md](HOUSE_PLANET_MATRIX.md) under the encounter spec.
+   New joy choices draw on [HOUSE_PLANET_MATRIX.md](HOUSE_PLANET_MATRIX.md) under the encounter spec.
 5. Read the prompt without its house heading and check that its situation still carries the intended meaning.
 
 When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and at most three visible choices unless a separate mechanics change is agreed.

@@ -14,10 +14,11 @@ The outcome, target, and predicate tables in §2, §3, and §4.3 describe curren
 | Area | Current behavior | Intended behavior | Remaining work |
 |---|---|---|---|
 | House references | [House data](../../client/src/data/houses.ts) stores good/bad valence and compound kind labels | Use the separate attributes grouped under House in [HOUSES.md §3.1](HOUSES.md#31-fixed-references) | Align the representation during the refresh |
-| House–sign variants | Scenarios are selected by house and prior visits, without sign variation | Sign shapes ordinary scenes and offers, including in empty houses | Author and select variants; verify equivalent opportunity across Ascendant arrangements |
-| Occupants and dignity | Special choices use joy and fixed game ruler predicates, including their dignity; occupants do not select approaches | Occupants supply special approaches with dignity shaping their terms; joy options depend on the joyful planet's condition | Implement occupant approaches and terms; reconcile existing gates with the refreshed catalogue |
-| Run-long stat gains | [economy.ts](../../client/src/data/economy.ts) defines purchase amounts and prices; the resolver supports Light, affliction, and revival | Offers can include the defined run-long gains and direct exchanges | Add supported outcomes, state updates, previews, and authored offers |
-| Baseline prices | Scenarios contain earlier prices and do not use `economy.ts` | Use its agreed values as the reference for ordinary offers and authored advantages | Reprice the catalogue and validate its exchanges |
+| House–sign scenes | Selection prefers the house and the Prince's sign on it, then falls back to the house; four House IV scenes exist | Five scenes for each of the 144 house–sign pairs | Write one rising sign's 60 scenes, then the rest; retire the 24 house-only scenes and the helpers only they use |
+| Occupants and dignity | Every choice's terms follow §4.2 (`withOccupants` in [narrative.ts](../../client/src/game/narrative.ts)); the screen names the occupants | As implemented | Tune the step sizes in the balancing pass |
+| Joy choices | Joy choices are added under `joyPresent`; only a test fixture has one | One per scene in the seven joy houses | Author them with the scenes |
+| Run-long stat gains | `gain` outcomes raise a planet's stat on the run (`Run.gains`), read through `runChart` in combat, map openings, narrative, and the stat table | As implemented | None for this iteration |
+| Prices | [economy.ts](../../client/src/data/economy.ts) holds the provisional going rates; the house-only scenes keep earlier prices | Every scene priced from the going rates and its house's terms | Price new scenes as they are written |
 
 ## 1. The Complementary Loop
 
@@ -38,10 +39,12 @@ The location of affliction matters: restoring Mercury or preserving Saturn chang
 - **Press:** choose which planet absorbs an immediate affliction cost to gather Light.
 - **Tend:** spend Light for selected or distributed recovery.
 - **Revive:** spend Light to return a selected combusted planet at half its ceiling.
+- **Stat gains:** spend Light or take affliction to raise a selected planet's Resolve, Afflict, or Fortune for the rest of the run.
 
 A scene uses the families its situation supports.
 It does not need a copy of every economic option.
-Gifts can be favorable without a matching penalty; preserving the chart that reveals one is meaningful preparation.
+Each standard choice is a trade, and one choice exits.
+Free gains come only from favorable planets in the house (§4.2).
 
 ### 1.3 Run context
 
@@ -51,8 +54,8 @@ The test is whether the player can explain who needs recovery, who can carry a c
 
 ### 1.4 Valence and dignity
 
-Valence and geometry are house attributes: valence guides offers and their severity, while geometry guides agency and narrative emphasis without an additional angularity bonus.
-Planet–house placement unlocks occupant approaches; planet–sign dignity shapes their economic terms without an automatic exchange-rate multiplier.
+Valence and geometry are house attributes: valence sets the terms of a house's trades (§4.5), while geometry guides agency and narrative emphasis without an additional angularity bonus.
+Planets in the house change those terms by a fixed rule, with dignity deciding whether for better or worse (§4.2).
 Exact balance remains deferred.
 
 ## 2. Outcomes and Payment
@@ -65,6 +68,7 @@ Debts, vows with later consequences, Omen, Lore, and other persistent effects ar
 | `affliction { target, delta }` | Positive adds affliction; negative heals, clamped at zero. |
 | `uncombust { target }` | Return a combusted planet at half its ceiling, through the shared uncombust rule. |
 | `light { delta }` | Gather Light or incur an ordinary loss, clamped at zero. |
+| `gain { target, stat, amount }` | Raise a lit planet's stat for the rest of the run; a Resolve gain raises its combustion ceiling. |
 
 An option's separate `cost` is a **purchase**, paid in full before its result.
 Insufficient Light makes the entire option unavailable; incoming rewards cannot finance its price.
@@ -78,15 +82,15 @@ Positive affliction must fit within the target's remaining combustion margin; la
 ### 2.1 Exchange value
 
 Light is both a spendable currency and the common reference for valuing encounter exchanges.
-Use the agreed purchase quantities and prices in the [economy table](../../client/src/data/economy.ts) as the baseline.
+The [economy table](../../client/src/data/economy.ts) holds the going rates (§6).
+They approximate each change's simulated effect on final run Light; full balance is deferred.
 An offer can exchange burdens and benefits directly without Light changing hands.
 For example, a Prince could take affliction for a run-long stat increase, or combine a smaller Light payment with an affliction cost.
 The offer identifies which planet bears each burden and receives each benefit.
 
 Value taking affliction separately from the price of removing it; the two need not form a reversible exchange.
-Compare a direct trade, including the cost of later recovery, with buying its benefit at the ordinary Light price.
-Better terms can be an intentional placement bonus, with the advantage explicit in the authored offer.
-Eligibility and payment are separate: an occupant's special approach can still ask for Light, affliction, or both.
+In simulation, a point of affliction taken cost more final Light than a point removed gained, so taking affliction pays more per point than recovery costs.
+Value a direct trade at the going rates of its parts.
 
 Several linked costs and benefits form one choice and resolve together, with their full effects visible before commitment.
 They do not require intermediate Light transactions or additional decisions.
@@ -118,32 +122,44 @@ Early scenes must still work with only the Moon unlocked.
 
 Use the grouped references and dependencies defined in [HOUSES.md §3](HOUSES.md#3-chart-conditioning-model).
 House and sign establish the shared situation and ordinary offers, including in empty houses.
-Occupants and an available joy supply additional approaches; the occupant's planet–sign dignity shapes its terms.
+An available joy adds an authored choice; occupants change the terms of every choice by the rule in §4.2.
 Historical potency does not automatically increase rewards, and adverse house character does not require every option to be a loss.
-The shared economy and encounter limits constrain all offers; there are no cumulative modifiers for each reference attribute.
+The shared economy and encounter limits constrain all offers.
 
 ### 4.1 Planetary joys
 
 A house's fixed joy assignment identifies the planet to inspect, wherever it resides in the natal chart.
-That planet's current unlock status, affliction, and combustion determine whether the additional options are available.
+That planet's current unlock status, affliction, and combustion determine whether its choice is available.
 This gives players opportunities they can preserve, lose, and restore through their decisions during a run.
 
+Every scene in the seven houses with a joy authors one joy choice, added to the scene's other choices rather than replacing one.
+It offers better terms than the scene's trades, or an exchange they lack, in that planet's manner (§4.4).
+
 A joy is present when it is unlocked, lit, and below 96 affliction.
-At or above that threshold, or when combusted, its special approach disappears.
+At or above that threshold, or when combusted, its choice disappears.
 This threshold remains provisional.
 
 ### 4.2 Occupants and dignity
 
-Dignity derived from an occupant's planet–sign pair shapes its offer's terms, following the [natal relationships](HOUSES.md#32-natal-placements-and-relationships).
-Neutral, detriment, and fall placements should still support substantive special options.
+Occupants are the unlocked planets whose natal sign is the house's sign, whatever their current condition.
+They are not written into scenes.
+Instead they change the terms of every choice in the scene, applied in this order:
 
-Favorable dignity can provide better terms, including lower costs or greater benefits, alongside some alternative exchanges.
-These advantages are authored into individual offers rather than applied through an automatic exchange-rate multiplier.
+1. **Any occupant raises the stakes.**
+   Each affliction amount in a choice grows by 12, recovered or taken, and the choice's Light scales in the same proportion, rounded to a multiple of 12.
+   Choices with a stat gain or a revival, and choices with no affliction, are unchanged.
+2. **Dignity tilts the terms by one step.**
+   Each occupant counts +1 in domicile or exaltation and −1 in detriment or fall; only the sign of the total applies.
+   A favorable total lowers each choice's cost by one step and an unfavorable total raises it: 24 Light for a purchase or an ordinary loss, or 12 affliction taken, never below zero.
 
-Dignities are broadly distributed across charts but retain meaningful birth-cohort effects, especially through slower-moving planets.
-Keep dignity bonuses modest enough that their cumulative value does not excessively advantage particular charts or cohorts.
-Assess repeated savings and access to run-long growth as well as the value of a single offer.
-Exact amounts remain subject to encounter design and playtesting.
+A favorable planet can therefore reduce a cost to nothing, which is how a scene offers a free gain.
+An unfavorable planet makes every trade worse, with the exit as the floor.
+The encounter names its occupants and whether they make the terms larger, better, or worse.
+The [Capricorn worked example](../drafts/narrative-encounters/SCENES.md#iv--capricorn--the-sausage) shows the rule applied.
+
+Each planet has as many favorable signs as unfavorable ones, so its expected effect is zero.
+Individual charts still vary, and slower-moving planets turn that variation into birth-cohort effects.
+Keep the steps modest, and assess their cumulative value across a run as well as within one scene.
 
 ### 4.3 Current predicates
 
@@ -157,6 +173,8 @@ For these predicates, Domicile and Exaltation are the strong band.
 | `rulerStrong` | The fixed game ruler is lit, unlocked, and has strong dignity. |
 | `anyCombusted` | At least one unlocked planet is combusted. |
 
+`joyStrong` and `rulerStrong` serve only the earlier house-only scenes, which remain as a fallback until house–sign scenes replace them.
+
 Visibility is distinct from affordability.
 A chart-gated option is absent when its predicate fails.
 Revival is offered only when an unlocked planet is combusted.
@@ -166,7 +184,7 @@ An offered choice with insufficient Light or no valid targets stays visible with
 
 This economic treatment combines the house's joy assignment with that planet's benefic or malefic character.
 It is a game adaptation of the historical affinities.
-Benefic joys add help: a free restoration, a gift, or a better way through the scene.
+Benefic joys add help: cheaper recovery, a larger return, or a better way through the scene.
 Contained malefics reduce harm: Mars or Saturn can absorb a smaller, scoped cost in their own domains.
 Without containment, the ordinary choices may concentrate a larger burden or spread it across the lit chart.
 All costs remain visible and immediate.
@@ -174,12 +192,16 @@ All costs remain visible and immediate.
 ### 4.5 House–sign economic balance
 
 Narrative variation should be available throughout the chart, including empty houses.
-Where house–sign combinations change ordinary economic offers, arrange those differences in a cycle or equivalent distribution so that every chart receives equivalent aggregate economic opportunity across the encounter catalogue.
+Every chart should receive equivalent aggregate economic opportunity across the encounter catalogue.
 
-Evaluate each of the twelve Ascendant arrangements separately.
-Every chart containing each sign once does not, by itself, establish equivalence: the particular house–sign pairings also matter.
-Account for encounter frequency, prices, payment methods, benefit types, and target restrictions.
-Use the shared economy table in §2.1 as the valuation reference.
+The house, not the sign, sets the terms of its trades.
+In houses that aspect the Ascendant, each trade comes out 24 Light better than the going rate.
+In the averse houses (II, VI, VIII, and XII), trades are at the going rate and the exit may cost a little Light.
+Because every scene in a house carries the same advantage whatever its sign, each of the twelve Ascendant arrangements receives the same aggregate opportunity.
+Signs vary which exchanges a scene offers, not how much it offers.
+
+Value trades at the going rates (§6).
+Account for encounter frequency, payment methods, benefit types, and target restrictions when checking that an advantage holds.
 
 Compare the available choices as alternatives; their benefits cannot simply be added together when only one option can be taken.
 Check that nominally equivalent arrangements remain comparably useful under representative resource levels and planetary conditions.
@@ -192,19 +214,17 @@ Review the narrative before assigning prices or mechanical effects.
 
 1. **Generate and review the narrative.**
    Read the House's topics, geometry, favorability, joy affinity, and fixed game ruler together, then use Sign to shape the situation's manner and mood.
-   Use house–planet wants and planet–sign expression to develop candidate approaches, including a qualitative joy approach where appropriate.
-   Write concrete situations, competing wants, actions, and immediate fictional consequences that also work without occupants or available joy.
-   Evaluate emotional range, specificity, repetition, and whether the sign and planetary variants change how people act.
+   In a joy house, use the joyful planet's house–planet wants to develop its choice.
+   Write concrete situations, competing wants, actions, and immediate fictional consequences that work for any occupant and without an available joy.
+   Evaluate emotional range, specificity, repetition, and whether the sign changes who is present and what they want.
    Keep the Prince's motives distinct from the player's possible experience.
    Retain the scope of one immediate decision and avoid consequences requiring unsupported lasting obligations or narrative state.
-   Leave prices, stat changes, dignity advantages, exact eligibility, and replacement priorities for the economic pass; the candidates are not yet an assembled menu.
+   Leave prices, stat changes, and exact eligibility for the economic pass; the candidates are not yet an assembled menu.
 2. **Compose and review the economic offers.**
-   Assign supported costs, benefits, and targets to suitable actions, using the shared economy and explaining how each exchange follows from the fiction.
-   Derive occupant dignity and inspect the joyful planet's current condition wherever it resides to determine terms and availability.
-   House geometry has already informed the situation and ordinary offers; do not count it again as a placement bonus.
-   If one planet supplies an occupant approach and a joy option, identify each route's eligibility and advantage without automatically combining bonuses.
-   Compare replacements beside their ordinary counterparts and assemble menus within the three-choice limit across representative charts and run states.
-   Check payment, target validity, aggregate house–sign opportunity, and cumulative dignity and joy advantages.
+   Turn two participation directions into trades and one into the exit, using the going rates and the house's terms (§4.5) and explaining how each exchange follows from the fiction.
+   Add the joy choice in a joy house, and a revival choice where the house supports a return.
+   Occupant terms are computed (§4.2); check the scene still reads sensibly when a planet in the house enlarges or tilts its trades.
+   Check payment and target validity across representative charts and run states.
 3. **Review the integrated encounter.**
    Check that the displayed choices form a coherent scene and that prose, previews, costs, and immediate consequences agree.
    A fictional burden alone does not justify affliction, and a desired reward does not justify inventing a transaction that weakens the scene.
@@ -217,7 +237,7 @@ Label supported resolver effects separately from proposed effects, and keep unap
 
 To refine a reference attribute's contribution, compare alternative interpretations while holding the selected chart and other authoring choices steady.
 For example, VI is always cadent and averse; compare how different VI scenes express those attributes rather than treating them as chart variations.
-When comparing charts, use valid placements and name which linked references change: holding occupants fixed while changing their house's sign also changes their signs and may change dignity.
+When comparing charts, use valid placements and name which linked references change: holding a planet in a house while changing the house's sign also changes the planet's sign and may change its dignity.
 Changing affliction can change joy availability while leaving the natal references intact.
 If a proposed influence adds no useful distinction, simplify its use and update the relevant guidance rather than adding a token sentence or bonus.
 Keep unresolved writing questions separate from economic or implementation questions so each can be revisited on its own evidence.
@@ -226,9 +246,8 @@ Keep unresolved writing questions separate from economic or implementation quest
 
 ### 5.1 One decision
 
-Each scene has one prompt and at most three visible choices, including any exit.
-The default is two substantive offers and a way to decline.
-Chart-conditioned offers replace their standard counterparts within that limit.
+Each scene has one prompt, two trades, and an exit.
+A joy choice and a revival choice are added when they apply, so up to five choices can show.
 There are no child nodes, intermediate rewards, cash-outs, or traversal state.
 Choosing an option that needs a target and inspecting previews are preparation for the decision, with no gameplay effects.
 
@@ -247,14 +266,26 @@ Its consequence is shown before returning to the map; the lifetime encounter cou
 ### 5.3 Exits
 
 Every scene must offer a valid choice at every unlock tier and at zero Light.
-Usually this is a plain exit; a harsh house can instead impose a small ordinary Light loss, which clamps at zero.
+The exit provides it.
+It is a participation direction like the trades, usually with no effect; in an averse house it can impose a small ordinary Light loss, which clamps at zero.
 
 ## 6. Provisional Amounts
 
 Authored amounts are multiples of 12.
-Existing scenarios use affliction changes of 12–72, Light gains up to 96, and healing prices of 12–36.
-They price ordinary revival at 84 Light; a strong fixed game ruler of Home offers a 60-Light alternative.
-Revival always returns a planet at half its own ceiling.
+The [economy table](../../client/src/data/economy.ts) holds the going rates:
+
+| Exchange | Going rate |
+|---|---|
+| Recover 24 affliction | 48 Light |
+| Take 24 affliction | Pays 72 Light |
+| +12 Resolve | 60 Light |
+| +12 Afflict | 36 Light |
+| +6 Fortune | 36 Light |
+| Revive | 180 Light |
+
+Testify gains are not offered; their simulated value was near zero.
+For valuing trades, count recovery at 2 Light per point and affliction taken at 3.
+Revival returns a planet at half its own ceiling, so its flat price favors planets with high Resolve.
 
 ## 7. House Blueprints
 
@@ -278,19 +309,20 @@ Use the [house matrix](../concept/HOUSE_MATRIX.md) and §4.6 to develop revised 
 
 ## 8. Scenario Identity and Selection
 
-There are two scenarios per house.
+The catalogue target is five scenarios for each house–sign pair.
 A stable `scenarioId` is the unit of the no-repeat rule.
-Prefer unseen scenarios within the selected house; recycle when its pool is exhausted.
+Prefer unseen scenarios for the house and the Prince's sign on it; then unseen scenarios of the same house in any sign, including the earlier house-only scenes; recycle when the pool is exhausted.
 The scenario and aria fragment are chosen on entry and persist through reloads.
 The alpha schema resets old tree-based saves rather than migrating them.
 
 ## 9. Prose and Mechanical Copy
 
 - **Aria:** one fragment in the fixed game ruler's voice for the whole encounter.
-- **Prompt:** one or two concrete sentences that establish the immediate situation.
+- **Prompt:** a short scene, usually 30–50 words, that establishes the immediate situation.
 - **Option:** a short action, with no implied debt or promise that the game does not track.
-- **Aside:** shows the full authored amounts and costs; stays fixed while inspecting planets.
-- **Consequence:** one specific sentence for the immediate result.
+- **Occupants:** one line naming the planets in the house and whether they make the terms larger, better, or worse.
+- **Aside:** shows the amounts and costs after occupant terms; stays fixed while inspecting planets.
+- **Consequence:** optional; when a scene has none, the chosen option's text stands for the result.
 
 Mechanics belong in the aside, not in the scene's prose.
 Planet previews and read-only effect amounts show the actual changes from the shared resolver, including recovery clamped to current affliction.
@@ -300,13 +332,15 @@ Player-facing text uses encounter, self, and other; named Light and Resolve foll
 
 Every authored scene must remain playable across all unlock tiers and representative clean, afflicted, and partially combusted charts.
 Preview and commit must agree for every valid target.
-Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, repeated resolution, and save resets.
+Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, stat gains, occupant terms, repeated resolution, and save resets.
+A catalogue test checks every house–sign scene for a choice valid at zero Light with only the Moon unlocked, and for amounts on the 12-lattice.
 Playtests compare choices across chart conditions and upcoming rulers.
-Catalogue reviews check baseline economic equivalence across the twelve Ascendant arrangements and cumulative advantages from dignity and joy options, including dignity's birth-cohort effects, as described in §4.
+Catalogue reviews check that each house's trades hold its advantage (§4.5) and the cumulative effect of occupant terms and joy choices, including dignity's birth-cohort effects.
 Editorial reviews use the scenario rationale in §4.6 to check that historical claims, original interpretations, eligibility, and economic advantages remain distinguishable.
 
 ## 11. Deferred Decisions
 
 Wagers, deliberate sacrifice, transfers, persistent effects, multi-stage scenes, and final balance remain deferred.
-The precise house–sign economic cycle and numerical limits on dignity bonuses remain to be designed and tested.
-No additional run currency or lasting narrative state is introduced by this version.
+The going rates and the size of occupant steps await the full balancing pass ([issue #12](https://github.com/kronosapiens/SpacePrince/issues/12)).
+Authored special choices for planets in the house were set aside for computed terms; [issue #10](https://github.com/kronosapiens/SpacePrince/issues/10) records the alternatives.
+Run-long stat gains are the only lasting state this version adds; there is no additional run currency or lasting narrative state.
