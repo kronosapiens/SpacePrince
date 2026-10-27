@@ -50,14 +50,10 @@ export interface NarrativeContext {
   occupants: Occupant[];
 }
 
-export function buildNarrativeContext(input: {
-  prince: Prince;
-  run: Run;
-  house: number;
-  unlocked: PlanetName[];
-}): NarrativeContext {
-  const { prince, run, house, unlocked } = input;
+/** The house and the run chart determine available joys, occupants, and targets. */
+export function narrativeContext(prince: Prince, run: Run, house: number, devUnlockAll = false): NarrativeContext {
   const { joy, ruler } = HOUSES[house - 1]!;
+  const unlocked = unlockedPlanets(prince.numEncounters, devUnlockAll);
   const placements = runChart(prince.chart, run).planets;
   const sign = houseSign(prince.chart, house);
   return {
@@ -159,39 +155,23 @@ export function availableSelections(run: Run, ctx: NarrativeContext, option: Opt
 }
 
 const DIGNITY_STEP: Record<Dignity, number> = { Domicile: 1, Exaltation: 1, Neutral: 0, Detriment: -1, Fall: -1 };
-const nearest12 = (n: number) => Math.sign(n) * Math.round(Math.abs(n) / 12) * 12;
 
 /** The occupants' net dignity, as one step: 1 favourable, -1 unfavourable, 0 neither. */
 export function occupantLean(occupants: readonly Occupant[]): number {
   return Math.sign(occupants.reduce((sum, o) => sum + DIGNITY_STEP[o.dignity], 0));
 }
 
-/**
- * Planets in the house change the terms of each option there; nothing about
- * this is authored. Presence: every affliction effect grows by 12, and the
- * option's Light (price and Light effects) scales by its first affliction
- * effect's ratio — except options that buy a stat gain or a revival. Dignity:
- * the occupants' net dignity moves the option's cost side one step, down when
- * favourable and up when not — its price (24), else the affliction it makes a
- * planet take (12), else an ordinary Light loss (24), each floored at zero.
- */
+/** The occupants' net dignity moves an existing cost by one step: a Light
+ *  price (24), else affliction taken (12), else an ordinary Light loss (24).
+ *  Costs stop at zero; gifts and neutral occupants leave terms unchanged. */
 export function withOccupants(option: Option, occupants: readonly Occupant[]): Option {
-  if (!occupants.length) return option;
+  const lean = occupantLean(occupants);
+  if (!lean) return option;
   let cost = option.cost;
   let effects = option.result.effects;
-  const first = Math.abs(effects.find((e) => e.kind === "affliction")?.delta ?? 0);
-  if (first && !effects.some((e) => e.kind === "gain" || e.kind === "uncombust")) {
-    const scale = (n: number) => nearest12(n * (first + 12) / first);
-    cost = cost && scale(cost);
-    effects = effects.map((e) =>
-      e.kind === "affliction" ? { ...e, delta: e.delta + Math.sign(e.delta) * 12 }
-      : e.kind === "light" ? { ...e, delta: scale(e.delta) }
-      : e);
-  }
-  const lean = occupantLean(occupants);
-  if (lean && cost) {
+  if (cost) {
     cost = Math.max(0, cost - lean * 24);
-  } else if (lean) {
+  } else {
     const taken = effects.findIndex((e) => e.kind === "affliction" && e.delta > 0);
     const side = taken >= 0 ? taken : effects.findIndex((e) => e.kind === "light" && e.delta < 0);
     effects = effects.map((e, i) =>
@@ -211,6 +191,11 @@ export function offeredOptions(scenario: NarrativeScenario, ctx: NarrativeContex
     .map((o) => withOccupants(o, ctx.occupants));
 }
 
+/** Offered choices and the selections that can carry them, shared by UI and evaluation. */
+export function visibleOptions(run: Run, ctx: NarrativeContext, scenario: NarrativeScenario): { option: Option; selections: Selection[] }[] {
+  return offeredOptions(scenario, ctx).map((option) => ({ option, selections: availableSelections(run, ctx, option) }));
+}
+
 /** Validate the live encounter and authored choice before applying its result. */
 export function resolveNarrative(
   run: Run, prince: Prince, scenario: NarrativeScenario, optionId: string,
@@ -218,7 +203,7 @@ export function resolveNarrative(
 ): Run | null {
   const encounter = run.encounter;
   if (encounter?.kind !== "narrative" || encounter.resolved || encounter.scenarioId !== scenario.scenarioId || encounter.house !== scenario.house) return null;
-  const ctx = buildNarrativeContext({ prince, run, house: encounter.house, unlocked: unlockedPlanets(prince.numEncounters, devUnlockAll) });
+  const ctx = narrativeContext(prince, run, encounter.house, devUnlockAll);
   const option = offeredOptions(scenario, ctx).find((o) => o.id === optionId);
   if (!option) return null;
   const preview = previewOption(run, ctx, option, selection);

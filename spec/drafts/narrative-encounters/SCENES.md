@@ -3,12 +3,13 @@
 Scene briefs and worked examples for the house–sign catalogue.
 The method lives in the [working guide](STYLE_GUIDE.md); playable scenes live in [narrative-scenarios.ts](../../../client/src/data/narrative-scenarios.ts).
 
-Each brief gives who is there, which side of the sign drives the scene, its register, and its two trades.
+Each brief gives who is there, which side of the sign drives the scene, its register, and its economic choices.
 Gains are measured against the exit at the going rates in [ENCOUNTERS.md §6](../../mechanics/ENCOUNTERS.md#6-provisional-amounts): recovery at 2 Light per point, affliction taken at 3.
 
 ## House IV worked examples
 
-House IV aspects the Ascendant, so each trade comes out 24 Light better than the going rate.
+House IV aspects the Ascendant, so its offers generally favor the Prince.
+The gains below use provisional reference rates; the scenes deliberately offer different values and do not establish balance across signs.
 It has no joy.
 Every scene adds a revival choice for 180 Light when a planet is combusted.
 
@@ -54,9 +55,9 @@ An earlier direction, promising your mother your own share in March, was dropped
 | In the Fourth | Cook | Salt | Revive |
 | --- | --- | --- | --- |
 | Empty | Pay 24, recover 24 (+24) | Take 12, +12 Resolve (+24) | 180 |
-| Mercury, neutral | Pay 36, recover 36 (+36) | Take 12, +12 Resolve (+24) | 180 |
-| Saturn, domicile | Pay 12, recover 36 (+60) | +12 Resolve, free (+60) | 156 |
-| Moon, detriment | Pay 60, recover 36 (+12) | Take 24, +12 Resolve (−12) | 204 |
+| Mercury, neutral | Pay 24, recover 24 (+24) | Take 12, +12 Resolve (+24) | 180 |
+| Saturn, domicile | Recover 24, free (+48) | +12 Resolve, free (+60) | 156 |
+| Moon, detriment | Pay 48, recover 24 (0) | Take 24, +12 Resolve (−12) | 204 |
 | Saturn and Moon | As Mercury | As Mercury | 180 |
 
 ### IV / Leo — the harvest wrestle
@@ -76,7 +77,7 @@ An earlier direction, promising your mother your own share in March, was dropped
 | Wrestle, and let him win. | Exit | 0 |
 | *If a planet is combusted:* Save a place at the harvest table for the one who's been away. | Pay 180 Light: revive a chosen planet | |
 
-The Afflict trade comes out even rather than 24 ahead, because stat gains move in steps of 12.
+The Afflict trade comes out even at the provisional rates.
 An early risk was drift toward House V's games; the father's injury and title keep it a household matter.
 
 ### IV / Pisces — the flood
@@ -90,11 +91,11 @@ An early risk was drift toward House V's games; the father's injury and title ke
 | Choice | Effect | Gain |
 | --- | --- | --- |
 | Give them your bed. | Take 12 affliction on a chosen planet: +6 Fortune on it | 0 |
-| Offer the barn loft instead. | Pay 48 Light: recover 12 on every lit planet | −24 to +48 |
+| Offer the barn loft instead. | Pay 48 Light: recover 12 on every lit planet | −24 to +120 |
 | Tell your aunt the house is full. | Exit | 0 |
 | *If a planet is combusted:* Make room for one more. | Pay 180 Light: revive a chosen planet | |
 
-The loft's gain depends on how many planets are lit: −24 with one, +48 with four.
+The loft's gain depends on how many planets are lit: −24 with one, +48 with four, and +120 with seven, assuming each receives the full recovery.
 
 ## In development
 

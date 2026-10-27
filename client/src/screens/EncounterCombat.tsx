@@ -6,7 +6,7 @@ import { PlanetBands } from "@/components/PlanetBands";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { hashString, mulberry32 } from "@/game/rng";
-import { resolveTurn } from "@/game/turn";
+import { combatTurnRng, resolveTurn, type TurnResult } from "@/game/turn";
 import { isOver } from "@/game/run";
 import { runChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";
@@ -37,23 +37,13 @@ import type {
   TurnLogEntry,
 } from "@/game/types";
 
-/** Outcome of a committed combat turn — feeds the animation playback. */
-export interface CommitTurnResult {
-  log: TurnLogEntry;
-  nextRun: Run;
-  encounter: CombatEncounter;
-  encounterEnded: boolean;
-  runEnded: boolean;
-}
-
 interface CombatScreenProps {
   run: Run;
   prince: Prince;
   encounter: CombatEncounter;
-  /** Resolves a turn; returns null if the click was rejected (e.g. encounter
-   *  resolved). Persistence + lifetime-bump + outcome construction happen
-   *  inside the implementation (real or dev). */
-  onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => CommitTurnResult | null;
+  /** Resolves and persists a turn; returns null if the click was rejected
+   *  (e.g. encounter resolved). */
+  onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => TurnResult | null;
   /** Clear `run.encounter` and return to the map. */
   onClearEncounter: () => void;
   devUnlockAll: boolean;
@@ -356,11 +346,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     (planet: PlanetName, action: Polarity) => {
       if (guideOpen || opening.active || animation || encounter.resolved || !opponentTurn) return;
       if (isCombusted(playerChart.planets[planet], run.state[planet])) return;
-      // Deterministic per (run, encounter, turn) — same seed produces the
-      // same fight every time, which is the point of `/encounter/<seed>`.
-      const rng = mulberry32(
-        (run.seed ^ encounter.turnIndex ^ hashString(encounter.id)) >>> 0,
-      );
+      const rng = combatTurnRng(run, encounter);
       const previousRun = run;
       const previousEncounter = encounter;
       // Snapshot the projection for the *chosen* action so the badges shown

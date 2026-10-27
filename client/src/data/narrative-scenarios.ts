@@ -12,7 +12,7 @@ const revive = (target: Target): Outcome => ({ kind: "uncombust", target });
 const choice = (id: string, text: string, consequence: string, effects: Outcome[], extra: Partial<Pick<Option, "cost" | "visibleIf">> = {}): Option =>
   ({ id, text, result: { text: consequence, effects }, ...extra });
 
-// House-and-sign scenes: two trades and a walk-away, plus a joy choice where
+// House-and-sign scenes: offers and a way through, plus a joy choice where
 // the house has a joy and a revival choice while a planet is dark. The option's
 // own text records the outcome; planets in the house adjust the terms.
 const trade = (id: string, text: string, effects: Outcome[], extra: Pick<Option, "cost"> = {}): Option =>
@@ -346,14 +346,18 @@ export function getScenario(scenarioId: string): NarrativeScenario {
   return scenario;
 }
 
-/** Unseen scenes of the house's sign first, then unseen scenes of the house in
- *  any sign (house-only scenes included); once all are seen, the same order again. */
+/** Unseen matching scenes, then unseen house-only scenes. Repeats stay within
+ *  the matching sign, or house-only scenes when that sign has none yet. */
 export function pickScenario(house: number, sign: SignName, seenScenarioIds: readonly string[], rng: () => number): NarrativeScenario {
   const all = SCENARIOS_BY_HOUSE[house] ?? [];
-  if (!all.length) throw new Error(`No scenarios for house ${house}`);
-  const fresh = all.filter((s) => !seenScenarioIds.includes(s.scenarioId));
-  const candidates = fresh.length ? fresh : all;
-  const signed = candidates.filter((s) => s.sign === sign);
-  const pool = signed.length ? signed : candidates;
-  return pool[Math.floor(rng() * pool.length)] ?? pool[0]!;
+  const matching = all.filter((s) => s.sign === sign);
+  const fallback = all.filter((s) => !s.sign);
+  const pool = [
+    matching.filter((s) => !seenScenarioIds.includes(s.scenarioId)),
+    fallback.filter((s) => !seenScenarioIds.includes(s.scenarioId)),
+    matching,
+    fallback,
+  ].find((scenes) => scenes.length);
+  if (!pool) throw new Error(`No scenarios for house ${house} in ${sign}`);
+  return pool[Math.floor(rng() * pool.length)]!;
 }

@@ -8,9 +8,9 @@ import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { unlockedPlanets } from "@/game/unlocks";
-import { availableSelections, buildNarrativeContext, joyPresent, offeredOptions, previewOption, resolveNarrative, requiresPlanet, type Selection } from "@/game/narrative";
+import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
 import { describeOptionParts, occupantLine } from "@/copy/narrative";
-import { newlyCombusted } from "@/game/combust";
+import { combustionCeiling, newlyCombusted } from "@/game/combust";
 import { runChart } from "@/game/chart";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -76,8 +76,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   // The run's chart: the wheel, its stats and ceilings read the run's gains.
   const chart = useMemo(() => runChart(prince.chart, run), [prince.chart, run.gains]);
   const ctx = useMemo(
-    () => buildNarrativeContext({ prince, run, house: encounter.house, unlocked: playerUnlocked }),
-    [prince, run, encounter.house, playerUnlocked],
+    () => narrativeContext(prince, run, encounter.house, devUnlockAll),
+    [prince, run, encounter.house, devUnlockAll],
   );
 
   const resolved = encounter.resolved;
@@ -96,17 +96,15 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     light: number;
   } | null>(null);
   const committedRef = useRef(false);
-  const options = useMemo(() => offeredOptions(scenario, ctx), [scenario, ctx]);
   const occupants = occupantLine(ctx.occupants);
-  const rows = useMemo(() => options.map((option) => {
-    const assignments = availableSelections(run, ctx, option);
+  const rows = useMemo(() => visibleOptions(run, ctx, scenario).map(({ option, selections: assignments }) => {
     const preview = previewOption(run, ctx, option);
     return {
       option, assignments,
       aside: describeOptionParts(ctx, option),
       reason: !assignments.length ? (preview.ok || run.light >= (option.cost ?? 0) ? "No eligible planets can carry this choice." : preview.reason) : null,
     };
-  }), [options, run, ctx]);
+  }), [scenario, run, ctx]);
   const [frozenRows, setFrozenRows] = useState<typeof rows | null>(null);
   const shownRows = resolved ? frozenRows ?? rows : rows;
   const selectedRow = rows.find((row) => row.option.id === selectedOptionId);
@@ -151,9 +149,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   }, [resolved, resetChoice]);
   const projection: ProjectionChips = { deltas: {} };
   if (!resolved && preview?.ok) {
+    const afterChart = runChart(prince.chart, preview.success);
     for (const p of playerUnlocked) {
-      const delta = preview.success.state[p].affliction - run.state[p].affliction;
-      if (delta) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony" };
+      const affliction = preview.success.state[p].affliction;
+      const delta = affliction - run.state[p].affliction;
+      const ceiling = combustionCeiling(afterChart.planets[p]);
+      const resolve = ceiling !== combustionCeiling(chart.planets[p]) ? { ceiling, affliction } : undefined;
+      if (delta || resolve) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony", resolve };
     }
   }
 

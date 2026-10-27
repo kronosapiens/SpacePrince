@@ -64,7 +64,7 @@ export function describeOption(ctx: NarrativeContext, option: Option, selection:
   return plainText(describeOptionParts(ctx, option, selection));
 }
 
-const TERMS: Record<number, string> = { 1: "better", 0: "larger", [-1]: "worse" };
+const TERMS: Record<number, string> = { 1: "better", 0: "unchanged", [-1]: "worse" };
 
 /** The planets in the house and how they change its terms (`withOccupants`). */
 export function occupantLine(occupants: readonly Occupant[]): string | null {

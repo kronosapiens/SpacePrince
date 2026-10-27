@@ -1,7 +1,7 @@
 # Working guide for narrative encounters
 
 **Status: method for the house–sign catalogue, 2026-10-13.**
-The working unit is a short scene for one house and sign, with two trades and an exit.
+The working unit is a short scene for one house and sign, with a small set of choices.
 The catalogue target is five scenes for each of the 144 house–sign pairs; the first pass is the 60 scenes one rising sign meets.
 
 Keep the evolving workflow and review findings together here, revising them in place.
@@ -66,12 +66,15 @@ Once the scene and participation are convincing, turn the participation into cho
 A developed option is **choice narration and economic effect**; there is no separate outcome narration.
 Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md) and the provisional rates in [economy.ts](../../../client/src/data/economy.ts).
 
-- **Two trades and an exit.**
-  Each trade gives something for something: Light for recovery, affliction for Light, affliction or Light for a run-long stat gain.
-  The exit is one more participation direction with no effect, or a small Light loss in an averse house.
-  Often it is the comfortable or the decent course, so declining both trades remains a real choice.
-- **The house sets the terms.**
-  In houses that aspect the Ascendant, each trade comes out 24 Light better than the going rate; in II, VI, VIII, and XII, trades are at the going rate and the exit may cost a little Light.
+- **Compose a small set of choices.**
+  Trades exchange Light, affliction, recovery, or run-long stat gains.
+  Gifts and mutually exclusive benefits need no matching payment: choosing one can mean forgoing another.
+  Include a valid way through at zero Light and every unlock tier, usually an exit or an available gift.
+  An exit may cost a little Light in an averse house; declining an offer can be the comfortable or decent course.
+- **The house guides the terms.**
+  Houses that aspect the Ascendant generally offer more favorable opportunities; II, VI, VIII, and XII can offer harsher terms.
+  Use the provisional rates as a reference and compare opportunities across the house–sign pool and representative run states.
+  Do not require the same surplus from every choice.
   Value recovery at 2 Light per point and affliction taken at 3, as in [ENCOUNTERS.md §6](../../mechanics/ENCOUNTERS.md#6-provisional-amounts).
 - **The fiction justifies each exchange.**
   Revise the fiction if it does not support the proposed exchange.
@@ -84,7 +87,7 @@ Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md)
   Add a revival choice where the house supports a return; every House IV scene has one.
   It costs the flat revival price and appears only when a planet is combusted.
 - **Planets in the house are not written.**
-  Their effect on the terms is computed under [ENCOUNTERS.md §4.2](../../mechanics/ENCOUNTERS.md#42-occupants-and-dignity); write scenes that work for any occupant.
+  Their effect on existing costs is computed under [ENCOUNTERS.md §4.2](../../mechanics/ENCOUNTERS.md#42-occupants-and-dignity); write scenes that work for any occupant.
 
 Options may deliberately offer unequal economic value when the difference gives the player a meaningful reason to sacrifice an advantage.
 The morally troubling choice may be the economically strongest one, as when letting Mara's correction pass buys a cheap supper.
@@ -93,7 +96,7 @@ Avoid automatically compensating that refusal with another reward, or making eve
 
 ## Plan variety with briefs
 
-Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its two trades.
+Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its economic choices.
 Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
 Five scenes in one house–sign pair should differ in people and register.
 

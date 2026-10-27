@@ -35,6 +35,8 @@ interface PlanetStatsPanelProps {
   actions?: PlanetStatsActions;
   /** Actual narrative effect, computed by the encounter's resolver. */
   effect?: { verb: Polarity; value: number };
+  /** Final values for a pending narrative Resolve change. */
+  resolvePreview?: { ceiling: number; affliction: number };
   /** Study mode on — the card drops open to the gloss + stat table. */
   study?: boolean;
   /** When provided, the panel shows the study "i" toggle. */
@@ -79,6 +81,7 @@ export function PlanetStatsPanel({
   height,
   actions,
   effect,
+  resolvePreview,
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
@@ -165,6 +168,7 @@ export function PlanetStatsPanel({
               <span className="ps-ratio">
                 <span className="ps-ratio-label">Resolve</span>
                 {Math.max(0, table.resolve - affliction)}/{table.resolve}
+                {resolvePreview && <span className="ps-ratio-preview">→ {Math.max(0, resolvePreview.ceiling - resolvePreview.affliction)}/{resolvePreview.ceiling}</span>}
               </span>
             </div>
           </div>

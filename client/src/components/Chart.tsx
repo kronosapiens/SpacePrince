@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
-import { combustionCeiling, isCombusted, wouldCombust } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
@@ -120,6 +120,8 @@ interface PlanetStatus {
 export interface ProjectionChip {
   delta: number;
   polarity: Polarity;
+  /** Narrative Resolve changes carry the resolver's final ceiling and affliction. */
+  resolve?: { ceiling: number; affliction: number };
 }
 
 export interface ProjectionChips {
@@ -561,6 +563,7 @@ export function Chart(props: ChartProps) {
           height={panelHeight}
           actions={statsPanelActions}
           effect={statsPanelEffect}
+          resolvePreview={projection?.deltas[statsPanelPlanet]?.resolve}
           study={statsPanelStudy}
           onToggleStudy={onToggleStudy}
         />
@@ -832,7 +835,7 @@ function PlanetArc({
   const degreesPerPoint = CHART_STYLE.afflictionArc.degreesPerPoint;
   // Remaining Resolve sets the angular distance back from the combustion anchor.
   const at = (a: number) =>
-    AFFLICTION_ARC_ANCHOR_DEG - (ceiling - clamp(a, 0, ceiling)) * degreesPerPoint;
+    AFFLICTION_ARC_ANCHOR_DEG - (ceiling - a) * degreesPerPoint;
   const spent = clamp(affliction, 0, ceiling);
 
   // The projected span runs between the current boundary and where the blow
@@ -858,14 +861,19 @@ function PlanetArc({
   } else if (projection) {
     const harm = projection.polarity !== "Testimony";
     const signed = harm ? Math.abs(projection.delta) : -Math.abs(projection.delta);
-    const projected = clamp(spent + signed, 0, ceiling);
+    const finalCeiling = projection.resolve?.ceiling ?? ceiling;
+    const finalAffliction = projection.resolve?.affliction ?? clamp(spent + signed, 0, ceiling);
+    // Express the final remaining capacity against the current ceiling so
+    // the same arc can show both affliction and Resolve changing together.
+    const projected = ceiling - Math.max(0, finalCeiling - finalAffliction);
     if (projected !== spent) {
-      const fatal = harm && wouldCombust(placement, { affliction }, Math.abs(projection.delta));
+      const losingCapacity = projected > spent;
+      const fatal = losingCapacity && finalAffliction >= finalCeiling;
       diff = {
         from: Math.min(spent, projected),
         to: Math.max(spent, projected),
         color: fatal ? COMBUST_WARNING
-          : harm ? VALENCE_COLOR.Affliction
+          : losingCapacity ? VALENCE_COLOR.Affliction
           : VALENCE_COLOR.Testimony,
       };
     }
@@ -875,7 +883,7 @@ function PlanetArc({
     <g data-guide={guideId} transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
       {/* The whole ceiling, faint. What shows through is the affliction already
           spent, and the full extent is the planet's Resolve. */}
-      <ArcStroke r={r} from={at(0)} to={at(ceiling)}
+      <ArcStroke r={r} from={at(ceiling - Math.max(ceiling, projection?.resolve?.ceiling ?? ceiling))} to={at(ceiling)}
         stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
       {spent < ceiling && (
         <ArcStroke r={r} from={at(spent)} to={at(ceiling)}

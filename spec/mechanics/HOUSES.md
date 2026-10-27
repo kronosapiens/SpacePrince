@@ -188,7 +188,8 @@ For an encounter in VI with Sagittarius rising, Venus in Taurus, and Mars in Aqu
 
 ### 4.1 Structure
 
-Each encounter has one prompt, two trades, and an exit, with joy and revival choices added when they apply.
+Each encounter has one prompt and a small set of offers, including trades or choices among benefits, with joy and revival choices added when they apply.
+Every scene provides a valid way through at every unlock tier and at zero Light.
 The [one-decision rules](ENCOUNTERS.md#51-one-decision) define preparation and resolution.
 
 ### 4.2 Direct effects

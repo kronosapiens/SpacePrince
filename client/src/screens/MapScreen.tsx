@@ -6,7 +6,7 @@ import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { playUISound, setTheme } from "@/audio/engine";
-import { isOver, MAPS_PER_RUN } from "@/game/run";
+import { enterNode, isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
 import { useRolloverMap, useStartRun } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -14,16 +14,9 @@ import { mulberry32, hashString } from "@/game/rng";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { HOUSES } from "@/data/houses";
-import { pickScenario } from "@/data/narrative-scenarios";
-import { chartRuler, houseSign, seededChart } from "@/game/chart";
-import type {
-  EncounterState,
-  MapState,
-  PlanetName,
-  Run,
-} from "@/game/types";
+import { chartRuler, seededChart } from "@/game/chart";
+import type { MapState, PlanetName, Run } from "@/game/types";
 
 export function MapScreen() {
   const prince = usePrince();
@@ -61,15 +54,14 @@ export function MapScreen() {
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
       if (!run || !prince || runOver || openingActive) return;
-      let nextRun: Run = { ...run };
+      let nextRun: Run = run;
       // Content is pre-rolled at map creation; the dev force cheats re-roll
       // the node here so "the next node you enter" is the forced kind. The
       // !content fallback covers persisted maps that predate eager rolling.
       const forced = settings.forceCombat || !!settings.forceNarrativeHouse;
-      let content = nextRun.map.rolledNodes[nodeId];
-      if (!content || forced) {
+      if (!nextRun.map.rolledNodes[nodeId] || forced) {
         const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
-        content = rollNodeContent({
+        const content = rollNodeContent({
           rng,
           forceNarrativeHouse: settings.forceNarrativeHouse,
           forceCombat: settings.forceCombat,
@@ -83,40 +75,13 @@ export function MapScreen() {
           },
         };
       }
-
-      nextRun = {
-        ...nextRun,
-        map: {
-          ...nextRun.map,
-          currentNodeId: nodeId,
-          visitedNodeIds: nextRun.map.visitedNodeIds.includes(nodeId)
-            ? nextRun.map.visitedNodeIds
-            : [...nextRun.map.visitedNodeIds, nodeId],
-        },
-      };
-
-      let encounter: EncounterState;
-      if (content.kind === "combat") {
-        encounter = beginCombatEncounter({
-          run: nextRun,
-          opponentSeed: content.opponentSeed,
-          lifetimeEncounterCount: prince.numEncounters,
-          devUnlockAll: settings.unlockAll,
-        });
-      } else {
-        const rng = mulberry32(hashString(`${run.id}_${content.house}_${nodeId}`));
-        const scenario = pickScenario(content.house, houseSign(prince.chart, content.house), nextRun.seenScenarioIds ?? [], rng);
-        encounter = beginNarrativeEncounter({
-          run: nextRun,
-          house: content.house,
-          scenarioId: scenario.scenarioId,
-        });
-        nextRun = {
-          ...nextRun,
-          seenScenarioIds: [...(nextRun.seenScenarioIds ?? []), scenario.scenarioId],
-        };
-      }
-      nextRun = { ...nextRun, encounter };
+      nextRun = enterNode({
+        run: nextRun,
+        chart: prince.chart,
+        nodeId,
+        lifetimeEncounterCount: prince.numEncounters,
+        devUnlockAll: settings.unlockAll,
+      });
       // Commit the pre-encounter run mutations (rolledNodes, visitedNodeIds,
       // currentNodeId, the new encounter) to the tail run. PlaySurface sees the
       // encounter and renders it — no navigation needed.
@@ -127,13 +92,11 @@ export function MapScreen() {
   );
 
   useEffect(() => {
-    if (!run || !prince || runOver) return;
-    if (run.encounter) return;
-    if (run.map.currentNodeId !== TERMINAL_NODE_ID) return;
-    // The chart (with the run's gains) + fielded roster cross the map boundary
-    // (MECHANICS §11.3): uncombust rolls, then necessity, both seeded by the new map.
+    if (!run || !prince || !shouldRolloverMap(run, prince.chart, prince.numEncounters)) return;
+    // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
+    // uncombust rolls, then necessity, both seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);
-  }, [run, prince, runOver, playerUnlocked, rolloverMap]);
+  }, [run, prince, playerUnlocked, rolloverMap]);
 
   if (!prince || !run) return null;
 

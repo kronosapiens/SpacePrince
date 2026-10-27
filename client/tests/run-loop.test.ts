@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { beginRun, isOver, newMapState, rolloverMap, MAPS_PER_RUN } from "@/game/run";
-import { chartRuler, seededChart } from "@/game/chart";
+import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
+import { chartRuler, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
-import { resolveTurn } from "@/game/turn";
+import { combatTurnRng, resolveTurn } from "@/game/turn";
 import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
-import { mulberry32 } from "@/game/rng";
+import { hashString, mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { rollNodeContent } from "@/game/map-content";
-import { eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
+import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
-import type { Run, PlanetName } from "@/game/types";
+import { pickScenario } from "@/data/narrative-scenarios";
+import type { CombatEncounter, NarrativeEncounter, NodeContent, Run, PlanetName } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 describe("Run loop integration", () => {
@@ -174,5 +175,100 @@ describe("Run loop integration", () => {
       dead.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
     }
     expect(isOver(dead, prince.chart, prince.numEncounters)).toBe(true);
+  });
+});
+
+describe("Shared run transitions", () => {
+  const prince = createStubPrince();
+  const run = beginRun(prince.chart, 42, prince.numEncounters);
+  const nodeOf = (kind: NodeContent["kind"]) =>
+    Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === kind)!;
+  const enter = (r: Run, nodeId: string, encounterIdSeed?: number) =>
+    enterNode({ run: r, chart: prince.chart, nodeId, lifetimeEncounterCount: prince.numEncounters, encounterIdSeed });
+
+  it("entering a node marks it visited and opens its encounter from the live seeds", () => {
+    const combatId = nodeOf("combat");
+    const { opponentSeed } = run.map.rolledNodes[combatId] as { opponentSeed: number };
+    const combat = enter(run, combatId);
+    expect(combat.map.currentNodeId).toBe(combatId);
+    expect(combat.map.visitedNodeIds).toEqual([...run.map.visitedNodeIds, combatId]);
+    expect(combat.encounter).toEqual(
+      beginCombatEncounter({ run, opponentSeed, lifetimeEncounterCount: prince.numEncounters }),
+    );
+
+    // Check every narrative node of a few runs against its actual house sign.
+    for (const r of [42, 43, 44].map((seed) => beginRun(prince.chart, seed, prince.numEncounters))) {
+      for (const [nodeId, content] of Object.entries(r.map.rolledNodes)) {
+        if (content.kind !== "narrative") continue;
+        const { house } = content;
+        const { scenarioId } = pickScenario(house, houseSign(prince.chart, house), [], mulberry32(hashString(`${r.id}_${house}_${nodeId}`)));
+        const narrative = enter(r, nodeId);
+        expect(narrative.encounter).toMatchObject({ kind: "narrative", house, scenarioId });
+        expect(narrative.seenScenarioIds).toEqual([scenarioId]);
+        // Once seen, another matching or house-only scene is available.
+        expect(enter({ ...r, seenScenarioIds: [scenarioId] }, nodeId).encounter).not.toMatchObject({ scenarioId });
+      }
+    }
+  });
+
+  it("an encounterIdSeed resamples arrival draws from what the map shows, never the live seeds", () => {
+    const before = structuredClone(run);
+    // Same map, different live seeds: a forecast must not tell the runs apart.
+    const other: Run = { ...run, id: "run_other", seed: run.seed + 1 };
+    const combatId = nodeOf("combat");
+    const live = enter(run, combatId).encounter as CombatEncounter;
+    const forecast = enter(run, combatId, 7).encounter as CombatEncounter;
+    expect(forecast.opponentChart).toEqual(live.opponentChart);
+    expect(forecast.necessity).not.toEqual(live.necessity);
+    expect({ ...enter(other, combatId, 7).encounter, id: forecast.id }).toEqual(forecast);
+
+    const narrativeId = nodeOf("narrative");
+    const scenarios = (r: Run) => [0, 1, 2, 3, 4, 5, 6, 7].map(
+      (seed) => (enter(r, narrativeId, seed).encounter as NarrativeEncounter).scenarioId,
+    );
+    expect(new Set(scenarios(run)).size).toBeGreaterThan(1);
+    expect(scenarios(other)).toEqual(scenarios(run));
+    expect(run).toEqual(before);
+  });
+
+  it("a combat ends on its last turn, or on the turn its run ends, and records its outcome on the map", () => {
+    const entered = enter({ ...run, mapsCompleted: 1 }, nodeOf("combat"));
+    const turn = (r: Run) =>
+      resolveTurn(r, prince.chart, "Moon", "Testimony", combatTurnRng(r, r.encounter as CombatEncounter))!;
+    const first = turn(entered);
+    expect(first.encounterEnded).toBe(false);
+    expect(first.run.map.outcomes).toEqual({});
+    const last = turn(first.run);
+    expect(last.encounterEnded).toBe(true);
+    expect(last.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({
+      kind: "combat",
+      summary: `Encounter · ${last.encounter.opponentChart.name}`,
+    });
+
+    // Every planet but the Moon is out, and the first blow takes the Moon too.
+    const enc = entered.encounter as CombatEncounter;
+    const nearlySpent: Run = {
+      ...entered,
+      state: Object.fromEntries(PLANETS.map((p) => [p, {
+        ...entered.state[p],
+        affliction: combustionCeiling(prince.chart.planets[p]) - (p === "Moon" ? 1 : 0),
+      }])) as Run["state"],
+      encounter: { ...enc, opponentActions: enc.opponentActions.map((a, i) => (i === 0 ? "Affliction" : a)) },
+    };
+    const fatal = turn(nearlySpent);
+    expect(fatal.runEnded).toBe(true);
+    expect(fatal.encounter).toMatchObject({ turnIndex: 1, resolved: true });
+    expect(fatal.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({ kind: "combat", combusts: ["Moon"] });
+  });
+
+  it("rolls over only from the cleared terminal node, and full combustion ends the run first", () => {
+    const atExit: Run = { ...run, map: { ...run.map, currentNodeId: TERMINAL_NODE_ID } };
+    const spent: Run = { ...atExit, state: { ...atExit.state } };
+    for (const p of PLANETS) spent.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
+    const rolls = (r: Run) => shouldRolloverMap(r, prince.chart, prince.numEncounters);
+    expect(rolls(run)).toBe(false);
+    expect(rolls(enter(run, TERMINAL_NODE_ID))).toBe(false);
+    expect(rolls(atExit)).toBe(true);
+    expect(rolls(spent)).toBe(false);
   });
 });

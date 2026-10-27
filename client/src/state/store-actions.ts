@@ -1,28 +1,10 @@
 import { useCallback } from "react";
 import { usePrince, usePrinceDispatch } from "./PrinceStore";
-import { resolveTurn } from "@/game/turn";
+import { resolveTurn, type TurnResult } from "@/game/turn";
 import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
 import { randomSeed } from "@/game/rng";
-import { newlyCombusted } from "@/game/combust";
 import { loadDevSettings } from "./settings";
-import type {
-  Chart,
-  CombatEncounter,
-  NodeOutcome,
-  PlanetName,
-  Polarity,
-  Run,
-  TurnLogEntry,
-} from "@/game/types";
-
-/** Shape returned by `useCommitTurn` — feeds the combat animation. */
-export interface CommitTurnResult {
-  log: TurnLogEntry;
-  nextRun: Run;
-  encounter: CombatEncounter;
-  encounterEnded: boolean;
-  runEnded: boolean;
-}
+import type { Chart, PlanetName, Polarity, Run } from "@/game/types";
 
 /**
  * Cross-cutting thunk hooks. These wrap impure work (RNG, time, computed
@@ -47,11 +29,10 @@ export function useStartRun() {
   );
 }
 
-/** Resolve a combat turn and dispatch the result. `playerChart` is the run's
- *  chart (`useRunChart`). Records a NodeOutcome on the map when the encounter
- *  ends. The lifetime layer (`numEncounters` and any unlock ceremony) advances
- *  at encounter *clear*, not here — a planet must not unlock mid-surface
- *  (EncounterScreen). */
+/** Resolve a combat turn and dispatch the result (`resolveTurn` records the
+ *  NodeOutcome on the map when the encounter ends). The lifetime layer
+ *  (`numEncounters` and any unlock ceremony) advances at encounter *clear*,
+ *  not here — a planet must not unlock mid-surface (EncounterScreen). */
 export function useCommitTurn() {
   const dispatch = usePrinceDispatch();
   return useCallback(
@@ -61,35 +42,11 @@ export function useCommitTurn() {
       planet: PlanetName,
       valence: Polarity,
       rng: () => number,
-    ): CommitTurnResult | null => {
+    ): TurnResult | null => {
       const result = resolveTurn(run, playerChart, planet, valence, rng);
       if (!result) return null;
-      let nextRun = result.run;
-      if (result.encounterEnded && result.encounter.kind === "combat") {
-        const combusts = newlyCombusted(playerChart, run.state, nextRun.state);
-        const outcome: NodeOutcome = {
-          nodeId: nextRun.map.currentNodeId,
-          kind: "combat",
-          summary: `Encounter · ${result.encounter.opponentChart.name}`,
-          lightDelta: nextRun.light - run.light,
-          combusts,
-        };
-        nextRun = {
-          ...nextRun,
-          map: {
-            ...nextRun.map,
-            outcomes: { ...nextRun.map.outcomes, [outcome.nodeId]: outcome },
-          },
-        };
-      }
-      dispatch({ kind: "commitRun", run: nextRun });
-      return {
-        log: result.log,
-        nextRun,
-        encounter: result.encounter,
-        encounterEnded: result.encounterEnded,
-        runEnded: result.runEnded,
-      };
+      dispatch({ kind: "commitRun", run: result.run });
+      return result;
     },
     [dispatch],
   );

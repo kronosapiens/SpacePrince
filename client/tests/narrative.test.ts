@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getScenario, NARRATIVE_SCENARIOS, pickScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
 import {
-  anyCombusted, applyOutcomes, availableSelections, buildNarrativeContext, joyPresent, joyStrong, offeredOptions,
+  anyCombusted, applyOutcomes, availableSelections, narrativeContext, joyPresent, joyStrong, offeredOptions,
   previewOption, resolveNarrative, resolveTargets, rulerStrong, requiresPlanet, withOccupants,
   type NarrativeScenario, type Occupant, type Outcome,
 } from "@/game/narrative";
@@ -22,7 +22,7 @@ function setup(id = "self-still-water", numEncounters = 64) {
   const scenario = getScenario(id);
   const run = { ...beginRun(prince.chart, 42, numEncounters), light: 120 };
   run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
-  const context = () => buildNarrativeContext({ prince, run, house: scenario.house, unlocked: unlockedPlanets(numEncounters) });
+  const context = () => narrativeContext(prince, run, scenario.house);
   const option = (optionId: string) => scenario.options.find((o) => o.id === optionId)!;
   const darken = (p: typeof PLANETS[number]) => { run.state[p].affliction = combustionCeiling(prince.chart.planets[p]); };
   return { prince, run, scenario, context, option, darken };
@@ -264,10 +264,9 @@ const A = (delta: number, target: "chosen" | "allUnlocked" = "chosen"): Outcome 
 const RESOLVE: Outcome = { kind: "gain", target: "chosen", stat: "resolve", amount: 12 };
 
 describe("house-and-sign scenes", () => {
-  it.each(SIGNED)("$scenarioId offers trades and a walk-away, adds joy and revival only under their predicates, and always leaves a choice", (scene) => {
+  it.each(SIGNED)("$scenarioId offers a small menu, gates joy and revival, and always leaves a choice", (scene) => {
     const standard = scene.options.filter((o) => !o.visibleIf);
-    expect(standard).toHaveLength(3);
-    expect(standard.some((o) => !o.cost && o.result.effects.every((e) => e.kind === "light" && e.delta < 0))).toBe(true);
+    expect(standard.length).toBeGreaterThan(0);
     for (const o of scene.options) {
       if (o.visibleIf === anyCombusted) {
         expect(o).toMatchObject({ cost: NARRATIVE_ECONOMY.revive.cost, result: { effects: [{ kind: "uncombust", target: "chosen" }] } });
@@ -282,7 +281,7 @@ describe("house-and-sign scenes", () => {
       if (condition === "partly combusted") roster.slice(1).forEach(darken);
       const ctx = context();
       const offered = offeredOptions(scene, ctx);
-      expect(offered).toHaveLength(3 + Number(joyPresent(ctx)) + Number(anyCombusted(ctx)));
+      expect(offered.length).toBeLessThanOrEqual(5);
       expect(offered.some((o) => availableSelections(run, ctx, o).length), `${count}/${condition}`).toBe(true);
     }
   });
@@ -296,7 +295,7 @@ describe("house-and-sign scenes", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, 64);
     const offered = (count: number) =>
-      offeredOptions(scene, buildNarrativeContext({ prince, run, house: 1, unlocked: unlockedPlanets(count) })).map((o) => o.id);
+      offeredOptions(scene, narrativeContext({ ...prince, numEncounters: count }, run, 1)).map((o) => o.id);
     expect(offered(0)).not.toContain("joy");
     run.state.Mercury.affliction = 0;
     expect(offered(64)).toContain("joy");
@@ -304,14 +303,19 @@ describe("house-and-sign scenes", () => {
     expect(offered(64)).not.toContain("joy");
   });
 
-  it("selects by house and sign, then by house, then recycles in the same order", () => {
+  it("uses matching signs and house-only fallbacks across repeat visits", () => {
     const house = SCENARIOS_BY_HOUSE[4]!;
     const capricorn = getScenario("home-capricorn-salting");
     expect(pickScenario(4, "Capricorn", [], mulberry32(1))).toBe(capricorn);
     const fallback = new Set(Array.from({ length: 40 }, (_, seed) => pickScenario(4, "Capricorn", [capricorn.scenarioId], mulberry32(seed))));
     expect([...fallback].sort((a, b) => a.scenarioId.localeCompare(b.scenarioId)))
-      .toEqual(house.filter((s) => s !== capricorn).sort((a, b) => a.scenarioId.localeCompare(b.scenarioId)));
-    expect(pickScenario(4, "Capricorn", house.map((s) => s.scenarioId), mulberry32(1))).toBe(capricorn);
+      .toEqual(house.filter((s) => !s.sign).sort((a, b) => a.scenarioId.localeCompare(b.scenarioId)));
+    const seen = [capricorn.scenarioId, ...house.filter((s) => !s.sign).map((s) => s.scenarioId)];
+    expect(pickScenario(4, "Capricorn", seen, mulberry32(1))).toBe(capricorn);
+    for (const seed of [0, 1, 2, 3]) {
+      expect(pickScenario(4, "Aries", [], mulberry32(seed)).sign).toBeUndefined();
+      expect(pickScenario(4, "Aries", seen, mulberry32(seed)).sign).toBeUndefined();
+    }
   });
 
   const terms = (occupants: Occupant[]) => Object.fromEntries(getScenario("home-capricorn-salting").options
@@ -322,10 +326,10 @@ describe("house-and-sign scenes", () => {
   const moon: Occupant = { planet: "Moon", dignity: "Detriment" };
   it.each([
     { occupants: [], cook: [24, -24], salt: 12, revive: 180 },
-    { occupants: [mercury], cook: [36, -36], salt: 12, revive: 180 },
-    { occupants: [saturn], cook: [12, -36], salt: 0, revive: 156 },
-    { occupants: [moon], cook: [60, -36], salt: 24, revive: 204 },
-    { occupants: [saturn, moon], cook: [36, -36], salt: 12, revive: 180 },
+    { occupants: [mercury], cook: [24, -24], salt: 12, revive: 180 },
+    { occupants: [saturn], cook: [0, -24], salt: 0, revive: 156 },
+    { occupants: [moon], cook: [48, -24], salt: 24, revive: 204 },
+    { occupants: [saturn, moon], cook: [24, -24], salt: 12, revive: 180 },
   ])("planets in the house set the Capricorn terms: $occupants.length occupant(s)", ({ occupants, cook, salt, revive }) => {
     const t = terms(occupants);
     expect(t.cook).toEqual({ cost: cook[0], effects: [A(cook[1]!)] });
@@ -334,12 +338,14 @@ describe("house-and-sign scenes", () => {
     expect(t.hang).toEqual({ cost: 0, effects: [] });
   });
 
-  it("scales Light with presence, steps losses with dignity, and leaves gains alone", () => {
+  it("changes only existing costs and leaves gifts unchanged", () => {
     const leo = getScenario("home-leo-harvest").options.find((o) => o.id === "place")!;
-    expect(withOccupants(leo, [mercury]).result.effects).toEqual([A(48), { kind: "light", delta: 180 }]);
-    expect(withOccupants(leo, [saturn]).result.effects).toEqual([A(36), { kind: "light", delta: 180 }]);
+    expect(withOccupants(leo, [mercury])).toEqual(leo);
+    expect(withOccupants(leo, [saturn]).result.effects).toEqual([A(24), { kind: "light", delta: 132 }]);
     const loft = getScenario("home-pisces-flood").options.find((o) => o.id === "loft")!;
-    expect(withOccupants(loft, [mercury])).toMatchObject({ cost: 96, result: { effects: [A(-24, "allUnlocked")] } });
+    expect(withOccupants(loft, [mercury])).toEqual(loft);
+    const gift = { id: "gift", text: "Rest.", result: { effects: [A(-24), RESOLVE] } };
+    for (const occupant of [mercury, saturn, moon]) expect(withOccupants(gift, [occupant])).toEqual(gift);
     const walk = { id: "walk", text: "Walk on.", result: { effects: [{ kind: "light", delta: -12 } as Outcome] } };
     expect(withOccupants(walk, [saturn]).result.effects).toEqual([{ kind: "light", delta: 0 }]);
     expect(withOccupants(walk, [moon]).result.effects).toEqual([{ kind: "light", delta: -36 }]);
@@ -354,10 +360,10 @@ describe("house-and-sign scenes", () => {
     expect(occupantLine(context().occupants)).toBe("Saturn is in this house: the terms are better.");
     expect(describeOption(context(), offeredOptions(scenario, context()).find((o) => o.id === "salt")!)).toBe("+12 Resolve on a chosen planet");
     const next = resolveNarrative(run, prince, scenario, "cook", { chosen: "Moon" })!;
-    expect(next.light).toBe(run.light - 12);
-    expect(next.state.Moon.affliction).toBe(0);
+    expect(next.light).toBe(run.light);
+    expect(next.state.Moon.affliction).toBe(12);
     Object.assign(prince.chart.planets.Moon, { sign: "Capricorn", dignity: "Detriment" });
-    expect(occupantLine(context().occupants)).toBe("Moon and Saturn are in this house: the terms are larger.");
+    expect(occupantLine(context().occupants)).toBe("Moon and Saturn are in this house: the terms are unchanged.");
   });
 
   it("applies a stat gain after the effects before it, against the ceiling they left", () => {
