@@ -17,9 +17,7 @@ export interface RunSummary {
   terminalMap: number;
   terminalNodeId: string;
   terminalKind: "combat" | "narrative";
-  terminalHouse: number | null;
   terminalScenarioId: string | null;
-  terminalOpponentSeed: number | null;
   terminalRuler: PlanetName | null;
   /** The final turn's planet and verb, or the narrative option and its chosen planet. */
   lastPlanet: PlanetName | null;
@@ -152,9 +150,7 @@ function summarize(steps: Step[], run: Run, unresolvedCombat: boolean): RunSumma
     terminalMap: last.map,
     terminalNodeId: last.nodeId,
     terminalKind: last.encounter,
-    terminalHouse: last.encounter === "narrative" ? last.house : null,
     terminalScenarioId: last.encounter === "narrative" ? last.scenarioId : null,
-    terminalOpponentSeed: last.encounter === "combat" ? last.opponentSeed : null,
     terminalRuler: last.encounter === "combat" ? last.ruler : null,
     lastPlanet: final.kind === "turn" ? final.planet : final.chosen,
     lastVerb: final.kind === "turn" ? final.verb : null,

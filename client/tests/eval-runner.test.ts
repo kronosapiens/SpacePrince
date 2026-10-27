@@ -100,8 +100,6 @@ describe("seeded runner", () => {
     // The summary alone names the encounter and the choice the run ended on.
     const entered = record.steps[entry]!;
     if (entered.kind !== "enter" || entered.encounter !== "combat" || last.kind !== "turn") throw new Error("Expected a combat ending");
-    expect(record.summary).toMatchObject({
-      terminalOpponentSeed: entered.opponentSeed, terminalRuler: entered.ruler, lastPlanet: last.planet, lastVerb: last.verb,
-    });
+    expect(record.summary).toMatchObject({ terminalRuler: entered.ruler, lastPlanet: last.planet, lastVerb: last.verb });
   });
 });
