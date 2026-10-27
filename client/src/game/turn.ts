@@ -1,13 +1,14 @@
 import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects, propagatedMagnitude } from "./aspects";
-import { combustionCeiling, isCombusted } from "./combust";
+import { combustionCeiling, isCombusted, newlyCombusted } from "./combust";
 import { cloneSideState } from "./chart";
 import { encounterRuler } from "./encounter";
 import { turnLight } from "./score";
-import { pickWeighted } from "./rng";
+import { hashString, mulberry32, pickWeighted } from "./rng";
 import type {
   Chart,
   CombatEncounter,
+  NodeOutcome,
   PlanetName,
   PlanetPlacement,
   PlanetStats,
@@ -21,12 +22,18 @@ import type {
 
 const ZERO_STATS = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
 
-interface TurnResult {
+export interface TurnResult {
   run: Run;
   encounter: CombatEncounter;
   log: TurnLogEntry;
   encounterEnded: boolean;
   runEnded: boolean;
+}
+
+/** The live turn's draws — deterministic per (run, encounter, turn), so the
+ *  same seed replays the same fight. */
+export function combatTurnRng(run: Run, encounter: CombatEncounter): () => number {
+  return mulberry32((run.seed ^ encounter.turnIndex ^ hashString(encounter.id)) >>> 0);
 }
 
 /**
@@ -151,6 +158,18 @@ export function resolveTurn(
     light: run.light + log.lightGain,
     encounter: updatedEnc,
   };
+  // An ended encounter leaves its outcome on the map, as `resolveNarrative` does.
+  if (encounterEnded) {
+    const nodeId = run.map.currentNodeId;
+    const outcome: NodeOutcome = {
+      nodeId,
+      kind: "combat",
+      summary: `Encounter · ${enc.opponentChart.name}`,
+      lightDelta: log.lightGain,
+      combusts: newlyCombusted(playerChart, run.state, playerStateMap),
+    };
+    updatedRun.map = { ...run.map, outcomes: { ...run.map.outcomes, [nodeId]: outcome } };
+  }
 
   return { run: updatedRun, encounter: updatedEnc, log, encounterEnded, runEnded };
 }
