@@ -2,7 +2,7 @@
 
 **Status: method for the house–sign catalogue, 2026-10-13.**
 The working unit is a short scene for one house and sign, with a small set of choices.
-The catalogue target is five scenes for each of the 144 house–sign pairs; the first pass is the 60 scenes one rising sign meets.
+The initial catalogue target is 720 scenes: five for each of the 144 house–sign pairs.
 
 Keep the evolving workflow and review findings together here, revising them in place.
 Scene content — briefs and worked examples — lives in [SCENES.md](SCENES.md).
@@ -38,7 +38,7 @@ Use them as a source of situations, not as a checklist.
 ## Characters
 
 Names are for flavor.
-Each scene's relationships stand alone: a Prince meets about 60 scenes, and they need not agree on who his mother or brother is.
+Each scene's relationships stand alone: a Prince's rising sign selects a pool of 60 scenes, and they need not agree on who his mother or brother is.
 Write so a scene does not depend on the Prince having exactly one of anyone.
 
 ## Voice and length
@@ -71,6 +71,11 @@ Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md)
   Gifts and mutually exclusive benefits need no matching payment: choosing one can mean forgoing another.
   Include a valid way through at zero Light and every unlock tier, usually an exit or an available gift.
   An exit may cost a little Light in an averse house; declining an offer can be the comfortable or decent course.
+- **Vary the decision.**
+  Use the [choice structures in ENCOUNTERS.md §1.2](../../mechanics/ENCOUNTERS.md#12-choice-families): choose a benefit, commitment size, payment, or concentrated versus distributed effects.
+  Their example amounts are provisional; let the situation justify the offers.
+  Compare recovery with Resolve's immediate capacity, group effects with actual lit recipients, and costs after occupant terms.
+  Keep the whole visible menu within five choices, including joy and revival, and use at most one independently chosen planet per option.
 - **The house guides the terms.**
   Houses that aspect the Ascendant generally offer more favorable opportunities; II, VI, VIII, and XII can offer harsher terms.
   Use the provisional rates as a reference and compare opportunities across the house–sign pool and representative run states.
@@ -83,6 +88,7 @@ Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md)
 - **Joy houses add a joy choice.**
   In the seven houses with a joy, each scene also writes one choice for its joyful planet, shown when that planet is present under [ENCOUNTERS.md §4.1](../../mechanics/ENCOUNTERS.md#41-planetary-joys).
   It offers better terms than the scene's trades, or an exchange they lack, in that planet's manner.
+  It can change the action, benefit, or recipients as well as the price.
 - **Revival where a return fits.**
   Add a revival choice where the house supports a return; every House IV scene has one.
   It costs the flat revival price and appears only when a planet is combusted.
@@ -98,7 +104,8 @@ Avoid automatically compensating that refusal with another reward, or making eve
 
 Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its economic choices.
 Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
-Five scenes in one house–sign pair should differ in people and register.
+Five scenes in one house–sign pair should differ in people, register, and economic decisions.
+Mix the choice structures where the fiction supports them; there is no requirement to assign one scene to each structure.
 
 ## Review through comparisons
 
@@ -126,7 +133,9 @@ The comparisons so far produced these findings:
 | A mother gives the Prince a key while his brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
 | House IV under Libra, Capricorn, Leo, and Pisces | “Each of these scenes has something to draw the reader in.” | The sign can carry the situation; proceed to house–sign scenes. |
 
-## Next: one rising sign
+## Next: the initial catalogue
 
-Write the 60 scenes one rising sign meets: briefs first, reviewed down each house and across each sign, then scenes and trades, then a playtest with a Prince of that rising.
-The remaining 660 scenes follow in a second pass.
+Generate five scenes for every house–sign pair, retaining the four existing House IV scenes within their respective pools.
+Work in batches: briefs first, then scenes and offers, then editorial review and resolver validation before integration.
+Review across batches for repeated situations and economic menus, and playtest several rising signs so coverage is not judged from one Prince alone.
+The first pass supplies the full catalogue for the demo; balance and writing continue to improve through playtesting.

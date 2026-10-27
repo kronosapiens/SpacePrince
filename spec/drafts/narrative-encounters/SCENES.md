@@ -4,7 +4,8 @@ Scene briefs and worked examples for the house–sign catalogue.
 The method lives in the [working guide](STYLE_GUIDE.md); playable scenes live in [narrative-scenarios.ts](../../../client/src/data/narrative-scenarios.ts).
 
 Each brief gives who is there, which side of the sign drives the scene, its register, and its economic choices.
-Gains are measured against the exit at the going rates in [ENCOUNTERS.md §6](../../mechanics/ENCOUNTERS.md#6-provisional-amounts): recovery at 2 Light per point, affliction taken at 3.
+The worked examples below measure gains against their exits at the going rates in [ENCOUNTERS.md §6](../../mechanics/ENCOUNTERS.md#6-provisional-amounts): recovery at 2 Light per point, affliction taken at 3.
+New briefs can also use the [expanded choice structures](../../mechanics/ENCOUNTERS.md#12-choice-families), including gifts whose tradeoff is the benefit forgone.
 
 ## House IV worked examples
 

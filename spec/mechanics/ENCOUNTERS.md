@@ -14,7 +14,7 @@ The outcome, target, and predicate tables in §2, §3, and §4.3 describe curren
 | Area | Current behavior | Intended behavior | Remaining work |
 |---|---|---|---|
 | House references | [House data](../../client/src/data/houses.ts) stores good/bad valence and compound kind labels | Use the separate attributes grouped under House in [HOUSES.md §3.1](HOUSES.md#31-fixed-references) | Align the representation during the refresh |
-| House–sign scenes | Selection prefers the house and the Prince's sign on it, then house-only scenes; four House IV scenes exist | Five scenes for each of the 144 house–sign pairs | Write one rising sign's 60 scenes, then the rest; retain house-only fallbacks until every playable sign has coverage |
+| House–sign scenes | Selection prefers the house and the Prince's sign on it, then house-only scenes; four House IV scenes exist | Five scenes for each of the 144 house–sign pairs | Generate an initial 720-scene catalogue in reviewed batches; retain house-only fallbacks until every playable sign has coverage |
 | Occupants and dignity | Existing costs follow §4.2 (`withOccupants` in [narrative.ts](../../client/src/game/narrative.ts)); the screen names the occupants | As implemented | Tune the step sizes in the balancing pass |
 | Joy choices | Joy choices are added under `joyPresent`; only a test fixture has one | One per scene in the seven joy houses | Author them with the scenes |
 | Run-long stat gains | `gain` outcomes raise a planet's stat on the run (`Run.gains`), read through `runChart` in combat, map openings, narrative, and the stat table | As implemented | None for this iteration |
@@ -37,15 +37,37 @@ The location of affliction matters: restoring Mercury or preserving Saturn chang
 ### 1.2 Choice families
 
 - **Press:** choose which planet absorbs an immediate affliction cost to gather Light.
-- **Tend:** spend Light for selected or distributed recovery.
+- **Tend:** selected or distributed recovery, as a gift or in exchange for a cost.
 - **Revive:** spend Light to return a selected combusted planet at half its ceiling.
-- **Stat gains:** spend Light or take affliction to raise a selected planet's Resolve, Afflict, or Fortune for the rest of the run.
+- **Stat gains:** raise a selected planet's Resolve, Afflict, or Fortune for the rest of the run, as a gift or in exchange for a cost.
 
 A scene uses the families its situation supports.
 It does not need a copy of every economic option.
 Offers may be trades, gifts, or mutually exclusive benefits.
 Forgoing another benefit can supply the tradeoff without a matching cost.
 Each scene includes a valid way through at every unlock tier and at zero Light (§5.3).
+
+The same outcomes support several structures for a decision:
+
+| Structure | Example offers | Research |
+|---|---|---|
+| Choose a benefit | Recover 24 on one planet, gain 12 Resolve on one planet, or gather 48 Light | [The Library](../research/STS.md#the-library), [Big Fish](../research/STS.md#big-fish) |
+| Choose commitment size | Gather 12 Light freely, take 12 affliction for 60 Light, or take 24 affliction for 96 Light | [Sensory Stone](../research/STS.md#sensory-stone) |
+| Choose payment | Gain 12 Afflict on a chosen planet by paying 36 Light or taking 12 affliction on that planet | [Vampires](../research/STS.md#vampires) |
+| Concentrate or spread | Recover 36 on one planet or 12 on each lit planet | [Ancient Writing](../research/STS.md#ancient-writing), which contrasts a focused change with a broad improvement |
+
+These are provisional examples using the existing outcomes and a single decision.
+Vary their amounts and combinations to fit the scene; they imply no fixed surplus or equivalence between offers.
+A modest free option can make a commitment menu useful to a badly afflicted chart, while a larger reward gives healthier charts a reason to participate further.
+Alternate payments are separate options for the same benefit, so the player can preserve whichever resource matters more now.
+
+Compare recovery with Resolve using remaining capacity: gaining Resolve also gives immediate room for affliction.
+With a ceiling of 60 and 24 affliction, recovering 24 leaves 60 capacity; gaining 12 Resolve leaves 48.
+For group effects, count the lit recipients and actual recovery after clamping to each planet's affliction.
+The value of spreading an effect changes with unlocks and the distribution of damage.
+For a positive affliction cost targeting `allUnlocked`, dignity adjusts the per-planet amount, so the total adjustment scales with the number of lit recipients.
+Apply occupant terms before comparing offers: favorable dignity makes the example's middle commitment free, while unfavorable dignity raises its affliction cost to 24.
+An option can become preferable on a particular chart without making it preferable throughout the catalogue.
 
 ### 1.3 Run context
 
@@ -116,6 +138,8 @@ Authored effects then apply in order to a copy of that state.
 An unavailable themed target never silently drops its cost or redirects it to someone else.
 
 Selected targets are the usual grammar for individual harm and recovery.
+An option accepts one player-chosen planet; every `chosen` effect in it uses that same selection.
+Other effects may use the fixed or automatic targets above, but two independently chosen planets would require a later interaction change.
 Automatic roles remain available where the situation calls for them.
 Early scenes must still work with only the Moon unlocked.
 
@@ -135,6 +159,8 @@ This gives players opportunities they can preserve, lose, and restore through th
 
 Every scene in the seven houses with a joy authors one joy choice, added to the scene's other choices rather than replacing one.
 It offers better terms than the scene's trades, or an exchange they lack, in that planet's manner (§4.4).
+The joy can change the action, benefit, or recipients: Jupiter might organize shared recovery where the ordinary offers provide individual support.
+The [FTL research station example](../research/FTL.md#engi-research-station) illustrates a capability changing how a problem can be approached; Space Prince expresses that through immediate, determined effects.
 
 A joy is present when it is unlocked, lit, and below 96 affliction.
 At or above that threshold, or when combusted, its choice disappears.
