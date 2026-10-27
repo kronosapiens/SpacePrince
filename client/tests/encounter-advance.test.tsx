@@ -203,16 +203,16 @@ describe("encounter advancement", () => {
   it("preserves narrative auto-advance through the same exit path", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
-    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: "livelihood-coin" });
+    run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: "home-libra-mara" });
     prince.runs = [run];
     mount(prince);
-    click(get('[data-guide="option-1"]'));
+    click(get('[data-guide="option-3"]'));
     expect(container.querySelector(".narrative.is-resolved")).not.toBeNull();
     advanceTime(1799);
     expect(container.querySelector('[data-screen="map"]')).toBeNull();
     advanceTime(1);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
-    expect(loadPrince()!.runs[0]!.light).toBe(12);
+    expect(loadPrince()!.runs[0]!.light).toBe(0);
     expect(loadPrince()!.numEncounters).toBe(65);
   });
 });

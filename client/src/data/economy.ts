@@ -1,5 +1,5 @@
 /**
- * Provisional narrative exchange rates for one planet; scenario integration is pending.
+ * Provisional narrative exchange rates for one planet.
  * Values approximate each change's simulated effect on final run Light; full balance is deferred.
  * Press pays Light for taking affliction; recovery removes it; stat gains last for the rest of the run.
  * Fortune uses displayed units: 6 Fortune corresponds to 12 underlying Luck.

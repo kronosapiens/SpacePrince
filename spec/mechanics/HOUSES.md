@@ -113,7 +113,7 @@ Houses without a joy still have ordinary trades, and planets in them still chang
 
 **Fixed game ruler:** this follows the game's natural-zodiac convention and supplies presentation rather than another source of the Prince's wants.
 It is distinct from the house's occupant, joy, and the traditional ruler of its natal sign, even when they name the same planet.
-The code identifiers `ruler` and `rulerStrong` refer to this fixed game ruler; their use is documented in [ENCOUNTERS.md §3–4.3](ENCOUNTERS.md#3-targeting).
+The code target `ruler` refers to this fixed game ruler; its use is documented in [ENCOUNTERS.md §3](ENCOUNTERS.md#3-targeting).
 
 #### Sign
 
@@ -224,4 +224,4 @@ Use those entries for the shared context of all seven planetary placements in a 
 | XI · Friendship | Allies, shared hopes, and assistance | [Friendship](../concept/HOUSE_MATRIX.md#xi--friendship) |
 | XII · The Hidden | Seclusion, confinement, and what others cannot see | [The Hidden](../concept/HOUSE_MATRIX.md#xii--the-hidden) |
 
-Existing mechanical blueprints and their implementation context live in [ENCOUNTERS.md §7](ENCOUNTERS.md#7-house-blueprints) and its [status table](ENCOUNTERS.md#implementation-status).
+Current scene briefs and runtime modules are linked from [ENCOUNTERS.md §7](ENCOUNTERS.md#7-house-briefs); its [status table](ENCOUNTERS.md#implementation-status) records the implementation context.

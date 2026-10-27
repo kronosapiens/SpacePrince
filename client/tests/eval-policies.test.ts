@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import * as catalogue from "@/data/narrative-scenarios";
 import { combatActions, narrativeOptions, snapshot, type Policy, type PlayContext } from "@/eval/play";
 import { forecast, lightPolicy, survivalPolicy } from "@/eval/policies";
-import { getScenario } from "@/data/narrative-scenarios";
+import { A, L, scene as defineScene, trade } from "@/data/narrative/shared";
+import { getScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
@@ -18,6 +20,7 @@ const context = (prince: Prince, policy: Policy): PlayContext => ({
 });
 
 describe("strategic policies", () => {
+  afterEach(() => vi.restoreAllMocks());
   const prince = createStubPrince();
   // Three candidates of both kinds, on a map whose combats run three turns.
   const run: Run = { ...beginRun(prince.chart, 2, prince.numEncounters), mapsCompleted: 2 };
@@ -61,10 +64,14 @@ describe("strategic policies", () => {
 
   it("ranks narrative choices by each strategy's criteria", () => {
     const chooser = createStubPrince({ seed: 3 });
-    // Keep the house's joy weak, so the scene offers finish (+48 affliction, +48 Light),
-    // rough (+24, +24), and sleep (nothing).
-    chooser.chart.planets.Venus.dignity = "Neutral";
-    const scenario = getScenario("creativity-song");
+    chooser.chart.ascendantSign = "Cancer";
+    for (const p of PLANETS) chooser.chart.planets[p].sign = "Aries";
+    const scenario = defineScene("fixture-policy", 4, "Libra", "A job offers two shifts or an exit.", [
+      trade("finish", "Work the full shift.", [A("chosen", 48), L(48)]),
+      trade("rough", "Work a short shift.", [A("chosen", 24), L(24)]),
+      trade("sleep", "Decline the work.", []),
+    ]);
+    vi.spyOn(catalogue, "getScenario").mockReturnValue(scenario);
     const scene = (state: (r: Run) => void): Run => {
       const r = beginRun(chooser.chart, 1, chooser.numEncounters);
       for (const p of PLANETS) r.state[p].affliction = 0;
@@ -133,11 +140,20 @@ describe("strategic policies", () => {
   });
 
   it("routes by forecasting each candidate's encounter", () => {
+    // Fix the authored offer so this policy test remains independent of which
+    // scene the expanding catalogue would randomly select.
+    const useMara = (r: Run): Run => {
+      r.seenScenarioIds = SCENARIOS_BY_HOUSE[4]!.filter((s) => s.sign === "Libra" && s.scenarioId !== "home-libra-mara").map((s) => s.scenarioId);
+      for (const [id, content] of Object.entries(r.map.rolledNodes)) {
+        if (content.kind === "narrative") r.map.rolledNodes[id] = { kind: "narrative", house: 4 };
+      }
+      return r;
+    };
     const ceiling = (p: PlanetName) => combustionCeiling(prince.chart.planets[p]);
     const at = (mapsCompleted: number, affliction: (p: PlanetName) => number): Run => {
       const r = { ...beginRun(prince.chart, 13, prince.numEncounters), mapsCompleted };
       for (const p of PLANETS) r.state[p].affliction = affliction(p);
-      return r;
+      return useMara(r);
     };
     const healthy = at(0, () => 0);
     const ids = eligibleNext(healthy.map.graph, healthy.map.currentNodeId, healthy.map.visitedNodeIds);
@@ -149,13 +165,13 @@ describe("strategic policies", () => {
     const spent = at(2, (p) => ceiling(p) - (p === "Moon" ? 1 : 0));
     expect(route(survivalPolicy, spent)).toBe("3C");
     expect(route(lightPolicy, spent)).toBe("3C");
-    // From full health every candidate is survived. The house-sign scene
-    // now offers both the most remaining capacity and the most Light.
+    // From full health every candidate is survived; the scene offers recovery
+    // for survival and Light for accepting a burden.
     expect(route(survivalPolicy, healthy)).toBe("3C");
     expect(route(lightPolicy, healthy)).toBe("3C");
 
     // Two scenes forecast alike; survival takes the one nearer the map's exit.
-    const tied = beginRun(prince.chart, 61, prince.numEncounters);
+    const tied = useMara(beginRun(prince.chart, 61, prince.numEncounters));
     const estimate = (id: string) => forecast(context(prince, survivalPolicy), tied, id);
     expect(estimate("2R")).toEqual(estimate("3C"));
     expect(survivalPolicy.route(context(prince, survivalPolicy), tied, ["3C", "2R"])).toBe("3C");

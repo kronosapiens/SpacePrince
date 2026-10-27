@@ -1,12 +1,12 @@
-import type { Chart, MapBoundary, Prince, SideState } from "@/game/types";
-import { blankGains, refreshChartStats, runChart } from "@/game/chart";
+import type { Chart, Prince, SideState } from "@/game/types";
+import { refreshChartStats, runChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 
-// v4: narrative encounters hold a single decision, with no tree traversal.
-const PRINCE_KEY = "sp:prince:v4";
+// v5: the complete house–sign catalogue replaces the earlier house-only scenes.
+const PRINCE_KEY = "sp:prince:v5";
 // Obsolete prototype shapes; cleared on first load (no migration).
-const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3"];
+const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3", "sp:prince:v4"];
 
 function capSavedAffliction(chart: Chart, state: SideState): void {
   for (const planet of PLANETS) {
@@ -22,13 +22,6 @@ export function loadPrince(): Prince | null {
     const prince = JSON.parse(raw) as Prince;
     refreshChartStats(prince.chart);
     for (const run of prince.runs) {
-      // Older v4 saves already applied their boundary; only rename the record.
-      const boundary = run.map.boundary as (MapBoundary & { barrage?: MapBoundary["necessity"] }) | undefined;
-      if (boundary?.barrage) {
-        boundary.necessity ??= boundary.barrage;
-        delete boundary.barrage;
-      }
-      run.gains ??= blankGains(); // saved before run gains
       capSavedAffliction(runChart(prince.chart, run), run.state);
       if (run.encounter?.kind === "combat") {
         refreshChartStats(run.encounter.opponentChart);
