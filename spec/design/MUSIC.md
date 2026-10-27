@@ -83,7 +83,7 @@ Seven planets do not require using every mode or every degree exactly once.
 | Tonic | D for all planetary modes |
 | Planet → mode | One of the seven modes per planet, using each once; associations are interpretive |
 | Planet → degree | Sun 1, Venus 2, Mercury 3, Moon 4, Saturn 5, Jupiter 6, Mars 7, fixed across rulers |
-| Active mode | Combat uses the opponent's chart ruler, narrative the house ruler, map necessity the player's chart ruler |
+| Active mode | Combat uses the opponent's chart ruler, narrative the house ruler, Necessity the receiving chart's ruler |
 | Register | Sun at D5, with degrees 5–7 below and degrees 2–4 above, spanning less than one octave |
 | Timbre | One shared `PLANET_VOICE` for strikes and necessity, currently auditioning the existing plucked arpeggio voice |
 | Event notes | Each affected planet sounds its assigned degree, without aspect-added notes |

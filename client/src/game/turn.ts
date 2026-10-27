@@ -167,8 +167,13 @@ export function resolveTurn(
       nodeId,
       kind: "combat",
       summary: `Encounter · ${enc.opponentChart.name}`,
-      lightDelta: log.lightGain,
-      combusts: newlyCombusted(playerChart, run.state, playerStateMap),
+      lightDelta: updatedEnc.log.reduce((sum, entry) => sum + entry.lightGain, 0),
+      // Necessity records every initially lit planet; none revive during combat.
+      // Keep final-turn losses too for older saves without a complete opening record.
+      combusts: [...new Set([
+        ...(enc.selfNecessity ?? []).filter(({ planet }) => isCombusted(playerChart.planets[planet], playerStateMap[planet])).map(({ planet }) => planet),
+        ...newlyCombusted(playerChart, run.state, playerStateMap),
+      ])],
     };
     updatedRun.map = { ...run.map, outcomes: { ...run.map.outcomes, [nodeId]: outcome } };
   }

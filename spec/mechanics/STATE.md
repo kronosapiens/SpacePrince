@@ -65,19 +65,28 @@ Narrative {
 
 A single RNG primitive supplies true randomness on demand (VRF-style).
 Combat and narrative resolution are deterministic.
-It is spent deliberately:
+The intended onchain draw boundaries are listed below.
+The current prototype instead derives the Other chart from the map's stored opponent seed, so that chart is already derivable at map creation (`game/run.ts`).
+Its arrival and future-turn streams are seeded stand-ins for future draws; this tuning does not settle the eventual onchain source of those draws.
+Any information derivable from public state remains available to the player.
 
-- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it, including its necessity rolls.
-- **Once per map rollover** — the next map's seed; from it derive node content and the opening uncombust rolls followed by necessity (MECHANICS §11.3), all shown on entry.
-  Opening rolls use a separate seeded stream from node content and do not scale with map depth.
-- **At encounter arrival** — the other chart and its necessity rolls, using the same rule as map openings.
-  In the prototype, necessity uses a separate seeded stream from the other chart's turn sequence.
+For the onchain design, randomness is spent deliberately:
+
+- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it, and the player's affliction starts at zero.
+- **Once per map rollover** — the next map's seed; from it derive node content and opening uncombust rolls (MECHANICS §11.3), shown on entry.
+  Revival uses a separate seeded stream from node content; map openings add no affliction.
+- **At combat encounter arrival** — the other chart and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with affliction capped at Resolve.
+  A successful Fortune roll blocks that planet's entire draw.
+  The player carries existing affliction; the other starts with fresh state.
+  Carried affliction can cause combustion at entry; fresh planets survive every draw.
+  In the prototype, each chart's Necessity uses a separate seeded stream from the other's and from the other chart's turn sequence.
 - **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
 
 Everything else is **pseudorandom**: a deterministic function of committed state that the client computes to render and the contract re-derives to bind, storing nothing.
 Combat resolution itself is fully deterministic — no crits, no hidden rolls — so the client renders a committed turn instantly and the transaction confirms the identical result.
-The client shows the whole current map (node types, boundary results), so routing is informed (Slay-the-Spire-style); the adversary behind a combat node and each turn's next precommit are the only things it cannot know early.
-With a fixed seed the map is knowable, but each encounter's adversary and its turn-by-turn precommits are fresh draws, so nothing past the immediate choice can be pre-solved.
+The client shows the whole current map (node types, boundary results), so routing is informed (Slay-the-Spire-style).
+Under the intended arrival-draw design, the opposing chart and future precommits remain unknown until drawn.
+The prototype's derivable opponent charts are an implementation difference, not information the client may conceal.
 
 ## Stored, derived, evented
 

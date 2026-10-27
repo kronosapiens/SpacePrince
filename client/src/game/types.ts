@@ -100,8 +100,10 @@ export interface CombatEncounter {
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
-  /** Opening rolls; absent on encounters saved before necessity animation. */
+  /** Other's opening rolls; absent on encounters saved before necessity animation. */
   necessity?: NecessityEntry[];
+  /** Self's combat-entry rolls; absent on older saves and manually spawned encounters. */
+  selfNecessity?: NecessityEntry[];
   /** Fielded planets — the roster both sides draw from, mirroring the player's
    *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
    *  placements; only these are sent and rendered solid. */
@@ -169,18 +171,19 @@ export interface NodeOutcome {
 export interface NecessityEntry {
   planet: PlanetName;
   amount: number;
-  halved: boolean;
+  /** Fortune blocked the draw; zero-amount entries still record lit planets. */
+  blocked?: boolean;
+  /** Legacy openings only: replay their stored half-draws unchanged. */
+  halved?: boolean;
   /** Original tier, before Fortune and the combustion cap; absent in old saves. */
   draw?: number;
 }
 
-/** What the map boundary did to the player's chart, rolled
- *  from the map seed at creation and shown on entry. Two steps, in order:
- *  uncombust rolls for combusted planets, then necessity on lit ones. */
+/** The player's uncombust rolls, seeded at map creation and shown on entry. */
 export interface MapBoundary {
   /** One entry per planet combusted at the crossing; failed rolls included. */
   uncombusts: Array<{ planet: PlanetName; chance: number; success: boolean }>;
-  /** Planets necessity actually wounded (zero-amount rolls are omitted). */
+  /** Legacy map Necessity records; empty on newly created maps. */
   necessity: NecessityEntry[];
 }
 

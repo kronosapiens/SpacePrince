@@ -1,7 +1,7 @@
 import { pickScenario } from "@/data/narrative-scenarios";
 import { blankGains, blankSideState, cloneSideState, houseSign, runChart } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
-import { isCombusted, uncombust } from "./combust";
+import { isCombusted, newlyCombusted, uncombust } from "./combust";
 import { beginCombatEncounter, beginNarrativeEncounter } from "./encounter";
 import { applyNecessity } from "./necessity";
 import { rollNodeContent } from "./map-content";
@@ -100,7 +100,18 @@ export function enterNode(input: EnterNodeInput): Run {
       devUnlockAll,
       encounterIdSeed,
     });
-    return { ...entered, encounter };
+    const playerChart = runChart(chart, entered);
+    const opening = applyNecessity(
+      playerChart, entered.state, encounter.roster,
+      mulberry32(hashString(`${encounterIdSeed ?? run.id}_${run.map.seed}_${nodeId}_player_necessity`)),
+    );
+    const wiped = encounter.roster.every((planet) => isCombusted(playerChart.planets[planet], opening.state[planet]));
+    const next = { ...entered, state: opening.state, encounter: { ...encounter, selfNecessity: opening.necessity, resolved: wiped } };
+    if (wiped) next.map = { ...next.map, outcomes: { ...next.map.outcomes, [nodeId]: {
+      nodeId, kind: "combat", summary: `Encounter · ${encounter.opponentChart.name}`, lightDelta: 0,
+      combusts: newlyCombusted(playerChart, entered.state, opening.state),
+    } } };
+    return next;
   }
   const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
   const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), run.seenScenarioIds, rng);
@@ -124,10 +135,9 @@ export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
 }
 
 /**
- * The map boundary, rolled from the new map's seed. Two steps,
- * in order: each combusted fielded planet rolls fortune to uncombust, then each
- * lit planet — relit ones included — takes its necessity. Returns the
- * crossed state and the record the map screen shows on entry.
+ * The map boundary, rolled from the new map's seed. Each combusted fielded
+ * planet rolls Fortune to return at half Resolve; lit planets are unchanged.
+ * Returns the crossed state and the record the map screen shows on entry.
  */
 export function rollMapBoundary(
   chart: Chart,
@@ -144,8 +154,7 @@ export function rollMapBoundary(
     if (success) uncombust(chart.planets[planet], next[planet]);
     uncombusts.push({ planet, chance, success });
   }
-  const applied = applyNecessity(chart, next, roster, rng);
-  return { state: applied.state, boundary: { uncombusts, necessity: applied.necessity } };
+  return { state: next, boundary: { uncombusts, necessity: [] } };
 }
 
 /** Whether the run crosses into its next map: the terminal node's encounter
@@ -157,8 +166,8 @@ export function shouldRolloverMap(run: Run, chart: Chart, numEncounters: number)
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
  *  the finished map to the event log, generates a fresh one, and passes the
- *  chart, with the run's gains, through the map boundary — uncombust rolls,
- *  then necessity, both seeded by the new map. The seventh completion ends the
+ *  chart, with the run's gains, through the map boundary's uncombust rolls,
+ *  seeded by the new map. The seventh completion ends the
  *  run: the final map stays current (not archived). */
 export function rolloverMap(
   run: Run,

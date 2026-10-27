@@ -18,6 +18,8 @@ function setup(opponentSeed: number) {
     opponentSeed,
     lifetimeEncounterCount: prince.numEncounters,
   });
+  // Give Testimony something to resolve even when opening Fortune blocks the draw.
+  enc.opponentState[enc.sequence[0]!].affliction = 12;
   const run: Run = { ...base, encounter: enc };
   return { prince, run, enc };
 }

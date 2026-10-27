@@ -155,6 +155,20 @@ it("finishes successful revivals in order before necessity and retains each rest
   expect(result.state.Saturn.affliction).toBe(20);
   expect(result.state.Moon.affliction).toBe(24);
 });
+it("finishes a revival-only map opening without a necessity sweep", () => {
+  const props = input();
+  props.necessity = [];
+  props.state.Moon.affliction = combustionCeiling(chart.planets.Moon) / 2;
+  props.uncombusts = [{ planet: "Moon", chance: 0.5, success: true }];
+  render(props);
+  expect(result.opening).toMatchObject({ phase: "revival", entries: [], revived: ["Moon"] });
+  expect(result.state.Moon.affliction).toBe(combustionCeiling(chart.planets.Moon));
+  advance(timing.revival);
+  expect(result.active).toBe(false);
+  expect(result.state).toEqual(props.state);
+  expect(audio.play).not.toHaveBeenCalled();
+  expect(vi.getTimerCount()).toBe(0);
+});
 it.each(["click", "Enter", "Escape"])("continues through %s and finishes without replaying on rerender", (gesture) => {
   const props = input();
   props.necessity!.push({ planet: "Saturn", amount: 12, halved: false });

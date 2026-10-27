@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { playEncounter, type PlayContext } from "@/eval/play";
 import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
 import { chartRuler, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
@@ -192,7 +193,9 @@ describe("Shared run transitions", () => {
     const combat = enter(run, combatId);
     expect(combat.map.currentNodeId).toBe(combatId);
     expect(combat.map.visitedNodeIds).toEqual([...run.map.visitedNodeIds, combatId]);
-    expect(combat.encounter).toEqual(
+    const { selfNecessity, ...other } = combat.encounter as CombatEncounter;
+    expect(selfNecessity!.length).toBeGreaterThan(0);
+    expect(other).toEqual(
       beginCombatEncounter({ run, opponentSeed, lifetimeEncounterCount: prince.numEncounters }),
     );
 
@@ -253,12 +256,80 @@ describe("Shared run transitions", () => {
         ...entered.state[p],
         affliction: combustionCeiling(prince.chart.planets[p]) - (p === "Moon" ? 1 : 0),
       }])) as Run["state"],
-      encounter: { ...enc, opponentActions: enc.opponentActions.map((a, i) => (i === 0 ? "Affliction" : a)) },
+      // This manually constructed starting state has no recorded opening sweep.
+      encounter: { ...enc, selfNecessity: undefined, opponentActions: enc.opponentActions.map((a, i) => (i === 0 ? "Affliction" : a)) },
     };
     const fatal = turn(nearlySpent);
     expect(fatal.runEnded).toBe(true);
     expect(fatal.encounter).toMatchObject({ turnIndex: 1, resolved: true });
     expect(fatal.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({ kind: "combat", combusts: ["Moon"] });
+  });
+
+  it("resolves a full entry wipe with zero Light, an outcome, and no action", () => {
+    const chart = structuredClone(prince.chart);
+    for (const p of PLANETS) {
+      chart.planets[p].base.luck = 0;
+      chart.planets[p].buffs.luck = 0;
+    }
+    const wounded = structuredClone(run);
+    wounded.light = 123;
+    for (const p of PLANETS) wounded.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 1;
+    wounded.state.Sun.affliction++; // Already combusted before this encounter.
+    const before = structuredClone(wounded), nodeId = nodeOf("combat");
+    const entered = enterNode({ run: wounded, chart, nodeId, lifetimeEncounterCount: prince.numEncounters });
+    expect(entered.encounter).toMatchObject({ kind: "combat", resolved: true, turnIndex: 0, log: [] });
+    expect(entered.light).toBe(123);
+    expect(entered.map.outcomes[nodeId]).toMatchObject({ kind: "combat", lightDelta: 0, combusts: PLANETS.filter((p) => p !== "Sun") });
+    const unused = vi.fn(() => { throw new Error("An entry wipe has no action"); });
+    const play: PlayContext = {
+      prince: { ...prince, chart }, trial: { chartSeed: 7, gameSeed: 42, strategy: "survival", strategySeed: 0 },
+      policy: { route: unused, combat: unused, narrative: unused }, rng: unused, turnRng: unused,
+    };
+    expect(playEncounter(play, entered, unused)).toBe(entered);
+    expect(resolveTurn(entered, chart, "Moon", "Testimony", unused)).toBeNull();
+    expect(unused).not.toHaveBeenCalled();
+    expect(isOver(entered, chart, prince.numEncounters)).toBe(true);
+    expect(wounded).toEqual(before);
+  });
+
+  it("records entry and later losses once, including planets whose opening Fortune blocked the draw", () => {
+    const chart = structuredClone(prince.chart);
+    chart.planets.Moon.sign = "Aries";
+    chart.planets.Mercury.sign = "Taurus";
+    chart.planets.Venus.sign = "Gemini";
+    chart.planets.Moon.base.luck = 0;
+    chart.planets.Moon.buffs.luck = 0;
+    for (const planet of ["Mercury", "Venus"] as const) {
+      chart.planets[planet].base.luck = 120;
+      chart.planets[planet].buffs.luck = 0;
+    }
+    const wounded = { ...beginRun(chart, 42, 2), mapsCompleted: 2 };
+    wounded.state.Moon.affliction = combustionCeiling(chart.planets.Moon) - 1;
+    const nodeId = Object.keys(wounded.map.rolledNodes).find((id) => wounded.map.rolledNodes[id]!.kind === "combat")!;
+    let current = enterNode({ run: wounded, chart, nodeId, lifetimeEncounterCount: 2 });
+    const encounter = current.encounter as CombatEncounter;
+    expect(encounter.selfNecessity!.filter(({ blocked }) => blocked)).toEqual([
+      { planet: "Mercury", amount: 0, blocked: true, draw: expect.any(Number) },
+      { planet: "Venus", amount: 0, blocked: true, draw: expect.any(Number) },
+    ]);
+    expect(isCombusted(chart.planets.Moon, current.state.Moon)).toBe(true);
+    expect(encounter.resolved).toBe(false);
+    expect(current.map.outcomes[nodeId]).toBeUndefined();
+    // Fix later wounds and the incoming magnitude to exercise all three loss stages.
+    current.state.Venus.affliction = combustionCeiling(chart.planets.Venus) - 12;
+    current.state.Mercury.affliction = combustionCeiling(chart.planets.Mercury) - 24;
+    encounter.sequence = ["Moon", "Moon", "Moon"];
+    encounter.opponentActions = ["Affliction", "Affliction", "Affliction"];
+    encounter.opponentChart.planets.Moon.base.affliction = 12;
+    encounter.opponentChart.planets.Moon.buffs.affliction = 0;
+    let light = 0;
+    for (const planet of ["Venus", "Mercury", "Mercury"] as const) {
+      const result = resolveTurn(current, chart, planet, "Testimony", () => 0)!;
+      current = result.run;
+      light += result.log.lightGain;
+    }
+    expect(current.encounter).toMatchObject({ resolved: true, turnIndex: 3 });
+    expect(current.map.outcomes[nodeId]).toMatchObject({ lightDelta: light, combusts: ["Moon", "Mercury", "Venus"] });
   });
 
   it("rolls over only from the cleared terminal node, and full combustion ends the run first", () => {

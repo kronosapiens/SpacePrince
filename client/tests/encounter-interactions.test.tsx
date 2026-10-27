@@ -7,9 +7,12 @@ import { beginCombatEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { getEffectiveStats } from "@/game/combat";
+import { combustionCeiling } from "@/game/combust";
+import { PLANETS } from "@/game/data";
+import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
 import { playUISound } from "@/audio/engine";
 import { NEUTRAL, VALENCE_COLOR } from "@/svg/palette";
-import type { PlanetName, Polarity } from "@/game/types";
+import type { NecessityEntry, PlanetName, Polarity } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -58,19 +61,32 @@ function finishOpening() {
   expect(container.querySelector(".necessity-opening")).toBeNull();
 }
 
-function setup(settleOpening = true) {
+function setup(settleOpening = true, openingCounts?: { self: number; other: number; combustSelf?: PlanetName; blocked?: boolean }, devAnimationControls = false) {
   const prince = createStubPrince();
   const run = beginRun(prince.chart, 42, prince.numEncounters);
   const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
   encounter.sequence = ["Moon", "Mars"];
   encounter.opponentActions = ["Affliction", "Testimony"];
   encounter.opponentState.Moon.affliction = 12;
+  if (openingCounts) {
+    const entries = (count: number): NecessityEntry[] => PLANETS.slice(0, count).map((planet) => openingCounts.blocked === undefined
+      ? { planet, amount: 12, draw: 24, halved: true }
+      : { planet, amount: openingCounts.blocked ? 0 : 12, draw: 12, blocked: openingCounts.blocked });
+    encounter.selfNecessity = entries(openingCounts.self);
+    encounter.necessity = entries(openingCounts.other);
+    for (const entry of encounter.selfNecessity) run.state[entry.planet].affliction = 30;
+    for (const entry of encounter.necessity) encounter.opponentState[entry.planet].affliction = 30;
+    if (openingCounts.combustSelf) {
+      const planet = openingCounts.combustSelf;
+      run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+    }
+  }
   run.encounter = encounter;
   const onCommitTurn = vi.fn((planet: PlanetName, verb: Polarity, rng: () => number) =>
     resolveTurn(run, prince.chart, planet, verb, rng));
   const render = () => act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
       <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
-    onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
+    onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} devAnimationControls={devAnimationControls} />
     </PlayerChartLayout>));
   render();
   if (settleOpening) finishOpening();
@@ -78,6 +94,114 @@ function setup(settleOpening = true) {
 }
 
 describe("encounter interactions", () => {
+  it.each(["self", "other"] as const)("waits for the longer %s opening before allowing the first action", (longer) => {
+    const counts = { self: longer === "self" ? 2 : 1, other: longer === "other" ? 2 : 1 };
+    const { run, encounter, render, onCommitTurn } = setup(false, counts);
+    const committed = structuredClone({ self: run.state, other: encounter.opponentState });
+    expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
+    act(() => vi.advanceTimersByTime(perPlanet));
+    expect(container.querySelectorAll(".necessity-opening")).toHaveLength(1);
+    expect(container.querySelector(`[data-guide="chart-${longer}"] .necessity-opening`)).not.toBeNull();
+    render();
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    expect(onCommitTurn).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(perPlanet));
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect({ self: run.state, other: encounter.opponentState }).toEqual(committed);
+    expect(get('[data-guide="opponent-move"]').textContent).toContain("Moon");
+    render();
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    click(moon);
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledExactlyOnceWith("Moon", "Testimony", expect.any(Function));
+  });
+
+  it("shows both committed charts immediately with reduced motion", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const { onCommitTurn } = setup(false, { self: 2, other: 2, blocked: true });
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    click(moon);
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledOnce();
+  });
+
+  it("shows then blocks every incoming arc while both openings finish before actions resume", () => {
+    const { run, encounter, render, onCommitTurn } = setup(false, { self: 7, other: 7, blocked: true });
+    const committed = structuredClone({ self: run.state, other: encounter.opponentState });
+    expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    expect(container.querySelectorAll(".necessity-arc")).toHaveLength(2);
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity));
+    expect(container.querySelector(".necessity-arc")).toBeNull();
+    expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
+    render();
+    expect(container.querySelector(".necessity-arc")).toBeNull();
+    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
+    act(() => vi.advanceTimersByTime(7 * perPlanet - openingTiming.encounter.accent - openingTiming.encounter.necessity - 1));
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    expect(onCommitTurn).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1));
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect({ self: run.state, other: encounter.opponentState }).toEqual(committed);
+    click(moon);
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledOnce();
+  });
+
+  it("still shows half the raw arc for a saved halved Fortune result", () => {
+    setup(false, { self: 1, other: 1 });
+    const arc = '[data-guide="arc-self-moon"] .necessity-arc path';
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    const raw = get(arc).getAttribute("d");
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity));
+    const half = get(arc).getAttribute("d");
+    expect(half).not.toBe(raw);
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.fortune));
+    expect(get(arc).getAttribute("d")).toBe(half);
+  });
+
+  it("shows an entry death when its sweep settles and only allows surviving planets to act", () => {
+    const { run, prince, onCommitTurn } = setup(false, { self: 1, other: 2, combustSelf: "Moon", blocked: false });
+    expect(get(moon).closest(".anim-combust")).toBeNull();
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    const arc = get('[data-guide="arc-self-moon"]');
+    const trackEnd = arc.querySelector("path")!.getAttribute("d")!.split(" ").slice(-2);
+    expect(arc.querySelector(".necessity-arc path")!.getAttribute("d")!.split(" ").slice(-2)).toEqual(trackEnd);
+    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity + openingTiming.encounter.fortune));
+    expect(get(moon).closest(".anim-combust")).not.toBeNull();
+    expect(run.state.Moon.affliction).toBe(combustionCeiling(prince.chart.planets.Moon));
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    finishOpening();
+    expect(get(moon).closest('[role="button"]')).toBeNull();
+    click(moon);
+    expect(container.querySelector(testimony)).toBeNull();
+    click(mars);
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledExactlyOnceWith("Mars", "Testimony", expect.any(Function));
+  });
+
+  it("does not replay either opening after a temporary dev animation", () => {
+    const { run, encounter, onCommitTurn } = setup(true, { self: 1, other: 1 }, true);
+    const committed = structuredClone({ self: run.state, other: encounter.opponentState });
+    click(".anim-console-header");
+    click(".anim-console-btn.is-primary");
+    act(() => vi.runAllTimers());
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect({ self: run.state, other: encounter.opponentState }).toEqual(committed);
+    expect(encounter.turnIndex).toBe(0);
+    expect(onCommitTurn).not.toHaveBeenCalled();
+    click(moon);
+    expect(container.querySelector(testimony)).not.toBeNull();
+  });
+
   it("finishes the other chart opening before allowing actions without replaying on turn changes", () => {
     const { encounter, render, onCommitTurn } = setup(false);
     const other = '[data-guide="chart-other"]';

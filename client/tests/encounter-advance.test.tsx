@@ -5,9 +5,12 @@ import { GameTest } from "./game-layout";
 import { useInfoCards } from "@/state/InfoCardContext";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
-import { beginRun } from "@/game/run";
+import { beginRun, enterNode, isOver } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
+import { eligibleNext } from "@/game/map-gen";
+import { unlockedPlanets } from "@/game/unlocks";
+import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
 import { playCombust, playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
@@ -54,10 +57,30 @@ function combat(turns = 1, count = 64) {
   prince.runs = [run];
   return { prince, run, encounter };
 }
-function mount(prince: ReturnType<typeof createStubPrince>) {
+function entryWipe(count: number) {
+  const prince = createStubPrince({ numEncounters: count });
+  prince.chart.planets.Moon.base.luck = 0;
+  prince.chart.planets.Moon.buffs.luck = 0;
+  let run = beginRun(prince.chart, 42, count);
+  for (const planet of unlockedPlanets(count)) {
+    run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+  }
+  run.state.Moon.affliction -= 6;
+  run.light = 96;
+  const nodeId = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+  run.map.rolledNodes[nodeId] = { kind: "combat", opponentSeed: 99 };
+  run = enterNode({ run, chart: prince.chart, nodeId, lifetimeEncounterCount: count });
+  const encounter = run.encounter!;
+  if (encounter.kind !== "combat") throw new Error("Expected a chart encounter");
+  expect(encounter).toMatchObject({ resolved: true, turnIndex: 0, log: [] });
+  expect(isOver(run, prince.chart, count)).toBe(true);
+  prince.runs = [run];
+  return { prince, run, encounter };
+}
+function mount(prince: ReturnType<typeof createStubPrince>, settleOpening = true) {
   savePrince(prince);
   act(() => root!.render(<GameTest path="/play" />));
-  if (container.querySelector(".necessity-opening")) {
+  if (settleOpening && container.querySelector(".necessity-opening")) {
     act(() => vi.runOnlyPendingTimers());
     expect(container.querySelector(".necessity-opening")).toBeNull();
   }
@@ -85,6 +108,73 @@ function settle() {
 }
 
 describe("encounter advancement", () => {
+  it("plays both entry-wipe openings before clearing and lets an unlock rescue the run", () => {
+    const { prince, run, encounter } = entryWipe(31);
+    mount(prince, false);
+    const committed = structuredClone(run);
+    expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
+    expect(get(".combat-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
+    expect(container.querySelector(".combat.is-resolved")).toBeNull();
+    expect(container.querySelector(".ps-action")).toBeNull();
+    expect(container.querySelector('[data-guide="incoming"]')).toBeNull();
+    click(get(".combat"));
+    expect(loadPrince()!.numEncounters).toBe(31);
+
+    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
+    advanceTime(perPlanet);
+    expect(container.querySelector('[data-guide="chart-self"] .necessity-opening')).toBeNull();
+    expect(container.querySelector('[data-guide="chart-other"] .necessity-opening')).not.toBeNull();
+    act(() => root!.render(<GameTest path="/play" />));
+    expect(container.querySelector('[data-guide="chart-self"] .necessity-opening')).toBeNull();
+    click(get(".combat"));
+    advanceTime((encounter.necessity!.length - 1) * perPlanet - 1);
+    expect(container.querySelector(".combat.is-resolved")).toBeNull();
+    expect(loadPrince()!.runs[0]).toEqual(committed);
+    advanceTime(1);
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(container.querySelector(".combat.is-resolved")).not.toBeNull();
+    expect(get(".combat-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
+    advanceTime(2799);
+    expect(loadPrince()!.numEncounters).toBe(31);
+    expect(container.querySelector("[data-intro]")).toBeNull();
+    advanceTime(1);
+
+    const after = loadPrince()!;
+    expect(after.numEncounters).toBe(32);
+    expect(after.runs[0]!.encounter).toBeNull();
+    expect(after.runs[0]!.light).toBe(96);
+    expect(after.runs[0]!.state.Saturn.affliction).toBe(0);
+    expect(isOver(after.runs[0]!, after.chart, after.numEncounters)).toBe(false);
+    expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
+    expect(get("[data-intro]").textContent).toBe("Saturn");
+    advanceTime(5000);
+    expect(loadPrince()!.numEncounters).toBe(32);
+  });
+
+  it("settles a fatal entry wipe immediately with reduced motion and clears it only once", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const { prince, encounter } = entryWipe(64);
+    mount(prince, false);
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(container.querySelector(".combat.is-resolved")).not.toBeNull();
+    expect(get(".combat-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
+    expect(container.querySelector(".ps-action")).toBeNull();
+    const surface = get(".combat");
+    act(() => {
+      surface.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      surface.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    const after = loadPrince()!;
+    expect(after.numEncounters).toBe(65);
+    expect(after.runs[0]!.encounter).toBeNull();
+    expect(after.runs[0]!.light).toBe(96);
+    expect(isOver(after.runs[0]!, after.chart, after.numEncounters)).toBe(true);
+    expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
+    expect(container.querySelector("[data-intro]")).toBeNull();
+    advanceTime(5000);
+    expect(loadPrince()!.numEncounters).toBe(65);
+  });
+
   it("sounds selection and commitment separately, and leaves repeated selection silent", () => {
     const { prince } = combat(2);
     mount(prince);
@@ -138,9 +228,6 @@ describe("encounter advancement", () => {
       planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
-    expect(container.querySelector(".necessity-opening")).not.toBeNull();
-    expect(container.querySelector("[data-intro]")).toBeNull();
-    act(() => vi.runOnlyPendingTimers());
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(get("[data-intro]").textContent).toBe("Mercury");

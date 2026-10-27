@@ -2,7 +2,7 @@ import { cloneSideState } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
 import { combustionCeiling, isCombusted } from "./combust";
 import { pickWeighted } from "./rng";
-import type { Chart, MapBoundary, PlanetName, SideState } from "./types";
+import type { Chart, NecessityEntry, PlanetName, SideState } from "./types";
 
 export const NECESSITY_AFFLICTION_TIERS = [12, 24, 36];
 
@@ -12,22 +12,20 @@ export function applyNecessity(
   state: SideState,
   roster: readonly PlanetName[],
   rng: () => number,
-): { state: SideState; necessity: MapBoundary["necessity"] } {
+): { state: SideState; necessity: NecessityEntry[] } {
   const next = cloneSideState(state);
-  const necessity: MapBoundary["necessity"] = [];
+  const necessity: NecessityEntry[] = [];
   for (const planet of roster) {
     const ps = next[planet];
     if (isCombusted(chart.planets[planet], ps)) continue;
     const draw = pickWeighted(NECESSITY_AFFLICTION_TIERS, rng);
-    const halved = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
+    const blocked = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
     const amount = Math.max(0, Math.min(
-      halved ? draw / 2 : draw,
-      combustionCeiling(chart.planets[planet]) - 1 - ps.affliction,
+      blocked ? 0 : draw,
+      combustionCeiling(chart.planets[planet]) - ps.affliction,
     ));
-    if (amount > 0) {
-      ps.affliction += amount;
-      necessity.push({ planet, amount, halved, draw });
-    }
+    ps.affliction += amount;
+    necessity.push({ planet, amount, blocked, draw });
   }
   return { state: next, necessity };
 }

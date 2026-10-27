@@ -39,7 +39,7 @@ describe("strategic policies", () => {
       expect(estimates(hidden)).toEqual(estimates(run));
       expect(policy.route(context(prince, policy), hidden, nodeIds)).toBe(policy.route(context(prince, policy), run, nodeIds));
     }
-    // The live combat opening keys on the visible opponent seed, so only sampled arrivals vary it.
+    // Other's live opening keys on the visible opponent seed, so only sampled arrivals vary it.
     const openings = new Set<string>();
     const recorder: Policy = {
       ...survivalPolicy,
@@ -100,6 +100,9 @@ describe("strategic policies", () => {
     const r = beginRun(prince.chart, 1, prince.numEncounters);
     for (const p of PLANETS) r.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 6;
     const encounter = beginCombatEncounter({ run: r, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
+    // Fix the tactical state independently of encounter-opening tuning.
+    const otherAffliction = { Moon: 24, Mercury: 18, Venus: 24, Sun: 12, Mars: 12, Jupiter: 36, Saturn: 12 };
+    for (const p of PLANETS) encounter.opponentState[p].affliction = otherAffliction[p];
     encounter.sequence = ["Venus"];
     encounter.opponentActions = ["Testimony"];
     const turn: Run = { ...r, encounter };
@@ -114,6 +117,8 @@ describe("strategic policies", () => {
     const afflictions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
     for (const p of PLANETS) even.state[p].affliction = afflictions[p];
     const evenEncounter = beginCombatEncounter({ run: even, opponentSeed: 14, lifetimeEncounterCount: prince.numEncounters });
+    const evenOtherAffliction = { Moon: 18, Mercury: 6, Venus: 24, Sun: 12, Mars: 12, Jupiter: 6, Saturn: 24 };
+    for (const p of PLANETS) evenEncounter.opponentState[p].affliction = evenOtherAffliction[p];
     expect([evenEncounter.sequence[0], evenEncounter.opponentActions[0]]).toEqual(["Sun", "Affliction"]);
     const evenTurn: Run = { ...even, encounter: evenEncounter };
     expect(lightPolicy.combat(context(prince, lightPolicy), evenTurn, combatActions(evenTurn, prince.chart, evenEncounter)))
