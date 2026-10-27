@@ -56,10 +56,8 @@ export function MapScreen() {
       if (!run || !prince || runOver || openingActive) return;
       let nextRun: Run = run;
       // Content is pre-rolled at map creation; the dev force cheats re-roll
-      // the node here so "the next node you enter" is the forced kind. The
-      // !content fallback covers persisted maps that predate eager rolling.
-      const forced = settings.forceCombat || !!settings.forceNarrativeHouse;
-      if (!nextRun.map.rolledNodes[nodeId] || forced) {
+      // the node here so "the next node you enter" is the forced kind.
+      if (settings.forceCombat || settings.forceNarrativeHouse) {
         const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
         const content = rollNodeContent({
           rng,

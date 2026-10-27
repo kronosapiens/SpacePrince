@@ -84,6 +84,7 @@ describe("strategic policies", () => {
       r.state.Saturn.affliction -= 48;
     });
     expect(choose(lightPolicy, lastLight)).toEqual({ optionId: "rough", selection: { chosen: "Saturn" } });
+
   });
 
   it("ranks combat actions by each strategy's criteria", () => {
@@ -99,6 +100,18 @@ describe("strategic policies", () => {
     const choose = (policy: Policy) => policy.combat(context(prince, policy), turn, combatActions(turn, prince.chart, encounter));
     expect(choose(survivalPolicy)).toEqual({ planet: "Venus", verb: "Affliction" });
     expect(choose(lightPolicy)).toEqual({ planet: "Sun", verb: "Affliction" });
+
+    // Against an afflicting Sun, Mars and Saturn afflicting earn the same 112
+    // Light: Mars keeps all seven lit, Saturn leaves more capacity but loses a
+    // planet. Light ranks lit planets before capacity.
+    const even = beginRun(prince.chart, 14, prince.numEncounters);
+    const afflictions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
+    for (const p of PLANETS) even.state[p].affliction = afflictions[p];
+    const evenEncounter = beginCombatEncounter({ run: even, opponentSeed: 14, lifetimeEncounterCount: prince.numEncounters });
+    expect([evenEncounter.sequence[0], evenEncounter.opponentActions[0]]).toEqual(["Sun", "Affliction"]);
+    const evenTurn: Run = { ...even, encounter: evenEncounter };
+    expect(lightPolicy.combat(context(prince, lightPolicy), evenTurn, combatActions(evenTurn, prince.chart, evenEncounter)))
+      .toEqual({ planet: "Mars", verb: "Affliction" });
   });
 
   it("routes by forecasting each candidate's encounter", () => {
@@ -122,5 +135,11 @@ describe("strategic policies", () => {
     // capacity in the scene, Light takes the combat worth the most Light.
     expect(route(survivalPolicy, healthy)).toBe("3C");
     expect(route(lightPolicy, healthy)).toBe("2L");
+
+    // Two scenes forecast alike; survival takes the one nearer the map's exit.
+    const tied = beginRun(prince.chart, 104, prince.numEncounters);
+    const estimate = (id: string) => forecast(context(prince, survivalPolicy), tied, id);
+    expect(estimate("2R")).toEqual(estimate("3C"));
+    expect(survivalPolicy.route(context(prince, survivalPolicy), tied, ["3C", "2R"])).toBe("3C");
   });
 });
