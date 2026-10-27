@@ -9,6 +9,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { getMusicVolume, getSoundVolume, setMusicVolume, setSoundVolume } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 import { beginRun } from "@/game/run";
+import { ACHIEVEMENT_SLOTS } from "@/svg/prince-style";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 
@@ -109,7 +110,7 @@ describe("settings menu", () => {
     expect(document.querySelectorAll('[role="dialog"]')).toHaveLength(1);
     expect(dialog.querySelector(".chart-svg")?.getAttribute("aria-label")).toBe(`${prince.chart.name} natal chart`);
     expect(dialog.querySelectorAll('[role="button"]')).toHaveLength(0);
-    expect(dialog.querySelectorAll('[data-achievement]')).toHaveLength(12);
+    expect(dialog.querySelector('[aria-label="Achievements"]')?.children).toHaveLength(ACHIEVEMENT_SLOTS.length);
     click('[aria-label="Close prince"]');
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
