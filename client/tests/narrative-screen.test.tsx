@@ -8,6 +8,7 @@ import { beginRun } from "@/game/run";
 import { PLANETS } from "@/game/data";
 import { combustionCeiling } from "@/game/combust";
 import { getScenario } from "@/data/narrative-scenarios";
+import { INTERACTION_SCENE } from "./narrative-fixture";
 import { createStubPrince } from "./fixtures";
 import { playUISound } from "@/audio/engine";
 
@@ -16,6 +17,12 @@ vi.hoisted(() => {
   HTMLCanvasElement.prototype.getContext = () => null;
 });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playUISound: vi.fn() }));
+
+vi.mock("@/data/narrative-scenarios", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/data/narrative-scenarios")>();
+  const { INTERACTION_SCENE } = await import("./narrative-fixture");
+  return { ...original, getScenario: (id: string) => id === INTERACTION_SCENE.scenarioId ? INTERACTION_SCENE : original.getScenario(id) };
+});
 
 let root: Root;
 let container: HTMLDivElement;
@@ -38,9 +45,9 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mount(id: string, prince = createStubPrince()) {
+function mount(id: string, prince = createStubPrince(), light = 120) {
   const scenario = getScenario(id);
-  const run = { ...beginRun(prince.chart, 42, prince.numEncounters), light: 120 };
+  const run = { ...beginRun(prince.chart, 42, prince.numEncounters), light };
   run.state.Moon.affliction = 10;
   run.state.Sun.affliction = 10;
   run.state.Mars.affliction = 24;
@@ -85,16 +92,16 @@ const leaveOption = (index: number) => act(() => {
 
 describe("narrative chart interaction", () => {
   it("previews revival by focus and commits once on target activation", () => {
-    const { run, onCommit, render } = mount("transformation-rite");
+    const { run, onCommit, render } = mount(INTERACTION_SCENE.scenarioId, createStubPrince(), 216);
     const options = [...document.querySelectorAll(".option")].map((option) => option.textContent);
-    hoverOption(1);
+    hoverOption(4);
     expect(document.querySelector(".option.is-selected")).toBeNull();
     expect(element('[data-guide="planet-self-moon"]').closest('[role="button"]')).not.toBeNull();
-    click('[data-guide="option-1"]');
+    click('[data-guide="option-4"]');
     expect(document.querySelector("select")).toBeNull();
     expect(document.querySelector('[data-guide="incoming"]')).not.toBeNull();
     expect(element('[data-guide="planet-self-moon"]').closest('[role="button"]')).toBeNull();
-    click('[data-guide="option-1"]');
+    click('[data-guide="option-4"]');
     expect(onCommit).not.toHaveBeenCalled();
     focus('[data-guide="planet-self-venus"]');
     expect(document.querySelector('[data-guide="arc-self-venus"] .arc-diff')).not.toBeNull();
@@ -113,11 +120,11 @@ describe("narrative chart interaction", () => {
     expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction / 2);
     render(next);
     expect([...document.querySelectorAll(".option")].map((option) => option.textContent)).toEqual(options);
-    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-1");
+    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-4");
   });
 
   it("previews multiple targets and applies the activated planet without a preceding hover", () => {
-    const { onCommit } = mount("home-buried");
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId);
     const aside = element('[data-guide="option-aside-2"]').textContent;
     expect(aside).toBe("Testify 36 on a chosen planet");
     click('[data-guide="option-2"]');
@@ -136,17 +143,17 @@ describe("narrative chart interaction", () => {
   });
 
   it("keeps group healing at its authored amount while previewing and applying individual recovery", () => {
-    const { run, onCommit } = mount("home-hearth");
+    const { run, onCommit } = mount(INTERACTION_SCENE.scenarioId);
     const aside = "Testify 24 on each lit planet · Lose 24 Light";
-    expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
+    expect(element('[data-guide="option-aside-5"]').textContent).toBe(aside);
     choose("sun");
-    hoverOption(2);
+    hoverOption(5);
     expect(element(".ps-name").textContent).toContain("SUN");
     expect(element(".ps-effect").textContent).toBe("Testify 10");
     expect(document.querySelector('[data-guide="arc-self-sun"] .arc-diff')).not.toBeNull();
-    expect(element('[data-guide="option-aside-2"]').textContent).toBe(aside);
+    expect(element('[data-guide="option-aside-5"]').textContent).toBe(aside);
     expect(onCommit).not.toHaveBeenCalled();
-    click('[data-guide="option-2"]');
+    click('[data-guide="option-5"]');
     const next = onCommit.mock.calls[0]![0];
     expect(next.state.Sun.affliction).toBe(0);
     expect(next.state.Moon.affliction).toBe(0);
@@ -156,7 +163,7 @@ describe("narrative chart interaction", () => {
   });
 
   it("keeps the selected target action separate from option previews", () => {
-    const { onCommit } = mount("home-buried");
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId);
     click('[data-guide="option-2"]');
     hoverPlanet("sun");
     hoverOption(1);
@@ -172,7 +179,7 @@ describe("narrative chart interaction", () => {
   });
 
   it("keeps focus previews after pointer exit and restores the selected action over the chart", () => {
-    const { onCommit } = mount("home-buried");
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId);
     click('[data-guide="option-2"]');
     focus('[data-guide="option-1"]');
     hoverOption(2);
@@ -197,7 +204,7 @@ describe("narrative chart interaction", () => {
   });
 
   it("clears target previews when changing options and cancels through Escape or background", () => {
-    const { onCommit } = mount("home-buried");
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId);
     click('[data-guide="option-2"]');
     hoverPlanet("moon");
     click('[data-guide="option-1"]');
@@ -215,8 +222,8 @@ describe("narrative chart interaction", () => {
   });
 
   it("blocks target commitment in the guide and preserves targeting when closing it", () => {
-    const { onCommit } = mount("transformation-rite");
-    click('[data-guide="option-1"]');
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId, createStubPrince(), 216);
+    click('[data-guide="option-4"]');
     click('[aria-label="Study this scene"]');
     focus('[data-guide="planet-self-venus"]');
     expect(element(".ps-effect").textContent).toContain("Testify");
@@ -225,42 +232,46 @@ describe("narrative chart interaction", () => {
     expect(onCommit).not.toHaveBeenCalled();
     expect(playUISound).not.toHaveBeenCalled();
     click('[aria-label="Close scene guide"]');
-    expect(element('[data-guide="option-1"]').getAttribute("aria-pressed")).toBe("true");
+    expect(element('[data-guide="option-4"]').getAttribute("aria-pressed")).toBe("true");
     choose("venus");
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(playUISound).toHaveBeenLastCalledWith("commit");
   });
 
   it("names the planets in the house and shows its terms", () => {
-    mount("relationships-stranger"); // the stub's seventh house holds Capricorn, home to its Saturn
+    const prince = createStubPrince();
+    prince.chart.ascendantSign = "Libra";
+    for (const planet of PLANETS) prince.chart.planets[planet].sign = "Aries";
+    Object.assign(prince.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
+    mount("home-capricorn-salting", prince);
     expect(element(".narrative-occupants").textContent).toBe("Saturn is in this house: the terms are better.");
-    expect(element('[data-guide="option-aside-1"]').textContent).toBe("Testify 36 on a chosen planet");
+    expect(element('[data-guide="option-aside-1"]').textContent).toBe("Testify 24 on a chosen planet");
   });
 
   it("commits an untargeted option on first activation and keeps its result highlighted", () => {
-    const { onCommit, render } = mount("livelihood-coin");
-    const aside = element('[data-guide="option-aside-1"]').textContent;
-    click('[data-guide="option-1"]');
+    const { onCommit, render } = mount(INTERACTION_SCENE.scenarioId);
+    const aside = element('[data-guide="option-aside-3"]').textContent;
+    click('[data-guide="option-3"]');
     expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     expect(document.querySelector(".ps-action")).toBeNull();
     expect(onCommit).toHaveBeenCalledTimes(1);
     const next = onCommit.mock.calls[0]![0];
     expect(next.light).toBe(132);
     render(next);
-    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-1");
-    expect(element('[data-guide="option-aside-1"]').textContent).toBe(aside);
+    expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-3");
+    expect(element('[data-guide="option-aside-3"]').textContent).toBe(aside);
   });
 
   it("blocks untargeted commitment and its sound while the guide is open", () => {
-    const { onCommit } = mount("livelihood-coin");
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId);
     click('[aria-label="Study this scene"]');
     vi.mocked(playUISound).mockClear();
-    click('[data-guide="option-1"]');
+    click('[data-guide="option-3"]');
     expect(onCommit).not.toHaveBeenCalled();
     expect(playUISound).not.toHaveBeenCalled();
     click('[aria-label="Close scene guide"]');
     vi.mocked(playUISound).mockClear();
-    click('[data-guide="option-1"]');
+    click('[data-guide="option-3"]');
     expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit.mock.calls[0]![0].light).toBe(132);

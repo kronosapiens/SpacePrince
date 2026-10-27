@@ -4,21 +4,23 @@ Narrative encounters are single decisions about the chart the player will carry 
 House concepts live in [HOUSES.md](HOUSES.md), combat rules in [MECHANICS.md](MECHANICS.md), and presentation in [SCREENS.md §3.2](../design/SCREENS.md#32-narrative-layout-asymmetric).
 Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../concept/HOUSE_MATRIX.md).
 The [encounter model](HOUSES.md#3-chart-conditioning-model) groups fixed references, natal relationships, and current state; §4 below applies these lookups to offers, and §4.6 describes composing and revising a scene.
-Authored scenes live in [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts); validation, targeting, previews, and resolution live in [narrative.ts](../../client/src/game/narrative.ts).
+Authored scenes live in the [house modules](../../client/src/data/narrative), assembled by [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts).
+Their source rationales and participation directions live in the [authoring briefs](../drafts/narrative-encounters/briefs).
+Validation, targeting, previews, and resolution live in [narrative.ts](../../client/src/game/narrative.ts).
 
 ### Implementation status
 
-The composition and economic guidance describes the intended refresh.
+The catalogue implements the composition and provisional economic guidance below.
 The outcome, target, and predicate tables in §2, §3, and §4.3 describe current client behavior.
 
 | Area | Current behavior | Intended behavior | Remaining work |
 |---|---|---|---|
-| House references | [House data](../../client/src/data/houses.ts) stores good/bad valence and compound kind labels | Use the separate attributes grouped under House in [HOUSES.md §3.1](HOUSES.md#31-fixed-references) | Align the representation during the refresh |
-| House–sign scenes | Selection prefers the house and the Prince's sign on it, then house-only scenes; four House IV scenes exist | Five scenes for each of the 144 house–sign pairs | Generate an initial 720-scene catalogue in reviewed batches; retain house-only fallbacks until every playable sign has coverage |
+| House references | [House data](../../client/src/data/houses.ts) stores good/bad valence and compound kind labels | Use the separate attributes grouped under House in [HOUSES.md §3.1](HOUSES.md#31-fixed-references) | Align the data representation |
+| House–sign scenes | 720 scenes: five for each of the 144 house–sign pairs; selection uses only the matching sign | As implemented | Playtesting and further editorial refinement |
 | Occupants and dignity | Existing costs follow §4.2 (`withOccupants` in [narrative.ts](../../client/src/game/narrative.ts)); the screen names the occupants | As implemented | Tune the step sizes in the balancing pass |
-| Joy choices | Joy choices are added under `joyPresent`; only a test fixture has one | One per scene in the seven joy houses | Author them with the scenes |
+| Joy choices | 420 choices under `joyPresent`, one per scene in the seven joy houses | As implemented | Playtest their usefulness across chart conditions |
 | Run-long stat gains | `gain` outcomes raise a planet's stat on the run (`Run.gains`), read through `runChart` in combat, map openings, narrative, and the stat table | As implemented | None for this iteration |
-| Prices | [economy.ts](../../client/src/data/economy.ts) holds the provisional going rates; the house-only scenes keep earlier prices | Every scene priced from the going rates and its house's terms | Price new scenes as they are written |
+| Prices | Authored from the provisional going rates in [economy.ts](../../client/src/data/economy.ts) and each house's terms | Comparable aggregate opportunity across charts | Full run balancing under issue #12 |
 
 ## 1. The Complementary Loop
 
@@ -186,16 +188,11 @@ Keep the steps modest, and assess their cumulative value across representative r
 ### 4.3 Current predicates
 
 These are the current client predicates.
-For these predicates, Domicile and Exaltation are the strong band.
 
 | Predicate | True when |
 |---|---|
 | `joyPresent` | The joy is unlocked, lit, and below the affliction threshold. |
-| `joyStrong` | The joy is present and has strong dignity. |
-| `rulerStrong` | The fixed game ruler is lit, unlocked, and has strong dignity. |
 | `anyCombusted` | At least one unlocked planet is combusted. |
-
-`joyStrong` and `rulerStrong` serve only the earlier house-only scenes, which remain as a fallback until house–sign scenes replace them.
 
 Visibility is distinct from affordability.
 A chart-gated option is absent when its predicate fails.
@@ -311,36 +308,22 @@ Testify gains are not offered; their simulated value was near zero.
 For valuing trades, count recovery at 2 Light per point and affliction taken at 3.
 Revival returns a planet at half its own ceiling, so its flat price favors planets with high Resolve.
 
-## 7. House Blueprints
+## 7. House Briefs
 
-These summarize the current catalogue's decisions, before the full narrative refresh.
-Use the [house matrix](../concept/HOUSE_MATRIX.md) and §4.6 to develop revised scenarios; these summaries do not exhaust a house's possible offers.
-
-| House | Immediate decision identity |
-|---|---|
-| 1 · Self | Attend to a chosen part of the chart, or stake its strength. |
-| 2 · Livelihood | Small gains versus costly labor. |
-| 3 · Communication | Selected recovery, carrying an errand, or finding a crossing. |
-| 4 · Home | Deep recovery for one planet versus smaller recovery across the chart; conditional revival. |
-| 5 · Creativity | Finishing work at a chosen cost, or taking time to recover. |
-| 6 · Labor | Concentrated versus distributed toil; Mars provides containment. |
-| 7 · Relationships | Accept help, carry a load for Light, or pay for relief. |
-| 8 · Transformation | Accept a heavy cost, recover, or choose who returns. |
-| 9 · Pilgrimage | Study, demonstration, or a vigil completed within the scene. |
-| 10 · Achievement | Take a modest return or spend strength for greater recognition. |
-| 11 · Friendship | Gather Light versus restore one or many planets; Jupiter adds gifts. |
-| 12 · The Hidden | Concentrate or spread an immediate burden; Saturn contains it. |
+The [authoring briefs](../drafts/narrative-encounters/briefs) contain five situations per house–sign pair, with source rationale, emotional register, and possible participation.
+They develop the [house matrix](../concept/HOUSE_MATRIX.md) through the process in §4.6.
+The [runtime house modules](../../client/src/data/narrative) contain the finished prose and economic offers.
 
 ## 8. Scenario Identity and Selection
 
-The catalogue target is five scenarios for each house–sign pair.
+The catalogue contains five scenarios for each house–sign pair.
 A stable `scenarioId` is the unit of the no-repeat rule.
-Prefer unseen scenarios for the house and the Prince's sign on it, then unseen house-only scenes.
-When these are exhausted, repeat matching-sign scenes, or house-only scenes when the sign has none.
+Prefer unseen scenarios for the house and the Prince's sign on it.
+When all five are exhausted, repeat matching-sign scenes.
 Never substitute a scene authored for another sign.
-Keep house-only fallbacks until every playable house–sign pair has coverage.
+The earlier house-only scenes and fallback selection have been removed.
 The scenario and aria fragment are chosen on entry and persist through reloads.
-The alpha schema resets old tree-based saves rather than migrating them.
+Save schema v5 resets earlier saves, including v4 saves that may reference retired scenes.
 
 ## 9. Prose and Mechanical Copy
 
@@ -361,7 +344,9 @@ Player-facing text uses encounter, self, and other; named Light and Resolve foll
 Every authored scene must remain playable across all unlock tiers and representative clean, afflicted, and partially combusted charts.
 Preview and commit must agree for every valid target.
 Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, stat gains, occupant terms, repeated resolution, and save resets.
-A catalogue test checks every house–sign scene for a choice valid at zero Light with only the Moon unlocked, and for amounts on the 12-lattice.
+The [catalogue tests](../../client/tests/narrative-catalogue.test.ts) check exact coverage, unique IDs and openings, matching-sign selection without repeats until exhaustion, and amounts on the 12-lattice.
+They check zero-Light playability through every unlock tier, with empty, favorable, and adverse occupancy across four chart conditions: 60,480 scene states.
+They also compare preview and commit for every eligible selection across five representative states, including run-long gains, and check joy visibility, revival, and the five-choice limit.
 Playtests compare choices across chart conditions and upcoming rulers.
 Catalogue reviews compare each house–sign pool under representative run conditions (§4.5), including the cumulative effects of occupants and joys and dignity's birth-cohort effects.
 Editorial reviews use the scenario rationale in §4.6 to check that historical claims, original interpretations, eligibility, and economic advantages remain distinguishable.

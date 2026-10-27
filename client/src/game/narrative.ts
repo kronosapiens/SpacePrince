@@ -31,8 +31,8 @@ export interface Option {
 export interface NarrativeScenario {
   scenarioId: string;
   house: number;
-  /** The house's sign the scene is written for; house-only scenes omit it. */
-  sign?: SignName;
+  /** The house's sign the scene is written for. */
+  sign: SignName;
   text: string;
   options: Option[];
 }
@@ -62,18 +62,12 @@ export function narrativeContext(prince: Prince, run: Run, house: number, devUnl
   };
 }
 
-const strong = (ctx: NarrativeContext, p: PlanetName) =>
-  ["Domicile", "Exaltation"].includes(ctx.placements[p].dignity);
 const combusted = (ctx: NarrativeContext, p: PlanetName) =>
   isCombusted(ctx.placements[p], ctx.perPlanetState[p]);
 
 export const joyPresent = (ctx: NarrativeContext): boolean =>
   !!ctx.joyPlanet && ctx.unlocked.includes(ctx.joyPlanet) &&
   !combusted(ctx, ctx.joyPlanet) && ctx.perPlanetState[ctx.joyPlanet].affliction < 96;
-export const joyStrong = (ctx: NarrativeContext): boolean =>
-  joyPresent(ctx) && strong(ctx, ctx.joyPlanet!);
-export const rulerStrong = (ctx: NarrativeContext): boolean =>
-  ctx.unlocked.includes(ctx.rulerPlanet) && !combusted(ctx, ctx.rulerPlanet) && strong(ctx, ctx.rulerPlanet);
 export const anyCombusted = (ctx: NarrativeContext): boolean =>
   ctx.unlocked.some((p) => combusted(ctx, p));
 

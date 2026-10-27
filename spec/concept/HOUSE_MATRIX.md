@@ -302,7 +302,8 @@ For copy revisions that preserve current mechanics:
    New joy choices draw on [HOUSE_PLANET_MATRIX.md](HOUSE_PLANET_MATRIX.md) under the encounter spec.
 5. Read the prompt without its house heading and check that its situation still carries the intended meaning.
 
-When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and at most three visible choices unless a separate mechanics change is agreed.
+When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and the existing menu unless a separate mechanics change is agreed.
+The encounter limit is five visible choices, including joy and revival.
 Keep the existing valid exit at zero Light and with only the Moon unlocked.
 The [scenario data](../../client/src/data/narrative-scenarios.ts) and [resolver](../../client/src/game/narrative.ts) remain authoritative for those details.
 

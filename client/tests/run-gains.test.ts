@@ -50,15 +50,12 @@ describe("run gains", () => {
     expect(beginRun(prince.chart, 4, 64).gains).toEqual(blankGains());
   });
 
-  it("load as zero from saves made before them, without capping a gained ceiling", () => {
+  it("preserve gained ceilings when reloading", () => {
     const run = gain(beginRun(prince.chart, 5), "Moon", "resolve", 12);
     run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) + 6;
     savePrince({ ...prince, runs: [run] });
     expect(loadPrince()!.runs[0]!.state.Moon.affliction).toBe(run.state.Moon.affliction);
-    const legacy = JSON.parse(localStorage.getItem("sp:prince:v4")!);
-    delete legacy.runs[0].gains;
-    localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
-    expect(loadPrince()!.runs[0]!.gains).toEqual(blankGains());
+
   });
 
   it("keep a planet lit in combat through a blow its natal Resolve could not hold", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { runTrial } from "@/eval/runner";
 import type { Step, Trial } from "@/eval/play";
 import type { Strategy } from "@/eval/policies";
-import { seededChart } from "@/game/chart";
+import { runChart, seededChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 import type { PlanetName } from "@/game/types";
@@ -48,8 +48,11 @@ describe("seeded runner", () => {
     // `resolveTurn` silently zeroes a combusted planet, so only this shows every turn sent a lit one.
     const sentDark = batch.flatMap((r) => {
       const chart = seededChart(r.trial.chartSeed);
-      return r.steps.filter((s, i) =>
-        s.kind === "turn" && r.steps[i - 1]!.affliction[s.planet] >= combustionCeiling(chart.planets[s.planet]));
+      return r.steps.filter((s, i) => {
+        if (s.kind !== "turn") return false;
+        const prev = r.steps[i - 1]!;
+        return prev.affliction[s.planet] >= combustionCeiling(runChart(chart, prev).planets[s.planet]);
+      });
     });
     expect(sentDark).toEqual([]);
     // A fresh chart takes necessity on every fielded planet, so this shows all seven start unlocked.
@@ -61,7 +64,7 @@ describe("seeded runner", () => {
   it("summarizes what the steps record", () => {
     for (const { trial, steps, summary } of batch) {
       const chart = seededChart(trial.chartSeed);
-      const dark = (s: Step, p: PlanetName) => s.affliction[p] >= combustionCeiling(chart.planets[p]);
+      const dark = (s: Step, p: PlanetName) => s.affliction[p] >= combustionCeiling(runChart(chart, s).planets[p]);
       let combustions = 0, revivals = 0, light = 0;
       steps.forEach((s, i) => {
         const prev = steps[i - 1];
@@ -94,7 +97,7 @@ describe("seeded runner", () => {
     )!;
     const entry = lastEntry(record);
     const last = record.steps.at(-1)!;
-    const chart = seededChart(record.trial.chartSeed);
+    const chart = runChart(seededChart(record.trial.chartSeed), last);
     expect(PLANETS.every((p) => last.affliction[p] >= combustionCeiling(chart.planets[p]))).toBe(true);
     expect(record.summary.endReason).toBe("combustion");
     // The summary alone names the encounter and the choice the run ended on.

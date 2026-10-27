@@ -23,21 +23,28 @@ describe("Prince storage", () => {
     expect(localStorage.getItem("sp:prince:v3")).toBeNull();
   });
 
+  it("starts fresh instead of loading the retired house-only catalogue", () => {
+    localStorage.setItem("sp:prince:v4", JSON.stringify({ runs: [{ encounter: { scenarioId: "livelihood-coin" } }] }));
+    expect(loadPrince()).toBeNull();
+    expect(localStorage.getItem("sp:prince:v4")).toBeNull();
+  });
+
   it("restores an unresolved scene and keeps a resolved result from paying twice", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 7, prince.numEncounters);
-    const scenario = getScenario("livelihood-coin");
-    run.encounter = beginNarrativeEncounter({ run, house: 2, scenarioId: scenario.scenarioId });
+    const scenario = getScenario("home-libra-mara");
+    run.state.Moon.affliction = 0;
+    run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: scenario.scenarioId });
     prince.runs = [run];
     savePrince(prince);
     const restored = loadPrince()!;
     expect(restored.runs[0]!.encounter).toEqual(run.encounter);
-    const resolved = resolveNarrative(restored.runs[0]!, restored, scenario, "take", {})!;
+    const resolved = resolveNarrative(restored.runs[0]!, restored, scenario, "name", { chosen: "Moon" })!;
     savePrince({ ...restored, runs: [resolved] });
     const reloaded = loadPrince()!;
     expect(reloaded.runs[0]!.encounter).toEqual(resolved.encounter);
-    expect(reloaded.runs[0]!.light).toBe(12);
-    expect(resolveNarrative(reloaded.runs[0]!, reloaded, scenario, "take", {})).toBeNull();
+    expect(reloaded.runs[0]!.light).toBe(96);
+    expect(resolveNarrative(reloaded.runs[0]!, reloaded, scenario, "name", { chosen: "Moon" })).toBeNull();
   });
 
   it("rebuilds saved player and opponent stats without changing run progress", () => {
@@ -55,7 +62,7 @@ describe("Prince storage", () => {
     const raw = JSON.stringify(prince, (key, value) =>
       key === "base" || key === "buffs" ? { luck: value.luck } : value,
     );
-    localStorage.setItem("sp:prince:v4", raw);
+    localStorage.setItem("sp:prince:v5", raw);
 
     const restored = loadPrince()!;
     expect(restored).toEqual(prince);
@@ -86,30 +93,7 @@ describe("Prince storage", () => {
     expect(savedRun.light).toBe(72);
   });
 
-  it("renames legacy boundary records without rerolling either chart or old first maps", () => {
-    const prince = createStubPrince();
-    const run = beginRun(prince.chart, 7, prince.numEncounters);
-    run.encounter = beginCombatEncounter({ run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters });
-    delete run.encounter.necessity;
-    for (const entry of run.map.boundary!.necessity) delete entry.draw;
-    prince.runs = [run];
-    const legacy = JSON.parse(JSON.stringify(prince));
-    const boundary = legacy.runs[0].map.boundary;
-    boundary.barrage = boundary.necessity;
-    delete boundary.necessity;
-    localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
-    expect(loadPrince()).toEqual(prince);
-    savePrince(loadPrince()!);
-    expect(localStorage.getItem("sp:prince:v4")).not.toContain('"barrage"');
-    expect(loadPrince()).toEqual(prince);
-
-    delete legacy.runs[0].map.boundary;
-    legacy.runs[0].state.Moon.affliction = 0;
-    localStorage.setItem("sp:prince:v4", JSON.stringify(legacy));
-    expect(loadPrince()).toEqual(legacy);
-  });
-
-  it("round-trips historical and active v4 Light state", () => {
+  it("round-trips historical and active Light state", () => {
     const prince = createStubPrince();
     const historical = { ...beginRun(prince.chart, 6), light: 36, mapsCompleted: MAPS_PER_RUN };
     const active = { ...beginRun(prince.chart, 7), light: 72 };
@@ -117,7 +101,7 @@ describe("Prince storage", () => {
 
     savePrince(prince);
 
-    const raw = localStorage.getItem("sp:prince:v4");
+    const raw = localStorage.getItem("sp:prince:v5");
     expect(raw).toContain('"light":36');
     expect(raw).toContain('"light":72');
     expect(raw).not.toContain('"distance"');

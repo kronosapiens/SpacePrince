@@ -1,6 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { NARRATIVE_SCENARIOS } from "@/data/narrative-scenarios";
 import { Chart } from "@/components/Chart";
 import { PLANETS } from "@/game/data";
 import { combustionCeiling } from "@/game/combust";
@@ -62,8 +63,8 @@ describe("shared player chart", () => {
     const combatNode = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
     const narrativeNode = eligibleNext(run.map.graph, combatNode, [...run.map.visitedNodeIds, combatNode])[0]!;
     run.map.rolledNodes[combatNode] = { kind: "combat", opponentSeed: 99 };
-    run.map.rolledNodes[narrativeNode] = { kind: "narrative", house: 2 };
-    run.seenScenarioIds = ["livelihood-coin"];
+    run.map.rolledNodes[narrativeNode] = { kind: "narrative", house: 4 };
+    run.seenScenarioIds = NARRATIVE_SCENARIOS.filter((s) => s.house === 4 && s.sign === "Libra" && s.scenarioId !== "home-libra-mara").map((s) => s.scenarioId);
     prince.runs = [run];
     savePrince(prince);
     act(() => root.render(<GameTest path="/play" />));
@@ -104,7 +105,7 @@ describe("shared player chart", () => {
 
     click(`[data-guide="node-${narrativeNode}"]`);
     expectStableChart();
-    expect(element('[data-guide="option-2"]').textContent).toContain("Work only the loose embroidery.");
+    expect(element('[data-guide="option-2"]').textContent).toContain("Tell your uncle her name, and leave his table.");
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     const target = PLANETS.find((planet) => afterCombat.runs[0]!.state[planet].affliction === 0)!;
@@ -112,7 +113,7 @@ describe("shared player chart", () => {
     const afterNarrative = loadPrince()!.runs[0]!;
     expect(afterNarrative.encounter?.resolved).toBe(true);
     expect(afterNarrative.state[target].affliction).toBe(24);
-    expect(afterNarrative.light).toBe(afterCombat.runs[0]!.light + 12);
+    expect(afterNarrative.light).toBe(afterCombat.runs[0]!.light + 96);
     expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
 
