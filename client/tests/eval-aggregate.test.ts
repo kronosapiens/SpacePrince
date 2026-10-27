@@ -79,9 +79,22 @@ describe("balance aggregation", () => {
       chartSeed: 2,
       byStrategy: { random: { completion: 0.5, maps: 4, light: 300 }, survival: { completion: 0.5, maps: 5, light: 600 } },
     });
-    // Mean maps across strategies: chart 1 is 5, chart 2 is 4.5; spreads are 4 and 1.
+    // Mean maps across strategies: chart 1 is 5, chart 2 is 4.5; survival gains 7 − 3 and 5 − 4 over random.
     expect(agg.struggling).toEqual([2, 1]);
-    expect(agg.strategySensitive).toEqual([{ chartSeed: 1, spread: 4 }, { chartSeed: 2, spread: 1 }]);
+    expect(agg.strategyGain).toEqual([{ chartSeed: 1, gain: 4 }, { chartSeed: 2, gain: 1 }]);
+    // Random's three failure nodes tie, so the first in key order stands for them; seeds 2:22 agree.
+    expect(agg.replays).toEqual({
+      failures: [
+        { strategy: "random", node: "3L", trials: ["1:11:random:0"] },
+        { strategy: "survival", node: "5C", trials: ["2:21:survival:0"] },
+      ],
+      disagreements: [
+        { spread: 5, best: "1:11:survival:0", worst: "1:11:random:0" },
+        { spread: 3, best: "1:12:survival:0", worst: "1:12:random:0" },
+        { spread: 2, best: "2:21:survival:0", worst: "2:21:random:0" },
+      ],
+      randomCompletions: ["2:22:random:0"],
+    });
   });
 
   it("bootstraps over charts, reproducibly from the seed", () => {

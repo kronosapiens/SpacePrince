@@ -7,7 +7,6 @@ import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
-import { unlockedPlanets } from "@/game/unlocks";
 import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
 import { describeOptionParts, occupantLine } from "@/copy/narrative";
 import { combustionCeiling, newlyCombusted } from "@/game/combust";
@@ -59,10 +58,6 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   );
   const rulerPlanet: PlanetName = house.ruler;
   const joyPlanet: PlanetName | null = house.joy;
-  const playerUnlocked = useMemo(
-    () => unlockedPlanets(prince.numEncounters, devUnlockAll),
-    [prince.numEncounters, devUnlockAll],
-  );
 
   useEffect(() => {
     setActive(rulerPlanet);
@@ -116,7 +111,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const preview = indicatedOption ? previewOption(run, ctx, indicatedOption, inspectedPlanet ? { chosen: inspectedPlanet } : {}) : null;
   const eligiblePlanets = new Set(targeting
     ? selectedRow!.assignments.flatMap((s) => s.chosen ? [s.chosen] : [])
-    : playerUnlocked);
+    : ctx.unlocked);
   const targetEffect = indicatedOption?.result.effects.find((e) =>
     "target" in e && e.target === "chosen" && !(e.kind === "affliction" && e.delta === 0));
   const verb: Polarity = targetEffect?.kind === "affliction" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
@@ -150,7 +145,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const projection: ProjectionChips = { deltas: {} };
   if (!resolved && preview?.ok) {
     const afterChart = runChart(prince.chart, preview.success);
-    for (const p of playerUnlocked) {
+    for (const p of ctx.unlocked) {
       const affliction = preview.success.state[p].affliction;
       const delta = affliction - run.state[p].affliction;
       const ceiling = combustionCeiling(afterChart.planets[p]);
@@ -217,7 +212,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     props: {
       chart,
       state: run.state,
-      unlockedPlanets: playerUnlocked,
+      unlockedPlanets: ctx.unlocked,
       activePlanet: !targeting && joyPresent(ctx) ? joyPlanet : null,
       selectedPlanet,
       hoveredPlanet: selectedPlanet ? null : hoveredPlanet,

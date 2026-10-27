@@ -88,14 +88,9 @@ export function enterNode(input: EnterNodeInput): Run {
   const { run, chart, nodeId, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const content = run.map.rolledNodes[nodeId];
   if (!content) throw new Error(`Node ${nodeId} has no content`);
-  const { visitedNodeIds } = run.map;
   const entered: Run = {
     ...run,
-    map: {
-      ...run.map,
-      currentNodeId: nodeId,
-      visitedNodeIds: visitedNodeIds.includes(nodeId) ? visitedNodeIds : [...visitedNodeIds, nodeId],
-    },
+    map: { ...run.map, currentNodeId: nodeId, visitedNodeIds: [...run.map.visitedNodeIds, nodeId] },
   };
   if (content.kind === "combat") {
     const encounter = beginCombatEncounter({
@@ -107,13 +102,12 @@ export function enterNode(input: EnterNodeInput): Run {
     });
     return { ...entered, encounter };
   }
-  const seen = run.seenScenarioIds ?? [];
   const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
-  const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), seen, rng);
+  const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), run.seenScenarioIds, rng);
   return {
     ...entered,
     encounter: beginNarrativeEncounter({ run: entered, house: content.house, scenarioId }),
-    seenScenarioIds: [...seen, scenarioId],
+    seenScenarioIds: [...run.seenScenarioIds, scenarioId],
   };
 }
 

@@ -1,6 +1,7 @@
 import { hashString, mulberry32 } from "@/game/rng";
 import { MAPS_PER_RUN } from "@/game/run";
 import type { Polarity } from "@/game/types";
+import type { Trial } from "./play";
 import type { Strategy } from "./policies";
 import type { RunRecord, RunSummary } from "./runner";
 
@@ -51,8 +52,16 @@ export interface Aggregates {
   charts: ChartStats[];
   /** Lowest mean maps completed across strategies. */
   struggling: number[];
-  /** Widest spread between strategies' mean maps completed. */
-  strategySensitive: { chartSeed: number; spread: number }[];
+  /** The chart's best strategy's mean maps completed minus random's; empty without random. */
+  strategyGain: { chartSeed: number; gain: number }[];
+  /** `--replay` ids to read before proposing balance changes. */
+  replays: {
+    /** Per strategy, combustion endings at its most frequent terminal node. */
+    failures: { strategy: Strategy; node: string; trials: string[] }[];
+    /** Chart and game seeds whose strategies' maps completed differ most. */
+    disagreements: { spread: number; best: string; worst: string }[];
+    randomCompletions: string[];
+  };
 }
 
 export const BOOTSTRAP_RESAMPLES = 1000;
@@ -62,6 +71,7 @@ const DOMINANT = 8;
 const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 const mean = (values: number[]) => sum(values) / values.length;
 const completed = (s: RunSummary) => (s.endReason === "completion" ? 1 : 0);
+const replayId = ({ chartSeed, gameSeed, strategy, strategySeed }: Trial) => `${chartSeed}:${gameSeed}:${strategy}:${strategySeed}`;
 /** Code-point order, so ties rank the same under any locale. */
 const byKey = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -198,14 +208,40 @@ export function aggregate(rows: Row[], seed: number): Aggregates {
     })),
   }));
   const chartMaps = (c: ChartStats) => Object.values(c.byStrategy).map((s) => s.maps);
+  const stats = strategies.map((s) => strategyStats(s, of(s), charts, draws));
+  const pairs = new Map<string, Row[]>();
+  for (const r of rows) {
+    const key = `${r.trial.chartSeed}:${r.trial.gameSeed}`;
+    pairs.set(key, [...(pairs.get(key) ?? []), r]);
+  }
   return {
-    strategies: strategies.map((s) => strategyStats(s, of(s), charts, draws)),
+    strategies: stats,
     paired: strategies.flatMap((a, i) => strategies.slice(i + 1).map((b) => pairedStats(a, b, rows, charts, draws))),
     charts: chartStats,
     struggling: [...chartStats].sort((x, y) => mean(chartMaps(x)) - mean(chartMaps(y))).slice(0, TOP).map((c) => c.chartSeed),
-    strategySensitive: chartStats
-      .map((c) => ({ chartSeed: c.chartSeed, spread: Math.max(...chartMaps(c)) - Math.min(...chartMaps(c)) }))
-      .sort((x, y) => y.spread - x.spread)
-      .slice(0, TOP),
+    strategyGain: strategies.includes("random")
+      ? chartStats
+        .map((c) => ({ chartSeed: c.chartSeed, gain: Math.max(...chartMaps(c)) - c.byStrategy.random!.maps }))
+        .sort((x, y) => y.gain - x.gain)
+        .slice(0, TOP)
+      : [],
+    replays: {
+      failures: stats.flatMap(({ strategy, failures }) => {
+        const [top] = ranked(failures.node);
+        if (!top) return [];
+        const trials = of(strategy).filter((r) => r.summary.endReason === "combustion" && r.summary.terminalNodeId === top[0]);
+        return [{ strategy, node: top[0], trials: trials.slice(0, TOP).map((r) => replayId(r.trial)) }];
+      }),
+      disagreements: [...pairs.values()]
+        .map((pair) => {
+          const [best, ...rest] = [...pair].sort((x, y) => y.summary.mapsCompleted - x.summary.mapsCompleted);
+          const worst = rest.at(-1) ?? best!;
+          return { spread: best!.summary.mapsCompleted - worst.summary.mapsCompleted, best: replayId(best!.trial), worst: replayId(worst.trial) };
+        })
+        .filter((d) => d.spread > 0)
+        .sort((x, y) => y.spread - x.spread)
+        .slice(0, TOP),
+      randomCompletions: of("random").filter((r) => completed(r.summary)).slice(0, TOP).map((r) => replayId(r.trial)),
+    },
   };
 }
