@@ -1,5 +1,5 @@
 import { pickScenario } from "@/data/narrative-scenarios";
-import { blankSideState, cloneSideState } from "./chart";
+import { blankGains, blankSideState, cloneSideState, houseSign, runChart } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
 import { isCombusted, uncombust } from "./combust";
 import { beginCombatEncounter, beginNarrativeEncounter } from "./encounter";
@@ -60,6 +60,7 @@ export function beginRun(
     seed,
     state: crossed.state,
     light: 0,
+    gains: blankGains(),
     map: { ...newMapState(mapSeed, combatRulers), boundary: crossed.boundary },
     mapsCompleted: 0,
     encounter: null,
@@ -70,6 +71,7 @@ export function beginRun(
 
 export interface EnterNodeInput {
   run: Run;
+  chart: Chart;
   nodeId: string;
   lifetimeEncounterCount: number;
   devUnlockAll?: boolean;
@@ -83,7 +85,7 @@ export interface EnterNodeInput {
  *  encounter. A narrative scenario is drawn from the house's unseen pool,
  *  seeded on (run, house, node), and joins the no-repeat history. */
 export function enterNode(input: EnterNodeInput): Run {
-  const { run, nodeId, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const { run, chart, nodeId, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const content = run.map.rolledNodes[nodeId];
   if (!content) throw new Error(`Node ${nodeId} has no content`);
   const entered: Run = {
@@ -101,7 +103,7 @@ export function enterNode(input: EnterNodeInput): Run {
     return { ...entered, encounter };
   }
   const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
-  const { scenarioId } = pickScenario(content.house, run.seenScenarioIds, rng);
+  const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), run.seenScenarioIds, rng);
   return {
     ...entered,
     encounter: beginNarrativeEncounter({ run: entered, house: content.house, scenarioId }),
@@ -112,11 +114,13 @@ export function enterNode(input: EnterNodeInput): Run {
 /** Whether a run has ended — derived, never stored (STATE.md). A run is over
  *  when the seventh map is finished (completion) or every planet the player has
  *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
- *  because combustion is itself derived — affliction against each ceiling. */
+ *  because combustion is itself derived — affliction against each ceiling,
+ *  which the run's gains raise. */
 export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
   if (run.mapsCompleted >= MAPS_PER_RUN) return true;
   const tier = unlockedPlanets(numEncounters);
-  return tier.length > 0 && tier.every((p) => isCombusted(chart.planets[p], run.state[p]));
+  const planets = runChart(chart, run).planets;
+  return tier.length > 0 && tier.every((p) => isCombusted(planets[p], run.state[p]));
 }
 
 /**
@@ -153,9 +157,9 @@ export function shouldRolloverMap(run: Run, chart: Chart, numEncounters: number)
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
  *  the finished map to the event log, generates a fresh one, and passes the
- *  chart through the map boundary — uncombust rolls, then necessity,
- *  both seeded by the new map. The seventh completion ends the run: the final
- *  map stays current (not archived). */
+ *  chart, with the run's gains, through the map boundary — uncombust rolls,
+ *  then necessity, both seeded by the new map. The seventh completion ends the
+ *  run: the final map stays current (not archived). */
 export function rolloverMap(
   run: Run,
   chart: Chart,
@@ -168,7 +172,7 @@ export function rolloverMap(
   }
   const events = [...run.events, { kind: "map-completed" as const, map: run.map }];
   const crossed = rollMapBoundary(
-    chart, run.state, roster,
+    runChart(chart, run), run.state, roster,
     mulberry32(hashString(`${seed}_boundary`)),
   );
   const map: MapState = { ...newMapState(seed, roster), boundary: crossed.boundary };

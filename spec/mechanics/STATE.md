@@ -35,6 +35,7 @@ Run {
   seed:          felt252,        -- one true-RNG draw at run start; seeds all previewable map structure + gives between-run variety
   light:         u64,            -- cumulative Light; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
   state:         u64,            -- per-planet run state: 7 × u9 affliction = 63 bits; combustion is derived, not stored (MECHANICS §10)
+  gains:         u128,           -- per-planet stat gains from narrative choices, lasting the run: 7 planets × 4 stats × u4 count of +12 steps = 112 bits; zero at run start (ENCOUNTERS §2)
   map:           Map,            -- the current map only; past maps are emitted as events, not stored
   mapsCompleted: u3,             -- maps finished this run, 0..7; the run ends at 7 (completion, MECHANICS §11)
   encounter:     Option<Encounter>,  -- the active encounter; None while routing on the map

@@ -1,7 +1,7 @@
 import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./combat";
 import { getAspects, propagatedMagnitude } from "./aspects";
 import { combustionCeiling, isCombusted, newlyCombusted } from "./combust";
-import { cloneSideState } from "./chart";
+import { cloneSideState, runChart } from "./chart";
 import { encounterRuler } from "./encounter";
 import { turnLight } from "./score";
 import { hashString, mulberry32, pickWeighted } from "./rng";
@@ -38,15 +38,17 @@ export function combatTurnRng(run: Run, encounter: CombatEncounter): () => numbe
 
 /**
  * Resolves a single combat turn. Operates on RUN-LEVEL player state — affliction
- * and combustion persist across encounters and maps within a run.
+ * and combustion persist across encounters and maps within a run, and the
+ * player's chart carries the run's stat gains.
  */
 export function resolveTurn(
   run: Run,
-  playerChart: Chart,
+  chart: Chart,
   playerPlanet: PlanetName,
   playerValence: Polarity,
   rng: () => number,
 ): TurnResult | null {
+  const playerChart = runChart(chart, run);
   const enc = run.encounter;
   if (!enc || enc.kind !== "combat" || enc.resolved) return null;
   const opponentPlanet = enc.sequence[enc.turnIndex];

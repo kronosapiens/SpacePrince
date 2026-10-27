@@ -79,7 +79,7 @@ export function runTrial(trial: Trial): RunRecord {
     }
     const { graph, currentNodeId, visitedNodeIds } = run.map;
     const nodeId = play.policy.route(play, run, eligibleNext(graph, currentNodeId, visitedNodeIds));
-    run = enterNode({ run, nodeId, lifetimeEncounterCount: FULL_TIER });
+    run = enterNode({ run, chart, nodeId, lifetimeEncounterCount: FULL_TIER });
     steps.push(entryStep(run));
     run = playEncounter(play, run, (step) => steps.push(step));
     // Leave it as EncounterScreen's clearEncounter does.

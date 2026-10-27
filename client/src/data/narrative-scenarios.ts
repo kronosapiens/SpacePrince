@@ -2,12 +2,27 @@ import {
   anyCombusted, joyPresent, joyStrong, rulerStrong,
   type NarrativeContext, type NarrativeScenario, type Option, type Outcome, type Target,
 } from "@/game/narrative";
+import { NARRATIVE_ECONOMY } from "./economy";
+import type { PlanetStats, SignName } from "@/game/types";
 
 const L = (delta: number): Outcome => ({ kind: "light", delta });
 const A = (target: Target, delta: number): Outcome => ({ kind: "affliction", target, delta });
+const G = (target: Target, stat: keyof PlanetStats, amount: number): Outcome => ({ kind: "gain", target, stat, amount });
 const revive = (target: Target): Outcome => ({ kind: "uncombust", target });
 const choice = (id: string, text: string, consequence: string, effects: Outcome[], extra: Partial<Pick<Option, "cost" | "visibleIf">> = {}): Option =>
   ({ id, text, result: { text: consequence, effects }, ...extra });
+
+// House-and-sign scenes: offers and a way through, plus a joy choice where
+// the house has a joy and a revival choice while a planet is dark. The option's
+// own text records the outcome; planets in the house adjust the terms.
+const trade = (id: string, text: string, effects: Outcome[], extra: Pick<Option, "cost"> = {}): Option =>
+  ({ id, text, result: { effects }, ...extra });
+export const joyChoice = (id: string, text: string, effects: Outcome[], extra: Pick<Option, "cost"> = {}): Option =>
+  ({ ...trade(id, text, effects, extra), visibleIf: joyPresent });
+const revival = (text: string): Option =>
+  ({ ...trade("revive", text, [revive("chosen")], { cost: NARRATIVE_ECONOMY.revive.cost }), visibleIf: anyCombusted });
+const scene = (scenarioId: string, house: number, sign: SignName, text: string, options: Option[]): NarrativeScenario =>
+  ({ scenarioId, house, sign, text, options });
 
 // A chart-conditioned offer occupies the same menu slot as its standard form.
 const conditioned = (when: (ctx: NarrativeContext) => boolean, standard: Option, special: Option): Option[] => [
@@ -17,7 +32,8 @@ const conditioned = (when: (ctx: NarrativeContext) => boolean, standard: Option,
 const canShelter = (ctx: NarrativeContext) => rulerStrong(ctx) && anyCombusted(ctx);
 
 // Original encounter copy informed by spec/concept/HOUSE_MATRIX.md and PLANET_MATRIX.md.
-// Two scenes per house. Every option resolves immediately; the chart supplies
+// Two house-only scenes per house, the fallback until house-and-sign scenes
+// cover it, then those. Every option resolves immediately; the chart supplies
 // the targets, and mechanical asides are derived from these effects.
 export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
   {
@@ -290,6 +306,34 @@ export const NARRATIVE_SCENARIOS: NarrativeScenario[] = [
       choice("back", "Leave the inscription where it is.", "He sits beside the wall and looks again through the gap.", []),
     ],
   },
+  scene("home-libra-mara", 4, "Libra",
+    "At supper, your uncle calls for “the girl.” The woman who taught you to tie your shoes sets down the bread. “My name is Mara,” she says.", [
+      trade("pass", "Let it pass, and finish your supper.", [A("chosen", -24)], { cost: 24 }),
+      trade("name", "Tell your uncle her name, and leave his table.", [A("chosen", 24), L(96)]),
+      revival("Ask Mara to set another place."),
+      trade("thank", "Thank Mara by name.", []),
+    ]),
+  scene("home-capricorn-salting", 4, "Capricorn",
+    "It is the longest night, and your mother is salting the whole pig for spring. Your brother comes in red from the cold, holding up one sausage he kept back. “Just one,” he says, “for the dark.” Your mother doesn't look up. “Ask him what we eat in March.”", [
+      trade("cook", "Cook it with him at the hearth.", [A("chosen", -24)], { cost: 24 }),
+      trade("salt", "Take the knife and salt with your mother until dawn.", [A("chosen", 12), G("chosen", "resolve", 12)]),
+      revival("Bring whoever's out in the cold to the fire."),
+      trade("hang", "Hang it with the rest.", []),
+    ]),
+  scene("home-leo-harvest", 4, "Leo",
+    "Every harvest, your father wrestles the strongest hand on the farm, and every harvest he wins. This year his knee is strapped, and the farmhands are looking at you. He is already rolling up his sleeves. “Well?” he says. “Someone has to lose to me.”", [
+      trade("earnest", "Wrestle him in earnest.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("place", "Take his place against the strongest hand.", [A("chosen", 36), L(132)]),
+      revival("Save a place at the harvest table for the one who's been away."),
+      trade("yield", "Wrestle, and let him win.", []),
+    ]),
+  scene("home-pisces-flood", 4, "Pisces",
+    "The river is over the mill-race again, and your aunt has taken in another family: a fisherman's widow and her boys, asleep by the stove. That makes eleven under this roof. “They could have your bed,” she says, already apologizing, “just until the water goes down.”", [
+      trade("bed", "Give them your bed.", [A("chosen", 12), G("chosen", "luck", 12)]),
+      trade("loft", "Offer the barn loft instead.", [A("allUnlocked", -12)], { cost: 48 }),
+      revival("Make room for one more."),
+      trade("full", "Tell your aunt the house is full.", []),
+    ]),
 ];
 
 export const SCENARIOS_BY_HOUSE: Record<number, NarrativeScenario[]> = {};
@@ -302,10 +346,18 @@ export function getScenario(scenarioId: string): NarrativeScenario {
   return scenario;
 }
 
-export function pickScenario(house: number, seenScenarioIds: readonly string[], rng: () => number): NarrativeScenario {
+/** Unseen matching scenes, then unseen house-only scenes. Repeats stay within
+ *  the matching sign, or house-only scenes when that sign has none yet. */
+export function pickScenario(house: number, sign: SignName, seenScenarioIds: readonly string[], rng: () => number): NarrativeScenario {
   const all = SCENARIOS_BY_HOUSE[house] ?? [];
-  if (!all.length) throw new Error(`No scenarios for house ${house}`);
-  const fresh = all.filter((s) => !seenScenarioIds.includes(s.scenarioId));
-  const pool = fresh.length ? fresh : all;
-  return pool[Math.floor(rng() * pool.length)] ?? pool[0]!;
+  const matching = all.filter((s) => s.sign === sign);
+  const fallback = all.filter((s) => !s.sign);
+  const pool = [
+    matching.filter((s) => !seenScenarioIds.includes(s.scenarioId)),
+    fallback.filter((s) => !seenScenarioIds.includes(s.scenarioId)),
+    matching,
+    fallback,
+  ].find((scenes) => scenes.length);
+  if (!pool) throw new Error(`No scenarios for house ${house} in ${sign}`);
+  return pool[Math.floor(rng() * pool.length)]!;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { combatActions, narrativeOptions, type Policy, type PlayContext } from "@/eval/play";
+import { combatActions, narrativeOptions, snapshot, type Policy, type PlayContext } from "@/eval/play";
 import { forecast, lightPolicy, survivalPolicy } from "@/eval/policies";
 import { getScenario } from "@/data/narrative-scenarios";
 import { combustionCeiling } from "@/game/combust";
@@ -27,7 +27,7 @@ describe("strategic policies", () => {
   it("forecasts routes from what the map shows, never the live arrival or turn draws", () => {
     const hidden: Run = { ...run, id: "run_other", seed: run.seed + 1 };
     const liveDraw = (r: Run) => {
-      const entered = enterNode({ run: r, nodeId: combatId, lifetimeEncounterCount: prince.numEncounters });
+      const entered = enterNode({ run: r, chart: prince.chart, nodeId: combatId, lifetimeEncounterCount: prince.numEncounters });
       return combatTurnRng(entered, entered.encounter as CombatEncounter)();
     };
     expect(liveDraw(hidden)).not.toBe(liveDraw(run));
@@ -84,7 +84,6 @@ describe("strategic policies", () => {
       r.state.Saturn.affliction -= 48;
     });
     expect(choose(lightPolicy, lastLight)).toEqual({ optionId: "rough", selection: { chosen: "Saturn" } });
-
   });
 
   it("ranks combat actions by each strategy's criteria", () => {
@@ -114,6 +113,25 @@ describe("strategic policies", () => {
       .toEqual({ planet: "Mars", verb: "Affliction" });
   });
 
+  it("uses run gains when selecting planets and valuing narrative growth", () => {
+    const chooser = createStubPrince();
+    chooser.chart.ascendantSign = "Libra";
+    for (const p of PLANETS) chooser.chart.planets[p].sign = "Aries";
+    Object.assign(chooser.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
+    const r = beginRun(chooser.chart, 1, chooser.numEncounters);
+    for (const p of PLANETS) r.state[p].affliction = combustionCeiling(chooser.chart.planets[p]);
+    r.gains.Moon.resolve = 12;
+    const combat = beginCombatEncounter({ run: r, opponentSeed: 5, lifetimeEncounterCount: chooser.numEncounters });
+    expect(combatActions(r, chooser.chart, combat).map(a => a.planet)).toEqual(["Moon", "Moon"]);
+
+    const scenario = getScenario("home-capricorn-salting");
+    r.encounter = beginNarrativeEncounter({ run: r, house: 4, scenarioId: scenario.scenarioId });
+    const options = narrativeOptions(r, chooser, scenario).filter(({option}) => ["salt", "hang"].includes(option.id));
+    const play = { ...context(chooser, survivalPolicy), rng: () => 0.99 };
+    expect(survivalPolicy.narrative(play, r, options)).toEqual({ optionId: "salt", selection: { chosen: "Moon" } });
+    expect(snapshot(r).gains.Moon.resolve).toBe(12);
+  });
+
   it("routes by forecasting each candidate's encounter", () => {
     const ceiling = (p: PlanetName) => combustionCeiling(prince.chart.planets[p]);
     const at = (mapsCompleted: number, affliction: (p: PlanetName) => number): Run => {
@@ -131,13 +149,13 @@ describe("strategic policies", () => {
     const spent = at(2, (p) => ceiling(p) - (p === "Moon" ? 1 : 0));
     expect(route(survivalPolicy, spent)).toBe("3C");
     expect(route(lightPolicy, spent)).toBe("3C");
-    // From full health every candidate is survived: survival keeps the most
-    // capacity in the scene, Light takes the combat worth the most Light.
+    // From full health every candidate is survived. The house-sign scene
+    // now offers both the most remaining capacity and the most Light.
     expect(route(survivalPolicy, healthy)).toBe("3C");
-    expect(route(lightPolicy, healthy)).toBe("2L");
+    expect(route(lightPolicy, healthy)).toBe("3C");
 
     // Two scenes forecast alike; survival takes the one nearer the map's exit.
-    const tied = beginRun(prince.chart, 104, prince.numEncounters);
+    const tied = beginRun(prince.chart, 61, prince.numEncounters);
     const estimate = (id: string) => forecast(context(prince, survivalPolicy), tied, id);
     expect(estimate("2R")).toEqual(estimate("3C"));
     expect(survivalPolicy.route(context(prince, survivalPolicy), tied, ["3C", "2R"])).toBe("3C");

@@ -1,3 +1,4 @@
+import { runChart } from "@/game/chart";
 import { getScenario } from "@/data/narrative-scenarios";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
@@ -31,7 +32,8 @@ interface Measures { over: boolean; lit: number; capacity: number; light: number
 
 /** Lit planets and remaining capacity to absorb affliction, across the fielded roster. */
 function measure(run: Run, prince: Prince): Measures {
-  const { chart, numEncounters } = prince;
+  const { numEncounters } = prince;
+  const chart = runChart(prince.chart, run);
   const roster = unlockedPlanets(numEncounters);
   return {
     over: isOver(run, chart, numEncounters),
@@ -54,7 +56,7 @@ export function forecast(play: PlayContext, run: Run, nodeId: string): Forecast 
   for (let sample = 0; sample < FORECAST_SAMPLES; sample++) {
     const seed = hashString(`forecast_${chartSeed}_${gameSeed}_${strategySeed}_${run.mapsCompleted + 1}_${nodeId}_${sample}`);
     const entered = enterNode({
-      run, nodeId, lifetimeEncounterCount: play.prince.numEncounters, encounterIdSeed: hashString(`${seed}_arrival`),
+      run, chart: play.prince.chart, nodeId, lifetimeEncounterCount: play.prince.numEncounters, encounterIdSeed: hashString(`${seed}_arrival`),
     });
     const after = measure(playEncounter(forecastContext(play, seed), entered), play.prince);
     total.survived += after.over ? 0 : 1;

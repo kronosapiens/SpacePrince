@@ -3,11 +3,11 @@ import type { Chart, PlanetName, PlanetPlacement, PlanetState, SideState } from 
 
 /**
  * Combustion ceiling (MECHANICS.md §10) — the affliction a planet absorbs
- * before it goes out: base Resolve plus placement bonuses, in the same units
- * as affliction. Ceilings are multiples of 12.
+ * before it goes out: base Resolve plus placement bonuses and the run's gains,
+ * in the same units as affliction. Ceilings are multiples of 12.
  */
 export function combustionCeiling(placement: PlanetPlacement): number {
-  return placement.base.resolve + placement.buffs.resolve;
+  return placement.base.resolve + placement.buffs.resolve + (placement.gains?.resolve ?? 0);
 }
 
 /**

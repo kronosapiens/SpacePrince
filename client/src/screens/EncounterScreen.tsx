@@ -1,4 +1,4 @@
-import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, usePrinceDispatch, useActiveRun, useRunChart } from "@/state/PrinceStore";
 import { useInfoCards } from "@/state/InfoCardContext";
 import { useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
@@ -11,13 +11,14 @@ import { EncounterNarrativeScreen } from "./EncounterNarrative";
 export function EncounterScreen() {
   const prince = usePrince();
   const run = useActiveRun();
+  const chart = useRunChart();
   const dispatch = usePrinceDispatch();
   const commitTurn = useCommitTurn();
   const { enqueueCard } = useInfoCards();
   const settings = loadDevSettings();
 
   // PlaySurface only renders this for a run with a live encounter.
-  if (!prince || !run || !run.encounter) return null;
+  if (!prince || !run || !chart || !run.encounter) return null;
   const enc = run.encounter;
 
   // Clearing the encounter returns to the map, including when the run ends.
@@ -41,7 +42,7 @@ export function EncounterScreen() {
         run={run}
         prince={prince}
         encounter={enc}
-        onCommitTurn={(planet, valence, rng) => commitTurn(run, prince.chart, planet, valence, rng)}
+        onCommitTurn={(planet, valence, rng) => commitTurn(run, chart, planet, valence, rng)}
         onClearEncounter={clearEncounter}
         devUnlockAll={settings.unlockAll}
       />

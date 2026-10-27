@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
-import { chartRuler, seededChart } from "@/game/chart";
+import { chartRuler, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { combatTurnRng, resolveTurn } from "@/game/turn";
 import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
@@ -184,7 +184,7 @@ describe("Shared run transitions", () => {
   const nodeOf = (kind: NodeContent["kind"]) =>
     Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === kind)!;
   const enter = (r: Run, nodeId: string, encounterIdSeed?: number) =>
-    enterNode({ run: r, nodeId, lifetimeEncounterCount: prince.numEncounters, encounterIdSeed });
+    enterNode({ run: r, chart: prince.chart, nodeId, lifetimeEncounterCount: prince.numEncounters, encounterIdSeed });
 
   it("entering a node marks it visited and opens its encounter from the live seeds", () => {
     const combatId = nodeOf("combat");
@@ -196,16 +196,16 @@ describe("Shared run transitions", () => {
       beginCombatEncounter({ run, opponentSeed, lifetimeEncounterCount: prince.numEncounters }),
     );
 
-    // Each house holds two scenarios, so check every narrative node of a few runs.
+    // Check every narrative node of a few runs against its actual house sign.
     for (const r of [42, 43, 44].map((seed) => beginRun(prince.chart, seed, prince.numEncounters))) {
       for (const [nodeId, content] of Object.entries(r.map.rolledNodes)) {
         if (content.kind !== "narrative") continue;
         const { house } = content;
-        const { scenarioId } = pickScenario(house, [], mulberry32(hashString(`${r.id}_${house}_${nodeId}`)));
+        const { scenarioId } = pickScenario(house, houseSign(prince.chart, house), [], mulberry32(hashString(`${r.id}_${house}_${nodeId}`)));
         const narrative = enter(r, nodeId);
         expect(narrative.encounter).toMatchObject({ kind: "narrative", house, scenarioId });
         expect(narrative.seenScenarioIds).toEqual([scenarioId]);
-        // No repeats: once seen, the house offers its other scenario.
+        // Once seen, another matching or house-only scene is available.
         expect(enter({ ...r, seenScenarioIds: [scenarioId] }, nodeId).encounter).not.toMatchObject({ scenarioId });
       }
     }

@@ -8,6 +8,7 @@ import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { hashString, mulberry32 } from "@/game/rng";
 import { combatTurnRng, resolveTurn, type TurnResult } from "@/game/turn";
 import { isOver } from "@/game/run";
+import { runChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";
 import { playUISound, setTheme } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -55,6 +56,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const { run, prince, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const devAnimationControls = props.devAnimationControls ?? false;
   const { setActive } = useActivePlanet();
+  // The run's chart: every stat, ceiling, preview and score here reads its gains.
+  const playerChart = useMemo(() => runChart(prince.chart, run), [prince.chart, run.gains]);
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
@@ -87,7 +90,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [encounter.id, encounter.turnIndex]);
 
   // `over` is derived (STATE.md): the run ended once every fielded planet combust.
-  const runEnded = isOver(run, prince.chart, prince.numEncounters);
+  const runEnded = isOver(run, playerChart, prince.numEncounters);
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -144,18 +147,18 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   );
   const guidePlanet = useMemo(
     () => playerUnlocked.find(
-      (planet) => !isCombusted(prince.chart.planets[planet], run.state[planet]),
+      (planet) => !isCombusted(playerChart.planets[planet], run.state[planet]),
     ) ?? null,
-    [playerUnlocked, prince.chart, run.state],
+    [playerUnlocked, playerChart, run.state],
   );
   // One of the example planet's drawn aspect lines, by its far end, for the
   // guide to trace.
   const guideAspect = useMemo(() => {
     if (!guidePlanet) return null;
     const drawn = (planet: PlanetName) =>
-      playerUnlocked.includes(planet) && !isCombusted(prince.chart.planets[planet], run.state[planet]);
-    return getAspects(prince.chart).find((a) => a.from === guidePlanet && drawn(a.to))?.to ?? null;
-  }, [guidePlanet, playerUnlocked, prince.chart, run.state]);
+      playerUnlocked.includes(planet) && !isCombusted(playerChart.planets[planet], run.state[planet]);
+    return getAspects(playerChart).find((a) => a.from === guidePlanet && drawn(a.to))?.to ?? null;
+  }, [guidePlanet, playerUnlocked, playerChart, run.state]);
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
   // and the one that says how you gain Light here (`score.ts` `RULER_RULES`).
@@ -169,8 +172,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     setActive(ruler);
   }, [ruler, setActive]);
   const scoreCharts = useMemo(
-    () => ({ self: prince.chart, other: encounter.opponentChart }),
-    [prince.chart, encounter.opponentChart],
+    () => ({ self: playerChart, other: encounter.opponentChart }),
+    [playerChart, encounter.opponentChart],
   );
 
   // Inspection pins the panel so its action buttons remain reachable.
@@ -185,11 +188,11 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const projection = useMemo(() => {
     if (animation || opening.active) return null;
     if (!previewPlanet || !opponentTurn) return null;
-    if (isCombusted(prince.chart.planets[previewPlanet], run.state[previewPlanet])) return null;
-    const playerAspects = getAspects(prince.chart);
+    if (isCombusted(playerChart.planets[previewPlanet], run.state[previewPlanet])) return null;
+    const playerAspects = getAspects(playerChart);
     const opponentAspects = getAspects(encounter.opponentChart);
     return computeProjectedEffects({
-      playerChart: prince.chart,
+      playerChart,
       opponentChart: encounter.opponentChart,
       playerPlanet: previewPlanet,
       opponentPlanet: opponentTurn,
@@ -202,7 +205,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       roster: encounter.roster,
       modelPreemption: !!indicatedVerb,
     });
-  }, [animation, opening.active, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, encounter.roster, prince.chart]);
+  }, [animation, opening.active, previewPlanet, indicatedVerb, opponentTurn, opponentAction, run.state, encounter.opponentState, encounter.opponentChart, encounter.roster, playerChart]);
 
   // What this gesture would add to Light, under the ruler's rule. Gated
   // like the other verb-dependent previews — nothing until a verb is indicated
@@ -225,14 +228,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     if (opponentAction !== "Affliction") return null;
     const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).affliction;
     const candidates = playerUnlocked.filter(
-      (p) => !isCombusted(prince.chart.planets[p], run.state[p]),
+      (p) => !isCombusted(playerChart.planets[p], run.state[p]),
     );
     const self = new Set(
-      candidates.filter((p) => wouldCombust(prince.chart.planets[p], run.state[p], incoming)),
+      candidates.filter((p) => wouldCombust(playerChart.planets[p], run.state[p], incoming)),
     );
     const maxAnswer = Math.max(
       0,
-      ...candidates.map((p) => getEffectiveStats(prince.chart, p).affliction),
+      ...candidates.map((p) => getEffectiveStats(playerChart, p).affliction),
     );
     const other = wouldCombust(
       encounter.opponentChart.planets[opponentTurn],
@@ -242,7 +245,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       ? new Set([opponentTurn])
       : null;
     return { self: self.size > 0 ? self : null, other };
-  }, [animation, opening.active, encounter, opponentTurn, opponentAction, playerUnlocked, run.state, prince.chart]);
+  }, [animation, opening.active, encounter, opponentTurn, opponentAction, playerUnlocked, run.state, playerChart]);
 
   // The warnings stay conservative under any preview — their meaning is "dies
   // if the blow lands," which holds. An afflict preview that preempts tells its
@@ -307,7 +310,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     !settled && outgoingPlanet && outgoingVerb
       ? {
           verb: outgoingVerb,
-          amount: directAmount(getEffectiveStats(prince.chart, outgoingPlanet), outgoingVerb),
+          amount: directAmount(getEffectiveStats(playerChart, outgoingPlanet), outgoingVerb),
         }
       : null;
 
@@ -324,14 +327,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       }
       if (guideOpen && guidePhase !== "act") return;
       if (!playerUnlocked.includes(planet)) return;
-      if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
+      if (isCombusted(playerChart.planets[planet], run.state[planet])) return;
       if (selected !== planet) playUISound("select");
       setSelected(planet);
       setHovered(null);
       if (guideOpen) setGuideAction("Testimony");
       setPreviewAction(null);
     },
-    [animation, opening.active, encounter.resolved, prince.chart, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase, selected],
+    [animation, opening.active, encounter.resolved, playerChart, run.state, playerUnlocked, skipAnimation, guideOpen, guidePhase, selected],
   );
 
   const handlePlayerHover = useCallback((planet: PlanetName | null) => {
@@ -342,14 +345,14 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const handleCommit = useCallback(
     (planet: PlanetName, action: Polarity) => {
       if (guideOpen || opening.active || animation || encounter.resolved || !opponentTurn) return;
-      if (isCombusted(prince.chart.planets[planet], run.state[planet])) return;
+      if (isCombusted(playerChart.planets[planet], run.state[planet])) return;
       const rng = combatTurnRng(run, encounter);
       const previousRun = run;
       const previousEncounter = encounter;
       // Snapshot the projection for the *chosen* action so the badges shown
       // during playback match the committed turn, independent of hover/focus.
       const projectionSnapshot = computeProjectedEffects({
-        playerChart: prince.chart,
+        playerChart,
         opponentChart: encounter.opponentChart,
         playerPlanet: planet,
         opponentPlanet: opponentTurn,
@@ -357,7 +360,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         opponentValence: opponentAction,
         playerState: run.state,
         opponentState: encounter.opponentState,
-        playerAspects: getAspects(prince.chart),
+        playerAspects: getAspects(playerChart),
         opponentAspects: getAspects(encounter.opponentChart),
         roster: encounter.roster,
       });
@@ -368,7 +371,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         entry: committed.log,
         previousRun,
         previousEncounter,
-        playerChart: prince.chart,
+        playerChart,
         projectedDeltas: projectionSnapshot,
       });
       setSelected(null);
@@ -377,7 +380,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       setHovered(null);
       setPreviewAction(null);
     },
-    [guideOpen, opening.active, animation, encounter, run, opponentTurn, opponentAction, prince.chart, onCommitTurn, startAnimation],
+    [guideOpen, opening.active, animation, encounter, run, opponentTurn, opponentAction, playerChart, onCommitTurn, startAnimation],
   );
 
   // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
@@ -402,7 +405,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       };
       const devRun: Run = { ...run, encounter: devEncounter };
       const rng = mulberry32((run.seed ^ hashString(cfg.opponentPlanet)) >>> 0);
-      const result = resolveTurn(devRun, prince.chart, cfg.playerPlanet, cfg.valence, rng);
+      const result = resolveTurn(devRun, playerChart, cfg.playerPlanet, cfg.valence, rng);
       if (!result) return;
       const entry: TurnLogEntry = { ...result.log };
       playUISound("select");
@@ -413,21 +416,21 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         entry,
         previousRun: devRun,
         previousEncounter: devEncounter,
-        playerChart: prince.chart,
+        playerChart,
         projectedDeltas: null,
       });
     },
-    [animation, skipAnimation, encounter, run, prince.chart, startAnimation],
+    [animation, skipAnimation, encounter, run, playerChart, startAnimation],
   );
 
   // Actions belong to the inspected planet; activation supplies the verb.
   const playerActions: PlanetStatsActions | undefined =
     inspected && !opening.active && !animation && !encounter.resolved &&
-    !isCombusted(prince.chart.planets[inspected], run.state[inspected])
+    !isCombusted(playerChart.planets[inspected], run.state[inspected])
       ? {
           choices: [
-            { verb: "Testimony", value: getEffectiveStats(prince.chart, inspected).testimony },
-            { verb: "Affliction", value: getEffectiveStats(prince.chart, inspected).affliction },
+            { verb: "Testimony", value: getEffectiveStats(playerChart, inspected).testimony },
+            { verb: "Affliction", value: getEffectiveStats(playerChart, inspected).affliction },
           ],
           preview: indicatedVerb,
           onChoose: (v) => {
@@ -493,7 +496,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   usePlayerChart({
     props: {
-      chart: prince.chart,
+      chart: playerChart,
       state: displayPlayerState,
       unlockedPlanets: playerUnlocked,
       selectedPlanet: selected,

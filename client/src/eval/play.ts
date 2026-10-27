@@ -1,3 +1,4 @@
+import { runChart } from "@/game/chart";
 import { getScenario } from "@/data/narrative-scenarios";
 import { isCombusted, newlyCombusted } from "@/game/combust";
 import { PLANETS } from "@/game/data";
@@ -40,9 +41,10 @@ export interface Policy {
 }
 
 /** The state a step leaves behind, so a record shows every change. */
-export function snapshot(run: Run): { light: number; affliction: Record<PlanetName, number> } {
+export function snapshot(run: Run): { light: number; affliction: Record<PlanetName, number>; gains: Run["gains"] } {
   return {
     light: run.light,
+    gains: run.gains,
     affliction: Object.fromEntries(PLANETS.map((p) => [p, run.state[p].affliction])) as Record<PlanetName, number>,
   };
 }
@@ -67,8 +69,9 @@ const VERBS: Polarity[] = ["Affliction", "Testimony"];
 
 /** Every lit fielded planet, sent with either verb. */
 export function combatActions(run: Run, chart: Chart, encounter: CombatEncounter): CombatAction[] {
+  const placements = runChart(chart, run).planets;
   return encounter.roster
-    .filter((planet) => !isCombusted(chart.planets[planet], run.state[planet]))
+    .filter((planet) => !isCombusted(placements[planet], run.state[planet]))
     .flatMap((planet) => VERBS.map((verb) => ({ planet, verb })));
 }
 
@@ -92,8 +95,8 @@ export function playEncounter(play: PlayContext, run: Run, record: (step: Step) 
       optionId,
       chosen: selection.chosen ?? null,
       lightDelta: next.light - run.light,
-      combusts: newlyCombusted(chart, run.state, next.state),
-      revivals: newlyCombusted(chart, next.state, run.state),
+      combusts: newlyCombusted(runChart(chart, next), run.state, next.state),
+      revivals: newlyCombusted(runChart(chart, next), next.state, run.state),
       ...snapshot(next),
     });
     return next;
@@ -112,7 +115,7 @@ export function playEncounter(play: PlayContext, run: Run, record: (step: Step) 
       playerDelta: log.playerDelta,
       opponentDelta: log.opponentDelta,
       lightGain: log.lightGain,
-      combusts: newlyCombusted(chart, run.state, result.run.state),
+      combusts: newlyCombusted(runChart(chart, run), run.state, result.run.state),
       opponentCombusts: newlyCombusted(enc.opponentChart, enc.opponentState, result.encounter.opponentState),
       ...snapshot(result.run),
     });

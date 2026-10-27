@@ -795,7 +795,8 @@
    are one readout and take one style, which the italic on `.ps-ratio` sets for
    both. Dimming the label or tracking it apart made it read as the lighter of
    the two rather than the same thing on a second line. */
-.ps-ratio-label { display: block; }
+.ps-ratio-label,
+.ps-ratio-preview { display: block; }
 /* Epithet on its own line — the name + role together overrun the panel for the
    longest planets (Saturn, Mercury) once the disclosure triangle is added.
    Stacking reads as a name/title pair and is immune to label length. */
@@ -885,6 +886,12 @@
 .ps-table col.c-base { width: 76px; }
 .ps-table col.c-place { width: 84px; }
 .ps-table col.c-total { width: 71px; }
+/* The run's gains take a fifth column from the same 330 units. */
+.ps-table.has-gains col.c-base { width: 60px; }
+.ps-table.has-gains col.c-place { width: 64px; }
+.ps-table.has-gains col.c-gains { width: 48px; }
+.ps-table.has-gains col.c-total { width: 59px; }
+.ps-table.has-gains :is(th, td) { padding-inline: 3px; }
 .ps-table thead th,
 .ps-table td.ps-rowlabel {
   white-space: nowrap;
@@ -1026,6 +1033,10 @@
   text-wrap: pretty;
 }
 .narrative-body p { margin: 0; }
+.narrative-body .narrative-occupants {
+  color: var(--mist);
+  font-size: 20px;
+}
 .narrative-house {
   font-family: var(--serif);
   font-size: 26px;

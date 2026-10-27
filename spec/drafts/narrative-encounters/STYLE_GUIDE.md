@@ -1,10 +1,11 @@
 # Working guide for narrative encounters
 
-**Status: developing the writing method, 2026-10-10.**
-The working unit is a short scene accompanied by a few possible ways the Prince could participate.
-The aim is a specific human situation that makes participation meaningful; writing at scale remains premature.
+**Status: method for the house–sign catalogue, 2026-10-13.**
+The working unit is a short scene for one house and sign, with a small set of choices.
+The initial catalogue target is 720 scenes: five for each of the 144 house–sign pairs.
 
-Keep the evolving workflow, useful examples, and review findings together here, revising them in place.
+Keep the evolving workflow and review findings together here, revising them in place.
+Scene content — briefs and worked examples — lives in [SCENES.md](SCENES.md).
 Replace superseded material instead of accumulating review documents or competing instructions.
 When the method settles, incorporate what remains useful into the existing authoring reference and remove this draft and the links to it.
 The [research notes](../../research/NARRATIVE_VOICE.md) retain the source evidence for the voice and length experiments.
@@ -12,19 +13,33 @@ The [research notes](../../research/NARRATIVE_VOICE.md) retain the source eviden
 ## Develop the scene and participation together
 
 Use the selected [house and sign references](../../mechanics/HOUSES.md#3-chart-conditioning-model) to establish a particular situation.
-Give someone an understandable concern or feeling: Mara wants to be addressed by name; Lena finds sledding joyful.
-Include a few possible directions for participation, such as riding with Lena or asking to take the brake.
+Give someone an understandable concern or feeling: Mara wants to be addressed by name; a brother wants one sausage for the dark.
+Include a few possible directions for participation.
 These are enough to assess the scene without enumerating every action or assembling a finished menu.
 
 Ask what makes participating a meaningful decision.
 Most decision encounters need something unresolved: a demand, competing wants, an opportunity with conditions, or a reason different forms of participation matter.
 Pleasure can contain tension without becoming a quarrel.
-Occasional uncomplicated gifts and welcomes can provide relief; avoid making every encounter a moral confrontation.
+Avoid making every encounter a moral confrontation.
 
 Keep the Prince's motive open during this pass.
 Other characters can express wants directly; the Prince's eventual drive and the player's experience remain distinct under [DRIVES.md](../../concept/DRIVES.md).
-Riding with Lena could express affection, excitement, or trust.
-The action alone need not settle which.
+
+## Let the sign describe the house's people and places
+
+Under whole-sign houses a Prince always meets the same sign in each house, so the sign makes that house his.
+Following the [sign notes](../../research/SIGN_NOTES.md#how-a-sign-qualifies-a-house), the sign describes the people, places, season, and manner of the house's affairs, not the Prince.
+In the House IV test, Libra gave a household arguing over courtesy, Capricorn the longest night and the winter stores, Leo a father's harvest title, and Pisces a flooded house that keeps taking people in.
+Each changed who was present and what they wanted, not only the backdrop.
+
+A sign's planets of dignity and debility often name its tensions: Capricorn's Saturn, Mars, Moon, and Jupiter map onto thrift, labor, comfort, and generosity deferred.
+Use them as a source of situations, not as a checklist.
+
+## Characters
+
+Names are for flavor.
+Each scene's relationships stand alone: a Prince's rising sign selects a pool of 60 scenes, and they need not agree on who his mother or brother is.
+Write so a scene does not depend on the Prince having exactly one of anyone.
 
 ## Voice and length
 
@@ -45,6 +60,53 @@ The action alone need not settle which.
 
 Keep generated narration separate from the sourced planetary aria under the [planetary voice guidance](../../concept/PLANETS.md#2-universal-voice-rules).
 
+## Choices and economics
+
+Once the scene and participation are convincing, turn the participation into choices.
+A developed option is **choice narration and economic effect**; there is no separate outcome narration.
+Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md) and the provisional rates in [economy.ts](../../../client/src/data/economy.ts).
+
+- **Compose a small set of choices.**
+  Trades exchange Light, affliction, recovery, or run-long stat gains.
+  Gifts and mutually exclusive benefits need no matching payment: choosing one can mean forgoing another.
+  Include a valid way through at zero Light and every unlock tier, usually an exit or an available gift.
+  An exit may cost a little Light in an averse house; declining an offer can be the comfortable or decent course.
+- **Vary the decision.**
+  Use the [choice structures in ENCOUNTERS.md §1.2](../../mechanics/ENCOUNTERS.md#12-choice-families): choose a benefit, commitment size, payment, or concentrated versus distributed effects.
+  Their example amounts are provisional; let the situation justify the offers.
+  Compare recovery with Resolve's immediate capacity, group effects with actual lit recipients, and costs after occupant terms.
+  Keep the whole visible menu within five choices, including joy and revival, and use at most one independently chosen planet per option.
+- **The house guides the terms.**
+  Houses that aspect the Ascendant generally offer more favorable opportunities; II, VI, VIII, and XII can offer harsher terms.
+  Use the provisional rates as a reference and compare opportunities across the house–sign pool and representative run states.
+  Do not require the same surplus from every choice.
+  Value recovery at 2 Light per point and affliction taken at 3, as in [ENCOUNTERS.md §6](../../mechanics/ENCOUNTERS.md#6-provisional-amounts).
+- **The fiction justifies each exchange.**
+  Revise the fiction if it does not support the proposed exchange.
+  A disagreement alone does not justify affliction; leaving shelter, hard work, or a cold floor can.
+  An obvious response should not disappear solely to manufacture a cost.
+- **Joy houses add a joy choice.**
+  In the seven houses with a joy, each scene also writes one choice for its joyful planet, shown when that planet is present under [ENCOUNTERS.md §4.1](../../mechanics/ENCOUNTERS.md#41-planetary-joys).
+  It offers better terms than the scene's trades, or an exchange they lack, in that planet's manner.
+  It can change the action, benefit, or recipients as well as the price.
+- **Revival where a return fits.**
+  Add a revival choice where the house supports a return; every House IV scene has one.
+  It costs the flat revival price and appears only when a planet is combusted.
+- **Planets in the house are not written.**
+  Their effect on existing costs is computed under [ENCOUNTERS.md §4.2](../../mechanics/ENCOUNTERS.md#42-occupants-and-dignity); write scenes that work for any occupant.
+
+Options may deliberately offer unequal economic value when the difference gives the player a meaningful reason to sacrifice an advantage.
+The morally troubling choice may be the economically strongest one, as when letting Mara's correction pass buys a cheap supper.
+Make the advantage being surrendered clear, and let the player decide whether refusing it is worth the cost.
+Avoid automatically compensating that refusal with another reward, or making every decent act expensive.
+
+## Plan variety with briefs
+
+Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its economic choices.
+Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
+Five scenes in one house–sign pair should differ in people, register, and economic decisions.
+Mix the choice structures where the fiction supports them; there is no requirement to assign one scene to each structure.
+
 ## Review through comparisons
 
 Compare a small number of scenes before expanding the catalogue.
@@ -62,68 +124,18 @@ Show the scene and possible participation without an explanation of why the writ
    Keep only feedback useful to the next iteration here.
    A model's approval does not establish the reader's preference or readiness to generate at scale.
 
-The first comparisons produced these useful findings:
+The comparisons so far produced these findings:
 
 | Comparison | Reader feedback | Working implication |
 | --- | --- | --- |
-| Mara speaking directly versus narration reporting her request | The direct request was preferred. | Preserve the accepted scene below; further near-duplicate comparisons add little. |
+| Mara speaking directly versus narration reporting her request | The direct request was preferred. | Let people say what they want. |
 | Lena's shared history versus a joke in dialogue | The history “evokes a larger backstory,” but screaming could mean joy or pain. | Keep the sense of an earlier shared experience and clarify its emotional character. |
 | A mother gives the Prince a key while his brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
+| House IV under Libra, Capricorn, Leo, and Pisces | “Each of these scenes has something to draw the reader in.” | The sign can carry the situation; proceed to house–sign scenes. |
 
-The later sled revision was liked for establishing Lena's joy, but the scene still needed meaningful participation.
+## Next: the initial catalogue
 
-## Develop choices and economics afterward
-
-Once the scene and possible participation are convincing, develop choice narration and economic effects together with the chosen drive and chart context.
-Use the [encounter economy and eligibility rules](../../mechanics/ENCOUNTERS.md) to make costs, benefits, and targets concrete.
-Revise the fiction if it does not support the proposed exchange.
-A disagreement alone does not justify affliction, and an obvious response should not disappear solely to manufacture a cost.
-
-For this authoring process, a developed option consists of **choice narration and economic effect**.
-Separate outcome narration is unnecessary.
-This direction does not change the existing client's result text or resolver.
-
-Options may deliberately offer unequal economic value when the difference gives the player a meaningful reason to sacrifice an advantage.
-The morally troubling choice may be the economically strongest one.
-Make the advantage being surrendered clear, and let the player decide whether refusing it is worth the cost.
-Avoid automatically compensating that refusal with another reward, or making every decent act expensive.
-Comparable economic opportunity across charts remains a separate catalogue concern.
-
-## Mara
-
-**Accepted prose reference; House IV / Libra.**
-
-> At supper, your uncle calls for “the girl.”
-> The woman who taught you to tie your shoes sets down the bread.
-> “My name is Mara,” she says.
-
-The childhood detail gives the relationship substance, and the direct request needs no explanatory closing line.
-The dramatic focus is the conflict with the uncle and the Prince's relationship to his family and values.
-Possible participation includes letting the exchange pass or challenging the uncle and refusing his hospitality.
-
-## Lena and the sled
-
-**Accepted for the shared history and emotional anchor; participation still under development.**
-
-> Your friends have hauled the sled to the top of the hill and saved you a place behind Lena.
-> She grips the brake; last winter, her shrieks of laughter could be heard from the village.
-
-Riding behind Lena, taking the brake, or helping launch the sled suggest ways to participate.
-The missing distinction is why these forms of participation matter to anyone here.
-
-**A development to test:**
-
-> Lena has dragged the sled past the village slope to the steep orchard track.
-> Last winter, her shrieks of laughter could be heard from the village.
-> She pats the place behind her.
-> “No braking until the gate.”
-
-Possible participation: accept her terms, insist on taking the brake, or suggest the gentler slope.
-Her joy now comes with a condition the Prince can respond to, while his own feelings remain open.
-Test whether this creates a meaningful decision while retaining the pleasure that made the scene appealing.
-
-## Next exercise
-
-Try fresh scenes with brief participation directions, using the comparison process above.
-Establish whether the situations work before polishing their wording or pricing their actions.
-Further reviews and eventual playtesting are needed before treating this method as ready for large-scale generation.
+Generate five scenes for every house–sign pair, retaining the four existing House IV scenes within their respective pools.
+Work in batches: briefs first, then scenes and offers, then editorial review and resolver validation before integration.
+Review across batches for repeated situations and economic menus, and playtest several rising signs so coverage is not judged from one Prince alone.
+The first pass supplies the full catalogue for the demo; balance and writing continue to improve through playtesting.

@@ -5,6 +5,7 @@ import { deriveStatTable } from "@/game/combat";
 import { PLANET_ROLE } from "@/game/data";
 import { PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { TermText } from "@/components/TermText";
+import { STAT_COLUMNS } from "@/copy/stats";
 import { VALENCE_COLOR } from "@/svg/palette";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -34,6 +35,8 @@ interface PlanetStatsPanelProps {
   actions?: PlanetStatsActions;
   /** Actual narrative effect, computed by the encounter's resolver. */
   effect?: { verb: Polarity; value: number };
+  /** Final values for a pending narrative Resolve change. */
+  resolvePreview?: { ceiling: number; affliction: number };
   /** Study mode on — the card drops open to the gloss + stat table. */
   study?: boolean;
   /** When provided, the panel shows the study "i" toggle. */
@@ -78,6 +81,7 @@ export function PlanetStatsPanel({
   height,
   actions,
   effect,
+  resolvePreview,
   study = false,
   onToggleStudy,
 }: PlanetStatsPanelProps) {
@@ -116,6 +120,7 @@ export function PlanetStatsPanel({
   });
 
   const table = deriveStatTable(chart.planets[planet]);
+  const hasGains = table.rows.some((row) => row.gains);
   const x0 = cx - W / 2;
   // Top fixed; study grows downward — unless the grown box would run off the
   // chart's bottom edge, in which case the panel
@@ -163,6 +168,7 @@ export function PlanetStatsPanel({
               <span className="ps-ratio">
                 <span className="ps-ratio-label">Resolve</span>
                 {Math.max(0, table.resolve - affliction)}/{table.resolve}
+                {resolvePreview && <span className="ps-ratio-preview">→ {Math.max(0, resolvePreview.ceiling - resolvePreview.affliction)}/{resolvePreview.ceiling}</span>}
               </span>
             </div>
           </div>
@@ -170,21 +176,23 @@ export function PlanetStatsPanel({
           {study ? (
             <div className="ps-study">
               <div className="ps-gloss">{PLANET_GLOSS[planet]}</div>
-              <table className="ps-table">
+              <table className={`ps-table ${hasGains ? "has-gains" : ""}`}>
                 {/* Named columns so the widths in layout.css can follow each
                     column's own content rather than splitting evenly. */}
                 <colgroup>
                   <col className="c-label" />
                   <col className="c-base" />
                   <col className="c-place" />
+                  {hasGains && <col className="c-gains" />}
                   <col className="c-total" />
                 </colgroup>
                 <thead>
                   <tr>
                     <th aria-hidden />
-                    <th scope="col">Base</th>
-                    <th scope="col">Place</th>
-                    <th scope="col">Total</th>
+                    <th scope="col">{STAT_COLUMNS.core}</th>
+                    <th scope="col">{STAT_COLUMNS.placement}</th>
+                    {hasGains && <th scope="col">{STAT_COLUMNS.gains}</th>}
+                    <th scope="col">{STAT_COLUMNS.total}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -209,6 +217,7 @@ export function PlanetStatsPanel({
                       </td>
                       <td>{row.core}</td>
                       <td>{row.placement || ""}</td>
+                      {hasGains && <td>{row.gains || ""}</td>}
                       <td>{row.total}</td>
                     </tr>
                   ))}

@@ -75,6 +75,7 @@ export function MapScreen() {
       }
       nextRun = enterNode({
         run: nextRun,
+        chart: prince.chart,
         nodeId,
         lifetimeEncounterCount: prince.numEncounters,
         devUnlockAll: settings.unlockAll,

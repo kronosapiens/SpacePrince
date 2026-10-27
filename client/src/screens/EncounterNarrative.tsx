@@ -8,8 +8,9 @@ import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
-import { describeOptionParts } from "@/copy/narrative";
-import { newlyCombusted } from "@/game/combust";
+import { describeOptionParts, occupantLine } from "@/copy/narrative";
+import { combustionCeiling, newlyCombusted } from "@/game/combust";
+import { runChart } from "@/game/chart";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
@@ -67,6 +68,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     setTheme(rulerPlanet, "narrative");
   }, [rulerPlanet]);
 
+  // The run's chart: the wheel, its stats and ceilings read the run's gains.
+  const chart = useMemo(() => runChart(prince.chart, run), [prince.chart, run.gains]);
   const ctx = useMemo(
     () => narrativeContext(prince, run, encounter.house, devUnlockAll),
     [prince, run, encounter.house, devUnlockAll],
@@ -88,6 +91,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     light: number;
   } | null>(null);
   const committedRef = useRef(false);
+  const occupants = occupantLine(ctx.occupants);
   const rows = useMemo(() => visibleOptions(run, ctx, scenario).map(({ option, selections: assignments }) => {
     const preview = previewOption(run, ctx, option);
     return {
@@ -108,7 +112,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const eligiblePlanets = new Set(targeting
     ? selectedRow!.assignments.flatMap((s) => s.chosen ? [s.chosen] : [])
     : ctx.unlocked);
-  const targetEffect = indicatedOption?.result.effects.find((e) => "target" in e && e.target === "chosen");
+  const targetEffect = indicatedOption?.result.effects.find((e) =>
+    "target" in e && e.target === "chosen" && !(e.kind === "affliction" && e.delta === 0));
   const verb: Polarity = targetEffect?.kind === "affliction" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
   const choosePlanet = (planet: PlanetName) => {
     if (resolved || committedRef.current || !eligiblePlanets.has(planet)) return;
@@ -139,9 +144,13 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   }, [resolved, resetChoice]);
   const projection: ProjectionChips = { deltas: {} };
   if (!resolved && preview?.ok) {
+    const afterChart = runChart(prince.chart, preview.success);
     for (const p of ctx.unlocked) {
-      const delta = preview.success.state[p].affliction - run.state[p].affliction;
-      if (delta) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony" };
+      const affliction = preview.success.state[p].affliction;
+      const delta = affliction - run.state[p].affliction;
+      const ceiling = combustionCeiling(afterChart.planets[p]);
+      const resolve = ceiling !== combustionCeiling(chart.planets[p]) ? { ceiling, affliction } : undefined;
+      if (delta || resolve) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony", resolve };
     }
   }
 
@@ -157,7 +166,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     // Dramatize the resolution on the chart: heal/harm valence bloom per planet,
     // a candle-out ripple for any combust, and a Light pulse (SCREENS.md §3.5).
     const effect = new Map<PlanetName, Polarity>();
-    const combusting = new Set<PlanetName>(newlyCombusted(prince.chart, run.state, nextRun.state));
+    const combusting = new Set<PlanetName>(newlyCombusted(runChart(prince.chart, nextRun), run.state, nextRun.state));
     for (const p of PLANETS) {
       const before = run.state[p];
       const after = nextRun.state[p];
@@ -188,12 +197,12 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
   const planetDelta = inspectedPlanet && preview?.ok
     ? preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction : 0;
-  const planetEffect = !resolved && preview?.ok && inspectedPlanet && (targetEffect || planetDelta)
+  const planetEffect = !resolved && preview?.ok && inspectedPlanet && (targetEffect?.kind === "affliction" || planetDelta)
     ? { verb: planetDelta > 0 ? "Affliction" as const : "Testimony" as const, value: Math.abs(planetDelta) }
     : undefined;
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
-  const runEnded = isOver(run, prince.chart, prince.numEncounters);
+  const runEnded = isOver(run, chart, prince.numEncounters);
 
   const advance = useEncounterAdvance(
     resolved, onClearEncounter, runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800,
@@ -201,7 +210,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
 
   const chartRef = usePlayerChart({
     props: {
-      chart: prince.chart,
+      chart,
       state: run.state,
       unlockedPlanets: ctx.unlocked,
       activePlanet: !targeting && joyPresent(ctx) ? joyPlanet : null,
@@ -273,6 +282,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
             </div>
           </div>
           <p>{resolved ? (encounter.resolutionText ?? "It is finished.") : scenario.text}</p>
+          {occupants && <p className="narrative-occupants">{occupants}</p>}
         </div>
 
         <div className={`narrative-options ${resolved ? "is-resolved" : ""} ${targeting ? "is-targeting" : ""}`} data-guide="narrative-options" style={{ "--vc": PLANET_PRIMARY[rulerPlanet] } as CSSProperties}>

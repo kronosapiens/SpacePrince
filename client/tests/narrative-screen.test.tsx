@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EncounterNarrativeScreen } from "@/screens/EncounterNarrative";
 import { beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
+import { PLANETS } from "@/game/data";
 import { combustionCeiling } from "@/game/combust";
 import { getScenario } from "@/data/narrative-scenarios";
 import { createStubPrince } from "./fixtures";
@@ -37,8 +38,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mount(id: string) {
-  const prince = createStubPrince();
+function mount(id: string, prince = createStubPrince()) {
   const scenario = getScenario(id);
   const run = { ...beginRun(prince.chart, 42, prince.numEncounters), light: 120 };
   run.state.Moon.affliction = 10;
@@ -57,7 +57,7 @@ function mount(id: string) {
     </PlayerChartLayout>));
   };
   render();
-  return { run, onCommit, render };
+  return { prince, run, onCommit, render };
 }
 const element = (selector: string) => {
   const found = document.querySelector(selector);
@@ -231,6 +231,12 @@ describe("narrative chart interaction", () => {
     expect(playUISound).toHaveBeenLastCalledWith("commit");
   });
 
+  it("names the planets in the house and shows its terms", () => {
+    mount("relationships-stranger"); // the stub's seventh house holds Capricorn, home to its Saturn
+    expect(element(".narrative-occupants").textContent).toBe("Saturn is in this house: the terms are better.");
+    expect(element('[data-guide="option-aside-1"]').textContent).toBe("Testify 36 on a chosen planet");
+  });
+
   it("commits an untargeted option on first activation and keeps its result highlighted", () => {
     const { onCommit, render } = mount("livelihood-coin");
     const aside = element('[data-guide="option-aside-1"]').textContent;
@@ -258,5 +264,32 @@ describe("narrative chart interaction", () => {
     expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit.mock.calls[0]![0].light).toBe(132);
+  });
+});
+
+
+describe("narrative Resolve previews", () => {
+  it.each([false, true])("shows final capacity and Resolve before a gain commits (free: %s)", (free) => {
+    const prince = createStubPrince();
+    prince.chart.ascendantSign = "Libra";
+    for (const planet of PLANETS) prince.chart.planets[planet].sign = "Aries";
+    if (free) Object.assign(prince.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
+    const { run, onCommit, render } = mount("home-capricorn-salting", prince);
+    const ceiling = combustionCeiling(prince.chart.planets.Moon);
+    const remaining = ceiling - run.state.Moon.affliction;
+    const arc = () => element('[data-guide="arc-self-moon"]');
+    const trackBefore = arc().firstElementChild!.getAttribute("d");
+    click('[data-guide="option-2"]');
+    focus('[data-guide="planet-self-moon"]');
+    expect(element(".ps-ratio").textContent).toBe(`Resolve${remaining}/${ceiling}→ ${remaining + (free ? 12 : 0)}/${ceiling + 12}`);
+    expect(arc().firstElementChild!.getAttribute("d")).not.toBe(trackBefore);
+    expect(arc().querySelector(".arc-diff") !== null).toBe(free);
+    expect(run.gains.Moon.resolve).toBe(0);
+    choose("moon");
+    const next = onCommit.mock.calls[0]![0];
+    expect(next.gains.Moon.resolve).toBe(12);
+    expect(next.state.Moon.affliction).toBe(run.state.Moon.affliction + (free ? 0 : 12));
+    render(next);
+    expect(arc().querySelector(".arc-diff")).toBeNull();
   });
 });

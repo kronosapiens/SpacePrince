@@ -1,5 +1,5 @@
 import type { Chart, MapBoundary, Prince, SideState } from "@/game/types";
-import { refreshChartStats } from "@/game/chart";
+import { blankGains, refreshChartStats, runChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 
@@ -28,7 +28,8 @@ export function loadPrince(): Prince | null {
         boundary.necessity ??= boundary.barrage;
         delete boundary.barrage;
       }
-      capSavedAffliction(prince.chart, run.state);
+      run.gains ??= blankGains(); // saved before run gains
+      capSavedAffliction(runChart(prince.chart, run), run.state);
       if (run.encounter?.kind === "combat") {
         refreshChartStats(run.encounter.opponentChart);
         capSavedAffliction(run.encounter.opponentChart, run.encounter.opponentState);
