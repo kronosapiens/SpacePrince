@@ -18,6 +18,7 @@ const DEFINITIONS: Record<Strategy, string> = {
 };
 
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
+const pp = (x: number) => `${(100 * x).toFixed(1)} pp`;
 const fixed = (digits: number) => (x: number) => x.toFixed(digits);
 const signed = (f: (x: number) => string) => (x: number) => (x > 0 ? `+${f(x)}` : f(x));
 const interval = (i: Interval, f: (x: number) => string) => `${f(i.low)} to ${f(i.high)}`;
@@ -50,6 +51,7 @@ export function renderReport(agg: Aggregates, ctx: ReportContext): string {
     "Charts come from `seededChart`: birth day uniform over the 73,000 days from 1900-01-01, time of day uniform (UTC), " +
       "latitude uniform in ±66°, longitude uniform in ±180°. Figures describe that sample.",
     "Every run fields all seven planets from the start: lifetime encounters begin at the final unlock threshold.",
+    "Encounters survived leave out the one a run ended in; turns count every choice, the last included.",
     `Intervals are 95%, by cluster bootstrap over charts (${BOOTSTRAP_RESAMPLES} resamples seeded from the master seed); ` +
       "a zero-width interval means no sampled chart deviated. Percentiles interpolate linearly between order statistics.",
     "",
@@ -73,7 +75,7 @@ export function renderReport(agg: Aggregates, ctx: ReportContext): string {
     "",
     table(
       ["b − a", "Pairs", "Light (95% CI)", "Maps completed (95% CI)", "Completion (95% CI)"],
-      agg.paired.map((p) => [`${p.b} − ${p.a}`, p.pairs, estimate(p.light, light), estimate(p.maps, two), estimate(p.completion, pct)]),
+      agg.paired.map((p) => [`${p.b} − ${p.a}`, p.pairs, estimate(p.light, light), estimate(p.maps, two), estimate(p.completion, pp)]),
     ),
     "",
     "## Per run (means)",
@@ -117,9 +119,21 @@ export function renderReport(agg: Aggregates, ctx: ReportContext): string {
     "",
     table(chartHead, agg.struggling.map(chartRow)),
     "",
-    "## Charts most sensitive to strategy (widest spread in mean maps)",
+    ...(agg.strategyGain.length ? [
+      "## Charts gaining most from strategy (best strategy's mean maps − random's)",
+      "",
+      table(["Gain", ...chartHead], agg.strategyGain.map((c) => [two(c.gain), ...chartRow(c.chartSeed)])),
+      "",
+    ] : []),
+    "## Trials to replay",
     "",
-    table(["Spread", ...chartHead], agg.strategySensitive.map((c) => [two(c.spread), ...chartRow(c.chartSeed)])),
+    "Regenerate one with `pnpm -s eval:balance --replay <id>`.",
+    "",
+    table(["Trials", "Ids"], [
+      ...agg.replays.failures.map((f) => [`${f.strategy} combusting at ${f.node}`, f.trials.join(", ")]),
+      ["Widest disagreements (best / worst)", agg.replays.disagreements.map((d) => `${d.best} / ${d.worst} (${d.spread} maps)`).join("; ") || "—"],
+      ["Random completions", agg.replays.randomCompletions.join(", ") || "—"],
+    ]),
     "",
   ].join("\n");
 }
