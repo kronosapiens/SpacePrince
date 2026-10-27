@@ -86,14 +86,14 @@ describe("seeded runner", () => {
     }
   });
 
-  it("stops and flags a run whose planets all combust before the combat's last turn", () => {
-    const record = batch.find((r) => r.summary.unresolvedCombat)!;
-    const entry = record.steps.map((s) => s.kind).lastIndexOf("enter");
-    const turnsPlayed = record.steps.length - 1 - entry;
-    const last = record.steps.at(-1)!;
+  it("ends a run whose planets all combust before the combat's last turn", () => {
+    const lastEntry = (r: (typeof batch)[number]) => r.steps.map((s) => s.kind).lastIndexOf("enter");
     // Combat length is the map number; the run ended with turns left.
-    expect(turnsPlayed).toBeLessThan(record.summary.terminalMap);
-    expect(last.kind).toBe("turn");
+    const record = batch.find((r) =>
+      r.steps.at(-1)!.kind === "turn" && r.steps.length - 1 - lastEntry(r) < r.summary.terminalMap,
+    )!;
+    const entry = lastEntry(record);
+    const last = record.steps.at(-1)!;
     const chart = seededChart(record.trial.chartSeed);
     expect(PLANETS.every((p) => last.affliction[p] >= combustionCeiling(chart.planets[p]))).toBe(true);
     expect(record.summary.endReason).toBe("combustion");

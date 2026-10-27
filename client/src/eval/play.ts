@@ -2,7 +2,6 @@ import { getScenario } from "@/data/narrative-scenarios";
 import { isCombusted, newlyCombusted } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 import { narrativeContext, resolveNarrative, visibleOptions, type NarrativeScenario, type Option, type Selection } from "@/game/narrative";
-import { isOver } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import type { Chart, CombatEncounter, MapBoundary, PlanetName, Polarity, Prince, Run } from "@/game/types";
 import type { Strategy } from "./policies";
@@ -79,8 +78,7 @@ export function narrativeOptions(run: Run, prince: Prince, scenario: NarrativeSc
     .filter(({ selections }) => selections.length > 0);
 }
 
-/** Play the open encounter until it resolves or the run ends (issue #11 can
- *  leave a combat unresolved). Each choice is reported to `record`. */
+/** Play the open encounter until it resolves. Each choice is reported to `record`. */
 export function playEncounter(play: PlayContext, run: Run, record: (step: Step) => void = () => {}): Run {
   const { prince, policy } = play;
   const { chart } = prince;
@@ -100,7 +98,7 @@ export function playEncounter(play: PlayContext, run: Run, record: (step: Step) 
     });
     return next;
   }
-  while (run.encounter?.kind === "combat" && !run.encounter.resolved && !isOver(run, chart, prince.numEncounters)) {
+  while (run.encounter?.kind === "combat" && !run.encounter.resolved) {
     const enc = run.encounter;
     const { planet, verb } = policy.combat(play, run, combatActions(run, chart, enc));
     const result = resolveTurn(run, chart, planet, verb, play.turnRng(run, enc))!;

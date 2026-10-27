@@ -58,10 +58,10 @@ export function renderReport(agg: Aggregates, ctx: ReportContext): string {
     "## Outcomes",
     "",
     table(
-      ["Strategy", "Runs", "Completion (95% CI)", "Maps completed mean", "Maps completed median", "Light mean", "Light median", "Light p10", "Light p90", "Stopped mid-combat (#11)"],
+      ["Strategy", "Runs", "Completion (95% CI)", "Maps completed mean", "Maps completed median", "Light mean", "Light median", "Light p10", "Light p90"],
       ss.map((s) => [
         s.strategy, s.runs, `${pct(s.completion.rate)} (${interval(s.completion.ci, pct)})`, two(s.maps.mean), two(s.maps.median),
-        light(s.light.mean), light(s.light.median), light(s.light.p10), light(s.light.p90), pct(s.unresolvedRate),
+        light(s.light.mean), light(s.light.median), light(s.light.p10), light(s.light.p90),
       ]),
     ),
     "",

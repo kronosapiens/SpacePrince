@@ -231,7 +231,7 @@ describe("Shared run transitions", () => {
     expect(run).toEqual(before);
   });
 
-  it("resolving a combat's last turn records its outcome on the map", () => {
+  it("a combat ends on its last turn, or on the turn its run ends, and records its outcome on the map", () => {
     const entered = enter({ ...run, mapsCompleted: 1 }, nodeOf("combat"));
     const turn = (r: Run) =>
       resolveTurn(r, prince.chart, "Moon", "Testimony", combatTurnRng(r, r.encounter as CombatEncounter))!;
@@ -244,6 +244,21 @@ describe("Shared run transitions", () => {
       kind: "combat",
       summary: `Encounter · ${last.encounter.opponentChart.name}`,
     });
+
+    // Every planet but the Moon is out, and the first blow takes the Moon too.
+    const enc = entered.encounter as CombatEncounter;
+    const nearlySpent: Run = {
+      ...entered,
+      state: Object.fromEntries(PLANETS.map((p) => [p, {
+        ...entered.state[p],
+        affliction: combustionCeiling(prince.chart.planets[p]) - (p === "Moon" ? 1 : 0),
+      }])) as Run["state"],
+      encounter: { ...enc, opponentActions: enc.opponentActions.map((a, i) => (i === 0 ? "Affliction" : a)) },
+    };
+    const fatal = turn(nearlySpent);
+    expect(fatal.runEnded).toBe(true);
+    expect(fatal.encounter).toMatchObject({ turnIndex: 1, resolved: true });
+    expect(fatal.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({ kind: "combat", combusts: ["Moon"] });
   });
 
   it("rolls over only from the cleared terminal node, and full combustion ends the run first", () => {

@@ -30,7 +30,6 @@ export interface StrategyStats {
   narrativeOptions: Record<string, Record<string, number>>;
   /** Options taking the largest share of their scenario's choices. */
   dominantOptions: { option: string; chosen: number; of: number }[];
-  unresolvedRate: number;
   /** Runs ending by combustion: where they ended and the last choice made there. */
   failures: {
     runs: number; map: Record<string, number>; node: Record<string, number>; kind: Record<string, number>;
@@ -163,7 +162,6 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     dominantOptions: shares
       .sort((x, y) => y.chosen / y.of - x.chosen / x.of || y.of - x.of || byKey(x.option, y.option))
       .slice(0, DOMINANT),
-    unresolvedRate: per((s) => (s.unresolvedCombat ? 1 : 0)),
     failures: {
       runs: failures.length,
       map: tally(failures.map((s) => String(s.terminalMap))),

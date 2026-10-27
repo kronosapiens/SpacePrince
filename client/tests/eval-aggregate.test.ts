@@ -11,7 +11,7 @@ function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: numb
     terminalNodeId: "5C", terminalKind: "combat", terminalScenarioId: null, terminalRuler: "Moon",
     lastPlanet: "Moon", lastVerb: "Affliction", lastOptionId: null,
     light, combatEncounters: 0, narrativeEncounters: 0, combatTurns: 0, combustions: 0, boundaryRevivals: 0,
-    narrativeRevivals: 0, verbs: { Affliction: 0, Testimony: 0 }, narrativeOptions: {}, unresolvedCombat: false,
+    narrativeRevivals: 0, verbs: { Affliction: 0, Testimony: 0 }, narrativeOptions: {},
     ...more,
   };
   return { trial: { chartSeed, gameSeed, strategy, strategySeed: 0 }, summary };
@@ -19,9 +19,9 @@ function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: numb
 
 // Two charts × two games × two strategies.
 const rows = [
-  // Stopped mid-combat (issue #11) against a Mars-ruled chart.
+  // Combusted mid-combat against a Mars-ruled chart.
   row("random", 1, 11, 2, 100, {
-    terminalNodeId: "3L", terminalRuler: "Mars", lastPlanet: "Sun", lastVerb: "Testimony", unresolvedCombat: true,
+    terminalNodeId: "3L", terminalRuler: "Mars", lastPlanet: "Sun", lastVerb: "Testimony",
     combatEncounters: 4, narrativeEncounters: 2, combatTurns: 6, combustions: 7, boundaryRevivals: 1,
     verbs: { Affliction: 4, Testimony: 2 }, narrativeOptions: { "song/finish": 1, "song/sleep": 1 },
   }),
@@ -58,7 +58,6 @@ describe("balance aggregation", () => {
       combatSurvived: 6.5, narrativeSurvived: 3.75, combatTurns: 2.25, narrativeTurns: 1.5,
       combustions: 3.5, boundaryRevivals: 0.25, narrativeRevivals: 0.25,
     });
-    expect(random!.unresolvedRate).toBe(0.25);
     expect(random!.verbs).toEqual({ Affliction: 5, Testimony: 4 });
     expect(survival!.completedRuns).toEqual({ runs: 3, combatSurvived: 18, narrativeSurvived: 12 });
     // Work was every choice in dice (2/2), finish three of song's four: ranked by share, not count.

@@ -24,8 +24,8 @@ export interface RunSummary {
   lastVerb: Polarity | null;
   lastOptionId: string | null;
   light: number;
-  /** Encounters survived, by kind — the fatal one is left out, whether or not
-   *  it resolved. A narrative encounter is one choice. */
+  /** Encounters survived, by kind — the fatal one is left out. A narrative
+   *  encounter is one choice. */
   combatEncounters: number;
   narrativeEncounters: number;
   combatTurns: number;
@@ -36,8 +36,6 @@ export interface RunSummary {
   verbs: Record<Polarity, number>;
   /** Keyed `scenarioId/optionId`. */
   narrativeOptions: Record<string, number>;
-  /** Issue #11's discrepancy: full combustion before a combat's last turn leaves it unresolved. */
-  unresolvedCombat: boolean;
 }
 
 export interface RunRecord {
@@ -73,7 +71,6 @@ export function runTrial(trial: Trial): RunRecord {
   };
   let run = beginRun(chart, gameSeed, FULL_TIER);
   const steps: Step[] = [boundaryStep(run)];
-  let unresolvedCombat = false;
   while (!isOver(run, chart, FULL_TIER)) {
     if (shouldRolloverMap(run, chart, FULL_TIER)) {
       run = rolloverMap(run, chart, unlockedPlanets(FULL_TIER), mapSeed(gameSeed, run.mapsCompleted + 2));
@@ -85,15 +82,10 @@ export function runTrial(trial: Trial): RunRecord {
     run = enterNode({ run, nodeId, lifetimeEncounterCount: FULL_TIER });
     steps.push(entryStep(run));
     run = playEncounter(play, run, (step) => steps.push(step));
-    // The UI cannot leave an unresolved combat (issue #11), so the run stops here.
-    if (!run.encounter!.resolved) {
-      unresolvedCombat = true;
-      break;
-    }
     // Leave it as EncounterScreen's clearEncounter does.
     run = { ...run, encounter: null };
   }
-  return { trial, summary: summarize(steps, run, unresolvedCombat), steps };
+  return { trial, summary: summarize(steps, run), steps };
 }
 
 function boundaryStep(run: Run): Step {
@@ -113,7 +105,7 @@ function entryStep(run: Run): Step {
     : { ...entry, encounter: "narrative", house: content.house, scenarioId: (run.encounter as NarrativeEncounter).scenarioId };
 }
 
-function summarize(steps: Step[], run: Run, unresolvedCombat: boolean): RunSummary {
+function summarize(steps: Step[], run: Run): RunSummary {
   const verbs: Record<Polarity, number> = { Affliction: 0, Testimony: 0 };
   const narrativeOptions: Record<string, number> = {};
   let entry: Extract<Step, { kind: "enter" }> | undefined;
@@ -164,6 +156,5 @@ function summarize(steps: Step[], run: Run, unresolvedCombat: boolean): RunSumma
     narrativeRevivals,
     verbs,
     narrativeOptions,
-    unresolvedCombat,
   };
 }

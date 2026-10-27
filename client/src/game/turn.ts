@@ -117,9 +117,16 @@ export function resolveTurn(
   const allOppCombusted = enc.roster.every((p) =>
     isCombusted(enc.opponentChart.planets[p], opponentStateMap[p]),
   );
+  // The run ends when every planet the player has *fielded* this run is combust;
+  // unlocked tier == roster, so locked planets (never sent) don't keep it alive.
+  const runEnded = enc.roster.every((p) =>
+    isCombusted(playerChart.planets[p], playerStateMap[p]),
+  );
+  // A run that ends mid-combat ends the encounter with it.
+  const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted || runEnded;
   const newSequence = [...enc.sequence];
   const newOpponentActions = [...enc.opponentActions];
-  if (nextTurnIndex < newSequence.length && !allOppCombusted) {
+  if (!encounterEnded) {
     const selectable = enc.roster.filter(
       (p) => !isCombusted(enc.opponentChart.planets[p], opponentStateMap[p]),
     );
@@ -132,13 +139,6 @@ export function resolveTurn(
       );
     }
   }
-
-  const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted;
-  // The run ends when every planet the player has *fielded* this run is combust;
-  // unlocked tier == roster, so locked planets (never sent) don't keep it alive.
-  const runEnded = enc.roster.every((p) =>
-    isCombusted(playerChart.planets[p], playerStateMap[p]),
-  );
 
   const updatedEnc: CombatEncounter = {
     ...enc,
