@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getScenario, NARRATIVE_SCENARIOS, pickScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
-import { HOUSES } from "@/data/houses";
-import { applyOutcomes, availableSelections, buildNarrativeContext, joyPresent, joyStrong, previewOption, resolveNarrative, resolveTargets, rulerStrong, requiresPlanet } from "@/game/narrative";
+import { applyOutcomes, availableSelections, joyPresent, joyStrong, narrativeContext, previewOption, resolveNarrative, resolveTargets, rulerStrong, requiresPlanet } from "@/game/narrative";
 import { beginNarrativeEncounter } from "@/game/encounter";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
@@ -16,10 +15,7 @@ function setup(id = "self-still-water", numEncounters = 64) {
   const scenario = getScenario(id);
   const run = { ...beginRun(prince.chart, 42, numEncounters), light: 120 };
   run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
-  const context = () => {
-    const house = HOUSES[scenario.house - 1]!;
-    return buildNarrativeContext({ prince, run, joyPlanet: house.joy, rulerPlanet: house.ruler, unlocked: unlockedPlanets(numEncounters) });
-  };
+  const context = () => narrativeContext(prince, run, scenario.house);
   const option = (optionId: string) => scenario.options.find((o) => o.id === optionId)!;
   const darken = (p: typeof PLANETS[number]) => { run.state[p].affliction = combustionCeiling(prince.chart.planets[p]); };
   return { prince, run, scenario, context, option, darken };
