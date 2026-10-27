@@ -1,9 +1,11 @@
+import { pickScenario } from "@/data/narrative-scenarios";
 import { blankSideState, cloneSideState } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./combat";
 import { isCombusted, uncombust } from "./combust";
+import { beginCombatEncounter, beginNarrativeEncounter } from "./encounter";
 import { applyNecessity } from "./necessity";
 import { rollNodeContent } from "./map-content";
-import { buildMapGraph, ROOT_NODE_ID } from "./map-gen";
+import { buildMapGraph, ROOT_NODE_ID, TERMINAL_NODE_ID } from "./map-gen";
 import { hashString, mulberry32, randomSeed } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type { Chart, MapBoundary, MapState, NodeContent, PlanetName, Run, SideState } from "./types";
@@ -66,6 +68,53 @@ export function beginRun(
   };
 }
 
+export interface EnterNodeInput {
+  run: Run;
+  nodeId: string;
+  lifetimeEncounterCount: number;
+  devUnlockAll?: boolean;
+  /** Route forecasts only: replaces the live arrival draws — combat's opening
+   *  necessity and precommits, narrative's scenario pick — with a sampled
+   *  seed. The opponent chart and the node bookkeeping are unchanged. */
+  encounterIdSeed?: number;
+}
+
+/** Step onto a node: mark it current and visited, and open its pre-rolled
+ *  encounter. A narrative scenario is drawn from the house's unseen pool,
+ *  seeded on (run, house, node), and joins the no-repeat history. */
+export function enterNode(input: EnterNodeInput): Run {
+  const { run, nodeId, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const content = run.map.rolledNodes[nodeId];
+  if (!content) throw new Error(`Node ${nodeId} has no content`);
+  const { visitedNodeIds } = run.map;
+  const entered: Run = {
+    ...run,
+    map: {
+      ...run.map,
+      currentNodeId: nodeId,
+      visitedNodeIds: visitedNodeIds.includes(nodeId) ? visitedNodeIds : [...visitedNodeIds, nodeId],
+    },
+  };
+  if (content.kind === "combat") {
+    const encounter = beginCombatEncounter({
+      run: entered,
+      opponentSeed: content.opponentSeed,
+      lifetimeEncounterCount,
+      devUnlockAll,
+      encounterIdSeed,
+    });
+    return { ...entered, encounter };
+  }
+  const seen = run.seenScenarioIds ?? [];
+  const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
+  const { scenarioId } = pickScenario(content.house, seen, rng);
+  return {
+    ...entered,
+    encounter: beginNarrativeEncounter({ run: entered, house: content.house, scenarioId }),
+    seenScenarioIds: [...seen, scenarioId],
+  };
+}
+
 /** Whether a run has ended — derived, never stored (STATE.md). A run is over
  *  when the seventh map is finished (completion) or every planet the player has
  *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
@@ -99,6 +148,13 @@ export function rollMapBoundary(
   }
   const applied = applyNecessity(chart, next, roster, rng);
   return { state: applied.state, boundary: { uncombusts, necessity: applied.necessity } };
+}
+
+/** Whether the run crosses into its next map: the terminal node's encounter
+ *  has cleared and the run is not over. Full combustion ends the run first,
+ *  so a spent chart never reaches the boundary's uncombust rolls. */
+export function shouldRolloverMap(run: Run, chart: Chart, numEncounters: number): boolean {
+  return !run.encounter && run.map.currentNodeId === TERMINAL_NODE_ID && !isOver(run, chart, numEncounters);
 }
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives

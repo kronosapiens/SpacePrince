@@ -8,7 +8,7 @@ import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { unlockedPlanets } from "@/game/unlocks";
-import { availableSelections, buildNarrativeContext, joyPresent, previewOption, resolveNarrative, requiresPlanet, type Selection } from "@/game/narrative";
+import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
 import { describeOptionParts } from "@/copy/narrative";
 import { newlyCombusted } from "@/game/combust";
 import { isOver } from "@/game/run";
@@ -73,15 +73,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   }, [rulerPlanet]);
 
   const ctx = useMemo(
-    () =>
-      buildNarrativeContext({
-        prince,
-        run,
-        joyPlanet,
-        rulerPlanet: house.ruler,
-        unlocked: playerUnlocked,
-      }),
-    [prince, run, joyPlanet, house.ruler, playerUnlocked],
+    () => narrativeContext(prince, run, encounter.house, devUnlockAll),
+    [prince, run, encounter.house, devUnlockAll],
   );
 
   const resolved = encounter.resolved;
@@ -100,16 +93,14 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     light: number;
   } | null>(null);
   const committedRef = useRef(false);
-  const options = useMemo(() => scenario.options.filter((o) => !o.visibleIf || o.visibleIf(ctx)), [scenario, ctx]);
-  const rows = useMemo(() => options.map((option) => {
-    const assignments = availableSelections(run, ctx, option);
+  const rows = useMemo(() => visibleOptions(run, ctx, scenario).map(({ option, selections: assignments }) => {
     const preview = previewOption(run, ctx, option);
     return {
       option, assignments,
       aside: describeOptionParts(ctx, option),
       reason: !assignments.length ? (preview.ok || run.light >= (option.cost ?? 0) ? "No eligible planets can carry this choice." : preview.reason) : null,
     };
-  }), [options, run, ctx]);
+  }), [scenario, run, ctx]);
   const [frozenRows, setFrozenRows] = useState<typeof rows | null>(null);
   const shownRows = resolved ? frozenRows ?? rows : rows;
   const selectedRow = rows.find((row) => row.option.id === selectedOptionId);

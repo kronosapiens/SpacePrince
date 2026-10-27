@@ -2,7 +2,7 @@ import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { EncounterCombatScreen, type CommitTurnResult } from "@/screens/EncounterCombat";
+import { EncounterCombatScreen } from "@/screens/EncounterCombat";
 import { beginCombatEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
@@ -66,10 +66,8 @@ function setup(settleOpening = true) {
   encounter.opponentActions = ["Affliction", "Testimony"];
   encounter.opponentState.Moon.affliction = 12;
   run.encounter = encounter;
-  const onCommitTurn = vi.fn((planet: PlanetName, verb: Polarity, rng: () => number): CommitTurnResult | null => {
-    const result = resolveTurn(run, prince.chart, planet, verb, rng);
-    return result ? { ...result, nextRun: result.run } : null;
-  });
+  const onCommitTurn = vi.fn((planet: PlanetName, verb: Polarity, rng: () => number) =>
+    resolveTurn(run, prince.chart, planet, verb, rng));
   const render = () => act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
       <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
     onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />

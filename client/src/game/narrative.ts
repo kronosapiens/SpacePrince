@@ -40,15 +40,16 @@ export interface NarrativeContext {
   placements: Prince["chart"]["planets"];
 }
 
-export function buildNarrativeContext(input: {
-  prince: Prince;
-  run: Run;
-  joyPlanet: PlanetName | null;
-  rulerPlanet: PlanetName;
-  unlocked: PlanetName[];
-}): NarrativeContext {
-  const { prince, run, joyPlanet, rulerPlanet, unlocked } = input;
-  return { joyPlanet, rulerPlanet, unlocked, placements: prince.chart.planets, perPlanetState: run.state };
+/** The context a narrative encounter in `house` reads: its joy and ruler, and the Prince's unlocked planets. */
+export function narrativeContext(prince: Prince, run: Run, house: number, devUnlockAll = false): NarrativeContext {
+  const { joy, ruler } = HOUSES[house - 1]!;
+  return {
+    joyPlanet: joy,
+    rulerPlanet: ruler,
+    unlocked: unlockedPlanets(prince.numEncounters, devUnlockAll),
+    placements: prince.chart.planets,
+    perPlanetState: run.state,
+  };
 }
 
 const strong = (ctx: NarrativeContext, p: PlanetName) =>
@@ -140,6 +141,13 @@ export function availableSelections(run: Run, ctx: NarrativeContext, option: Opt
   return selections.filter((s) => previewOption(run, ctx, option, s).ok);
 }
 
+/** The options this chart is offered, each with the selections that can carry it (none when it cannot be paid or targeted). */
+export function visibleOptions(run: Run, ctx: NarrativeContext, scenario: NarrativeScenario): { option: Option; selections: Selection[] }[] {
+  return scenario.options
+    .filter((option) => !option.visibleIf || option.visibleIf(ctx))
+    .map((option) => ({ option, selections: availableSelections(run, ctx, option) }));
+}
+
 /** Validate the live encounter and authored choice before applying its result. */
 export function resolveNarrative(
   run: Run, prince: Prince, scenario: NarrativeScenario, optionId: string,
@@ -150,7 +158,7 @@ export function resolveNarrative(
   const option = scenario.options.find((o) => o.id === optionId);
   if (!option) return null;
   const house = HOUSES[encounter.house - 1]!;
-  const ctx = buildNarrativeContext({ prince, run, joyPlanet: house.joy, rulerPlanet: house.ruler, unlocked: unlockedPlanets(prince.numEncounters, devUnlockAll) });
+  const ctx = narrativeContext(prince, run, encounter.house, devUnlockAll);
   const preview = previewOption(run, ctx, option, selection);
   if (!preview.ok) return null;
   const result = option.result;
