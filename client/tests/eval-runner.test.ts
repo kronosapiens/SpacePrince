@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { runTrial } from "@/eval/runner";
 import type { Step, Trial } from "@/eval/play";
+import type { Strategy } from "@/eval/policies";
 import { seededChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 import type { PlanetName } from "@/game/types";
 
-const trial = (chartSeed: number, gameSeed: number, strategySeed = 0): Trial =>
-  ({ chartSeed, gameSeed, strategy: "random", strategySeed });
+const trial = (chartSeed: number, gameSeed: number, strategySeed = 0, strategy: Strategy = "random"): Trial =>
+  ({ chartSeed, gameSeed, strategy, strategySeed });
+// Run before any other trial, so replaying them later shows nothing else leaks in.
+const strategic = (["survival", "light"] as const).map((s) => runTrial(trial(3, 7, 0, s)));
 const batch = [1, 2, 3, 4, 5].flatMap((c) => [1, 2, 3, 4, 5].map((g) => runTrial(trial(c, g))));
 
 describe("seeded runner", () => {
@@ -16,17 +19,23 @@ describe("seeded runner", () => {
     runTrial(trial(3, 7, 1));
     runTrial(trial(4, 2));
     expect(runTrial(trial(3, 7))).toEqual(first);
+    for (const record of strategic) expect(runTrial(record.trial)).toEqual(record);
     expect(JSON.parse(JSON.stringify(first))).toEqual(first);
   });
 
-  it("gives every strategy seed the same maps, indexed by map number", () => {
+  it("gives every strategy and strategy seed the same maps, indexed by map number", () => {
     const a = runTrial(trial(3, 7, 0)).steps;
     const b = runTrial(trial(3, 7, 1)).steps;
     expect(b).not.toEqual(a);
-    const seeds = (steps: Step[]) => steps.flatMap((s) => (s.kind === "boundary" ? [[s.map, s.seed]] : []));
-    const shared = Math.min(seeds(a).length, seeds(b).length);
-    expect(shared).toBeGreaterThan(1);
-    expect(seeds(a).slice(0, shared)).toEqual(seeds(b).slice(0, shared));
+    const seedByMap = new Map<number, number>();
+    for (const steps of [a, b, ...strategic.map((r) => r.steps)]) {
+      for (const s of steps) {
+        if (s.kind !== "boundary") continue;
+        expect(s.seed).toBe(seedByMap.get(s.map) ?? s.seed);
+        seedByMap.set(s.map, s.seed);
+      }
+    }
+    expect(seedByMap.size).toBeGreaterThan(1);
   });
 
   it("plays random runs through narrative choices, map boundaries, revival, combustion, and completion", () => {
@@ -43,6 +52,10 @@ describe("seeded runner", () => {
         s.kind === "turn" && r.steps[i - 1]!.affliction[s.planet] >= combustionCeiling(chart.planets[s.planet]));
     });
     expect(sentDark).toEqual([]);
+    // A fresh chart takes necessity on every fielded planet, so this shows all seven start unlocked.
+    for (const { steps: [first] } of batch) {
+      expect(first?.kind === "boundary" && first.necessity.map((n) => n.planet)).toEqual(PLANETS);
+    }
   });
 
   it("summarizes what the steps record", () => {
