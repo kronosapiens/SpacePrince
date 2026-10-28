@@ -7,6 +7,7 @@ import { ROUTES } from "./routes";
 import { TitleScreen } from "@/screens/TitleScreen";
 import { PlaySurface } from "@/screens/PlaySurface";
 import { IndexScreen } from "@/screens/IndexScreen";
+import { TokenScreen } from "@/screens/TokenScreen";
 import { GameLayout } from "@/screens/GameLayout";
 import { installAudioUnlock } from "@/audio/engine";
 
@@ -28,6 +29,7 @@ export function App() {
           <Route path={ROUTES.play} element={<PlaySurface />} />
         </Route>
         <Route path={ROUTES.index} element={<IndexScreen />} />
+        <Route path={ROUTES.token} element={<TokenScreen />} />
         {GalleryScreen && <Route path={ROUTES.gallery} element={
           <Suspense fallback={<div className="screen">Loading gallery…</div>}>
             <GalleryScreen />

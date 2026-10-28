@@ -1,0 +1,43 @@
+.token-screen {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 100svh;
+  padding: 24px;
+  text-align: center;
+}
+
+.token-header p,
+.token-header h1,
+.token-controls p { margin: 0; }
+.token-header h1 { font-size: 32px; font-weight: 400; }
+
+.token-artwork {
+  width: min(100%, calc((100svh - 240px) * var(--prince-aspect-ratio)));
+  min-width: min(280px, 100%);
+  margin: 0;
+}
+.token-artwork > .prince-artwork { width: 100%; height: auto; }
+.token-artwork figcaption {
+  margin-top: 12px;
+  color: var(--mist);
+  font: 12px / 1.5 var(--sans);
+}
+.token-artwork figcaption span { padding: 0 6px; }
+
+.token-controls button {
+  min-height: 44px;
+  padding: 4px 16px;
+  color: var(--gold);
+  font-size: 22px;
+}
+.token-controls button:hover { color: var(--bone); }
+.token-controls button:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
+}
+.token-controls p { color: var(--mist); font: 12px / 1.5 var(--sans); }

@@ -7,4 +7,5 @@ export const ROUTES = {
   play: "/play",
   index: "/__index",
   gallery: "/gallery",
+  token: "/token",
 } as const;
