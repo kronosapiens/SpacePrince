@@ -585,9 +585,8 @@
 }
 .combat-foot > * { pointer-events: auto; }
 @media (min-width: 900px) {
-  .combat-topbar,
-  .combat-foot { transform: translateY(-50%); }
-  .combat-foot { top: 100%; }
+  .combat-topbar { transform: translateY(calc(-50% + var(--combat-chrome-shift))); }
+  .combat-foot { top: 100%; transform: translateY(calc(-50% - var(--combat-chrome-shift))); }
 }
 .combat-rule {
   margin: 0;
@@ -617,6 +616,12 @@
   width: max-content;
   margin-inline: auto;
   text-align: center;
+}
+@media (min-width: 900px) {
+  .chart-layout-label,
+  .combat-side > .combat-side-label {
+    bottom: calc(100% + var(--chart-label-gap) - var(--combat-chrome-shift));
+  }
 }
 .combat-side-label {
   font-family: var(--sans);
@@ -1296,6 +1301,22 @@
   outline-offset: 2px;
 }
 .screen-settings-button { left: auto; right: 24px; }
+
+/* The player's next step, in one slot on every gameplay screen: top centre,
+   on the corner buttons' row. */
+.instruction {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  font-size: 13px;
+  line-height: 34px;
+  color: var(--bone);
+  text-align: center;
+  pointer-events: none;
+}
 
 .screen-settings-button[aria-expanded="true"] { color: var(--gold); border-color: var(--gold); }
 .settings-dropdown {

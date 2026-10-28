@@ -4,6 +4,8 @@ import type { GameLayoutContext } from "./GameLayout";
 import { BeginButton } from "@/components/BeginButton";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
+import { INSTRUCTION } from "@/copy/instruction";
+import { Instruction } from "@/components/Instruction";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { playUISound, setTheme } from "@/audio/engine";
 import { enterNode, isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
@@ -116,6 +118,9 @@ export function MapScreen() {
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
+      {!guideOpen && !openingActive && !runOver && (
+        <Instruction text={INSTRUCTION.map.node} />
+      )}
       <div className="map-content anim-surface-in">
         <div className="map-diagram-wrap">
           <MapDiagram map={run.map} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />

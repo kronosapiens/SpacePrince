@@ -8,6 +8,8 @@ import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
+import { INSTRUCTION } from "@/copy/instruction";
+import { Instruction } from "@/components/Instruction";
 import { describeOptionParts, occupantLine } from "@/copy/narrative";
 import { combustionCeiling, newlyCombusted } from "@/game/combust";
 import { runChart } from "@/game/chart";
@@ -261,6 +263,9 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           onClose={() => setGuideOpen(false)}
           onPhaseChange={setGuidePhase}
         />
+      )}
+      {!guideOpen && !resolved && (
+        <Instruction text={targeting ? INSTRUCTION.narrative.target : INSTRUCTION.narrative.option} />
       )}
       <div className="narrative-column anim-surface-in">
         <div className="narrative-body">

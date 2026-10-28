@@ -55,6 +55,9 @@
   --chart-pad-inline: 60px;
   --chart-gap: 32px;
   --chart-label-gap: 12px;
+  /* How far the encounter's chrome steps in toward the wheels — the top bar
+     and labels down, the foot up — so the top bar clears the instruction. */
+  --combat-chrome-shift: 8px;
 
   --music-theme-label-gap: 4px 8px;
   --music-parts-gap: 16px 28px;

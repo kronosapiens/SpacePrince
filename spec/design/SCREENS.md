@@ -302,7 +302,7 @@ The aesthetic remains *sparse and ethereal* (per `VIBES.md`), but that is an aes
 None of it is chart data, so it reads as chrome without becoming a HUD sitting over the wheels.
 
 **What moves sits above the charts; what is fixed sits below.**
-Above: the turn, Light, and the sentence naming the other's move — the three things that change during play.
+Above: the instruction, the turn, Light, and the sentence naming the other's move — the things that change during play.
 Below, between the SELF and OTHER labels: the encounter's ruler and its rule, constant from the first turn to the last.
 
 **Allowed:**
@@ -331,9 +331,10 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
   A glyph is not a name, and the audience premise is a player with no astrology, so this is the only place the other's planet is named at all.
   It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words until the board carried none.
   The sentence clears after the final animation; its space remains so the charts stay still during the pause before advancing.
-
-  Rejected: a second line, *"How do you respond?"*.
-  Instructional copy (below), and identical every turn it would stop being read within three — the invite rings already say it is the player's move.
+- **The instruction.** One line naming the player's next step — *Choose a planet to respond*, then *Choose Afflict or Testify* once a planet is selected.
+  It sits top centre between the corner buttons, in bone, the same slot the map and narrative screens use for theirs.
+  It shows on each run's first map only, and is absent while nothing waits on the player or the guide is open.
+  Playtesters still found the game confusing with the invite rings alone, so the step is named outright.
 - **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating how you gain Light here (*Gain Light from affliction on the Other's chart*), the rule in the same colour and Light itself neutral.
   The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
 
@@ -341,7 +342,6 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
 
 - Section titles ("ENCOUNTER", "MAP") on the screens themselves — the player knows where they are.
 - The wordmark "SPACE PRINCE" inside the encounter — it lives on the title screen.
-- Instructional hints ("Hover a planet to inspect. Click a planet to act.") — the grammar should be discoverable; if it isn't, that's a structural failure to fix, not to paper over with copy.
 - HP bars, "+N attack" registers, blockbuster game-UI flourishes.
   The affliction arc is not one of these, and the distinction is the point: an HP bar fills against an invented maximum, while the arc's track is a real ceiling the game already has (`MECHANICS.md §10`).
   Light, which has no ceiling to fill against, is a numeral rather than any kind of bar.

@@ -2,6 +2,8 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Chart } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
+import { INSTRUCTION } from "@/copy/instruction";
+import { Instruction } from "@/components/Instruction";
 import { PlanetBands } from "@/components/PlanetBands";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
@@ -574,6 +576,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           onClose={closeGuide}
           onPhaseChange={changeGuidePhase}
         />
+      )}
+      {!guideOpen && !openingActive && !animation && !encounter.resolved && (
+        <Instruction text={selected ? INSTRUCTION.encounter.verb : INSTRUCTION.encounter.planet} />
       )}
       <div className="combat-content">
         <div className="combat-topbar">
