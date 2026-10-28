@@ -192,25 +192,10 @@ Regenerate a full record with the replay ID from the report, supplying the same 
 pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> --starting-encounters 0
 ```
 
-### Historical comparisons
+### Evaluation methods
 
-The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the findings and their limitations.
-The `eval:history` recipes reconstruct selected comparisons from their Git revision, recorded rule patches, and fixed policies.
-They use the earlier narrative catalogue; their results do not estimate completion under today's catalogue.
-Start with a small reconstruction:
-
-```sh
-pnpm eval:history --experiment fortune --charts 1 --runs 1 --out eval-results/history-fortune
-```
-
-Recipes cover `basic` (original, extra Necessity, doubled damage), `necessity` (asymmetric versus symmetric), `lethality` (capped versus lethal), and `fortune` (halving versus blocking).
-Omitting `--charts` and `--runs` uses the recorded sample sizes and master seeds.
-The checkout must contain Git revision `2c06d597d098f00ca10bbb8f6500b7ccb003333c`; a shallow clone may need its history fetched first.
-The runner verifies reconstructed source fingerprints and selected replay hashes before running each comparison.
-Replay checkpoints outside the requested sample do not enter its aggregates.
-Gameplay steps and corrected summaries reproduce the archives; confidence intervals use the existing evaluator's 1,000 chart-bootstrap resamples rather than the historical Python analysis's 5,000-resample calculation.
-Generated results remain under the new output directory; temporary reconstructed source is removed when the command finishes.
-The retained inputs replace the research reports, copied source trees, and raw run archives.
+For study design, measurements, and interpretation, see the [evaluation methods guide](src/eval/README.md).
+The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the earlier findings and their limitations.
 
 ## Verification
 
