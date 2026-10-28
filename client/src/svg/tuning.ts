@@ -10,8 +10,7 @@ import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
  * on is then written back into `viewbox.ts` / `chart-style.ts` by hand.
  *
  * The committed tokens are the defaults, so this is an override layer and never
- * a second source of truth. Nothing outside the dev console calls `setTuning`,
- * so production renders the defaults and the store never notifies.
+ * a second source of truth. Nothing outside the dev console calls `setTuning`.
  *
  * A knob earns its place by being unsettled. The concentric radii (disc 24, arc
  * 30, ring 36), the stroke widths, the symbol ratio, the arc's track and
