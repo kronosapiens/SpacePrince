@@ -29,8 +29,7 @@ import type {
  * affliction/combustion on the boards, the combat turn, the map position, and
  * the house — so re-rolling actually surfaces different game states. Everything
  * is derived from one `randomSeed()` per spawn, so a given run still replays
- * the same. Dev-build-only (callers gate on `import.meta.env.DEV`) — minting
- * wipes the current local game, which is the intent here.
+ * the same. Minting wipes the current local game, which is the intent here.
  */
 
 export type SpawnKind = "map" | "combat" | "narrative" | "end";

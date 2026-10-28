@@ -29,7 +29,7 @@ const PAGES: Page[] = [
   { label: "Gallery", kind: "gallery" },
 ];
 
-/** Dev chrome (gated to dev builds by App): four keys, and a small legend for
+/** Dev chrome: four keys, and a small legend for
  *  them in the lower-left whose words are buttons too. `d` opens the console,
  *  `r` re-rolls the current surface — spawning a fresh real game there — and
  *  `p` lists the surfaces, where a digit picks one; `g` outlines layout boxes.
