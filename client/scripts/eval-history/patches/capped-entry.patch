@@ -1,0 +1,106 @@
+--- a/client/src/game/run.ts
++++ b/client/src/game/run.ts
+@@ -100,7 +100,11 @@
+       devUnlockAll,
+       encounterIdSeed,
+     });
+-    return { ...entered, encounter };
++    const opening = applyNecessity(
++      runChart(chart, entered), entered.state, encounter.roster,
++      mulberry32(hashString(`${encounterIdSeed ?? run.id}_${run.map.seed}_${nodeId}_player_necessity`)),
++    );
++    return { ...entered, state: opening.state, encounter: { ...encounter, selfNecessity: opening.necessity } };
+   }
+   const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
+   const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), run.seenScenarioIds, rng);
+@@ -124,10 +128,9 @@
+ }
+ 
+ /**
+- * The map boundary, rolled from the new map's seed. Two steps,
+- * in order: each combusted fielded planet rolls fortune to uncombust, then each
+- * lit planet — relit ones included — takes its necessity. Returns the
+- * crossed state and the record the map screen shows on entry.
++ * The map boundary, rolled from the new map's seed. Each combusted fielded
++ * planet rolls Fortune to return at half Resolve; lit planets are unchanged.
++ * Returns the crossed state and the record the map screen shows on entry.
+  */
+ export function rollMapBoundary(
+   chart: Chart,
+@@ -144,8 +147,7 @@
+     if (success) uncombust(chart.planets[planet], next[planet]);
+     uncombusts.push({ planet, chance, success });
+   }
+-  const applied = applyNecessity(chart, next, roster, rng);
+-  return { state: applied.state, boundary: { uncombusts, necessity: applied.necessity } };
++  return { state: next, boundary: { uncombusts, necessity: [] } };
+ }
+ 
+ /** Whether the run crosses into its next map: the terminal node's encounter
+@@ -157,8 +159,8 @@
+ 
+ /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives
+  *  the finished map to the event log, generates a fresh one, and passes the
+- *  chart, with the run's gains, through the map boundary — uncombust rolls,
+- *  then necessity, both seeded by the new map. The seventh completion ends the
++ *  chart, with the run's gains, through the map boundary's uncombust rolls,
++ *  seeded by the new map. The seventh completion ends the
+  *  run: the final map stays current (not archived). */
+ export function rolloverMap(
+   run: Run,
+--- a/client/src/game/types.ts
++++ b/client/src/game/types.ts
+@@ -100,8 +100,10 @@
+   id: string;
+   opponentChart: Chart;
+   opponentState: SideState;
+-  /** Opening rolls; absent on encounters saved before necessity animation. */
++  /** Other's opening rolls; absent on encounters saved before necessity animation. */
+   necessity?: NecessityEntry[];
++  /** Self's combat-entry rolls; absent on older saves and manually spawned encounters. */
++  selfNecessity?: NecessityEntry[];
+   /** Fielded planets — the roster both sides draw from, mirroring the player's
+    *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
+    *  placements; only these are sent and rendered solid. */
+@@ -174,13 +176,11 @@
+   draw?: number;
+ }
+ 
+-/** What the map boundary did to the player's chart, rolled
+- *  from the map seed at creation and shown on entry. Two steps, in order:
+- *  uncombust rolls for combusted planets, then necessity on lit ones. */
++/** The player's uncombust rolls, seeded at map creation and shown on entry. */
+ export interface MapBoundary {
+   /** One entry per planet combusted at the crossing; failed rolls included. */
+   uncombusts: Array<{ planet: PlanetName; chance: number; success: boolean }>;
+-  /** Planets necessity actually wounded (zero-amount rolls are omitted). */
++  /** Legacy map Necessity records; empty on newly created maps. */
+   necessity: NecessityEntry[];
+ }
+ 
+--- a/client/src/game/necessity.ts
++++ b/client/src/game/necessity.ts
+@@ -2,9 +2,9 @@
+ import { fortuneChance, getEffectiveStats } from "./combat";
+ import { combustionCeiling, isCombusted } from "./combust";
+ import { pickWeighted } from "./rng";
+-import type { Chart, MapBoundary, PlanetName, SideState } from "./types";
++import type { Chart, NecessityEntry, PlanetName, SideState } from "./types";
+ 
+-export const NECESSITY_AFFLICTION_TIERS = [12, 24, 36];
++export const NECESSITY_AFFLICTION_TIERS = [24, 36, 48];
+ 
+ /** Apply necessity to available fielded planets, preserving existing affliction. */
+ export function applyNecessity(
+@@ -12,9 +12,9 @@
+   state: SideState,
+   roster: readonly PlanetName[],
+   rng: () => number,
+-): { state: SideState; necessity: MapBoundary["necessity"] } {
++): { state: SideState; necessity: NecessityEntry[] } {
+   const next = cloneSideState(state);
+-  const necessity: MapBoundary["necessity"] = [];
++  const necessity: NecessityEntry[] = [];
+   for (const planet of roster) {
+     const ps = next[planet];
+     if (isCombusted(chart.planets[planet], ps)) continue;

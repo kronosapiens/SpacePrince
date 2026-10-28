@@ -1,0 +1,166 @@
+{
+  "format": 1,
+  "baseRevision": "2c06d597d098f00ca10bbb8f6500b7ccb003333c",
+  "catalogue": "28 historical narrative scenarios, restored from Git; never the current 720-scene catalogue.",
+  "commonPatches": [
+    "runner"
+  ],
+  "historicalNode": "v22.20.0",
+  "historicalViteNode": "3.2.4",
+  "runtimeFingerprint": "SHA256 of sorted astronomy/, data/, game/ relative paths and file SHA256s, each encoded path + NUL + hash + newline.",
+  "sourcePolicySha256": {
+    "balance-study/policies.ts": "51cc875898887e2060108364fad4071d36babdfdc4eaeef7fbe784da5642cd42",
+    "balance-tuning/policies.ts": "dba9351aa0d1e0fd45242c729aa344dfc72d627c96e836137fc96cefaca96dbe",
+    "necessity-lethality/policies.ts": "e3551903281c7253f93d9cdf22b7225a2976c298d5e55ea5ed4ab94a1d1db0d0"
+  },
+  "policySemantics": {
+    "trialStrategy": "survival",
+    "strategySeed": 0,
+    "roster": "full; lifetime encounter count fixed at 32",
+    "route": "Prefer arm node kind, then shortest path to exit; independent difficulty_route tie stream, including single-candidate draws.",
+    "combat": "Immediate historical survival or exact two-turn expectation, allowance 0; enumerate next announcements without reading future live RNG.",
+    "narrative": "Historical immediate survival policy.",
+    "entryAware": "Lethality sensitivity only: resolved leaves analytically value another Self Necessity sweep before recovery, except after full combustion or completed map 7; this is not optimal play."
+  },
+  "experiments": {
+    "fortune": {
+      "seed": 2026102781,
+      "charts": 20,
+      "runs": 5,
+      "arms": [
+        "combat-immediate",
+        "combat-two-turn",
+        "narrative-immediate"
+      ],
+      "description": "Final Fortune comparison; first 20 charts and 5 runs of the lethality cohort, not an independent sample.",
+      "variants": {
+        "half": {
+          "patches": [
+            "capped-entry",
+            "lethal",
+            "fortune-outcomes"
+          ],
+          "rules": "Self and Other uniform [12,24,36] at combat entry, lethal clamp, Fortune halves; map resurrection only.",
+          "archive": "2026-10-27-fortune-blocking/half",
+          "source": "2026-10-27-fortune-blocking/workspaces/half/src",
+          "runtimeSha256": "a0be8902ca124b2fc484ce42a7fc6ddc25264e9d8b4d8e57d8f101e7f79400e6"
+        },
+        "block": {
+          "patches": [
+            "capped-entry",
+            "lethal",
+            "fortune-outcomes",
+            "fortune-block"
+          ],
+          "rules": "Same lethal entry, but Fortune blocks the full draw and retains zero-amount entries. Historical halved metadata marks Fortune success.",
+          "archive": "2026-10-27-fortune-blocking/block",
+          "source": "2026-10-27-fortune-blocking/workspaces/block/src",
+          "runtimeSha256": "cae8c706b70b55870a9c8ec5d9fa24df5c7fb56d2246620ba1c285a93d9e24f8"
+        }
+      }
+    },
+    "lethality": {
+      "seed": 2026102781,
+      "charts": 50,
+      "runs": 10,
+      "arms": [
+        "combat-immediate",
+        "combat-two-turn",
+        "narrative-immediate",
+        "combat-two-turn-entry-aware"
+      ],
+      "description": "Primary capped versus lethal comparison; fourth arm is a separate predeclared continuation sensitivity.",
+      "variants": {
+        "capped-36": {
+          "patches": [
+            "capped-entry"
+          ],
+          "rules": "Self and Other uniform [24,36,48] at combat entry, cap at Resolve minus 1; Fortune halves; map resurrection only.",
+          "archive": "2026-10-27-necessity-lethality/primary-capped/capped-36",
+          "source": "2026-10-27-necessity-lethality/primary-capped/workspaces/capped-36/src",
+          "runtimeSha256": "759d0afa1e2b2b2aedb217ecdf15dddc8300bd4e2f3c7ca1cb8b0d0876d97a99"
+        },
+        "lethal-24": {
+          "patches": [
+            "capped-entry",
+            "lethal"
+          ],
+          "rules": "Self and Other uniform [12,24,36] at combat entry, cap at Resolve; Fortune halves; map resurrection only. Full entry wipe resolves at turn 0 without Light.",
+          "archive": "2026-10-27-necessity-lethality/primary-lethal/lethal-24",
+          "source": "2026-10-27-necessity-lethality/primary-lethal/workspaces/lethal-24/src",
+          "runtimeSha256": "ad03668a54b7f01fb81d36ba619d1f7d0dcf29315b56ae9e3926fd1f0f289857"
+        }
+      }
+    },
+    "necessity": {
+      "seed": 2026102773,
+      "charts": 50,
+      "runs": 10,
+      "arms": [
+        "combat-immediate",
+        "combat-two-turn",
+        "narrative-immediate"
+      ],
+      "description": "Asymmetric versus symmetric confirmation; both use Self [24,36,48].",
+      "variants": {
+        "self-36-other-24": {
+          "patches": [
+            "asymmetric"
+          ],
+          "rules": "Self uniform [24,36,48], Other [12,24,36] at combat entry; cap at Resolve minus 1; Fortune halves; map resurrection only.",
+          "archive": "2026-10-27-necessity-tuning/confirmation-a/self-36-other-24",
+          "source": "2026-10-27-necessity-tuning/confirmation-a/workspaces/self-36-other-24/src",
+          "runtimeSha256": "76ead758c0f5ddd058aed095132e983f13a21bb81aef9bb5a9d4e3b4204efb31"
+        },
+        "self-36-other-36": {
+          "patches": [
+            "asymmetric",
+            "symmetric"
+          ],
+          "rules": "Both sides uniform [24,36,48] at combat entry; cap at Resolve minus 1; Fortune halves; map resurrection only.",
+          "archive": "2026-10-27-necessity-tuning/confirmation-symmetric/self-36-other-36",
+          "source": "2026-10-27-necessity-tuning/confirmation-symmetric/workspaces/self-36-other-36/src",
+          "runtimeSha256": "a74e31c238fefda4cdf2ccdf6534dcd82c704108a4d63ae20c71fdf1325e3838"
+        }
+      }
+    },
+    "basic": {
+      "seed": 2026102761,
+      "charts": 20,
+      "runs": 5,
+      "arms": [
+        "combat-immediate",
+        "combat-two-turn",
+        "narrative-immediate"
+      ],
+      "description": "Original tuning screen: unchanged rules, extra player Necessity, and doubled player-side combat affliction.",
+      "variants": {
+        "baseline": {
+          "patches": [],
+          "rules": "Original player map Necessity plus Other combat-entry Necessity, uniform [12,24,36], cap at Resolve minus 1, Fortune halves.",
+          "archive": "2026-10-27-balance-tuning/screen/baseline",
+          "source": "2026-10-27-balance-tuning/screen/workspaces/baseline/src",
+          "runtimeSha256": "fd02724b7fe1d5a569f391a9406283fa5ff253c63ab5e02e5b777cd3acde875a"
+        },
+        "extra-player-necessity": {
+          "patches": [
+            "extra-player"
+          ],
+          "rules": "Retain original map Necessity and add player combat-entry Necessity using effective chart and encounter roster. No extra revival; original Other entry unchanged.",
+          "archive": "2026-10-27-balance-tuning/screen/extra-player-necessity",
+          "source": "2026-10-27-balance-tuning/screen/workspaces/extra-player-necessity/src",
+          "runtimeSha256": "f10c081f8be3dc2be5b77ff375cde51d436f927de188156b46380c2122d7fa06"
+        },
+        "double-player-damage": {
+          "patches": [
+            "double-player"
+          ],
+          "rules": "Double only raw positive player-side combat affliction before clamps, direct or propagated, including inverted Testimony. Preserve healing magnitudes, Other damage, probability, Necessity and narrative.",
+          "archive": "2026-10-27-balance-tuning/screen/double-player-damage",
+          "source": "2026-10-27-balance-tuning/screen/workspaces/double-player-damage/src",
+          "runtimeSha256": "9714cfb33dc2dd9082f5b2bfafc71cb157055d36ffa2fd9b1ccdc960985b83f3"
+        }
+      }
+    }
+  }
+}

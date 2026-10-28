@@ -10,6 +10,8 @@ export interface BatchOptions {
   runs: number;
   strategies: Strategy[];
   strategySeed: number;
+  /** Each trial begins at this lifetime count; omitted means a fully unlocked roster. */
+  startingLifetimeEncounterCount?: number;
 }
 
 /** Chart i, as a pure function of the master seed and its index. */

@@ -1,14 +1,14 @@
 import { runChart } from "@/game/chart";
 import { getScenario } from "@/data/narrative-scenarios";
 import { combustionCeiling, isCombusted } from "@/game/combust";
-import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { resolveNarrative } from "@/game/narrative";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { enterNode, isOver } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { unlockedPlanets } from "@/game/unlocks";
-import type { MapState, NarrativeEncounter, Prince, Run } from "@/game/types";
+import type { NarrativeEncounter, Prince, Run } from "@/game/types";
 import { playEncounter, type Policy, type PlayContext } from "./play";
+import { encountersToExit, planningPolicy } from "./planning";
 
 /** Uniform among the legal choices: route, (planet, verb), then a narrative
  *  option and one of its selections. */
@@ -74,19 +74,6 @@ function forecastContext(play: PlayContext, seed: number): PlayContext {
   return { ...play, rng: mulberry32(hashString(`${seed}_ties`)), turnRng: () => turns };
 }
 
-/** Encounters from `nodeId` to the map's exit by the shortest path the map allows. */
-function encountersToExit(map: MapState, nodeId: string): number {
-  const seen = new Set([...map.visitedNodeIds, nodeId]);
-  let frontier = [nodeId];
-  let count = 0;
-  while (!frontier.includes(TERMINAL_NODE_ID)) {
-    frontier = frontier.flatMap((id) => eligibleNext(map.graph, id, [...seen]));
-    for (const id of frontier) seen.add(id);
-    count++;
-  }
-  return count;
-}
-
 /** Criteria compared in order, never weighted; the strategy's rng picks among exact ties. */
 function best<T>(items: T[], key: (item: T) => number[], rng: () => number): T {
   let top: T[] = [];
@@ -138,5 +125,16 @@ export const lightPolicy = strategic(
   (f) => [f.survived, f.light, f.lit, f.capacity],
 );
 
-export const POLICIES = { random: randomPolicy, survival: survivalPolicy, light: lightPolicy } satisfies Record<string, Policy>;
+export const POLICIES = {
+  random: randomPolicy,
+  survival: survivalPolicy,
+  light: lightPolicy,
+  "combat-immediate": planningPolicy(survivalPolicy, { route: "combat" }),
+  "combat-two-turn": planningPolicy(survivalPolicy, { route: "combat", horizon: 2 }),
+  "narrative-immediate": planningPolicy(survivalPolicy, { route: "narrative" }),
+  "capacity-12": planningPolicy(survivalPolicy, { capacityAllowance: 12 }),
+  "two-turn-survival": planningPolicy(survivalPolicy, { horizon: 2 }),
+  "two-turn-capacity-12": planningPolicy(survivalPolicy, { horizon: 2, capacityAllowance: 12 }),
+  "combat-two-turn-entry-aware": planningPolicy(survivalPolicy, { route: "combat", horizon: 2, anticipateEntry: true }),
+} satisfies Record<string, Policy>;
 export type Strategy = keyof typeof POLICIES;

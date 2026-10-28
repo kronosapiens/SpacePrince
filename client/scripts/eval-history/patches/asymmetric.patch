@@ -1,0 +1,55 @@
+--- a/client/src/game/run.ts
++++ b/client/src/game/run.ts
+@@ -100,7 +100,12 @@
+       devUnlockAll,
+       encounterIdSeed,
+     });
+-    return { ...entered, encounter };
++    const playerOpening = applyNecessity(
++      runChart(chart, entered), entered.state, encounter.roster,
++      mulberry32(hashString(`${encounterIdSeed ?? run.id}_${run.map.seed}_${nodeId}_player_necessity`)),
++      [24,36,48],
++    );
++    return { ...entered, state: playerOpening.state, encounter };
+   }
+   const rng = mulberry32(encounterIdSeed ?? hashString(`${run.id}_${content.house}_${nodeId}`));
+   const { scenarioId } = pickScenario(content.house, houseSign(chart, content.house), run.seenScenarioIds, rng);
+@@ -144,8 +149,7 @@
+     if (success) uncombust(chart.planets[planet], next[planet]);
+     uncombusts.push({ planet, chance, success });
+   }
+-  const applied = applyNecessity(chart, next, roster, rng);
+-  return { state: applied.state, boundary: { uncombusts, necessity: applied.necessity } };
++  return { state: next, boundary: { uncombusts, necessity: [] } };
+ }
+ 
+ /** Whether the run crosses into its next map: the terminal node's encounter
+--- a/client/src/game/necessity.ts
++++ b/client/src/game/necessity.ts
+@@ -12,13 +12,14 @@
+   state: SideState,
+   roster: readonly PlanetName[],
+   rng: () => number,
++  tiers: number[] = NECESSITY_AFFLICTION_TIERS,
+ ): { state: SideState; necessity: MapBoundary["necessity"] } {
+   const next = cloneSideState(state);
+   const necessity: MapBoundary["necessity"] = [];
+   for (const planet of roster) {
+     const ps = next[planet];
+     if (isCombusted(chart.planets[planet], ps)) continue;
+-    const draw = pickWeighted(NECESSITY_AFFLICTION_TIERS, rng);
++    const draw = pickWeighted(tiers, rng);
+     const halved = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
+     const amount = Math.max(0, Math.min(
+       halved ? draw / 2 : draw,
+--- a/client/src/game/encounter.ts
++++ b/client/src/game/encounter.ts
+@@ -75,7 +75,7 @@
+   // Separate stream for the necessity so its draws don't perturb the
+   // turn-sequence rolls above.
+   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
+-  const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng);
++  const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng, [12,24,36]);
+   return {
+     kind: "combat",
+     id: `enc_combat_${run.id}_${acceptedSeed}`,

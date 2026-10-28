@@ -1,0 +1,101 @@
+--- a/client/src/eval/runner.ts
++++ b/client/src/eval/runner.ts
+@@ -1,13 +1,14 @@
+-import { seededChart } from "@/game/chart";
+-import { UNLOCK_THRESHOLDS } from "@/game/data";
++import { runChart, seededChart } from "@/game/chart";
++import { combustionCeiling } from "@/game/combust";
++import { PLANETS, UNLOCK_THRESHOLDS } from "@/game/data";
+ import { encounterRuler } from "@/game/encounter";
+ import { eligibleNext } from "@/game/map-gen";
+ import { hashString, mulberry32 } from "@/game/rng";
+ import { beginRun, enterNode, isOver, MAPS_PER_RUN, rolloverMap, shouldRolloverMap } from "@/game/run";
+ import { combatTurnRng } from "@/game/turn";
+ import { unlockedPlanets } from "@/game/unlocks";
+-import type { CombatEncounter, NarrativeEncounter, PlanetName, Polarity, Run } from "@/game/types";
+-import { playEncounter, snapshot, type PlayContext, type Step, type Trial } from "./play";
++import type { Chart, CombatEncounter, NarrativeEncounter, PlanetName, Polarity, Run } from "@/game/types";
++import { playEncounter, snapshot, type PlayContext, type Policy, type Step, type Trial } from "./play";
+ import { POLICIES } from "./policies";
+ 
+ export interface RunSummary {
+@@ -56,7 +57,7 @@
+ 
+ /** Play one trial with the real game functions, in the UI's order. Re-running
+  *  a trial reproduces its record exactly. */
+-export function runTrial(trial: Trial): RunRecord {
++export function runTrial(trial: Trial, policy: Policy = POLICIES[trial.strategy]): RunRecord {
+   const { chartSeed, gameSeed, strategy, strategySeed } = trial;
+   const chart = seededChart(chartSeed);
+   const play: PlayContext = {
+@@ -65,7 +66,7 @@
+       id: `eval_${chartSeed}`, position: { iso: "", lat: 0, lon: 0 }, chart,
+       numEncounters: FULL_TIER, achievements: 0, runs: [],
+     },
+-    policy: POLICIES[strategy],
++    policy,
+     rng: mulberry32(hashString(`strategy_${chartSeed}_${gameSeed}_${strategy}_${strategySeed}`)),
+     turnRng: combatTurnRng,
+   };
+@@ -85,7 +86,7 @@
+     // Leave it as EncounterScreen's clearEncounter does.
+     run = { ...run, encounter: null };
+   }
+-  return { trial, summary: summarize(steps, run), steps };
++  return { trial, summary: summarize(steps, run, chart), steps };
+ }
+ 
+ function boundaryStep(run: Run): Step {
+@@ -105,19 +106,25 @@
+     : { ...entry, encounter: "narrative", house: content.house, scenarioId: (run.encounter as NarrativeEncounter).scenarioId };
+ }
+ 
+-function summarize(steps: Step[], run: Run): RunSummary {
++function summarize(steps: Step[], run: Run, chart: Chart): RunSummary {
+   const verbs: Record<Polarity, number> = { Affliction: 0, Testimony: 0 };
+   const narrativeOptions: Record<string, number> = {};
+   let entry: Extract<Step, { kind: "enter" }> | undefined;
+   let choice: Extract<Step, { kind: "turn" | "narrative" }> | undefined;
+   let combatEncounters = 0, narrativeEncounters = 0, combatTurns = 0;
+   let combustions = 0, boundaryRevivals = 0, narrativeRevivals = 0;
+-  for (const step of steps) {
++  for (const [index, step] of steps.entries()) {
+     if (step.kind === "boundary") {
+       boundaryRevivals += step.uncombusts.filter((u) => u.success).length;
+     } else if (step.kind === "enter") {
+       entry = step;
+-      if (step.encounter === "combat") combatEncounters++;
++      choice = undefined;
++      if (step.encounter === "combat") {
++        combatEncounters++;
++        const before = steps[index - 1]!, placements = runChart(chart, step).planets;
++        combustions += PLANETS.filter((planet) =>
++          before.affliction[planet] < combustionCeiling(placements[planet]) && step.affliction[planet] >= combustionCeiling(placements[planet])).length;
++      }
+       else narrativeEncounters++;
+     } else if (step.kind === "turn") {
+       choice = step;
+@@ -132,8 +139,8 @@
+       narrativeOptions[key] = (narrativeOptions[key] ?? 0) + 1;
+     }
+   }
+-  // Every encounter makes at least one choice, so both are set.
+-  const last = entry!, final = choice!;
++  // A combat may end at entry, before any choice.
++  const last = entry!, final = choice;
+   const endReason = run.mapsCompleted >= MAPS_PER_RUN ? "completion" : "combustion";
+   const fatal = (kind: "combat" | "narrative") => (endReason === "combustion" && last.encounter === kind ? 1 : 0);
+   return {
+@@ -144,9 +151,9 @@
+     terminalKind: last.encounter,
+     terminalScenarioId: last.encounter === "narrative" ? last.scenarioId : null,
+     terminalRuler: last.encounter === "combat" ? last.ruler : null,
+-    lastPlanet: final.kind === "turn" ? final.planet : final.chosen,
+-    lastVerb: final.kind === "turn" ? final.verb : null,
+-    lastOptionId: final.kind === "narrative" ? final.optionId : null,
++    lastPlanet: final?.kind === "turn" ? final.planet : final?.chosen ?? null,
++    lastVerb: final?.kind === "turn" ? final.verb : null,
++    lastOptionId: final?.kind === "narrative" ? final.optionId : null,
+     light: run.light,
+     combatEncounters: combatEncounters - fatal("combat"),
+     narrativeEncounters: narrativeEncounters - fatal("narrative"),

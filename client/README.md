@@ -161,6 +161,57 @@ It uses `useRef` + `useId` for the gradient — never `document.getElementById`.
 - `MECHANICS.md` wins when it conflicts with older design docs.
 - No wallet, RPC, or contract calls in `client/` unless explicitly asked.
 
+## Balance evaluation
+
+The evaluator uses the game resolvers, seeded charts and runs, and a separate strategy RNG.
+Its default strategies remain `random`, `survival`, and `light`.
+Compare immediate defense with two-turn planning on combat-preferring routes:
+
+```sh
+pnpm eval:balance --seed 20261028 --charts 5 --runs 2 --strategies combat-immediate,combat-two-turn --out eval-results/planning
+```
+
+`narrative-immediate` provides a narrative-preferring control with the same immediate decisions.
+`capacity-12` and `two-turn-capacity-12` allow up to 12 less remaining capacity for additional Light while preserving the best available survival and lit-planet measures.
+They retain the original survival route forecasts; `two-turn-survival` uses those forecasts with no score allowance.
+`combat-two-turn-entry-aware` values completed encounters as if another combat arrived before recovery, using the current Necessity and Fortune rules.
+That continuation omits intervening narratives and revival; it is a heuristic, not optimal play.
+Planning enumerates possible future announcements without inspecting live future draws.
+
+Use `--starting-encounters 0` to evaluate a first run with actual planet unlocks.
+Each trial starts at the selected lifetime count independently; omitting the option starts with all seven planets unlocked.
+Encounter clearing advances lifetime progress before checking for failure, including a new planet rescuing an otherwise combusted roster.
+Programmatic callers can pass a run's final lifetime count into the next `runTrial` call.
+
+Outputs include configuration, source revision and working-tree patch, run summaries, and paired comparisons with intervals resampled by chart.
+The report separates combat damage and healing, combat-entry affliction and losses, and unlocks.
+These fixed policies provide comparisons, not calibrated human win rates.
+Regenerate a full record with the replay ID from the report, supplying the same starting count when used:
+
+```sh
+pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> --starting-encounters 0
+```
+
+### Historical comparisons
+
+The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the findings and their limitations.
+The `eval:history` recipes reconstruct selected comparisons from their Git revision, recorded rule patches, and fixed policies.
+They use the earlier narrative catalogue; their results do not estimate completion under today's catalogue.
+Start with a small reconstruction:
+
+```sh
+pnpm eval:history --experiment fortune --charts 1 --runs 1 --out eval-results/history-fortune
+```
+
+Recipes cover `basic` (original, extra Necessity, doubled damage), `necessity` (asymmetric versus symmetric), `lethality` (capped versus lethal), and `fortune` (halving versus blocking).
+Omitting `--charts` and `--runs` uses the recorded sample sizes and master seeds.
+The checkout must contain Git revision `2c06d597d098f00ca10bbb8f6500b7ccb003333c`; a shallow clone may need its history fetched first.
+The runner verifies reconstructed source fingerprints and selected replay hashes before running each comparison.
+Replay checkpoints outside the requested sample do not enter its aggregates.
+Gameplay steps and corrected summaries reproduce the archives; confidence intervals use the existing evaluator's 1,000 chart-bootstrap resamples rather than the historical Python analysis's 5,000-resample calculation.
+Generated results remain under the new output directory; temporary reconstructed source is removed when the command finishes.
+The retained inputs replace the research reports, copied source trees, and raw run archives.
+
 ## Verification
 
 - `pnpm exec tsc -b --noEmit` — typecheck

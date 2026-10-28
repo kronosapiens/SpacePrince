@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import { aggregate, type Row } from "@/eval/aggregate";
 import { batchTrials } from "@/eval/batch";
 import type { Strategy } from "@/eval/policies";
-import type { RunSummary } from "@/eval/runner";
+import { emptyRunPressure, type RunSummary } from "@/eval/runner";
+import { renderReport } from "@/eval/report";
 
 /** A run that completed `maps` maps (seven is completion) with `light` Light. */
 function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: number, light: number, more: Partial<RunSummary> = {}): Row {
   const summary: RunSummary = {
+    startingLifetimeEncounterCount: 32, finalLifetimeEncounterCount: 32, unlocks: [], unlockRescues: 0, pressure: emptyRunPressure(),
     endReason: maps === 7 ? "completion" : "combustion", mapsCompleted: maps, terminalMap: Math.min(maps + 1, 7),
     terminalNodeId: "5C", terminalKind: "combat", terminalScenarioId: null, terminalRuler: "Moon",
     lastPlanet: "Moon", lastVerb: "Affliction", lastOptionId: null,
@@ -41,6 +43,35 @@ const rows = [
 ];
 
 describe("balance aggregation", () => {
+  it("reports actual pressure and unlock recovery with the run denominator", () => {
+    const pressure = emptyRunPressure();
+    pressure.entryDamage = 12;
+    pressure.entryDeaths = 1;
+    pressure.entryWipes = 1;
+    pressure.entryWipeRescues = 1;
+    pressure.combat = { damage: 48, healing: 24, directAffliction: 24, propagatedAffliction: 12,
+      invertedTestimonyDamage: 12, directTestimony: 12, propagatedTestimony: 6, invertedAfflictionHealing: 6 };
+    pressure.resolveGain = 12;
+    pressure.unlockCapacity = 72;
+    pressure.capacityStart = 100;
+    pressure.capacityEnd = 148;
+    const agg = aggregate([
+      row("random", 1, 1, 7, 0, { pressure, startingLifetimeEncounterCount: 0, finalLifetimeEncounterCount: 32, unlocks: ["Mercury"], unlockRescues: 1 }),
+      row("random", 1, 2, 1, 0),
+    ], 1);
+    const actual = agg.strategies[0]!;
+    expect(actual.pressure).toMatchObject({ entryDamage: 6, entryDeaths: .5, entryWipes: .5, entryWipeRescues: .5,
+      resolveGain: 6, unlockCapacity: 36, capacityStart: 50, capacityEnd: 74,
+      combat: { damage: 24, healing: 12, invertedTestimonyDamage: 6, invertedAfflictionHealing: 3 } });
+    expect(actual.progression).toEqual({ unlocks: .5, unlockRescues: .5, finalLifetimeEncounterCount: 32 });
+    const report = renderReport(agg, { revision: "fixture", dirty: false,
+      options: { seed: 1, charts: 1, runs: 2, strategies: ["random"], strategySeed: 0, startingLifetimeEncounterCount: 0 } });
+    expect(report).toContain("starts independently at 0 lifetime encounters");
+    expect(report).toContain("--replay <id> --starting-encounters 0");
+    expect(report).toContain("Inverted Testimony damage");
+    expect(report).toContain("Unlock rescues");
+  });
+
   it("matches a hand-calculated batch", () => {
     const agg = aggregate(rows, 1);
     const [random, survival] = agg.strategies;

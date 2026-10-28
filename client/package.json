@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "sim:economy": "vite-node scripts/sim-economy.ts",
-    "eval:balance": "vite-node scripts/eval-balance.ts"
+    "eval:balance": "vite-node scripts/eval-balance.ts",
+    "eval:history": "vite-node scripts/eval-history/run.ts"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",

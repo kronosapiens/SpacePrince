@@ -5,6 +5,7 @@ import type { Strategy } from "@/eval/policies";
 import { runChart, seededChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
+import { unlockedPlanets } from "@/game/unlocks";
 import type { PlanetName } from "@/game/types";
 
 const trial = (chartSeed: number, gameSeed: number, strategySeed = 0, strategy: Strategy = "random"): Trial =>
@@ -13,8 +14,56 @@ const trial = (chartSeed: number, gameSeed: number, strategySeed = 0, strategy: 
 const strategic = (["survival", "light"] as const).map((s) => runTrial(trial(3, 7, 0, s)));
 const batch = [1, 2, 3, 4, 5].flatMap((c) => [1, 2, 3, 4, 5].map((g) => runTrial(trial(c, g))));
 const completion = runTrial(trial(1524643982, 1569170341, 0, "survival"));
+const progression = runTrial(trial(1, 1), undefined, { startingLifetimeEncounterCount: 0 });
 
 describe("seeded runner", () => {
+  it("clears a zero-turn wipe before checking the enlarged unlock roster", () => {
+    const { steps, summary } = progression;
+    const index = steps.findIndex((s) => s.kind === "unlock" && s.entryWipe && s.rescuedByUnlock);
+    expect(index).toBeGreaterThan(0);
+    const entered = steps[index - 1]!, unlocked = steps[index]!, next = steps[index + 1]!;
+    expect(entered).toMatchObject({ kind: "enter", encounter: "combat", lifetimeEncounterCount: 15, wipe: true });
+    expect(unlocked).toMatchObject({ kind: "unlock", planet: "Jupiter", lifetimeEncounterCount: 16, rescuedByUnlock: true });
+    expect(next).toMatchObject({ kind: "enter", lifetimeEncounterCount: 16 });
+    expect(unlocked.light).toBe(entered.light);
+    expect(unlocked.affliction.Jupiter).toBe(0);
+    const chart = runChart(seededChart(1), entered);
+    expect(unlockedPlanets(15).every((p) => entered.affliction[p] >= combustionCeiling(chart.planets[p]))).toBe(true);
+    const entries = steps.filter((s) => s.kind === "enter");
+    expect(entries.map((s) => s.lifetimeEncounterCount)).toEqual(entries.map((_, i) => i));
+    expect(summary.finalLifetimeEncounterCount).toBe(entries.length);
+    expect(summary.unlocks).toEqual(PLANETS.slice(1));
+    expect(summary.pressure.entryWipeRescues).toBe(1);
+    expect(runTrial(progression.trial, undefined, { startingLifetimeEncounterCount: 0 })).toEqual(progression);
+  });
+
+  it("can start the next fresh run at the previous run's final lifetime count", () => {
+    const start = progression.summary.finalLifetimeEncounterCount;
+    const next = runTrial(trial(1, 2), undefined, { startingLifetimeEncounterCount: start });
+    expect(next.summary.startingLifetimeEncounterCount).toBe(start);
+    expect(next.summary.finalLifetimeEncounterCount).toBe(start + next.steps.filter((s) => s.kind === "enter").length);
+    expect(next.summary.unlocks).toEqual([]);
+    expect(Object.values(next.steps[0]!.affliction)).toEqual(PLANETS.map(() => 0));
+    expect(Object.values(next.steps[0]!.gains).flatMap(Object.values).every((gain) => gain === 0)).toBe(true);
+  });
+
+  it("reconciles pressure with fielded capacity across combat, entries, gains, revivals and unlocks", () => {
+    for (const record of [...batch, completion, progression]) {
+      const { pressure: p, startingLifetimeEncounterCount: start, finalLifetimeEncounterCount: end } = record.summary;
+      const chart = seededChart(record.trial.chartSeed);
+      const capacity = (step: Step, count: number) => unlockedPlanets(count).reduce((sum, planet) =>
+        sum + Math.max(0, combustionCeiling(runChart(chart, step).planets[planet]) - step.affliction[planet]), 0);
+      expect(p.capacityStart).toBe(capacity(record.steps[0]!, start));
+      expect(p.capacityEnd).toBe(capacity(record.steps.at(-1)!, end));
+      expect(p.capacityEnd - p.capacityStart).toBe(
+        p.combat.healing - p.combat.damage - p.entryDamage + p.narrativeHealing - p.narrativeDamage +
+        p.narrativeRevivalRecovery + p.boundaryRevivalRecovery + p.resolveGain + p.unlockCapacity,
+      );
+    }
+    expect(progression.summary.pressure.resolveGain).toBeGreaterThan(0);
+    expect(progression.summary.pressure.unlockCapacity).toBeGreaterThan(0);
+  });
+
   it("replays a trial exactly, whatever ran before it", () => {
     const first = runTrial(trial(3, 7));
     runTrial(trial(3, 7, 1));
