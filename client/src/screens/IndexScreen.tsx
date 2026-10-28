@@ -28,7 +28,7 @@ export function IndexScreen() {
   return (
     <div className="index-screen">
       <h1>Index</h1>
-      <p className="muted t-display-italic">Dev navigation + cheats. Hidden in production builds.</p>
+      <p className="muted t-display-italic">Dev navigation + cheats.</p>
 
       <section>
         <div className="t-chrome-em" style={{ marginBottom: 8 }}>Routes</div>
