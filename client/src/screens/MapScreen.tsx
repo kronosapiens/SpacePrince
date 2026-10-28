@@ -92,7 +92,7 @@ export function MapScreen() {
   useEffect(() => {
     if (!run || !prince || !shouldRolloverMap(run, prince.chart, prince.numEncounters)) return;
     // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
-    // uncombust rolls, then necessity, both seeded by the new map.
+    // uncombust rolls, seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);
   }, [run, prince, playerUnlocked, rolloverMap]);
 

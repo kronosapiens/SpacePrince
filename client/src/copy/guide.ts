@@ -39,7 +39,7 @@ export const GUIDE_COPY = {
       },
       other: {
         label: "Other",
-        body: "The other chart begins each encounter with affliction from necessity. Each planet's Fortune may halve it. Your action affects its acting planet.",
+        body: "Both charts take affliction from necessity when they meet. Fortune may block it completely; wounded planets can combust. Your action affects the other chart's acting planet.",
       },
       activePlanet: {
         label: "Incoming move",
@@ -106,7 +106,7 @@ export const GUIDE_COPY = {
       },
       crossing: {
         label: "The crossing",
-        body: "Crossings lead to the next map. Combusted planets roll Fortune to revive before necessity brings new affliction.",
+        body: "Crossings lead to the next map. Combusted planets roll Fortune to revive at half Resolve.",
       },
       index: {
         label: "Map {n} of VII",
@@ -114,7 +114,7 @@ export const GUIDE_COPY = {
       },
       necessity: {
         label: "Necessity",
-        body: "Every map opens with 12, 24, or 36 affliction per available planet. Fortune may halve it; the amount stops short of combustion. The arcs show it arriving. Inspect a planet and open its study notes to review the result.",
+        body: "When you meet another chart, available planets on both charts take 12, 24, or 36 affliction. Fortune may block it completely. Wounded planets can combust; unwounded planets survive the opening.",
       },
     },
   },

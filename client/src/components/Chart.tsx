@@ -853,11 +853,12 @@ function PlanetArc({
     // Old records lack the raw draw; their actual amount is all we can show.
     const from = openingPhase === "settle" ? Math.max(0, spent - necessity.amount) : spent;
     const draw = necessity.draw ?? necessity.amount;
+    const afterFortune = necessity.blocked ? 0 : draw / (necessity.halved ? 2 : 1);
     const amount = openingPhase === "necessity" ? draw
       : openingPhase === "fortune" && necessity.draw !== undefined
-        ? draw / (necessity.halved ? 2 : 1) : necessity.amount;
-    const to = clamp(from + amount, from, Math.max(from, ceiling - 1));
-    if (to > from) diff = { from, to, color: VALENCE_COLOR.Affliction };
+        ? afterFortune : necessity.amount;
+    const to = clamp(from + amount, from, ceiling);
+    if (to > from) diff = { from, to, color: to >= ceiling ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
   } else if (projection) {
     const harm = projection.polarity !== "Testimony";
     const signed = harm ? Math.abs(projection.delta) : -Math.abs(projection.delta);

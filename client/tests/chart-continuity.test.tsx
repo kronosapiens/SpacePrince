@@ -108,11 +108,14 @@ describe("shared player chart", () => {
     expect(element('[data-guide="option-2"]').textContent).toContain("Tell your uncle her name, and leave his table.");
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
-    const target = PLANETS.find((planet) => afterCombat.runs[0]!.state[planet].affliction === 0)!;
+    const target = PLANETS.find((planet) =>
+      combustionCeiling(prince.chart.planets[planet]) - afterCombat.runs[0]!.state[planet].affliction >= 24)!;
+    expect(target).toBeDefined();
+    const startingAffliction = afterCombat.runs[0]!.state[target].affliction;
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
     const afterNarrative = loadPrince()!.runs[0]!;
     expect(afterNarrative.encounter?.resolved).toBe(true);
-    expect(afterNarrative.state[target].affliction).toBe(24);
+    expect(afterNarrative.state[target].affliction).toBe(startingAffliction + 24);
     expect(afterNarrative.light).toBe(afterCombat.runs[0]!.light + 96);
     expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
@@ -125,7 +128,7 @@ describe("shared player chart", () => {
     expect(loadPrince()!.numEncounters).toBe(prince.numEncounters + 2);
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
     const ceiling = combustionCeiling(prince.chart.planets[target]);
-    expect(element(".ps-ratio").textContent).toBe(`Resolve${ceiling - 24}/${ceiling}`);
+    expect(element(".ps-ratio").textContent).toBe(`Resolve${ceiling - startingAffliction - 24}/${ceiling}`);
     expect(container.querySelector(".ps-actions")).toBeNull();
   });
 

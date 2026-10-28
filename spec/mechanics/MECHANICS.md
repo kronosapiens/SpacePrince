@@ -6,8 +6,8 @@ The source of truth for the game's mechanics. Where an older design doc conflict
 Combat stat divisions produce whole numbers without rounding.
 Effective stats are multiples of `12` — the smallest number every aspect fraction (§9) divides — so halves, thirds, quarters, and sixths of any stat are integers.
 Resolve is the combustion ceiling, also a multiple of `12` (§10).
-Necessity draws `12`, `24`, or `36` affliction; Fortune can halve the draw to `6`, `12`, or `18` (§11.3).
-Its addition is limited to the remaining room up to `Resolve − 1`, without rounding or reducing existing affliction.
+Necessity draws `12`, `24`, or `36` affliction; a successful Fortune roll blocks the draw entirely (§11.3).
+Its addition is limited to the remaining room up to Resolve, where the planet combusts.
 Probabilities are stated in sixtieths (§7); percentages appear only as glosses.
 Lattice membership is an invariant: never introduce a buff, multiplier, or knob that steps off it.
 Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Light totals, rite prices) — sums and payments, never divided.
@@ -145,16 +145,16 @@ There are no crits and no hidden rolls: anything derivable before commitment is 
 
 Fresh randomness enters only where the game is already pausing to reveal something new, and every reveal rides a transaction the player is already waiting on:
 
-- **Map creation.** The map seed is a VRF draw; from it derive node content (`MAP.md`) and the opening uncombust rolls and necessity (§11.3), including on the first map.
+- **Map creation.** The map seed is a VRF draw; from it derive node content (`MAP.md`) and opening uncombust rolls (§11.3).
   These are settled and displayed before the first node is entered.
-- **Encounter arrival.** The other chart receives necessity before the first action (§11.3).
-  In the prototype, its affliction uses a separate seeded stream from its turn sequence, so necessity draws do not change the announced actions.
+- **Combat encounter arrival.** Both charts receive necessity before the first action (§11.3).
+  In the prototype, each chart's opening affliction uses a separate seeded stream from the other's and from the turn sequence, so necessity draws do not change the announced actions.
 - **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5). By the time the resolution animation finishes, the next move has landed. Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
 - **Wagers.** A narrative wager's outcome is rolled by the transaction that commits it; the wait is the reveal. The odds are always displayed before commitment: the fortune roll on the conditioning planet's luck.
 
 Luck is therefore not a combat stat.
 Affliction, testimony, and Resolve decide what a planet does inside an encounter; luck decides wager odds, uncombust rolls, and relief from necessity.
-The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the shared luck-based probability: a narrative wager's odds, the chance a combusted planet uncombusts, and the chance an available planet's necessity draw is halved (§11.3).
+The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the shared luck-based probability: a narrative wager's odds, the chance a combusted planet uncombusts, and the chance an available planet's necessity draw is blocked (§11.3).
 One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fortune is its odds wherever fate is asked.
 
 *Rejected:* a separate wager curve, `min(45, 20 + luck/2) / 60` — a `20/60` (⅓) floor rising to a `45/60` (¾) cap.
@@ -210,7 +210,10 @@ A planet combusts **the moment its affliction reaches the ceiling** — determin
 **Provisional maximum for future run upgrades: 180 Resolve per planet**, including base stats, placement bonuses, and run bonuses.
 At 2° per point, this fills one affliction arc.
 
-Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few. Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin. Combustion is planned for, not gambled on — the player can read how many more blows a planet has in it.
+Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few.
+Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin.
+During an exchange, the player can read the exact combustion outcome before acting.
+Combat entry adds a Necessity draw (§11.3), so preparation must account for its possible amounts.
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more. Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation. Testimony defends the margin; it never resurrects.
 
@@ -242,17 +245,17 @@ Per encounter:
 - Every combat encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP`, `CHART.md`).
   It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the combat theme (`MUSIC.md`), and the encounter's scoring rule (§12).
   Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
-- The other chart begins **already afflicted** through the same necessity rule used at map openings (§11.3), applied to a fresh chart state.
-  Under the Moon's rule only resolution scores (§12), so even the first one-turn encounter needs affliction to resolve.
-  The three draws and Fortune's halving keep this initial amount bounded and nonzero, while every fielded planet arrives lit.
+- Both charts receive **Necessity at combat entry** (§11.3): the player adds it to carried affliction, while the other begins with fresh state.
+  Fortune can leave a planet at zero affliction, while every fielded planet on the other chart arrives lit.
+  Under the Moon's rule only resolution scores (§12), so an opening with no affliction to resolve can yield no Light.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1). The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
 - Encounter advances manually via `Continue` after completion.
 
 The player's affliction and combust state **persist across encounters and across maps within a run**.
-Each map opening applies uncombust rolls followed by necessity (§11.3).
-A new run begins with fresh state and immediately applies its first map's necessity.
+Each map opening applies uncombust rolls without adding affliction (§11.3).
+A new run begins with zero affliction; the first combat entry applies its first Necessity sweep.
 
 ### 11.1 Planet Unlock Schedule
 
@@ -274,7 +277,7 @@ The first 32 encounters are effectively a tutorial — the chart fills in at exp
 Difficulty therefore ramps on two axes.
 The opponent's *roster* mirrors the player's unlock tier — Moon vs Moon at the first encounter, up to a full seven-vs-seven — so the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
 Encounter *length* rides the run instead: one-turn encounters on the first map, full arcs on late maps.
-Necessity applies at every map opening without a depth multiplier; the player's existing affliction carries forward.
+Necessity applies at every combat opening without a depth multiplier; the player's existing affliction carries forward.
 The length ramp is also a curriculum for the two-beat (§12): map 1 teaches resolving initial affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
 On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
 Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
@@ -297,28 +300,32 @@ The Prince NFT artifact reveals planets on the same cumulative-encounter schedul
 
 The run-end-only structure suggests room for an achievements layer — recognitions for completing multiple maps in a single run, encountering rare topologies (e.g. the canonical Sephirot pattern from `MAP.md §2`), or other lifetime markers. Achievements are out of scope for v1; they're noted here so the surrounding mechanics leave room for them.
 
-### 11.3 Necessity at map and encounter openings
+### 11.3 Necessity at combat openings and revival at map openings
 
 Necessity is the affliction a chart brings into a new situation; Fortune offers relief from it.
-The same rule applies to the player's chart at every map opening, including the first, and to the other chart at every combat encounter opening.
+The same rule applies independently to both charts at every combat encounter opening.
 The player's state carries forward; each other chart begins with fresh state.
 
 For each available fielded planet:
 
 1. Draw uniformly from `12`, `24`, or `36` affliction.
-2. Roll Fortune (`luck / 120`, §7); on success, halve the draw.
-3. Add the result to existing affliction, limited to the room up to `Resolve − 1`.
-   Necessity never combusts a planet or reduces its existing affliction.
+2. Roll Fortune (`luck / 120`, §7); on success, block the draw entirely.
+3. Add the result to existing affliction, capped at Resolve.
+   Reaching Resolve combusts the planet.
 
 Combusted and unfielded planets receive nothing.
 There is no map-depth multiplier, and necessity does not propagate or award Light.
+Fresh planets always survive: the maximum draw is 36, below the minimum fresh Resolve of 48.
+If Necessity combusts the player's entire fielded roster, the encounter resolves with zero actions and zero Light.
+Clearing that encounter still advances the lifetime encounter count; a newly unlocked planet can keep the run alive.
 
-At map openings, revival comes first: each combusted fielded planet rolls Fortune and, on success, returns at half Resolve (§10).
-Necessity then applies to all available fielded planets, including those just revived.
-The first map follows the same process, with no combusted planets to revive.
+Map openings apply revival only: each combusted fielded planet rolls Fortune and, on success, returns at half Resolve (§10).
+Available planets retain their existing affliction, and revived planets receive no further affliction at the boundary.
+A new run starts at zero affliction, with no combusted planets to revive.
+Narrative entry applies no Necessity, and combat entry provides no resurrection.
 
-The map seed determines both opening steps in a separate stream from node content; results are applied and displayed before the first node is entered (§7).
-At encounter arrival, necessity is likewise settled before the first action and visible in the other chart's affliction.
+The map seed determines revival in a separate stream from node content; results are applied and displayed before the first node is entered (§7).
+At combat arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
 Encounter length still increases with map number, while repeated necessity adds to the player's carried affliction and revival provides a way back from combustion.
 
 ## 12. Scoring (Light)

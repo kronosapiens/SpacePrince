@@ -76,9 +76,11 @@ function planetPositions() {
 }
 
 describe("entry screens", () => {
-  it("finishes the chart opening before allowing travel and study", () => {
+  it("finishes map revival before allowing travel and study", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
+    run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) / 2;
+    run.map.boundary = { uncombusts: [{ planet: "Moon", chance: 0.5, success: true }], necessity: [] };
     prince.runs = [run];
     savePrince(prince);
     act(() => root.render(<GameTest path="/play" />));
@@ -87,7 +89,8 @@ describe("entry screens", () => {
 
     expect(container.querySelector(".map-boundary")).toBeNull();
     expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("");
-    expect(container.querySelector(".necessity-accent")).not.toBeNull();
+    expect(container.querySelector(".necessity-revival")).not.toBeNull();
+    expect(container.querySelector(".necessity-accent")).toBeNull();
     expect(container.querySelector(".necessity-arc")).toBeNull();
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
     click(element(node));
@@ -165,10 +168,10 @@ describe("entry screens", () => {
     expect(minted.runs).toHaveLength(1);
     const first = minted.runs[0]!;
     expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numEncounters).state);
-    expect(first.state.Moon.affliction).toBeGreaterThan(0);
-    expect(first.map.boundary!.necessity.map((entry) => entry.planet)).toEqual(["Moon"]);
+    expect(first.state.Moon.affliction).toBe(0);
+    expect(first.map.boundary!.necessity).toEqual([]);
     expect(container.querySelector(".map-boundary")).toBeNull();
-    expect(element(".map-screen .chart-svg .necessity-opening").textContent).toBe("");
+    expect(container.querySelector(".map-screen .chart-svg .necessity-opening")).toBeNull();
     expect(container.querySelector(".necessity-title")).toBeNull();
     finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
@@ -268,9 +271,9 @@ describe("entry screens", () => {
     expect(restarted.runs[0]).toEqual(run);
     const fresh = restarted.runs[1]!;
     expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numEncounters).state);
-    expect(fresh.state.Moon.affliction).toBeGreaterThan(0);
-    expect(element(".necessity-opening").textContent).toBe("");
-    expect(element('[data-guide="map"]').querySelector('[role="button"]')).toBeNull();
+    expect(fresh.state.Moon.affliction).toBe(0);
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
     finishOpening();
     expect(restarted.runs[1]!.light).toBe(0);
     expect(container.querySelector(".begin-btn")).toBeNull();

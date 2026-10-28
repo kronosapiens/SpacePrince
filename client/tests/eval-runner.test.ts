@@ -12,6 +12,7 @@ const trial = (chartSeed: number, gameSeed: number, strategySeed = 0, strategy: 
 // Run before any other trial, so replaying them later shows nothing else leaks in.
 const strategic = (["survival", "light"] as const).map((s) => runTrial(trial(3, 7, 0, s)));
 const batch = [1, 2, 3, 4, 5].flatMap((c) => [1, 2, 3, 4, 5].map((g) => runTrial(trial(c, g))));
+const completion = runTrial(trial(1524643982, 1569170341, 0, "survival"));
 
 describe("seeded runner", () => {
   it("replays a trial exactly, whatever ran before it", () => {
@@ -38,8 +39,8 @@ describe("seeded runner", () => {
     expect(seedByMap.size).toBeGreaterThan(1);
   });
 
-  it("plays random runs through narrative choices, map boundaries, revival, combustion, and completion", () => {
-    const summaries = batch.map((r) => r.summary);
+  it("plays runs through narrative choices, map boundaries, revival, combustion, and completion", () => {
+    const summaries = [...batch, completion].map((r) => r.summary);
     expect(batch.some((r) => r.steps.some((s) => s.kind === "narrative"))).toBe(true);
     expect(batch.some((r) => r.steps.some((s) => s.kind === "boundary" && s.map > 1))).toBe(true);
     expect(summaries.some((s) => s.boundaryRevivals > 0)).toBe(true);
@@ -55,9 +56,10 @@ describe("seeded runner", () => {
       });
     });
     expect(sentDark).toEqual([]);
-    // A fresh chart takes necessity on every fielded planet, so this shows all seven start unlocked.
+    // Entry snapshots, rather than map boundaries, now record Self's Necessity.
     for (const { steps: [first] } of batch) {
-      expect(first?.kind === "boundary" && first.necessity.map((n) => n.planet)).toEqual(PLANETS);
+      expect(first?.kind === "boundary" && first.necessity).toEqual([]);
+      expect(PLANETS.every((p) => first!.affliction[p] === 0)).toBe(true);
     }
   });
 
@@ -87,6 +89,24 @@ describe("seeded runner", () => {
         narrative: summary.narrativeEncounters,
       });
     }
+  });
+
+  it("counts entry deaths once and clears the terminal choice when an entry wipe ends the run", () => {
+    const record = batch.find((r) => r.steps.at(-1)!.kind === "enter");
+    expect(record).toBeDefined();
+    const { steps, summary } = record!;
+    expect(summary).toMatchObject({ endReason: "combustion", terminalKind: "combat", lastPlanet: null, lastVerb: null, lastOptionId: null });
+    expect(steps.at(-1)!.light).toBe(steps.at(-2)!.light);
+    expect(steps.some((step) => step.kind === "turn" || step.kind === "narrative")).toBe(true);
+    const chart = seededChart(record!.trial.chartSeed);
+    const entryDeaths = steps.reduce((sum, step, i) => step.kind === "enter" && step.encounter === "combat" ? sum + PLANETS.filter((p) => {
+      const ceiling = combustionCeiling(runChart(chart, step).planets[p]);
+      return steps[i - 1]!.affliction[p] < ceiling && step.affliction[p] >= ceiling;
+    }).length : sum, 0);
+    const actionDeaths = steps.reduce((sum, step) => sum + (step.kind === "turn" || step.kind === "narrative" ? step.combusts.length : 0), 0);
+    expect(entryDeaths).toBeGreaterThan(0);
+    expect(summary.combustions).toBe(entryDeaths + actionDeaths);
+    expect(summary.combatTurns).toBe(steps.filter((step) => step.kind === "turn").length);
   });
 
   it("ends a run whose planets all combust before the combat's last turn", () => {
