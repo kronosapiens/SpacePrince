@@ -3,7 +3,7 @@ import { MAPS_PER_RUN } from "@/game/run";
 import type { Polarity } from "@/game/types";
 import type { Trial } from "./play";
 import type { Strategy } from "./policies";
-import type { RunRecord, RunSummary } from "./runner";
+import { emptyRunPressure, type RunPressure, type RunRecord, type RunSummary } from "./runner";
 
 /** One line of `runs.jsonl`: replay regenerates the steps. */
 export type Row = Pick<RunRecord, "trial" | "summary">;
@@ -19,6 +19,9 @@ export interface StrategyStats {
   completion: { rate: number; ci: Interval };
   maps: { mean: number; median: number };
   light: { mean: number; median: number; p10: number; p90: number };
+  /** Means per run, using actual Self effects rather than announced magnitudes. */
+  pressure: RunPressure;
+  progression: { unlocks: number; unlockRescues: number; finalLifetimeEncounterCount: number };
   /** Means per run. Encounters count once survived. */
   perRun: {
     combatSurvived: number; narrativeSurvived: number; combatTurns: number; narrativeTurns: number;
@@ -121,7 +124,7 @@ function encounterKey(s: RunSummary): string {
 function choiceKey(s: RunSummary): string {
   return s.terminalKind === "narrative"
     ? `${s.terminalScenarioId}/${s.lastOptionId}${s.lastPlanet ? ` on ${s.lastPlanet}` : ""}`
-    : `${s.lastPlanet} ${s.lastVerb}`;
+    : s.lastPlanet === null ? "Necessity (no action)" : `${s.lastPlanet} ${s.lastVerb}`;
 }
 
 function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws: number[][]): StrategyStats {
@@ -143,6 +146,14 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     return Object.entries(counts).map(([option, chosen]) => ({ option: `${scenario}/${option}`, chosen, of }));
   });
   const per = (of: (s: RunSummary) => number) => mean(ss.map(of));
+  const pressure = emptyRunPressure();
+  for (const key of Object.keys(pressure) as (keyof RunPressure)[]) {
+    if (key === "combat") {
+      for (const source of Object.keys(pressure.combat) as (keyof RunPressure["combat"])[]) {
+        pressure.combat[source] = per((s) => s.pressure.combat[source]);
+      }
+    } else pressure[key] = per((s) => s.pressure[key]);
+  }
   return {
     strategy,
     runs: ss.length,
@@ -153,6 +164,9 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     },
     maps: { mean: mean(maps), median: quantile(maps, 0.5) },
     light: { mean: mean(light), median: quantile(light, 0.5), p10: quantile(light, 0.1), p90: quantile(light, 0.9) },
+    pressure,
+    progression: { unlocks: per((s) => s.unlocks.length), unlockRescues: per((s) => s.unlockRescues),
+      finalLifetimeEncounterCount: per((s) => s.finalLifetimeEncounterCount) },
     perRun: {
       combatSurvived: per((s) => s.combatEncounters),
       narrativeSurvived: per((s) => s.narrativeEncounters),

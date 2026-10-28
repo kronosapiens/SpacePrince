@@ -161,6 +161,42 @@ It uses `useRef` + `useId` for the gradient — never `document.getElementById`.
 - `MECHANICS.md` wins when it conflicts with older design docs.
 - No wallet, RPC, or contract calls in `client/` unless explicitly asked.
 
+## Balance evaluation
+
+The evaluator uses the game resolvers, seeded charts and runs, and a separate strategy RNG.
+Its default strategies remain `random`, `survival`, and `light`.
+Compare immediate defense with two-turn planning on combat-preferring routes:
+
+```sh
+pnpm eval:balance --seed 20261028 --charts 5 --runs 2 --strategies combat-immediate,combat-two-turn --out eval-results/planning
+```
+
+`narrative-immediate` provides a narrative-preferring control with the same immediate decisions.
+`capacity-12` and `two-turn-capacity-12` allow up to 12 less remaining capacity for additional Light while preserving the best available survival and lit-planet measures.
+They retain the original survival route forecasts; `two-turn-survival` uses those forecasts with no score allowance.
+`combat-two-turn-entry-aware` values completed encounters as if another combat arrived before recovery, using the current Necessity and Fortune rules.
+That continuation omits intervening narratives and revival; it is a heuristic, not optimal play.
+Planning enumerates possible future announcements without inspecting live future draws.
+
+Use `--starting-encounters 0` to evaluate a first run with actual planet unlocks.
+Each trial starts at the selected lifetime count independently; omitting the option starts with all seven planets unlocked.
+Encounter clearing advances lifetime progress before checking for failure, including a new planet rescuing an otherwise combusted roster.
+Programmatic callers can pass a run's final lifetime count into the next `runTrial` call.
+
+Outputs include configuration, source revision and working-tree patch, run summaries, and paired comparisons with intervals resampled by chart.
+The report separates combat damage and healing, combat-entry affliction and losses, and unlocks.
+These fixed policies provide comparisons, not calibrated human win rates.
+Regenerate a full record with the replay ID from the report, supplying the same starting count when used:
+
+```sh
+pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> --starting-encounters 0
+```
+
+### Evaluation methods
+
+For study design, measurements, and interpretation, see the [evaluation methods guide](src/eval/README.md).
+The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the earlier findings and their limitations.
+
 ## Verification
 
 - `pnpm exec tsc -b --noEmit` — typecheck

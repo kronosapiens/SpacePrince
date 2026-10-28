@@ -4,7 +4,8 @@
  * per run, and an aggregate report.
  *
  *   pnpm eval:balance [--seed 20261022] [--charts 100] [--runs 100]
- *     [--strategies random,survival,light] [--strategy-seed 0] [--out DIR]
+ *     [--strategies random,survival,light] [--strategy-seed 0]
+ *     [--starting-encounters 0] [--out DIR]
  *   pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> > trial.json
  *
  * Replay prints one trial's full record (route, choices, state after each step).
@@ -18,19 +19,28 @@ import { batchTrials, SEED_DERIVATIONS, type BatchOptions } from "@/eval/batch";
 import type { Trial } from "@/eval/play";
 import { FORECAST_SAMPLES, POLICIES, type Strategy } from "@/eval/policies";
 import { renderReport } from "@/eval/report";
-import { runTrial } from "@/eval/runner";
+import { runTrial, type RunTrialOptions } from "@/eval/runner";
 
 const { values: args } = parseArgs({
   options: {
     seed: { type: "string", default: "20261022" },
     charts: { type: "string", default: "100" },
     runs: { type: "string", default: "100" },
-    strategies: { type: "string", default: Object.keys(POLICIES).join(",") },
+    strategies: { type: "string", default: "random,survival,light" },
     "strategy-seed": { type: "string", default: "0" },
+    "starting-encounters": { type: "string" },
     out: { type: "string" },
     replay: { type: "string" },
   },
 });
+
+const runOptions: RunTrialOptions = args["starting-encounters"] === undefined
+  ? {}
+  : { startingLifetimeEncounterCount: Number(args["starting-encounters"]) };
+if (runOptions.startingLifetimeEncounterCount !== undefined &&
+    (!Number.isSafeInteger(runOptions.startingLifetimeEncounterCount) || runOptions.startingLifetimeEncounterCount < 0)) {
+  throw new Error("--starting-encounters must be a nonnegative integer");
+}
 
 function toStrategy(name: string): Strategy {
   if (!(name in POLICIES)) throw new Error(`Unknown strategy ${name}; expected one of ${Object.keys(POLICIES).join(", ")}`);
@@ -40,7 +50,7 @@ function toStrategy(name: string): Strategy {
 function replay(id: string): void {
   const [chartSeed, gameSeed, strategy, strategySeed] = id.split(":");
   const trial: Trial = { chartSeed: Number(chartSeed), gameSeed: Number(gameSeed), strategy: toStrategy(strategy!), strategySeed: Number(strategySeed) };
-  process.stdout.write(`${JSON.stringify(runTrial(trial), null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify(runTrial(trial, undefined, runOptions), null, 2)}\n`);
 }
 
 /** The code that produced a batch: the revision, plus the client's working-tree changes. */
@@ -67,9 +77,11 @@ function batch(): void {
     runs: Number(args.runs),
     strategies: args.strategies.split(",").map(toStrategy),
     strategySeed: Number(args["strategy-seed"]),
+    ...runOptions,
   };
+  const rosterSuffix = options.startingLifetimeEncounterCount === undefined ? "" : `_e${options.startingLifetimeEncounterCount}`;
   const out = resolve(args.out ?? join(
-    "eval-results", `seed-${options.seed}_${options.charts}x${options.runs}_${options.strategies.join("-")}_s${options.strategySeed}`,
+    "eval-results", `seed-${options.seed}_${options.charts}x${options.runs}_${options.strategies.join("-")}_s${options.strategySeed}${rosterSuffix}`,
   ));
   mkdirSync(out, { recursive: true });
   // A rerun into the same directory, even an interrupted one, never mixes in an earlier run's results.
@@ -86,6 +98,7 @@ function batch(): void {
     seedDerivations: SEED_DERIVATIONS,
     constants: { forecastSamples: FORECAST_SAMPLES, bootstrapResamples: BOOTSTRAP_RESAMPLES },
     revision,
+    nodeVersion: process.version,
     dirty,
     sourceDiff: dirty ? "source.diff" : null,
   }, null, 2)}\n`);
@@ -94,7 +107,7 @@ function batch(): void {
   const errors: { trial: Trial; error: string }[] = [];
   for (const [i, trial] of trials.entries()) {
     try {
-      const { summary } = runTrial(trial);
+      const { summary } = runTrial(trial, undefined, runOptions);
       rows.push({ trial, summary });
     } catch (error) {
       errors.push({ trial, error: error instanceof Error ? error.stack ?? error.message : String(error) });
