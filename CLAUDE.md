@@ -137,5 +137,5 @@ After user approval, incorporate accepted conclusions into the relevant current 
 ## Tooling
 
 - Client package manager: **pnpm**. Dev: `pnpm dev` in `client/`.
-- **Chart tuner** (dev only): `DEV → CHART` in the running client drives the concentric radii, the arc, and the invite's breath live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth — settled values get written back by hand.
+- **Tuner** (dev only): `d` in the running client opens the dev console, whose tuner drives whatever is still unsettled live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth — settled values get written back by hand.
 - Cairo: standard `scarb` workflow inside `cairo/crates/star_chart`. Build expects the sibling `astronomy-engine` workspace to resolve the path dependency.

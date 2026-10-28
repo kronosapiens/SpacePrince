@@ -14,12 +14,12 @@ import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
 /**
- * Dev-only chart and title tuner: live sliders for the concentric radii, the
- * arc, the invite's breath, and the title glow. These values are chosen by
- * dragging and watching the screen behind the panel.
+ * Dev-only tuner: live sliders and toggles for whatever `tuning.ts` still
+ * lists as unsettled. These values are chosen by dragging and watching the
+ * screen behind the panel.
  *
- * Nothing here persists. Copy the settled numbers into `viewbox.ts`,
- * `chart-style.ts`, `motion.css`, and `tokens.css`; a reload is the discard.
+ * Nothing here persists. Copy the settled numbers into the token files; a
+ * reload is the discard.
  */
 export function ChartTuner() {
   const tuning = useTuning();
@@ -44,7 +44,7 @@ export function ChartTuner() {
   return (
     <div className="dev-console-block">
       <div className="dev-tuner-head">
-        <span>Chart &amp; title</span>
+        <span>Tuning</span>
         <button type="button" className="dev-tuner-reset" onClick={resetAll} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
           Reset
         </button>

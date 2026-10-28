@@ -1,39 +1,29 @@
 import { useSyncExternalStore } from "react";
-import { CHART_STYLE } from "@/svg/chart-style";
-import { ACTIVE_HALO_R, INVITE_HALO_R } from "@/svg/viewbox";
 
 /**
- * Live overrides for the chart knobs that can only be judged in motion —
- * concentric radii that are read against each other, breath swings that are
- * read against the clock. The DevConsole drives these at runtime so a value
- * gets picked by looking rather than by arithmetic; whatever a session settles
- * on is then written back into `viewbox.ts` / `chart-style.ts` by hand.
+ * Live overrides for the knobs that can only be judged in motion — radii that
+ * are read against each other, breath swings that are read against the clock.
+ * The DevConsole drives these at runtime so a value gets picked by looking
+ * rather than by arithmetic; whatever a session settles on is then written back
+ * into the token files by hand.
  *
  * The committed tokens are the defaults, so this is an override layer and never
  * a second source of truth. Nothing outside the dev console calls `setTuning`.
  *
  * A knob earns its place by being unsettled. The concentric radii (disc 24, arc
- * 30, ring 36), the stroke widths, the symbol ratio, the arc's track and
- * remaining opacities, the breath period and the ring swing have all come off
- * this list as their values stopped moving — their consumers read the tokens
- * directly now, which is also how you can tell at the call site that a number
- * is decided. Put one back the moment it is in question again; that costs a
- * field, a default and a row.
+ * 30, ring 36), the stroke widths, the symbol ratio, the arc's opacities, the
+ * halo radii, the diff's glow and stroke, the invite glow's floor and swing,
+ * the ring swing and the title glow have all come off this list as their values
+ * stopped moving — their consumers read the tokens directly now, which is also
+ * how you can tell at the call site that a number is decided. Put one back the
+ * moment it is in question again; that costs a field, a default and a row.
  *
- * What is left is the two halo radii, the invite glow's floor and swing, and
- * the diff's own glow and stroke — the channels still being pushed to make a
- * preview read.
+ * What is left is the breath period, which may still speed up.
  *
  * CSS knobs use the stylesheet values as defaults and the console overrides
  * them as inline custom properties on :root (see `CSS_KNOBS`).
  */
 export interface ChartTuning {
-  inviteHaloR: number;
-  activeHaloR: number;
-  /** Drop-shadow radius on the projection diff — how hard a preview burns. */
-  arcDiffGlow: number;
-  /** The diff's own stroke, wider than the arc's so it gains area. */
-  arcDiffStroke: number;
   /** The numeric affliction / projection badges. Off — the arc replaced them.
    *  Scaffolding: the toggle exists to put them back for a moment while the
    *  arc is still being trusted. Deleting the badges deletes this too. */
@@ -52,10 +42,6 @@ type NumericKey = {
 }[keyof ChartTuning];
 
 export const TUNING_DEFAULTS: ChartTuning = {
-  inviteHaloR: INVITE_HALO_R,
-  activeHaloR: ACTIVE_HALO_R,
-  arcDiffGlow: CHART_STYLE.afflictionArc.diffGlow,
-  arcDiffStroke: CHART_STYLE.afflictionArc.diffStroke,
   showBadges: false,
   showGlow: true,
 };
@@ -69,12 +55,7 @@ export const TUNING_KNOBS: ReadonlyArray<{
   min: number;
   max: number;
   step: number;
-}> = [
-  { key: "inviteHaloR", label: "Invite halo r", min: 24, max: 120, step: 1 },
-  { key: "activeHaloR", label: "Active halo r", min: 30, max: 160, step: 1 },
-  { key: "arcDiffGlow", label: "Arc diff glow", min: 0, max: 16, step: 0.5 },
-  { key: "arcDiffStroke", label: "Arc diff stroke", min: 1, max: 10, step: 0.5 },
-];
+}> = [];
 
 /** The CSS custom properties the console can override. `suffix` is
  *  what CSS needs appended to the raw number (a duration needs its unit). */
@@ -86,9 +67,7 @@ export const CSS_KNOBS: ReadonlyArray<{
   step: number;
   suffix: string;
 }> = [
-  { prop: "--invite-glow-min", label: "Glow floor", min: 0, max: 1, step: 0.02, suffix: "" },
-  { prop: "--invite-glow-range", label: "Glow swing", min: 0, max: 1, step: 0.02, suffix: "" },
-  { prop: "--wordmark-glow-mid", label: "Title glow midpoint", min: 0, max: 1, step: 0.01, suffix: "" },
+  { prop: "--breath-period", label: "Breath period", min: 0.5, max: 4, step: 0.1, suffix: "s" },
 ];
 
 /** The current CSS value, including any console override. */

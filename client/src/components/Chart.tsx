@@ -15,8 +15,8 @@ import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
   AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
   CHART_CENTER, CHART_VIEWBOX,
-  CORONA_INNER_R, INCOMING_RING_PITCH,
-  INNER_RING_R, INTERACTION_RING_R, OUTER_RING_R,
+  ACTIVE_HALO_R, CORONA_INNER_R, INCOMING_RING_PITCH,
+  INNER_RING_R, INTERACTION_RING_R, INVITE_HALO_R, OUTER_RING_R,
   PLANET_R_ACTIVE, PLANET_R_REST,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
@@ -508,7 +508,6 @@ export function Chart(props: ChartProps) {
         return (
           <PlanetArc
             key={p.planet}
-            tuning={tuning}
             point={p}
             placement={chart.planets[p.planet]}
             affliction={state?.[p.planet]?.affliction ?? 0}
@@ -707,7 +706,7 @@ function PlanetGlyph({
       {active && tuning.showGlow && (
         <circle
           className="anim-active-halo"
-          r={tuning.activeHaloR}
+          r={ACTIVE_HALO_R}
           fill={`url(#v2-halo-${point.planet})`}
           style={{ pointerEvents: "none" }}
         />
@@ -721,7 +720,7 @@ function PlanetGlyph({
           because only selection opens the action fan-out. The halo goes steady
           with it, so a committed choice can't read dimmer than a hovered one. */}
       {ringShown && !active && tuning.showGlow && (
-        <circle r={tuning.inviteHaloR}
+        <circle r={INVITE_HALO_R}
           fill={`url(#v2-halo-${point.planet})`}
           className={ringSteady ? undefined : "anim-invite-glow"}
           style={{ opacity: ringSteady ? CHART_STYLE.invite.halo.steady : undefined, pointerEvents: "none" }} />
@@ -817,9 +816,8 @@ function PlanetGlyph({
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  tuning, point, placement, affliction, projection, guideId, openingPhase, necessity,
+  point, placement, affliction, projection, guideId, openingPhase, necessity,
 }: {
-  tuning: ChartTuning;
   point: PlanetPoint;
   placement: PlanetPlacement;
   affliction: number;
@@ -898,12 +896,12 @@ function PlanetArc({
           className={`arc-diff ${openingPhase ? `necessity-arc necessity-${openingPhase}` : ""}`}
           style={{
             color: diff.color,
-            "--arc-diff-glow": `${tuning.arcDiffGlow}px`,
+            "--arc-diff-glow": `${CHART_STYLE.afflictionArc.diffGlow}px`,
           } as CSSProperties}
         >
           <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)}
             stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity}
-            width={tuning.arcDiffStroke} />
+            width={CHART_STYLE.afflictionArc.diffStroke} />
         </g>
       )}
     </g>

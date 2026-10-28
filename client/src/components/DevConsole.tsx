@@ -6,7 +6,7 @@ import { playUISound } from "@/audio/engine";
 import { ChartTuner } from "@/components/ChartTuner";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-/** Dev-only unlock tier, chart tuning, and Prince reset. Opened with `d`;
+/** Dev-only Prince reset, unlock tier, and tuning. Opened with `d`;
  *  screen-spawning and re-rolling live in DevChrome. */
 export function DevConsole({ open }: { open: boolean }) {
   const prince = usePrince();
@@ -33,29 +33,7 @@ export function DevConsole({ open }: { open: boolean }) {
   return (
     <div className="dev-console">
       {prince ? (
-        <div className="dev-console-block">
-          <div>
-            Planets <strong>{unlocked.length} / 7</strong>
-          </div>
-          <input
-            type="range"
-            min={1}
-            max={7}
-            step={1}
-            value={Math.min(Math.max(unlocked.length, 1), 7)}
-            onPointerEnter={playHoverSound}
-            onFocus={playFocusSound}
-            onChange={(e) => setPlanets(Number(e.target.value))}
-          />
-        </div>
-      ) : (
-        <div>No Prince — mint one from the Title.</div>
-      )}
-      <div className="dev-console-divider" />
-      <ChartTuner />
-      {prince && (
         <>
-          <div className="dev-console-divider" />
           <button
             type="button"
             className="dev-chrome-button is-danger"
@@ -68,8 +46,28 @@ export function DevConsole({ open }: { open: boolean }) {
           >
             Delete Prince
           </button>
+          <div className="dev-console-divider" />
+          <div className="dev-console-block">
+            <div>
+              Planets <strong>{unlocked.length} / 7</strong>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={7}
+              step={1}
+              value={Math.min(Math.max(unlocked.length, 1), 7)}
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
+              onChange={(e) => setPlanets(Number(e.target.value))}
+            />
+          </div>
         </>
+      ) : (
+        <div>No Prince — mint one from the Title.</div>
       )}
+      <div className="dev-console-divider" />
+      <ChartTuner />
     </div>
   );
 }
