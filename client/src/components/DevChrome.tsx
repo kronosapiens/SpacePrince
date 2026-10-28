@@ -10,7 +10,7 @@ import type { Prince, Run } from "@/game/types";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-type Surface = "title" | "index" | "gallery" | "mint" | "map" | "combat" | "narrative" | "end";
+type Surface = "title" | "index" | "gallery" | "token" | "mint" | "map" | "combat" | "narrative" | "end";
 
 interface Page {
   label: string;
@@ -188,6 +188,7 @@ const SURFACE_LABEL: Record<Surface, string> = {
   title: "Title",
   index: "Index",
   gallery: "Gallery",
+  token: "Token",
   mint: "Mint",
   map: "Map",
   combat: "Encounter",
@@ -199,6 +200,7 @@ const SURFACE_LABEL: Record<Surface, string> = {
 function currentSurface(pathname: string, prince: Prince | null, run: Run | null): Surface {
   if (pathname === ROUTES.index) return "index";
   if (pathname === ROUTES.gallery) return "gallery";
+  if (pathname === ROUTES.token) return "token";
   if (pathname !== ROUTES.play) return "title";
   if (!prince || !run) return "mint";
   if (run.encounter) return run.encounter.kind === "narrative" ? "narrative" : "combat";
