@@ -173,6 +173,10 @@ describe("entry screens", () => {
     expect(container.querySelector(".map-boundary")).toBeNull();
     expect(container.querySelector(".map-screen .chart-svg .necessity-opening")).toBeNull();
     expect(container.querySelector(".necessity-title")).toBeNull();
+    // A new Prince's first map opens its guide by itself.
+    expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-label")).toBe("Read the map");
+    click(document.querySelector(".guide-close")!);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
     expect(element(".ps-name").textContent).toContain("MOON");

@@ -169,20 +169,22 @@ function useGuideRects(open: boolean, phase: string, ids: string[], revision: st
   useLayoutEffect(() => {
     if (!open) return;
 
-    const elements = ids.flatMap((id) => {
+    // Looked up on every measure, not once: an element can mount a render
+    // after the phase that names it (the encounter's planet panel does).
+    const find = () => ids.flatMap((id) => {
       const element = document.querySelector<Element>(`[data-guide="${id}"]`);
       return element ? [[id, element] as const] : [];
     });
 
     const measure = () => {
       setViewport({ width: window.innerWidth, height: window.innerHeight });
-      setRects(Object.fromEntries(elements.map(([id, element]) => [id, measureRect(element)])));
+      setRects(Object.fromEntries(find().map(([id, element]) => [id, measureRect(element)])));
     };
 
     measure();
     const frame = requestAnimationFrame(measure);
     const observer = new ResizeObserver(measure);
-    elements.forEach(([, element]) => observer.observe(element));
+    find().forEach(([, element]) => observer.observe(element));
     window.addEventListener("resize", measure);
     window.addEventListener("scroll", measure, true);
 

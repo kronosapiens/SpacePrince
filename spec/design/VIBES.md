@@ -177,7 +177,7 @@ It emerges from the accumulation of fragments, visuals, and sounds across many r
 
 ## What the Client Must Never Do
 
-- **Offer a foothold; never force a lesson.** No mandatory tutorial, no didactic interruption, no lesson on what a trine is that a fluent player must read past — the symbolic language is still learned through encounter, not imposed by instruction. But a newcomer with no astrology cannot form intent, and must be able to *summon* understanding: an opt-in, dismissible study layer (the inspect "i" — `SCREENS.md §3.6.1`) that explains mechanics plainly and keeps symbols evocative. The accommodation is summoned, never always-on — a fluent player who never invokes it sees no instruction at all.
+- **Offer a foothold; never force a lesson.** No mandatory tutorial, no didactic interruption, no lesson on what a trine is that a fluent player must read past — the symbolic language is still learned through encounter, not imposed by instruction. But a newcomer with no astrology cannot form intent, and must be able to *summon* understanding: an opt-in, dismissible study layer (the inspect "i" — `SCREENS.md §3.6.1`) that explains mechanics plainly and keeps symbols evocative. The accommodation is summoned, never always-on — a screen's guide opens unasked only the first time a Prince meets that screen, and after that waits for its `?`.
 - **Never generate text.** All fragments are authored and curated. Quality over quantity.
 - **Avoid blockbuster game-UI registers.**
   No "Level Up!", "+3 Attack", or HP-bar flourishes.

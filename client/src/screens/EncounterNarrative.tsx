@@ -2,7 +2,7 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import type { ProjectionChips } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
-import { NarrativeGuide, type NarrativeGuidePhase } from "@/components/NarrativeGuide";
+import { NarrativeGuide } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
@@ -10,6 +10,7 @@ import { HOUSE_COIN_GLOW } from "@/svg/map-style";
 import { joyPresent, narrativeContext, previewOption, resolveNarrative, requiresPlanet, visibleOptions, type Selection } from "@/game/narrative";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
+import { useFirstGuide } from "@/components/useFirstGuide";
 import { describeOptionParts, occupantLine } from "@/copy/narrative";
 import { combustionCeiling, newlyCombusted } from "@/game/combust";
 import { runChart } from "@/game/chart";
@@ -85,7 +86,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetName | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [guidePhase, setGuidePhase] = useState<NarrativeGuidePhase>("scene");
+  const openGuide = useCallback(() => setGuideOpen(true), []);
+  useFirstGuide("narrative", !resolved, openGuide);
   const [flash, setFlash] = useState<{
     epoch: number;
     effect: Map<PlanetName, Polarity>;
@@ -256,12 +258,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       {!resolved && (
         <NarrativeGuide
           open={guideOpen}
-          phase={guidePhase}
-          house={house}
-          asideIndex={shownRows.length ? 1 : null}
-          onOpen={() => { setGuidePhase("scene"); setGuideOpen(true); }}
+          onOpen={openGuide}
           onClose={() => setGuideOpen(false)}
-          onPhaseChange={setGuidePhase}
         />
       )}
       {!guideOpen && !resolved && (

@@ -1,10 +1,9 @@
 import { useMemo } from "react";
 import { NODE_R } from "@/svg/map-style";
 import { GUIDE_COPY } from "@/copy/guide";
-import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { fillLabel, planetName, TermText } from "@/components/TermText";
+import { planetName, TermText } from "@/components/TermText";
 import { chartGlyphs, chartShape, planetAnchor, PLANET_REACH } from "@/components/chart-guide";
 import {
   center,
@@ -24,15 +23,10 @@ interface MapGuideProps {
   phase: MapGuidePhase;
   map: MapState;
   examplePlanet: PlanetName;
-  /** Maps already crossed — the index the screen prints under the diagram. */
-  mapsCompleted: number;
   onOpen: () => void;
   onClose: () => void;
   onPhaseChange: (phase: MapGuidePhase) => void;
 }
-
-/** Roman numerals for the current map. */
-export const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 
 const COPY = GUIDE_COPY.map;
 
@@ -72,7 +66,6 @@ export function MapGuide({
   phase,
   map,
   examplePlanet,
-  mapsCompleted,
   onOpen,
   onClose,
   onPhaseChange,
@@ -103,20 +96,13 @@ export function MapGuide({
         });
       }
       const houseId = pickNode(map, eligible, "narrative");
-      const house = houseId ? map.rolledNodes[houseId] : undefined;
-      if (houseId && house?.kind === "narrative") {
-        const def = HOUSES[house.house - 1]!;
+      if (houseId) {
         mapNotes.push({
           key: "house",
           anchor: nodeAnchor(houseId),
           placement: "right",
           label: COPY.notes.house.label,
-          body: (
-            <TermText
-              text={COPY.notes.house.body}
-              vars={{ name: def.name, gloss: def.gloss, ruler: planetName(def.ruler) }}
-            />
-          ),
+          body: <TermText text={COPY.notes.house.body} />,
         });
       }
       return mapNotes;
@@ -141,24 +127,8 @@ export function MapGuide({
         body: <TermText text={COPY.notes.crossing.body} />,
       });
     }
-    chartNotes.push({
-      key: "index",
-      anchor: "map-index",
-      placement: "top",
-      label: fillLabel(COPY.notes.index.label, { n: ROMAN[mapsCompleted] ?? mapsCompleted + 1 }),
-      body: <TermText text={COPY.notes.index.body} />,
-    });
-    if (map.boundary) {
-      chartNotes.push({
-        key: "necessity",
-        anchor: planetAnchor("self", examplePlanet),
-        placement: "right",
-        label: COPY.notes.necessity.label,
-        body: <TermText text={COPY.notes.necessity.body} />,
-      });
-    }
     return chartNotes;
-  }, [phase, map, examplePlanet, mapsCompleted]);
+  }, [phase, map, examplePlanet]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // The chart's outer ring sits at 96% of its box; the circle clears it.

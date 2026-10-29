@@ -54,6 +54,8 @@ function combat(turns = 1, count = 64) {
   encounter.sequence = Array.from({ length: turns }, () => "Moon");
   encounter.opponentActions = Array.from({ length: turns }, () => "Testimony");
   run.encounter = encounter;
+  // Past the first map, so the encounter's guide doesn't open by itself.
+  run.mapsCompleted = 1;
   prince.runs = [run];
   return { prince, run, encounter };
 }
@@ -291,6 +293,7 @@ describe("encounter advancement", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
     run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: "home-libra-mara" });
+    run.mapsCompleted = 1;
     prince.runs = [run];
     mount(prince);
     click(get('[data-guide="option-3"]'));

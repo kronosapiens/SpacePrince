@@ -34,7 +34,13 @@ export function GameLayout() {
   const isEncounter = !isTitle && !!run?.encounter;
   const casting = useCasting(isCasting);
   const [sample, setSample] = useState(() => seededChart(randomSeed(), "Sample"));
-  const [guideOpen, setGuideOpen] = useState(false);
+  const surface = isTitle ? "title" : isCasting ? "mint-screen" : run?.encounter?.kind ?? "map-screen";
+  // The guide belongs to the surface it opened on, so leaving that surface
+  // closes it — derived, not reset in an effect, which would run after the
+  // screen's own effects and close a guide the screen opens on arrival.
+  const [guideSurface, setGuideSurface] = useState<string | null>(null);
+  const guideOpen = guideSurface === surface;
+  const setGuideOpen = useCallback((open: boolean) => setGuideSurface(open ? surface : null), [surface]);
   const reroll = useCallback(() => setSample(seededChart(randomSeed(), "Sample")), []);
 
   useEffect(() => {
@@ -42,8 +48,6 @@ export function GameLayout() {
     const timer = window.setInterval(reroll, RECHART_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [isTitle, prince, reroll]);
-
-  useEffect(() => { setGuideOpen(false); }, [pathname, isEncounter]);
 
   const chart = isCasting ? casting.chart ?? sample : princeChart ?? sample;
   const unlocked = isCasting ? casting.revealedPlanets
@@ -59,8 +63,6 @@ export function GameLayout() {
     kind: "map",
   });
   const context: GameLayoutContext = { casting, guideOpen, setGuideOpen, openingActive: opening.active };
-
-  const surface = isTitle ? "title" : isCasting ? "mint-screen" : run?.encounter?.kind ?? "map-screen";
 
   return (
     <>

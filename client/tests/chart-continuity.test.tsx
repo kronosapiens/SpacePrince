@@ -48,6 +48,12 @@ function element(selector: string) {
 function click(selector: string) {
   act(() => element(selector).dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
+/** A first encounter of each kind opens its guide by itself; close it to play. */
+function closeFirstGuide(label: string) {
+  expect(document.querySelector('[role="dialog"]')?.getAttribute("aria-label")).toBe(label);
+  act(() => document.querySelector(".guide-close")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  expect(document.querySelector('[role="dialog"]')).toBeNull();
+}
 function playerChart() {
   return element(".chart-layout-chart .chart-svg");
 }
@@ -57,7 +63,7 @@ function planetPositions() {
 }
 
 describe("shared player chart", () => {
-  it("keeps the same wheel through combat, narrative choices, and both returns to Map", () => {
+  it("keeps the same wheel through first guides, combat, narrative choices, and both returns to Map", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numEncounters);
     const combatNode = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
@@ -82,6 +88,7 @@ describe("shared player chart", () => {
     expect(element('[data-guide="chart-other"] .chart-svg')).not.toBe(chart);
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(2);
     if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
+    closeFirstGuide("Read the encounter");
     click('[data-guide="planet-self-moon"]');
     click('[data-guide="action-testimony"]');
     const combat = loadPrince()!.runs[0]!.encounter;
@@ -105,6 +112,7 @@ describe("shared player chart", () => {
 
     click(`[data-guide="node-${narrativeNode}"]`);
     expectStableChart();
+    closeFirstGuide("Read the scene");
     expect(element('[data-guide="option-2"]').textContent).toContain("Tell your uncle her name, and leave his table.");
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);

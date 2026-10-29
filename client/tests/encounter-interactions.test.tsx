@@ -333,7 +333,6 @@ describe("encounter interactions", () => {
     click('[aria-label="Study Moon"]');
     click('[aria-label="Study this encounter"]');
     click(".guide-step.is-primary");
-    click(".guide-step.is-primary");
     expect(get(testimony).classList.contains("is-previewed")).toBe(true);
     click(affliction);
     click(affliction);

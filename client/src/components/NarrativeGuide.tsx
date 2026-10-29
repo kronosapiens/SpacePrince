@@ -1,130 +1,45 @@
-import { useMemo } from "react";
 import { GUIDE_COPY } from "@/copy/guide";
-import type { HouseDef } from "@/data/houses";
-import { planetName, TermText } from "@/components/TermText";
-import {
-  chartGlyphs,
-  chartShape,
-  CORONA_REACH,
-  planetAnchor,
-  PLANET_REACH,
-  wheelOf,
-} from "@/components/chart-guide";
-import {
-  center,
-  GuideOverlay,
-  type GuideNote,
-  type GuidePoint,
-  type GuideShapes,
-} from "@/components/GuideOverlay";
-
-export type NarrativeGuidePhase = "scene" | "choices";
+import { TermText } from "@/components/TermText";
+import { GuideOverlay, type GuideNote } from "@/components/GuideOverlay";
 
 interface NarrativeGuideProps {
   open: boolean;
-  phase: NarrativeGuidePhase;
-  house: HouseDef;
-  /** 1-based index of the first option carrying an aside, if any. */
-  asideIndex: number | null;
   onOpen: () => void;
   onClose: () => void;
-  onPhaseChange: (phase: NarrativeGuidePhase) => void;
 }
 
 const COPY = GUIDE_COPY.narrative;
 
-const PHASES: NarrativeGuidePhase[] = ["scene", "choices"];
+const NOTES: GuideNote[] = [
+  {
+    key: "house",
+    anchor: "narrative-house",
+    placement: "top",
+    label: COPY.notes.house.label,
+    body: <TermText text={COPY.notes.house.body} />,
+  },
+  {
+    key: "commit",
+    anchor: "narrative-options",
+    placement: "bottom",
+    label: COPY.notes.commit.label,
+    body: <TermText text={COPY.notes.commit.body} />,
+  },
+];
 
-export function NarrativeGuide({
-  open,
-  phase,
-  house,
-  asideIndex,
-  onOpen,
-  onClose,
-  onPhaseChange,
-}: NarrativeGuideProps) {
-  const housePlanet = house.joy ?? house.ruler;
-
-  const notes = useMemo<GuideNote[]>(() => {
-    if (phase === "scene") {
-      return [
-        {
-          key: "house",
-          anchor: "narrative-house",
-          placement: "top",
-          label: COPY.notes.house.label,
-          body: <TermText text={COPY.notes.house.body} vars={{ ruler: planetName(house.ruler) }} />,
-        },
-        {
-          key: "house-planet",
-          anchor: planetAnchor("self", housePlanet),
-          spotlights: ["wheel-self", planetAnchor("self", housePlanet)],
-          placement: "outward",
-          label: house.joy ? COPY.notes.housePlanet.label : COPY.notes.housePlanetNoJoy.label,
-          body: house.joy
-            ? <TermText text={COPY.notes.housePlanet.body} vars={{ joy: planetName(house.joy) }} />
-            : <TermText text={COPY.notes.housePlanetNoJoy.body} vars={{ ruler: planetName(house.ruler) }} />,
-        },
-      ];
-    }
-
-    const choiceNotes: GuideNote[] = [
-      {
-        key: "commit",
-        anchor: "narrative-options",
-        placement: "bottom",
-        label: COPY.notes.commit.label,
-        body: <TermText text={COPY.notes.commit.body} />,
-      },
-    ];
-    if (asideIndex) {
-      choiceNotes.push({
-        key: "aside",
-        // Lit on the aside, but hung off its whole row: the aside is inset
-        // far enough that a note 28px to its left would stand inside the lit
-        // list. Only the left is free either way — that side is the chart's,
-        // and this note is meant to sit over it.
-        anchor: `option-${asideIndex}`,
-        spotlights: [`option-aside-${asideIndex}`],
-        placement: "left",
-        label: COPY.notes.aside.label,
-        body: <TermText text={COPY.notes.aside.body} />,
-      });
-    }
-    return choiceNotes;
-  }, [phase, house, housePlanet, asideIndex]);
-
-  const shapes = useMemo<GuideShapes>(() => {
-    // Only the joy planet wears the active halo here (the chart's
-    // `activePlanet`), so only its ring has to clear a corona.
-    const joyId = house.joy ? planetAnchor("self", house.joy) : null;
-
-    return {
-      measure: ["wheel-self", ...chartGlyphs("self")],
-      shape: (id, rects) => chartShape(id, rects, (planet) => (planet === joyId ? CORONA_REACH : PLANET_REACH)),
-      // Away from the wheel's centre, so a planet's note leaves the chart
-      // rather than crossing it.
-      outwardFrom: (anchor, rects): GuidePoint | undefined => {
-        const wheel = rects[wheelOf(anchor)];
-        return wheel ? center(wheel) : undefined;
-      },
-    };
-  }, [house.joy]);
-
+export function NarrativeGuide({ open, onOpen, onClose }: NarrativeGuideProps) {
   return (
     <GuideOverlay
       open={open}
-      phase={phase}
-      phases={PHASES}
+      phase="scene"
+      phases={["scene"]}
       phaseLabel={COPY.phases}
-      notes={notes}
-      shapes={shapes}
+      notes={NOTES}
       openLabel={COPY.open}
       closeLabel={COPY.close}
       onOpen={onOpen}
       onClose={onClose}
-      onPhaseChange={onPhaseChange}
+      onPhaseChange={() => {}}
     />
   );
 }

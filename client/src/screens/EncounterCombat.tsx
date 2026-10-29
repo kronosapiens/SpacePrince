@@ -4,6 +4,7 @@ import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
+import { useFirstGuide } from "@/components/useFirstGuide";
 import { PlanetBands } from "@/components/PlanetBands";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
@@ -164,14 +165,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     ) ?? null,
     [playerUnlocked, playerChart, run.state],
   );
-  // One of the example planet's drawn aspect lines, by its far end, for the
-  // guide to trace.
-  const guideAspect = useMemo(() => {
-    if (!guidePlanet) return null;
-    const drawn = (planet: PlanetName) =>
-      playerUnlocked.includes(planet) && !isCombusted(playerChart.planets[planet], run.state[planet]);
-    return getAspects(playerChart).find((a) => a.from === guidePlanet && drawn(a.to))?.to ?? null;
-  }, [guidePlanet, playerUnlocked, playerChart, run.state]);
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
   // and the one that says how you gain Light here (`score.ts` `RULER_RULES`).
@@ -444,9 +437,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     setHovered(null);
     setPreviewAction(null);
     setStudy(false);
-    setGuidePhase("chart");
+    setGuidePhase("read");
     setGuideOpen(true);
   }, [animation, openingActive, selected, skipAnimation, study]);
+  useFirstGuide("combat", !openingActive, openGuide);
 
   const closeGuide = useCallback(() => {
     const snapshot = guideSnapshot.current;
@@ -521,16 +515,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         <CombatGuide
           open={guideOpen}
           phase={guidePhase}
-          turn={{
-            current: Math.min(displayTurnIndex + 1, encounter.sequence.length),
-            total: encounter.sequence.length,
-          }}
           ruler={ruler}
           rule={RULER_RULES[ruler].label}
           opponentPlanet={displayOpponentTurn}
           examplePlanet={guidePlanet}
-          exampleAspect={guideAspect}
-          selectedPlanet={selected}
           previewAction={indicatedVerb}
           projectedLight={projectedLight?.value ?? null}
           onOpen={openGuide}
@@ -556,7 +544,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 and cost the strip a second visual language — the pips carried no
                 baseline of their own, so they could not sit with the type beside
                 them. */}
-            <div className="combat-turns" data-guide="turn">
+            <div className="combat-turns">
               <span className="eyebrow">TURN</span>
               <span className="combat-turns-v">
                 {encounter.resolved && !animation
@@ -637,7 +625,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         </div>
 
         <div className="combat-side" data-guide="chart-other">
-          <div className="combat-side-label" data-guide="label-other">OTHER</div>
+          <div className="combat-side-label">OTHER</div>
           <Chart
             chart={encounter.opponentChart}
             state={displayOpponentState}

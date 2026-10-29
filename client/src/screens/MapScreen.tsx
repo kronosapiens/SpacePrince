@@ -3,9 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import type { GameLayoutContext } from "./GameLayout";
 import { BeginButton } from "@/components/BeginButton";
 import { MapDiagram } from "@/components/MapDiagram";
-import { MapGuide, ROMAN, type MapGuidePhase } from "@/components/MapGuide";
+import { MapGuide, type MapGuidePhase } from "@/components/MapGuide";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
+import { useFirstGuide } from "@/components/useFirstGuide";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { playUISound, setTheme } from "@/audio/engine";
 import { enterNode, isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
@@ -20,6 +21,9 @@ import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
 import type { MapState, PlanetName, Run } from "@/game/types";
 
+/** Roman numerals for the current map. */
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+
 export function MapScreen() {
   const prince = usePrince();
   const run = useActiveRun();
@@ -30,6 +34,11 @@ export function MapScreen() {
   const { guideOpen, setGuideOpen, openingActive } = useOutletContext<GameLayoutContext>();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
   const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numEncounters);
+  const openGuide = useCallback(() => {
+    setGuidePhase("map");
+    setGuideOpen(true);
+  }, [setGuideOpen]);
+  useFirstGuide("map", !openingActive, openGuide);
 
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
@@ -113,8 +122,7 @@ export function MapScreen() {
         phase={guidePhase}
         map={run.map}
         examplePlanet={playerUnlocked[0] ?? "Moon"}
-        mapsCompleted={mapIndex}
-        onOpen={() => { if (!openingActive) { setGuidePhase("map"); setGuideOpen(true); } }}
+        onOpen={() => { if (!openingActive) openGuide(); }}
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
@@ -125,7 +133,7 @@ export function MapScreen() {
         <div className="map-diagram-wrap">
           <MapDiagram map={run.map} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
-        <div className="map-index" data-guide="map-index">
+        <div className="map-index">
           <span className="map-index-v">{ROMAN[mapIndex]}</span>
         </div>
         {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>New Run</BeginButton>}

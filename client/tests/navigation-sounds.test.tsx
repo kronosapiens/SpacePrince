@@ -23,6 +23,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.useFakeTimers();
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+  vi.stubGlobal("SVGLineElement", class {});
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
