@@ -54,19 +54,6 @@ export function ChartTuner() {
         <label className="dev-console-check">
           <input
             type="checkbox"
-            checked={tuning.showBadges}
-            onPointerEnter={playHoverSound}
-            onFocus={playFocusSound}
-            onChange={(e) => {
-              playUISound("select");
-              setTuning({ showBadges: e.target.checked });
-            }}
-          />
-          Badges
-        </label>
-        <label className="dev-console-check">
-          <input
-            type="checkbox"
             checked={tuning.showGlow}
             onPointerEnter={playHoverSound}
             onFocus={playFocusSound}

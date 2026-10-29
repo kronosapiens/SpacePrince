@@ -41,20 +41,6 @@ const SIGN_LABELS: Record<SignName, string> = {
   Sagittarius: "SAG", Capricorn: "CAP", Aquarius: "AQU", Pisces: "PIS",
 };
 
-// Measure a badge label's advance width in the badge font. A canvas advance at
-// `fontPx` equals SVG user units at the same nominal font-size, so the result
-// drops straight into pill geometry. Measuring (vs. estimating from character
-// count) keeps the pill's padding constant across 1-, 2-, and 3-digit values —
-// a char-count estimate over-budgets every extra glyph and lets longer numbers
-// drift looser. One shared context; font is re-set per call (cheap).
-const badgeMeasureCtx =
-  typeof document !== "undefined" ? document.createElement("canvas").getContext("2d") : null;
-function measureBadgeText(text: string, fontPx: number): number {
-  if (!badgeMeasureCtx) return text.length * fontPx * 0.6; // SSR / no-canvas fallback
-  badgeMeasureCtx.font = `700 ${fontPx}px 'Inter', sans-serif`;
-  return badgeMeasureCtx.measureText(text).width;
-}
-
 /** Planet placement inside a sign, per stack size. Each entry is
  *  [radius, angle-offset-deg] from the sign's mid-point.
  *
@@ -150,9 +136,9 @@ export interface ChartProps {
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
-  /** Hide the affliction display — arc and badge both. For charts shown for
-   *  their form rather than their state (such as the Title's sample charts);
-   *  gameplay screens don't set it. */
+  /** Hide the affliction arc. For charts shown for their form rather than
+   *  their state (such as the Title's sample charts); gameplay screens don't
+   *  set it. */
   hideAffliction?: boolean;
   scale?: number;
   side?: "self" | "other";
@@ -176,23 +162,16 @@ export interface ChartProps {
   projection?: ProjectionChips;
   /** Directed aspect keys (`Source->Target`) currently propagating. The
    *  pulse just brightens the existing aspect-line color; heal/harm signal
-   *  lives on the projection badge and the planet's effect pulse. */
+   *  lives on the arc and the planet's effect bloom. */
   activePropagationKeys?: ReadonlySet<string>;
   /** One-shot glow pulse for the action planet (player or opponent) on direct hit. */
   actionPulsePlanet?: PlanetName | null;
   /** Planets that took a hit this beat, mapped to the polarity received.
-   *  Drives the badge pulse (presence) and the glyph's in-place valence
-   *  bloom (heal = testimony/violet, harm = affliction/amber). */
+   *  Drives the glyph's in-place valence bloom (heal = testimony/violet,
+   *  harm = affliction/amber). */
   effectPlanets?: ReadonlyMap<PlanetName, Polarity>;
   /** Planets combusting this beat — desaturate the glyph + ripple a ring outward. */
   combustingPlanets?: ReadonlySet<PlanetName>;
-  /** Planets whose projection badge is sliding into the affliction badge this beat. */
-  mergingPlanets?: ReadonlySet<PlanetName>;
-  /** Ambient combust warning: planets for whom combustion is on the table this
-   *  turn — own candidates that would combust catching the incoming blow, or
-   *  the opponent's actor when a candidate could combust it first. The
-   *  affliction badge turns amber and breathes. */
-  warningPlanets?: ReadonlySet<PlanetName>;
   /** The verb and magnitude arriving at this chart, drawn at the centre. It sits
    *  there rather than on a planet because until the player commits, the blow
    *  has no target: `resolveTurn` lands it on whichever planet is sent, so
@@ -247,8 +226,6 @@ export function Chart(props: ChartProps) {
     actionPulsePlanet,
     effectPlanets,
     combustingPlanets,
-    mergingPlanets,
-    warningPlanets,
     incoming,
     animationEpoch,
     statsPanelPlanet,
@@ -450,9 +427,7 @@ export function Chart(props: ChartProps) {
       {aspectLines}
       {propagationLines}
 
-      {/* Planet layer: halos + glyphs. Badges draw in a separate pass below,
-          so a selected/active planet's halo can't occlude a neighbouring
-          planet's affliction badge (SVG paints in document order). */}
+      {/* Planet layer: halos + glyphs. */}
       {points.map((p) => {
         const combusted = planetCombusted(p.planet);
         const unlocked = isUnlocked(p.planet);
@@ -496,7 +471,7 @@ export function Chart(props: ChartProps) {
         ) : null,
       )}
 
-      {/* Arc layer: above every planet's halo, same as the badges — the arc is
+      {/* Arc layer: above every planet's halo — the arc is
           the primary read of how much a planet can still absorb, so a
           neighbour's bloom must not sit on top of it. A combusted planet has
           nothing left to absorb, so it drops the arc entirely rather than
@@ -515,27 +490,6 @@ export function Chart(props: ChartProps) {
             openingPhase={opening?.phase}
             necessity={opening?.entries.find((entry) => entry.planet === p.planet)}
             guideId={side ? `arc-${side}-${p.planet.toLowerCase()}` : undefined}
-          />
-        );
-      })}
-
-      {/* Badge layer: above every planet's halo. Off by default — the arc
-          carries this now — and kept only so the dev console can put the
-          numbers back while the arc is still being trusted. */}
-      {tuning.showBadges && !opening && points.map((p) => {
-        if (!isUnlocked(p.planet)) return null;
-        return (
-          <PlanetBadges
-            key={p.planet}
-            point={p}
-            combusted={planetCombusted(p.planet)}
-            affliction={state?.[p.planet]?.affliction ?? 0}
-            hideAfflictionBadge={hideAffliction}
-            projection={projection?.deltas[p.planet]}
-            effect={effectPlanets?.has(p.planet) ?? false}
-            merging={mergingPlanets?.has(p.planet) ?? false}
-            warning={warningPlanets?.has(p.planet) ?? false}
-            animationEpoch={animationEpoch}
           />
         );
       })}
@@ -1025,225 +979,6 @@ function IncomingMark({ verb, amount }: { verb: Polarity; amount?: number }) {
           <circle key={i} r={INTERACTION_RING_R - i * INCOMING_RING_PITCH} />
         ))}
       </g>
-    </g>
-  );
-}
-
-// Affliction + projection badges — pill-shaped, gold border, drop shadow.
-// Rendered in a pass above every planet's glyph/halo so a selected or active
-// planet's halo can't occlude a neighbouring planet's badge. Pills sit on the
-// chart-facing side of the planet; projection sits beside the affliction along
-// the perpendicular.
-function PlanetBadges({
-  point, combusted, affliction,
-  hideAfflictionBadge,
-  projection, effect, merging, warning, animationEpoch,
-}: {
-  point: PlanetPoint;
-  combusted: boolean;
-  affliction: number;
-  hideAfflictionBadge: boolean;
-  projection?: ProjectionChip;
-  merging: boolean;
-  effect: boolean;
-  warning: boolean;
-  animationEpoch?: number;
-}) {
-  const r = point.glyphR;
-  const dx = CHART_CENTER - point.cx;
-  const dy = CHART_CENTER - point.cy;
-  const d = Math.hypot(dx, dy) || 1;
-  const ux = dx / d;
-  const uy = dy / d;
-  const badgeOffset = r;
-  const badgeR = Math.max(12, r * 0.5);
-  const badgeFontSize = Math.max(13, Math.round(r * 0.5));
-  // Projection badge shares the affliction badge's size; the affliction pill
-  // still widens for two-digit values via widthFor.
-  const projBadgeR = badgeR;
-  const projFontSize = badgeFontSize;
-  // Pill width = measured content + a fixed pad, floored at 2*r (circle). The
-  // pad is proportional to font size, not character count, so "+6" and "+12"
-  // carry the same breathing room rather than longer numbers drifting looser.
-  const widthFor = (text: string, fontSize: number, pillR: number) =>
-    Math.max(2 * pillR, measureBadgeText(text, fontSize) + fontSize * 0.8);
-
-  const epoch = animationEpoch ?? 0;
-  const badgeClass = effect ? "anim-effect" : undefined;
-
-  // A combust warning surfaces the pill even at zero affliction: one blow can
-  // exceed a fragile planet's Resolve, before it has an affliction badge.
-  const showAffliction = !hideAfflictionBadge && !combusted && (affliction > 0 || warning);
-  // Show the projection badge whenever there's any projected effect —
-  // including testimony at zero delta (planet already at 0 affliction).
-  // The polarity tells the player "this would heal", even if the
-  // numeric outcome is the same as standing still.
-  const showProjection = !combusted && projection !== undefined;
-  if (!showAffliction && !showProjection) return null;
-
-  const afflictionText = String(Math.round(affliction));
-  const wA = widthFor(afflictionText, badgeFontSize, badgeR);
-  const aX = ux * badgeOffset;
-  const aY = uy * badgeOffset;
-
-  let projBadge: { wP: number; pX: number; pY: number; sign: string; mag: string; col: string } | null = null;
-  if (showProjection && projection) {
-    const isHarm = projection.polarity !== "Testimony";
-    // Sign prefix + valence color both carry direction — amber "+N" adds
-    // affliction, violet "−N" heals it — so the effect reads at a glance.
-    // The sign renders as a smaller, lighter prefix (see below) so the digit —
-    // the thing the player reads — sits centered in the pill rather than shoved
-    // right by a full-size operator.
-    const sign = isHarm ? "+" : "−";
-    const mag = Math.abs(projection.delta).toFixed(1).replace(/\.0$/, "");
-    const wP = widthFor(sign + mag, projFontSize, projBadgeR);
-    // Both centers sit on the planet rim. Projection is rotated around
-    // the rim from the affliction by the angle at which the two badges
-    // just clear each other — chord = sum of their (approximated
-    // circular) radii plus a small visual gap so the strokes don't
-    // fuse at the tangent point.
-    const chord = wA / 2 + wP / 2 + 2;
-    const projAngle = 2 * Math.asin(Math.min(1, chord / (2 * badgeOffset)));
-    const cos = Math.cos(projAngle);
-    const sin = Math.sin(projAngle);
-    const projDirX = ux * cos - uy * sin;
-    const projDirY = uy * cos + ux * sin;
-    projBadge = {
-      wP,
-      pX: projDirX * badgeOffset,
-      pY: projDirY * badgeOffset,
-      sign,
-      mag,
-      // Valence, not aspect mood: amber = incoming harm, violet = incoming
-      // heal — matching the action-verb colors.
-      col: isHarm ? VALENCE_COLOR.Affliction : VALENCE_COLOR.Testimony,
-    };
-  }
-
-  const shadow: CSSProperties = {
-    filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))",
-    pointerEvents: "none",
-    userSelect: "none",
-  };
-
-  return (
-    <g transform={`translate(${point.cx}, ${point.cy})`}>
-      {showAffliction && (
-        // Outer g positions; inner g animates. Splitting prevents the
-        // CSS keyframe `transform` from clobbering the SVG translate
-        // attribute mid-animation (which would snap the badge to (0,0)
-        // = planet center for one frame).
-        <g
-          transform={`translate(${aX}, ${aY})`}
-          style={shadow}
-        >
-          <g
-            className={badgeClass}
-            key={`badge-${epoch}-${effect ? 1 : 0}`}
-          >
-            {/* Combust warning: blurred ember underlay breathing on the shared
-                clock, ember digits; the pill itself keeps its resting gold
-                border. Ember stays clear of the projection chip's amber, so
-                colored digits here can't read as a projected delta. */}
-            {warning && (
-              <rect
-                x={-wA / 2} y={-badgeR}
-                width={wA} height={2 * badgeR}
-                rx={badgeR} ry={badgeR}
-                className="anim-combust-warning"
-                fill="none"
-                stroke={COMBUST_WARNING}
-                strokeWidth={CHART_STYLE.badge.warningGlowStroke} />
-            )}
-            <rect
-              x={-wA / 2} y={-badgeR}
-              width={wA} height={2 * badgeR}
-              rx={badgeR} ry={badgeR}
-              fill={NEUTRAL.void} fillOpacity={CHART_STYLE.badge.afflictionFill}
-              stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.badge.afflictionBorder} strokeWidth={CHART_STYLE.badge.borderStroke} />
-            <foreignObject
-              x={-wA / 2} y={-badgeR}
-              width={wA} height={2 * badgeR}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: warning ? COMBUST_WARNING : NEUTRAL.bone,
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: 700,
-                  fontSize: `${badgeFontSize}px`,
-                  lineHeight: 1,
-                  userSelect: "none",
-                }}
-              >
-                {afflictionText}
-              </div>
-            </foreignObject>
-          </g>
-        </g>
-      )}
-      {projBadge && (
-        <g
-          transform={`translate(${projBadge.pX}, ${projBadge.pY})`}
-          style={shadow}
-        >
-          {/* Inner g carries the merge animation — the projection pill slides
-              into the affliction badge and fades, so the delta visibly merges
-              into the running total. Outer g keeps the SVG positioning. */}
-          <g
-            key={`proj-${epoch}-${merging ? 1 : 0}`}
-            className={merging ? "anim-badge-merge" : undefined}
-            style={
-              merging
-                ? ({ "--mdx": `${aX - projBadge.pX}px`, "--mdy": `${aY - projBadge.pY}px` } as CSSProperties)
-                : undefined
-            }
-          >
-          <rect
-            x={-projBadge.wP / 2} y={-projBadgeR}
-            width={projBadge.wP} height={2 * projBadgeR}
-            rx={projBadgeR} ry={projBadgeR}
-            fill={NEUTRAL.void} fillOpacity={CHART_STYLE.badge.projectionFill}
-            stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.badge.projectionBorder} strokeWidth={CHART_STYLE.badge.borderStroke} />
-          <foreignObject
-            x={-projBadge.wP / 2} y={-projBadgeR}
-            width={projBadge.wP} height={2 * projBadgeR}
-          >
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: projBadge.col,
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 700,
-                fontSize: `${projFontSize}px`,
-                lineHeight: 1,
-                userSelect: "none",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "0.72em",
-                  fontWeight: 600,
-                  opacity: CHART_STYLE.badge.signPrefixOpacity,
-                  marginRight: "0.5px",
-                }}
-              >
-                {projBadge.sign}
-              </span>
-              {projBadge.mag}
-            </div>
-          </foreignObject>
-          </g>
-        </g>
-      )}
     </g>
   );
 }

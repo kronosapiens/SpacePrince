@@ -24,15 +24,11 @@ import { useSyncExternalStore } from "react";
  * them as inline custom properties on :root (see `CSS_KNOBS`).
  */
 export interface ChartTuning {
-  /** The numeric affliction / projection badges. Off — the arc replaced them.
-   *  Scaffolding: the toggle exists to put them back for a moment while the
-   *  arc is still being trusted. Deleting the badges deletes this too. */
-  showBadges: boolean;
   /** Every soft light on the surface at once — the colour-field blooms, both
    *  planet halos, the drop-shadows under the interaction ring and the arc's
    *  diff, and the screen's active-planet tint. Off puts the whole UI on pure
    *  void, which is the only way to see what the line work is doing on its own.
-   *  Scaffolding, like the badges above. */
+   *  Scaffolding. */
   showGlow: boolean;
 }
 
@@ -42,7 +38,6 @@ type NumericKey = {
 }[keyof ChartTuning];
 
 export const TUNING_DEFAULTS: ChartTuning = {
-  showBadges: false,
   showGlow: true,
 };
 

@@ -61,7 +61,7 @@ They do not travel: the run map and the encounter seam render at their own unit 
 
 | Name        | Weight | Role               | Carries                                                                    |
 |-------------|--------|--------------------|-----------------------------------------------------------------------------|
-| Light       | `1u`   | ground             | Substrate, aspect web at rest, chart inner ring, badge border, planet rim.   |
+| Light       | `1u`   | ground             | Substrate, aspect web at rest, chart inner ring, planet rim.                |
 | Medium      | `2u`   | structure          | Chart outer ring, sign ticks, combust shockwave.                             |
 | Heavy       | `3u`   | under attention    | Interaction ring, active aspect line, propagation pulse, combust ripple.     |
 | Extra heavy | `4u`   | the affliction arc | The arc alone.                                                              |

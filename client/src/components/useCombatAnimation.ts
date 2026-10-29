@@ -23,10 +23,6 @@ import type {
 
 export const ANIMATION_TIMINGS = {
   primaryDelay: 200,
-  /** Lead before an effect's apply beat to start the projection badge sliding
-   *  into the affliction badge, so it lands just as the count ticks. Matches the
-   *  `badge-merge` keyframe duration in motion.css. */
-  mergeLead: 200,
   primaryEffectClear: 360,
   primaryGlowClear: 600,
   propagationStart: 800,
@@ -49,7 +45,7 @@ interface FlagPair<T> {
 
 /** Planets that took an effect this beat, mapped to the polarity they
  *  received. Heal (testimony) vs harm (affliction) drive the glyph's
- *  in-place valence bloom; presence alone drives the badge pulse. */
+ *  in-place valence bloom. */
 export type EffectMap = ReadonlyMap<PlanetName, Polarity>;
 
 export type ProjectionDeltas = Partial<Record<PlanetName, ProjectedEffect>>;
@@ -78,17 +74,13 @@ export interface CombatAnimationState {
   effectPlanets: { self: EffectMap; other: EffectMap };
   combustingPlanets: FlagPair<PlanetName>;
   /** Snapshot of the per-planet projection deltas captured at commit, so
-   *  the projection badges can persist through the animation rather than
+   *  the projected arcs can persist through the animation rather than
    *  vanishing all at once. */
   projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   /** Planets whose projection has been "consumed" — once their effect
-   *  pulse fires, the projection badge for that planet stops rendering.
+   *  pulse fires, the projected arc for that planet stops rendering.
    *  Accumulates only; never cleared until the animation ends. */
   consumedProjections: FlagPair<PlanetName>;
-  /** Planets whose projection badge is currently sliding into the affliction
-   *  badge (set `mergeLead` before the apply, cleared when consumed). Drives the
-   *  `badge-merge` animation so the delta visibly merges into the running total. */
-  mergingPlanets: FlagPair<PlanetName>;
   epoch: number;
 }
 
@@ -270,7 +262,6 @@ function runScheduler(args: {
     combustingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     projectedDeltas,
     consumedProjections: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
-    mergingPlanets: { self: EMPTY_PLANET_SET, other: EMPTY_PLANET_SET },
     epoch: previousEncounter.turnIndex,
   });
 
@@ -300,18 +291,6 @@ function runScheduler(args: {
     // The action planet receives the opposing valence: sign < 0 means the hit
     // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
     const receivedPolarity: Polarity = sign < 0 ? "Testimony" : "Affliction";
-
-    // Start the direct target's projection badge sliding into its affliction
-    // badge, so it lands as the count ticks (mergeLead before the apply).
-    schedule(() => {
-      updateAnimation((state) => ({
-        ...state,
-        mergingPlanets: {
-          ...state.mergingPlanets,
-          [side]: addToFlag(state.mergingPlanets[side], actionPlanet),
-        },
-      }));
-    }, base + ANIMATION_TIMINGS.primaryDelay - ANIMATION_TIMINGS.mergeLead);
 
     // Primary direct phase — apply delta, light action-glow, effect.
     schedule(() => {
@@ -384,20 +363,6 @@ function runScheduler(args: {
             },
           }));
         }, delay);
-      }
-
-      if (step.note !== "Combusts") {
-        // Slide this target's projection badge into its affliction badge,
-        // arriving as the propagated delta applies.
-        schedule(() => {
-          updateAnimation((state) => ({
-            ...state,
-            mergingPlanets: {
-              ...state.mergingPlanets,
-              [side]: addToFlag(state.mergingPlanets[side], step.target),
-            },
-          }));
-        }, delay + ANIMATION_TIMINGS.propagationApplyOffset - ANIMATION_TIMINGS.mergeLead);
       }
 
       schedule(() => {

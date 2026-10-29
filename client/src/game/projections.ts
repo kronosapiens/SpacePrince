@@ -36,7 +36,7 @@ export interface ComputeProjectedEffectsInput {
   modelPreemption?: boolean;
 }
 
-/** Per-planet projection: the polarity (so the badge can be colored even
+/** Per-planet projection: the polarity (so the arc can be colored even
  *  when the numeric delta clamps to zero — e.g. testimony on a planet
  *  already at 0 affliction) and the actual delta after clamping. */
 export interface ProjectedEffect {

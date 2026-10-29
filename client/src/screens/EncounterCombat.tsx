@@ -21,7 +21,7 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
 import { directAmount, getEffectiveStats } from "@/game/combat";
-import { isCombusted, wouldCombust } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
 import { NEUTRAL, PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
@@ -142,8 +142,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const effectOpponent = animation?.effectPlanets.other ?? EMPTY_EFFECT_MAP;
   const combustingPlayer = animation?.combustingPlanets.self ?? EMPTY_PLANET_SET;
   const combustingOpponent = animation?.combustingPlanets.other ?? EMPTY_PLANET_SET;
-  const mergingPlayer = animation?.mergingPlanets.self ?? EMPTY_PLANET_SET;
-  const mergingOpponent = animation?.mergingPlanets.other ?? EMPTY_PLANET_SET;
   const animationEpoch = animation?.epoch ?? encounter.turnIndex;
   // The edge bands' bright level: every planet taking an effect on this beat,
   // whether it blooms (effect) or combusts (ripple).
@@ -233,41 +231,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           color: VALENCE_COLOR[indicatedVerb],
         }
       : null;
-
-  // Ambient combust warnings (choice-independent, afflict turns only):
-  // self — candidates that combust if they catch the incoming blow;
-  // other — the opponent's actor, when some candidate could combust it first.
-  // Both render as the amber badge treatment (Chart `warningPlanets`).
-  const combustWarnings = useMemo(() => {
-    if (animation || openingActive || encounter.resolved || !opponentTurn) return null;
-    if (opponentAction !== "Affliction") return null;
-    const incoming = getEffectiveStats(encounter.opponentChart, opponentTurn).affliction;
-    const candidates = playerUnlocked.filter(
-      (p) => !isCombusted(playerChart.planets[p], run.state[p]),
-    );
-    const self = new Set(
-      candidates.filter((p) => wouldCombust(playerChart.planets[p], run.state[p], incoming)),
-    );
-    const maxAnswer = Math.max(
-      0,
-      ...candidates.map((p) => getEffectiveStats(playerChart, p).affliction),
-    );
-    const other = wouldCombust(
-      encounter.opponentChart.planets[opponentTurn],
-      encounter.opponentState[opponentTurn],
-      maxAnswer,
-    )
-      ? new Set([opponentTurn])
-      : null;
-    return { self: self.size > 0 ? self : null, other };
-  }, [animation, openingActive, encounter, opponentTurn, opponentAction, playerUnlocked, run.state, playerChart]);
-
-  // The warnings stay conservative under any preview — their meaning is "dies
-  // if the blow lands," which holds. An afflict preview that preempts tells its
-  // own story through the exact projection: their actor shows the kill and no
-  // incoming chips appear.
-  const selfWarnings = combustWarnings?.self ?? null;
-  const otherWarnings = combustWarnings?.other ?? null;
 
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection, and nothing at all until a planet is under consideration.
@@ -364,7 +327,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       const rng = combatTurnRng(run, encounter);
       const previousRun = run;
       const previousEncounter = encounter;
-      // Snapshot the projection for the *chosen* action so the badges shown
+      // Snapshot the projection for the *chosen* action so the arcs shown
       // during playback match the committed turn, independent of hover/focus.
       const projectionSnapshot = computeProjectedEffects({
         playerChart,
@@ -528,8 +491,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       actionPulsePlanet: actionPulsePlayer,
       effectPlanets: effectPlayer,
       combustingPlanets: combustingPlayer,
-      mergingPlanets: mergingPlayer,
-      warningPlanets: selfWarnings ?? undefined,
       incoming: incomingSelf,
       animationEpoch,
       statsPanelPlanet: previewPlanet,
@@ -713,8 +674,6 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             actionPulsePlanet={actionPulseOpponent}
             effectPlanets={effectOpponent}
             combustingPlanets={combustingOpponent}
-            mergingPlanets={mergingOpponent}
-            warningPlanets={otherWarnings ?? undefined}
             incoming={incomingOther}
             animationEpoch={animationEpoch}
           />

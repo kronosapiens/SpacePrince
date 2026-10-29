@@ -211,18 +211,4 @@ export const CHART_STYLE = {
     halo: { core: 0.35, mid: 0.09 },
     valence: { core: 0.45, mid: 0.17 },
   },
-
-  /** Word — affliction / projection badge pills (gold border on Void fill). */
-  badge: {
-    afflictionFill: 0.92,
-    afflictionBorder: 0.55,
-    projectionFill: 0.84,
-    projectionBorder: 0.4,
-    borderStroke: STROKE_LIGHT,
-    signPrefixOpacity: 0.85,
-    /** Combust warning — ember digits plus a blurred ember underlay whose
-     *  opacity rides the shared --breath clock (motion.css); the pill border
-     *  stays resting gold. */
-    warningGlowStroke: 6,
-  },
 } as const;
