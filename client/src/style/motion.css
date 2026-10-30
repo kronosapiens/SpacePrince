@@ -228,11 +228,10 @@
 /* The invite's shared settings. Declared here rather than in a token module
    because their consumers are the CSS animations below; the dev console
    overrides them inline on :root and clearing the override falls back to these.
-   Period was 1s, which read as panting; 1.5s is where it settled under the live
-   tuner. It is now the only period on the encounter screen — the opponent's
-   halo above derives from this same clock. */
+   The period is the only one on the encounter screen — the opponent's halo
+   above derives from this same clock. */
 :root {
-  --breath-period: 1.5s;
+  --breath-period: 1s;
   --invite-glow-min: 0.28;
   --invite-glow-range: 0.22;
   --invite-glow-blur: 8px;
