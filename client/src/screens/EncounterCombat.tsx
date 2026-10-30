@@ -496,7 +496,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
         setStudy(!study);
         setPreviewAction(null);
       },
-      inviteInteraction: !openingActive && !animation && !encounter.resolved && !selected,
+      inviteInteraction: !openingActive && !animation && !encounter.resolved,
       ringVerb: selected ? indicatedVerb : null,
     },
     onBackgroundClick: settled ? advance : handleClearSelection,

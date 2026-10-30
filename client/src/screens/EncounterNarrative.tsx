@@ -229,7 +229,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       },
       onPlanetClick: resolved ? undefined : choosePlanet,
       interactionPlanets: eligiblePlanets,
-      inviteInteraction: !resolved && targeting && !selectedPlanet,
+      inviteInteraction: !resolved && targeting,
       incoming: !resolved && targetEffect ? {
         verb,
         amount: targetEffect.kind === "affliction" ? Math.abs(targetEffect.delta) : undefined,

@@ -452,7 +452,7 @@ export function Chart(props: ChartProps) {
             onFocus={handleFocus}
             passive={passive || !!opening}
             eligible={interactionPlanets ? interactionPlanets.has(p.planet) : !combusted}
-            invite={inviteInteraction && !opening}
+            invite={inviteInteraction && !opening && !selectedPlanet}
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
             necessityAccent={opening?.phase === "accent" && opening.entries.some((entry) => entry.planet === p.planet)}

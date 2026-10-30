@@ -56,7 +56,7 @@ export function ChartInspection({ chart, state, unlockedPlanets, disabled = fals
         },
         onPlanetHover: !preview || inspected ? undefined : setHovered,
         interactionPlanets: new Set(unlockedPlanets),
-        inviteInteraction: invite && inspect && !selected,
+        inviteInteraction: invite && inspect,
         statsPanelPlanet: inspect ? selected ?? hovered : null,
         statsPanelStudy: study,
         onToggleStudy: () => {
