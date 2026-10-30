@@ -73,6 +73,7 @@ export function GameLayout() {
         opening={opening.opening}
         unlockedPlanets={unlocked}
         mode={isCasting ? "passive" : prince ? "inspect" : "preview"}
+        invite={isTitle}
         disabled={opening.active || (!isTitle && guideOpen)}
         activePlanet={isCasting ? casting.currentRevealing : null}
         hideAffliction={isTitle || isCasting}

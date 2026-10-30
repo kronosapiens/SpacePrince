@@ -11,10 +11,12 @@ export interface ChartInspectionProps extends Pick<ChartProps, "activePlanet" | 
   mode?: "inspect" | "preview" | "passive";
   presentation?: ChartProps;
   onReroll?: () => void;
+  /** Breathe an invite on each inspectable planet. */
+  invite?: boolean;
 }
 
 /** Inspect planets in place, with the same stats and study toggle as encounters. */
-export function ChartInspection({ chart, state, unlockedPlanets, disabled = false, mode = "inspect", presentation, onReroll, ...display }: ChartInspectionProps) {
+export function ChartInspection({ chart, state, unlockedPlanets, disabled = false, mode = "inspect", presentation, onReroll, invite = false, ...display }: ChartInspectionProps) {
   const [selected, setSelected] = useState<PlanetName | null>(null);
   const [hovered, setHovered] = useState<PlanetName | null>(null);
   const [study, setStudy] = useState(false);
@@ -54,7 +56,7 @@ export function ChartInspection({ chart, state, unlockedPlanets, disabled = fals
         },
         onPlanetHover: !preview || inspected ? undefined : setHovered,
         interactionPlanets: new Set(unlockedPlanets),
-        inviteInteraction: inspect && !selected,
+        inviteInteraction: invite && inspect && !selected,
         statsPanelPlanet: inspect ? selected ?? hovered : null,
         statsPanelStudy: study,
         onToggleStudy: () => {
