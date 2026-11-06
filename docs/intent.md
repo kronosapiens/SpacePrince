@@ -56,7 +56,9 @@ It is not trying to entertain so much as to reward attention.
 
 You are the Prince.
 Your own chart is the character sheet, and the position is how you were recognized: one place and time, once.
-The journey is Siddhartha's: by playing, you re-live his journey to enlightenment, self-discovery through lived experience rather than instruction, each encounter a partial teacher.
+The journey has Siddhartha's shape, lived as your own: self-discovery through lived experience rather than instruction, each encounter a partial teacher, and no one else's path to follow.
+Enlightenment is the player's, not the game's: more stars and more marks point to mastery, but it is not something a run can complete or the artifact can represent.
+The Prince is addressed in the second person; the scenes already speak to you, and the writing guidance should too.
 No two Princes occupy the same position; many may share a chart, and chart twins are siblings in nature, not duplicates.
 The Prince NFT is the Prince: if it exists the Prince exists, and if it changes the Prince has changed ([NFT.md](presentation/NFT.md)).
 
@@ -84,8 +86,8 @@ The game asserts nothing about whether astrology is true, only that it is useful
 
 ### Siddhartha (Hermann Hesse)
 
-The spine of the game, not only a reference: playing Space Prince is re-living Siddhartha's journey to enlightenment.
-A Prince's journey is Siddhartha's: self-discovery through lived experience rather than instruction, whose meaning may emerge later.
+The spine of the game, not only a reference: playing Space Prince is living a journey of Siddhartha's shape as your own, never re-living his.
+Self-discovery comes through lived experience rather than instruction, and its meaning may emerge later.
 The planets are partial teachers, each giving something and none the whole.
 The cosmos is the river, a presence to listen to rather than an opponent to defeat.
 Other Princes are Govinda: different coordinates, different journeys, no judgment between them.
@@ -126,6 +128,8 @@ Keeping a whole run's gas well under that dollar is a constraint on the onchain 
 What maturity means for a Prince, and whether a free sample run precedes the mint, remain open ([#31](https://github.com/kronosapiens/SpacePrince/issues/31)).
 
 ## Open questions
+
+Selected next: [#35](https://github.com/kronosapiens/SpacePrince/issues/35), giving the chart-to-chart encounter its words at every level, an ending, and fixes for the turns with no human reading, alongside the run-end beat.
 
 - [#22](https://github.com/kronosapiens/SpacePrince/issues/22): the first encounter, what the actions mean and why to choose one.
 - [#23](https://github.com/kronosapiens/SpacePrince/issues/23): the emotional meaning of the journey, the encounters, and Light.

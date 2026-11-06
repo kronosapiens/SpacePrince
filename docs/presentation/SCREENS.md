@@ -407,7 +407,7 @@ The durations live in `client/src/style/motion.css`.
   On an afflict turn a hard aspect inverts to testimony, and a target already at zero affliction has nothing to heal — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence.
   The retired projection badge covered this by showing a violet zero.
 - Accessibility (color-channel parallel signal) — [STYLE.md §14](STYLE.md#14-open-questions).
-- What the encounter says about itself before, during, and after — the reading layer proposed in [#26](https://github.com/kronosapiens/SpacePrince/issues/26).
+- What the encounter says about itself before, during, and after — the reading layer proposed in [#26](https://github.com/kronosapiens/SpacePrince/issues/26), now selected work under [#35](https://github.com/kronosapiens/SpacePrince/issues/35).
 
 ---
 
