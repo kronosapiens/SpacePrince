@@ -62,7 +62,7 @@ No alternative versions, re-rolls, or parallel instances can exist.
 The Prince NFT is not a copy of an idea.
 It is the canonical artifact associated with that position.
 
-How finely that position is quantized — and therefore how large the identity space is, and how chart twins arise — is covered in [CHART.md §11](../mechanics/CHART.md#11-identity-grid-and-chart-twins); the grid itself is unresolved ([#30](https://github.com/kronosapiens/SpacePrince/issues/30)).
+How finely that position is quantized — and therefore how large the identity space is, and how chart twins arise — is covered in [CHART.md §11](../mechanics/CHART.md#11-identity-grid-and-chart-twins): 5-minute buckets and a 0.01° grid, one Prince per position.
 
 ---
 
@@ -252,21 +252,10 @@ Princes become *objects of conversation*, not comparison.
 
 ## Transfer, Ownership, and Consequence
 
-The Prince NFT is **not designed for frictionless trading**.
-
-If transfer is allowed at all, it should be:
-
-- Ritualized
-- Explicitly acknowledged in-world
-- Potentially destructive to continuity
-
-Possible models:
-
-- Abdication (original player relinquishes claim)
-- Succession (new steward inherits a changed Prince)
-- Non-transferability (soulbound)
-
-This decision is intentionally unresolved; the economic side of the same question is collected in [#31](https://github.com/kronosapiens/SpacePrince/issues/31).
+The Prince is a standard ERC-721 and transfers like one.
+Its value as an artwork accrues through play: each run leaves a star, and the achievement marks fill in as earning arrives, so a Prince that has been played is a different object from one that has not.
+Transfer carries no in-world ceremony; abdication, succession, and a visible mark of changed hands were considered and set aside, and could return as rites if a reason for them appears.
+The economics of minting and runs are in [intent.md](../intent.md), Economics, with the remaining work in [#31](https://github.com/kronosapiens/SpacePrince/issues/31).
 
 ---
 

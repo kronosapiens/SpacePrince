@@ -94,6 +94,7 @@ Listed roughly in the order a player encounters them.
 | Map             | Walk the Sephirot tree; one map per L1→L7 traversal                    | Built (§4)                              |
 | Encounter       | Combat (symmetric) or narrative (asymmetric column)                    | Built (§3)                              |
 | Inspection      | Planets inspected in place; the Prince artifact from the settings menu | Built (§7); earned layers open (#32)    |
+| End of run      | The run's Light becomes a star                                         | In design (§6, #34)                     |
 
 Dev-only and auxiliary routes: `/__index` (navigation and reset during development), `/gallery` (the design gallery of components, palettes, and themes), `/token` (a random Prince artifact preview).
 None is part of the shipped game's navigation (§8).
@@ -532,7 +533,7 @@ On first arrival the **framing** (§9.6) precedes input; the mint screen itself 
 
 **Input.**
 The player enters birth date, time, and place (a city search, `CityPicker`).
-The time field steps in 5-minute increments; the identity grid the onchain mint will quantize to is unresolved ([#30](https://github.com/kronosapiens/SpacePrince/issues/30)).
+The time field steps in 5-minute increments and coordinates are kept to 0.01°, the identity grid the onchain mint quantizes to ([CHART.md §11](../mechanics/CHART.md#11-identity-grid-and-chart-twins)).
 The chart wheel stands beside the form, empty of planets: geometry waiting, not generating.
 
 **Confirmation.**
@@ -578,7 +579,7 @@ There is no standing "preview" of the full chart in the artifact; a verification
 ### 5.5 Open questions (onchain integration)
 
 - **Date/time picker treatment.**
-  The picker should reflect the identity grid once it is settled (#30) — not "type any time" but "select your slot."
+  The picker should reflect the identity grid — not "type any time" but "select your slot."
 - **Location input.**
   City search exists; whether a coordinate picker joins it is open.
 - **Failed mints.**
@@ -589,7 +590,7 @@ There is no standing "preview" of the full chart in the artifact; a verification
 
 ## 6. End of Run
 
-End-of-run presentation is deferred ([#32](https://github.com/kronosapiens/SpacePrince/issues/32)).
+End-of-run presentation is being developed as the run's closing beat, where the run's Light becomes a star ([#34](https://github.com/kronosapiens/SpacePrince/issues/34)).
 For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
 Starting again preserves the Prince's identity, encounter count, unlocks, and run records.
 

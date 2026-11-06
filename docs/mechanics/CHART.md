@@ -270,13 +270,12 @@ This is astrologically authentic — people born on the same day in the same Asc
 Chart twins are siblings in nature, not duplicates; their coordinates, and therefore their identities, remain distinct.
 The gap between the identity space and the chart space is the chart-twin landscape, and at scale it is a social feature, not a defect.
 
-### The grid itself is unresolved
+### The grid
 
-Three values are in play and do not agree ([issue #30](https://github.com/kronosapiens/SpacePrince/issues/30)):
+The identity grid is **5-minute time buckets and a 0.01° location grid**.
+Five minutes is within the minute-level time on most birth certificates and well inside the ~2-hour Ascendant window; a 0.01° cell is about 1.1 km at the equator.
+This is what the `Position` packing in [STATE.md](STATE.md) and the prototype's mint form already assume: the time field steps in 5-minute increments, and the city picker returns coordinates rounded to 0.01° with a manual two-decimal entry beside it (`client/src/screens/StartScreen.tsx`, `client/src/components/CityPicker.tsx`).
+The Cairo quantizer (`cairo/crates/star_chart/src/quantization.cairo`) still floors to 15-minute slots, and its latitude and longitude bins are signed 16-bit integers whose unit is defined in the astronomy dependency; aligning both with the grid is [issue #30](https://github.com/kronosapiens/SpacePrince/issues/30).
 
-- The artifact prose assumed 5-minute time buckets (288 per day, within the minute-level time on most birth certificates and well inside the ~2-hour Ascendant window) and a 0.1° location grid (~11 km at the equator, which shifts the effective time by ~45 seconds); under those values the identity space is about 1.87 million slots per day.
-- The `Position` packing in [STATE.md](STATE.md) assumes 5-minute buckets and a 0.01° grid.
-- The Cairo quantizer (`cairo/crates/star_chart/src/quantization.cairo`) floors minutes-since-1900 to 15-minute slots, and its latitude and longitude bins are signed 16-bit integers whose unit is defined in the astronomy dependency.
-- The prototype's mint form steps its time input in 5-minute increments (`client/src/screens/StartScreen.tsx`).
-
-Pick one of each, then align the packing, the quantizer, and the mint pickers together; the choice changes the identity-space arithmetic but not the chart space.
+Each quantized position is globally unique: one Prince per position, and no second mint at the same coordinates.
+Most players will mint at a city centroid, so in practice two people share a position when they share a city and a 5-minute slot; what the mint does for them is left to work out as the onchain mint takes shape.

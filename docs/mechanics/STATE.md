@@ -27,9 +27,8 @@ Position {                       -- packs into one felt: 16 + 16 + 32 = 64 bits
   lat: u16,                      -- (latitude  + 90)  * 100  -> 0..18000   (0.01° resolution)
   lon: u16,                      -- (longitude + 180) * 100  -> 0..36000   (0.01° resolution)
   dob: u32,                      -- birth instant in 5-minute buckets from a fixed epoch (~40k-year range)
-  -- UNRESOLVED (issue #30): the artifact prose assumed a 0.1° grid and 5-minute buckets, this packing assumes
-  -- 0.01° and 5 minutes, and the Cairo quantizer floors to 15-minute slots. CHART.md, "Identity grid and chart
-  -- twins", holds the reasoning; the widths above are not settled until that question is.
+  -- The grid is 5-minute buckets and 0.01° (CHART.md, "Identity grid and chart twins"). The Cairo quantizer
+  -- still floors to 15-minute slots; aligning it is issue #30.
 }
 
 Chart {

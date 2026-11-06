@@ -11,7 +11,7 @@ A player mints a **Prince**: one moment and place, a latitude, a longitude, and 
 The position is recognized, not invented, and it can be recognized only once.
 The chart is the character sheet, the save file, and the artifact the player owns, all the same object.
 
-Play is a journey of encounters, with other charts and with the houses of the player's own.
+Play is a journey of encounters, with other charts and with the houses of the player's own, and the journey is Siddhartha's (below).
 In each encounter the player chooses which planet answers and how, and the chart's own structure, its signs and aspects, carries the consequences.
 Encounters create **Light**: the energy a meeting leaves behind, carried into what comes next, with what remains at a journey's end shaping one star in the Prince's sky.
 Affliction accumulates, planets combust and return, and a run ends by completion or by every planet going dark.
@@ -54,13 +54,11 @@ It is not trying to entertain so much as to reward attention.
 
 ## The Prince
 
-The Prince is a position in the cosmos that has been recognized.
+You are the Prince.
+Your own chart is the character sheet, and the position is how you were recognized: one place and time, once.
+The journey is Siddhartha's: by playing, you re-live his journey to enlightenment, self-discovery through lived experience rather than instruction, each encounter a partial teacher.
 No two Princes occupy the same position; many may share a chart, and chart twins are siblings in nature, not duplicates.
 The Prince NFT is the Prince: if it exists the Prince exists, and if it changes the Prince has changed ([NFT.md](presentation/NFT.md)).
-
-Whether the Prince is a *person* the player plays as, with their own chart as the character sheet, or a *position and point of view* through which forces converge, is unresolved.
-The current framing copy and the encounter openings lean toward the first; the earlier lore leaned toward the second.
-The question is open in [#22](https://github.com/kronosapiens/SpacePrince/issues/22) and [#23](https://github.com/kronosapiens/SpacePrince/issues/23), and the answer shapes how encounters are narrated.
 
 Lore, where it exists, is structural rather than expository: no omniscient narrator, no timeline, no villains; facts and state are canon, and interpretation belongs to the player.
 
@@ -86,7 +84,7 @@ The game asserts nothing about whether astrology is true, only that it is useful
 
 ### Siddhartha (Hermann Hesse)
 
-The emotional reference.
+The spine of the game, not only a reference: playing Space Prince is re-living Siddhartha's journey to enlightenment.
 A Prince's journey is Siddhartha's: self-discovery through lived experience rather than instruction, whose meaning may emerge later.
 The planets are partial teachers, each giving something and none the whole.
 The cosmos is the river, a presence to listen to rather than an opponent to defeat.
@@ -120,7 +118,12 @@ Its events shape the house scenes: a deterministic decision with a few offers an
 Economics exist to reinforce commitment, not to extract value or accelerate outcomes.
 Money may acknowledge commitment; it may never improve outcomes, influence randomness, restore permission, or undo recorded history.
 Inspecting the Prince, waiting, and returning are always free.
-Pricing, what maturity means, and whether a Prince can be transferred are open ([#31](https://github.com/kronosapiens/SpacePrince/issues/31)).
+
+The Prince is a standard ERC-721, freely transferable.
+Its value is as an artwork that records play: each run leaves a star and each earned mark a glyph, so a played Prince is a different object from a fresh one ([NFT.md](presentation/NFT.md)).
+The intended pricing is a flat mint fee of about $5 that includes five runs, then about $1 per run, with the game paying the gas.
+Keeping a whole run's gas well under that dollar is a constraint on the onchain design.
+What maturity means for a Prince, and whether a free sample run precedes the mint, remain open ([#31](https://github.com/kronosapiens/SpacePrince/issues/31)).
 
 ## Open questions
 
@@ -128,6 +131,7 @@ Pricing, what maturity means, and whether a Prince can be transferred are open (
 - [#23](https://github.com/kronosapiens/SpacePrince/issues/23): the emotional meaning of the journey, the encounters, and Light.
 - [#25](https://github.com/kronosapiens/SpacePrince/issues/25): how encounters generate Light.
 - [#26](https://github.com/kronosapiens/SpacePrince/issues/26): a worded reading of each encounter from its facts and beats.
-- [#30](https://github.com/kronosapiens/SpacePrince/issues/30): the mint identity grid.
-- [#31](https://github.com/kronosapiens/SpacePrince/issues/31): economy, maturity, transferability, and a free sample run.
-- [#32](https://github.com/kronosapiens/SpacePrince/issues/32): deferred presentation (end of run, run history, chart study layers).
+- [#30](https://github.com/kronosapiens/SpacePrince/issues/30): aligning the Cairo quantizer with the mint identity grid.
+- [#31](https://github.com/kronosapiens/SpacePrince/issues/31): the per-run gas budget, maturity, and a free sample run.
+- [#34](https://github.com/kronosapiens/SpacePrince/issues/34): the end-of-run beat, where the run's Light becomes a star.
+- [#32](https://github.com/kronosapiens/SpacePrince/issues/32): deferred presentation (run history, chart study layers, map valence cue, shareable runs).
