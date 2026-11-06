@@ -1,0 +1,174 @@
+# Jupiter — expansive, affirmative, oracular.
+# Curated keepers from the source review.
+# See docs/writing/PLANETS.md §8 (Jupiter) and docs/research/chorus/README.md (sourcing record).
+
+- text: |
+    Time is endless in thy hands, my lord. There is none to count thy minutes.
+  author: "Rabindranath Tagore"
+  source: "Gitanjali, Song 82"
+  source_url: "https://www.gutenberg.org/cache/epub/7164/pg7164.txt"
+  moods: [reverie, opening]
+
+- text: |
+    Were one asked to characterize the life of religion in the broadest and most general terms possible, one might say that it consists of the belief that there is an unseen order, and that our supreme good lies in harmoniously adjusting ourselves thereto.
+  author: "William James"
+  source: "The Varieties of Religious Experience, Lecture III (The Reality of the Unseen)"
+  source_url: "https://www.gutenberg.org/cache/epub/621/pg621.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    Man is a stream whose source is hidden. Our being is descending into us from we know not whence.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [reverie, opening]
+
+- text: |
+    From within or from behind, a light shines through us upon things and makes us aware that we are nothing, but the light is all.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'The Over-Soul'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, reverie]
+
+- text: |
+    We lie in the lap of immense intelligence, which makes us receivers of its truth and organs of its activity.
+  author: "Ralph Waldo Emerson"
+  source: "Essays: First Series, 'Self-Reliance'"
+  source_url: "https://www.gutenberg.org/cache/epub/2944/pg2944.txt"
+  moods: [opening, affirmation, reverie]
+
+- text: |
+    Beauty is the mark God sets upon virtue. Every natural action is graceful. Every heroic act is also decent, and causes the place and the bystanders to shine.
+  author: "Ralph Waldo Emerson"
+  source: "Nature, Ch. III (Beauty)"
+  source_url: "https://www.gutenberg.org/cache/epub/29433/pg29433.txt"
+  moods: [opening, affirmation, venus_secondary]
+
+- text: |
+    The light which puts out our eyes is darkness to us. Only that day dawns to which we are awake. There is more day to dawn. The sun is but a morning star.
+  author: "Henry David Thoreau"
+  source: "Walden, Conclusion"
+  source_url: "https://www.gutenberg.org/cache/epub/205/pg205.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    This is the spirit that Beauty must ever induce, wonderment and a delicious trouble, longing and love and a trembling that is all delight.
+  author: "Plotinus"
+  source: "Enneads I.6 (On Beauty), §4"
+  title: "Enneads"
+  translation: "Stephen MacKenna, 1917"
+  source_url: "https://en.wikisource.org/wiki/Plotinus_(MacKenna)/Volume_1/Ennead_1.6"
+  moods: [opening, affirmation]
+
+- text: |
+    The tree which fills the arms grew from the tiniest sprout; the tower of nine storeys rose from a (small) heap of earth; the journey of a thousand li commenced with a single step.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 64"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, affirmation]
+
+- text: |
+    The mortal nature is seeking as far as is possible to be everlasting and immortal: and this is only to be attained by generation, because generation always leaves behind a new existence in the place of the old.
+  author: "Plato"
+  source: "Symposium (Diotima to Socrates)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, affirmation]
+
+- text: |
+    Either death is a state of nothingness and utter unconsciousness, or, as men say, there is a change and migration of the soul from this world to another.
+  author: "Plato"
+  source: "Apology (Socrates, reflecting on death)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [reverie, opening, saturn_secondary]
+
+- text: |
+    How I wish that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
+  author: "Plato"
+  source: "Symposium (Socrates to Agathon, at the couch)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, paradox]
+
+- text: |
+    Empires wax and wane; states cleave asunder and coalesce.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 1 (opening line)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_1"
+  moods: [opening, saturn_secondary]
+
+- text: |
+    A dragon can assume any size, can rise in glory or hide from sight. Bulky, it generates clouds and evolves mist; attenuated, it can scarcely hide a mustard stalk or conceal a shadow. Mounting, it can soar to the empyrean; subsiding, it lurks in the uttermost depths of the ocean.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 21 (Cao Cao on the nature of dragons)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_1/Chapter_21"
+  moods: [opening, reverie]
+
+- text: |
+    Living you were valorous, dead you left behind a name.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 91 (Zhuge Liang, sacrificial prayer at the Lu waters)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_91"
+  moods: [affirmation, saturn_secondary]
+
+- text: |
+    With ten utterances the world was created.
+  author: "Mishnah"
+  source: "Pirkei Avot 5:1"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.5.1"
+  moods: [opening, reverie]
+
+- text: |
+    Socrates said, that he was not an Athenian or Greek, but a citizen of the world.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §V"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, declaration, sun_secondary]
+
+- text: |
+    I died as a mineral and arose a plant,
+    I died as a plant and rose again an animal.
+    I died as an animal and arose a man.
+    Why then should I fear to become less by dying?
+  author: "Rumi"
+  source: "Masnavi, Book III, Story XVII ('The Vakil of Bokhara')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, affirmation, saturn_secondary]
+
+- text: |
+    Pain is a treasure, for it contains mercies;
+    The kernel is soft when the rind is scraped off.
+    O brother, the place of darkness and cold
+    Is the fountain of life and the cup of ecstasy.
+  author: "Rumi"
+  source: "Masnavi, Book II, Story X ('Bayazid and the Saint')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [affirmation, reverie, saturn_secondary]
+
+- text: |
+    Under the water you see there is another Water moving it,
+    Within the spirit is a Spirit that calls it.
+  author: "Rumi"
+  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, reverie]
+
+- text: |
+    As Water lifted from the Deep, again
+    Falls back in individual Drops of Rain
+    Then melts into the Universal Main.
+  author: "Attar"
+  source: "Bird Parliament (Conference of the Birds), the Voice from the Throne"
+  translation: "Edward FitzGerald, 1889"
+  source_url: "https://archive.org/details/BirdParliamentEnglishFareeduddinAttaarFitzgerald"
+  moods: [reverie, affirmation, ending]

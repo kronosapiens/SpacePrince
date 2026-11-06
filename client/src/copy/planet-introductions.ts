@@ -1,6 +1,6 @@
 import type { PlanetName, SignName } from "@/game/types";
 
-// Original placement portraits informed by spec/concept/PLANET_MATRIX.md.
+// Original placement portraits informed by docs/writing/PLANET_MATRIX.md.
 // Read each planet's framework and placement notes when revising its copy.
 export const PLANET_INTRODUCTIONS: Record<PlanetName, Record<SignName, string>> = {
   Sun: {

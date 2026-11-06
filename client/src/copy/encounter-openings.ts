@@ -8,7 +8,7 @@ import type { PlanetName, SignName } from "@/game/types";
  *  never says how they arrive or what they will do, and it leaves the player's
  *  response unwritten, so it stays true whichever way the turns go. Each block
  *  is headed by the rule it should make emotionally legible (`RULER_RULES`).
- *  Placement colour draws on spec/concept/PLANET_MATRIX.md and the planet
+ *  Placement colour draws on docs/writing/PLANET_MATRIX.md and the planet
  *  introductions. */
 export const ENCOUNTER_OPENINGS: Record<PlanetName, Record<SignName, string>> = {
   // Gain Light from healing on the Other's chart.

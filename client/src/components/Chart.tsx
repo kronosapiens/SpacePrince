@@ -191,7 +191,7 @@ export interface ChartProps {
    *  doesn't shift between hover (stats only) and select (stats + actions). */
   statsPanelReserveActions?: boolean;
   /** Study mode — the stats panel grows the gloss + stat derivation
-   *  (spec/design/SCREENS.md §3.6.1). Reserves the taller study height. */
+   *  (docs/presentation/SCREENS.md §3.6.1). Reserves the taller study height. */
   statsPanelStudy?: boolean;
   /** Shows the study "i" toggle on the stats panel; called when it's tapped. */
   onToggleStudy?: () => void;
@@ -1042,7 +1042,7 @@ function renderSubstrate() {
   // is inside the vesica's closest approach to centre, so the figures never
   // intersect and opposing them creates no crossings to shimmer. One period,
   // deliberately — two would beat against each other, and a beat is a second
-  // rhythm however it is labelled (`spec/design/STYLE.md §11`).
+  // rhythm however it is labelled (`docs/presentation/STYLE.md §11`).
   return (
     <g opacity={CHART_STYLE.substrate.opacity}>
       <g>

@@ -1,0 +1,160 @@
+# Mercury — aphoristic, paradoxical, self-inverting.
+# The riddle, the turn. Never earnest, never conclusive, never threatens.
+# Curated keepers from the source review.
+# See docs/writing/PLANETS.md §5 (Mercury) and docs/research/chorus/README.md (sourcing record).
+
+- text: |
+    That which does not kill me, makes me stronger.
+  author: "Friedrich Nietzsche"
+  source: "Twilight of the Idols, 'Maxims and Missiles' §8"
+  translation: "Anthony M. Ludovici, 1911"
+  source_url: "https://www.gutenberg.org/cache/epub/52263/pg52263.txt"
+  moods: [opening, turn]
+
+- text: |
+    "I did that," says my memory. "I could not have done that," says my pride, and remains inexorable. Eventually--the memory yields.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §68 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [turn, paradox]
+
+- text: |
+    You cannot step twice into the same rivers; for fresh waters are ever flowing in upon you.
+  author: "Heraclitus"
+  source: "Fragments 41, 42 (Bywater numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [opening, paradox]
+
+- text: |
+    The way up and the way down is one and the same.
+  author: "Heraclitus"
+  source: "Fragment 69 (Bywater numbering), in Burnet, Early Greek Philosophy"
+  translation: "John Burnet, 2nd ed. 1908 (first ed. 1892)"
+  source_url: "https://www.gutenberg.org/cache/epub/67097/pg67097.txt"
+  moods: [paradox, question]
+
+- text: |
+    If the fool would persist in his folly he would become wise.
+  author: "William Blake"
+  source: "The Marriage of Heaven and Hell, 'Proverbs of Hell'"
+  source_url: "https://en.wikisource.org/wiki/The_Marriage_of_Heaven_and_Hell"
+  moods: [paradox, turn]
+
+- text: |
+    Now I do not know whether I was then a man dreaming I was a butterfly, or whether I am now a butterfly dreaming I am a man.
+  author: "Zhuangzi"
+  source: "Chuang Tzŭ, Ch. II ('The Identity of Contraries')"
+  translation: "Herbert A. Giles, 1889"
+  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
+  moods: [question, paradox, reverie]
+
+- text: |
+    My life has a limit, but my knowledge is without limit. To drive the limited in search of the limitless, is fatal.
+  author: "Zhuangzi"
+  source: "Chuang Tzŭ, Ch. III ('Nourishment of the Soul')"
+  translation: "Herbert A. Giles, 1889"
+  source_url: "https://www.gutenberg.org/cache/epub/59709/pg59709.txt"
+  moods: [opening, paradox, warning]
+
+- text: |
+    Negative Capability, that is when man is capable of being in uncertainties, Mysteries, doubts, without any irritable reaching after fact & reason.
+  author: "John Keats"
+  source: "Letter to George and Thomas Keats, 21/27 December 1817"
+  source_url: "https://en.wikisource.org/wiki/Letter_to_George_and_Thomas_Keats,_December_28,_1817"
+  moods: [opening, paradox, question, venus_secondary]
+
+- text: |
+    The Tao that can be trodden is not the enduring and unchanging Tao. The name that can be named is not the enduring and unchanging name.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 1"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox, jupiter_secondary]
+
+- text: |
+    The movement of the Tao
+      By contraries proceeds;
+    And weakness marks the course
+      Of Tao's mighty deeds.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 40"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, paradox]
+
+- text: |
+    He who knows (the Tao) does not (care to) speak (about it); he who is (ever ready to) speak about it does not know it.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 56"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, turn, saturn_secondary]
+
+- text: |
+    To know and yet (think) we do not know is the highest (attainment); not to know (and yet think) we do know is a disease.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 71"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, question]
+
+- text: |
+    Words that are strictly true seem to be paradoxical.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 78"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [paradox, opening]
+
+- text: |
+    If I am not for myself, who is for me? And being for my own self, what am I? And if not now, when?
+  author: "Hillel"
+  source: "Pirkei Avot 1:14"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [question, paradox, opening]
+
+- text: |
+    Everything is foreseen yet freedom of choice is granted, and the world is judged with goodness; and everything is in accordance with the preponderance of works.
+  author: "Rabbi Akiva"
+  source: "Pirkei Avot 3:15"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.3.15"
+  moods: [paradox, opening, saturn_secondary]
+
+- text: |
+    Who is wise? He who learns from every man. Who is mighty? He who subdues his inclination. Who is rich? He who rejoices in his portion. Who is honored? He who honors others.
+  author: "Ben Zoma"
+  source: "Pirkei Avot 4:1"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.1"
+  moods: [opening, paradox]
+
+- text: |
+    Do not despise any man, and do not discriminate against anything, for there is no man that has not his hour, and there is no thing that has not its place.
+  author: "Ben Azzai"
+  source: "Pirkei Avot 4:3"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.3"
+  moods: [opening, turn]
+
+- text: |
+    I'm nobody! Who are you?
+    Are you nobody, too?
+    Then there 's a pair of us — don't tell!
+    They 'd banish us, you know.
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book I. Life, I"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, paradox]
+
+- text: |
+    Keep silence, that you may hear Him speaking
+    Words unutterable by tongue in speech.
+  author: "Rumi"
+  source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, paradox]

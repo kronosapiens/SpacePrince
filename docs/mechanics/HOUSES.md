@@ -1,0 +1,225 @@
+# Space Prince — Houses (Narrative Encounters)
+
+This document defines the **narrative encounter** system, organized around the twelve astrological houses.
+Narrative encounters are an alternative node type to combat, offering a single decision about immediate costs, recovery, revival, or run-long stat gains.
+
+Combat mechanics are specified in [MECHANICS.md](MECHANICS.md).
+Chart construction (whole-sign houses, the Ascendant) is specified in [CHART.md](CHART.md); sign rulerships are tabulated in the [sign matrix](../writing/PLANET_MATRIX.md#sign-matrix).
+Map topology is specified in [MAP.md](MAP.md).
+
+### Reading the encounter references
+
+| Reference | Responsibility |
+|---|---|
+| [ASTROLOGY.md](../research/ASTROLOGY.md#favorable-and-unfavorable-houses) | Historical concepts, sources, and qualifications |
+| [HOUSE_MATRIX.md](../writing/HOUSE_MATRIX.md) | Each house's classifications, situations, and original authoring guidance |
+| [HOUSE_PLANET_MATRIX.md](../writing/HOUSE_PLANET_MATRIX.md) and [PLANET_MATRIX.md](../writing/PLANET_MATRIX.md) | Planetary wants in each house and their expression through signs |
+| [DRIVES.md](../writing/DRIVES.md) | Motives, emotional range, and the distinction between Prince and player |
+| This document, §3 | Fixed references and the dependencies that select and combine them |
+| [ENCOUNTERS.md](ENCOUNTERS.md) | Scenario composition, economic terms, eligibility, resolution, and review |
+| [SCENES.md](../writing/SCENES.md) | How scenes are written: voice, length, briefs, worked examples |
+
+Historical claims and original game interpretations remain separately identified in these references.
+The matrices supply writing possibilities; the authoring spec determines which effects can currently resolve.
+
+---
+
+## 1. Purpose and Scope
+
+### Goals
+
+- Provide a second encounter type shaped by house, sign, and planet references selected through natal placements and current condition.
+- Give each of the twelve houses a distinct mechanical identity.
+- Give each Prince chart-specific approaches while keeping ordinary economic opportunity equivalent across charts.
+- Keep each encounter to one decision, with target selection and previews before commitment.
+- Influences include Slay the Spire and Faster Than Light, whose events connect available resources to the choices ahead.
+
+### In Scope
+
+- Chart-conditioning model: fixed references, their relationships in the natal chart, and current condition.
+- **Essential dignity from planet and sign.**
+  The chart computes dignity from this pair, which shapes occupant terms under [ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity).
+  Dignity is not a combat input (`MECHANICS.md §10`).
+- Twelve house archetypes: topics, fixed geometry, favorability, and joy.
+- Outcome vocabulary: what resources narrative encounters can move.
+- Encounter shape: one decision, immediate consequences, previews, and exits.
+
+### Open
+
+- Exact risk/reward curves: the going rates are provisional pending the balancing pass ([issue #12](https://github.com/kronosapiens/SpacePrince/issues/12)).
+- Additional influences from planets aspecting the encounter house from elsewhere, and weighting by proximity to the exact angles.
+
+---
+
+## 2. Outcome Vocabulary
+
+Narrative encounters operate on the same resources as combat.
+Light, affliction, revival, and stat gains are defined with payment and target rules in [ENCOUNTERS.md §2–3](ENCOUNTERS.md#2-outcomes-and-payment).
+That document also records [implementation status](ENCOUNTERS.md#implementation-status) and [deferred decisions](ENCOUNTERS.md#11-deferred-decisions).
+
+---
+
+## 3. Chart-Conditioning Model
+
+Group each attribute under the reference that determines it.
+House, sign, and planet supply fixed references; natal placements connect them; current run state determines availability and usefulness.
+Cadency and aversion belong to House, just as element and modality belong to Sign.
+Selecting their parent determines them together.
+
+### 3.1 Fixed references
+
+| Reference | Indexed by | Fixed contents |
+|---|---|---|
+| House | One of twelve houses | Topics, geometry and angularity, relationship to the Ascendant and favorability, joy assignment, fixed game ruler |
+| Sign | One of twelve signs | Imagery, element, modality, traditional ruler, manner of expression |
+| Planet | One of seven planets | Domains, archetype, benefic or malefic character where applicable |
+
+Placements and relationships select combinations of these references, as described in §3.2.
+They are linked lookups rather than independent random selections.
+A reference can influence the fiction without adding a numerical modifier.
+The Prince's motives and emotions remain distinct from economic advantage and from the player's experience, as described in [DRIVES.md](../writing/DRIVES.md).
+
+#### House
+
+Read all fixed house attributes together from the [house matrix](../writing/HOUSE_MATRIX.md).
+Historical classifications and their qualifications are explained in [ASTROLOGY.md](../research/ASTROLOGY.md#favorable-and-unfavorable-houses).
+
+| House attribute | Contribution to authoring |
+|---|---|
+| Topics | Human situation and what is at stake |
+| Diurnal geometry and angularity | Position from which action occurs, authority, and constraints on agency |
+| Relationship to the Ascendant and favorability | Tendencies toward opportunities or burdens in ordinary offers |
+| Joy assignment, where present | Planetary affinity contributing to house character; identifies the planet whose condition can enable joy options |
+| Fixed game ruler | Colour and musical identity |
+
+**Geometry and angularity:** I, IV, VII, and X are angular; II, V, VIII, and XI succedent; III, VI, IX, and XII cadent.
+Our adaptation asks who can act directly, who holds authority, and what the Prince depends on.
+Apply those questions through the house's topics: angular IV can remain private, and cadent IX can offer consequential understanding.
+An occupant shares its house's classification.
+
+**Relationship to the Ascendant and favorability:** I is the origin; III, IV, V, VII, IX, X, and XI aspect it; II, VI, VIII, and XII are averse.
+This fixed relationship is distinct from aspects cast by planets elsewhere in an individual chart.
+Historical favorability informs our **valence**: favorable houses tend toward assistance and opportunity; adverse houses toward necessity, constraint, and extraction.
+These are authoring tendencies rather than guaranteed outcomes or prescribed emotional tones.
+II can concern abundance as well as scarcity; VIII can offer a gain without making a loss beneficial.
+Angularity and favorability remain distinct attributes of House: potency does not itself make an offer generous.
+
+**Joy assignment:** Venus's affinity with V, for example, contributes to its pleasures regardless of occupancy.
+These affinities do not establish a single historical origin for every house topic.
+The assignment is fixed by house; an option's availability is derived from that planet's changing condition (§3.3).
+Houses without a joy still have ordinary trades, and planets in them still change the terms.
+
+**Fixed game ruler:** this follows the game's natural-zodiac convention and supplies presentation — the node's colour on the map, the narrative screen's tint and theme — rather than another source of the Prince's wants.
+It is distinct from the house's occupant, joy, and the traditional ruler of its natal sign, even when they name the same planet.
+The code target `ruler` refers to this fixed game ruler; its use is documented in [ENCOUNTERS.md §3](ENCOUNTERS.md#3-targeting).
+
+#### Sign
+
+The [sign reference](../writing/PLANET_MATRIX.md#sign-matrix) groups each sign's emblem, element, modality, and traditional ruler.
+These attributes inform manner, mood, and imagery together.
+They can also inform ordinary tradeoffs under [ENCOUNTERS.md §4.5](ENCOUNTERS.md#45-housesign-economic-balance).
+The natal chart selects the sign for each house; empty houses retain this expression.
+
+#### Planet
+
+Each planet supplies domains and a characteristic way of wanting or acting; [PLANETS.md](../writing/PLANETS.md) develops its archetype.
+Venus and Jupiter's benefic character, and Mars and Saturn's malefic character, belong to these planet references.
+They do not assign a moral personality or require a particular emotional outcome.
+Mercury, the Moon, and the Sun also participate in the joy scheme without being assigned either of these two roles for its economic treatment.
+
+The **asymmetric joy rule** combines a house's fixed joy assignment with its planet's character; its game interpretation and economic treatment live in [ENCOUNTERS.md §4.4](ENCOUNTERS.md#44-asymmetric-joy).
+
+### 3.2 Natal placements and relationships
+
+Under whole-sign houses, the Ascendant sign and planetary signs determine the house–sign arrangement and occupancy.
+Use these relationships to select references and approaches; dignity is derived from a planet–sign pair.
+
+| Relationship | Determined by | Encounter use |
+|---|---|---|
+| House and sign | Ascendant sign and encounter house | Shared situation expressed through the selected sign, including ordinary tradeoffs |
+| Planet and house | Planet's natal sign relative to the Ascendant sign | Occupancy, which changes the terms of the house's choices; the 84 [house–planet entries](../writing/HOUSE_PLANET_MATRIX.md) supply wants for writing, including joy choices |
+| Planet and sign | Planet identity and its natal sign | Expression from the 84 [planet–sign entries](../writing/PLANET_MATRIX.md); essential dignity and resulting occupant terms |
+
+An occupant necessarily has the sign of its whole-sign house.
+Its house–planet entry develops what it wants in that situation; its planet–sign entry develops how it expresses that concern.
+The entries allow mixed motives, enjoyment, refusal, and unresolved feelings.
+Occupants are not written into scenes; scenes are written to work for any occupant.
+
+Essential dignity shapes economic terms rather than replacing the planet's concern or settling the emotional meaning of a choice.
+The treatment of each dignity and limits on bonuses live in [ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity).
+
+### 3.3 Current run state
+
+Read unlocks, affliction, derived combustion, and Light from the current run.
+These determine valid targets, affordability, and which approaches are currently usable.
+
+Joy availability is derived by taking the house's fixed joy assignment and inspecting that planet's condition wherever it resides.
+Unlock status, affliction, and combustion can open or close its additional approaches, giving players opportunities they can preserve, lose, and restore.
+Natal occupancy is not required.
+The current threshold and related predicates live in [ENCOUNTERS.md §4.1–4.3](ENCOUNTERS.md#4-chart-conditioning).
+
+### 3.4 Composition and lookup order
+
+The shared economy and encounter rules constrain composition without adding another chart axis.
+Use [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario) to turn these dependencies into a scene, then apply its [catalogue balance checks](ENCOUNTERS.md#45-housesign-economic-balance).
+
+For an encounter in VI with Sagittarius rising, Venus in Taurus, and Mars in Aquarius:
+
+1. **Read House VI.**
+   Its topics include labor and care; it is cadent and averse, its joy is Mars, and its fixed game ruler is Mercury.
+   These attributes remain the same in every chart.
+2. **Resolve the house's sign.**
+   Sagittarius rising places Taurus in VI, supplying Taurus's imagery, earth element, fixed modality, and traditional ruler Venus.
+   That sign ruler does not replace Mercury's fixed presentation role.
+3. **Resolve occupants and their references.**
+   Venus in Taurus occupies VI, selecting Venus–VI wants and Venus–Taurus expression.
+   Venus–Taurus also determines domicile dignity, which improves the terms of the scene's choices.
+4. **Inspect the relevant current state.**
+   Mars in Aquarius occupies III, but its condition can still enable VI's joy choice.
+   Read the current resources and eligible targets for each proposed choice.
+5. **Compose and validate the offers.**
+   Apply the shared encounter rules to the trades, exit, and joy choice using [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
+
+---
+
+## 4. Encounter Shape
+
+### 4.1 Structure
+
+Each encounter has one prompt and a small set of offers, including trades or choices among benefits, with joy and revival choices added when they apply.
+Every scene provides a valid way through at every unlock tier and at zero Light.
+The [one-decision rules](ENCOUNTERS.md#51-one-decision) define preparation and resolution.
+
+### 4.2 Direct effects
+
+Every choice has a determined consequence, previewed before commitment.
+Targeting and commitment follow [ENCOUNTERS.md §3](ENCOUNTERS.md#3-targeting) and [§5.2](ENCOUNTERS.md#52-commitment).
+
+### 4.3 Offered vs always-present
+
+Joy and revival choices are added to the standard ones under the [eligibility](ENCOUNTERS.md#43-current-predicates) and [encounter shape](ENCOUNTERS.md#5-encounter-shape) rules.
+
+---
+
+## 5. The Twelve Houses
+
+The [house matrix](../writing/HOUSE_MATRIX.md#game-correspondences) records each house's geometry, joy, and fixed game ruler together; the client reads the same table from `client/src/data/houses.ts`.
+Its individual entries separate source notes from editorial direction, stakes, scenes, and economic applications.
+Use those entries for the shared context of all seven planetary placements in a house.
+
+| House | Human situation | Authoring reference |
+|---|---|---|
+| I · Self | Bodily presence and introducing oneself | [Self](../writing/HOUSE_MATRIX.md#i--self) |
+| II · Livelihood | Obtaining, holding, and using resources | [Livelihood](../writing/HOUSE_MATRIX.md#ii--livelihood) |
+| III · Communication | Everyday exchange, siblings, and short journeys | [Communication](../writing/HOUSE_MATRIX.md#iii--communication) |
+| IV · Home | Shelter, ancestry, and private foundations | [Home](../writing/HOUSE_MATRIX.md#iv--home) |
+| V · Creativity | Making, pleasure, children, and play | [Creativity](../writing/HOUSE_MATRIX.md#v--creativity) |
+| VI · Labor | Necessary work, illness, and receiving care | [Labor](../writing/HOUSE_MATRIX.md#vi--labor) |
+| VII · Relationships | Partnership, negotiation, and open opposition | [Relationships](../writing/HOUSE_MATRIX.md#vii--relationships) |
+| VIII · Transformation | Death, endings, inheritance, and others' resources | [Transformation](../writing/HOUSE_MATRIX.md#viii--transformation) |
+| IX · Pilgrimage | Travel, belief, and unfamiliar learning | [Pilgrimage](../writing/HOUSE_MATRIX.md#ix--pilgrimage) |
+| X · Achievement | Public action, recognition, and authority | [Achievement](../writing/HOUSE_MATRIX.md#x--achievement) |
+| XI · Friendship | Allies, shared hopes, and assistance | [Friendship](../writing/HOUSE_MATRIX.md#xi--friendship) |
+| XII · The Hidden | Seclusion, confinement, and what others cannot see | [The Hidden](../writing/HOUSE_MATRIX.md#xii--the-hidden) |
+
+Current scene briefs and runtime modules are linked from [ENCOUNTERS.md §7](ENCOUNTERS.md#7-house-briefs); its [status table](ENCOUNTERS.md#implementation-status) records the implementation context.

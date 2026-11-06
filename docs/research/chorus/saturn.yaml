@@ -1,0 +1,241 @@
+# Saturn — measured, austere, patient.
+# Curated keepers from the source review.
+# See docs/writing/PLANETS.md §9 (Saturn) and docs/research/chorus/README.md (sourcing record).
+
+- text: |
+    And the dust returneth to the earth as it was, and the spirit returneth unto God who gave it.
+  author: "Ecclesiastes"
+  source: "Ecclesiastes 12:7"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Ecclesiastes.12.7"
+  moods: [ending, cost]
+
+- text: |
+    While we are postponing, life speeds by.
+  author: "Seneca"
+  source: "Epistulae Morales ad Lucilium, Letter 1.2"
+  translation: "Richard M. Gummere (Loeb), 1917"
+  source_url: "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_1"
+  moods: [cost, warning]
+
+- text: |
+    Retire yourself into yourself, but first prepare yourself there to receive yourself.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. XXXVIII ('Of Solitude')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_XXXVIII"
+  moods: [opening, reverie]
+
+- text: |
+    To die of old age is a death rare, extraordinary, and singular.
+  author: "Michel de Montaigne"
+  source: "Essays, Book I, Ch. LVII ('Of Age')"
+  translation: "Charles Cotton, 1685–1686"
+  source_url: "https://en.wikisource.org/wiki/The_Essays_of_Montaigne/Book_I/Chapter_LVII"
+  moods: [ending, reverie]
+
+- text: |
+    Life is a task to be done.
+  author: "Arthur Schopenhauer"
+  source: "Studies in Pessimism, 'On the Sufferings of the World'"
+  translation: "T. Bailey Saunders, 1890"
+  source_url: "https://www.gutenberg.org/files/10732/10732-h/10732-h.htm"
+  moods: [opening, cost]
+
+- text: |
+    Unrest is the mark of existence.
+  author: "Arthur Schopenhauer"
+  source: "Studies in Pessimism, 'The Vanity of Existence'"
+  translation: "T. Bailey Saunders, 1890"
+  source_url: "https://www.gutenberg.org/files/10732/10732-h/10732-h.htm"
+  moods: [opening, warning]
+
+- text: |
+    For truly in adverse fortune the worst sting of misery is to have been happy.
+  author: "Boethius"
+  source: "The Consolation of Philosophy, Book II, Prose IV"
+  translation: "H. R. James, 1897"
+  source_url: "https://www.gutenberg.org/files/14328/14328-h/14328-h.htm"
+  moods: [cost, reverie]
+
+- text: |
+    It is better to leave a vessel unfilled, than to attempt to carry it when it is full. If you keep feeling a point that has been sharpened, the point cannot long preserve its sharpness.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 9"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [warning, cost]
+
+- text: |
+    When the work is done, and one's name is becoming distinguished, to withdraw into obscurity is the way of Heaven.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 9"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [ending, opening]
+
+- text: |
+    He who knows other men is discerning; he who knows himself is intelligent. He who overcomes others is strong; he who overcomes himself is mighty. He who is satisfied with his lot is rich.
+  author: "Lao Tzu"
+  source: "Tao Te Ching, Ch. 33"
+  translation: "James Legge, 1891"
+  source_url: "https://www.gutenberg.org/cache/epub/216/pg216.txt"
+  moods: [opening, cost]
+
+- text: |
+    For we are but of yesterday, and know nothing,
+    Because our days upon earth are a shadow.
+  author: "The Book of Job"
+  source: "Job 8:9 (Bildad)"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Job.8.9"
+  moods: [opening, reverie]
+
+- text: |
+    I shall never again lead the army against the rebels. O distant and azure Heaven, when will this end?
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang, after his final inspection of the camps)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [ending, question]
+
+- text: |
+    Life and death are the common lot, and fate cannot be evaded. Death is at hand, and I desire to prove my loyalty to the end.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 104 (Zhuge Liang's testament)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_104"
+  moods: [opening, ending]
+
+- text: |
+    All down the ages rings the note of change, for fate so rules it; none escapes its sway. The kingdoms three have vanished as a dream, the useless misery is ours to grieve.
+  author: "Luo Guanzhong"
+  source: "Romance of the Three Kingdoms, Ch. 120 (closing poem)"
+  translation: "C. H. Brewitt-Taylor, 1925"
+  source_url: "https://en.wikisource.org/wiki/San_Kuo/Volume_2/Chapter_120"
+  moods: [ending, reverie]
+
+- text: |
+    Why, O Gish, dost thou run about? The life that thou seekest, thou wilt not find. When the gods created mankind, death they imposed on mankind; life they kept in their power.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Old Babylonian Tablet (Sabitum to Gilgamesh)"
+  translation: "Morris Jastrow & Albert T. Clay, 1920"
+  source_url: "https://www.gutenberg.org/files/11000/11000-0.txt"
+  moods: [warning, cost]
+
+- text: |
+    All that was bright was turned into darkness.
+  author: "Anonymous (Babylonian)"
+  source: "Epic of Gilgamesh, Tablet XI (Utnapishtim, on the coming of the Flood)"
+  translation: "R. Campbell Thompson, 1928"
+  source_url: "https://archive.org/details/thompson-1928-gilgamesh"
+  moods: [opening, jupiter_secondary]
+
+- text: |
+    It is not for thee to finish the work, nor art thou free to desist therefrom.
+  author: "Rabbi Tarphon"
+  source: "Pirkei Avot 2:21"
+  translation: "Charles Taylor, 1897"
+  source_url: "https://archive.org/details/sayingsofjewish00tayl"
+  moods: [opening, command]
+
+- text: |
+    Be exceeding humble spirit, for the end of man is the worm.
+  author: "Rabbi Levitas of Yavneh"
+  source: "Pirkei Avot 4:4"
+  translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.4"
+  moods: [warning, ending]
+
+- text: |
+    I am old and move slowly, and the slower runner has overtaken me, and my accusers are keen and quick, and the faster runner, who is unrighteousness, has overtaken them.
+  author: "Plato"
+  source: "Apology (Socrates, after the verdict)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1656/pg1656.txt"
+  moods: [ending, reverie, cost]
+
+- text: |
+    For the sensible make their life pleasanter and more endurable by mitigating their sorrows with the consideration of their blessings, while most people, like sieves, let the worst things stick to them while the best pass through.
+  author: "Plutarch"
+  source: "Moralia, 'On Exile' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost, warning]
+
+- text: |
+    A patrician's slipper is no cure for the gout, nor a costly ring for a whitlow, nor a diadem for the headache.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §I"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, cut]
+
+- text: |
+    Events will take their course, it is no good our being angry at them, he is happiest who wisely turns them to the best account.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §IV"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [opening, cost, sun_secondary]
+
+- text: |
+    It is the act of a madman to distress oneself over what is lost, and not to rejoice at what is left.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §VIII"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, cut]
+
+- text: |
+    Whenever then you admire anyone carried by in his litter as a greater man than yourself, lower your eyes and look at those that bear the litter.
+  author: "Plutarch"
+  source: "Moralia, 'On Contentedness of Mind' §X"
+  translation: "A. R. Shilleto, 1898"
+  source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
+  moods: [warning, reverie]
+
+- text: |
+    I assure you that the seconds are strongly and solemnly accentuated now; and each, as it drips from the pendulum, says: "I am Life: intolerable, implacable Life!"
+  author: "Charles Baudelaire"
+  source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
+  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [cost, warning]
+
+- text: |
+    Because I could not stop for Death,
+    He kindly stopped for me;
+    The carriage held but just ourselves
+    And Immortality.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, XXVII — 'The Chariot'"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, ending, reverie]
+
+- text: |
+    Safe in their alabaster chambers,
+    Untouched by morning and untouched by noon,
+    Sleep the meek members of the resurrection,
+    Rafter of satin, and roof of stone.
+  author: "Emily Dickinson"
+  source: "Poems, First Series (1890), Book IV. Time and Eternity, IV"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [ending, reverie, moon_secondary]
+
+- text: |
+    Although thou ridest on the heaven above,
+    A brick will be thy pillow in the end.
+  author: "Ferdowsi"
+  source: "Shahnameh, Faridun §12 (Iraj to Tur, before his murder)"
+  translation: "Arthur George Warner & Edmond Warner, 1905"
+  source_url: "https://archive.org/details/FirdausiShahnamaTrWarnerVol1"
+  moods: [cost, warning, ending]
+
+- text: |
+    Do not act as if thou wert going to live ten thousand years. Death hangs over thee. While thou livest, while it is in thy power, be good.
+  author: "Marcus Aurelius"
+  source: "Meditations, Book IV, §17"
+  translation: "George Long, 1862"
+  source_url: "https://www.gutenberg.org/cache/epub/15877/pg15877.txt"
+  moods: [warning, command]

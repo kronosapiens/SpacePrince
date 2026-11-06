@@ -1,0 +1,196 @@
+# Venus — sensory, relational, attuned to beauty.
+# Curated keepers from the source review.
+# See docs/writing/PLANETS.md §6 (Venus) and docs/research/chorus/README.md (sourcing record).
+
+- text: |
+    As the sweet-apple blushes on the end of the bough, the very end of the bough, which the gatherers overlooked, nay overlooked not but could not reach.
+  author: "Sappho"
+  source: "Fragment 93 (Wharton)"
+  translation: "Henry Thornton Wharton, 1885 (literal prose)"
+  source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
+  moods: [beauty, reverie]
+
+- text: |
+    A thing of beauty is a joy for ever:
+    Its loveliness increases; it will never
+    Pass into nothingness.
+  author: "John Keats"
+  source: "Endymion, Book I, lines 1–3"
+  source_url: "https://www.gutenberg.org/files/24280/24280-h/24280-h.htm"
+  moods: [opening, beauty, gift]
+
+- text: |
+    O for a life of Sensations rather than of Thoughts!
+  author: "John Keats"
+  source: "Letter to Benjamin Bailey, 22 November 1817"
+  source_url: "https://www.gutenberg.org/files/35698/35698-h/35698-h.htm"
+  moods: [opening, reverie]
+
+- text: |
+    To burn always with this hard, gemlike flame, to maintain this ecstasy, is success in life.
+  author: "Walter Pater"
+  source: "Studies in the History of the Renaissance, Conclusion"
+  source_url: "https://www.gutenberg.org/files/2398/2398-h/2398-h.htm"
+  moods: [opening, beauty]
+
+- text: |
+    To look at a thing is very different from seeing a thing. One does not see anything until one sees its beauty.
+  author: "Oscar Wilde"
+  source: "The Decay of Lying (Intentions, 1891)"
+  source_url: "https://www.gutenberg.org/files/887/887-h/887-h.htm"
+  moods: [opening, beauty]
+
+- text: |
+    With freedom, flowers, books, and the moon, who could not be perfectly happy?
+  author: "Oscar Wilde"
+  source: "De Profundis"
+  source_url: "https://www.gutenberg.org/files/921/921-h/921-h.htm"
+  moods: [gift, reverie]
+
+- text: |
+    For, lo, the winter is past,
+    The rain is over and gone;
+    The flowers appear on the earth;
+    The time of singing is come,
+    And the voice of the turtle is heard in our land.
+  author: "Song of Songs"
+  source: "Song of Songs 2:11–12"
+  translation: "Jewish Publication Society, 1917"
+  source_url: "https://www.sefaria.org/Song_of_Songs.2.11-12"
+  moods: [opening, gift]
+
+- text: |
+    The face of a child that has its teeth dug into a melon.
+  author: "Sei Shōnagon"
+  source: "The Pillow-Book, 'Pretty Things'"
+  translation: "Arthur Waley, 1928"
+  source_url: "https://archive.org/details/pillowbookofseis0000arth_v1i4"
+  moods: [beauty, gift]
+
+- text: |
+    Human nature was originally one and we were a whole, and the desire and pursuit of the whole is called love.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [opening, relation]
+
+- text: |
+    When one of them meets with his other half, the actual half of himself, the pair are lost in an amazement of love and friendship and intimacy, and one will not be out of the other's sight, as I may say, even for a moment.
+  author: "Plato"
+  source: "Symposium (speech of Aristophanes)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [reverie, relation]
+
+- text: |
+    The love of the noble disposition is life-long, for it becomes one with the everlasting.
+  author: "Plato"
+  source: "Symposium (speech of Pausanias)"
+  translation: "Benjamin Jowett, 1871"
+  source_url: "https://www.gutenberg.org/cache/epub/1600/pg1600.txt"
+  moods: [affirmation, relation]
+
+- text: |
+    Fire is readily kindled in chaff, dry rushes, or hare's fur, but quickly goes out unless it gets a further hold upon something capable both of keeping it in and feeding it. So with that fierce blaze of passion which is produced in the newly-married by physical enjoyment.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §4"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [warning, reverie, relation]
+
+- text: |
+    It is these little, continual, daily frictions between man and wife, which the world knows nothing of, that do most to create the rifts which ruin married life.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §22"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [warning, relation, saturn_secondary]
+
+- text: |
+    If you are thought to trust, you are trusted; if you are thought to love, you are loved.
+  author: "Plutarch"
+  source: "Moralia, 'Advice to Married Couples' §36"
+  translation: "T. G. Tucker, 1913"
+  source_url: "https://www.gutenberg.org/cache/epub/62618/pg62618.txt"
+  moods: [relation, gift, affirmation]
+
+- text: |
+    When, with closed eyes in the warm autumn night,
+    I breathe the fragrance of thy bosom bare,
+    My dream unfurls a clime of loveliest air,
+    Drenched in the fiery sun's unclouded light.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'Exotic Fragrance' (Parfum Exotique)"
+  translation: "W. J. Robertson, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [opening, beauty, reverie]
+
+- text: |
+    They pass before me, these Eyes full of light,
+    Eyes made magnetic by some angel wise;
+    The holy brothers pass before my sight,
+    And cast their diamond fires in my dim eyes.
+  author: "Charles Baudelaire"
+  source: "The Flowers of Evil, 'The Living Flame' (Le Flambeau Vivant)"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
+  moods: [beauty, relation, reverie]
+
+- text: |
+    The rainbow flickering gleams along the walls,
+    And glittering rain in sparkling diamonds falls.
+  author: "Kalidasa"
+  source: "Meghaduta (Cloud Messenger), verses 447–448 (Alaka)"
+  translation: "H. H. Wilson, 1843"
+  source_url: "https://archive.org/details/bub_gb_GbQIAAAAQAAJ"
+  moods: [beauty, reverie]
+
+- text: |
+    Wild nights! Wild nights!
+    Were I with thee,
+    Wild nights should be
+    Our luxury!
+  author: "Emily Dickinson"
+  source: "Poems, Second Series (1891), Book II. Love, VII"
+  source_url: "https://www.gutenberg.org/cache/epub/12242/pg12242.txt"
+  moods: [opening, relation, reverie, moon_secondary]
+
+- text: |
+    A true lover is proved such by his pain of heart;
+    No sickness is there like sickness of heart.
+    The lover's ailment is different from all ailments;
+    Love is the astrolabe of God's mysteries.
+  author: "Rumi"
+  source: "Masnavi, Book I, Story I ('The Prince and the Handmaid'), Description of Love"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation]
+
+- text: |
+    However much we describe and explain love,
+    When we fall in love we are ashamed of our words.
+    Explanation by the tongue makes most things clear,
+    But love unexplained is clearer.
+  author: "Rumi"
+  source: "Masnavi, Book I, Description of Love"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [opening, relation, mercury_secondary]
+
+- text: |
+    Did my Beloved only touch me with his lips,
+    I too, like the flute, would burst out in melody.
+  author: "Rumi"
+  source: "Masnavi, Book I, Prologue"
+  translation: "E. H. Whinfield, 1887"
+  source_url: "https://archive.org/details/masnaviimanavi"
+  moods: [reverie, relation]
+
+- text: |
+    One loves ultimately one's desires, not the thing desired.
+  author: "Friedrich Nietzsche"
+  source: "Beyond Good and Evil, §175 (Apophthegms and Interludes)"
+  translation: "Helen Zimmern, 1907"
+  source_url: "https://www.gutenberg.org/cache/epub/4363/pg4363.txt"
+  moods: [turn, paradox]

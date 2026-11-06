@@ -1,7 +1,7 @@
 /**
  * Legacy doubling scale, unused by current rendering.
  * The live readout is numeric; NFT stars use pseudorandom positions with
- * score-derived radius and opacity (`spec/concept/NFT.md`, The Star-Field).
+ * score-derived radius and opacity (`docs/presentation/NFT.md`, The Star-Field).
  */
 export interface LightBands {
   /** Doublings completed. The first point on the board earns the first tick. */

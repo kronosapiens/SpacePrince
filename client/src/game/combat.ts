@@ -86,7 +86,7 @@ export interface StatTable {
 }
 
 /** The stat table behind the operational numbers (the study drop-down,
- *  spec/design/SCREENS.md §3.6.1). `placement` bundles every sign/position buff
+ *  docs/presentation/SCREENS.md §3.6.1). `placement` bundles every sign/position buff
  *  (element + modality + in-sect luck); `gains` is the run's. Every column is
  *  already in the stat's display unit, so core + placement + gains = total and
  *  each total is the headline number — the player never meets a raw stat or has

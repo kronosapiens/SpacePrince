@@ -3,11 +3,11 @@ import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 import { STAT_LABEL } from "./combat";
 
 // Study-mode copy — the opt-in foothold for a player new to astrology
-// (spec/design/SCREENS.md §3.6.1). Authored, never generated.
+// (docs/presentation/SCREENS.md §3.6.1). Authored, never generated.
 // Study annotations name the symbol plainly.
 
 /** One grounded line per planet — its core astrological significations in a
- *  plain, textbook register (drawn from spec/concept/PLANETS.md archetypes).
+ *  plain, textbook register (drawn from docs/writing/PLANETS.md archetypes).
  *
  *  Two lines in the panel, so keep each under ~68 characters: the gloss sits
  *  above a fixed table in a card whose width is set by that table, and a third
