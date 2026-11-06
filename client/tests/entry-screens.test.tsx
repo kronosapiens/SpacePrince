@@ -125,8 +125,8 @@ describe("entry screens", () => {
     expect(element(".city-input").getAttribute("placeholder")).toBe("Los Angeles, CA · United States");
     expect((element(".mint-submit") as HTMLButtonElement).disabled).toBe(false);
     click(element(".city-compass"));
-    input('[placeholder="Lat"]', "4070");
-    input('[placeholder="Lon"]', "-7400");
+    input('[placeholder="Lat"]', "4071");
+    input('[placeholder="Lon"]', "-7401");
     expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(0);
     const initialPositions = planetPositions();
     expect(initialPositions).toHaveLength(7);
@@ -165,6 +165,7 @@ describe("entry screens", () => {
     expect(element(".map-screen .chart-svg")).toBe(chart);
     expect(planetPositions()).toEqual(settledPositions);
     const minted = loadPrince()!;
+    expect(minted.position).toMatchObject({ lat: 40.71, lon: -74.01 });
     expect(minted.runs).toHaveLength(1);
     const first = minted.runs[0]!;
     expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numEncounters).state);

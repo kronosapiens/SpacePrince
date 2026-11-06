@@ -39,8 +39,7 @@ Player copy itself lives in `client/src/copy/`.
 
 **Onchain.**
 [STATE.md](mechanics/STATE.md) for the intended contract storage against the prototype's shapes, [CHART.md](mechanics/CHART.md) for the Cairo-first chart derivation and the identity grid, and the determinism sections of [NFT.md](presentation/NFT.md) for the onchain renderer.
-The derivation crate is `cairo/crates/star_chart`, consuming the sibling [astronomy-engine](https://github.com/kronosapiens/astronomy-engine) repository.
-The Cairo quantizer still needs aligning with the identity grid ([#30](https://github.com/kronosapiens/SpacePrince/issues/30)).
+The derivation crate is `cairo/crates/star_chart`, consuming `engine_v6` from the [`astronomy-cairo`](https://github.com/kronosapiens/astronomy-cairo) repository as a pinned git dependency.
 
 ## Research and archive
 

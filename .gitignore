@@ -8,6 +8,9 @@ client/.vite/
 landing/dist/
 landing/.vite/
 
+# Cairo / Scarb
+cairo/target/
+
 # Balance evaluator output
 client/eval-results/
 

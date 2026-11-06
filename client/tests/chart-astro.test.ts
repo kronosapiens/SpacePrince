@@ -27,13 +27,13 @@ describe("computeBirthChart — known dates", () => {
   });
 
   it("places the ascendant in Scorpio for 1989-02-12 at 00:35 in Los Angeles", () => {
-    // PST is UTC−8; coordinates match the city's 0.1° mint rounding.
-    const { ascendantLongitude } = computeBirthChart("1989-02-12T08:35:00Z", 34.1, -118.2);
+    // PST is UTC−8; coordinates are the city's 0.01° mint position.
+    const { ascendantLongitude } = computeBirthChart("1989-02-12T08:35:00Z", 34.05, -118.24);
     expect(signFromLongitude(ascendantLongitude)).toBe("Scorpio");
   });
 
   it("places the ascendant on the eastern horizon throughout the day", () => {
-    for (const [lat, lon] of [[34.1, -118.2], [-33.9, 151.2], [0, 0]] as const) {
+    for (const [lat, lon] of [[34.1, -118.2], [-33.9, 151.2], [0, 0], [70, 20]] as const) {
       for (const hour of [0, 6, 12, 18]) {
         const iso = new Date(Date.UTC(2000, 5, 21, hour)).toISOString();
         const { ascendantLongitude } = computeBirthChart(iso, lat, lon);

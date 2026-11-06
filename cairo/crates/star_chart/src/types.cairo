@@ -23,7 +23,9 @@ pub const ASPECT_OPPOSITION: u8 = 6;
 #[derive(Drop, Serde, Copy)]
 pub struct ChartInput {
     pub time_minute_since_1900: u32,
+    /// Latitude in hundredths of a degree (±9,000).
     pub lat_bin: i16,
+    /// Longitude in hundredths of a degree (±18,000).
     pub lon_bin: i16,
 }
 

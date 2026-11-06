@@ -66,7 +66,7 @@ Responsibilities:
 - Ecliptic longitudes for 7 planets
 - Ascendant computation
 
-This layer lives in the separate [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) repository, which this repo consumes as a sibling path dependency (`astronomy_engine_v1` in `cairo/crates/star_chart/Scarb.toml`).
+This layer lives in the separate [`astronomy-cairo`](https://github.com/kronosapiens/astronomy-cairo) repository, whose `engine_v6` crate this repo consumes as a pinned git dependency (`cairo/crates/star_chart/Scarb.toml`).
 
 ### 3.2 `StarChart` (Cairo)
 
@@ -194,7 +194,7 @@ Policy:
 
 **Where this stands.**
 The `star_chart` crate implements input quantization, sign derivation, whole-sign houses, dignity, sect, and sign-aspect classes, with end-to-end tests over the astronomy dependency (`quantization.cairo`, `chart.cairo`, `derive.cairo`, `signs.cairo`, `e2e.cairo`).
-The astronomy phases live in the astronomy-engine repository.
+The astronomy phases live in the `astronomy-cairo` repository.
 The validation gates of §6 and the hardening phase are not recorded in this repo; the game contract itself (runs, encounters, the SVG renderer) does not exist yet.
 
 ---
@@ -275,7 +275,6 @@ The gap between the identity space and the chart space is the chart-twin landsca
 The identity grid is **5-minute time buckets and a 0.01° location grid**.
 Five minutes is within the minute-level time on most birth certificates and well inside the ~2-hour Ascendant window; a 0.01° cell is about 1.1 km at the equator.
 This is what the `Position` packing in [STATE.md](STATE.md) and the prototype's mint form already assume: the time field steps in 5-minute increments, and the city picker returns coordinates rounded to 0.01° with a manual two-decimal entry beside it (`client/src/screens/StartScreen.tsx`, `client/src/components/CityPicker.tsx`).
-The Cairo quantizer (`cairo/crates/star_chart/src/quantization.cairo`) still floors to 15-minute slots, and its latitude and longitude bins are signed 16-bit integers whose unit is defined in the astronomy dependency; aligning both with the grid is [issue #30](https://github.com/kronosapiens/SpacePrince/issues/30).
 
 Each quantized position is globally unique: one Prince per position, and no second mint at the same coordinates.
 Most players will mint at a city centroid, so in practice two people share a position when they share a city and a 5-minute slot; what the mint does for them is left to work out as the onchain mint takes shape.
