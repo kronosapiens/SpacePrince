@@ -18,9 +18,9 @@ For authoring, distinguish:
 | Term | Meaning | Example |
 | --- | --- | --- |
 | Drive | A broad concern that can recur across situations | Recognition |
-| Want | Something you seek in this encounter | Public acknowledgement of your contribution |
+| Want | Something the Prince seeks in this encounter | Public acknowledgement of a contribution |
 | Emotion | A feeling arising around the situation and what matters to the Prince | Pride, envy, embarrassment |
-| Response | What you do about it | Claim credit, share it, conceal your concern, withdraw |
+| Response | What the Prince does about it | Claim credit, share it, conceal the concern, withdraw |
 
 These distinctions help turn an abstract concern into a playable situation.
 They leave room for conflicting wants and for the same action to have different motives.
@@ -45,7 +45,7 @@ The scene makes the motive specific.
 
 ## Emotional range
 
-You can be generous, vain, frightened, resentful, curious, possessive, tender, or simply enjoying yourself.
+The Prince can be generous, vain, frightened, resentful, curious, possessive, tender, or simply having a good time.
 Motives can coexist: generosity can include wanting gratitude; duty can include fear of becoming unnecessary.
 Self-deception can create a gap between the reason the Prince gives and what the response suggests.
 The writing can make that gap legible while leaving the player room to interpret it.
