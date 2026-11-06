@@ -5,6 +5,7 @@ The vocabulary and examples are proposals to develop through research and scene 
 
 ## The Prince and the player
 
+[You are the Prince](../intent.md#the-prince): the Prince is you in the fiction, and the player is you at the table.
 The Prince's motives belong to the fiction; the player's motivations and emotional experience belong to playing the game.
 They can influence one another without matching.
 A Prince seeking recognition might act from envy while the player feels curiosity, sympathy, discomfort, or satisfaction at finding an effective choice.
@@ -17,9 +18,9 @@ For authoring, distinguish:
 | Term | Meaning | Example |
 | --- | --- | --- |
 | Drive | A broad concern that can recur across situations | Recognition |
-| Want | Something the Prince seeks in this encounter | Public acknowledgement of his contribution |
-| Emotion | A feeling arising around the situation and what matters to him | Pride, envy, embarrassment |
-| Response | What he does about it | Claim credit, share it, conceal his concern, withdraw |
+| Want | Something the Prince seeks in this encounter | Public acknowledgement of a contribution |
+| Emotion | A feeling arising around the situation and what matters to the Prince | Pride, envy, embarrassment |
+| Response | What the Prince does about it | Claim credit, share it, conceal the concern, withdraw |
 
 These distinctions help turn an abstract concern into a playable situation.
 They leave room for conflicting wants and for the same action to have different motives.
@@ -44,9 +45,9 @@ The scene makes the motive specific.
 
 ## Emotional range
 
-The Prince can be generous, vain, frightened, resentful, curious, possessive, tender, or simply enjoying himself.
+The Prince can be generous, vain, frightened, resentful, curious, possessive, tender, or simply having a good time.
 Motives can coexist: generosity can include wanting gratitude; duty can include fear of becoming unnecessary.
-Self-deception can create a gap between the reason he gives and what his response suggests.
+Self-deception can create a gap between the reason the Prince gives and what the response suggests.
 The writing can make that gap legible while leaving the player room to interpret it.
 
 Every planet should admit difficult feelings as well as welcome ones.

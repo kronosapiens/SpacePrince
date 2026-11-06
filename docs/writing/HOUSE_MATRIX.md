@@ -52,9 +52,9 @@ The table below records the fixed whole-sign relationships, not aspects from pla
 
 **Game interpretation:** distinguish the uses of these House attributes when composing its situation:
 
-- **Angularity:** where authority lies, what the Prince can directly affect, and what conditions his agency.
+- **Angularity:** where authority lies, what the Prince can directly affect, and what conditions the Prince's agency.
   It supplies narrative emphasis, with no automatic economic multiplier.
-- **Favorability:** what support is available and what burdens ordinary options ask him to bear.
+- **Favorability:** what support is available and what burdens ordinary options ask the Prince to bear.
   It informs economic composition within the [shared balance requirements](../mechanics/ENCOUNTERS.md#45-housesign-economic-balance), without guaranteeing outcomes or assigning an emotional mood.
 
 The applications below are revisable writing directions, not further historical claims or requirements that every scene follow one formula.
@@ -96,8 +96,8 @@ Use the existing [conditioning rules](../mechanics/ENCOUNTERS.md#4-chart-conditi
 - [Houlding, First House](https://www.skyscript.co.uk/1.html): bodily life and vitality, personal expression, and the person initiating an encounter; Mercury's joy.
 - [Cafe Astrology, First House](https://cafeastrology.com/houses.html): self-image and the first response to experience.
 
-**Editorial direction:** make the Prince present as a particular person, with a body and a way of introducing himself.
-Let his own gesture establish the terms on which he is met.
+**Editorial direction:** make the Prince present as a particular person, with a body and a manner of self-introduction.
+Let the Prince's own gesture establish the terms on which the Prince is met.
 **Stakes:** being recognized; choosing how to appear; admitting that a once-familiar image no longer fits.
 
 **Game fit:** Keep the attention on embodied identity; the Tenth concerns what an audience makes of it.
@@ -164,7 +164,7 @@ Coppock's discussion extends creative activity beyond making art.
 Our scenes should leave room for play, affection, and participation alongside craft.
 
 **Editorial direction:** let making or enjoying something matter before it becomes useful or impressive.
-Give him room to sustain an occasion, join in, or enjoy what others have made.
+Give the Prince room to sustain an occasion, join in, or enjoy what others have made.
 **Stakes:** showing an imperfect creation; making someone delighted; joining in without needing to excel.
 
 **Game fit:** Keep public rank for the Tenth and shared civic aims for the Eleventh.
@@ -215,7 +215,7 @@ Let the options redistribute immediate effort or payment between the parties.
 Our title “Transformation” should leave space for a loss that remains a loss.
 
 **Editorial direction:** make the transfer or ending concrete before giving it a symbolic meaning.
-An ending can leave him a choice about what to accept or relinquish even when he cannot reverse it.
+An ending can leave the Prince a choice about what to accept or relinquish even when the Prince cannot reverse it.
 **Stakes:** accepting what a death leaves behind; separating an inheritance from its burden; wanting a particular presence returned.
 
 **Game fit:** Keep debts inside an immediate settlement; later obligations require mechanics the game does not have.

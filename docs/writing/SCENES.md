@@ -24,7 +24,7 @@ Other characters can express wants directly; the Prince's eventual drive and the
 
 ## Let the sign describe the house's people and places
 
-Under whole-sign houses a Prince always meets the same sign in each house, so the sign makes that house his.
+Under whole-sign houses a Prince always meets the same sign in each house, so the sign makes that house the Prince's own.
 Following the [sign notes](../research/SIGN_NOTES.md#how-a-sign-qualifies-a-house), the sign describes the people, places, season, and manner of the house's affairs, not the Prince.
 In the House IV test, Libra gave a household arguing over courtesy, Capricorn the longest night and the winter stores, Leo a father's harvest title, and Pisces a flooded house that keeps taking people in.
 Each changed who was present and what they wanted, not only the backdrop.
@@ -35,7 +35,7 @@ Use them as a source of situations, not as a checklist.
 ## Characters
 
 Names are for flavor.
-Each scene's relationships stand alone: a Prince's rising sign selects a pool of 60 scenes, and they need not agree on who his mother or brother is.
+Each scene's relationships stand alone: a Prince's rising sign selects a pool of 60 scenes, and they need not agree on who that Prince's mother or brother is.
 Write so a scene does not depend on the Prince having exactly one of anyone.
 Villains, antagonists, and epic stakes are out of register; the people in a scene want ordinary things for understandable reasons.
 
@@ -54,7 +54,7 @@ Villains, antagonists, and epic stakes are out of register; the people in a scen
   An observation needs evidence in the scene; it should leave the Prince's feelings and response available to the player.
 - Treat the horoscope influence as an experiment in direct address and compressed social observation.
   Avoid generic reassurance, unsupported predictions, prescribed responses, and assumptions about the Prince's personality.
-  The encounter's sign is not necessarily his Sun sign.
+  The encounter's sign is not necessarily the Prince's Sun sign.
 - Keep mechanics out of the prose; amounts and costs belong in the option's aside ([ENCOUNTERS.md §9](../mechanics/ENCOUNTERS.md#9-prose-and-mechanical-copy)).
 
 ## Choices and economics
@@ -130,7 +130,7 @@ The comparisons that shaped the catalogue produced these findings:
 | --- | --- | --- |
 | Mara speaking directly versus narration reporting her request | The direct request was preferred. | Let people say what they want. |
 | Lena's shared history versus a joke in dialogue | The history “evokes a larger backstory,” but screaming could mean joy or pain. | Keep the sense of an earlier shared experience and clarify its emotional character. |
-| A mother gives the Prince a key while his brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
+| A mother gives you a key while your brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
 | House IV under Libra, Capricorn, Leo, and Pisces | “Each of these scenes has something to draw the reader in.” | The sign can carry the situation; proceed to house–sign scenes. |
 
 ## House IV worked examples
