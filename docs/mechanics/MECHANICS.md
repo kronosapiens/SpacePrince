@@ -1,0 +1,414 @@
+# Space Prince — Mechanics
+
+The maintained reference for combat: the rules and the reasoning behind them.
+The implementation lives in `client/src/game/` (`turn.ts`, `combat.ts`, `combust.ts`, `necessity.ts`, `score.ts`); when this document and the code disagree, investigate which is stale rather than assuming either is right.
+Narrative encounters are specified in [ENCOUNTERS.md](ENCOUNTERS.md) and their references in [HOUSES.md](HOUSES.md); data shapes in [STATE.md](STATE.md); chart construction in [CHART.md](CHART.md); map topology in [MAP.md](MAP.md).
+
+**Number model — the sexagesimal lattice.** The mechanics use the arithmetic of their source material: the 360° circle.
+Combat stat divisions produce whole numbers without rounding.
+Effective stats are multiples of `12` — the smallest number every aspect fraction (§9) divides — so halves, thirds, quarters, and sixths of any stat are integers.
+Resolve is the combustion ceiling, also a multiple of `12` (§10).
+Necessity draws `12`, `24`, or `36` affliction; a successful Fortune roll blocks the draw entirely (§11.3).
+Its addition is limited to the remaining room up to Resolve, where the planet combusts.
+Probabilities are stated in sixtieths (§7); percentages appear only as glosses.
+Lattice membership is an invariant: never introduce a buff, multiplier, or knob that steps off it.
+Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Light totals, narrative prices) — sums and payments, never divided.
+Affliction accumulates toward deterministic combustion at Resolve, and is capped there — a combusted planet holds `ceiling`, never more.
+
+## 1. Entities
+
+- Planets: `Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn`
+- Signs: 12 zodiac signs.
+- Each planet placement stores:
+  - `sign`
+  - `element`
+  - `modality`
+  - `dignity`
+  - `base` stats
+  - `buffs` stats
+
+## 2. Roles and Base Stats
+
+Each planet has a gameplay role — a stat profile that matches its astrological archetype (see [PLANETS.md](../writing/PLANETS.md)).
+The role is the player's first read on the planet; the stats are the role's mechanical expression.
+The short display label per planet (e.g., "the warrior") lives in `client/src/game/data.ts` as `PLANET_ROLE`.
+
+- **Sun** — balanced presence in every stat; the centered self.
+- **Moon** — top testimony, fragile elsewhere; the reflective interior.
+- **Mercury** — top luck, average elsewhere; paradox, the turn.
+- **Venus** — strong testimony with more Resolve and less luck than the Moon; beauty, relation, the sensed world.
+- **Mars** — top affliction, brittle elsewhere; the decisive cut.
+- **Jupiter** — balanced and generous across all stats; expansion, gift.
+- **Saturn** — top Resolve, slow elsewhere; limit, time, endurance.
+
+Current base values live in [`PLANET_BASE_STATS`](../../client/src/game/data.ts), the base stat table the game reads.
+
+Base values are authored as small integers and multiplied by `12` during chart generation.
+Buffs (§4) add `+12`, so every effective stat stays on the 12-lattice — every aspect fraction (§9) of every magnitude is an integer.
+
+**Balance (open).**
+These provisional values are being tuned through playtesting; the simulation findings are collected in [issue #12](https://github.com/kronosapiens/SpacePrince/issues/12).
+
+## 3. Chart Generation
+
+Every chart — player or opponent — comes from one generator: real ephemeris positions for a birth moment and place, via `astronomy-engine` (`client/src/astronomy/compute.ts`).
+There are no fabricated skies.
+
+- **Player** Princes use the player's real birth data: ISO datetime, latitude, longitude.
+- **Opponent, dev, and preview** charts (`seededChart`) use a deterministic-random birth — a seeded moment over ~200 years and a random place — so they are reproducible from the seed yet astronomically real.
+
+For a given moment and place it computes:
+
+- apparent **geocentric** ecliptic longitude per planet, in the tropical zodiac (ecliptic of date) — the frame astrology uses, so Mercury stays within `±28°` of the Sun and Venus within `±47°`
+- Ascendant from local sidereal time and the obliquity of date
+- sect (`isDiurnal`) from whether the Sun is above the horizon at birth
+
+Sign, dignity, element/modality, and buffs derive from longitude the same way regardless of source (sign = `floor(longitude / 30)`).
+The onchain version of this computation is the subject of [CHART.md](CHART.md).
+
+## 4. Stat Buffs
+
+Buffs are additive at generation, always in `+12` steps, so effective stats stay on the 12-lattice.
+A planet's effective stat is base + buffs — the value used in combat.
+
+Element — each element buffs the one stat it expresses:
+
+| Element | Affliction | Testimony | Resolve | Luck |
+|---------|:------:|:-------:|:----------:|:----:|
+| Fire    |  +12   |         |            |      |
+| Water   |        |  +12    |            |      |
+| Earth   |        |         |    +12     |      |
+| Air     |        |         |            | +12  |
+
+Modality — three of the four stats; modality does not touch luck:
+
+| Modality | Affliction | Testimony | Resolve | Luck |
+|----------|:------:|:-------:|:----------:|:----:|
+| Cardinal |  +12   |         |            |      |
+| Mutable  |        |  +12    |            |      |
+| Fixed    |        |         |    +12     |      |
+
+Sect — a conditional `+12 luck`, the companion to Air.
+A planet gains it when its sect matches the chart's.
+Chart sect is `Day` when the birth is diurnal, else `Night`; sect changes nothing but luck.
+
+| Sect  | Planets              |
+|-------|----------------------|
+| Day   | Sun, Jupiter, Saturn |
+| Night | Moon, Venus, Mars    |
+
+Mercury has no fixed sect — it takes `Day` or `Night` from its solar phase (ecliptic longitude relative to the Sun), then matches the chart the same way.
+
+## 5. Action and Valence
+
+Each turn, both sides commit one planet to one of two actions.
+
+- **Afflict** — uses the planet's `affliction` stat.
+- **Testify** — uses the planet's `testimony` stat.
+
+The affliction stat is the amount a planet sends; its run-state affliction records the amount it has accumulated.
+
+Action is set per side:
+
+- **Player side:** explicitly chosen.
+  Selecting a planet fans out the two actions; the player picks one.
+- **Opponent side:** randomly drawn and precommitted.
+  The verb is a stat-weighted random draw — `P(afflict) = affliction / (affliction + testimony)`, `P(testify) = 1 - P(afflict)`.
+  It is locked at turn start and surfaced to the player — alongside the already-revealed opponent planet — before the player chooses, so the player always acts with full information.
+
+## 6. Direct Resolution
+
+Resolution is **sequential**, in two phases — the intent → act → response rhythm of Slay the Spire rather than the simultaneous trade of FTL (see [intent.md](../intent.md), Influences):
+
+1. **Your action → the opponent's chart.** Your acting planet's effect lands on the opponent's active planet and propagates through their web (§9); combustion is resolved there.
+2. **The opponent's action → your chart.** Read *after* phase 1 — so a planet you combusted in phase 1 outputs nothing; its phase-2 response is **preempted**.
+
+The opponent's verb is precommitted (§5), so you choose with full information and you always act first.
+This is the core tactical lever: afflict a threatening opponent planet hard enough to combust it before it swings.
+Preemption only fires on combustion — a planet hits at full stat until it goes — so it is a finisher, not a guaranteed negate.
+Conversely, letting a *testifying* opponent planet resolve is free relief — longevity, not Light (§12) — that combusting it would deny.
+
+Base amount is the stat for the action:
+
+- `Afflict`: `affliction`
+- `Testify`: `testimony`
+
+Raw direct amount:
+
+- `raw = baseStat` — no multipliers; there are no crits (§7)
+
+Magnitude is the planet's own stat; sect and element/modality buffs (§4) are the only sources of contextual strength.
+
+## 7. Randomness
+
+Randomness never decides how a committed action resolves; it only decides what is revealed next.
+
+When the player commits an action, its full outcome — affliction, testimony, propagation, combustion, Light — is computable from state the client already holds.
+The client renders the resolution immediately; the transaction confirms the same result behind the animation.
+There are no crits and no hidden rolls: anything derivable before commitment is shown (client honesty, [SCREENS.md §1.1](../presentation/SCREENS.md#11-client-honesty)), and anything not derivable is genuinely unknown to everyone — including the contract — until the transaction lands.
+
+Fresh randomness enters only where the game is already pausing to reveal something new, and every reveal rides a transaction the player is already waiting on:
+
+- **Map creation.** The map seed is a VRF draw; from it derive node content ([MAP.md](MAP.md)) and opening uncombust rolls (§11.3).
+  These are settled and displayed before the first node is entered.
+- **Combat encounter arrival.** Both charts receive necessity before the first action (§11.3).
+  In the prototype, each chart's opening affliction uses a separate seeded stream from the other's and from the turn sequence, so necessity draws do not change the announced actions.
+- **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5).
+  By the time the resolution animation finishes, the next move has landed.
+  Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
+
+Narrative choices roll nothing: every option's effect is determined and previewed before commitment ([ENCOUNTERS.md](ENCOUNTERS.md)).
+
+Luck is therefore not a combat stat.
+Affliction, testimony, and Resolve decide what a planet does inside an encounter; luck decides uncombust rolls and relief from necessity.
+The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the one luck-based probability: the chance a combusted planet uncombusts at a map opening, and the chance an available planet's necessity draw is blocked (§11.3).
+One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fortune is its odds wherever fate is asked.
+
+## 8. Affliction Value Model
+
+Affliction is integer-valued — every direct and propagated effect is a whole number.
+
+- direct and propagated effects apply their full amounts
+- testimony clamps affliction at zero
+
+## 9. Aspects and Propagation
+
+The four aspects carry **circle-fraction** multipliers — each aspect's share of the 360° circle; hard aspects invert.
+The conjunction stands apart — union, not aspect:
+
+- Conjunction (0°): `+1` — co-presence; full conduction
+- Sextile (60°): `+1/6`
+- Square (90°): `-1/4`
+- Trine (120°): `+1/3`
+- Opposition (180°): `-1/2`
+
+An aspect is a transmission across distance — *aspectus*, beholding — so the multiplier is readable off the chart itself: the wider the arc, the stronger the effect; soft aspects transmit, hard aspects invert.
+The conjunction is classically not an aspect but **co-presence** ([ASTROLOGY.md](../research/ASTROLOGY.md)): planets in one sign do not behold each other across the circle — they share a place, so a blow that lands on one lands on the household.
+Its `+1` is the absence of transmission, not its maximum; "wider arc, stronger effect" governs the four aspects, and the conjunction sits outside it.
+The angle→effect mapping is piecewise by design: separations of 30° and 150° transmit nothing — signs that cannot see each other are in **aversion**.
+This preserves the traditional strength ordering — trine over sextile, opposition over square, the conjunction most powerful of all.
+Rejected: flat multipliers (`±0.5`, `−1`) — they left sextile and trine mechanically identical and contradicted the tradition's aspect hierarchy.
+Rejected: strict monotonicity in arc (conjunction on the same rule) — it would rank same-sign planets weakest, inverting the tradition and draining the intensity a same-sign cluster should carry.
+
+Rules:
+
+- one-hop propagation from active source to connected targets
+- magnitude: `abs(directAmount * aspectMultiplier)` — exact, since every denominator divides every effective stat (§2)
+- negative multipliers invert the valence (`Affliction <-> Testimony`)
+- propagation applies the same integer effect model as direct effects
+- combusted targets are skipped
+- unfielded targets are skipped — only the roster conducts (§11.1)
+- combustion resolves before propagation: if the blow combusts the planet it lands on, that planet conducts nothing onward — propagation is short-circuited, not computed then negated
+
+## 10. Combustion
+
+Each planet takes **at most one** affliction application per turn — the direct blow if it is the acting planet, otherwise a single propagated ripple if aspected to it.
+Combustion is checked once, at that application, and only for affliction.
+
+Affliction accumulates toward **Resolve**, the combustion ceiling.
+A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
+
+- `ceiling = base.resolve + buffs.resolve` (§4), in the same units as affliction and testimony.
+- combust when `affliction >= ceiling`
+
+**Provisional maximum for future run upgrades: 180 Resolve per planet**, including base stats, placement bonuses, and run bonuses.
+At 2° per point, this fills one affliction arc.
+
+Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few.
+Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin.
+During an exchange, the player can read the exact combustion outcome before acting.
+Combat entry adds a Necessity draw (§11.3), so preparation must account for its possible amounts.
+
+Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more.
+Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation.
+Testimony defends the margin; it never resurrects.
+
+The cap makes combustion **derived state**: a planet is combusted exactly when `affliction >= ceiling`, so no combust flag is stored anywhere ([STATE.md](STATE.md)) — affliction is the whole per-planet state.
+
+A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat.
+Two processes exist: the map-boundary fortune roll (§11.3) and narrative revival choices ([ENCOUNTERS.md §2](ENCOUNTERS.md#2-outcomes-and-payment)).
+Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
+Combustion is intended to be **frequent and recoverable**.
+A strong Mars can combust a clean Moon in one action, while a clean Saturn survives that blow.
+Revival choices appear in scenes whose house supports a return ([ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario)), alongside the boundary rolls.
+Combustion scores only under Saturn's rule (§12); under every other ruler, combusting an opponent planet is a trade: denying its swing against forfeiting the harvest banked on it.
+
+**Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system ([HOUSES.md](HOUSES.md)), where a planet in the encounter's house makes the terms of its choices better or worse ([ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity)).
+The chart still computes each planet's dignity; combat simply does not read it.
+
+## 11. Encounter / Map / Run Flow
+
+The game's progression is layered:
+
+- **Encounter** — one node traversal (combat or narrative).
+  Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters resolve one decision with immediate consequences ([ENCOUNTERS.md](ENCOUNTERS.md)).
+- **Map** — one Sephirot-tree (per [MAP.md](MAP.md)).
+  The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
+- **Run** — **up to seven maps** (`MAPS_PER_RUN` in `client/src/game/run.ts`).
+  After completing a map, the next is generated and begun.
+  The structure is similar to FTL's sectors.
+- **Run end** — a run ends on whichever comes first: **full combustion** (every planet the player fields combusts) or **completion** (the seventh map is finished).
+  Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage.
+  Either way, the run's **final Light (§12)** is its permanent record, inscribed as a star in the NFT field ([NFT.md](../presentation/NFT.md)).
+
+Per encounter:
+
+- Every combat encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
+  It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the combat theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
+  Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
+- Both charts receive **Necessity at combat entry** (§11.3): the player adds it to carried affliction, while the other begins with fresh state.
+  Fortune can leave a planet at zero affliction, while every fielded planet on the other chart arrives lit.
+  Under the Moon's rule only resolution scores (§12), so an opening with no affliction to resolve can yield no Light.
+- Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
+  The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
+- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
+- If all fielded opponent planets combust before the final turn, the encounter ends early.
+- Once the outcome settles, the encounter advances to the map by itself after a short pause, longer when the run has ended; a tap skips the pause (`useEncounterAdvance`).
+
+The player's affliction and combust state **persist across encounters and across maps within a run**.
+Each map opening applies uncombust rolls without adding affliction (§11.3).
+A new run begins with zero affliction; the first combat entry applies its first Necessity sweep.
+
+### 11.1 Planet Unlock Schedule
+
+A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run.
+The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward).
+The Moon is present from the first encounter; each subsequent planet unlocks at a cumulative count of `2^i` for `i = 0..5` (`UNLOCK_THRESHOLDS` in `client/src/game/data.ts`):
+
+| Cumulative encounters | Unlock | Total planets |
+|-----|--------|---------------|
+| 0 (start) | Moon | 1 |
+| 1 | Mercury | 2 |
+| 2 | Venus | 3 |
+| 4 | Sun | 4 |
+| 8 | Mars | 5 |
+| 16 | Jupiter | 6 |
+| 32 | Saturn | 7 |
+
+The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
+Saturn arrives last as the final teacher.
+
+**Encounter length and the mirrored opponent.** Combat length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
+Difficulty therefore ramps on two axes.
+The opponent's *roster* mirrors the player's unlock tier — Moon vs Moon at the first encounter, up to a full seven-vs-seven — so the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
+Encounter *length* rides the run instead: one-turn encounters on the first map, full arcs on late maps.
+Necessity applies at every combat opening without a depth multiplier; the player's existing affliction carries forward.
+The length ramp is also a curriculum for the two-beat (§12): map 1 teaches resolving initial affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
+On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
+Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
+Only fielded planets conduct: propagation (§9) ripples through the roster's aspect web alone, so an unfielded planet takes nothing, passes nothing on, and scores nothing — the web the game resolves is the web the chart draws.
+Rejected: fixed 3-turn encounters — the final turn made afflict-for-setup dead and the initial affliction was too deep to drain in three turns, so the first and last turns were near-forced and the build beat never became necessary; and three random draws could meet at most three planets of a seven-planet roster.
+
+Each unlock happens **between encounters**, on the Map screen: surfacing from the encounter that crossed a threshold presents the new planet's introduction card, and on dismissal the planet stands lit in its computed sign on the chart ([SCREENS.md §3.6.2](../presentation/SCREENS.md#362-the-info-card-summoned-and-queued)).
+
+A planet enters the **combat-encounter ruler rotation** when it unlocks.
+Before that threshold, no combat encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
+Each map samples its combat rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
+The client prototype enforces this with deterministic rejection sampling: it generates Other charts until the Ascendant ruler belongs to that tier.
+The eventual onchain sampling mechanism remains unspecified.
+
+The Prince NFT artifact reveals planets on the same cumulative-encounter schedule: an unrevealed planet renders as a **ghost** at hairline weight (per [STYLE.md](../presentation/STYLE.md)), present as potential but not yet awakened.
+See [NFT.md](../presentation/NFT.md).
+
+The dev setting `unlockAll` (`client/src/state/settings.ts`) reveals all seven planets regardless of the schedule; it is a development aid, never active for players.
+
+### 11.2 Achievements
+
+The Prince artifact reserves a fixed set of achievement slots, drawn as empty rings until earned ([NFT.md](../presentation/NFT.md), Placement).
+Twelve candidate marks are defined in `client/src/data/achievements.ts`, selected from the [achievement research](../research/ACHIEVEMENTS.md) — first completed run, a run without a combustion, every ruler scored under, and the like.
+Earning is not implemented: the bitmap exists on the Prince ([STATE.md](STATE.md)) but no condition is evaluated yet, and the artwork preview shows every assigned mark as earned until it is.
+Candidates that depend on lasting narrative consequences stay provisional, since the narrative system has no persistent effects ([ENCOUNTERS.md §11](ENCOUNTERS.md#11-deferred-decisions)).
+
+### 11.3 Necessity at combat openings and revival at map openings
+
+Necessity is the affliction a chart brings into a new situation; Fortune offers relief from it.
+The same rule applies independently to both charts at every combat encounter opening (`applyNecessity` in `client/src/game/necessity.ts`).
+The player's state carries forward; each other chart begins with fresh state.
+
+For each available fielded planet:
+
+1. Draw uniformly from `12`, `24`, or `36` affliction.
+2. Roll Fortune (`luck / 120`, §7); on success, block the draw entirely.
+3. Add the result to existing affliction, capped at Resolve.
+   Reaching Resolve combusts the planet.
+
+Combusted and unfielded planets receive nothing.
+There is no map-depth multiplier, and necessity does not propagate or award Light.
+Fresh planets always survive: the maximum draw is 36, below the minimum fresh Resolve of 48.
+If Necessity combusts the player's entire fielded roster, the encounter resolves with zero actions and zero Light.
+Clearing that encounter still advances the lifetime encounter count; a newly unlocked planet can keep the run alive.
+
+Map openings apply revival only: each combusted fielded planet rolls Fortune and, on success, returns at half Resolve (§10).
+Available planets retain their existing affliction, and revived planets receive no further affliction at the boundary.
+A new run starts at zero affliction, with no combusted planets to revive.
+Narrative entry applies no Necessity, and combat entry provides no resurrection.
+
+The map seed determines revival in a separate stream from node content; results are applied and displayed before the first node is entered (§7).
+At combat arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
+Encounter length still increases with map number, while repeated necessity adds to the player's carried affliction and revival provides a way back from combustion.
+The balancing study that arrived at these rules is summarised on [PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560).
+
+## 12. Scoring (Light)
+
+UI label: `Light`.
+
+Light sums integer magnitudes from the turn log, or Resolve ceilings, which are multiples of `12`.
+What gathers it is decided by the encounter's **ruler** (§11): each ruler admits a different set of beats (`RULER_RULES` in `client/src/game/score.ts`).
+
+| Ruler | Polarity condition | Chart | Channel | Payout |
+|---|---|---|---|---|
+| Moon | Testimony | Other | All | Applied magnitude |
+| Mercury | Contrary | Other | All | Applied magnitude |
+| Venus | Testimony | Both | Direct | Applied magnitude |
+| Sun | Accord | Other | All | Applied magnitude |
+| Mars | Affliction | Other | All | Applied magnitude |
+| Jupiter | Either | Both | Direct | Applied magnitude |
+| Saturn | Affliction | Both | Combustion | Target's ceiling |
+
+`Other` means the Other's chart, while `Both` includes the Prince's chart and the Other's chart.
+`All` includes direct and propagated applied effects, while `Direct` includes only the initial effect on each chart.
+`Accord` means that a resolved beat has the same polarity as the Other's announced action.
+`Contrary` means that it has the opposite polarity.
+Each beat is checked after any aspect inversion, so one action can produce both Accord and Contrary beats.
+The announced action remains the reference if the Other is preempted, and its zero-magnitude response still pays zero.
+
+Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `lightGain` is the sum of the beats the ruler admits.
+The projection preview produces the same beats, so a previewed Light and an awarded one are one function.
+The run's `light` accumulates `lightGain`.
+
+Applied-magnitude rules pay the actual magnitude after clamping, not the attempted magnitude.
+A hit that causes combustion remains an applied-effect beat and also emits a separate combust marker.
+Only Saturn admits the marker, and Saturn pays the target's ceiling rather than the hit magnitude.
+
+Under the Moon only real reductions count — testifying a planet already at zero affliction scores nothing — so each turn is a two-beat: afflict to set up, testify to cash.
+Under Mars the two-beat inverts.
+Mercury and the Sun instead ask whether each effect runs contrary to or in accord with the Other's announced action.
+Under Venus, Jupiter, and Saturn, the Other's reply on the Prince's chart can pay, so the choice includes which planet stands in the way.
+The rule is stated on the encounter screen for the whole encounter, beneath a sentence saying what the Other seeks from the exchange ([SCREENS.md §3.7](../presentation/SCREENS.md#37-chrome)), and the node's colour on the map is the same ruler, so a route is chosen with the rotation in view.
+
+Moon and Mars partition effects on the Other's chart by absolute polarity.
+Mercury and the Sun partition them by polarity relative to the Other's announced action.
+Venus and Jupiter govern the direct exchange on both charts, with Jupiter intentionally containing Venus as the greater benefic contains the lesser.
+No other ordinary rule strictly contains another.
+Within the unlocked rotation, rulership fixes relative frequencies: the luminaries rule one sign each, while the other planets rule two.
+Before Mercury unlocks, every combat encounter is necessarily Moon-ruled.
+
+A run's remaining **Light** is its permanent output.
+When the run ends — combustion or completion (§11) — that value shapes a star in the Prince's NFT field ([NFT.md](../presentation/NFT.md), "The Star-Field").
+Nothing else about the run is recorded: not how it ended, not which planets combust.
+Only the Light, and the star it shapes.
+
+What Light means to the player, and whether these rules are the right way to generate it, remain open explorations ([#23](https://github.com/kronosapiens/SpacePrince/issues/23), [#25](https://github.com/kronosapiens/SpacePrince/issues/25)).
+
+## 13. Interaction Chart Semantics
+
+The per-turn readout of the Other's precommit — planet, verb, amount — is the sentence above the wheels, specified in [SCREENS.md §3.7](../presentation/SCREENS.md#37-chrome); the earlier dev-console table this section described is retired.
+
+## 14. Prototype Scope
+
+Intentionally out of scope for the current prototype:
+
+- metaprogression and the economy around mints and runs ([#31](https://github.com/kronosapiens/SpacePrince/issues/31))
+- production persistence migrations (a schema change wipes the local save)
+- the final balance pass ([#12](https://github.com/kronosapiens/SpacePrince/issues/12))
+- onchain integration: the client computes charts with the JS `astronomy-engine`, and the Cairo port is tracked in [CHART.md](CHART.md)

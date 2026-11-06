@@ -2,7 +2,7 @@
  *  term of art the player meets in play, grouped as the index shows them.
  *  Register: PRIMER.md "Voice" — spare, confident, unhurried; assumes no
  *  astrology; not a textbook. `paragraphs` give the traditional meaning,
- *  drawn from spec/concept/ASTROLOGY.md (eras and attributions as it gives
+ *  drawn from docs/research/ASTROLOGY.md (eras and attributions as it gives
  *  them) and, for affliction, testimony and combustion, from the common
  *  traditional usage; `inPlay` appears only where the game really uses the
  *  concept, accurate to MECHANICS.md and client/src/game. Vocabulary per the

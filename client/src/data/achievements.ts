@@ -1,4 +1,4 @@
-/** Selected candidate numbers match spec/research/ACHIEVEMENTS.md; bit 0 is candidate 1.
+/** Selected candidate numbers match docs/research/ACHIEVEMENTS.md; bit 0 is candidate 1.
  * These describe the visual baseline, not implemented earning conditions. */
 export const ACHIEVEMENTS = [
   { id: 1, category: "Milestones", condition: "Complete the first map." },

@@ -2,20 +2,21 @@
 
 The client is a presentation-only browser app.
 It reads game state, renders it as SVG, and writes new state when the player acts.
-There is no wallet, no RPC, no contract calls — production will run on Starknet, that's a separate project (`cairo/`).
-Right now, everything is dev: state lives in `localStorage`, opponents are seeded random charts, and the focus is combat-flow + chart-readability prototyping.
+There is no wallet, no RPC, and no contract calls; production will run on Starknet, which is a separate project (`cairo/`).
+Right now everything is local: state lives in `localStorage`, other charts are seeded real-ephemeris charts, and the focus is combat flow and chart readability.
 
-`spec/mechanics/MECHANICS.md` is the runtime source of truth for combat math.
-`spec/design/SCREENS.md` / `STYLE.md` / `VIBES.md` define the visual contract.
-This file describes the *implementation* — how the client is wired together and why.
+The design references live in `docs/` (see [docs/README.md](../docs/README.md)).
+`docs/mechanics/MECHANICS.md` describes the combat rules the resolvers implement; `docs/presentation/SCREENS.md` and `STYLE.md` describe the surfaces and the vocabulary they are drawn with.
+This file describes the *implementation*: how the client is wired together and why.
 
 ## Stack
 
 - React 18 + Vite 6 + TypeScript (strict + `noUncheckedIndexedAccess`)
-- React Router 7 — URLs are state for dev seed routes (`/encounter/<seed>`)
-- Vitest — pure logic + reducers tested
-- `astronomy-engine` (Don Cross) — real ephemeris for Mint
-- pnpm — `pnpm dev`, `pnpm test`, `pnpm exec tsc -b --noEmit`
+- React Router 7: two game routes plus dev and gallery routes (below)
+- Vitest: pure logic, reducers, and screen tests (`tests/`)
+- `astronomy-engine` (Don Cross): real ephemeris for casting a chart
+- Tone.js: the audio engine (`src/audio/`)
+- pnpm: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm exec tsc -b --noEmit`
 
 ## Folder layout
 
@@ -23,14 +24,18 @@ Layers are listed lowest-first; each layer imports only from layers above it.
 
 ```
 client/src/
-  svg/                  Constants only — palette, glyph maps, viewBox geometry, stroke scale
-  game/                 Pure game logic — no React, no storage, no DOM
-  data/                 Static reference data (houses, narrative scenarios)
-  astronomy/            astronomy-engine wrapper for Mint
-  state/                Reducers, providers, thunk hooks, persistence
-  components/           Reusable presentation pieces (Chart, MapDiagram, etc.)
-  screens/              Route-level components — one per screen
+  svg/                  Constants: palette, glyphs, viewBox geometry, stroke scale, chart/map/prince style tokens, the dev tuner
+  game/                 Pure game logic: no React, no storage, no DOM
+  data/                 Static reference data: houses, the economy table, the 720 narrative scenes, achievement candidates
+  copy/                 Player-facing text, one file per surface (guides, help, primer, codex, openings, introductions)
+  astronomy/            astronomy-engine wrapper for casting
+  audio/                Tone.js engine, themes, strike pitches, UI cues
+  eval/                 Balance evaluator (see below)
+  state/                The Prince store: reducer, provider, thunk hooks, persistence, dev settings, dev spawn
+  components/           Reusable presentation pieces (Chart, MapDiagram, guides, info cards, animation hooks)
+  screens/              Title, the play surface, encounter and map screens, dev index, gallery, token
   style/                Tokens, motion keyframes, layout, reset
+  assets/               Static assets
   main.tsx              Mount + provider stack + router
   App.tsx               Route table
   routes.ts             Route constants
@@ -38,128 +43,101 @@ client/src/
 
 ## Architectural decisions
 
-### Two stores, split along the onchain seam
+### One store: the Prince owns its runs
 
-There are two reducers at the app root.
-Each owns a domain, persists to a dedicated `localStorage` key, and is read via context.
+There is one reducer at the app root, `princeReducer`, provided by `PrinceStoreProvider` (`state/PrinceStore.tsx`) and persisted under one `localStorage` key, `sp:prince:v5` (`state/prince.ts`).
+The `Prince` holds identity, chart, lifetime encounter count, the achievement bitmap, and every run it has played; the active run is the tail of `runs` if and only if it is not over (`docs/mechanics/STATE.md`).
+Keys from earlier prototype shapes (`sp:profile:v1`, `sp:run:v1`, `sp:prince:v1` through `v4`) are cleared on load; there is no migration, so a schema change wipes stored state until the game ships for real users.
 
-| Domain | Reducer | Provider | Persistence key |
-|---|---|---|---|
-| Run (in-flight game state) | `runReducer` | `RunStoreProvider` | `sp:run:v1` |
-| Profile (the Prince) | `profileReducer` | `ProfileStoreProvider` | `sp:profile:v1` |
-
-The split is not arbitrary: Profile is the NFT, Run is ephemeral session state.
-Onchain, these will be different storage with different lifetimes, so the client never entangles them.
-Settings (`DevSettings`) is small and toggle-shaped, kept as ad-hoc `localStorage` reads in `state/settings.ts`.
+Reducer actions: `mint`, `clear`, `setEncounters`, `incrementEncounters`, `startRun`, `commitRun`.
+Run mutations land on the tail run through `commitRun`.
+Hooks: `usePrince`, `usePrinceDispatch`, `useActiveRun`, and `useRunChart` (the chart as the active run sees it, with the run's stat gains applied through `runChart`).
 
 ### Reducers are pure; thunks quarantine impurity
 
-A reducer is `(state, action) => state` — no RNG, no `Date.now()`, no storage reads, no input mutation.
-Actions that adopt a fully-resolved next state (e.g. `run/commitTurn`) carry it as a pre-computed `nextRun`; the reducer just returns it.
-All impure work — `resolveTurn`, `randomSeed`, `Date.now`, RNG-rolling — happens in **thunk hooks** in `state/store-actions.ts`.
+A reducer is `(state, action) => state`: no RNG, no `Date.now()`, no storage reads, no input mutation.
+Actions that adopt a resolved next state carry it pre-computed; the reducer just returns it.
+All impure work (`resolveTurn`, seeds, RNG rolling) happens in the thunk hooks in `state/store-actions.ts`: `useStartRun`, `useCommitTurn`, `useRolloverMap`, `useResetAll`.
 
 This shape deliberately mirrors the eventual onchain flow.
-Today: thunk computes `nextRun` → dispatch → reducer adopts it → persistence effect.
+Today: thunk computes the next run → dispatch → reducer adopts it → persistence effect.
 Tomorrow: thunk submits a transaction → resolved chain state comes back → reducer adopts it.
 The screens won't need to change.
 
-Thunks are also where cross-store concerns live — `useCommitTurn` dispatches `run/commitTurn` and, if the encounter ended, also `profile/incrementLifetime`.
-
-The current vocabulary:
-
-- `useStartRun` — begin a run for a profile
-- `useCommitTurn` — resolve a combat turn, build the `NodeOutcome`, bump lifetime if encounter ends
-- `useCommitNarrative` — apply narrative outcomes, build the `NodeOutcome`, bump lifetime if encounter ends
-- `useRolloverMap` — terminal node reached, archive current map, generate a fresh one
-- `useResetAll` — clear both stores
-
 ### Persistence is an effect, not a call
 
-Each provider runs:
+The provider runs one effect: save the Prince when it changes, clear storage when it is null.
+Screens never call `savePrince` or `clearPrince`; they dispatch actions, and persistence is reactive.
+The run's in-memory event log (`Run.events`) is stripped on save.
 
-```ts
-useEffect(() => {
-  if (state) saveX(state); else clearX();
-}, [state]);
-```
-
-Screens never call `saveRun` / `saveProfile` / `clearRun` / `clearProfile` directly.
-The grep `grep -rn "saveRun\|saveProfile\|loadRun\|loadProfile" src/screens src/components` should always return empty — the load/save helpers are called only by the providers and the reducer init.
-Screens dispatch actions; persistence is reactive.
+Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-shaped: unlock all planets, force the next node to a house or to combat.
 
 ### The game layer is framework-free
 
-`src/game/` imports only from itself and `data/` — never from React, the store, or any screen.
-The boundary lets the same logic be called from screens (via thunks) and from tests (directly).
+`src/game/` imports only from itself and `data/`, never from React, the store, or any screen.
+The boundary lets the same logic be called from screens (via thunks), from tests, and from the evaluator.
 
 Determinism has a deliberate boundary inside this layer:
 
-- **Combat resolution is deterministic.** `resolveTurn` takes RNG as a passed-in `() => number`; a run is replayable from its seed. This is the part that must match the Cairo implementation.
-- **Edges are not.** Entity IDs and `startedAt` use `Date.now()` (`run.ts`, `turn.ts`, `encounter.ts`), and narrative combust rolls use `Math.random` directly (`narrative.ts` — commented there: narrative isn't replayed). These are acceptable for the prototype but are exactly the call sites that change for onchain parity.
+- **Resolution is deterministic.** `resolveTurn` computes the whole turn from state; its only draw is the opponent's *next* precommit, from a per-(run, encounter, turn) seeded stream (`combatTurnRng`), so a run replays from its seed. Narrative resolution has no randomness. This is the part that must match the Cairo implementation.
+- **Edges are not.** Entity ids use `Date.now()` (`encounter.ts`, `turn.ts`), and a new run's or map's seed comes from `randomSeed()` (`rng.ts`, `Math.random`), the prototype's stand-in for the VRF. These are the call sites that change for onchain parity.
 
-Adding a new `Math.random()` or `Date.now()` inside combat-path game code is a bug; pass RNG in.
+Adding a new `Math.random()` or `Date.now()` inside resolution-path game code is a bug; pass RNG in.
 
 Key modules:
 
-- `turn.ts` — `resolveTurn`: combat turn resolution
-- `combat.ts` — polarity, stats, exchange formulas (shared between resolution and projection)
-- `projections.ts` — preview deltas for tap-preview UI
-- `combust.ts` — combustion probability + roll
-- `encounter.ts` — `beginCombatEncounter`, `beginNarrativeEncounter`
-- `run.ts` — `beginRun`, `rolloverMap`
-- `chart.ts` — chart construction, `cloneSideState`, `blankSideState`
-- `aspects.ts` — `getAspects` (stable lookup keyed on chart)
-- `map-gen.ts` / `map-content.ts` — Sephirot graph + lazy node content rolling
-- `unlocks.ts` — Macrobian threshold ladder
+- `turn.ts`: `resolveTurn`, sequential combat resolution with preemption
+- `combat.ts`: stats, the valence draw, direct exchange, the fortune roll (shared by resolution and projection)
+- `projections.ts`: preview deltas and projected Light, over the same beats the scorer reads
+- `score.ts`: Light by the encounter's ruler (`RULER_RULES`)
+- `combust.ts`: ceilings, combustion, uncombust
+- `necessity.ts`: combat-entry Necessity with Fortune blocking
+- `encounter.ts`: `beginCombatEncounter`, `beginNarrativeEncounter`, `encounterRuler`
+- `narrative.ts`: scene context, targets, occupant terms (`withOccupants`), preview and resolve
+- `run.ts`: `beginRun`, map rollover, boundary revival, `isOver`
+- `chart.ts` / `aspects.ts`: chart construction, the run chart with gains, aspect lookup
+- `map-gen.ts` / `map-content.ts`: the Sephirot graph and per-node content rolls
+- `unlocks.ts`: the Macrobian threshold ladder
+- `light-scale.ts`: star radius and opacity from Light
 
-### Encounter is derived, not passed
+### The surface is derived from state, not the URL
 
-`run.currentEncounter` is the single source of truth for whether an encounter is in flight.
-Screens that render an encounter narrow it via `run.currentEncounter` — never as a separate prop that could drift.
+The game runs at two routes (`routes.ts`): `/` is the Title, and `/play` is one state-derived surface (`screens/PlaySurface.tsx`) that shows casting, the map, or the encounter as a pure function of the active run.
+`run.encounter` is the single source of truth for whether an encounter is in flight; screens narrow it rather than taking it as a separate prop that could drift.
+Refresh during play resumes from the same state.
+Onchain, `/play` gains a `?prince=` parameter resolved against chain; the surface layer is unchanged.
 
-### Dev mode is structurally isolated
+Other routes: `/__index` (the dev index), `/gallery` (the design gallery), and `/token` (the Prince artwork).
 
-`DevSettings.devModeActive` (toggle on Index screen) routes the encounter and map screens to *dev sub-components* that use local `useState` instead of dispatching to the real stores.
-`DevCombatScreen` (in `EncounterScreen.tsx`) and `DevMapScreen` (in `MapScreen.tsx`) synthesize ephemeral state from a URL seed (`/encounter/<8-char-base36>`).
-The synthetic profile lives in `sessionStorage` (`getOrCreateDevProfile`) so reroll only changes the encounter, not the Prince.
+### Dev tooling spawns real games
 
-Because real screens never call save helpers directly, switching `devModeActive` cannot leak state into `localStorage`.
-This was a real bug before the state refactor; it's now structurally impossible.
-
-`NarrativeRoute` (`/narrative/<seed>`) is dev-only and renders `EncounterNarrativeScreen` with no-op callbacks.
+There is no separate dev state.
+`state/dev-spawn.ts` builds a real `Prince`, with a tail run and an encounter where relevant, positioned at a chosen screen (map, combat, narrative, end) and mints it into the store; "Regenerate" re-rolls a fresh real game at the same screen.
+The dev console (`d` in the running client; `components/DevConsole.tsx`) hosts the tuner (`svg/tuning.ts`), whose defaults are the committed tokens, so it is an override layer and never a second source of truth.
+Dev chrome ships in production builds too (PR #19) and is driven by the dev settings above.
 
 ### Animation is an overlay, not a state machine
 
 Combat animations are choreographed by `components/useCombatAnimation.ts`.
-The hook owns animation state, a list of `setTimeout` IDs, `start(entry, prevRun, prevEncounter)`, and `skip()`.
-Cleanup-on-unmount is built in.
-
-At the moment of commit the screen captures `previousRun` and `previousEncounter` (pre-dispatch), then calls `start(...)` with the `TurnLogEntry` from the resolver.
-The hook seeds animation state with the *previous* values, then schedules timeouts that mutate animation state toward the resolved post-turn state.
-While `animation` is non-null, the screen reads display values from it; when it becomes null, the screen falls back to the live `run` / `encounter` props (which by then reflect the resolved turn).
+The hook owns animation state and a list of timeouts, with `start(...)` and `skip()`; cleanup on unmount is built in.
+At commit the screen captures the pre-dispatch run and encounter, then calls `start(...)` with the resolver's `TurnLogEntry`; the hook seeds animation state with the previous values and schedules timeouts toward the resolved state.
+While `animation` is non-null the screen reads display values from it; when it becomes null the screen falls back to the live run and encounter, which by then reflect the resolved turn.
 The store always holds the truth; animation only controls what the player sees and when.
 
-Per-planet visual tells are flag maps on animation state — `actionPulse`, `effectPlanets`, `critPlanets`, `combustingPlanets` — read by `Chart.tsx` and translated into CSS class toggles (`anim-action-glow`, `anim-effect`, `anim-crit-burst`, `anim-combust-ripple`).
-Keyframes live in `style/motion.css`.
-The schedule's longest-running phase is the combust ripple (1000ms); the end delay extends to wait for it before clearing animation state.
-
+Per-planet visual tells are flag maps on animation state (`actionPulse`, `effectPlanets`, `combustingPlanets`), read by `Chart.tsx` and translated into CSS class toggles; keyframes live in `style/motion.css`.
+`useNecessityAnimation.ts` plays the opening sweeps the same way, and `useEncounterAdvance.ts` advances a settled encounter after a pause, with tap to skip.
 `PropagationLine` is RAF-driven gradient travel along a `<line>`.
-It uses `useRef` + `useId` for the gradient — never `document.getElementById`.
 
 ## Known gaps and watch points
 
-- **`Chart.tsx` is the one large file (~950 lines).** It is cohesive — one surface, with its geometry, color math, and subcomponents — but it is where complexity concentrates. If color utilities (`rgbToHsl`, `deepShade`, …) grow a second consumer, move them to `svg/`.
-- **No schema migration.** `Profile` carries `schemaVersion: 1` but schema changes wipe stored state until we ship for real users. The Index screen has a Reset button for explicit clearing.
-- **Determinism edges** (IDs, timestamps, narrative rolls) listed above must be revisited for Starknet integration.
+- **`Chart.tsx` is the one large file.** It is cohesive (one surface with its geometry, colour math, and subcomponents), but it is where complexity concentrates.
+- **No schema migration.** Storage changes wipe saved state; the dev index has a reset.
+- **Determinism edges** (ids, seeds) listed above must be revisited for Starknet integration.
 
 ## Conventions
 
-- Markdown in this repo uses one sentence per line.
-- Don't introduce new visual vocabulary or colors outside the planetary palette without checking `spec/design/STYLE.md`.
-- The chart is never a corner HUD; surfaces flow through the chart, not on top of it.
-- Everything the player sees is SVG — including the NFT, the chart, the map, the encounter, the chrome.
-- `MECHANICS.md` wins when it conflicts with older design docs.
-- No wallet, RPC, or contract calls in `client/` unless explicitly asked.
+Working rules live in the root `CLAUDE.md`, and the design references in `docs/`.
+In short: Markdown one sentence per line, no wallet or contract calls here unless asked, player copy in `src/copy/`, visual values in their token files.
 
 ## Balance evaluation
 
@@ -199,7 +177,7 @@ The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pul
 
 ## Verification
 
-- `pnpm exec tsc -b --noEmit` — typecheck
-- `pnpm test` — Vitest (game logic + reducers)
-- Manual playthrough: Title → Start (mint) → Map → Encounter (combat + narrative) → Finished map → New Run
-- Reset button on Index clears both stores; refresh during an encounter resumes from the same state
+- `pnpm exec tsc -b --noEmit`: typecheck
+- `pnpm test`: Vitest (game logic, reducers, screens)
+- Manual playthrough: Title → cast a chart → Map → Encounter (combat and narrative) → finished map → New Run
+- The dev index's reset clears the store; refresh during an encounter resumes from the same state

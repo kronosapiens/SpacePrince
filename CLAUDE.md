@@ -2,140 +2,81 @@
 
 An onchain roguelike about identity, attention, and irreversible choice.
 
-The player mints a unique **Prince** — a natal chart of 7 planets in 12 signs — and plays runs by choosing which planet to send against opponents.
+The player mints a unique **Prince**, a natal chart of 7 planets in 12 signs, and plays runs of encounters with other charts and with the houses of their own.
 The chart is the character sheet, the save file, and the NFT artifact, all the same object.
 
-See `README.md` for the design pitch.
-The full design lives in `spec/`; this file is a map.
+See `README.md` for the pitch and `docs/README.md` for the map of the design references.
+This file holds working instructions and pointers.
 
 ## Current phase
 
-*This section describes now, not the design — revise it as the phase moves.*
+*This section describes now, not the design; revise it as the phase moves.*
 
 - **Alpha.** Mechanics and screens are still settling; playtesting drives changes.
 - **Prioritize legibility of mechanics and debuggability over production polish.** Making game state readable beats making it pretty.
 - Visual tuning knobs are centralized in `client/src/svg/chart-style.ts` and `client/src/svg/palette.ts`; prefer turning knobs to restructuring.
-- Base stats are being tuned through playtesting; final balance remains open (`spec/mechanics/MECHANICS.md §2`).
+- Base stats are being tuned through playtesting; final balance remains open (`docs/mechanics/MECHANICS.md §2`).
 
 ## Architecture
 
-Space Prince is a **fully onchain game** with a thin presentation client.
+Space Prince is intended as a **fully onchain game** with a thin presentation client.
 
 - **Backend (Starknet / Cairo).**
-  Game state, chart derivation, and run resolution are computed onchain.
-  The Prince NFT is generated entirely onchain as SVG.
-  Astronomical computation is provided by a separate, reusable Cairo package — the [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) repo — which `cairo/crates/star_chart` consumes as a path dependency.
+  Game state, chart derivation, and run resolution are meant to be computed onchain, and the Prince NFT generated onchain as SVG.
+  Astronomical computation comes from a separate, reusable Cairo package, the [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) repo, which `cairo/crates/star_chart` consumes as a path dependency.
   This repo does not vendor that package; the workspace is expected to live as a sibling on disk.
+  Today only the chart-derivation crate exists.
 
 - **Client (browser, React + Vite + TypeScript).**
-  The client is presentation-only: it reads onchain state and renders it.
+  The client is presentation-only: it reads game state and renders it.
   Currently it is a **local prototype** with no wallet, no RPC, and no contract calls.
-  Charts are randomly generated, state lives in `localStorage`, and the focus is combat-flow and chart-readability prototyping.
+  Charts come from a real ephemeris, state lives in `localStorage`, and the focus is combat flow and chart readability.
   Production integration with Starknet will replace the local generators; the rendering surface stays the same.
 
 - **Rendering medium.**
-  Everything the player sees is SVG — the NFT, the chart, the map, the encounter, the chrome.
-  This is a hard constraint: the artifact a player owns must be visually continuous with the world they play in.
-  See `spec/design/STYLE.md`.
+  Everything the player sees is SVG: the NFT, the chart, the map, the encounter, the chrome.
+  The artifact a player owns must be visually continuous with the world they play in (`docs/presentation/STYLE.md`).
 
 ## Repo layout
 
 ```
 cairo/        Cairo crates — onchain backend
-client/       React/Vite/TS — browser client (current prototype, v2)
+client/       React/Vite/TS — browser client (current prototype)
 landing/      React/Vite/TS — the public landing page (spaceprince.xyz)
-spec/         Design spec (see outline below)
-planets/      Per-planet YAML reference notes
-img/          Chart and prototype screenshots
+docs/         Design references, writing material, research, and a small archive
+img/          Banner and prototype screenshots
 README.md     Design pitch
 ```
 
-## Spec outline
+## Where things are
 
-The concept, mechanics, and design directories hold current references and design intent, which remain open to revision.
-Research records retain evidence and history; drafts contain unapproved proposals.
-Completed review of a draft does not make it current guidance.
-
-### `spec/concept/` — what the game *is*
-
-- `LORE.md` — what lore is for in this game (not backstory; structural)
-- `ASTROLOGY.md` — astrology as a symbolic system, historically grounded
-- `PRIMER.md` — player-facing on-ramp: what astrology is and what you're playing (framing + codex)
-- `PLANETS.md` — the philosophical chorus / voice for each of the seven planets
-- [DRIVES.md](spec/concept/DRIVES.md) — the Prince's motives and emotional range, distinct from the player's experience
-- [HOUSE_MATRIX.md](spec/concept/HOUSE_MATRIX.md) — fixed house attributes, human situations, and writing guidance
-- [HOUSE_PLANET_MATRIX.md](spec/concept/HOUSE_PLANET_MATRIX.md) — wants and expressions for all 84 house–planet placements
-- [PLANET_MATRIX.md](spec/concept/PLANET_MATRIX.md) — planet and sign references, dignities, and all 84 planet–sign expressions
-- `NFT.md` — what the Prince NFT is and how it evolves with play
-- `ECONOMICS.md` — economics as commitment reinforcement, not extraction
-- `INFLUENCES.md` — games and genres that shaped Space Prince and where it diverges
-
-### `spec/mechanics/` — how the game *works*
-
-- `MECHANICS.md` — **runtime source of truth** for combat. When older docs conflict, this wins.
-- `STATE.md` — **data source of truth**: canonical structures for the chart + all game state (onchain-bound, mirrored by the client)
-- `CHART.md` — chart-construction spec (Cairo-first)
-- `MAP.md` — run map topology (Sephirot-pattern node graph)
-- [HOUSES.md](spec/mechanics/HOUSES.md) — encounter references grouped by House, Sign, Planet, natal relationships, and current state
-- [ENCOUNTERS.md](spec/mechanics/ENCOUNTERS.md) — scenario composition, economy, eligibility, resolution, and implementation status
-
-### `spec/design/` — how the game *looks and feels*
-
-- `SCREENS.md` — the screen set and how surfaces relate (encounter is the anchor, chart is always present)
-- `STYLE.md` — visual vocabulary: SVG primitives, stroke scale, palette, typography
-- `VIBES.md` — felt qualities: how mechanical state becomes experience
-- `MUSIC.md` — sonic vocabulary: the music workstream (Holst-derived, FTL-structured; strategy only so far)
-- `swatches/` — color swatches per planet
-- `tree.html` — Sephirot tree prototype
-
-### `spec/research/` — evidence and historical findings
-
-The [research index](spec/research/README.md) locates source notes and comparisons.
-Consult these for evidence or historical reasoning; embedded proposals do not supersede current references.
-
-### `spec/drafts/` — active proposals and archived experiments
-
-The [working draft index](spec/drafts/README.md) identifies active work and its status.
-Read drafts when the task concerns that proposal; archived experiments are historical context rather than default authoring inputs.
-After user approval, incorporate accepted conclusions into the relevant current reference and retire the working proposal.
-
-### `spec/v1/` — archived earlier pass
-
-- `DESIGN.md`, `CONTRACTS.md`, `ONBOARD.md` — superseded by the documents above. Kept for reference; do not treat as current.
+- `docs/intent.md` holds premise, audience, experience, and influences.
+- `docs/mechanics/` holds the rules: `MECHANICS.md` (combat), `ENCOUNTERS.md` and `HOUSES.md` (house scenes), `STATE.md` (data), `CHART.md`, `MAP.md`.
+- `docs/presentation/` holds `SCREENS.md`, `STYLE.md`, `MUSIC.md`, and `NFT.md`.
+- `docs/writing/` holds the authoring guide, the matrices, the planetary archetypes, the primer, and the 720 scene briefs.
+- `docs/research/` holds sources and historical findings; a recommendation there is not a rule.
+- GitHub issues hold proposals, experiments, and open questions.
+- Docs record intended behavior; code records implemented behavior.
+  Investigate a disagreement rather than treating either as correct.
+- Presentation rules (register, client honesty, interaction grammar, the chart's channels, chrome placement) live in `docs/presentation/SCREENS.md` §1 and §3 and in `STYLE.md`; read them before UI work.
+  Where a doc and the client disagree on a placement, size, or timing, the client is current; where they disagree on a stated rule, that is a discrepancy to resolve, not a rule the client has quietly changed.
 
 ## Conventions
 
-- **`MECHANICS.md` wins** when it conflicts with older design docs.
-- **Mechanics are specified; composition is decided by looking.** `spec/mechanics/` and the vocabulary in `spec/design/STYLE.md` (primitives, stroke scale, palette, faces) are normative, and code mirrors them. Where a surface puts things, how large, how far apart, how fast, is decided in the running client and lives beside the value in its token file or stylesheet; `SCREENS.md` and the rest of `STYLE.md` hold intent, constraints, and what was tried and shouldn't be re-tried. When one of those docs and the client disagree on a value, the client is current.
-- **Spec markdown uses one sentence per line.**
-- **Don't add wallet, RPC, or contract calls to `client/`** unless explicitly asked — the client is presentation-only and currently a local prototype.
-- **Don't introduce new visual vocabulary or colors** outside the planetary palette without checking `spec/design/STYLE.md` first.
-- **The chart is never a corner HUD.** Surfaces flow through the chart, not on top of it (`spec/design/SCREENS.md`).
-- **No martial language on player surfaces.** Players see encounter / self / other — tension held and relieved; combat, adversary, opponent are internal vocabulary only (`spec/design/SCREENS.md §1.2`).
-- **Client honesty.** Never present derivable information as unknowable, and never frame a determined outcome as a gamble (`spec/design/SCREENS.md §1.1`).
-- **Desktop interactions.**
-  Hover or keyboard focus previews; one activation executes a fully specified action.
-  Planet inspection and narrative target choice remain separate steps; mobile adaptation is deferred (`spec/design/SCREENS.md §3.6`).
-- **Previews show only what is determined.**
-  Verb-dependent information appears once a verb is indicated by hover or focus; verb-free information is free everywhere (`spec/design/SCREENS.md §3.6`).
+- **Markdown uses one sentence per line.**
+- **Don't add wallet, RPC, or contract calls to `client/`** unless explicitly asked; the client is presentation-only and currently a local prototype.
+- **Player-facing text lives under `client/src/copy/`**, one file per surface, never inline JSX.
+- **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (chart viewBox units only; the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
 - **One breath clock.** Every ambient pulse rides the shared `--breath` property (`client/src/style/motion.css`); never add a second rhythm.
-- **The affliction arc is the chart's primary channel.**
-  Affliction is an arc at 1 point = 2°, absolute; the bright span is what a planet can still absorb and the combustion end is pinned at 6 o'clock.
-  Numeric badges are retired (`spec/design/SCREENS.md §3.5.1`).
-- **What is arriving is drawn at the chart's centre.** The corona again, around the magnitude instead of a planet — the blow has no target until the player commits, so it belongs to the chart, not to anything in it. Both charts carry it; yours from the top of the turn, theirs once you indicate a verb (`spec/design/STYLE.md §11`).
-- **One interaction ring, and its colour is the verb.**
-  Breathing = available, steady = hovered/focused/selected/acting.
-  Mist until a verb is determined for that planet, the verb's colour then — never the planet's own hue, which the disc, glyph and halo already carry (`spec/design/SCREENS.md §3.6`).
-- **Chrome sits above and below the wheels, never beside them.** What moves this turn above, what is fixed for the encounter below, each reaching into the empty corners of the wheels' square boxes rather than reserving a band; the wheel is sized from the viewport with no maximum (`spec/design/SCREENS.md §3.7`, §3.1.1).
-- **Don't compulsively record decisions.** Most choices are just the process of arriving at an answer, and writing each one into the spec or a comment turns the repo into a tar pit where every later suggestion has to be argued past an entry that may no longer hold. If something genuinely reads as a core principle worth recording, propose it as a separate edit and wait for explicit confirmation.
-- **Tune via tokens.** Colors live in `client/src/svg/palette.ts`, chart stroke/opacity knobs in `client/src/svg/chart-style.ts`, the stroke schedule in `client/src/svg/viewbox.ts` (four rungs, **chart viewBox units only** — the map and seam render at their own scales), motion in `client/src/style/motion.css`. A hard-coded value moves to its token file the first time it gets tuned; new visual work starts there.
-- **The landing chart follows the client's.** `landing/` carries its own trimmed copy of the chart (resting + hover only — no combat state, so no arc, badges, corona, or propagation), and `landing/src/svg/chart-style.ts` mirrors the client's token values. The client is the source; when its chart styling moves, re-sync the landing.
-- **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`) — never a parallel implementation of the math, so preview and outcome can't drift.
-- **The sexagesimal lattice.** Stats and Resolve ceilings are multiples of 12, probabilities in sixtieths; aspect multipliers are circle fractions (`spec/mechanics/MECHANICS.md`, "Number model" + §9). Never introduce a value that steps off the lattice.
-- **Harvest upward, on request.** A settled design rule may be worth writing into the relevant spec with a one-line pointer here — propose it, don't do it unasked. Code comments hold only what's local to the site.
+- **The landing chart follows the client's.** `landing/` carries a trimmed copy of the chart (resting + hover only), and `landing/src/svg/chart-style.ts` mirrors the client's token values; when the client's chart styling moves, re-sync the landing.
+- **Previews share the resolver's code.** Derived displays (projections, warnings) call the resolution functions (`turn.ts`, `combust.ts`, `narrative.ts`), never a parallel implementation of the math.
+- **The sexagesimal lattice.** Stats and Resolve ceilings are multiples of 12, probabilities in sixtieths; aspect multipliers are circle fractions (`docs/mechanics/MECHANICS.md`, "Number model" and §9). Never introduce a value that steps off the lattice.
+- **Don't record decisions unprompted.** Most choices are just the process of arriving at an answer; writing each one into a doc or a comment turns the repo into a tar pit. If something reads as a principle worth recording, propose it as a separate edit and wait for explicit confirmation.
+- **Harvest upward, on request.** A settled rule may be worth writing into the relevant reference with a one-line pointer here; propose it, don't do it unasked. Code comments hold only what's local to the site.
+- **When a change alters guidance, update the affected reference.** Leave implementation history to git and PRs.
 
 ## Tooling
 
 - Client package manager: **pnpm**. Dev: `pnpm dev` in `client/`.
-- **Tuner** (dev only): `d` in the running client opens the dev console, whose tuner drives whatever is still unsettled live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth — settled values get written back by hand.
+- **Tuner** (dev only): `d` in the running client opens the dev console, whose tuner drives whatever is still unsettled live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth; settled values get written back by hand.
 - Cairo: standard `scarb` workflow inside `cairo/crates/star_chart`. Build expects the sibling `astronomy-engine` workspace to resolve the path dependency.

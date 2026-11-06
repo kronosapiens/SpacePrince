@@ -24,7 +24,7 @@ export const PLANETS: PlanetName[] = [
 export const UNLOCK_THRESHOLDS = [0, 1, 2, 4, 8, 16, 32] as const;
 
 // Per-planet gameplay role — the one-word epithet that gives a player a quick
-// read on what the planet is for. See `spec/mechanics/MECHANICS.md §2`.
+// read on what the planet is for. See `docs/mechanics/MECHANICS.md §2`.
 export const PLANET_ROLE: Record<PlanetName, string> = {
   Sun:     "the sovereign",
   Moon:    "the healer",
