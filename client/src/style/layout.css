@@ -586,7 +586,18 @@
 .combat-foot > * { pointer-events: auto; }
 @media (min-width: 900px) {
   .combat-topbar { transform: translateY(calc(-50% + var(--combat-chrome-shift))); }
-  .combat-foot { top: 100%; transform: translateY(calc(-50% - var(--combat-chrome-shift))); }
+  /* The foot hangs from the wheels' bottom edge. The ruler row alone is tucked
+     up into the corner between the wheels, the chrome shift above that edge;
+     the opening and the rule, too wide for the corner, hang below it. */
+  .combat-foot { top: 100%; }
+  .combat-foot > .combat-ruler {
+    position: absolute;
+    bottom: calc(100% + var(--combat-chrome-shift));
+    left: 0;
+    right: 0;
+    width: max-content;
+    margin-inline: auto;
+  }
 }
 .combat-rule {
   margin: 0;
@@ -596,6 +607,16 @@
   letter-spacing: 0.01em;
   color: var(--mist);
   text-align: center;
+}
+.combat-opening {
+  margin: 0;
+  max-width: var(--combat-opening-width);
+  font-family: var(--serif);
+  font-size: var(--combat-opening-size);
+  line-height: var(--combat-opening-leading);
+  color: var(--bone);
+  text-align: center;
+  text-wrap: balance;
 }
 .combat-side {
   position: relative;
@@ -977,6 +998,7 @@
   .combat-light-v,
   .combat-ruler-v { font-size: clamp(18px, 5vw, 22px); }
   .combat-rule { font-size: 19px; }
+  .combat-opening { font-size: 19px; }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */

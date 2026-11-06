@@ -2,6 +2,7 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Chart } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
+import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
@@ -669,8 +670,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
         {/* What is fixed for the whole encounter, under the wheels:
             the planet that rules it — the colour its node
-            carried on the map — and the rule it sets. What moves (the turn, the
-            score, the other's move) reads above the charts; this reads below. */}
+            carried on the map — how the meeting opens, and the rule it sets.
+            What moves (the turn, the score, the other's move) reads above the
+            charts; this reads below. */}
         <div className="combat-foot">
           <div className="combat-ruler" data-guide="ruler">
             <span className="eyebrow">RULER</span>
@@ -678,6 +680,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
               {ruler}
             </span>
           </div>
+          <p className="combat-opening">
+            {/* How this meeting opens: what the Other seeks, in the manner of the
+                ruler's own sign in their chart (`copy/encounter-openings.ts`).
+                Keyed on the ruler's natal sign, not the rising sign that chose the
+                ruler. Fixed for the whole encounter, like the rule beneath it. */}
+            {ENCOUNTER_OPENINGS[ruler][encounter.opponentChart.planets[ruler].sign]}
+          </p>
           <p className="combat-rule" data-guide="rule">
             {/* The rule in the ruler's colour, under the name in the same colour.
                 Light itself stays neutral — no colour stands for it anywhere

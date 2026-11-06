@@ -58,6 +58,10 @@
   /* How far the encounter's chrome steps in toward the wheels — the top bar
      and labels down, the foot up — so the top bar clears the instruction. */
   --combat-chrome-shift: 8px;
+  /* The sentence that opens the encounter, hung under the wheels with the rule. */
+  --combat-opening-size: 24px;
+  --combat-opening-leading: 1.3;
+  --combat-opening-width: 720px;
 
   --music-theme-label-gap: 4px 8px;
   --music-parts-gap: 16px 28px;

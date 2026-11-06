@@ -303,7 +303,7 @@ None of it is chart data, so it reads as chrome without becoming a HUD sitting o
 
 **What moves sits above the charts; what is fixed sits below.**
 Above: the instruction, the turn, Light, and the sentence naming the other's move — the things that change during play.
-Below, between the SELF and OTHER labels: the encounter's ruler and its rule, constant from the first turn to the last.
+Below, between the SELF and OTHER labels: the encounter's ruler, the sentence that opens the meeting, and the rule, constant from the first turn to the last.
 
 **Allowed:**
 
@@ -335,8 +335,11 @@ Below, between the SELF and OTHER labels: the encounter's ruler and its rule, co
   It sits top centre between the corner buttons, in bone, the same slot the map and narrative screens use for theirs.
   It shows on each run's first map only, and is absent while nothing waits on the player or the guide is open.
   Playtesters still found the game confusing with the invite rings alone, so the step is named outright.
-- **The ruler and its rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — over one line stating how you gain Light here (*Gain Light from affliction on the Other's chart*), the rule in the same colour and Light itself neutral.
-  The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered.
+- **The ruler, the opening, and the rule.** The encounter's ruler (`MECHANICS.md §11`), named in its own colour — the colour its node had on the map — tucked into the corner between the wheels just above their lower edge.
+  Beneath it hang one sentence in bone that opens the meeting, and under that one line stating how you gain Light here (*Gain Light from affliction on the Other's chart*), the rule in the ruler's colour and Light itself neutral.
+  The opening says what the Other seeks from this exchange, in the manner of the ruler's own natal sign in the Other's chart (not the rising sign that chose the ruler), and leaves the player's response unwritten; one sentence per ruler–sign placement lives in `client/src/copy/encounter-openings.ts`.
+  Its job is to make the rule beneath it emotionally legible: what the Other wants is what the rule rewards.
+  The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered, and the opening holds with it, unchanged as turns and acting planets change, from entry through resolution.
 
 **Out:**
 
@@ -616,7 +619,12 @@ Account, wallet, and configuration management are **not** in-game surfaces. They
 
 The game's explanatory copy lives in `PRIMER.md` and surfaces in two places, by length:
 
-- **The framing** — the ~5-line intent-and-stakes beat. Shown **once**, at first arrival, between "Recognize a Position" (§9.4) and Mint (§5). Two affordances: **`Recognize a Position`** (continue into the mint) and **`New to astrology? Read on →`** (open the codex). "Clicking past" the framing *is* choosing to recognize — the gesture leads into the mint, not around it.
+- **The framing** — the short intent-and-stakes beat: seven brief paragraphs in `client/src/copy/primer.ts`.
+  Shown **once**, at first arrival, between the Title (§9.4) and Mint (§5).
+  It says what the player is (a cosmic entity travelling the universe through encounters with others) and what Light is: the energy those meetings create, a kindness and a difficult exchange alike, carried into what comes next, with what remains at a journey's end shaping a star in the sky.
+  It stays above the named mechanics (Resolve, affliction, testimony), which are taught in play, and it stays at two paragraphs on Light so **`Continue`** remains above the fold at 800px tall.
+  Affordances: **`Continue`** (into the mint) and **`New to astrology? Read on →`** (open the codex; not yet in the client).
+  "Clicking past" the framing *is* choosing to begin — the gesture leads into the mint, not around it.
 - **The codex** — the full account of astrology and the game. **Opt-in, never gated:** reachable from the framing's "Read on" and from the quiet Codex affordance on the Title (§9.1). Also usable as a standalone explainer outside the game (`PRIMER.md`, "Role").
 
 **Returning players never see this.** A player who already has a Prince enters through Begin (§9.2, continue or new run) and bypasses the framing entirely; the codex stays available on the Title for whoever wants it. Per `VIBES.md` ("Audience & Exposition"), this is *front-load intent, not information* made literal: the short thing is unavoidable, the long thing is summoned.
