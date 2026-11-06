@@ -58,7 +58,7 @@ You are the Prince.
 Your own chart is the character sheet, and the position is how you were recognized: one place and time, once.
 The journey has Siddhartha's shape, lived as your own: self-discovery through lived experience rather than instruction, each encounter a partial teacher, and no one else's path to follow.
 Enlightenment is the player's, not the game's: more stars and more marks point to mastery, but it is not something a run can complete or the artifact can represent.
-The Prince is addressed in the second person; the scenes already speak to you, and the writing guidance should too.
+The Prince is addressed in the second person, in the scenes and in the house–planet entries.
 No two Princes occupy the same position; many may share a chart, and chart twins are siblings in nature, not duplicates.
 The Prince NFT is the Prince: if it exists the Prince exists, and if it changes the Prince has changed ([NFT.md](presentation/NFT.md)).
 
