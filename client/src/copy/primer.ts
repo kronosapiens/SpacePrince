@@ -12,7 +12,8 @@ export const PRIMER_FRAMING: string[] = [
   "Space Prince is a game about relationships.",
   "But it's not like other games you've played.",
   "Instead of playing as a character, you play as yourself: your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by creating and relieving tension.",
-  "**You are a cosmic entity, traveling the universe gathering light.**",
+  "**You are a cosmic entity, traveling the universe through encounters with others.**",
+  "Light is the energy those meetings create. A kindness can warm you; a difficult exchange can stir you. You carry it into what comes next, and what remains at the end of each journey shapes a star in your sky.",
   "The goal isn't to win, but to better understand yourself, and the inner architecture that sustains you.",
 ];
 

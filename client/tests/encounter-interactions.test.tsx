@@ -3,7 +3,8 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EncounterCombatScreen } from "@/screens/EncounterCombat";
-import { beginCombatEncounter } from "@/game/encounter";
+import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
+import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { getEffectiveStats } from "@/game/combat";
@@ -12,7 +13,7 @@ import { PLANETS } from "@/game/data";
 import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
 import { playUISound } from "@/audio/engine";
 import { NEUTRAL, VALENCE_COLOR } from "@/svg/palette";
-import type { NecessityEntry, PlanetName, Polarity } from "@/game/types";
+import type { NecessityEntry, PlanetName, Polarity, SignName } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -94,6 +95,17 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
 }
 
 describe("encounter interactions", () => {
+  it("opens with the sentence for the ruler's own natal sign, not the rising sign", () => {
+    const { encounter, render } = setup();
+    const ruler = encounterRuler(encounter);
+    const rising = encounter.opponentChart.ascendantSign;
+    const natal: SignName = rising === "Pisces" ? "Aries" : "Pisces";
+    encounter.opponentChart.planets[ruler].sign = natal;
+    render();
+    expect(get(".combat-opening").textContent).toBe(ENCOUNTER_OPENINGS[ruler][natal]);
+    expect(get(".combat-opening").textContent).not.toBe(ENCOUNTER_OPENINGS[ruler][rising]);
+  });
+
   it.each(["self", "other"] as const)("waits for the longer %s opening before allowing the first action", (longer) => {
     const counts = { self: longer === "self" ? 2 : 1, other: longer === "other" ? 2 : 1 };
     const { run, encounter, render, onCommitTurn } = setup(false, counts);
