@@ -328,7 +328,8 @@ A card opens in three contexts:
   It reuses the planet introduction’s abstract composition with a complete curated passage, author, linked work/locator, and translator when present.
   Its opaque backdrop keeps the initialized chart concealed until the opening can play; the chart stays mounted and cannot be inspected while reading.
   Continue, backdrop, ✕, and ESC all reveal the committed encounter.
-  Refresh restores an open passage; after Continue it stays dismissed.
+  Reloading an encounter shows a newly selected passage, even after a previous dismissal.
+  Passage and dismissal state live only in the UI.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
 The Moon has no threshold to cross; its card presents at the end of the mint reveal instead (§5.2).

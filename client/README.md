@@ -74,14 +74,15 @@ Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-sh
 
 ### Planetary chorus at encounter entry
 
-`useEnterNode` applies development overrides, initializes the encounter through `enterNode`, and commits it together with a passage snapshot in optional `encounter.chorus`.
-Selection uses a separate seeded stream derived from run, map, node, and a chorus salt; it does not consume gameplay draws.
+`useEnterNode` applies development overrides and commits the initialized encounter through `enterNode`.
 The catalogue in `copy/chorus.ts` imports the seven canonical YAML files under `docs/research/chorus/` through `@rollup/plugin-yaml` in both Vite and Vitest.
 
-`PlaySurface` renders `ChorusCard` instead of mounting `EncounterScreen` while that field exists, so opening playback, guides, and automatic advancement wait for Continue.
+`PlaySurface` mounts an opening component keyed by encounter ID, which selects a random passage once and holds it in local UI state.
+It renders `ChorusCard` before mounting `EncounterScreen`, so opening playback, guides, and automatic advancement wait for Continue.
 The shared chart stays mounted with inspection disabled behind an opaque backdrop.
-All dismissal paths remove only the snapshot through `commitRun`; persistence restores an open passage and remembers dismissal without a new storage version.
-Existing saves and direct development spawns without the field render normally.
+All dismissal paths discard the local passage without changing game state.
+Reloading an encounter, including an existing save or direct development spawn, shows a newly selected card; ordinary rerenders and turn updates do not reopen it.
+No passage or dismissal state is persisted, and no storage migration is needed.
 
 ### The game layer is framework-free
 

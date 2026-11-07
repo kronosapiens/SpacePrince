@@ -10,7 +10,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { saveDevSettings } from "@/state/settings";
 import { CHORUS, chorusRuler } from "@/copy/chorus";
 import { playNecessityNote, setTheme } from "@/audio/engine";
-import type { Prince, Run } from "@/game/types";
+import type { Prince } from "@/game/types";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn() }));
@@ -60,26 +60,22 @@ function reload() {
   root = createRoot(container);
   act(() => root.render(<GameTest path="/play" />));
 }
-function withoutChorus(run: Run) {
-  const { chorus: _, ...encounter } = run.encounter!;
-  return { ...run, encounter };
-}
-
 describe("chorus entry", () => {
-  it.each(["relational", "narrative"] as const)("commits %s once, holds its lifecycle, and persists Continue", (kind) => {
+  it.each(["relational", "narrative"] as const)("commits %s once and holds its lifecycle without storing presentation state", (kind) => {
     const { prince, run, nodeId } = setup(kind);
     const expected = enterNode({ run, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     mount(prince);
     const chart = document.querySelector(".chart-layout-chart .chart-svg");
     click(`[data-guide="node-${nodeId}"]`);
     const committed = current();
-    expect(withoutChorus(committed)).toEqual(expected);
+    expect(committed).toEqual(expected);
+    expect(committed.encounter).not.toHaveProperty("chorus");
     const ruler = chorusRuler(committed.encounter!);
-    expect(CHORUS[ruler].some((p) => p.text === committed.encounter!.chorus!.text)).toBe(true);
+    const passage = CHORUS[ruler].find((p) => p.text === document.querySelector(".chorus-passage")!.textContent)!;
+    expect(passage).toBeDefined();
     expect(document.querySelector(".chorus-name")!.textContent).toBe(ruler);
-    expect(document.querySelector(".chorus-passage")!.textContent).toBe(committed.encounter!.chorus!.text);
     const source = document.querySelector<HTMLAnchorElement>(".chorus-attribution a")!;
-    expect(source.href).toBe(committed.encounter!.chorus!.source_url);
+    expect(source.href).toBe(passage.source_url);
     expect(source.target).toBe("_blank");
     expect(setTheme).toHaveBeenLastCalledWith(ruler, kind);
     expect(document.querySelector(".chart-layout-chart .chart-svg")).toBe(chart);
@@ -89,23 +85,45 @@ describe("chorus entry", () => {
     expect(current()).toEqual(committed);
     expect(document.querySelector(".necessity-opening, .guide-overlay, .relational-foot, .narrative-column")).toBeNull();
     expect(playNecessityNote).not.toHaveBeenCalled();
-    reload();
-    expect(current()).toEqual(committed);
-    expect(document.querySelector(".chorus-passage")!.textContent).toBe(committed.encounter!.chorus!.text);
     click(".chorus-continue");
     expect(current()).toEqual(expected);
     expect(document.querySelector(".chorus-modal")).toBeNull();
     expect(document.querySelector(kind === "relational" ? ".relational-foot" : ".narrative-column")).not.toBeNull();
-    reload();
-    expect(current().encounter).not.toHaveProperty("chorus");
+    act(() => root.render(<GameTest path="/play" />));
     expect(document.querySelector(".chorus-modal")).toBeNull();
+  });
+
+  it("keeps the passage stable through rerenders and draws again on reload before or after Continue", () => {
+    const random = vi.spyOn(Math, "random").mockReturnValue(0);
+    try {
+      const { prince, nodeId } = setup("narrative");
+      mount(prince);
+      click(`[data-guide="node-${nodeId}"]`);
+      const committed = current();
+      const pool = CHORUS[chorusRuler(committed.encounter!)];
+      expect(document.querySelector(".chorus-passage")!.textContent).toBe(pool[0]!.text);
+      random.mockReturnValue(0.999);
+      act(() => root.render(<GameTest path="/play" />));
+      expect(document.querySelector(".chorus-passage")!.textContent).toBe(pool[0]!.text);
+      reload();
+      expect(document.querySelector(".chorus-passage")!.textContent).toBe(pool.at(-1)!.text);
+      expect(current()).toEqual(committed);
+      click(".chorus-continue");
+      expect(current()).toEqual(committed);
+      random.mockReturnValue(0);
+      reload();
+      expect(document.querySelector(".chorus-passage")!.textContent).toBe(pool[0]!.text);
+      expect(current()).toEqual(committed);
+    } finally {
+      random.mockRestore();
+    }
   });
 
   it.each(["close", "backdrop", "Escape"])("%s reveals the committed encounter without applying entry again", (method) => {
     const { prince, nodeId } = setup("narrative");
     mount(prince);
     click(`[data-guide="node-${nodeId}"]`);
-    const expected = withoutChorus(current());
+    const expected = current();
     if (method === "Escape") act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })));
     else click(method === "close" ? ".info-card-close" : ".chorus-modal");
     expect(current()).toEqual(expected);
@@ -133,13 +151,13 @@ describe("chorus entry", () => {
     saveDevSettings({ unlockAll: true, forceRelational: false, forceNarrativeHouse: 8 });
     mount(prince);
     click(`[data-guide="node-${nodeId}"]`);
-    expect(current().encounter).toMatchObject({ kind: "narrative", house: 8, chorus: expect.any(Object) });
+    expect(current().encounter).toMatchObject({ kind: "narrative", house: 8 });
     act(() => root.unmount());
     root = createRoot(container);
     saveDevSettings({ unlockAll: true, forceRelational: true, forceNarrativeHouse: null });
     mount(prince);
     click(`[data-guide="node-${nodeId}"]`);
-    expect(current().encounter).toMatchObject({ kind: "relational", chorus: expect.any(Object) });
+    expect(current().encounter).toMatchObject({ kind: "relational" });
   });
 
   it("keeps a roster wiped on entry behind the chorus, then plays and advances", () => {
@@ -153,7 +171,7 @@ describe("chorus entry", () => {
     }
     mount(prince);
     click(`[data-guide="node-${nodeId}"]`);
-    expect(current().encounter).toMatchObject({ resolved: true, chorus: expect.any(Object) });
+    expect(current().encounter).toMatchObject({ resolved: true });
     act(() => vi.advanceTimersByTime(60_000));
     expect(current().encounter).not.toBeNull();
     expect(loadPrince()!.numRelationalEncounters).toBe(0);
@@ -166,11 +184,13 @@ describe("chorus entry", () => {
     expect(loadPrince()!.numRelationalEncounters).toBe(1);
   });
 
-  it("resumes an existing save without a chorus field normally", () => {
+  it("shows a chorus for an existing encounter save before resuming", () => {
     const { prince, run, nodeId } = setup("narrative");
     prince.runs = [enterNode({ run, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: 64 })];
     mount(prince);
-    expect(document.querySelector(".chorus-modal")).toBeNull();
+    expect(document.querySelector(".chorus-modal")).not.toBeNull();
+    expect(document.querySelector(".narrative-column")).toBeNull();
+    click(".chorus-continue");
     expect(document.querySelector(".narrative-column")).not.toBeNull();
   });
 });

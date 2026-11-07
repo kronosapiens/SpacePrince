@@ -6,6 +6,6 @@ declare module "*?raw" {
 }
 
 declare module "*.yaml" {
-  const passages: import("./game/types").ChorusPassage[];
+  const passages: import("./copy/chorus").ChorusPassage[];
   export default passages;
 }

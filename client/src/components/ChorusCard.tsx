@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { InfoCard } from "./InfoCard";
 import { KandinskyComposition } from "./KandinskyComposition";
 import { BeginButton } from "./BeginButton";
-import { CHORUS_COPY } from "@/copy/chorus";
+import { CHORUS_COPY, type ChorusPassage } from "@/copy/chorus";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { playUISound, setTheme } from "@/audio/engine";
-import type { ChorusPassage, EncounterState, PlanetName } from "@/game/types";
+import type { EncounterState, PlanetName } from "@/game/types";
 
 interface ChorusCardProps {
   planet: PlanetName;

@@ -17,15 +17,13 @@ describe("planetary chorus", () => {
     }
   });
 
-  it("selects uniformly, permits repeats, and snapshots only presentation fields", () => {
+  it("selects uniformly and permits repeats", () => {
     for (const planet of PLANETS) {
       const pool = CHORUS[planet];
       pool.forEach((passage, i) => {
         const draw = () => (i + 0.5) / pool.length;
         const selected = selectChorusPassage(planet, draw);
         expect(selected.text).toBe(passage.text);
-        expect(selected).not.toBe(passage);
-        expect(selected).not.toHaveProperty("moods");
         expect(selectChorusPassage(planet, draw)).toEqual(selected);
       });
     }

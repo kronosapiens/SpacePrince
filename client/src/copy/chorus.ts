@@ -8,7 +8,15 @@ import saturn from "../../../docs/research/chorus/saturn.yaml";
 import { HOUSES } from "@/data/houses";
 import { encounterRuler } from "@/game/encounter";
 import { pickWeighted } from "@/game/rng";
-import type { ChorusPassage, EncounterState, PlanetName } from "@/game/types";
+import type { EncounterState, PlanetName } from "@/game/types";
+
+export interface ChorusPassage {
+  text: string;
+  author: string;
+  source: string;
+  translation?: string;
+  source_url: string;
+}
 
 export const CHORUS: Record<PlanetName, ChorusPassage[]> = {
   Sun: sun, Moon: moon, Mercury: mercury, Venus: venus, Mars: mars, Jupiter: jupiter, Saturn: saturn,
@@ -23,8 +31,7 @@ export function chorusRuler(encounter: EncounterState): PlanetName {
   return encounter.kind === "relational" ? encounterRuler(encounter) : HOUSES[encounter.house - 1]!.ruler;
 }
 
-/** Uniform independent selection; snapshot only the fields shown by the card. */
-export function selectChorusPassage(planet: PlanetName, rng: () => number): ChorusPassage {
-  const { text, author, source, translation, source_url } = pickWeighted(CHORUS[planet], rng);
-  return { text, author, source, ...(translation ? { translation } : {}), source_url };
+/** Uniform independent selection; repeated passages are allowed. */
+export function selectChorusPassage(planet: PlanetName, rng: () => number = Math.random): ChorusPassage {
+  return pickWeighted(CHORUS[planet], rng);
 }

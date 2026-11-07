@@ -3,7 +3,8 @@
 The chorus presents one complete curated excerpt when the player enters a relational or narrative encounter.
 It uses the encounter ruler's corpus, displays attribution beside the existing planetary composition, and waits for Continue before revealing the encounter.
 Selection is independent at each entry; repeats are acceptable.
-The pending passage is saved with the encounter, so refresh preserves it until Continue.
+The passage lives only in UI state until Continue.
+Reloading an encounter selects and shows a new passage, even after a previous dismissal.
 
 The seven YAML files beside this document are the runtime's single source of quoted content.
 The client imports them at build time through `client/src/copy/chorus.ts`.

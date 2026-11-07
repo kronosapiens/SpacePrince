@@ -82,6 +82,7 @@ function entryWipe(count: number) {
 function mount(prince: ReturnType<typeof createStubPrince>, settleOpening = true) {
   savePrince(prince);
   act(() => root!.render(<GameTest path="/play" />));
+  click(document.querySelector(".chorus-continue")!);
   if (settleOpening && container.querySelector(".necessity-opening")) {
     act(() => vi.runOnlyPendingTimers());
     expect(container.querySelector(".necessity-opening")).toBeNull();
@@ -180,6 +181,7 @@ describe("encounter advancement", () => {
   it("sounds selection and commitment separately, and leaves repeated selection silent", () => {
     const { prince } = relational(2);
     mount(prince);
+    vi.mocked(playUISound).mockClear();
     const planet = get('[data-guide="planet-self-moon"]');
     click(planet);
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);

@@ -6,7 +6,6 @@ import { hashString, mulberry32, randomSeed } from "@/game/rng";
 import { loadDevSettings } from "./settings";
 import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
-import { chorusRuler, selectChorusPassage } from "@/copy/chorus";
 import type { Chart, PlanetName, Polarity, Run } from "@/game/types";
 
 /**
@@ -32,7 +31,7 @@ export function useStartRun() {
   );
 }
 
-/** Commit entry and its pending passage together, without drawing from game RNG. */
+/** Apply development overrides and commit initialized node entry. */
 export function useEnterNode() {
   const prince = usePrince();
   const run = useActiveRun();
@@ -58,11 +57,6 @@ export function useEnterNode() {
       devUnlockAll: settings.unlockAll,
     });
     if (!nextRun.encounter) return;
-    const rng = mulberry32(hashString(`${run.seed}/${run.map.seed}/${nodeId}/chorus`));
-    nextRun = {
-      ...nextRun,
-      encounter: { ...nextRun.encounter, chorus: selectChorusPassage(chorusRuler(nextRun.encounter), rng) },
-    };
     dispatch({ kind: "commitRun", run: nextRun });
   }, [prince, run, dispatch]);
 }
