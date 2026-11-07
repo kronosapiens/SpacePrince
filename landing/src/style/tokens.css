@@ -99,7 +99,7 @@ button {
 
 /* Force monochrome symbol rendering for astrology glyphs (no emoji) */
 svg text,
-.combat-opp-glyph,
+.relational-opp-glyph,
 .option-gate {
   font-family: 'Cormorant Garamond', 'Noto Sans Symbols 2', 'Segoe UI Symbol', 'Apple Symbols', serif !important;
   font-variant-emoji: text;

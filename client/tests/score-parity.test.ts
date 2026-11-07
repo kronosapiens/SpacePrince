@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
-import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
+import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { getAspects } from "@/game/aspects";
 import { combustionCeiling } from "@/game/combust";
 import { computeProjectedEffects } from "@/game/projections";
@@ -8,15 +8,15 @@ import { PLANETS } from "@/game/data";
 import { logToBeats, scoreBeats, turnLight, type ScoreCharts } from "@/game/score";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
-import type { CombatEncounter, PlanetName, Polarity, Run } from "@/game/types";
+import type { RelationalEncounter, PlanetName, Polarity, Run } from "@/game/types";
 
 function setup(opponentSeed: number) {
   const prince = createStubPrince({ seed: 7 });
   const base = beginRun(prince.chart, 42);
-  const enc = beginCombatEncounter({
+  const enc = beginRelationalEncounter({
     run: base,
     opponentSeed,
-    lifetimeEncounterCount: prince.numEncounters,
+    lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
   });
   // Give Testimony something to resolve even when opening Fortune blocks the draw.
   enc.opponentState[enc.sequence[0]!].affliction = 12;
@@ -30,7 +30,7 @@ function setup(opponentSeed: number) {
 function compare(
   opponentSeed: number,
   playerValence: Polarity,
-  prepare?: (ctx: { run: Run; enc: CombatEncounter; playerPlanet: PlanetName }) => void,
+  prepare?: (ctx: { run: Run; enc: RelationalEncounter; playerPlanet: PlanetName }) => void,
 ) {
   const { prince, run, enc } = setup(opponentSeed);
   // A planet with a web, so the hops are exercised on the player's side too.

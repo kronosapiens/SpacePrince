@@ -70,13 +70,13 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   const w = maxX - minX;
   const h = maxY - minY;
 
-  // Combat nodes derive their color from the opponent's chart ruler — the
+  // Relational nodes derive their color from the opponent's chart ruler — the
   // planet that rules the opponent's Ascendant sign. Cached per node so we
   // only build each opponent chart once per render pass.
-  const combatRulerByNode = useMemo(() => {
+  const relationalRulerByNode = useMemo(() => {
     const out: Record<string, PlanetName> = {};
     for (const [id, content] of Object.entries(map.rolledNodes)) {
-      if (content.kind !== "combat") continue;
+      if (content.kind !== "relational") continue;
       out[id] = chartRuler(seededChart(content.opponentSeed, ""));
     }
     return out;
@@ -87,7 +87,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const c = map.rolledNodes[id];
     if (!c) return null;
     if (c.kind === "narrative") return HOUSES[c.house - 1]!.ruler;
-    if (c.kind === "combat") return combatRulerByNode[id] ?? null;
+    if (c.kind === "relational") return relationalRulerByNode[id] ?? null;
     return null;
   };
 
@@ -163,7 +163,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const r = ruler(n.id);
     const color = nodeColor(n.id);
     const isNarrative = content?.kind === "narrative";
-    const isCombat = content?.kind === "combat";
+    const isRelational = content?.kind === "relational";
     const selectNode = onSelectNode && isEligible
       ? () => onSelectNode(n.id)
       : undefined;
@@ -186,7 +186,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
     const strokeWidth = isCurrent ? 2.4 : isDistant ? TIER.background.stroke : 1.8;
 
     // Halo gradient for the current node and for clickable nodes (the latter use
-    // it for the breathing "you can go here" glow, mirroring combat planets).
+    // it for the breathing "you can go here" glow, mirroring relational planets).
     if (isCurrent || isClickable) {
       haloDefs.push(
         <radialGradient key={`mh-${n.id}`} id={`m2-halo-${n.id}`}>
@@ -270,7 +270,7 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
             </g>
           );
         })()}
-        {isCombat && (() => {
+        {isRelational && (() => {
           const fillOp = isCurrent ? 0.85 : op * 0.78;
           return (
             <g style={{ pointerEvents: "none" }}>

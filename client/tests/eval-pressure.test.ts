@@ -4,20 +4,20 @@ import { A, G, scene, trade } from "@/data/narrative/shared";
 import { playEncounter, snapshot, type PlayContext, type Policy, type Step } from "@/eval/play";
 import { runChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
-import { combatTurnRng } from "@/game/turn";
+import { relationalTurnRng } from "@/game/turn";
 import { PLANETS } from "@/game/data";
 import type { Prince, Run } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 const policy: Policy = {
   route: (_play, _run, ids) => ids[0]!,
-  combat: () => ({ planet: "Moon", verb: "Testimony" }),
+  relational: () => ({ planet: "Moon", verb: "Testimony" }),
   narrative: () => ({ optionId: "restore", selection: { chosen: "Venus" } }),
 };
 const context = (prince: Prince): PlayContext => ({ prince, policy,
-  trial: { chartSeed: 7, gameSeed: 2, strategy: "random", strategySeed: 0 }, rng: () => .5, turnRng: combatTurnRng });
+  trial: { chartSeed: 7, gameSeed: 2, strategy: "random", strategySeed: 0 }, rng: () => .5, turnRng: relationalTurnRng });
 const capacity = (prince: Prince, run: Run, roster = PLANETS) => {
   const chart = runChart(prince.chart, run);
   return roster.reduce((sum, p) => sum + Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction), 0);
@@ -28,13 +28,13 @@ describe("evaluation pressure ledger", () => {
 
   it.each(["Affliction", "Testimony"] as const)("counts actual direct, propagated and inverted effects of %s", (verb) => {
     vi.spyOn(Date, "now").mockReturnValue(0);
-    const prince = createStubPrince({ numEncounters: 2 });
+    const prince = createStubPrince({ numRelationalEncounters: 2 });
     prince.chart.planets.Moon.sign = "Aries";
     prince.chart.planets.Mercury.sign = "Gemini";
     prince.chart.planets.Venus.sign = "Libra";
-    const run = beginRun(prince.chart, 2, prince.numEncounters);
+    const run = beginRun(prince.chart, 2, prince.numRelationalEncounters);
     run.gains.Moon.resolve = 12;
-    const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
+    const encounter = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     encounter.sequence = ["Moon"];
     encounter.opponentActions = [verb];
     encounter.opponentChart.planets.Moon.base.affliction = 36;
@@ -68,7 +68,7 @@ describe("evaluation pressure ledger", () => {
     const prince = createStubPrince();
     prince.chart.ascendantSign = "Aries";
     for (const p of PLANETS) prince.chart.planets[p].sign = "Taurus";
-    const run = beginRun(prince.chart, 2, prince.numEncounters);
+    const run = beginRun(prince.chart, 2, prince.numRelationalEncounters);
     run.gains.Venus.resolve = 24;
     const ceiling = combustionCeiling(runChart(prince.chart, run).planets.Venus);
     run.state.Venus.affliction = revived ? ceiling : 12;

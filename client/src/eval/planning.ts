@@ -1,21 +1,21 @@
 import { runChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
-import { fortuneChance, getEffectiveStats } from "@/game/combat";
+import { fortuneChance, getEffectiveStats } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { NECESSITY_AFFLICTION_TIERS } from "@/game/necessity";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { MAPS_PER_RUN } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
-import type { Chart, CombatEncounter, MapState, PlanetName, Polarity, Run } from "@/game/types";
-import { combatActions, type CombatAction, type PlayContext, type Policy } from "./play";
+import type { Chart, RelationalEncounter, MapState, PlanetName, Polarity, Run } from "@/game/types";
+import { relationalActions, type RelationalAction, type PlayContext, type Policy } from "./play";
 
 export interface Value { alive: number; lit: number; capacity: number; light: number }
-export interface Candidate { action: CombatAction; immediate: Value; value: Value }
+export interface Candidate { action: RelationalAction; immediate: Value; value: Value }
 export interface PlanningOptions {
   horizon?: 1 | 2;
   capacityAllowance?: number;
   anticipateEntry?: boolean;
-  route?: "survival" | "combat" | "narrative";
+  route?: "survival" | "relational" | "narrative";
 }
 
 const NO_DRAW = () => 0;
@@ -34,7 +34,7 @@ function measure(run: Run, chart: Chart, roster: PlanetName[]): Value {
 /** Every possible next announcement: uniform among lit Other planets, then
  * the game's stat-weighted verb. Replaces the resolver's placeholder draw. */
 export function nextAnnouncements(run: Run): { run: Run; probability: number }[] {
-  const encounter = run.encounter as CombatEncounter;
+  const encounter = run.encounter as RelationalEncounter;
   if (encounter.resolved) return [];
   const roster = encounter.roster.filter((p) => !isCombusted(encounter.opponentChart.planets[p], encounter.opponentState[p]));
   return roster.flatMap((planet) => {
@@ -69,12 +69,12 @@ export function preferred(candidates: Candidate[], allowance = 0): Candidate[] {
   return lightBest.filter((c) => c.value.capacity >= remaining - EPSILON);
 }
 
-/** Value a resolved combat as if another combat arrived before recovery.
+/** Value a resolved relational as if another relational encounter arrived before recovery.
  * This heuristic omits intervening narratives, map revival and unlocks.
  * Independent Fortune rolls fully block the current Necessity tiers.
  * The chart is natal; both Resolve and Fortune include run gains here. */
 export function entryLeafValue(run: Run, chart: Chart): Value {
-  const encounter = run.encounter as CombatEncounter;
+  const encounter = run.encounter as RelationalEncounter;
   const effective = runChart(chart, run);
   const current = measure(run, effective, encounter.roster);
   const completed = run.mapsCompleted >= MAPS_PER_RUN ||
@@ -104,12 +104,12 @@ export function entryLeafValue(run: Run, chart: Chart): Value {
 /** Resolve the announced exchange exactly. At horizon two, enumerate the next
  * announcement and choose its best response by the same rule. No live draws
  * are consumed; entry anticipation changes only resolved-encounter leaves. */
-export function evaluateCombat(
-  play: PlayContext, run: Run, actions: CombatAction[], options: PlanningOptions = {},
+export function evaluateRelational(
+  play: PlayContext, run: Run, actions: RelationalAction[], options: PlanningOptions = {},
 ): Candidate[] {
   const { horizon = 1, capacityAllowance = 0, anticipateEntry = false } = options;
   const chart = runChart(play.prince.chart, run);
-  const roster = (run.encounter as CombatEncounter).roster;
+  const roster = (run.encounter as RelationalEncounter).roster;
   const valueOf = (after: Run) => anticipateEntry
     ? entryLeafValue(after, play.prince.chart) : measure(after, chart, roster);
   return actions.map((action) => {
@@ -119,7 +119,7 @@ export function evaluateCombat(
     if (!announcements.length) return { action, immediate, value: valueOf(after) };
     const value: Value = { alive: 0, lit: 0, capacity: 0, light: 0 };
     for (const next of announcements) {
-      const following = combatActions(next.run, play.prince.chart, next.run.encounter as CombatEncounter).map((choice) => {
+      const following = relationalActions(next.run, play.prince.chart, next.run.encounter as RelationalEncounter).map((choice) => {
         const resolved = resolveTurn(next.run, play.prince.chart, choice.planet, choice.verb, NO_DRAW)!.run;
         return { action: choice, immediate: measure(resolved, chart, roster), value: valueOf(resolved) };
       });
@@ -144,14 +144,14 @@ export function encountersToExit(map: MapState, nodeId: string): number {
   return count;
 }
 
-function preferredRoute(kind: "combat" | "narrative", play: PlayContext, run: Run, nodes: string[]): string {
+function preferredRoute(kind: "relational" | "narrative", play: PlayContext, run: Run, nodes: string[]): string {
   const preferred = nodes.filter((id) => run.map.rolledNodes[id]!.kind === kind);
   const candidates = preferred.length ? preferred : nodes;
   const distances = candidates.map((id) => encountersToExit(run.map, id));
   const shortest = Math.min(...distances);
   const tied = candidates.filter((_, i) => distances[i] === shortest);
   const { chartSeed, gameSeed } = play.trial;
-  // Historical route controls use a node-keyed stream, independent of combat ties.
+  // Historical route controls use a node-keyed stream, independent of relational ties.
   const rng = mulberry32(hashString(`difficulty_route_${chartSeed}_${gameSeed}_${run.mapsCompleted + 1}_${run.map.currentNodeId}`));
   return pickWeighted(tied, rng);
 }
@@ -164,9 +164,9 @@ export function planningPolicy(baseline: Policy, options: PlanningOptions): Poli
     route: route === "survival"
       ? (play, run, ids) => baseline.route({ ...play, policy: baseline }, run, ids)
       : (play, run, ids) => preferredRoute(route, play, run, ids),
-    combat: horizon === 1 && capacityAllowance === 0 && !anticipateEntry
-      ? baseline.combat
-      : (play, run, actions) => pickWeighted(preferred(evaluateCombat(play, run, actions, options), capacityAllowance), play.rng).action,
+    relational: horizon === 1 && capacityAllowance === 0 && !anticipateEntry
+      ? baseline.relational
+      : (play, run, actions) => pickWeighted(preferred(evaluateRelational(play, run, actions, options), capacityAllowance), play.rng).action,
     narrative: baseline.narrative,
   };
 }

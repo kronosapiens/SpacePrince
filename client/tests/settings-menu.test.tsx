@@ -54,7 +54,7 @@ function mount() {
 
 describe("settings menu", () => {
   it.each(["/", "/play"])("re-rolls the Prince inside its preview from %s without navigating or closing it", (path) => {
-    const prince = createStubPrince({ numEncounters: 4 });
+    const prince = createStubPrince({ numRelationalEncounters: 4 });
     prince.runs = [beginRun(prince.chart, 1, 4)];
     savePrince(prince);
     act(() => root.render(
@@ -74,7 +74,7 @@ describe("settings menu", () => {
 
     const rerolled = loadPrince()!;
     expect(rerolled.id).not.toBe(prince.id);
-    expect(rerolled.numEncounters).toBe(prince.numEncounters);
+    expect(rerolled.numRelationalEncounters).toBe(prince.numRelationalEncounters);
     expect(get(".prince-modal")).toBe(preview);
     expect(get("[data-location]").textContent).toBe(path);
     expect(preview.querySelectorAll('[aria-label="Past runs"] > g')).toHaveLength(rerolled.runs.length - 1);

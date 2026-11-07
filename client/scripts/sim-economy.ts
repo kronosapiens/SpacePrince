@@ -9,8 +9,8 @@
  *   pnpm sim:economy [--charts N] [--roster 7] [--maps 1,3,5] [--seed 1] [--json out.json]
  *
  * The run lifecycle mirrors the client: `beginRun` (store-actions `useStartRun`),
- * node entry and `beginCombatEncounter` (MapScreen `handleNodeSelect`), the turn
- * rng and `resolveTurn` (EncounterCombat `handleCommit`, store-actions
+ * node entry and `beginRelationalEncounter` (MapScreen `handleNodeSelect`), the turn
+ * rng and `resolveTurn` (EncounterRelational `handleCommit`, store-actions
  * `useCommitTurn`), clearing the encounter (EncounterScreen `clearEncounter`),
  * and `rolloverMap` once the terminal node is cleared (MapScreen's effect).
  */
@@ -19,7 +19,7 @@ import { parseArgs } from "node:util";
 import { cloneSideState, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted, uncombust } from "@/game/combust";
 import { PLANETS, UNLOCK_THRESHOLDS } from "@/game/data";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { beginRun, isOver, MAPS_PER_RUN, rolloverMap } from "@/game/run";
@@ -58,10 +58,10 @@ const seedOf = (...parts: (string | number)[]) => hashString(parts.join("_")) % 
 
 const VERBS: Polarity[] = ["Affliction", "Testimony"];
 
-/** Baseline-only observer: snapshots at each map opening, and per-combat tallies. */
+/** Baseline-only observer: snapshots at each map opening, and per-relational tallies. */
 interface Watch {
   mapOpened(run: Run): void;
-  combat(map: number, light: number, afflictionTaken: number): void;
+  relational(map: number, light: number, afflictionTaken: number): void;
 }
 
 const fieldedAffliction = (run: Run) => ROSTER.reduce((s, p) => s + run.state[p].affliction, 0);
@@ -89,22 +89,22 @@ function chooseAction(run: Run, chart: Chart): { planet: PlanetName; verb: Polar
   return best;
 }
 
-function playCombat(run: Run, chart: Chart, opponentSeed: number, watch?: Watch): Run {
+function playRelational(run: Run, chart: Chart, opponentSeed: number, watch?: Watch): Run {
   const map = run.mapsCompleted + 1;
   let r: Run = {
     ...run,
-    encounter: beginCombatEncounter({ run, opponentSeed, lifetimeEncounterCount: TIER }),
+    encounter: beginRelationalEncounter({ run, opponentSeed, lifetimeRelationalEncounterCount: TIER }),
   };
   // A run whose fielded planets all combust mid-encounter is over: no lit
   // planet is left to act, so the encounter cannot finish.
-  while (r.encounter?.kind === "combat" && !r.encounter.resolved && !isOver(r, chart, TIER)) {
+  while (r.encounter?.kind === "relational" && !r.encounter.resolved && !isOver(r, chart, TIER)) {
     const enc = r.encounter;
     const { planet, verb } = chooseAction(r, chart);
-    // The client's per-turn rng (EncounterCombat `handleCommit`).
+    // The client's per-turn rng (EncounterRelational `handleCommit`).
     const rng = mulberry32((r.seed ^ enc.turnIndex ^ hashString(enc.id)) >>> 0);
     r = resolveTurn(r, chart, planet, verb, rng)!.run;
   }
-  watch?.combat(map, r.light - run.light, fieldedAffliction(r) - fieldedAffliction(run));
+  watch?.relational(map, r.light - run.light, fieldedAffliction(r) - fieldedAffliction(run));
   return { ...r, encounter: null };
 }
 
@@ -122,7 +122,7 @@ function playMap(run: Run, chart: Chart, pairSeed: number, watch?: Watch): Run {
     const content = r.map.rolledNodes[nodeId]!;
     // Narrative nodes are a walk-away: no effects.
     if (content.kind === "narrative") continue;
-    r = playCombat(r, chart, content.opponentSeed, watch);
+    r = playRelational(r, chart, content.opponentSeed, watch);
     if (isOver(r, chart, TIER)) return r;
   }
   return r;
@@ -211,7 +211,7 @@ function treat(
 interface MapTally {
   reached: number;
   litAtOpen: number;
-  combats: number;
+  relationalEncounters: number;
   light: number;
   afflictionTaken: number;
 }
@@ -226,7 +226,7 @@ interface Obs {
 }
 
 const mapTallies: MapTally[] = Array.from({ length: MAPS_PER_RUN }, () => ({
-  reached: 0, litAtOpen: 0, combats: 0, light: 0, afflictionTaken: 0,
+  reached: 0, litAtOpen: 0, relationalEncounters: 0, light: 0, afflictionTaken: 0,
 }));
 const finalLights: number[] = [];
 const earlyEnds: number[] = Array(MAPS_PER_RUN).fill(0); // by map the run ended on
@@ -245,9 +245,9 @@ for (let i = 0; i < CHARTS; i++) {
       tally.reached++;
       tally.litAtOpen += ROSTER.filter((p) => !isCombusted(chart.planets[p], run.state[p])).length;
     },
-    combat(map, light, afflictionTaken) {
+    relational(map, light, afflictionTaken) {
       const tally = mapTallies[map - 1]!;
-      tally.combats++;
+      tally.relationalEncounters++;
       tally.light += light;
       tally.afflictionTaken += afflictionTaken;
     },
@@ -332,9 +332,9 @@ const baselineRows = mapTallies.map((t, m) => ({
   map: m + 1,
   reached: t.reached / CHARTS,
   litAtOpen: t.litAtOpen / t.reached,
-  combats: t.combats / t.reached,
-  lightPerCombat: t.light / t.combats,
-  afflictionPerCombat: t.afflictionTaken / t.combats,
+  relationalEncounters: t.relationalEncounters / t.reached,
+  lightPerRelationalEncounter: t.light / t.relationalEncounters,
+  afflictionPerRelationalEncounter: t.afflictionTaken / t.relationalEncounters,
   lightPerMap: t.light / t.reached,
 }));
 
@@ -373,13 +373,13 @@ out.push(
   `Runtime: ${elapsed.toFixed(1)}s (${(elapsed / CHARTS).toFixed(2)}s per chart, ` +
     `${observations.length} treated runs)`,
   "",
-  "Baseline by map (Light and affliction per combat; affliction is the net rise on the player's",
-  "fielded planets across the combat, excluding map-opening Necessity)",
+  "Baseline by map (Light and affliction per relational encounter; affliction is the net rise on the player's",
+  "fielded planets across the relational encounter, excluding map-opening Necessity)",
   table(
-    ["map", "reached", "lit at open", "combats", "Light/combat", "affliction/combat", "Light/map"],
+    ["map", "reached", "lit at open", "relational encounters", "Light/relational encounter", "affliction/relational encounter", "Light/map"],
     baselineRows.map((r) => [
-      String(r.map), pct(r.reached), fmt(r.litAtOpen, 2), fmt(r.combats, 2),
-      fmt(r.lightPerCombat), fmt(r.afflictionPerCombat), fmt(r.lightPerMap),
+      String(r.map), pct(r.reached), fmt(r.litAtOpen, 2), fmt(r.relationalEncounters, 2),
+      fmt(r.lightPerRelationalEncounter), fmt(r.afflictionPerRelationalEncounter), fmt(r.lightPerMap),
     ]),
   ),
   "",

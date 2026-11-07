@@ -97,7 +97,7 @@ The visual system mirrors the mechanical structure of the game.
 1. **Immutable Core** — derived from the chart: the wheel, the planets in their signs, the aspect web.
    Never changes.
 
-2. **Planet revelation** — planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn): the Moon from the start, each subsequent planet at a cumulative combat-encounter count of `2^i` for `i = 0..5` ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+2. **Planet revelation** — planets are progressively revealed per the **Macrobian ascent** (Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn): the Moon from the start, each subsequent planet at a cumulative relational-encounter count of `2^i` for `i = 0..5` ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
    Unrevealed planets render as ghosts at hairline weight — present as potential, not yet awakened.
 
 3. **The Star-Field** — every run inscribes one star (see below).
@@ -185,7 +185,7 @@ The Prince NFT must be:
 The rendered image is a **pure function** of:
 
 - Birth data (through the chart)
-- The lifetime combat count (which planets are revealed)
+- The lifetime relational encounter count (which planets are revealed)
 - Recorded run-scores (the star-field)
 - The achievement bitmap
 

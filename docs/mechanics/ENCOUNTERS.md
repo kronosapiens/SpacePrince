@@ -1,7 +1,7 @@
 # Space Prince — Narrative Encounter Authoring Spec
 
 Narrative encounters are single decisions about the chart the player will carry onward.
-House concepts live in [HOUSES.md](HOUSES.md), combat rules in [MECHANICS.md](MECHANICS.md), and presentation in [SCREENS.md §3.2](../presentation/SCREENS.md#32-narrative-layout-asymmetric).
+House concepts live in [HOUSES.md](HOUSES.md), relational encounter rules in [MECHANICS.md](MECHANICS.md), and presentation in [SCREENS.md §3.2](../presentation/SCREENS.md#32-narrative-layout-asymmetric).
 Sourced house meanings and original scene material live in [HOUSE_MATRIX.md](../writing/HOUSE_MATRIX.md); how to write a scene — voice, length, briefs, worked examples — lives in [SCENES.md](../writing/SCENES.md).
 The [encounter model](HOUSES.md#3-chart-conditioning-model) groups fixed references, natal relationships, and current state; §4 below applies these lookups to offers, and §4.6 describes composing and revising a scene.
 Authored scenes live in the [house modules](../../client/src/data/narrative), assembled by [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts).
@@ -19,13 +19,13 @@ The outcome, target, and predicate tables in §2, §3, and §4.3 describe curren
 | House–sign scenes | 720 scenes: five for each of the 144 house–sign pairs; selection uses only the matching sign | As implemented | Playtesting and further editorial refinement |
 | Occupants and dignity | Existing costs follow §4.2 (`withOccupants` in [narrative.ts](../../client/src/game/narrative.ts)); the screen names the occupants | As implemented | Tune the step sizes in the balancing pass |
 | Joy choices | 420 choices under `joyPresent`, one per scene in the seven joy houses | As implemented | Playtest their usefulness across chart conditions |
-| Run-long stat gains | `gain` outcomes raise a planet's stat on the run (`Run.gains`), read through `runChart` in combat, map openings, narrative, and the stat table | As implemented | None for this iteration |
+| Run-long stat gains | `gain` outcomes raise a planet's stat on the run (`Run.gains`), read through `runChart` in relational encounters, map openings, narrative encounters, and the stat table | As implemented | None for this iteration |
 | Prices | Authored from the provisional going rates in [economy.ts](../../client/src/data/economy.ts) and each house's terms | Comparable aggregate opportunity across charts | Full run balancing under issue #12 |
 
 ## 1. The Complementary Loop
 
 Narrative choices gather or spend Light, add or relieve affliction, or revive a planet.
-Combat remains the primary scoring engine.
+Relational encounters remain the primary scoring engine.
 
 ### 1.1 Shared resources
 

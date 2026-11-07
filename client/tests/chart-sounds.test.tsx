@@ -4,9 +4,9 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Chart, type ChartProps } from "@/components/Chart";
 import { ChartInspection } from "@/components/ChartInspection";
-import { EncounterCombatScreen } from "@/screens/EncounterCombat";
+import { EncounterRelationalScreen } from "@/screens/EncounterRelational";
 import { playUISound } from "@/audio/engine";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { createStubPrince } from "./fixtures";
 
@@ -102,12 +102,12 @@ describe("chart feedback", () => {
 
   it("keeps a rejected first activation silent and leaves inspection available", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numEncounters);
-    const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
+    const encounter = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     run.encounter = encounter;
     const onCommitTurn = vi.fn(() => null);
-    act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
-      <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
+    act(() => root.render(<PlayerChartLayout className="relational" chart={prince.chart} unlockedPlanets={[]}>
+      <EncounterRelationalScreen prince={prince} run={run} encounter={encounter}
       onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} />
     </PlayerChartLayout>));
     if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
@@ -118,7 +118,7 @@ describe("chart feedback", () => {
     click(moon);
     expect(cues()).toEqual(["select"]);
     expect(get('[data-guide="action-testimony"]').hasAttribute("aria-pressed")).toBe(false);
-    click(".combat");
+    click(".relational");
     expect(cues()).toEqual(["select", "dismiss"]);
     expect(container.querySelector(".ps-card")).toBeNull();
   });

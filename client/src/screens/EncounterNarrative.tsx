@@ -186,7 +186,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     // Each planet the outcome touches rings its degree in the house ruler's
     // mode (MUSIC.md, "The strike grid"), so an
     // outcome that touches several sounds as a chord. Combustion adds a
-    // breath to the planet's note, as in combat.
+    // breath to the planet's note, as in relational encounters.
     for (const p of effect.keys()) {
       if (combusting.has(p)) continue;
       playStrike(house.ruler, p);
@@ -206,7 +206,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     : undefined;
 
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
-  const runEnded = isOver(run, chart, prince.numEncounters);
+  const runEnded = isOver(run, chart, prince.numRelationalEncounters);
 
   const advance = useEncounterAdvance(
     resolved, onClearEncounter, runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800,

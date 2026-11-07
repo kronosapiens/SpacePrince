@@ -83,13 +83,13 @@ export function MapGuide({
           body: <TermText text={COPY.notes.here.body} />,
         },
       ];
-      const combatId = pickNode(map, eligible, "combat");
-      const combat = combatId ? map.rolledNodes[combatId] : undefined;
-      if (combatId && combat?.kind === "combat") {
-        const ruler = chartRuler(seededChart(combat.opponentSeed, ""));
+      const relationalId = pickNode(map, eligible, "relational");
+      const relational = relationalId ? map.rolledNodes[relationalId] : undefined;
+      if (relationalId && relational?.kind === "relational") {
+        const ruler = chartRuler(seededChart(relational.opponentSeed, ""));
         mapNotes.push({
           key: "encounter",
-          anchor: nodeAnchor(combatId),
+          anchor: nodeAnchor(relationalId),
           placement: "right",
           label: COPY.notes.encounter.label,
           body: <TermText text={COPY.notes.encounter.body} vars={{ ruler: planetName(ruler) }} />,

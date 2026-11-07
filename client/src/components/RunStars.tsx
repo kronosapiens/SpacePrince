@@ -9,7 +9,7 @@ export function RunStars({ prince }: { prince: Prince }) {
   const glowId = useId();
   // Earlier runs are already finished, including combustions at a lower unlock tier.
   const completed = prince.runs.filter((run, index) =>
-    index < prince.runs.length - 1 || isOver(run, prince.chart, prince.numEncounters),
+    index < prince.runs.length - 1 || isOver(run, prince.chart, prince.numRelationalEncounters),
   );
 
   return (

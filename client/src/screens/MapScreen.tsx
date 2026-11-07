@@ -33,7 +33,7 @@ export function MapScreen() {
   const { setActive } = useActivePlanet();
   const { guideOpen, setGuideOpen, openingActive } = useOutletContext<GameLayoutContext>();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
-  const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numEncounters);
+  const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numRelationalEncounters);
   const openGuide = useCallback(() => {
     setGuidePhase("map");
     setGuideOpen(true);
@@ -58,7 +58,7 @@ export function MapScreen() {
 
   const settings = loadDevSettings();
   const playerUnlocked = useMemo(
-    () => (prince ? unlockedPlanets(prince.numEncounters, settings.unlockAll) : []),
+    () => (prince ? unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll) : []),
     [prince, settings.unlockAll],
   );
 
@@ -68,13 +68,13 @@ export function MapScreen() {
       let nextRun: Run = run;
       // Content is pre-rolled at map creation; the dev force cheats re-roll
       // the node here so "the next node you enter" is the forced kind.
-      if (settings.forceCombat || settings.forceNarrativeHouse) {
+      if (settings.forceRelational || settings.forceNarrativeHouse) {
         const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
         const content = rollNodeContent({
           rng,
           forceNarrativeHouse: settings.forceNarrativeHouse,
-          forceCombat: settings.forceCombat,
-          combatRulers: playerUnlocked,
+          forceRelational: settings.forceRelational,
+          relationalRulers: playerUnlocked,
         });
         nextRun = {
           ...nextRun,
@@ -88,7 +88,7 @@ export function MapScreen() {
         run: nextRun,
         chart: prince.chart,
         nodeId,
-        lifetimeEncounterCount: prince.numEncounters,
+        lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
         devUnlockAll: settings.unlockAll,
       });
       // Commit the pre-encounter run mutations (rolledNodes, visitedNodeIds,
@@ -101,7 +101,7 @@ export function MapScreen() {
   );
 
   useEffect(() => {
-    if (!run || !prince || !shouldRolloverMap(run, prince.chart, prince.numEncounters)) return;
+    if (!run || !prince || !shouldRolloverMap(run, prince.chart, prince.numRelationalEncounters)) return;
     // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
     // uncombust rolls, seeded by the new map.
     rolloverMap(run, prince.chart, playerUnlocked);

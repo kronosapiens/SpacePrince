@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import type { PlanetName } from "@/game/types";
 
 /** Serializable card references, so a card can be queued by one surface and
- *  presented later by another (an unlock earned in combat shows over the map).
+ *  presented later by another (an unlock earned in a relational encounter shows over the map).
  *  New interstitial content kinds extend this union. */
 export type InfoCardRef = { kind: "planet-intro"; planet: PlanetName };
 

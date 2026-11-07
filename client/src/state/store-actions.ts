@@ -17,21 +17,21 @@ export function useStartRun() {
   const prince = usePrince();
   const dispatch = usePrinceDispatch();
   const devUnlockAll = loadDevSettings().unlockAll;
-  const lifetimeEncounterCount = prince?.numEncounters ?? 0;
+  const lifetimeRelationalEncounterCount = prince?.numRelationalEncounters ?? 0;
   return useCallback(
     (seed: number = randomSeed()): Run => {
       if (!prince) throw new Error("A Prince is required to start a run");
-      const run = beginRun(prince.chart, seed, lifetimeEncounterCount, devUnlockAll);
+      const run = beginRun(prince.chart, seed, lifetimeRelationalEncounterCount, devUnlockAll);
       dispatch({ kind: "startRun", run });
       return run;
     },
-    [dispatch, prince, lifetimeEncounterCount, devUnlockAll],
+    [dispatch, prince, lifetimeRelationalEncounterCount, devUnlockAll],
   );
 }
 
-/** Resolve a combat turn and dispatch the result (`resolveTurn` records the
+/** Resolve a relational turn and dispatch the result (`resolveTurn` records the
  *  NodeOutcome on the map when the encounter ends). The lifetime layer
- *  (`numEncounters` and any unlock ceremony) advances at encounter *clear*,
+ *  (`numRelationalEncounters` and any unlock ceremony) advances at encounter *clear*,
  *  not here — a planet must not unlock mid-surface (EncounterScreen). */
 export function useCommitTurn() {
   const dispatch = usePrinceDispatch();
@@ -53,7 +53,7 @@ export function useCommitTurn() {
 }
 
 /** Roll over to a fresh map (terminal node reached). The fielded roster gates
- *  its combat rulers and feeds the boundary's uncombust rolls and necessity. */
+ *  its relational rulers and feeds the boundary's uncombust rolls and necessity. */
 export function useRolloverMap() {
   const dispatch = usePrinceDispatch();
   return useCallback(

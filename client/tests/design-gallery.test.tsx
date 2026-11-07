@@ -67,7 +67,7 @@ function key(value: string) {
 }
 
 it("opens locked planet previews from dev navigation without changing the saved Prince", () => {
-  const prince = createStubPrince({ numEncounters: 0 });
+  const prince = createStubPrince({ numRelationalEncounters: 0 });
   savePrince(prince);
   act(() => root.render(
     <MemoryRouter>

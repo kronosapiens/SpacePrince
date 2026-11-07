@@ -8,11 +8,11 @@ import { renderReport } from "@/eval/report";
 /** A run that completed `maps` maps (seven is completion) with `light` Light. */
 function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: number, light: number, more: Partial<RunSummary> = {}): Row {
   const summary: RunSummary = {
-    startingLifetimeEncounterCount: 32, finalLifetimeEncounterCount: 32, unlocks: [], unlockRescues: 0, pressure: emptyRunPressure(),
+    startingLifetimeRelationalEncounterCount: 32, finalLifetimeRelationalEncounterCount: 32, unlocks: [], unlockRescues: 0, pressure: emptyRunPressure(),
     endReason: maps === 7 ? "completion" : "combustion", mapsCompleted: maps, terminalMap: Math.min(maps + 1, 7),
-    terminalNodeId: "5C", terminalKind: "combat", terminalScenarioId: null, terminalRuler: "Moon",
+    terminalNodeId: "5C", terminalKind: "relational", terminalScenarioId: null, terminalRuler: "Moon",
     lastPlanet: "Moon", lastVerb: "Affliction", lastOptionId: null,
-    light, combatEncounters: 0, narrativeEncounters: 0, combatTurns: 0, combustions: 0, boundaryRevivals: 0,
+    light, relationalEncounters: 0, narrativeEncounters: 0, relationalTurns: 0, combustions: 0, boundaryRevivals: 0,
     narrativeRevivals: 0, verbs: { Affliction: 0, Testimony: 0 }, narrativeOptions: {},
     ...more,
   };
@@ -21,25 +21,25 @@ function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: numb
 
 // Two charts × two games × two strategies.
 const rows = [
-  // Combusted mid-combat against a Mars-ruled chart.
+  // Combusted during a relational encounter against a Mars-ruled chart.
   row("random", 1, 11, 2, 100, {
     terminalNodeId: "3L", terminalRuler: "Mars", lastPlanet: "Sun", lastVerb: "Testimony",
-    combatEncounters: 4, narrativeEncounters: 2, combatTurns: 6, combustions: 7, boundaryRevivals: 1,
+    relationalEncounters: 4, narrativeEncounters: 2, relationalTurns: 6, combustions: 7, boundaryRevivals: 1,
     verbs: { Affliction: 4, Testimony: 2 }, narrativeOptions: { "song/finish": 1, "song/sleep": 1 },
   }),
   // Combusted by its own narrative choice, which is not counted as survived.
   row("random", 1, 12, 4, 300, {
     terminalNodeId: "6C", terminalKind: "narrative", terminalScenarioId: "song", terminalRuler: null,
     lastPlanet: "Saturn", lastVerb: null, lastOptionId: "finish",
-    combatEncounters: 2, narrativeEncounters: 3, combatTurns: 3, combustions: 7, narrativeRevivals: 1,
+    relationalEncounters: 2, narrativeEncounters: 3, relationalTurns: 3, combustions: 7, narrativeRevivals: 1,
     verbs: { Affliction: 1, Testimony: 2 }, narrativeOptions: { "song/finish": 2, "dice/work": 2 },
   }),
   row("random", 2, 21, 1, 200),
-  row("random", 2, 22, 7, 400, { combatEncounters: 20, narrativeEncounters: 10 }),
-  row("survival", 1, 11, 7, 500, { combatEncounters: 18, narrativeEncounters: 12 }),
-  row("survival", 1, 12, 7, 700, { combatEncounters: 16, narrativeEncounters: 14 }),
+  row("random", 2, 22, 7, 400, { relationalEncounters: 20, narrativeEncounters: 10 }),
+  row("survival", 1, 11, 7, 500, { relationalEncounters: 18, narrativeEncounters: 12 }),
+  row("survival", 1, 12, 7, 700, { relationalEncounters: 16, narrativeEncounters: 14 }),
   row("survival", 2, 21, 3, 300),
-  row("survival", 2, 22, 7, 900, { combatEncounters: 20, narrativeEncounters: 10 }),
+  row("survival", 2, 22, 7, 900, { relationalEncounters: 20, narrativeEncounters: 10 }),
 ];
 
 describe("balance aggregation", () => {
@@ -49,24 +49,24 @@ describe("balance aggregation", () => {
     pressure.entryDeaths = 1;
     pressure.entryWipes = 1;
     pressure.entryWipeRescues = 1;
-    pressure.combat = { damage: 48, healing: 24, directAffliction: 24, propagatedAffliction: 12,
+    pressure.relational = { damage: 48, healing: 24, directAffliction: 24, propagatedAffliction: 12,
       invertedTestimonyDamage: 12, directTestimony: 12, propagatedTestimony: 6, invertedAfflictionHealing: 6 };
     pressure.resolveGain = 12;
     pressure.unlockCapacity = 72;
     pressure.capacityStart = 100;
     pressure.capacityEnd = 148;
     const agg = aggregate([
-      row("random", 1, 1, 7, 0, { pressure, startingLifetimeEncounterCount: 0, finalLifetimeEncounterCount: 32, unlocks: ["Mercury"], unlockRescues: 1 }),
+      row("random", 1, 1, 7, 0, { pressure, startingLifetimeRelationalEncounterCount: 0, finalLifetimeRelationalEncounterCount: 32, unlocks: ["Mercury"], unlockRescues: 1 }),
       row("random", 1, 2, 1, 0),
     ], 1);
     const actual = agg.strategies[0]!;
     expect(actual.pressure).toMatchObject({ entryDamage: 6, entryDeaths: .5, entryWipes: .5, entryWipeRescues: .5,
       resolveGain: 6, unlockCapacity: 36, capacityStart: 50, capacityEnd: 74,
-      combat: { damage: 24, healing: 12, invertedTestimonyDamage: 6, invertedAfflictionHealing: 3 } });
-    expect(actual.progression).toEqual({ unlocks: .5, unlockRescues: .5, finalLifetimeEncounterCount: 32 });
+      relational: { damage: 24, healing: 12, invertedTestimonyDamage: 6, invertedAfflictionHealing: 3 } });
+    expect(actual.progression).toEqual({ unlocks: .5, unlockRescues: .5, finalLifetimeRelationalEncounterCount: 32 });
     const report = renderReport(agg, { revision: "fixture", dirty: false,
-      options: { seed: 1, charts: 1, runs: 2, strategies: ["random"], strategySeed: 0, startingLifetimeEncounterCount: 0 } });
-    expect(report).toContain("starts independently at 0 lifetime encounters");
+      options: { seed: 1, charts: 1, runs: 2, strategies: ["random"], strategySeed: 0, startingLifetimeRelationalEncounterCount: 0 } });
+    expect(report).toContain("starts independently at 0 lifetime relational encounters");
     expect(report).toContain("--replay <id> --starting-encounters 0");
     expect(report).toContain("Inverted Testimony damage");
     expect(report).toContain("Unlock rescues");
@@ -86,19 +86,19 @@ describe("balance aggregation", () => {
 
     // Sums over random's four runs, divided by four.
     expect(random!.perRun).toEqual({
-      combatSurvived: 6.5, narrativeSurvived: 3.75, combatTurns: 2.25, narrativeTurns: 1.5,
+      relationalSurvived: 6.5, narrativeSurvived: 3.75, relationalTurns: 2.25, narrativeTurns: 1.5,
       combustions: 3.5, boundaryRevivals: 0.25, narrativeRevivals: 0.25,
     });
     expect(random!.verbs).toEqual({ Affliction: 5, Testimony: 4 });
-    expect(survival!.completedRuns).toEqual({ runs: 3, combatSurvived: 18, narrativeSurvived: 12 });
+    expect(survival!.completedRuns).toEqual({ runs: 3, relationalSurvived: 18, narrativeSurvived: 12 });
     // Work was every choice in dice (2/2), finish three of song's four: ranked by share, not count.
     expect(random!.narrativeOptions).toEqual({ song: { finish: 3, sleep: 1 }, dice: { work: 2 } });
     expect(random!.dominantOptions).toEqual([
       { option: "dice/work", chosen: 2, of: 2 }, { option: "song/finish", chosen: 3, of: 4 }, { option: "song/sleep", chosen: 1, of: 4 },
     ]);
     const { encounters, lastChoices, ...ends } = random!.failures;
-    expect(ends).toEqual({ runs: 3, map: { 2: 1, 3: 1, 5: 1 }, node: { "3L": 1, "6C": 1, "5C": 1 }, kind: { combat: 2, narrative: 1 } });
-    expect(Object.fromEntries(encounters)).toEqual({ "combat ruled by Mars": 1, "narrative song": 1, "combat ruled by Moon": 1 });
+    expect(ends).toEqual({ runs: 3, map: { 2: 1, 3: 1, 5: 1 }, node: { "3L": 1, "6C": 1, "5C": 1 }, kind: { relational: 2, narrative: 1 } });
+    expect(Object.fromEntries(encounters)).toEqual({ "relational ruled by Mars": 1, "narrative song": 1, "relational ruled by Moon": 1 });
     expect(Object.fromEntries(lastChoices)).toEqual({ "Sun Testimony": 1, "song/finish on Saturn": 1, "Moon Affliction": 1 });
 
     const [paired] = agg.paired;

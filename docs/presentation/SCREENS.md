@@ -11,7 +11,7 @@ It records intent and constraints, not composition.
 Where a surface puts things, how large, how far apart, and how fast is decided in the running client, and each value lives beside the code that uses it (`client/src/style/layout.css` and the token files named in `CLAUDE.md`).
 Visual vocabulary lives in [STYLE.md](STYLE.md).
 The experience the surfaces serve is described in [intent.md](../intent.md).
-Mechanical resolution lives in [MECHANICS.md](../mechanics/MECHANICS.md) for combat and [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md) for narrative encounters.
+Mechanical resolution lives in [MECHANICS.md](../mechanics/MECHANICS.md) for relational encounters and [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md) for narrative encounters.
 
 Where this document says what is built, it describes the local prototype; where it describes mint transactions, wallets, or other Princes as opponents, it describes the intended onchain game.
 
@@ -31,7 +31,7 @@ StS, by contrast, splits combat (cards in hand, deck/discard) from events (paint
 
 Space Prince inherits FTL's logic.
 The player's natal chart is who they are, and most surfaces of the game are about the chart in a particular state.
-Combat encounters and house narrative encounters are *modes of the same encounter screen*, not separate screens — see §3.
+Relational encounters and narrative encounters are *modes of the same encounter screen*, not separate screens — see §3.
 The client makes this literal: one layout owns the player's chart across the title, the mint, the map, and both encounter configurations (`GameLayout` and `PlayerChartLayout`), and each surface supplies only what sits beside it.
 
 This produces a small screen set: two main surfaces (encounter, map) and a handful of supporting ones (mint, title, inspection).
@@ -45,7 +45,7 @@ Fake mystery loses to a block explorer, and a choice made against pretend-uncert
 Two boundaries keep the rule workable:
 
 - **Curation is not concealment.**
-  The client may foreground a summary and leave depth to other surfaces — a combat node shows the opponent's chart *ruler*, not the whole chart — so long as it never asserts that the rest is unknown.
+  The client may foreground a summary and leave depth to other surfaces — a relational node shows the opponent's chart *ruler*, not the whole chart — so long as it never asserts that the rest is unknown.
 - **Ceremonial pacing is not hiding.**
   The mint reveal dramatizes the arrival of knowledge; it withholds nothing from a choice.
   The rule bites only where the player is asked to *decide*.
@@ -59,7 +59,8 @@ The surfaces are **Map**, **Encounter**, and **Narrative**; the encounter shows 
 Affliction builds tension, testimony relieves it; planets combust and return; nothing fights, wounds, or wins.
 Generated other-charts are named `Other N`, never `Adversary`.
 
-**Combat, adversary, and opponent are internal vocabulary** — the developers' easy metaphor for the interaction (`MECHANICS.md`, code identifiers, this spec's internals).
+**Encounter** is the shared unit, with two types: **relational** and **narrative**.
+"Adversary" and "opponent" are internal names for the other chart (`MECHANICS.md`, code identifiers, this spec's internals).
 They do not reach player prose: not the openings, the scenes, the primer, the help, or labels and summaries.
 The mechanical terms the player sees are the verbs Afflict/Testify, the operational readouts Resolve and Fortune, and Light.
 The underlying stats are **affliction, testimony, Resolve, and luck**.
@@ -92,7 +93,7 @@ Listed roughly in the order a player encounters them.
 | Primer          | Framing at first arrival; the codex glossary from the settings menu    | Framing and glossary built (§9.6)       |
 | Mint            | Birth-data input → chart computation → reveal ceremony                 | Built locally, no transaction (§5)      |
 | Map             | Walk the Sephirot tree; one map per L1→L7 traversal                    | Built (§4)                              |
-| Encounter       | Combat (symmetric) or narrative (asymmetric column)                    | Built (§3)                              |
+| Encounter       | Relational (symmetric) or narrative (asymmetric column)                    | Built (§3)                              |
 | Inspection      | Planets inspected in place; the Prince artifact from the settings menu | Built (§7); earned layers open (#32)    |
 | End of run      | The run's Light becomes a star                                         | In design (§6, #34)                     |
 
@@ -108,13 +109,13 @@ Where they diverge on a rule stated here, that is a discrepancy to investigate a
 ## 3. Encounter Screen
 
 The primary surface.
-Two distinct configurations — **combat** and **house narrative** — sharing one constant: the player's chart on the left.
+Two distinct configurations — **relational** and **narrative** — sharing one constant: the player's chart on the left.
 
 The two configurations are different layouts, not modes of one layout.
 An earlier draft of this document framed them as a single morphing screen; that framing has been retired.
 The screens are related by what they share (the player chart) and by their place in the run flow, not by being the same layout with different content.
 
-### 3.1 Combat layout (symmetric)
+### 3.1 Relational layout (symmetric)
 
 The player's chart and the other's chart, side by side as equals, drawn in one visual language (§3.4).
 There is no visual differentiation between yours and theirs beyond position.
@@ -150,17 +151,17 @@ Mobile adaptation is deferred while desktop takes priority.
 These layout sketches can inform later work without constraining desktop interactions.
 Both layouts stack vertically.
 
-- **Combat:** player's chart on top, the other's chart below.
+- **Relational:** player's chart on top, the other's chart below.
   The chrome stays above both, so the turn and the encounter's rule are read before scrolling.
 - **Narrative:** player's chart on top, then the heading, prompt, and options.
 
 In both cases the vertical stacking preserves the semantic relationship between the chart and what it faces.
 See [STYLE.md §13](STYLE.md#13-layout-and-viewport).
 
-### 3.4 NPC opponents (combat)
+### 3.4 NPC opponents (relational)
 
 Intended: the opponent's chart is a real player's chart (another minted Prince) pulled in as an NPC.
-Combat is single-player; the multiplayer dimension is purely as content source.
+Relational encounters are single-player; the multiplayer dimension is purely as content source.
 The prototype stands in with seeded charts computed from real ephemeris positions, named `Other N` ([MECHANICS.md §3](../mechanics/MECHANICS.md#3-chart-generation)).
 
 This means:
@@ -178,7 +179,7 @@ Earlier drafts used asymmetric matchups, a single-planet player against a full c
 
 ### 3.5 Visual climax
 
-**Combat.**
+**Relational.**
 The two charts resolve in sequence, the order the rules resolve them ([MECHANICS.md §6](../mechanics/MECHANICS.md#6-direct-resolution), [STYLE.md §7](STYLE.md#7-motion-language)): the other's chart lights up first — the player's action landing and propagating through its web — then, after a short pause, the player's chart resolves the other's reply.
 Activation propagates within each chart along that chart's own aspect lines; there is no line drawn between the two charts.
 The connection between them is conceptual (your planet faces theirs this turn), not visual.
@@ -189,7 +190,7 @@ The per-motion durations live in `client/src/style/motion.css`.
 **Narrative.**
 During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.
 On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied).
-No propagation through aspect lines — propagation is a combat-only language.
+No propagation through aspect lines — propagation is specific to relational encounters.
 The heading does not animate during resolution; it remains the steady framing presence.
 
 ### 3.5.1 The affliction arc
@@ -223,7 +224,7 @@ The arc replaced the earlier numeric badges, which showed numerators whose denom
 
 ### 3.6 Interaction grammar
 
-The player's per-turn action in combat is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per [MECHANICS.md §5](../mechanics/MECHANICS.md#5-action-and-valence)).
+The player's per-turn action in a relational encounter is choosing which of their planets acts, and with which verb (the opponent's planet and verb are system-selected and precommitted, per [MECHANICS.md §5](../mechanics/MECHANICS.md#5-action-and-valence)).
 Desktop previews use hover or keyboard focus; one activation executes a fully specified action.
 Mobile adaptation is deferred.
 
@@ -261,7 +262,7 @@ The readout shows the actual effect amount, including clamped recovery, without 
 Previewing another option leaves the selected targeting option unchanged; returning to the chart restores that option's preview.
 Choosing another option replaces the selection; background click or Escape cancels targeting.
 Outside targeting, planet activation remains safe inspection.
-Only eligible targets invite selection; revival can select combusted planets without enabling them in combat.
+Only eligible targets invite selection; revival can select combusted planets without enabling them in relational encounters.
 Determined effects project on the chart through the same resolver used at commit.
 Unavailable purchases remain visible with an explanation.
 Guides permit demonstrations but prevent gameplay commitment and commit sounds.
@@ -281,7 +282,7 @@ With study **off**, the panel shows only **operational numbers** — what matter
   Now that combustion is deterministic, this is literally its HP.
   It is the planet's base Resolve plus placement bonuses, shown directly.
 - **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings or blocking its entire necessity draw.
-  Necessity applies independently to both charts at each combat encounter opening, drawing 12, 24, or 36 before Fortune.
+  Necessity applies independently to both charts at each relational encounter opening, drawing 12, 24, or 36 before Fortune.
   Each sweep shows the raw draw, then removes it on a successful Fortune roll before settling the resulting state.
   Wounded planets can combust at entry; fresh planets survive every draw.
   Both charts show their opening sweep before the first action becomes available.
@@ -299,7 +300,7 @@ With study **on**, the box **drops open downward** (its top fixed) and the actio
   Authored, never generated (`client/src/game/glossary.ts`).
 - **Stat table** — rows for the four core stats, columns **Core · Placement · Total**.
   `Core` is the innate base; `Placement` bundles the sign-derived buffs (element, mode, sect); `Total` is the sum, tying back to the operational numbers above.
-  Dignity is **not** here — it's a house-encounter input, not a combat stat; see [MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion).
+  Dignity is **not** here — it's a house-encounter input, not a stat used during relational turns; see [MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion).
 
 Depth scales inversely with how often a thing is needed.
 The table shows the numbers at a glance; the *concept* explanations — what Core or Placement each mean — sit one tap deeper (tap a column header), since a player needs them roughly once.
@@ -370,7 +371,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
   The board already says all three wordlessly: the acting planet is the only one on its chart wearing a ring, that ring's colour is the verb, and the bites on the player's candidates are the magnitude.
   The sentence is the caption that teaches those marks, and the colour split is what makes it one — the name matches the disc on the other chart, the verb matches the corona around it.
   A glyph is not a name, and the audience premise is a player with no astrology, so this is the only place the other's planet is named at all.
-  It is the one piece of prose on the combat surface, kept deliberately against a direction that otherwise removed words until the board carried none.
+  It is the one piece of prose on the relational surface, kept deliberately against a direction that otherwise removed words until the board carried none.
   The sentence clears after the final animation; its space remains so the charts stay still during the pause before advancing.
 - **The instruction.**
   One line naming the player's next step — *Choose a planet to respond*, then *Choose Afflict or Testify* once a planet is selected.
@@ -421,8 +422,8 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 - **The diagram** sits beside the player's chart, with the breathing room [STYLE.md §10](STYLE.md#10-the-maps-visual-treatment) asks for, and a Roman numeral naming which map of the run this is.
 - **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, affliction on the arc (§3.5.1).
   The "chart is always present" principle made literal on this surface.
-  At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-combat-openings-and-revival-at-map-openings)).
-- **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative combat encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
+  At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-relational-openings-and-revival-at-map-openings)).
+- **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative relational encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
 - **New Run** appears in place of the next step once the run is over (§6).
 
 ### 4.2 Nodes
@@ -430,7 +431,7 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 Two content types, distinguished by shape and fill.
 Both share the same outer disc footprint so the diagram reads as one network of nodes; the *content inside* the disc tells you what kind of beat it is.
 
-- **Combat node:** thin disc-ring outline plus an eight-pointed star inside, filled with the opponent's **chart ruler** color — the planet ruling the opponent's Ascendant sign.
+- **Relational node:** thin disc-ring outline plus an eight-pointed star inside, filled with the opponent's **chart ruler** color — the planet ruling the opponent's Ascendant sign.
   The star extends slightly past the disc rim.
   Reads as *"another chart waits here, anchored by [planet]."*
 - **Narrative node:** filled disc in the color of the house's fixed game ruler (§4.5).
@@ -438,7 +439,7 @@ Both share the same outer disc footprint so the diagram reads as one network of 
   The house Roman numeral appears at the node center.
 
 Each node's identifying planet supplies its color.
-Narrative nodes use the house's fixed game ruler (§4.5); combat nodes use the traditional ruler of the opponent's Ascendant sign, listed in the [sign matrix](../writing/PLANET_MATRIX.md#sign-matrix).
+Narrative nodes use the house's fixed game ruler (§4.5); relational nodes use the traditional ruler of the opponent's Ascendant sign, listed in the [sign matrix](../writing/PLANET_MATRIX.md#sign-matrix).
 
 Each node also has one of four **temporal states** relative to the player's current position.
 Together with content type, the state determines what's rendered:
@@ -482,7 +483,7 @@ A map is fully determined the moment it is created:
 
 - The **map seed** comes from a VRF request at map creation ([MAP.md §4](../mechanics/MAP.md#4-seeding)) — one call per map, never per node.
 - The **topology** derives from the seed (per [MAP.md](../mechanics/MAP.md)).
-- **Encounter content** (combat opponent, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
+- **Encounter content** (relational opponent, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
 
 Before a map exists, nothing about it is knowable; once it exists, everything is — and the map renders accordingly (§4.2).
 An earlier draft rolled content lazily at the eligible frontier and hid distant nodes behind a fog of war.
@@ -490,11 +491,11 @@ Both were dropped: under a per-map VRF seed the fog reflected no real uncertaint
 
 **Roll parameters:**
 
-- **Combat-to-narrative ratio:** **50/50**.
-  Refine in playtesting — earlier drafts ran a φ:1 (62/38) combat-heavy split, but rebalanced to give narrative beats equal footing in a run.
+- **Relational-to-narrative ratio:** **50/50**.
+  Refine in playtesting — earlier drafts ran a φ:1 (62/38) relational-heavy split, but rebalanced to give narrative beats equal footing in a run.
 - **House assignment** (for narrative nodes): **uniform random over the 12 houses**.
   A "no immediate repeat" rule and position-derived house assignment (upper layers = elevated houses, lower = grounded) are deferred until they earn their weight in playtesting.
-- **Combat opponent assignment:** intended, a real other-player Prince per §3.4; in the prototype, a seeded chart whose ruler belongs to the unlocked rotation ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+- **Relational opponent assignment:** intended, a real other-player Prince per §3.4; in the prototype, a seeded chart whose ruler belongs to the unlocked rotation ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
 
 ### 4.4 Mobile (deferred)
 
@@ -553,7 +554,7 @@ Each planet appears at its computed sign placement, in its glyph and color, with
 The ceremony is intentionally long enough to mask an onchain confirmation and to give the act its weight.
 After all seven planets have appeared, the chart sits whole for a brief held moment.
 
-This is the **only time** the player sees their full chart until cumulative combat encounter 32 (Saturn, the final unlock — [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+This is the **only time** the player sees their full chart until cumulative relational encounter 32 (Saturn, the final unlock — [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
 
 The chart then **dims whole**: all seven planets recede to **ghost** (hairline outline, no color), the Moon included, and the planet-colored bands down the screen edge go dark and stay dark — past the reveal they only mark planets acting in an encounter.
 After a beat, the Moon's **planet introduction** (§3.6.2) presents, and the Moon stands lit behind it in its computed sign.
@@ -592,14 +593,14 @@ There is no standing "preview" of the full chart in the artifact; a verification
 
 End-of-run presentation is being developed as the run's closing beat, where the run's Light becomes a star ([#34](https://github.com/kronosapiens/SpacePrince/issues/34)).
 For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
-Starting again preserves the Prince's identity, combat count, unlocks, and run records.
+Starting again preserves the Prince's identity, relational encounter count, unlocks, and run records.
 
 ---
 
 ## 7. Chart Study Screen
 
 There is no separate study screen.
-Sitting with one's chart happens in place: the chart the layout keeps on the title and the map is inspectable there with the same grammar as combat, and the Prince artifact opens from the settings menu as **Inspect Prince** (§3.6.2).
+Sitting with one's chart happens in place: the chart the layout keeps on the title and the map is inspectable there with the same grammar as relational encounters, and the Prince artifact opens from the settings menu as **Inspect Prince** (§3.6.2).
 
 ### 7.1 Entry and exit
 
@@ -608,7 +609,7 @@ Sitting with one's chart happens in place: the chart the layout keeps on the tit
 
 ### 7.2 Inspection grammar
 
-Inspection supports the same previews as combat (per §3.6):
+Inspection supports the same previews as relational encounters (per §3.6):
 
 - Activate a planet → its aspect lines highlight, the planet receives its inspection ring, and the stats panel opens with the study toggle (§3.6.1).
 - Hover or keyboard focus → ambient preview, same surface.
@@ -754,6 +755,6 @@ The player knows where they are because the screen tells them by being itself.
 - [CHART.md](../mechanics/CHART.md) — chart computation (rendered on the Encounter screen and at inspection).
 - [HOUSES.md](../mechanics/HOUSES.md) — narrative reference attributes and chart dependencies.
 - [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md) — narrative composition, eligibility, and resolution.
-- [MECHANICS.md](../mechanics/MECHANICS.md) — combat resolution.
+- [MECHANICS.md](../mechanics/MECHANICS.md) — relational resolution.
 - [NFT.md](NFT.md) — the on-chain SVG chart artifact (what Inspect Prince renders).
 - [PLANETS.md](../writing/PLANETS.md) — the planetary archetypes the study glosses and introductions draw on.

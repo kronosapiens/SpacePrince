@@ -1,4 +1,4 @@
-import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./combat";
+import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./relational";
 import { getAspects, propagatedMagnitude } from "./aspects";
 import { combustionCeiling, isCombusted, newlyCombusted } from "./combust";
 import { cloneSideState, runChart } from "./chart";
@@ -7,7 +7,7 @@ import { turnLight } from "./score";
 import { hashString, mulberry32, pickWeighted } from "./rng";
 import type {
   Chart,
-  CombatEncounter,
+  RelationalEncounter,
   NodeOutcome,
   PlanetName,
   PlanetPlacement,
@@ -24,7 +24,7 @@ const ZERO_STATS = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
 
 export interface TurnResult {
   run: Run;
-  encounter: CombatEncounter;
+  encounter: RelationalEncounter;
   log: TurnLogEntry;
   encounterEnded: boolean;
   runEnded: boolean;
@@ -32,12 +32,12 @@ export interface TurnResult {
 
 /** The live turn's draws — deterministic per (run, encounter, turn), so the
  *  same seed replays the same fight. */
-export function combatTurnRng(run: Run, encounter: CombatEncounter): () => number {
+export function relationalTurnRng(run: Run, encounter: RelationalEncounter): () => number {
   return mulberry32((run.seed ^ encounter.turnIndex ^ hashString(encounter.id)) >>> 0);
 }
 
 /**
- * Resolves a single combat turn. Operates on RUN-LEVEL player state — affliction
+ * Resolves a single relational turn. Operates on RUN-LEVEL player state — affliction
  * and combustion persist across encounters and maps within a run, and the
  * player's chart carries the run's stat gains.
  */
@@ -50,7 +50,7 @@ export function resolveTurn(
 ): TurnResult | null {
   const playerChart = runChart(chart, run);
   const enc = run.encounter;
-  if (!enc || enc.kind !== "combat" || enc.resolved) return null;
+  if (!enc || enc.kind !== "relational" || enc.resolved) return null;
   const opponentPlanet = enc.sequence[enc.turnIndex];
   if (!opponentPlanet) return null;
   const opponentValence = enc.opponentActions[enc.turnIndex] ?? "Affliction";
@@ -109,7 +109,7 @@ export function resolveTurn(
     other: enc.opponentChart,
   });
 
-  // Draw the next turn's precommit — planet + verb. This is combat's only
+  // Draw the next turn's precommit — planet + verb. This is the relational encounter's only
   // randomness (MECHANICS §7): the resolution above is deterministic, and the
   // roll here decides what is *revealed* next, riding the same resolution.
   const nextTurnIndex = enc.turnIndex + 1;
@@ -124,7 +124,7 @@ export function resolveTurn(
   const runEnded = enc.roster.every((p) =>
     isCombusted(playerChart.planets[p], playerStateMap[p]),
   );
-  // A run that ends mid-combat ends the encounter with it.
+  // A run that ends during a relational encounter ends the encounter with it.
   const encounterEnded = nextTurnIndex >= enc.sequence.length || allOppCombusted || runEnded;
   const newSequence = [...enc.sequence];
   const newOpponentActions = [...enc.opponentActions];
@@ -142,7 +142,7 @@ export function resolveTurn(
     }
   }
 
-  const updatedEnc: CombatEncounter = {
+  const updatedEnc: RelationalEncounter = {
     ...enc,
     opponentState: opponentStateMap,
     sequence: newSequence,
@@ -165,10 +165,10 @@ export function resolveTurn(
     const nodeId = run.map.currentNodeId;
     const outcome: NodeOutcome = {
       nodeId,
-      kind: "combat",
+      kind: "relational",
       summary: `Encounter · ${enc.opponentChart.name}`,
       lightDelta: updatedEnc.log.reduce((sum, entry) => sum + entry.lightGain, 0),
-      // Necessity records every initially lit planet; none revive during combat.
+      // Necessity records every initially lit planet; none revive during relational.
       // Keep final-turn losses too for older saves without a complete opening record.
       combusts: [...new Set([
         ...(enc.selfNecessity ?? []).filter(({ planet }) => isCombusted(playerChart.planets[planet], playerStateMap[planet])).map(({ planet }) => planet),
@@ -187,7 +187,7 @@ export function resolveTurn(
  * the effect lands on `side`'s active planet and propagates through the fielded
  * planets of `chart` — one `roster` serves both charts, since the opponent's
  * mirrors the player's unlock tier (MECHANICS §11.1).
- * The same per-direction base stat the projection preview uses (combat.ts
+ * The same per-direction base stat the projection preview uses (relational.ts
  * `computeDirectExchange`), so they don't drift. Sequenced by the caller —
  * phase 1 (your action) before phase 2 (theirs).
  */

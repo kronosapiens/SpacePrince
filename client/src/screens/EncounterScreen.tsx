@@ -3,10 +3,10 @@ import { useInfoCards } from "@/state/InfoCardContext";
 import { useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { thresholdCrossedBy } from "@/game/unlocks";
-import { EncounterCombatScreen } from "./EncounterCombat";
+import { EncounterRelationalScreen } from "./EncounterRelational";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
 
-/** The encounter surface — combat or narrative, driven by the active run's
+/** The encounter surface — relational or narrative, driven by the active run's
  *  `encounter`. Both kinds resolve against the real Prince store. */
 export function EncounterScreen() {
   const prince = usePrince();
@@ -28,17 +28,17 @@ export function EncounterScreen() {
   // Crossing a Macrobian threshold queues the planet introduction, which
   // presents over the next stable surface (InfoCardHost).
   const clearEncounter = () => {
-    if (enc.resolved) {
-      const crossed = thresholdCrossedBy(prince.numEncounters, prince.numEncounters + 1);
+    if (enc.resolved && enc.kind === "relational") {
+      const crossed = thresholdCrossedBy(prince.numRelationalEncounters, prince.numRelationalEncounters + 1);
       if (crossed) enqueueCard({ kind: "planet-intro", planet: crossed });
-      dispatch({ kind: "incrementEncounters" });
+      dispatch({ kind: "incrementRelationalEncounters" });
     }
     dispatch({ kind: "commitRun", run: { ...run, encounter: null } });
   };
 
-  if (enc.kind === "combat") {
+  if (enc.kind === "relational") {
     return (
-      <EncounterCombatScreen
+      <EncounterRelationalScreen
         run={run}
         prince={prince}
         encounter={enc}

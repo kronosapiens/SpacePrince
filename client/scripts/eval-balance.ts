@@ -36,9 +36,9 @@ const { values: args } = parseArgs({
 
 const runOptions: RunTrialOptions = args["starting-encounters"] === undefined
   ? {}
-  : { startingLifetimeEncounterCount: Number(args["starting-encounters"]) };
-if (runOptions.startingLifetimeEncounterCount !== undefined &&
-    (!Number.isSafeInteger(runOptions.startingLifetimeEncounterCount) || runOptions.startingLifetimeEncounterCount < 0)) {
+  : { startingLifetimeRelationalEncounterCount: Number(args["starting-encounters"]) };
+if (runOptions.startingLifetimeRelationalEncounterCount !== undefined &&
+    (!Number.isSafeInteger(runOptions.startingLifetimeRelationalEncounterCount) || runOptions.startingLifetimeRelationalEncounterCount < 0)) {
   throw new Error("--starting-encounters must be a nonnegative integer");
 }
 
@@ -79,7 +79,7 @@ function batch(): void {
     strategySeed: Number(args["strategy-seed"]),
     ...runOptions,
   };
-  const rosterSuffix = options.startingLifetimeEncounterCount === undefined ? "" : `_e${options.startingLifetimeEncounterCount}`;
+  const rosterSuffix = options.startingLifetimeRelationalEncounterCount === undefined ? "" : `_e${options.startingLifetimeRelationalEncounterCount}`;
   const out = resolve(args.out ?? join(
     "eval-results", `seed-${options.seed}_${options.charts}x${options.runs}_${options.strategies.join("-")}_s${options.strategySeed}${rosterSuffix}`,
   ));

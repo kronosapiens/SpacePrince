@@ -95,14 +95,14 @@ export type SideState = Record<PlanetName, PlanetState>;
 
 // ── Encounters ────────────────────────────────────────────────────────────────
 
-export interface CombatEncounter {
-  kind: "combat";
+export interface RelationalEncounter {
+  kind: "relational";
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
   /** Other's opening rolls; absent on encounters saved before necessity animation. */
   necessity?: NecessityEntry[];
-  /** Self's combat-entry rolls; absent on older saves and manually spawned encounters. */
+  /** Self's relational-entry rolls; absent on older saves and manually spawned encounters. */
   selfNecessity?: NecessityEntry[];
   /** Fielded planets — the roster both sides draw from, mirroring the player's
    *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
@@ -127,7 +127,7 @@ export interface NarrativeEncounter {
   resolutionText?: string;
 }
 
-export type EncounterState = CombatEncounter | NarrativeEncounter;
+export type EncounterState = RelationalEncounter | NarrativeEncounter;
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 
@@ -156,12 +156,12 @@ export interface MapGraph {
 }
 
 export type NodeContent =
-  | { kind: "combat"; opponentSeed: number }
+  | { kind: "relational"; opponentSeed: number }
   | { kind: "narrative"; house: number };
 
 export interface NodeOutcome {
   nodeId: string;
-  kind: "combat" | "narrative";
+  kind: "relational" | "narrative";
   // Free-form summary of the encounter's outcome.
   summary: string;
   lightDelta: number;
@@ -238,8 +238,8 @@ export interface Prince {
   id: string;
   position: BirthData;
   chart: Chart;
-  /** Cumulative lifetime encounters; gates the unlock ramp (MECHANICS §11.1). */
-  numEncounters: number;
+  /** Cumulative lifetime relational encounters; gates the unlock ramp (MECHANICS §11.1). */
+  numRelationalEncounters: number;
   /** Earned achievement bitmap; rendered on the Prince, earning logic deferred. */
   achievements: number;
   /** Every run this Prince has played. The active run is the tail iff it is not

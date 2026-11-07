@@ -2,7 +2,7 @@
 
 /* Combustion — a planet dies. Flares hot, then collapses to desaturated ash.
    The opening flare gives the irreversible beat real weight; total length stays
-   at 1000ms to match `combustRippleDuration` in useCombatAnimation.ts. */
+   at 1000ms to match `combustRippleDuration` in useRelationalAnimation.ts. */
 @keyframes combust {
   0%   { filter: saturate(1.5) brightness(1.7); opacity: 1; }
   12%  { filter: saturate(1.6) brightness(2);   opacity: 1; }
@@ -113,7 +113,7 @@
   animation: prop-travel 460ms var(--ease-out) forwards;
 }
 
-/* Combat per-planet feedback — ported from client_v1. */
+/* Relational per-planet feedback — ported from client_v1. */
 @keyframes action-glow-pulse {
   0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
   50%      { filter: brightness(1.18) drop-shadow(0 0 6px currentColor); }

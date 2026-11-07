@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeDirectExchange, drawValence } from "@/game/combat";
+import { computeDirectExchange, drawValence } from "@/game/relational";
 import type { PlanetStats } from "@/game/types";
 
 describe("drawValence", () => {

@@ -97,8 +97,8 @@ export type SideState = Record<PlanetName, PlanetState>;
 
 // ── Encounters ────────────────────────────────────────────────────────────────
 
-export interface CombatEncounter {
-  kind: "combat";
+export interface RelationalEncounter {
+  kind: "relational";
   id: string;
   opponentChart: Chart;
   opponentState: SideState;
@@ -120,7 +120,7 @@ export interface NarrativeEncounter {
   resolutionText?: string;
 }
 
-export type EncounterState = CombatEncounter | NarrativeEncounter;
+export type EncounterState = RelationalEncounter | NarrativeEncounter;
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 
@@ -154,12 +154,12 @@ export interface MapGraph {
 }
 
 export type NodeContent =
-  | { kind: "combat"; opponentSeed: number }
+  | { kind: "relational"; opponentSeed: number }
   | { kind: "narrative"; house: number };
 
 export interface NodeOutcome {
   nodeId: string;
-  kind: "combat" | "narrative";
+  kind: "relational" | "narrative";
   // free-form summary for End-of-Run inspection
   summary: string;
   lightDelta: number;

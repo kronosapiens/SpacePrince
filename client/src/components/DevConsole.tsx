@@ -1,5 +1,5 @@
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
-import { remirrorCombat } from "@/state/dev-spawn";
+import { remirrorRelational } from "@/state/dev-spawn";
 import { unlockedPlanets } from "@/game/unlocks";
 import { UNLOCK_THRESHOLDS } from "@/game/data";
 import { playUISound } from "@/audio/engine";
@@ -12,18 +12,18 @@ export function DevConsole({ open }: { open: boolean }) {
   const prince = usePrince();
   const run = useActiveRun();
   const dispatch = usePrinceDispatch();
-  const unlocked = prince ? unlockedPlanets(prince.numEncounters) : [];
+  const unlocked = prince ? unlockedPlanets(prince.numRelationalEncounters) : [];
 
   // Set the unlock tier from a planet count (1–7): jump to that planet's
-  // Macrobian threshold. A live combat is re-mirrored so the opponent re-fields
+  // Macrobian threshold. A live relational encounter is re-mirrored so the opponent re-fields
   // to the new tier alongside the player (Moon v Moon, 2v2, …).
   const setPlanets = (n: number) => {
     const count = UNLOCK_THRESHOLDS[n - 1] ?? 0;
-    dispatch({ kind: "setEncounters", count });
-    if (run?.encounter?.kind === "combat") {
+    dispatch({ kind: "setRelationalEncounters", count });
+    if (run?.encounter?.kind === "relational") {
       dispatch({
         kind: "commitRun",
-        run: { ...run, encounter: remirrorCombat(run.encounter, count, run.seed) },
+        run: { ...run, encounter: remirrorRelational(run.encounter, count, run.seed) },
       });
     }
   };

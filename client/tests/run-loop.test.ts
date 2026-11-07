@@ -3,31 +3,31 @@ import { playEncounter, type PlayContext } from "@/eval/play";
 import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
 import { chartRuler, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
-import { combatTurnRng, resolveTurn } from "@/game/turn";
-import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
+import { relationalTurnRng, resolveTurn } from "@/game/turn";
+import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { hashString, mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
 import { pickScenario } from "@/data/narrative-scenarios";
-import type { CombatEncounter, NarrativeEncounter, NodeContent, Run, PlanetName } from "@/game/types";
+import type { RelationalEncounter, NarrativeEncounter, NodeContent, Run, PlanetName } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 describe("Run loop integration", () => {
-  it("resolves a combat encounter and persists run state across turns", () => {
+  it("resolves a relational encounter and persists run state across turns", () => {
     const prince = createStubPrince({ seed: 7 });
     const run = beginRun(prince.chart, 42);
-    const enc = beginCombatEncounter({
+    const enc = beginRelationalEncounter({
       run,
       opponentSeed: 99,
-      lifetimeEncounterCount: prince.numEncounters,
+      lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
     });
     let r: Run = { ...run, encounter: enc };
     const rng = mulberry32(123);
     let safety = 0;
-    while (r.encounter && r.encounter.kind === "combat" && !r.encounter.resolved && safety++ < 30) {
-      const playerPlanet = (unlockedPlanets(prince.numEncounters).filter(
+    while (r.encounter && r.encounter.kind === "relational" && !r.encounter.resolved && safety++ < 30) {
+      const playerPlanet = (unlockedPlanets(prince.numRelationalEncounters).filter(
         (p) => !isCombusted(prince.chart.planets[p], r.state[p]),
       )[0] ?? "Sun") as PlanetName;
       const result = resolveTurn(r, prince.chart, playerPlanet, "Affliction", rng);
@@ -53,8 +53,8 @@ describe("Run loop integration", () => {
   });
 
   it("a new map pre-rolls content for every node except the root, deterministically", () => {
-    const combatRulers = unlockedPlanets(0);
-    const map = newMapState(123, combatRulers);
+    const relationalRulers = unlockedPlanets(0);
+    const map = newMapState(123, relationalRulers);
     for (const node of map.graph.nodes) {
       if (node.id === ROOT_NODE_ID) {
         expect(map.rolledNodes[node.id]).toBeUndefined();
@@ -62,19 +62,19 @@ describe("Run loop integration", () => {
         expect(map.rolledNodes[node.id]).toBeDefined();
       }
     }
-    expect(newMapState(123, combatRulers).rolledNodes).toEqual(map.rolledNodes);
+    expect(newMapState(123, relationalRulers).rolledNodes).toEqual(map.rolledNodes);
   });
 
-  it("rejects combat charts whose rulers are not unlocked", () => {
+  it("rejects relational charts whose rulers are not unlocked", () => {
     for (const count of [0, 1, 2, 4, 8, 16, 32]) {
       const eligible = unlockedPlanets(count);
       const map = newMapState(1_000 + count, eligible);
-      const combatNodes = Object.values(map.rolledNodes).filter(
-        (content) => content.kind === "combat",
+      const relationalNodes = Object.values(map.rolledNodes).filter(
+        (content) => content.kind === "relational",
       );
-      expect(combatNodes.length).toBeGreaterThan(0);
-      for (const content of combatNodes) {
-        if (content.kind !== "combat") continue;
+      expect(relationalNodes.length).toBeGreaterThan(0);
+      for (const content of relationalNodes) {
+        if (content.kind !== "relational") continue;
         expect(eligible).toContain(
           chartRuler(seededChart(content.opponentSeed, "Other")),
         );
@@ -86,10 +86,10 @@ describe("Run loop integration", () => {
     const rejectedSeed = Array.from({ length: 20 }, (_, seed) => seed).find(
       (seed) => chartRuler(seededChart(seed, "Other")) !== "Moon",
     )!;
-    const encounter = beginCombatEncounter({
+    const encounter = beginRelationalEncounter({
       run: beginRun(createStubPrince().chart, 42, 0),
       opponentSeed: rejectedSeed,
-      lifetimeEncounterCount: 0,
+      lifetimeRelationalEncounterCount: 0,
     });
     expect(encounterRuler(encounter)).toBe("Moon");
     expect(encounter.opponentChart.id).not.toBe(`chart_${rejectedSeed}`);
@@ -118,13 +118,13 @@ describe("Run loop integration", () => {
     expect(next).not.toContain(firstNeighbor);
   });
 
-  it("combat length equals the map number; the opponent fields the player's tier (mirror)", () => {
+  it("relational length equals the map number; the opponent fields the player's tier (mirror)", () => {
     const run = beginRun(createStubPrince().chart, 42);
-    const begin = (lifetimeEncounterCount: number, mapsCompleted = 0) =>
-      beginCombatEncounter({
+    const begin = (lifetimeRelationalEncounterCount: number, mapsCompleted = 0) =>
+      beginRelationalEncounter({
         run: { ...run, mapsCompleted },
         opponentSeed: 99,
-        lifetimeEncounterCount,
+        lifetimeRelationalEncounterCount,
       });
 
     // Length = mapsCompleted + 1 regardless of unlock tier (MECHANICS §11.1).
@@ -145,13 +145,13 @@ describe("Run loop integration", () => {
 
   it("a run ends by completion when the seventh map is finished", () => {
     const prince = createStubPrince({ seed: 3 });
-    const roster = unlockedPlanets(prince.numEncounters);
+    const roster = unlockedPlanets(prince.numRelationalEncounters);
     let r = beginRun(prince.chart, 9);
     // Six rollovers: each archives the current map and begins a fresh one,
     // never ending the run.
     for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
       r = rolloverMap(r, prince.chart, roster, 100 + i);
-      expect(isOver(r, prince.chart, prince.numEncounters)).toBe(false);
+      expect(isOver(r, prince.chart, prince.numRelationalEncounters)).toBe(false);
       expect(r.events).toHaveLength(i + 1);
       expect(r.mapsCompleted).toBe(i + 1);
     }
@@ -159,7 +159,7 @@ describe("Run loop integration", () => {
     // completion: the final map stays current and is NOT archived.
     const finalMap = r.map;
     r = rolloverMap(r, prince.chart, roster, 999);
-    expect(isOver(r, prince.chart, prince.numEncounters)).toBe(true);
+    expect(isOver(r, prince.chart, prince.numRelationalEncounters)).toBe(true);
     expect(r.mapsCompleted).toBe(MAPS_PER_RUN);
     expect(r.events).toHaveLength(MAPS_PER_RUN - 1);
     expect(r.map).toBe(finalMap);
@@ -170,37 +170,37 @@ describe("Run loop integration", () => {
   it("isOver true iff every fielded player planet is combusted", () => {
     const prince = createStubPrince({ seed: 13 });
     const run = beginRun(prince.chart, 1);
-    expect(isOver(run, prince.chart, prince.numEncounters)).toBe(false);
+    expect(isOver(run, prince.chart, prince.numRelationalEncounters)).toBe(false);
     const dead = { ...run, state: { ...run.state } };
     for (const p of PLANETS) {
       dead.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
     }
-    expect(isOver(dead, prince.chart, prince.numEncounters)).toBe(true);
+    expect(isOver(dead, prince.chart, prince.numRelationalEncounters)).toBe(true);
   });
 });
 
 describe("Shared run transitions", () => {
   const prince = createStubPrince();
-  const run = beginRun(prince.chart, 42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
   const nodeOf = (kind: NodeContent["kind"]) =>
     Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === kind)!;
   const enter = (r: Run, nodeId: string, encounterIdSeed?: number) =>
-    enterNode({ run: r, chart: prince.chart, nodeId, lifetimeEncounterCount: prince.numEncounters, encounterIdSeed });
+    enterNode({ run: r, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters, encounterIdSeed });
 
   it("entering a node marks it visited and opens its encounter from the live seeds", () => {
-    const combatId = nodeOf("combat");
-    const { opponentSeed } = run.map.rolledNodes[combatId] as { opponentSeed: number };
-    const combat = enter(run, combatId);
-    expect(combat.map.currentNodeId).toBe(combatId);
-    expect(combat.map.visitedNodeIds).toEqual([...run.map.visitedNodeIds, combatId]);
-    const { selfNecessity, ...other } = combat.encounter as CombatEncounter;
+    const relationalId = nodeOf("relational");
+    const { opponentSeed } = run.map.rolledNodes[relationalId] as { opponentSeed: number };
+    const relational = enter(run, relationalId);
+    expect(relational.map.currentNodeId).toBe(relationalId);
+    expect(relational.map.visitedNodeIds).toEqual([...run.map.visitedNodeIds, relationalId]);
+    const { selfNecessity, ...other } = relational.encounter as RelationalEncounter;
     expect(selfNecessity!.length).toBeGreaterThan(0);
     expect(other).toEqual(
-      beginCombatEncounter({ run, opponentSeed, lifetimeEncounterCount: prince.numEncounters }),
+      beginRelationalEncounter({ run, opponentSeed, lifetimeRelationalEncounterCount: prince.numRelationalEncounters }),
     );
 
     // Check every narrative node of a few runs against its actual house sign.
-    for (const r of [42, 43, 44].map((seed) => beginRun(prince.chart, seed, prince.numEncounters))) {
+    for (const r of [42, 43, 44].map((seed) => beginRun(prince.chart, seed, prince.numRelationalEncounters))) {
       for (const [nodeId, content] of Object.entries(r.map.rolledNodes)) {
         if (content.kind !== "narrative") continue;
         const { house } = content;
@@ -218,12 +218,12 @@ describe("Shared run transitions", () => {
     const before = structuredClone(run);
     // Same map, different live seeds: a forecast must not tell the runs apart.
     const other: Run = { ...run, id: "run_other", seed: run.seed + 1 };
-    const combatId = nodeOf("combat");
-    const live = enter(run, combatId).encounter as CombatEncounter;
-    const forecast = enter(run, combatId, 7).encounter as CombatEncounter;
+    const relationalId = nodeOf("relational");
+    const live = enter(run, relationalId).encounter as RelationalEncounter;
+    const forecast = enter(run, relationalId, 7).encounter as RelationalEncounter;
     expect(forecast.opponentChart).toEqual(live.opponentChart);
     expect(forecast.necessity).not.toEqual(live.necessity);
-    expect({ ...enter(other, combatId, 7).encounter, id: forecast.id }).toEqual(forecast);
+    expect({ ...enter(other, relationalId, 7).encounter, id: forecast.id }).toEqual(forecast);
 
     const narrativeId = nodeOf("narrative");
     const scenarios = (r: Run) => [0, 1, 2, 3, 4, 5, 6, 7].map(
@@ -234,22 +234,22 @@ describe("Shared run transitions", () => {
     expect(run).toEqual(before);
   });
 
-  it("a combat ends on its last turn, or on the turn its run ends, and records its outcome on the map", () => {
-    const entered = enter({ ...run, mapsCompleted: 1 }, nodeOf("combat"));
+  it("a relational encounter ends on its last turn, or on the turn its run ends, and records its outcome on the map", () => {
+    const entered = enter({ ...run, mapsCompleted: 1 }, nodeOf("relational"));
     const turn = (r: Run) =>
-      resolveTurn(r, prince.chart, "Moon", "Testimony", combatTurnRng(r, r.encounter as CombatEncounter))!;
+      resolveTurn(r, prince.chart, "Moon", "Testimony", relationalTurnRng(r, r.encounter as RelationalEncounter))!;
     const first = turn(entered);
     expect(first.encounterEnded).toBe(false);
     expect(first.run.map.outcomes).toEqual({});
     const last = turn(first.run);
     expect(last.encounterEnded).toBe(true);
     expect(last.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({
-      kind: "combat",
+      kind: "relational",
       summary: `Encounter · ${last.encounter.opponentChart.name}`,
     });
 
     // Every planet but the Moon is out, and the first blow takes the Moon too.
-    const enc = entered.encounter as CombatEncounter;
+    const enc = entered.encounter as RelationalEncounter;
     const nearlySpent: Run = {
       ...entered,
       state: Object.fromEntries(PLANETS.map((p) => [p, {
@@ -262,7 +262,7 @@ describe("Shared run transitions", () => {
     const fatal = turn(nearlySpent);
     expect(fatal.runEnded).toBe(true);
     expect(fatal.encounter).toMatchObject({ turnIndex: 1, resolved: true });
-    expect(fatal.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({ kind: "combat", combusts: ["Moon"] });
+    expect(fatal.run.map.outcomes[entered.map.currentNodeId]).toMatchObject({ kind: "relational", combusts: ["Moon"] });
   });
 
   it("resolves a full entry wipe with zero Light, an outcome, and no action", () => {
@@ -275,20 +275,20 @@ describe("Shared run transitions", () => {
     wounded.light = 123;
     for (const p of PLANETS) wounded.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 1;
     wounded.state.Sun.affliction++; // Already combusted before this encounter.
-    const before = structuredClone(wounded), nodeId = nodeOf("combat");
-    const entered = enterNode({ run: wounded, chart, nodeId, lifetimeEncounterCount: prince.numEncounters });
-    expect(entered.encounter).toMatchObject({ kind: "combat", resolved: true, turnIndex: 0, log: [] });
+    const before = structuredClone(wounded), nodeId = nodeOf("relational");
+    const entered = enterNode({ run: wounded, chart, nodeId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
+    expect(entered.encounter).toMatchObject({ kind: "relational", resolved: true, turnIndex: 0, log: [] });
     expect(entered.light).toBe(123);
-    expect(entered.map.outcomes[nodeId]).toMatchObject({ kind: "combat", lightDelta: 0, combusts: PLANETS.filter((p) => p !== "Sun") });
+    expect(entered.map.outcomes[nodeId]).toMatchObject({ kind: "relational", lightDelta: 0, combusts: PLANETS.filter((p) => p !== "Sun") });
     const unused = vi.fn(() => { throw new Error("An entry wipe has no action"); });
     const play: PlayContext = {
       prince: { ...prince, chart }, trial: { chartSeed: 7, gameSeed: 42, strategy: "survival", strategySeed: 0 },
-      policy: { route: unused, combat: unused, narrative: unused }, rng: unused, turnRng: unused,
+      policy: { route: unused, relational: unused, narrative: unused }, rng: unused, turnRng: unused,
     };
     expect(playEncounter(play, entered, unused)).toBe(entered);
     expect(resolveTurn(entered, chart, "Moon", "Testimony", unused)).toBeNull();
     expect(unused).not.toHaveBeenCalled();
-    expect(isOver(entered, chart, prince.numEncounters)).toBe(true);
+    expect(isOver(entered, chart, prince.numRelationalEncounters)).toBe(true);
     expect(wounded).toEqual(before);
   });
 
@@ -305,9 +305,9 @@ describe("Shared run transitions", () => {
     }
     const wounded = { ...beginRun(chart, 42, 2), mapsCompleted: 2 };
     wounded.state.Moon.affliction = combustionCeiling(chart.planets.Moon) - 1;
-    const nodeId = Object.keys(wounded.map.rolledNodes).find((id) => wounded.map.rolledNodes[id]!.kind === "combat")!;
-    let current = enterNode({ run: wounded, chart, nodeId, lifetimeEncounterCount: 2 });
-    const encounter = current.encounter as CombatEncounter;
+    const nodeId = Object.keys(wounded.map.rolledNodes).find((id) => wounded.map.rolledNodes[id]!.kind === "relational")!;
+    let current = enterNode({ run: wounded, chart, nodeId, lifetimeRelationalEncounterCount: 2 });
+    const encounter = current.encounter as RelationalEncounter;
     expect(encounter.selfNecessity!.filter(({ blocked }) => blocked)).toEqual([
       { planet: "Mercury", amount: 0, blocked: true, draw: expect.any(Number) },
       { planet: "Venus", amount: 0, blocked: true, draw: expect.any(Number) },
@@ -336,7 +336,7 @@ describe("Shared run transitions", () => {
     const atExit: Run = { ...run, map: { ...run.map, currentNodeId: TERMINAL_NODE_ID } };
     const spent: Run = { ...atExit, state: { ...atExit.state } };
     for (const p of PLANETS) spent.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
-    const rolls = (r: Run) => shouldRolloverMap(r, prince.chart, prince.numEncounters);
+    const rolls = (r: Run) => shouldRolloverMap(r, prince.chart, prince.numRelationalEncounters);
     expect(rolls(run)).toBe(false);
     expect(rolls(enter(run, TERMINAL_NODE_ID))).toBe(false);
     expect(rolls(atExit)).toBe(true);

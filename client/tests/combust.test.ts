@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { combustionCeiling, isCombusted, newlyCombusted, uncombust, wouldCombust } from "@/game/combust";
 import { derivePlacements, seededChart } from "@/game/chart";
-import { getEffectiveStatsFromPlacement } from "@/game/combat";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
 
 // Fixtures supply Resolve directly.

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
 import { loadPrince, savePrince } from "@/state/prince";
 import { getScenario } from "@/data/narrative-scenarios";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { resolveNarrative } from "@/game/narrative";
 import { combustionCeiling } from "@/game/combust";
 import { createStubPrince } from "./fixtures";
@@ -29,9 +29,15 @@ describe("Prince storage", () => {
     expect(localStorage.getItem("sp:prince:v4")).toBeNull();
   });
 
+  it("discards counts that included narrative encounters and the old encounter kinds", () => {
+    localStorage.setItem("sp:prince:v5", JSON.stringify({ numEncounters: 32, runs: [] }));
+    expect(loadPrince()).toBeNull();
+    expect(localStorage.getItem("sp:prince:v5")).toBeNull();
+  });
+
   it("restores an unresolved scene and keeps a resolved result from paying twice", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     const scenario = getScenario("home-libra-mara");
     run.state.Moon.affliction = 0;
     run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: scenario.scenarioId });
@@ -49,11 +55,11 @@ describe("Prince storage", () => {
 
   it("rebuilds saved player and opponent stats without changing run progress", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     run.light = 72;
     run.state.Moon.affliction = 24;
-    run.encounter = beginCombatEncounter({
-      run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters,
+    run.encounter = beginRelationalEncounter({
+      run, opponentSeed: 8, lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
     });
     prince.runs = [run];
 
@@ -62,7 +68,7 @@ describe("Prince storage", () => {
     const raw = JSON.stringify(prince, (key, value) =>
       key === "base" || key === "buffs" ? { luck: value.luck } : value,
     );
-    localStorage.setItem("sp:prince:v5", raw);
+    localStorage.setItem("sp:prince:v6", raw);
 
     const restored = loadPrince()!;
     expect(restored).toEqual(prince);
@@ -72,10 +78,10 @@ describe("Prince storage", () => {
 
   it("caps saved affliction at the current Resolve on both charts", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 7, prince.numEncounters);
+    const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     run.light = 72;
-    const encounter = beginCombatEncounter({
-      run, opponentSeed: 8, lifetimeEncounterCount: prince.numEncounters,
+    const encounter = beginRelationalEncounter({
+      run, opponentSeed: 8, lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
     });
     run.state.Moon.affliction = 180;
     encounter.opponentState.Moon.affliction = 180;
@@ -87,7 +93,7 @@ describe("Prince storage", () => {
     const savedRun = restored.runs[0]!;
     expect(savedRun.state.Moon.affliction).toBe(combustionCeiling(restored.chart.planets.Moon));
     const savedEncounter = savedRun.encounter;
-    if (savedEncounter?.kind !== "combat") throw new Error("Expected a saved combat encounter");
+    if (savedEncounter?.kind !== "relational") throw new Error("Expected a saved relational encounter");
     expect(savedEncounter.opponentState.Moon.affliction)
       .toBe(combustionCeiling(savedEncounter.opponentChart.planets.Moon));
     expect(savedRun.light).toBe(72);
@@ -101,7 +107,7 @@ describe("Prince storage", () => {
 
     savePrince(prince);
 
-    const raw = localStorage.getItem("sp:prince:v5");
+    const raw = localStorage.getItem("sp:prince:v6");
     expect(raw).toContain('"light":36');
     expect(raw).toContain('"light":72');
     expect(raw).not.toContain('"distance"');

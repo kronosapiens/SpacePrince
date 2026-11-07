@@ -5,7 +5,7 @@ import { PLANETS } from "@/game/data";
 import { narrativeContext, resolveNarrative, visibleOptions, type NarrativeScenario, type Option, type Selection } from "@/game/narrative";
 import { resolveTurn } from "@/game/turn";
 import { unlockedPlanets } from "@/game/unlocks";
-import type { Chart, CombatEncounter, MapBoundary, NecessityEntry, PlanetName, Polarity, Prince, Run, TurnLogEntry } from "@/game/types";
+import type { Chart, RelationalEncounter, MapBoundary, NecessityEntry, PlanetName, Polarity, Prince, Run, TurnLogEntry } from "@/game/types";
 import type { Strategy } from "./policies";
 
 /** One evaluated run. Strategies share a chart/game-seed pair and choose their own path. */
@@ -16,7 +16,7 @@ export interface Trial {
   strategySeed: number;
 }
 
-export interface CombatAction { planet: PlanetName; verb: Polarity }
+export interface RelationalAction { planet: PlanetName; verb: Polarity }
 /** A legal narrative option with every selection that can carry it. */
 export interface NarrativeOption { option: Option; selections: Selection[] }
 export interface NarrativeChoice { optionId: string; selection: Selection }
@@ -30,14 +30,14 @@ export interface PlayContext {
   policy: Policy;
   /** The strategy's own randomness — never fed to the game. */
   rng: () => number;
-  /** Each combat turn's draws (`combatTurnRng` in live play). */
-  turnRng: (run: Run, encounter: CombatEncounter) => () => number;
+  /** Each relational turn's draws (`relationalTurnRng` in live play). */
+  turnRng: (run: Run, encounter: RelationalEncounter) => () => number;
 }
 
 /** Each decision returns one of the legal choices it is given. */
 export interface Policy {
   route(play: PlayContext, run: Run, nodeIds: string[]): string;
-  combat(play: PlayContext, run: Run, actions: CombatAction[]): CombatAction;
+  relational(play: PlayContext, run: Run, actions: RelationalAction[]): RelationalAction;
   narrative(play: PlayContext, run: Run, options: NarrativeOption[]): NarrativeChoice;
 }
 
@@ -52,19 +52,19 @@ export function snapshot(run: Run): { light: number; affliction: Record<PlanetNa
 export type Snapshot = ReturnType<typeof snapshot>;
 
 /** Actual effects received by Self, after clamping and aspect inversion. */
-export interface CombatPressure {
+export interface RelationalPressure {
   damage: number; healing: number;
   directAffliction: number; propagatedAffliction: number; invertedTestimonyDamage: number;
   directTestimony: number; propagatedTestimony: number; invertedAfflictionHealing: number;
 }
 
-export function emptyCombatPressure(): CombatPressure {
+export function emptyRelationalPressure(): RelationalPressure {
   return { damage: 0, healing: 0, directAffliction: 0, propagatedAffliction: 0,
     invertedTestimonyDamage: 0, directTestimony: 0, propagatedTestimony: 0, invertedAfflictionHealing: 0 };
 }
 
-export function combatPressure(log: TurnLogEntry): CombatPressure {
-  const pressure = emptyCombatPressure();
+export function relationalPressure(log: TurnLogEntry): RelationalPressure {
+  const pressure = emptyRelationalPressure();
   pressure[log.opponentValence === "Affliction" ? "directAffliction" : "directTestimony"] = log.playerDelta;
   for (const effect of log.propagation) {
     if (effect.side !== "self") continue;
@@ -99,15 +99,15 @@ export function statePressure(chart: Chart, before: Snapshot, after: Snapshot, r
 /** Every step carries the state it leaves, so replay shows each change. */
 export type Step = ReturnType<typeof snapshot> & (
   | { kind: "boundary"; map: number; seed: number; uncombusts: MapBoundary["uncombusts"]; necessity: MapBoundary["necessity"] }
-  | { kind: "enter"; map: number; nodeId: string; lifetimeEncounterCount: number;
-      encounter: "combat"; opponentSeed: number; ruler: PlanetName; necessity: NecessityEntry[]; combusts: PlanetName[]; wipe: boolean }
-  | { kind: "enter"; map: number; nodeId: string; lifetimeEncounterCount: number; encounter: "narrative"; house: number; scenarioId: string }
-  | { kind: "unlock"; planet: PlanetName; lifetimeEncounterCount: number; rescuedByUnlock: boolean; entryWipe: boolean; capacity: number }
+  | { kind: "enter"; map: number; nodeId: string; lifetimeRelationalEncounterCount: number;
+      encounter: "relational"; opponentSeed: number; ruler: PlanetName; necessity: NecessityEntry[]; combusts: PlanetName[]; wipe: boolean }
+  | { kind: "enter"; map: number; nodeId: string; lifetimeRelationalEncounterCount: number; encounter: "narrative"; house: number; scenarioId: string }
+  | { kind: "unlock"; planet: PlanetName; lifetimeRelationalEncounterCount: number; rescuedByUnlock: boolean; entryWipe: boolean; capacity: number }
   | {
       kind: "turn"; planet: PlanetName; verb: Polarity; opponentPlanet: PlanetName; opponentVerb: Polarity;
       playerDelta: number; opponentDelta: number; lightGain: number;
       combusts: PlanetName[]; opponentCombusts: PlanetName[];
-      pressure: CombatPressure;
+      pressure: RelationalPressure;
     }
   | {
       kind: "narrative"; optionId: string; chosen: PlanetName | null; lightDelta: number;
@@ -119,7 +119,7 @@ export type Step = ReturnType<typeof snapshot> & (
 const VERBS: Polarity[] = ["Affliction", "Testimony"];
 
 /** Every lit fielded planet, sent with either verb. */
-export function combatActions(run: Run, chart: Chart, encounter: CombatEncounter): CombatAction[] {
+export function relationalActions(run: Run, chart: Chart, encounter: RelationalEncounter): RelationalAction[] {
   const placements = runChart(chart, run).planets;
   return encounter.roster
     .filter((planet) => !isCombusted(placements[planet], run.state[planet]))
@@ -142,7 +142,7 @@ export function playEncounter(play: PlayContext, run: Run, record?: (step: Step)
     const { optionId, selection } = policy.narrative(play, run, narrativeOptions(run, prince, scenario));
     const next = resolveNarrative(run, prince, scenario, optionId, selection)!;
     const beforeChart = runChart(chart, run), afterChart = runChart(chart, next);
-    const roster = unlockedPlanets(prince.numEncounters);
+    const roster = unlockedPlanets(prince.numRelationalEncounters);
     const combustedBefore = (p: PlanetName) => isCombusted(beforeChart.planets[p], run.state[p]);
     const combustedAfter = (p: PlanetName) => isCombusted(afterChart.planets[p], next.state[p]);
     record?.({
@@ -157,9 +157,9 @@ export function playEncounter(play: PlayContext, run: Run, record?: (step: Step)
     });
     return next;
   }
-  while (run.encounter?.kind === "combat" && !run.encounter.resolved) {
+  while (run.encounter?.kind === "relational" && !run.encounter.resolved) {
     const enc = run.encounter;
-    const { planet, verb } = policy.combat(play, run, combatActions(run, chart, enc));
+    const { planet, verb } = policy.relational(play, run, relationalActions(run, chart, enc));
     const result = resolveTurn(run, chart, planet, verb, play.turnRng(run, enc))!;
     const { log } = result;
     record?.({
@@ -173,7 +173,7 @@ export function playEncounter(play: PlayContext, run: Run, record?: (step: Step)
       lightGain: log.lightGain,
       combusts: newlyCombusted(runChart(chart, run), run.state, result.run.state),
       opponentCombusts: newlyCombusted(enc.opponentChart, enc.opponentState, result.encounter.opponentState),
-      pressure: combatPressure(log),
+      pressure: relationalPressure(log),
       ...snapshot(result.run),
     });
     run = result.run;

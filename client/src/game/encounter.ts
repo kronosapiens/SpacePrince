@@ -1,12 +1,12 @@
 import { blankSideState, chartRuler, seededChart } from "./chart";
 import { applyNecessity } from "./necessity";
-import { drawValence, getEffectiveStatsFromPlacement } from "./combat";
+import { drawValence, getEffectiveStatsFromPlacement } from "./relational";
 import { eligibleOpponentSeed } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
   Chart,
-  CombatEncounter,
+  RelationalEncounter,
   NarrativeEncounter,
   PlanetName,
   Polarity,
@@ -15,23 +15,23 @@ import type {
 
 /** The encounter's ruler — the planet ruling the opponent chart's Ascendant.
  *  Derived, never stored, and one planet drives three surfaces: the node's
- *  colour on the map, the combat theme, and the encounter's scoring rule
+ *  colour on the map, the relational theme, and the encounter's scoring rule
  *  (`score.ts` `RULER_RULES`). */
-export function encounterRuler(enc: CombatEncounter): PlanetName {
+export function encounterRuler(enc: RelationalEncounter): PlanetName {
   return chartRuler(enc.opponentChart);
 }
 
-/** Combat length is the map number (MECHANICS §11.1): 1 turn on map 1, up to 7
+/** Relational encounter length is the map number (MECHANICS §11.1): 1 turn on map 1, up to 7
  *  on map 7. Difficulty ramps on two axes — roster via the unlock mirror,
  *  length via the run's progress. */
-export function combatTurnCount(mapsCompleted: number): number {
+export function relationalTurnCount(mapsCompleted: number): number {
   return mapsCompleted + 1;
 }
 
-export interface BeginCombatInput {
+export interface BeginRelationalInput {
   run: Run;
   opponentSeed: number;
-  lifetimeEncounterCount: number;
+  lifetimeRelationalEncounterCount: number;
   devUnlockAll?: boolean;
   encounterIdSeed?: number;
 }
@@ -57,9 +57,9 @@ export function rollOpponentTurns(
   return { sequence, opponentActions };
 }
 
-export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
-  const { run, opponentSeed, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
-  const roster = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
+export function beginRelationalEncounter(input: BeginRelationalInput): RelationalEncounter {
+  const { run, opponentSeed, lifetimeRelationalEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const roster = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
   // Maps normally store an already-eligible seed. Recheck here so direct dev
   // encounters and old local maps obey the same ruler gate.
   const acceptedSeed = eligibleOpponentSeed(opponentSeed, roster);
@@ -70,14 +70,15 @@ export function beginCombatEncounter(input: BeginCombatInput): CombatEncounter {
   // the map number, so a single planet may simply be sent on repeat turns.
   const rng = mulberry32(encounterIdSeed ?? acceptedSeed);
   const { sequence, opponentActions } = rollOpponentTurns(
-    opponentChart, roster, rng, combatTurnCount(run.mapsCompleted),
+    opponentChart, roster, rng, relationalTurnCount(run.mapsCompleted),
   );
   // Separate stream for the necessity so its draws don't perturb the
   // turn-sequence rolls above.
   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
   const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng);
   return {
-    kind: "combat",
+    kind: "relational",
+    // The ID feeds turn RNG; retain its original salt to preserve seeded outcomes.
     id: `enc_combat_${run.id}_${acceptedSeed}`,
     opponentChart,
     opponentState: opening.state,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveStatTable, fortuneChance } from "@/game/combat";
+import { deriveStatTable, fortuneChance } from "@/game/relational";
 import { combustionCeiling } from "@/game/combust";
 import { seededChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";

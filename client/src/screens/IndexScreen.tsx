@@ -53,9 +53,9 @@ export function IndexScreen() {
               <span className="muted">{prince.id}</span>
             </div>
             <div className="index-row">
-              Lifetime encounters: {prince.numEncounters}
+              Lifetime relational encounters: {prince.numRelationalEncounters}
               <span className="muted">
-                ({unlockedPlanets(prince.numEncounters, settings.unlockAll).length} unlocked)
+                ({unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll).length} unlocked)
               </span>
             </div>
             <div className="index-row">
@@ -68,12 +68,12 @@ export function IndexScreen() {
                 onFocus={playFocusSound}
                 onClick={() => {
                   if (!prince) return;
-                  const v = window.prompt("Set numEncounters", String(prince.numEncounters));
+                  const v = window.prompt("Set numRelationalEncounters", String(prince.numRelationalEncounters));
                   if (v == null) return;
                   const n = Math.max(0, Math.floor(Number(v)));
-                  if (Number.isFinite(n) && n !== prince.numEncounters) {
+                  if (Number.isFinite(n) && n !== prince.numRelationalEncounters) {
                     playUISound("commit");
-                    dispatch({ kind: "setEncounters", count: n });
+                    dispatch({ kind: "setRelationalEncounters", count: n });
                   }
                 }}
               >
@@ -108,7 +108,7 @@ export function IndexScreen() {
                   id: `stub_${seed}`,
                   position: { iso: new Date().toISOString(), lat: 0, lon: 0 },
                   chart,
-                  numEncounters: 0,
+                  numRelationalEncounters: 0,
                   achievements: 0,
                   runs: [],
                 };
@@ -153,14 +153,14 @@ export function IndexScreen() {
           <label>
             <input
               type="checkbox"
-              checked={settings.forceCombat}
+              checked={settings.forceRelational}
               onPointerEnter={playHoverSound}
               onFocus={playFocusSound}
               onChange={(e) =>
-                update({ ...settings, forceCombat: e.target.checked, forceNarrativeHouse: null })
+                update({ ...settings, forceRelational: e.target.checked, forceNarrativeHouse: null })
               }
             />
-            Force combat (no narrative)
+            Force relational (no narrative)
           </label>
         </div>
         <div className="index-cheat">
@@ -173,7 +173,7 @@ export function IndexScreen() {
               update({
                 ...settings,
                 forceNarrativeHouse: e.target.value === "" ? null : Number(e.target.value),
-                forceCombat: e.target.value === "" ? settings.forceCombat : false,
+                forceRelational: e.target.value === "" ? settings.forceRelational : false,
               })
             }
           >

@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CHART_CENTER, OUTER_RING_R } from "@/svg/viewbox";
 import type { Chart, PlanetName, PlanetStats, Polarity } from "@/game/types";
-import { deriveStatTable } from "@/game/combat";
+import { deriveStatTable } from "@/game/relational";
 import { PLANET_ROLE } from "@/game/data";
 import { PLANET_GLOSS, describeStat } from "@/game/glossary";
 import { TermText } from "@/components/TermText";

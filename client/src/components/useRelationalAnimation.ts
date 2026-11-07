@@ -6,7 +6,7 @@ import { beatScore, type ScoreCharts, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
 import type {
   Chart,
-  CombatEncounter,
+  RelationalEncounter,
   PlanetName,
   Polarity,
   Run,
@@ -50,7 +50,7 @@ export type EffectMap = ReadonlyMap<PlanetName, Polarity>;
 
 export type ProjectionDeltas = Partial<Record<PlanetName, ProjectedEffect>>;
 
-export interface CombatAnimationState {
+export interface RelationalAnimationState {
   selfState: SideState;
   otherState: SideState;
   playerPlanet: PlanetName;
@@ -93,15 +93,15 @@ export const EMPTY_EFFECT_MAP: EffectMap = new Map();
 
 // ── Hook ────────────────────────────────────────────────────────────────
 
-export interface CombatAnimationApi {
+export interface RelationalAnimationApi {
   /** Snapshot of in-flight animation, or null when idle. */
-  animation: CombatAnimationState | null;
+  animation: RelationalAnimationState | null;
   /** Begin choreographing a turn — call after the turn is committed (so
    *  display falls back to the new committed state when animation ends). */
   start(args: {
     entry: TurnLogEntry;
     previousRun: Run;
-    previousEncounter: CombatEncounter;
+    previousEncounter: RelationalEncounter;
     /** The player's chart — the scorer needs both charts, since a ruler whose
      *  rule reaches your side pays a combust its ceiling (`score.ts`). */
     playerChart: Chart;
@@ -111,8 +111,8 @@ export interface CombatAnimationApi {
   skip(): void;
 }
 
-export function useCombatAnimation(): CombatAnimationApi {
-  const [animation, setAnimation] = useState<CombatAnimationState | null>(null);
+export function useRelationalAnimation(): RelationalAnimationApi {
+  const [animation, setAnimation] = useState<RelationalAnimationState | null>(null);
   const timeoutIds = useRef<number[]>([]);
 
   // Cleanup on unmount.
@@ -133,7 +133,7 @@ export function useCombatAnimation(): CombatAnimationApi {
     (args: {
       entry: TurnLogEntry;
       previousRun: Run;
-      previousEncounter: CombatEncounter;
+      previousEncounter: RelationalEncounter;
       playerChart: Chart;
       projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
     }) => {
@@ -192,7 +192,7 @@ function cloneSide(state: SideState): SideState {
   return out;
 }
 
-function cloneAnimation(state: CombatAnimationState): CombatAnimationState {
+function cloneAnimation(state: RelationalAnimationState): RelationalAnimationState {
   return {
     ...state,
     selfState: cloneSide(state.selfState),
@@ -207,14 +207,14 @@ function applyDelta(state: SideState, planet: PlanetName, delta: number) {
 function runScheduler(args: {
   entry: TurnLogEntry;
   previousRun: Run;
-  previousEncounter: CombatEncounter;
+  previousEncounter: RelationalEncounter;
   playerChart: Chart;
   projectedDeltas: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   setAnimation: (
     update:
-      | CombatAnimationState
+      | RelationalAnimationState
       | null
-      | ((prev: CombatAnimationState | null) => CombatAnimationState | null),
+      | ((prev: RelationalAnimationState | null) => RelationalAnimationState | null),
   ) => void;
   timeoutIds: { current: number[] };
 }) {
@@ -228,7 +228,7 @@ function runScheduler(args: {
   // order, which is the order of record — so they sum to `entry.lightGain`.
   const ruler = encounterRuler(previousEncounter);
   const charts: ScoreCharts = { self: playerChart, other: previousEncounter.opponentChart };
-  const tick = (state: CombatAnimationState, beat: ScoredBeat) => {
+  const tick = (state: RelationalAnimationState, beat: ScoredBeat) => {
     const gain = beatScore(ruler, beat, charts, entry.opponentValence);
     if (gain <= 0) return;
     state.runningLight += gain;
@@ -237,7 +237,7 @@ function runScheduler(args: {
   };
 
   const updateAnimation = (
-    fn: (state: CombatAnimationState) => CombatAnimationState,
+    fn: (state: RelationalAnimationState) => RelationalAnimationState,
   ) => {
     setAnimation((prev) => (prev ? fn(prev) : prev));
   };

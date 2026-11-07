@@ -51,7 +51,7 @@ export function GameLayout() {
 
   const chart = isCasting ? casting.chart ?? sample : princeChart ?? sample;
   const unlocked = isCasting ? casting.revealedPlanets
-    : prince ? unlockedPlanets(prince.numEncounters, loadDevSettings().unlockAll) : PLANETS;
+    : prince ? unlockedPlanets(prince.numRelationalEncounters, loadDevSettings().unlockAll) : PLANETS;
   const emptyState = useMemo(blankSideState, []);
   const opening = useNecessityAnimation({
     id: run ? `${run.id}/${run.map.id}` : "",

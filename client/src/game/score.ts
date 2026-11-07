@@ -111,7 +111,7 @@ export function scoreBeats(
 
 /**
  * The turn log as beats, in the order the UI replays them
- * (`useCombatAnimation.ts`): phase 1 on the opponent's chart, then phase 2 on
+ * (`useRelationalAnimation.ts`): phase 1 on the opponent's chart, then phase 2 on
  * yours. Within a phase — the direct hit, the propagation hops with each hop's
  * combust marker, then the struck planet's own combust ripple.
  */

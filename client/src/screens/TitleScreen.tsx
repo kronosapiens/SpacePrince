@@ -38,7 +38,7 @@ export function TitleScreen() {
   // A player with no Prince falls through to the mint at /play; wiping identity
   // is dev-only (DevConsole). Which surface /play shows is derived from run
   // state by PlaySurface — the Title just routes there.
-  const hasLiveRun = !!(prince && run && !isOver(run, prince.chart, prince.numEncounters));
+  const hasLiveRun = !!(prince && run && !isOver(run, prince.chart, prince.numRelationalEncounters));
   const label = hasLiveRun ? "Continue" : "Begin";
   const handleBegin = () => {
     if (leaving) return;

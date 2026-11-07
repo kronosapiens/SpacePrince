@@ -15,18 +15,18 @@ describe("princeReducer", () => {
   });
 
   it("non-mint/clear actions on null state are no-ops", () => {
-    expect(princeReducer(null, { kind: "incrementEncounters" })).toBeNull();
+    expect(princeReducer(null, { kind: "incrementRelationalEncounters" })).toBeNull();
   });
 
-  it("incrementEncounters bumps by one", () => {
-    const p = createStubPrince({ numEncounters: 3 });
-    expect(princeReducer(p, { kind: "incrementEncounters" })?.numEncounters).toBe(4);
+  it("incrementRelationalEncounters bumps by one", () => {
+    const p = createStubPrince({ numRelationalEncounters: 3 });
+    expect(princeReducer(p, { kind: "incrementRelationalEncounters" })?.numRelationalEncounters).toBe(4);
   });
 
-  it("setEncounters sets the value, clamped at zero", () => {
-    const p = createStubPrince({ numEncounters: 3 });
-    expect(princeReducer(p, { kind: "setEncounters", count: 99 })?.numEncounters).toBe(99);
-    expect(princeReducer(p, { kind: "setEncounters", count: -5 })?.numEncounters).toBe(0);
+  it("setRelationalEncounters sets the value, clamped at zero", () => {
+    const p = createStubPrince({ numRelationalEncounters: 3 });
+    expect(princeReducer(p, { kind: "setRelationalEncounters", count: 99 })?.numRelationalEncounters).toBe(99);
+    expect(princeReducer(p, { kind: "setRelationalEncounters", count: -5 })?.numRelationalEncounters).toBe(0);
   });
 
   it("startRun appends a run to the tail", () => {

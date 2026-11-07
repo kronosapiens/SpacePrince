@@ -49,7 +49,7 @@ function press(selector: string, key: string, repeat = false) {
 }
 function setup() {
   const prince = createStubPrince();
-  const run = beginRun(prince.chart, 42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
   prince.runs = [run];
   savePrince(prince);
   const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
@@ -79,6 +79,22 @@ describe("map feedback", () => {
     expect(cues()).toEqual(["commit"]);
     expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
     expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
+  });
+
+  it("does not reopen the first map guide after a narrative-only encounter", () => {
+    const prince = createStubPrince({ numRelationalEncounters: 0 });
+    const run = beginRun(prince.chart, 42, 0);
+    const nodeId = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+    run.map.currentNodeId = nodeId;
+    run.map.visitedNodeIds.push(nodeId);
+    run.map.rolledNodes[nodeId] = { kind: "narrative", house: 4 };
+    run.map.outcomes[nodeId] = { nodeId, kind: "narrative", summary: "Left", lightDelta: 0, combusts: [] };
+    prince.runs = [run];
+    savePrince(prince);
+    act(() => root.render(<GameTest path="/play" />));
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(container.querySelector('.screen-help-button')).not.toBeNull();
+    expect(loadPrince()!.numRelationalEncounters).toBe(0);
   });
 
   it("previews a route on hover or focus, preserving focus when the pointer leaves", () => {

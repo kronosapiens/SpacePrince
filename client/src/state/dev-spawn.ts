@@ -1,7 +1,7 @@
 import { blankGains, houseSign, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
-import { beginCombatEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { mulberry32, hashString, randomSeed } from "@/game/rng";
 import { PLANETS } from "@/game/data";
@@ -9,7 +9,7 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { pickScenario } from "@/data/narrative-scenarios";
 import type {
   Chart,
-  CombatEncounter,
+  RelationalEncounter,
   MapState,
   NodeOutcome,
   PlanetName,
@@ -26,16 +26,16 @@ import type {
  * preview: "Regenerate" is just a fresh real game re-rolled at the same screen.
  *
  * Spawns are deliberately *lived-in*, not pristine: each re-roll randomizes
- * affliction/combustion on the boards, the combat turn, the map position, and
+ * affliction/combustion on the boards, the relational turn, the map position, and
  * the house — so re-rolling actually surfaces different game states. Everything
  * is derived from one `randomSeed()` per spawn, so a given run still replays
  * the same. Minting wipes the current local game, which is the intent here.
  */
 
-export type SpawnKind = "map" | "combat" | "narrative" | "end";
+export type SpawnKind = "map" | "relational" | "narrative" | "end";
 
 export interface SpawnOpts {
-  /** Unlock tier (numEncounters); defaults to all seven unlocked for full charts. */
+  /** Unlock tier (numRelationalEncounters); defaults to all seven unlocked for full charts. */
   tier?: number;
   /** Pin a narrative house; null/undefined rolls a random one. */
   house?: number | null;
@@ -50,7 +50,7 @@ const DEFAULT_TIER = 32; // Saturn unlocks at 32 → all seven planets shown.
 export function spawn(kind: SpawnKind, opts: SpawnOpts = {}): Prince {
   switch (kind) {
     case "map": return spawnMap(opts);
-    case "combat": return spawnCombat(opts);
+    case "relational": return spawnRelational(opts);
     case "narrative": return spawnNarrative(opts);
     case "end": return spawnEnd(opts);
   }
@@ -60,7 +60,7 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const fielded = unlockedPlanets(tier);
-  // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
+  // Relational encounter length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so encounters entered from here exercise every length.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
   const base = { ...beginRun(devPlayerChart(seed), seed, tier), mapsCompleted };
@@ -75,15 +75,15 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   return devPrince(seed, tier, run);
 }
 
-export function spawnCombat(opts: SpawnOpts = {}): Prince {
+export function spawnRelational(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
   const roster = unlockedPlanets(tier);
-  // Combat length rides the map number (MECHANICS §11.1); park the spawn on a
+  // Relational encounter length rides the map number (MECHANICS §11.1); park the spawn on a
   // random mid-run map so every length gets exercised.
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
   const base = { ...beginRun(devPlayerChart(seed), seed, tier), mapsCompleted };
-  const fresh = beginCombatEncounter({ run: base, opponentSeed: seed, lifetimeEncounterCount: tier });
+  const fresh = beginRelationalEncounter({ run: base, opponentSeed: seed, lifetimeRelationalEncounterCount: tier });
   // Mid-fight: a random turn and lived-in boards. Keep the opponent's acting
   // planet alive so the seam reads a real "their turn".
   const turnRng = mulberry32(hashString(`${seed}_turn`));
@@ -95,7 +95,7 @@ export function spawnCombat(opts: SpawnOpts = {}): Prince {
     const ceiling = combustionCeiling(fresh.opponentChart.planets[acting]);
     opponentState[acting] = { affliction: Math.min(opponentState[acting].affliction, ceiling - 1) };
   }
-  const encounter: CombatEncounter = { ...fresh, turnIndex, opponentState, necessity: undefined };
+  const encounter: RelationalEncounter = { ...fresh, turnIndex, opponentState, necessity: undefined };
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), roster),
@@ -160,11 +160,11 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
   return devPrince(seed, tier, run);
 }
 
-/** Re-mirror a live combat to a new unlock tier (dev console). Rebuilds the
+/** Re-mirror a live relational to a new unlock tier (dev console). Rebuilds the
  *  roster + opponent turns for `tier`, preserving the charts, boards, and the
  *  current turn — so scrubbing the unlock slider keeps the matchup mirrored
  *  (Moon v Moon, 2v2, …) instead of leaving the opponent at the spawn tier. */
-export function remirrorCombat(enc: CombatEncounter, tier: number, seed: number): CombatEncounter {
+export function remirrorRelational(enc: RelationalEncounter, tier: number, seed: number): RelationalEncounter {
   const roster = unlockedPlanets(tier);
   const rng = mulberry32(hashString(`${seed}_remirror_${tier}`));
   const { sequence, opponentActions } = rollOpponentTurns(
@@ -201,7 +201,7 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
     id: `dev_${seed}`,
     position: { iso: "1970-01-01T00:00:00.000Z", lat: 0, lon: 0 },
     chart: devPlayerChart(seed),
-    numEncounters: tier,
+    numRelationalEncounters: tier,
     achievements: 0,
     runs: [...history, run],
   };
@@ -277,7 +277,7 @@ function walkMap(seed: number, toTerminal: boolean, tier: number): MapState {
     outcomes[nodeId] = {
       nodeId,
       kind: content.kind,
-      summary: content.kind === "combat" ? "Encounter" : `House ${content.house}`,
+      summary: content.kind === "relational" ? "Encounter" : `House ${content.house}`,
       lightDelta: 6 + Math.floor(outRng() * 10),
       combusts: [],
     };

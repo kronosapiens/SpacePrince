@@ -21,14 +21,14 @@ export interface StrategyStats {
   light: { mean: number; median: number; p10: number; p90: number };
   /** Means per run, using actual Self effects rather than announced magnitudes. */
   pressure: RunPressure;
-  progression: { unlocks: number; unlockRescues: number; finalLifetimeEncounterCount: number };
+  progression: { unlocks: number; unlockRescues: number; finalLifetimeRelationalEncounterCount: number };
   /** Means per run. Encounters count once survived. */
   perRun: {
-    combatSurvived: number; narrativeSurvived: number; combatTurns: number; narrativeTurns: number;
+    relationalSurvived: number; narrativeSurvived: number; relationalTurns: number; narrativeTurns: number;
     combustions: number; boundaryRevivals: number; narrativeRevivals: number;
   };
   /** Encounters survived per completed run: whether completing means meeting fewer. */
-  completedRuns: { runs: number; combatSurvived: number; narrativeSurvived: number };
+  completedRuns: { runs: number; relationalSurvived: number; narrativeSurvived: number };
   verbs: Record<Polarity, number>;
   /** Times each option was chosen, by scenario. */
   narrativeOptions: Record<string, Record<string, number>>;
@@ -118,7 +118,7 @@ function clusters(charts: number[], rows: { chartSeed: number; value: number }[]
 }
 
 function encounterKey(s: RunSummary): string {
-  return s.terminalKind === "narrative" ? `narrative ${s.terminalScenarioId}` : `combat ruled by ${s.terminalRuler}`;
+  return s.terminalKind === "narrative" ? `narrative ${s.terminalScenarioId}` : `relational ruled by ${s.terminalRuler}`;
 }
 
 function choiceKey(s: RunSummary): string {
@@ -148,9 +148,9 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
   const per = (of: (s: RunSummary) => number) => mean(ss.map(of));
   const pressure = emptyRunPressure();
   for (const key of Object.keys(pressure) as (keyof RunPressure)[]) {
-    if (key === "combat") {
-      for (const source of Object.keys(pressure.combat) as (keyof RunPressure["combat"])[]) {
-        pressure.combat[source] = per((s) => s.pressure.combat[source]);
+    if (key === "relational") {
+      for (const source of Object.keys(pressure.relational) as (keyof RunPressure["relational"])[]) {
+        pressure.relational[source] = per((s) => s.pressure.relational[source]);
       }
     } else pressure[key] = per((s) => s.pressure[key]);
   }
@@ -166,11 +166,11 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     light: { mean: mean(light), median: quantile(light, 0.5), p10: quantile(light, 0.1), p90: quantile(light, 0.9) },
     pressure,
     progression: { unlocks: per((s) => s.unlocks.length), unlockRescues: per((s) => s.unlockRescues),
-      finalLifetimeEncounterCount: per((s) => s.finalLifetimeEncounterCount) },
+      finalLifetimeRelationalEncounterCount: per((s) => s.finalLifetimeRelationalEncounterCount) },
     perRun: {
-      combatSurvived: per((s) => s.combatEncounters),
+      relationalSurvived: per((s) => s.relationalEncounters),
       narrativeSurvived: per((s) => s.narrativeEncounters),
-      combatTurns: per((s) => s.combatTurns),
+      relationalTurns: per((s) => s.relationalTurns),
       narrativeTurns: per((s) => sum(Object.values(s.narrativeOptions))),
       combustions: per((s) => s.combustions),
       boundaryRevivals: per((s) => s.boundaryRevivals),
@@ -178,7 +178,7 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     },
     completedRuns: {
       runs: finished.length,
-      combatSurvived: mean(finished.map((s) => s.combatEncounters)),
+      relationalSurvived: mean(finished.map((s) => s.relationalEncounters)),
       narrativeSurvived: mean(finished.map((s) => s.narrativeEncounters)),
     },
     verbs: { Affliction: sum(ss.map((s) => s.verbs.Affliction)), Testimony: sum(ss.map((s) => s.verbs.Testimony)) },

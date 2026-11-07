@@ -1,37 +1,37 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as catalogue from "@/data/narrative-scenarios";
-import { combatActions, narrativeOptions, snapshot, type Policy, type PlayContext } from "@/eval/play";
+import { relationalActions, narrativeOptions, snapshot, type Policy, type PlayContext } from "@/eval/play";
 import { forecast, lightPolicy, survivalPolicy } from "@/eval/policies";
 import { A, L, scene as defineScene, trade } from "@/data/narrative/shared";
 import { getScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { eligibleNext } from "@/game/map-gen";
 import { mulberry32 } from "@/game/rng";
 import { beginRun, enterNode } from "@/game/run";
-import { combatTurnRng } from "@/game/turn";
-import type { CombatEncounter, PlanetName, Prince, Run } from "@/game/types";
+import { relationalTurnRng } from "@/game/turn";
+import type { RelationalEncounter, PlanetName, Prince, Run } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 const context = (prince: Prince, policy: Policy): PlayContext => ({
   trial: { chartSeed: 7, gameSeed: 2, strategy: "survival", strategySeed: 0 },
-  prince, policy, rng: mulberry32(1), turnRng: combatTurnRng,
+  prince, policy, rng: mulberry32(1), turnRng: relationalTurnRng,
 });
 
 describe("strategic policies", () => {
   afterEach(() => vi.restoreAllMocks());
   const prince = createStubPrince();
-  // Three candidates of both kinds, on a map whose combats run three turns.
-  const run: Run = { ...beginRun(prince.chart, 2, prince.numEncounters), mapsCompleted: 2 };
+  // Three candidates of both kinds, on a map whose relational encounters run three turns.
+  const run: Run = { ...beginRun(prince.chart, 2, prince.numRelationalEncounters), mapsCompleted: 2 };
   const nodeIds = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds);
-  const combatId = nodeIds.find((id) => run.map.rolledNodes[id]!.kind === "combat")!;
+  const relationalId = nodeIds.find((id) => run.map.rolledNodes[id]!.kind === "relational")!;
 
   it("forecasts routes from what the map shows, never the live arrival or turn draws", () => {
     const hidden: Run = { ...run, id: "run_other", seed: run.seed + 1 };
     const liveDraw = (r: Run) => {
-      const entered = enterNode({ run: r, chart: prince.chart, nodeId: combatId, lifetimeEncounterCount: prince.numEncounters });
-      return combatTurnRng(entered, entered.encounter as CombatEncounter)();
+      const entered = enterNode({ run: r, chart: prince.chart, nodeId: relationalId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
+      return relationalTurnRng(entered, entered.encounter as RelationalEncounter)();
     };
     expect(liveDraw(hidden)).not.toBe(liveDraw(run));
     for (const policy of [survivalPolicy, lightPolicy]) {
@@ -43,13 +43,13 @@ describe("strategic policies", () => {
     const openings = new Set<string>();
     const recorder: Policy = {
       ...survivalPolicy,
-      combat: (play, r, actions) => {
-        const enc = r.encounter as CombatEncounter;
+      relational: (play, r, actions) => {
+        const enc = r.encounter as RelationalEncounter;
         if (enc.turnIndex === 0) openings.add(JSON.stringify([enc.necessity, enc.sequence[0], enc.opponentActions[0]]));
-        return survivalPolicy.combat(play, r, actions);
+        return survivalPolicy.relational(play, r, actions);
       },
     };
-    forecast(context(prince, recorder), run, combatId);
+    forecast(context(prince, recorder), run, relationalId);
     expect(openings.size).toBeGreaterThan(1);
   });
 
@@ -73,7 +73,7 @@ describe("strategic policies", () => {
     ]);
     vi.spyOn(catalogue, "getScenario").mockReturnValue(scenario);
     const scene = (state: (r: Run) => void): Run => {
-      const r = beginRun(chooser.chart, 1, chooser.numEncounters);
+      const r = beginRun(chooser.chart, 1, chooser.numRelationalEncounters);
       for (const p of PLANETS) r.state[p].affliction = 0;
       state(r);
       return { ...r, encounter: beginNarrativeEncounter({ run: r, house: scenario.house, scenarioId: scenario.scenarioId }) };
@@ -93,35 +93,35 @@ describe("strategic policies", () => {
     expect(choose(lightPolicy, lastLight)).toEqual({ optionId: "rough", selection: { chosen: "Saturn" } });
   });
 
-  it("ranks combat actions by each strategy's criteria", () => {
+  it("ranks relational actions by each strategy's criteria", () => {
     // Every planet sits 6 short of combusting, against a testifying Venus. Venus
     // afflicting keeps all seven lit (32 Light). Sun and Moon afflicting gain the
     // most (84) but combust a planet without ending the run; the Sun leaves more capacity.
-    const r = beginRun(prince.chart, 1, prince.numEncounters);
+    const r = beginRun(prince.chart, 1, prince.numRelationalEncounters);
     for (const p of PLANETS) r.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 6;
-    const encounter = beginCombatEncounter({ run: r, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
+    const encounter = beginRelationalEncounter({ run: r, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     // Fix the tactical state independently of encounter-opening tuning.
     const otherAffliction = { Moon: 24, Mercury: 18, Venus: 24, Sun: 12, Mars: 12, Jupiter: 36, Saturn: 12 };
     for (const p of PLANETS) encounter.opponentState[p].affliction = otherAffliction[p];
     encounter.sequence = ["Venus"];
     encounter.opponentActions = ["Testimony"];
     const turn: Run = { ...r, encounter };
-    const choose = (policy: Policy) => policy.combat(context(prince, policy), turn, combatActions(turn, prince.chart, encounter));
+    const choose = (policy: Policy) => policy.relational(context(prince, policy), turn, relationalActions(turn, prince.chart, encounter));
     expect(choose(survivalPolicy)).toEqual({ planet: "Venus", verb: "Affliction" });
     expect(choose(lightPolicy)).toEqual({ planet: "Sun", verb: "Affliction" });
 
     // Against an afflicting Sun, Mars and Saturn afflicting earn the same 112
     // Light: Mars keeps all seven lit, Saturn leaves more capacity but loses a
     // planet. Light ranks lit planets before capacity.
-    const even = beginRun(prince.chart, 14, prince.numEncounters);
+    const even = beginRun(prince.chart, 14, prince.numRelationalEncounters);
     const afflictions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
     for (const p of PLANETS) even.state[p].affliction = afflictions[p];
-    const evenEncounter = beginCombatEncounter({ run: even, opponentSeed: 14, lifetimeEncounterCount: prince.numEncounters });
+    const evenEncounter = beginRelationalEncounter({ run: even, opponentSeed: 14, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     const evenOtherAffliction = { Moon: 18, Mercury: 6, Venus: 24, Sun: 12, Mars: 12, Jupiter: 6, Saturn: 24 };
     for (const p of PLANETS) evenEncounter.opponentState[p].affliction = evenOtherAffliction[p];
     expect([evenEncounter.sequence[0], evenEncounter.opponentActions[0]]).toEqual(["Sun", "Affliction"]);
     const evenTurn: Run = { ...even, encounter: evenEncounter };
-    expect(lightPolicy.combat(context(prince, lightPolicy), evenTurn, combatActions(evenTurn, prince.chart, evenEncounter)))
+    expect(lightPolicy.relational(context(prince, lightPolicy), evenTurn, relationalActions(evenTurn, prince.chart, evenEncounter)))
       .toEqual({ planet: "Mars", verb: "Affliction" });
   });
 
@@ -130,11 +130,11 @@ describe("strategic policies", () => {
     chooser.chart.ascendantSign = "Libra";
     for (const p of PLANETS) chooser.chart.planets[p].sign = "Aries";
     Object.assign(chooser.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
-    const r = beginRun(chooser.chart, 1, chooser.numEncounters);
+    const r = beginRun(chooser.chart, 1, chooser.numRelationalEncounters);
     for (const p of PLANETS) r.state[p].affliction = combustionCeiling(chooser.chart.planets[p]);
     r.gains.Moon.resolve = 12;
-    const combat = beginCombatEncounter({ run: r, opponentSeed: 5, lifetimeEncounterCount: chooser.numEncounters });
-    expect(combatActions(r, chooser.chart, combat).map(a => a.planet)).toEqual(["Moon", "Moon"]);
+    const relational = beginRelationalEncounter({ run: r, opponentSeed: 5, lifetimeRelationalEncounterCount: chooser.numRelationalEncounters });
+    expect(relationalActions(r, chooser.chart, relational).map(a => a.planet)).toEqual(["Moon", "Moon"]);
 
     const scenario = getScenario("home-capricorn-salting");
     r.encounter = beginNarrativeEncounter({ run: r, house: 4, scenarioId: scenario.scenarioId });
@@ -156,16 +156,16 @@ describe("strategic policies", () => {
     };
     const ceiling = (p: PlanetName) => combustionCeiling(prince.chart.planets[p]);
     const at = (mapsCompleted: number, affliction: (p: PlanetName) => number): Run => {
-      const r = { ...beginRun(prince.chart, 13, prince.numEncounters), mapsCompleted };
+      const r = { ...beginRun(prince.chart, 13, prince.numRelationalEncounters), mapsCompleted };
       for (const p of PLANETS) r.state[p].affliction = affliction(p);
       return useMara(r);
     };
     const healthy = at(0, () => 0);
     const ids = eligibleNext(healthy.map.graph, healthy.map.currentNodeId, healthy.map.visitedNodeIds);
-    expect(ids.map((id) => healthy.map.rolledNodes[id]!.kind)).toEqual(["combat", "combat", "narrative"]);
+    expect(ids.map((id) => healthy.map.rolledNodes[id]!.kind)).toEqual(["relational", "relational", "narrative"]);
     const route = (policy: Policy, r: Run) => policy.route(context(prince, policy), r, ids);
 
-    // Only the Moon is lit, one point from combusting: the three-turn combats
+    // Only the Moon is lit, one point from combusting: the three-turn relational encounters
     // usually end the run, the scene never does.
     const spent = at(2, (p) => ceiling(p) - (p === "Moon" ? 1 : 0));
     expect(route(survivalPolicy, spent)).toBe("3C");
@@ -176,7 +176,7 @@ describe("strategic policies", () => {
     expect(route(lightPolicy, healthy)).toBe("3C");
 
     // Two scenes forecast alike; survival takes the one nearer the map's exit.
-    const tied = useMara(beginRun(prince.chart, 61, prince.numEncounters));
+    const tied = useMara(beginRun(prince.chart, 61, prince.numRelationalEncounters));
     const estimate = (id: string) => forecast(context(prince, survivalPolicy), tied, id);
     expect(estimate("2R")).toEqual(estimate("3C"));
     expect(survivalPolicy.route(context(prince, survivalPolicy), tied, ["3C", "2R"])).toBe("3C");

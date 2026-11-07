@@ -23,11 +23,11 @@ import {
   type GuideShapes,
 } from "@/components/GuideOverlay";
 
-export type CombatGuidePhase = "read" | "act";
+export type RelationalGuidePhase = "read" | "act";
 
-interface CombatGuideProps {
+interface RelationalGuideProps {
   open: boolean;
-  phase: CombatGuidePhase;
+  phase: RelationalGuidePhase;
   ruler: PlanetName;
   rule: string;
   opponentPlanet: PlanetName | null;
@@ -37,7 +37,7 @@ interface CombatGuideProps {
   projectedLight: number | null;
   onOpen: () => void;
   onClose: () => void;
-  onPhaseChange: (phase: CombatGuidePhase) => void;
+  onPhaseChange: (phase: RelationalGuidePhase) => void;
 }
 
 const COPY = GUIDE_COPY.encounter;
@@ -63,7 +63,7 @@ function encounterShape(id: string, rects: GuideRects, reachOf: (id: string) => 
   return undefined;
 }
 
-export function CombatGuide({
+export function RelationalGuide({
   open,
   phase,
   ruler,
@@ -75,8 +75,8 @@ export function CombatGuide({
   onOpen,
   onClose,
   onPhaseChange,
-}: CombatGuideProps) {
-  const phases: CombatGuidePhase[] = examplePlanet ? ["read", "act"] : ["read"];
+}: RelationalGuideProps) {
+  const phases: RelationalGuidePhase[] = examplePlanet ? ["read", "act"] : ["read"];
 
   const notes = useMemo<GuideNote[]>(() => {
     if (phase === "read") {

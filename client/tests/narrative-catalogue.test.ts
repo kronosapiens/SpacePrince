@@ -43,7 +43,7 @@ function stateFor(scene: NarrativeScenario, prince: Prince, condition: Condition
   const run: Run = { ...BASE_RUN, light, state: blankSideState(), gains: blankGains() };
   if (gains) for (const p of PLANETS) run.gains[p].resolve = 24;
   const chart = runChart(prince.chart, run);
-  const roster = unlockedPlanets(prince.numEncounters);
+  const roster = unlockedPlanets(prince.numRelationalEncounters);
   for (const [i, p] of roster.entries()) {
     const ceiling = combustionCeiling(chart.planets[p]);
     run.state[p].affliction = condition === "clean" ? 0
@@ -134,12 +134,12 @@ describe("narrative catalogue", () => {
     for (const scene of SCENARIOS_BY_HOUSE[house.num] ?? []) {
       for (const occupancy of ["empty", "favorable", "adverse"] as const) {
         const chart = chartFor(scene, occupancy);
-        for (const numEncounters of UNLOCK_THRESHOLDS) {
-          const prince = { ...BASE_PRINCE, chart, numEncounters };
+        for (const numRelationalEncounters of UNLOCK_THRESHOLDS) {
+          const prince = { ...BASE_PRINCE, chart, numRelationalEncounters };
           for (const condition of ["clean", "injured", "near combustion", "one lit"] as const) {
             const run = stateFor(scene, prince, condition, 0);
             const offered = visibleOptions(run, narrativeContext(prince, run, scene.house), scene);
-            const label = `${scene.scenarioId}/${numEncounters}/${occupancy}/${condition}`;
+            const label = `${scene.scenarioId}/${numRelationalEncounters}/${occupancy}/${condition}`;
             expect(offered.length, label).toBeLessThanOrEqual(5);
             expect(offered.some(({ selections }) => selections.length), label).toBe(true);
           }

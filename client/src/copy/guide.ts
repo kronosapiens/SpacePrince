@@ -1,5 +1,5 @@
 /** Guide copy — every player-facing word in the three tutorial guides
- *  (`CombatGuide`, `MapGuide`, `NarrativeGuide`), gathered so the wording can
+ *  (`RelationalGuide`, `MapGuide`, `NarrativeGuide`), gathered so the wording can
  *  be tuned in one place. Layout stays in the guides: note keys, anchors,
  *  spotlights, placements, and phase order are code.
  *  Register: direct game instructions, accurate to MECHANICS.md, limited to

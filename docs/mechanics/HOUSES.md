@@ -1,9 +1,9 @@
 # Space Prince — Houses (Narrative Encounters)
 
 This document defines the **narrative encounter** system, organized around the twelve astrological houses.
-Narrative encounters are an alternative node type to combat, offering a single decision about immediate costs, recovery, revival, or run-long stat gains.
+Narrative encounters are an alternative to relational encounters, offering a single decision about immediate costs, recovery, revival, or run-long stat gains.
 
-Combat mechanics are specified in [MECHANICS.md](MECHANICS.md).
+Relational encounter mechanics are specified in [MECHANICS.md](MECHANICS.md).
 Chart construction (whole-sign houses, the Ascendant) is specified in [CHART.md](CHART.md); sign rulerships are tabulated in the [sign matrix](../writing/PLANET_MATRIX.md#sign-matrix).
 Map topology is specified in [MAP.md](MAP.md).
 
@@ -39,7 +39,7 @@ The matrices supply writing possibilities; the authoring spec determines which e
 - Chart-conditioning model: fixed references, their relationships in the natal chart, and current condition.
 - **Essential dignity from planet and sign.**
   The chart computes dignity from this pair, which shapes occupant terms under [ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity).
-  Dignity is not a combat input (`MECHANICS.md §10`).
+  Dignity is not an input to relational encounters (`MECHANICS.md §10`).
 - Twelve house archetypes: topics, fixed geometry, favorability, and joy.
 - Outcome vocabulary: what resources narrative encounters can move.
 - Encounter shape: one decision, immediate consequences, previews, and exits.
@@ -53,7 +53,7 @@ The matrices supply writing possibilities; the authoring spec determines which e
 
 ## 2. Outcome Vocabulary
 
-Narrative encounters operate on the same resources as combat.
+Narrative encounters operate on the same resources as relational encounters.
 Light, affliction, revival, and stat gains are defined with payment and target rules in [ENCOUNTERS.md §2–3](ENCOUNTERS.md#2-outcomes-and-payment).
 That document also records [implementation status](ENCOUNTERS.md#implementation-status) and [deferred decisions](ENCOUNTERS.md#11-deferred-decisions).
 

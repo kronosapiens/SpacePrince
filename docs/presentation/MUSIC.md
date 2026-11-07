@@ -12,9 +12,9 @@ The guiding principle:
 **Status:** the direction is implemented in-engine; the DAW pass (real timbre and mix) remains future work.
 The shared tonic, planet-to-mode mapping, planet-to-degree mapping, register, and timbre are design choices described below.
 All seven themes play in the client (`client/src/audio/themes.ts`, developed from the auditions in [`music-sketches/`](music-sketches/README.md)) as synchronized bed + down + up layers.
-The surface selects the mix — map breathes the down layer and combat drives the up layer — while one ruler's theme remains active at a time.
+The surface selects the mix — map breathes the down layer and relational encounters drive the up layer — while one ruler's theme remains active at a time.
 This vertical variation within one theme is distinct from the future multi-planet layered model in Architecture (b).
-Theme selection: the map plays the Prince's chart ruler, combat the opponent's chart ruler, narrative the house ruler.
+Theme selection: the map plays the Prince's chart ruler, relational encounters the opponent's chart ruler, narrative encounters the house ruler.
 There are no standalone per-planet signature gestures; event audio uses the ruler-relative degrees below, voiced within one octave around Sun's D5 tonic (`client/src/audio/pitches.ts`, `engine.ts`).
 Venus and Saturn's open mode calls were resolved provisionally in the shipped themes (Venus Mixolydian, Saturn Locrian over a moving toll rather than a static pedal).
 
@@ -58,7 +58,7 @@ The structural model is Ben Prunty's *FTL* soundtrack, not the concert-suite for
 - The two variants of a theme **share harmonic DNA** (Prunty's trick: same bed, the battle version adds percussion and drive), so they crossfade without a jarring cut.
 - This means we really compose **7 cores and derive their variants**, not 14 unrelated pieces — it roughly halves the work.
 
-The adaptive logic then falls out for free: the **active planet** selects the theme, **map vs. combat** selects the variant (the runtime model and its later extension are in *Architecture*, below).
+The adaptive logic then falls out for free: the **active planet** selects the theme, **map vs. relational encounter** selects the variant (the runtime model and its later extension are in *Architecture*, below).
 Themes stay **ambient and atmospheric**, not character songs — consistent with planets staying ambient rather than personified ([intent.md](../intent.md)).
 
 ---
@@ -82,7 +82,7 @@ Seven planets do not require using every mode or every degree exactly once.
 | Tonic | D for all planetary modes |
 | Planet → mode | One of the seven modes per planet, using each once; associations are interpretive |
 | Planet → degree | Sun 1, Venus 2, Mercury 3, Moon 4, Saturn 5, Jupiter 6, Mars 7, fixed across rulers |
-| Active mode | Combat uses the opponent's chart ruler, narrative the house ruler, Necessity the receiving chart's ruler |
+| Active mode | Relational encounters use the opponent's chart ruler, narrative encounters the house ruler, Necessity the receiving chart's ruler |
 | Register | Sun at D5, with degrees 5–7 below and degrees 2–4 above, spanning less than one octave |
 | Timbre | One shared `PLANET_VOICE` for strikes and necessity, currently auditioning the existing plucked arpeggio voice |
 | Event notes | Each affected planet sounds its assigned degree, without aspect-added notes |
@@ -152,7 +152,7 @@ The music's emotional arc as the chart fills in is built into the unlock schedul
 
 ## The strike grid — one mode per encounter, a degree per planet
 
-Every combat encounter has a ruler ([MECHANICS.md §11](../mechanics/MECHANICS.md#11-encounter--map--run-flow)), and the combat score already plays the ruler's theme, so the encounter sits in one mode from its first turn to its last.
+Every relational encounter has a ruler ([MECHANICS.md §11](../mechanics/MECHANICS.md#11-encounter--map--run-flow)), and the relational score already plays the ruler's theme, so the encounter sits in one mode from its first turn to its last.
 The resolution strikes ring in that same mode: every beat that strikes a planet — the direct hit, each propagation hop, each combust — sounds that planet's **degree** in the ruler's mode, on the shared D.
 It is the same set of beats that lights the edge bands, so band and note are one event, the key struck.
 The narrative screen strikes the same way at its house's natural ruler: each planet an outcome touches rings its degree, so an outcome that touches several planets sounds as a chord.
@@ -237,11 +237,11 @@ The score has composed melodies and instrument registers; event sounds use the p
 There is no separate library of pitched per-planet jingles.
 The ruler governs the event pitch collection throughout an encounter, and the affected planet selects the degree.
 
-**Combat-music model: implement (a), architect for (b).**
+**Relational encounter music model: implement (a), architect for (b).**
 
 - **(a) Jukebox** *(current)* — the encounter ruler's battle variant plays while the event layer articulates actions and combustion inside that mode.
   The score does not progressively thin as individual planets combust.
-- **(b) Layered** *(possible later)* — combat music is a live mix of the fielded planets' battle stems, each muting as it combusts: literally the chart-as-chord in motion.
+- **(b) Layered** *(possible later)* — relational music is a live mix of the fielded planets' battle stems, each muting as it combusts: literally the chart-as-chord in motion.
   This is the architecture that can make the continuous soundscape grow genuinely sparser as planets go dark: early in a run the fielded chart is full; late in a run, dark planets leave gaps where voices used to be.
   It is richer but larger, and it requires every theme to be writable as a simultaneous stem.
 

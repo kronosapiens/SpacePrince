@@ -14,7 +14,7 @@ import { encountersToExit, planningPolicy } from "./planning";
  *  option and one of its selections. */
 export const randomPolicy: Policy = {
   route: (play, _run, nodeIds) => pickWeighted(nodeIds, play.rng),
-  combat: (play, _run, actions) => pickWeighted(actions, play.rng),
+  relational: (play, _run, actions) => pickWeighted(actions, play.rng),
   narrative: (play, _run, options) => {
     const { option, selections } = pickWeighted(options, play.rng);
     return { optionId: option.id, selection: pickWeighted(selections, play.rng) };
@@ -32,11 +32,11 @@ interface Measures { over: boolean; lit: number; capacity: number; light: number
 
 /** Lit planets and remaining capacity to absorb affliction, across the fielded roster. */
 function measure(run: Run, prince: Prince): Measures {
-  const { numEncounters } = prince;
+  const { numRelationalEncounters } = prince;
   const chart = runChart(prince.chart, run);
-  const roster = unlockedPlanets(numEncounters);
+  const roster = unlockedPlanets(numRelationalEncounters);
   return {
-    over: isOver(run, chart, numEncounters),
+    over: isOver(run, chart, numRelationalEncounters),
     lit: roster.filter((p) => !isCombusted(chart.planets[p], run.state[p])).length,
     capacity: roster.reduce((sum, p) => sum + Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction), 0),
     light: run.light,
@@ -56,7 +56,7 @@ export function forecast(play: PlayContext, run: Run, nodeId: string): Forecast 
   for (let sample = 0; sample < FORECAST_SAMPLES; sample++) {
     const seed = hashString(`forecast_${chartSeed}_${gameSeed}_${strategySeed}_${run.mapsCompleted + 1}_${nodeId}_${sample}`);
     const entered = enterNode({
-      run, chart: play.prince.chart, nodeId, lifetimeEncounterCount: play.prince.numEncounters, encounterIdSeed: hashString(`${seed}_arrival`),
+      run, chart: play.prince.chart, nodeId, lifetimeRelationalEncounterCount: play.prince.numRelationalEncounters, encounterIdSeed: hashString(`${seed}_arrival`),
     });
     const after = measure(playEncounter(forecastContext(play, seed), entered), play.prince);
     total.survived += after.over ? 0 : 1;
@@ -68,7 +68,7 @@ export function forecast(play: PlayContext, run: Run, nodeId: string): Forecast 
 }
 
 /** A forecast's own tie-breaks and turn draws: it can neither consume the live
- *  strategy stream nor read `combatTurnRng`, which keys on the live run. */
+ *  strategy stream nor read `relationalTurnRng`, which keys on the live run. */
 function forecastContext(play: PlayContext, seed: number): PlayContext {
   const turns = mulberry32(hashString(`${seed}_turns`));
   return { ...play, rng: mulberry32(hashString(`${seed}_ties`)), turnRng: () => turns };
@@ -102,7 +102,7 @@ function strategic(
     route: (play, run, nodeIds) => nodeIds.length === 1
       ? nodeIds[0]!
       : best(nodeIds, (id) => routeKey(forecast(play, run, id), run, id), play.rng),
-    combat: (play, run, actions) => best(actions, ({ planet, verb }) =>
+    relational: (play, run, actions) => best(actions, ({ planet, verb }) =>
       choiceKey(measure(resolveTurn(run, play.prince.chart, planet, verb, NO_DRAW)!.run, play.prince)), play.rng),
     narrative: (play, run, options) => {
       const scenario = getScenario((run.encounter as NarrativeEncounter).scenarioId);
@@ -129,12 +129,12 @@ export const POLICIES = {
   random: randomPolicy,
   survival: survivalPolicy,
   light: lightPolicy,
-  "combat-immediate": planningPolicy(survivalPolicy, { route: "combat" }),
-  "combat-two-turn": planningPolicy(survivalPolicy, { route: "combat", horizon: 2 }),
+  "relational-immediate": planningPolicy(survivalPolicy, { route: "relational" }),
+  "relational-two-turn": planningPolicy(survivalPolicy, { route: "relational", horizon: 2 }),
   "narrative-immediate": planningPolicy(survivalPolicy, { route: "narrative" }),
   "capacity-12": planningPolicy(survivalPolicy, { capacityAllowance: 12 }),
   "two-turn-survival": planningPolicy(survivalPolicy, { horizon: 2 }),
   "two-turn-capacity-12": planningPolicy(survivalPolicy, { horizon: 2, capacityAllowance: 12 }),
-  "combat-two-turn-entry-aware": planningPolicy(survivalPolicy, { route: "combat", horizon: 2, anticipateEntry: true }),
+  "relational-two-turn-entry-aware": planningPolicy(survivalPolicy, { route: "relational", horizon: 2, anticipateEntry: true }),
 } satisfies Record<string, Policy>;
 export type Strategy = keyof typeof POLICIES;

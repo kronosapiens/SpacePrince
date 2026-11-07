@@ -44,14 +44,14 @@ export const MUSIC_VOLUME_DB: Record<ThemeRole, number> = {
   hat: -9,
 };
 
-export type ThemeSurface = "map" | "combat" | "narrative";
+export type ThemeSurface = "map" | "relational" | "narrative";
 export type ThemeLayer = "bed" | "down" | "up";
 
 // Linear layer gains; zero leaves the layer silent on that surface.
 export const SURFACE_MIX: Record<ThemeSurface, Record<ThemeLayer, number>> = {
   map: { bed: 0.9, down: 1, up: 0 },
   narrative: { bed: 0.65, down: 0.4, up: 0 },
-  combat: { bed: 1, down: 0.25, up: 0.85 },
+  relational: { bed: 1, down: 0.25, up: 0.85 },
 };
 
 // Wet fractions: zero is dry, one is fully processed.

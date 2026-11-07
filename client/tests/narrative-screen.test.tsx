@@ -47,7 +47,7 @@ afterEach(() => {
 
 function mount(id: string, prince = createStubPrince(), light = 120) {
   const scenario = getScenario(id);
-  const run = { ...beginRun(prince.chart, 42, prince.numEncounters), light };
+  const run = { ...beginRun(prince.chart, 42, prince.numRelationalEncounters), light };
   run.state.Moon.affliction = 10;
   run.state.Sun.affliction = 10;
   run.state.Mars.affliction = 24;

@@ -24,7 +24,7 @@ New design decisions are recorded only with the user's agreement.
 ## Reading paths
 
 **Mechanics.**
-Start with [MECHANICS.md](mechanics/MECHANICS.md) for combat (the number model, stats, resolution, aspects, combustion, Necessity, the run, and Light), then [STATE.md](mechanics/STATE.md) for the data shapes and what is stored, derived, or evented.
+Start with [MECHANICS.md](mechanics/MECHANICS.md) for relational encounters (the number model, stats, resolution, aspects, combustion, Necessity, the run, and Light), then [STATE.md](mechanics/STATE.md) for the data shapes and what is stored, derived, or evented.
 [ENCOUNTERS.md](mechanics/ENCOUNTERS.md) specifies house scenes (outcomes, targets, chart conditioning, economy, resolution) and [HOUSES.md](mechanics/HOUSES.md) the references they draw on.
 [MAP.md](mechanics/MAP.md) is the map grammar and [CHART.md](mechanics/CHART.md) chart construction.
 

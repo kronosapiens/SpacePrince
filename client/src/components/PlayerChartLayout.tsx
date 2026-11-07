@@ -52,7 +52,7 @@ export function PlayerChartLayout({ children, className, ...chart }: ChartInspec
           onMouseLeave={presentation?.onMouseLeave}
         >
           {presentation?.label && (
-            <div className="chart-layout-label combat-side-label" data-guide="label-self">
+            <div className="chart-layout-label relational-side-label" data-guide="label-self">
               {presentation.label}
             </div>
           )}

@@ -1,5 +1,5 @@
 import { cloneSideState } from "./chart";
-import { fortuneChance, getEffectiveStats } from "./combat";
+import { fortuneChance, getEffectiveStats } from "./relational";
 import { combustionCeiling, isCombusted } from "./combust";
 import { pickWeighted } from "./rng";
 import type { Chart, NecessityEntry, PlanetName, SideState } from "./types";

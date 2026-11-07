@@ -145,7 +145,7 @@ export interface ChartProps {
   onPlanetClick?: (p: PlanetName) => void;
   onPlanetHover?: (p: PlanetName | null) => void;
   /** When true, the player's tappable planets carry a quiet breathing ring
-   *  inviting a choice — the combat decision phase. Off everywhere else. */
+   *  inviting a choice — the relational decision phase. Off everywhere else. */
   inviteInteraction?: boolean;
   /** Explicit narrative targets; may include combusted planets for revival. */
   interactionPlanets?: ReadonlySet<PlanetName>;
@@ -184,7 +184,7 @@ export interface ChartProps {
    *  on planet positions), so swapping which planet is inspected doesn't
    *  jump the panel around. */
   statsPanelPlanet?: PlanetName | null;
-  /** When set, render the combat action fan-out under the stats panel. */
+  /** When set, render the relational action fan-out under the stats panel. */
   statsPanelActions?: PlanetStatsActions;
   statsPanelEffect?: { verb: Polarity; value: number };
   /** Reserve the taller (action-row) panel height when placing, so the panel

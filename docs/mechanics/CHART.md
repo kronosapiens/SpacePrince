@@ -241,7 +241,7 @@ Implications for rarity tiering:
 
 This document only covers chart construction.
 
-Combat/encounter resolution remains defined in [MECHANICS.md](MECHANICS.md).
+Relational encounter resolution remains defined in [MECHANICS.md](MECHANICS.md).
 
 Key interface contract between systems:
 
