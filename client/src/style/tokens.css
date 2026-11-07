@@ -51,6 +51,15 @@
   --planet-intro-close-inset: 28px;
   --planet-intro-starfield-opacity: 0.55;
 
+  --chorus-width: 760px;
+  --chorus-art-size: 210px;
+  --chorus-gap: 16px;
+  --chorus-padding: 40px;
+  --chorus-passage-size: 24px;
+  --chorus-passage-leading: 1.35;
+  --chorus-name-size: 36px;
+  --chorus-attribution-size: 16px;
+
   --chart-pad-block: 80px;
   --chart-pad-inline: 60px;
   --chart-gap: 32px;

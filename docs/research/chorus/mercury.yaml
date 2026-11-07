@@ -109,9 +109,9 @@
   moods: [paradox, opening]
 
 - text: |
-    If I am not for myself, who is for me? And being for my own self, what am I? And if not now, when?
+    If I am not for myself, who is for me? and being for my own self what am I? If not now when?
   author: "Hillel"
-  source: "Pirkei Avot 1:14"
+  source: "Pirkei Avot 1:14 (Ch. I §15 in Taylor)"
   translation: "Charles Taylor, 1897"
   source_url: "https://archive.org/details/sayingsofjewish00tayl"
   moods: [question, paradox, opening]
@@ -121,15 +121,15 @@
   author: "Rabbi Akiva"
   source: "Pirkei Avot 3:15"
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.3.15"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.3.15?ven=Mishnah_Yomit_by_Dr._Joshua_Kulp"
   moods: [paradox, opening, saturn_secondary]
 
 - text: |
-    Who is wise? He who learns from every man. Who is mighty? He who subdues his inclination. Who is rich? He who rejoices in his portion. Who is honored? He who honors others.
+    Who is wise? He who learns from every man … Who is mighty? He who subdues his [evil] inclination … Who is rich? He who rejoices in his lot … Who is he that is honored? He who honors his fellow human beings …
   author: "Ben Zoma"
   source: "Pirkei Avot 4:1"
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.4.1"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.1?ven=Mishnah_Yomit_by_Dr._Joshua_Kulp"
   moods: [opening, paradox]
 
 - text: |
@@ -137,7 +137,7 @@
   author: "Ben Azzai"
   source: "Pirkei Avot 4:3"
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.4.3"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.3?ven=Mishnah_Yomit_by_Dr._Joshua_Kulp"
   moods: [opening, turn]
 
 - text: |
@@ -155,6 +155,6 @@
     Words unutterable by tongue in speech.
   author: "Rumi"
   source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, paradox]

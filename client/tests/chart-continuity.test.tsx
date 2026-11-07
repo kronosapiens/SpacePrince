@@ -85,6 +85,9 @@ describe("shared player chart", () => {
 
     click(`[data-guide="node-${relationalNode}"]`);
     expectStableChart();
+    expect(container.querySelector('[data-guide="chart-other"]')).toBeNull();
+    act(() => document.querySelector(".chorus-continue")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    expectStableChart();
     expect(element('[data-guide="chart-other"] .chart-svg')).not.toBe(chart);
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(2);
     if (container.querySelector(".necessity-opening")) act(() => vi.runOnlyPendingTimers());
@@ -111,6 +114,8 @@ describe("shared player chart", () => {
     expect(afterRelational.numRelationalEncounters).toBe(prince.numRelationalEncounters + 1);
 
     click(`[data-guide="node-${narrativeNode}"]`);
+    expectStableChart();
+    act(() => document.querySelector(".chorus-continue")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expectStableChart();
     closeFirstGuide("Read the scene");
     expect(element('[data-guide="option-2"]').textContent).toContain("Tell your uncle her name, and leave his table.");

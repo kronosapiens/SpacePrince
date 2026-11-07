@@ -57,7 +57,7 @@ Hooks: `usePrince`, `usePrinceDispatch`, `useActiveRun`, and `useRunChart` (the 
 
 A reducer is `(state, action) => state`: no RNG, no `Date.now()`, no storage reads, no input mutation.
 Actions that adopt a resolved next state carry it pre-computed; the reducer just returns it.
-All impure work (`resolveTurn`, seeds, RNG rolling) happens in the thunk hooks in `state/store-actions.ts`: `useStartRun`, `useCommitTurn`, `useRolloverMap`, `useResetAll`.
+All impure work (`resolveTurn`, seeds, RNG rolling) happens in the thunk hooks in `state/store-actions.ts`: `useStartRun`, `useEnterNode`, `useCommitTurn`, `useRolloverMap`, `useResetAll`.
 
 This shape deliberately mirrors the eventual onchain flow.
 Today: thunk computes the next run → dispatch → reducer adopts it → persistence effect.
@@ -71,6 +71,17 @@ Screens never call `savePrince` or `clearPrince`; they dispatch actions, and per
 The run's in-memory event log (`Run.events`) is stripped on save.
 
 Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-shaped: unlock all planets, force the next node to a narrative house or a relational encounter.
+
+### Planetary chorus at encounter entry
+
+`useEnterNode` applies development overrides, initializes the encounter through `enterNode`, and commits it together with a passage snapshot in optional `encounter.chorus`.
+Selection uses a separate seeded stream derived from run, map, node, and a chorus salt; it does not consume gameplay draws.
+The catalogue in `copy/chorus.ts` imports the seven canonical YAML files under `docs/research/chorus/` through `@rollup/plugin-yaml` in both Vite and Vitest.
+
+`PlaySurface` renders `ChorusCard` instead of mounting `EncounterScreen` while that field exists, so opening playback, guides, and automatic advancement wait for Continue.
+The shared chart stays mounted with inspection disabled behind an opaque backdrop.
+All dismissal paths remove only the snapshot through `commitRun`; persistence restores an open passage and remembers dismissal without a new storage version.
+Existing saves and direct development spawns without the field render normally.
 
 ### The game layer is framework-free
 

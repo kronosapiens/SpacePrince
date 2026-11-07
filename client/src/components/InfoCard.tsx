@@ -8,6 +8,7 @@ interface InfoCardProps {
   ariaLabel: string;
   className?: string;
   onClose: () => void;
+  restoreFocus?: boolean;
   children: ReactNode;
 }
 
@@ -15,7 +16,7 @@ interface InfoCardProps {
  *  stage + close button. Content-agnostic — the chart study view, planet
  *  introductions, and future tooltip/tutorial cards all render inside this
  *  one frame. Dismissed via backdrop click, the close button, or ESC. */
-export function InfoCard({ ariaLabel, className = "", onClose, children }: InfoCardProps) {
+export function InfoCard({ ariaLabel, className = "", onClose, children, restoreFocus = true }: InfoCardProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => {
     playUISound("dismiss");
@@ -23,8 +24,8 @@ export function InfoCard({ ariaLabel, className = "", onClose, children }: InfoC
   }, [onClose]);
   useEffect(() => {
     const trigger = document.activeElement as HTMLElement | null;
-    return () => { trigger?.focus({ preventScroll: true }); };
-  }, []);
+    return () => { if (restoreFocus) trigger?.focus({ preventScroll: true }); };
+  }, [restoreFocus]);
   useEffect(() => { stageRef.current?.focus(); }, [ariaLabel]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

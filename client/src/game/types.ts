@@ -95,7 +95,17 @@ export type SideState = Record<PlanetName, PlanetState>;
 
 // ── Encounters ────────────────────────────────────────────────────────────────
 
+/** Snapshot retained only until the encounter opening is revealed. */
+export interface ChorusPassage {
+  text: string;
+  author: string;
+  source: string;
+  translation?: string;
+  source_url: string;
+}
+
 export interface RelationalEncounter {
+  chorus?: ChorusPassage;
   kind: "relational";
   id: string;
   opponentChart: Chart;
@@ -119,6 +129,7 @@ export interface RelationalEncounter {
 }
 
 export interface NarrativeEncounter {
+  chorus?: ChorusPassage;
   kind: "narrative";
   id: string;
   house: number; // 1..12

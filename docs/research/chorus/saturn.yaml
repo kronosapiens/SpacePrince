@@ -7,7 +7,7 @@
   author: "Ecclesiastes"
   source: "Ecclesiastes 12:7"
   translation: "Jewish Publication Society, 1917"
-  source_url: "https://www.sefaria.org/Ecclesiastes.12.7"
+  source_url: "https://www.sefaria.org/Ecclesiastes.12.7?ven=The_Holy_Scriptures%3A_A_New_Translation_(JPS_1917)"
   moods: [ending, cost]
 
 - text: |
@@ -88,7 +88,7 @@
   author: "The Book of Job"
   source: "Job 8:9 (Bildad)"
   translation: "Jewish Publication Society, 1917"
-  source_url: "https://www.sefaria.org/Job.8.9"
+  source_url: "https://www.sefaria.org/Job.8.9?ven=The_Holy_Scriptures%3A_A_New_Translation_(JPS_1917)"
   moods: [opening, reverie]
 
 - text: |
@@ -116,9 +116,12 @@
   moods: [ending, reverie]
 
 - text: |
-    Why, O Gish, dost thou run about? The life that thou seekest, thou wilt not find. When the gods created mankind, death they imposed on mankind; life they kept in their power.
+    The life that thou seekest, thou wilt not find.
+    When the gods created mankind,
+    Death they imposed on mankind;
+    Life they kept in their power.
   author: "Anonymous (Babylonian)"
-  source: "Epic of Gilgamesh, Old Babylonian Tablet (Sabitum to Gilgamesh)"
+  source: "An Old Babylonian Version of the Gilgamesh Epic, Introduction I (Sabitum to Gilgamesh)"
   translation: "Morris Jastrow & Albert T. Clay, 1920"
   source_url: "https://www.gutenberg.org/files/11000/11000-0.txt"
   moods: [warning, cost]
@@ -134,7 +137,7 @@
 - text: |
     It is not for thee to finish the work, nor art thou free to desist therefrom.
   author: "Rabbi Tarphon"
-  source: "Pirkei Avot 2:21"
+  source: "Pirkei Avot 2:16 (Ch. II §19 in Taylor)"
   translation: "Charles Taylor, 1897"
   source_url: "https://archive.org/details/sayingsofjewish00tayl"
   moods: [opening, command]
@@ -144,7 +147,7 @@
   author: "Rabbi Levitas of Yavneh"
   source: "Pirkei Avot 4:4"
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.4.4"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.4.4?ven=Mishnah_Yomit_by_Dr._Joshua_Kulp"
   moods: [warning, ending]
 
 - text: |
@@ -172,9 +175,11 @@
   moods: [warning, cut]
 
 - text: |
-    Events will take their course, it is no good our being angry at them, he is happiest who wisely turns them to the best account.
-  author: "Plutarch"
-  source: "Moralia, 'On Contentedness of Mind' §IV"
+    Events will take their course, it is no good
+    Our being angry at them, he is happiest
+    Who wisely turns them to the best account.
+  author: "Euripides"
+  source: "Bellerophon, fragment 298, quoted in Plutarch, Moralia, 'On Contentedness of Mind' §IV"
   translation: "A. R. Shilleto, 1898"
   source_url: "https://www.gutenberg.org/cache/epub/23639/pg23639.txt"
   moods: [opening, cost, sun_secondary]
@@ -199,7 +204,7 @@
     I assure you that the seconds are strongly and solemnly accentuated now; and each, as it drips from the pendulum, says: "I am Life: intolerable, implacable Life!"
   author: "Charles Baudelaire"
   source: "Paris Spleen (Petits Poèmes en Prose), 'The Double Chamber'"
-  translation: "Arthur Symons, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
+  translation: "F. P. Sturm, in Baudelaire: His Prose and Poetry (T. R. Smith, ed.), 1919"
   source_url: "https://www.gutenberg.org/cache/epub/47032/pg47032.txt"
   moods: [cost, warning]
 

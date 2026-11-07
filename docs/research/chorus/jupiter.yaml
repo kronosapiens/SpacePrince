@@ -85,7 +85,7 @@
   moods: [reverie, opening, saturn_secondary]
 
 - text: |
-    How I wish that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
+    How I wish, said Socrates, taking his place as he was desired, that wisdom could be infused by touch, out of the fuller into the emptier man, as water runs through wool out of a fuller cup into an emptier one.
   author: "Plato"
   source: "Symposium (Socrates to Agathon, at the couch)"
   translation: "Benjamin Jowett, 1871"
@@ -121,11 +121,11 @@
   author: "Mishnah"
   source: "Pirkei Avot 5:1"
   translation: "Joshua Kulp, Mishnah Yomit (CC-BY)"
-  source_url: "https://www.sefaria.org/Pirkei_Avot.5.1"
+  source_url: "https://www.sefaria.org/Pirkei_Avot.5.1?ven=Mishnah_Yomit_by_Dr._Joshua_Kulp"
   moods: [opening, reverie]
 
 - text: |
-    Socrates said, that he was not an Athenian or Greek, but a citizen of the world.
+    But better still said Socrates, that he was not an Athenian or Greek, but a citizen of the world (as a man might say he was a Rhodian or Corinthian), for he did not confine himself to Sunium, or Taenarum, or the Ceraunian mountains.
   author: "Plutarch"
   source: "Moralia, 'On Exile' §V"
   translation: "A. R. Shilleto, 1898"
@@ -139,7 +139,7 @@
     Why then should I fear to become less by dying?
   author: "Rumi"
   source: "Masnavi, Book III, Story XVII ('The Vakil of Bokhara')"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, affirmation, saturn_secondary]
 
@@ -150,7 +150,7 @@
     Is the fountain of life and the cup of ecstasy.
   author: "Rumi"
   source: "Masnavi, Book II, Story X ('Bayazid and the Saint')"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [affirmation, reverie, saturn_secondary]
 
@@ -159,7 +159,7 @@
     Within the spirit is a Spirit that calls it.
   author: "Rumi"
   source: "Masnavi, Book III, Story V ('The Elephant in a Dark Room')"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, reverie]
 

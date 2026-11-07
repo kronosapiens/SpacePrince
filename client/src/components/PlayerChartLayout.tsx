@@ -41,6 +41,7 @@ export function PlayerChartLayout({ children, className, ...chart }: ChartInspec
   return (
     <Context.Provider value={context}>
       <div
+        tabIndex={-1}
         className={`chart-layout ${className} ${presentation?.className ?? ""}`}
         onClick={presentation?.onBackgroundClick}
       >
