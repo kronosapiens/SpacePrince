@@ -27,8 +27,7 @@ Position {                       -- packs into one felt: 16 + 16 + 32 = 64 bits
   lat: u16,                      -- (latitude  + 90)  * 100  -> 0..18000   (0.01° resolution)
   lon: u16,                      -- (longitude + 180) * 100  -> 0..36000   (0.01° resolution)
   dob: u32,                      -- birth instant in 5-minute buckets from a fixed epoch (~40k-year range)
-  -- The grid is 5-minute buckets and 0.01° (CHART.md, "Identity grid and chart twins"). The Cairo quantizer
-  -- still floors to 15-minute slots; aligning it is issue #30.
+  -- The grid is 5-minute buckets and 0.01° (CHART.md, "Identity grid and chart twins").
 }
 
 Chart {

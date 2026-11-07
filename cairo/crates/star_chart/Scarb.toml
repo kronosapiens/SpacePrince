@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-astronomy_engine_v1 = { path = "../astronomy_engine_v1" }
+engine_v6 = { git = "https://github.com/kronosapiens/astronomy-cairo", rev = "d5952ebd85eccc9ddd7279ba3b732b16ceb1ff46" }
 
 [dev-dependencies]
-cairo_test = "2.11.4"
+cairo_test = "2.16.1"

@@ -34,8 +34,8 @@ export function useCasting(enabled: boolean) {
     name: "",
     date: "2000-01-01",
     time: "00:00",
-    lat: "34.1",
-    lon: "-118.2",
+    lat: "34.05",
+    lon: "-118.24",
     tz: "America/Los_Angeles",
   });
   const [revealedCount, setRevealedCount] = useState(0);
@@ -53,13 +53,13 @@ export function useCasting(enabled: boolean) {
     try {
       const ms = quantizeMs(localToUtcMs(form.date, form.time, form.tz));
       const iso = new Date(ms).toISOString();
-      const data = computeBirthChart(iso, roundLat(lat), roundLon(lon));
+      const data = computeBirthChart(iso, roundCoord(lat), roundCoord(lon));
       const { planets, ascendantSign } = derivePlacements({
         longitudes: data.longitudes,
         ascendantLongitude: data.ascendantLongitude,
         isDiurnal: data.isDiurnal,
       });
-      const id = `prince_${hashString(`${iso}_${roundLat(lat).toFixed(1)}_${roundLon(lon).toFixed(1)}`)}`;
+      const id = `prince_${hashString(`${iso}_${roundCoord(lat).toFixed(2)}_${roundCoord(lon).toFixed(2)}`)}`;
       return {
         id,
         name: form.name.trim() || "Prince",
@@ -118,8 +118,8 @@ export function useCasting(enabled: boolean) {
       id: computed.id,
       position: {
         iso,
-        lat: roundLat(Number(form.lat)),
-        lon: roundLon(Number(form.lon)),
+        lat: roundCoord(Number(form.lat)),
+        lon: roundCoord(Number(form.lon)),
       },
       chart: computed,
       numRelationalEncounters: 0,
@@ -181,8 +181,7 @@ export function useCasting(enabled: boolean) {
 function quantizeMs(ms: number): number {
   return Math.floor(ms / TIME_BUCKET_MS) * TIME_BUCKET_MS;
 }
-function roundLat(v: number): number { return Math.round(v * 10) / 10; }
-function roundLon(v: number): number { return Math.round(v * 10) / 10; }
+function roundCoord(v: number): number { return Math.round(v * 100) / 100; }
 
 // Convert a wall-clock (date, time) in IANA `tz` to a UTC ms timestamp.
 // Empty tz: input is treated as UTC (used for manual coordinates).
