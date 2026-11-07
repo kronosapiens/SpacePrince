@@ -2264,3 +2264,36 @@ body:has(.guide-overlay) .dev-keys { display: none; }
   font-family: var(--sans);
   padding: 4px 6px;
 }
+
+/* The encounter is committed, but its opening has not been revealed. */
+.chorus-modal { background: var(--void); animation: none; }
+.chorus-modal .info-card-stage {
+  width: min(var(--chorus-width), 100%);
+  max-height: calc(100svh - 2 * var(--pad));
+  aspect-ratio: auto;
+  padding: var(--chorus-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--chorus-gap);
+  animation: info-card-fade 280ms var(--ease-out) both;
+}
+.chorus-content { min-height: 0; overflow-y: auto; width: 100%; text-align: center; }
+.chorus-figure { width: var(--chorus-art-size); margin: auto; }
+.chorus-figure svg { display: block; width: 100%; height: auto; }
+.chorus-name { margin: 0 0 var(--chorus-gap); font-weight: 400; font-size: var(--chorus-name-size); }
+.chorus-passage {
+  margin: 0;
+  text-align: left;
+  white-space: pre-line;
+  font-size: var(--chorus-passage-size);
+  line-height: var(--chorus-passage-leading);
+}
+.chorus-attribution { margin-top: var(--chorus-gap); color: var(--mist); font-size: var(--chorus-attribution-size); text-align: left; }
+.chorus-attribution p { margin: 0; }
+.chorus-attribution a { text-decoration: underline; text-underline-offset: 0.2em; }
+.chorus-attribution a:hover, .chorus-attribution a:focus-visible { color: var(--bone); }
+.chorus-continue { flex-shrink: 0; }
+.chart-layout:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  .chorus-modal .info-card-stage { animation: none; }
+}

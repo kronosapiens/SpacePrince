@@ -57,7 +57,7 @@ Hooks: `usePrince`, `usePrinceDispatch`, `useActiveRun`, and `useRunChart` (the 
 
 A reducer is `(state, action) => state`: no RNG, no `Date.now()`, no storage reads, no input mutation.
 Actions that adopt a resolved next state carry it pre-computed; the reducer just returns it.
-All impure work (`resolveTurn`, seeds, RNG rolling) happens in the thunk hooks in `state/store-actions.ts`: `useStartRun`, `useCommitTurn`, `useRolloverMap`, `useResetAll`.
+All impure work (`resolveTurn`, seeds, RNG rolling) happens in the thunk hooks in `state/store-actions.ts`: `useStartRun`, `useEnterNode`, `useCommitTurn`, `useRolloverMap`, `useResetAll`.
 
 This shape deliberately mirrors the eventual onchain flow.
 Today: thunk computes the next run → dispatch → reducer adopts it → persistence effect.
@@ -71,6 +71,18 @@ Screens never call `savePrince` or `clearPrince`; they dispatch actions, and per
 The run's in-memory event log (`Run.events`) is stripped on save.
 
 Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-shaped: unlock all planets, force the next node to a narrative house or a relational encounter.
+
+### Planetary chorus at encounter entry
+
+`useEnterNode` applies development overrides and commits the initialized encounter through `enterNode`.
+The catalogue in `copy/chorus.ts` imports the seven canonical YAML files under `docs/research/chorus/` through `@rollup/plugin-yaml` in both Vite and Vitest.
+
+`PlaySurface` mounts an opening component keyed by encounter ID, which selects a random passage once and holds it in local UI state.
+It renders `ChorusCard` before mounting `EncounterScreen`, so opening playback, guides, and automatic advancement wait for Continue.
+The shared chart stays mounted with inspection disabled behind an opaque backdrop.
+All dismissal paths discard the local passage without changing game state.
+Reloading an encounter, including an existing save or direct development spawn, shows a newly selected card; ordinary rerenders and turn updates do not reopen it.
+No passage or dismissal state is persisted, and no storage migration is needed.
 
 ### The game layer is framework-free
 

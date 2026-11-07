@@ -314,16 +314,22 @@ Signs and houses extend the same mechanism later.
 Same teaching impulse, different moment: study annotations serve the player mid-encounter at the point of decision, while inspection on the title and map is the between-runs contemplative surface.
 They share a register and the same panel.
 
-### 3.6.2 The info card (summoned and queued)
+### 3.6.2 The info card
 
 One modal frame — full-viewport backdrop, bordered square stage, close button (`InfoCard`) — hosts standalone study content: the Prince artifact, the Astral Codex, planet introductions, and future tooltip or tutorial cards.
 Content differs; the frame, entrance, and dismissal grammar (backdrop tap, ✕, or ESC) never do.
 The primer keeps its own gated flow (§9.6) for now; whether it ever presents inside this frame is an open question.
 
-A card opens one of two ways:
+A card opens in three contexts:
 
 - **Summoned** — the player asks for it: **Inspect Prince** and the **Astral Codex** from the settings menu (§9.5).
 - **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents on returning to the map, one at a time, never over a running encounter.
+- **Encounter entry** — the planetary chorus presents after node entry is committed, before the encounter mounts.
+  It reuses the planet introduction’s abstract composition with a complete curated passage, author, linked work/locator, and translator when present.
+  Its opaque backdrop keeps the initialized chart concealed until the opening can play; the chart stays mounted and cannot be inspected while reading.
+  Continue, backdrop, ✕, and ESC all reveal the committed encounter.
+  Reloading an encounter shows a newly selected passage, even after a previous dismissal.
+  Passage and dismissal state live only in the UI.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
 The Moon has no threshold to cross; its card presents at the end of the mint reveal instead (§5.2).
@@ -467,7 +473,11 @@ The tiers grade *attention*, not information: meaning concentrates near the play
 The progression from faint (distant) through translucent (eligible) to full saturation + halo (current), with the walked path solid behind the player, reads as the map becoming real as it is walked.
 
 Hover or keyboard focus highlights an eligible node and its incoming route.
-One activation enters the node; there is no separate selection or confirmation ring.
+One activation commits node entry and presents the planetary chorus; there is no separate selection or confirmation ring.
+The chorus selects independently from the encounter ruler’s YAML corpus, with repeats permitted: the other chart’s ruler for relational encounters, the house’s fixed ruler for narratives.
+The full passage is ready immediately, and the player can read for as long as they wish.
+Continue reveals the same initialized encounter, followed by its existing opening effects and first-time guide.
+Even an encounter resolved by entry Necessity waits at the chorus before its opening plays and normal advancement resumes.
 The map guide permits route previews while blocking travel.
 The finished run's map remains noninteractive, without invitations to travel.
 

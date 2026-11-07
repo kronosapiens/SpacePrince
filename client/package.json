@@ -20,6 +20,7 @@
     "tone": "^15.1.22"
   },
   "devDependencies": {
+    "@rollup/plugin-yaml": "^5.0.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

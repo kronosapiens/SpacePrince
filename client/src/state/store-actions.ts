@@ -1,9 +1,11 @@
 import { useCallback } from "react";
-import { usePrince, usePrinceDispatch } from "./PrinceStore";
+import { useActiveRun, usePrince, usePrinceDispatch } from "./PrinceStore";
 import { resolveTurn, type TurnResult } from "@/game/turn";
-import { beginRun, rolloverMap as rolloverMapFn } from "@/game/run";
-import { randomSeed } from "@/game/rng";
+import { beginRun, enterNode, isOver, rolloverMap as rolloverMapFn } from "@/game/run";
+import { hashString, mulberry32, randomSeed } from "@/game/rng";
 import { loadDevSettings } from "./settings";
+import { rollNodeContent } from "@/game/map-content";
+import { unlockedPlanets } from "@/game/unlocks";
 import type { Chart, PlanetName, Polarity, Run } from "@/game/types";
 
 /**
@@ -27,6 +29,36 @@ export function useStartRun() {
     },
     [dispatch, prince, lifetimeRelationalEncounterCount, devUnlockAll],
   );
+}
+
+/** Apply development overrides and commit initialized node entry. */
+export function useEnterNode() {
+  const prince = usePrince();
+  const run = useActiveRun();
+  const dispatch = usePrinceDispatch();
+  return useCallback((nodeId: string) => {
+    if (!prince || !run || run.encounter || isOver(run, prince.chart, prince.numRelationalEncounters)) return;
+    const settings = loadDevSettings();
+    let nextRun = run;
+    if (settings.forceRelational || settings.forceNarrativeHouse) {
+      const content = rollNodeContent({
+        rng: mulberry32(hashString(`${run.map.seed}_${nodeId}`)),
+        forceNarrativeHouse: settings.forceNarrativeHouse,
+        forceRelational: settings.forceRelational,
+        relationalRulers: unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll),
+      });
+      nextRun = { ...run, map: { ...run.map, rolledNodes: { ...run.map.rolledNodes, [nodeId]: content } } };
+    }
+    nextRun = enterNode({
+      run: nextRun,
+      chart: prince.chart,
+      nodeId,
+      lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
+      devUnlockAll: settings.unlockAll,
+    });
+    if (!nextRun.encounter) return;
+    dispatch({ kind: "commitRun", run: nextRun });
+  }, [prince, run, dispatch]);
 }
 
 /** Resolve a relational turn and dispatch the result (`resolveTurn` records the

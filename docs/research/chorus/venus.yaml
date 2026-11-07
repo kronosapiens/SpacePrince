@@ -6,7 +6,7 @@
     As the sweet-apple blushes on the end of the bough, the very end of the bough, which the gatherers overlooked, nay overlooked not but could not reach.
   author: "Sappho"
   source: "Fragment 93 (Wharton)"
-  translation: "Henry Thornton Wharton, 1885 (literal prose)"
+  translation: "Henry Thornton Wharton, 5th ed., 1908 (literal prose)"
   source_url: "https://www.gutenberg.org/files/57390/57390-h/57390-h.htm"
   moods: [beauty, reverie]
 
@@ -56,7 +56,7 @@
   author: "Song of Songs"
   source: "Song of Songs 2:11–12"
   translation: "Jewish Publication Society, 1917"
-  source_url: "https://www.sefaria.org/Song_of_Songs.2.11-12"
+  source_url: "https://www.sefaria.org/Song_of_Songs.2.11-12?ven=The_Holy_Scriptures%3A_A_New_Translation_(JPS_1917)"
   moods: [opening, gift]
 
 - text: |
@@ -76,7 +76,7 @@
   moods: [opening, relation]
 
 - text: |
-    When one of them meets with his other half, the actual half of himself, the pair are lost in an amazement of love and friendship and intimacy, and one will not be out of the other's sight, as I may say, even for a moment.
+    When one of them meets with his other half, the actual half of himself, whether he be a lover of youth or a lover of another sort, the pair are lost in an amazement of love and friendship and intimacy, and one will not be out of the other's sight, as I may say, even for a moment.
   author: "Plato"
   source: "Symposium (speech of Aristophanes)"
   translation: "Benjamin Jowett, 1871"
@@ -163,7 +163,7 @@
     Love is the astrolabe of God's mysteries.
   author: "Rumi"
   source: "Masnavi, Book I, Story I ('The Prince and the Handmaid'), Description of Love"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, relation]
 
@@ -174,7 +174,7 @@
     But love unexplained is clearer.
   author: "Rumi"
   source: "Masnavi, Book I, Description of Love"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, relation, mercury_secondary]
 
@@ -183,7 +183,7 @@
     I too, like the flute, would burst out in melody.
   author: "Rumi"
   source: "Masnavi, Book I, Prologue"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [reverie, relation]
 

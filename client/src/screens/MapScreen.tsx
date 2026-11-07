@@ -7,19 +7,17 @@ import { MapGuide, type MapGuidePhase } from "@/components/MapGuide";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
-import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { usePrince, useActiveRun } from "@/state/PrinceStore";
 import { playUISound, setTheme } from "@/audio/engine";
-import { enterNode, isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
-import { useRolloverMap, useStartRun } from "@/state/store-actions";
+import { isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
+import { useEnterNode, useRolloverMap, useStartRun } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
-import { mulberry32, hashString } from "@/game/rng";
-import { rollNodeContent } from "@/game/map-content";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { HOUSES } from "@/data/houses";
 import { chartRuler, seededChart } from "@/game/chart";
-import type { MapState, PlanetName, Run } from "@/game/types";
+import type { MapState, PlanetName } from "@/game/types";
 
 /** Roman numerals for the current map. */
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
@@ -27,7 +25,7 @@ const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 export function MapScreen() {
   const prince = usePrince();
   const run = useActiveRun();
-  const dispatch = usePrinceDispatch();
+  const enterNode = useEnterNode();
   const rolloverMap = useRolloverMap();
   const startRun = useStartRun();
   const { setActive } = useActivePlanet();
@@ -65,39 +63,10 @@ export function MapScreen() {
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
       if (!run || !prince || runOver || openingActive) return;
-      let nextRun: Run = run;
-      // Content is pre-rolled at map creation; the dev force cheats re-roll
-      // the node here so "the next node you enter" is the forced kind.
-      if (settings.forceRelational || settings.forceNarrativeHouse) {
-        const rng = mulberry32(hashString(`${run.map.seed}_${nodeId}`));
-        const content = rollNodeContent({
-          rng,
-          forceNarrativeHouse: settings.forceNarrativeHouse,
-          forceRelational: settings.forceRelational,
-          relationalRulers: playerUnlocked,
-        });
-        nextRun = {
-          ...nextRun,
-          map: {
-            ...nextRun.map,
-            rolledNodes: { ...nextRun.map.rolledNodes, [nodeId]: content },
-          },
-        };
-      }
-      nextRun = enterNode({
-        run: nextRun,
-        chart: prince.chart,
-        nodeId,
-        lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
-        devUnlockAll: settings.unlockAll,
-      });
-      // Commit the pre-encounter run mutations (rolledNodes, visitedNodeIds,
-      // currentNodeId, the new encounter) to the tail run. PlaySurface sees the
-      // encounter and renders it — no navigation needed.
-      dispatch({ kind: "commitRun", run: nextRun });
+      enterNode(nodeId);
       playUISound("commit");
     },
-    [run, prince, runOver, openingActive, settings, playerUnlocked, dispatch],
+    [run, prince, runOver, openingActive, enterNode],
   );
 
   useEffect(() => {

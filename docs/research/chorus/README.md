@@ -1,11 +1,16 @@
 # The planetary chorus: sourcing record
 
-**Retired system; reference material.**
-The chorus was a curated set of public-domain thinkers per planet whose quotations the game delivered as fragments in narrative encounters.
-Commit `386a87a` (2026-09-16) removed fragment selection, fragment tracking, and the client's YAML dependency; no runtime surface shows quotations today.
-This file keeps the sourcing method and its findings, because the license discipline, the public-domain edition list, and the guardrails against fabricated quotations are reusable by any future sourced text.
-The curated quotations themselves remain beside this file, one YAML per planet (`sun.yaml`, `moon.yaml`, `mercury.yaml`, `venus.yaml`, `mars.yaml`, `jupiter.yaml`, `saturn.yaml`), each entry carrying `text`, `author`, `source`, and optional `translation`, `source_url`, and `moods`.
-The planetary archetypes and voice rules the chorus illustrated live in [writing/PLANETS.md](../../writing/PLANETS.md).
+The chorus presents one complete curated excerpt when the player enters a relational or narrative encounter.
+It uses the encounter ruler's corpus, displays attribution beside the existing planetary composition, and waits for Continue before revealing the encounter.
+Selection is independent at each entry; repeats are acceptable.
+The passage lives only in UI state until Continue.
+Reloading an encounter selects and shows a new passage, even after a previous dismissal.
+
+The seven YAML files beside this document are the runtime's single source of quoted content.
+The client imports them at build time through `client/src/copy/chorus.ts`.
+Each entry carries `text`, `author`, `source`, `source_url`, and optional `translation` and `moods`.
+The older fragment selection and tracking system, removed in commit `386a87a`, remains retired; the current chorus shows the whole stored excerpt without fragment history or mood filtering.
+See [issue #40](https://github.com/kronosapiens/SpacePrince/issues/40) for the implementation spec and [writing/PLANETS.md](../../writing/PLANETS.md) for planetary voices.
 Section numbers below continue that document's original numbering (§§10–12) so older references still resolve.
 
 ---
@@ -48,7 +53,7 @@ Default rule of thumb for PD: target works where **both** the author died before
 
 ### Storage
 
-Sourced fragments live in `docs/research/chorus/<planet>.yaml`, one file per planet:
+Sourced passages live in `docs/research/chorus/<planet>.yaml`, one file per planet:
 
 ```
 docs/research/chorus/
@@ -69,13 +74,16 @@ Schema per entry:
   author: "Author Name"
   source: "Work, section reference"
   translation: "Translator, year"     # optional; only for non-English originals
-  source_url: "https://..."           # optional; PD verification link
-  moods: [opening, cost]              # optional; free-form tags
+  source_url: "https://..."           # primary text in the cited edition
+  moods: [opening, cost]              # optional; editorial tags, unused at runtime
 ```
 
-Required fields: `text`, `author`, `source`.
-Optional: `translation`, `source_url`, `moods`.
-A fragment that fits more than one planet (see §10) lives in the file of whichever planet is its primary assignment and carries a `moods` tag identifying its secondary register; cross-planet selection was a runtime concern that no longer applies.
+Required fields: `text`, `author`, `source`, `source_url`.
+Optional: `translation`, `moods`.
+Preserve the source's wording and verse breaks; indicate internal omissions with ellipses rather than silently joining or paraphrasing passages.
+A passage that fits more than one planet (see §10) lives in the file of whichever planet is its primary assignment and may carry a `moods` tag identifying its secondary register.
+Selection uses only that planet's file.
+For hosts with multiple translations, link to the named version rather than the site's default translation.
 
 ### Public-domain editions to prefer
 
@@ -128,7 +136,8 @@ Anyone sourcing must:
 - Never source from quote-aggregator sites (BrainyQuote, Goodreads) — only from the primary text.
 - Flag any quote that is widely attributed but not locatable in a primary source (common for Emerson, Aurelius, Nietzsche).
 
-A spot-check of ~20% of each batch against the linked primary source should be part of the acceptance workflow before merging.
+A spot-check of at least 20% of retained entries per planet against primary sources accompanies a corpus review.
+Check all new or revised quotations, including the edition, translator, and any internal omissions.
 
 ### Tagging
 
@@ -136,13 +145,11 @@ Each sourced fragment carries the fields defined in Storage above.
 The `moods` tag vocabulary emerged from the sourced content rather than being fixed in advance.
 Initial candidates: *opening, warning, cost, gift, ending, question, cut, reverie, paradox.*
 
-### Scale (the original target)
+### Scale and variety
 
-Initial target: ~10 fragments per planet, ~70 total.
-This comfortably covers 60 narrative encounter openings (12 houses × 5 encounters) without within-run repetition.
-The library could grow the same way if the chorus ever returns.
-
-Within each planet's ten, aim for coverage across the chorus rather than a single-author shotgun: no more than 3–4 fragments from any one author.
+Review each planet for voice, author and register variety, standalone readability, and duplicated sentiment.
+Keep strong passages and add only to address a named gap; there is no per-planet quota or repetition-avoidance target.
+Short aphorisms and longer passages can coexist, provided each works as an encounter arrival.
 
 ### Workflow (as used in the 2026 sourcing sweep)
 

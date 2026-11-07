@@ -8,11 +8,12 @@ The [planet and sign matrix](PLANET_MATRIX.md) develops how each planet expresse
 
 ## 1. Status
 
-Earlier versions of this document specified a **chorus**: a curated set of public-domain thinkers per planet, whose quotations the game delivered as fragments at the opening of narrative encounters.
-The chorus was removed from the game in commit `386a87a` (2026-09-16), which deleted fragment selection and tracking and the client's YAML dependency.
-No runtime surface shows quotations today, and nothing below instructs the game to show them.
-Each planet's chorus roster is kept in its section as a description of the register, because the authors chosen are the most concrete statement of what that voice sounds like.
-The curated quotations and the sourcing record (license discipline, editions, candidate sources) are reference material under [research/chorus](../research/chorus/README.md).
+The **chorus** presents one complete curated excerpt from the encounter ruler's corpus at entry to relational and narrative encounters.
+It uses the existing planetary artwork and waits for Continue before the encounter's opening effects and guides.
+The older fragment selection and tracking system, removed in commit `386a87a`, remains retired.
+Each planet's chorus roster below describes its register; authored encounter copy and sourced passages can differ in length.
+The runtime corpus and sourcing record (license discipline, editions, candidate sources) live under [research/chorus](../research/chorus/README.md).
+The implementation spec is [issue #40](https://github.com/kronosapiens/SpacePrince/issues/40).
 
 ## 2. Voice principles
 

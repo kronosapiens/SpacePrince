@@ -124,7 +124,7 @@
     If you would see it displayed, turn not away from it.
   author: "Rumi"
   source: "Masnavi, Book I, Description of Love"
-  translation: "E. H. Whinfield, 1887"
+  translation: "E. H. Whinfield, 2nd ed., 1898"
   source_url: "https://archive.org/details/masnaviimanavi"
   moods: [opening, beauty, sun_secondary]
 
@@ -141,5 +141,5 @@
   author: "The Book of Job"
   source: "Job 27:6 (Job)"
   translation: "Jewish Publication Society, 1917"
-  source_url: "https://www.sefaria.org/Job.27.6"
+  source_url: "https://www.sefaria.org/Job.27.6?ven=The_Holy_Scriptures%3A_A_New_Translation_(JPS_1917)"
   moods: [cut, command]
