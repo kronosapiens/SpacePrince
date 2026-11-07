@@ -63,12 +63,12 @@ function planetPositions() {
 }
 
 describe("shared player chart", () => {
-  it("keeps the same wheel through first guides, combat, narrative choices, and both returns to Map", () => {
+  it("keeps the same wheel through first guides, relational, narrative choices, and both returns to Map", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numEncounters);
-    const combatNode = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
-    const narrativeNode = eligibleNext(run.map.graph, combatNode, [...run.map.visitedNodeIds, combatNode])[0]!;
-    run.map.rolledNodes[combatNode] = { kind: "combat", opponentSeed: 99 };
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
+    const relationalNode = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+    const narrativeNode = eligibleNext(run.map.graph, relationalNode, [...run.map.visitedNodeIds, relationalNode])[0]!;
+    run.map.rolledNodes[relationalNode] = { kind: "relational", opponentSeed: 99 };
     run.map.rolledNodes[narrativeNode] = { kind: "narrative", house: 4 };
     run.seenScenarioIds = NARRATIVE_SCENARIOS.filter((s) => s.house === 4 && s.sign === "Libra" && s.scenarioId !== "home-libra-mara").map((s) => s.scenarioId);
     prince.runs = [run];
@@ -83,7 +83,7 @@ describe("shared player chart", () => {
       expect(planetPositions()).toEqual(positions);
     };
 
-    click(`[data-guide="node-${combatNode}"]`);
+    click(`[data-guide="node-${relationalNode}"]`);
     expectStableChart();
     expect(element('[data-guide="chart-other"] .chart-svg')).not.toBe(chart);
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(2);
@@ -91,24 +91,24 @@ describe("shared player chart", () => {
     closeFirstGuide("Read the encounter");
     click('[data-guide="planet-self-moon"]');
     click('[data-guide="action-testimony"]');
-    const combat = loadPrince()!.runs[0]!.encounter;
-    expect(combat?.kind).toBe("combat");
-    if (combat?.kind !== "combat") throw new Error("Expected combat encounter");
-    expect(combat.log).toHaveLength(1);
-    expect(combat.log[0]).toMatchObject({ playerPlanet: "Moon", playerValence: "Testimony" });
-    expect(combat.resolved).toBe(true);
+    const relational = loadPrince()!.runs[0]!.encounter;
+    expect(relational?.kind).toBe("relational");
+    if (relational?.kind !== "relational") throw new Error("Expected relational encounter");
+    expect(relational.log).toHaveLength(1);
+    expect(relational.log[0]).toMatchObject({ playerPlanet: "Moon", playerValence: "Testimony" });
+    expect(relational.resolved).toBe(true);
     expectStableChart();
 
     act(() => vi.runOnlyPendingTimers());
-    expect(element(".combat").classList.contains("is-resolved")).toBe(true);
+    expect(element(".relational").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
     click(".chart-layout-chart");
     expect(element(".map-content")).toBeDefined();
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(1);
     expectStableChart();
-    const afterCombat = loadPrince()!;
-    expect(afterCombat.runs[0]!.map.outcomes[combatNode]?.kind).toBe("combat");
-    expect(afterCombat.numEncounters).toBe(prince.numEncounters + 1);
+    const afterRelational = loadPrince()!;
+    expect(afterRelational.runs[0]!.map.outcomes[relationalNode]?.kind).toBe("relational");
+    expect(afterRelational.numRelationalEncounters).toBe(prince.numRelationalEncounters + 1);
 
     click(`[data-guide="node-${narrativeNode}"]`);
     expectStableChart();
@@ -117,14 +117,14 @@ describe("shared player chart", () => {
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     const target = PLANETS.find((planet) =>
-      combustionCeiling(prince.chart.planets[planet]) - afterCombat.runs[0]!.state[planet].affliction >= 24)!;
+      combustionCeiling(prince.chart.planets[planet]) - afterRelational.runs[0]!.state[planet].affliction >= 24)!;
     expect(target).toBeDefined();
-    const startingAffliction = afterCombat.runs[0]!.state[target].affliction;
+    const startingAffliction = afterRelational.runs[0]!.state[target].affliction;
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
     const afterNarrative = loadPrince()!.runs[0]!;
     expect(afterNarrative.encounter?.resolved).toBe(true);
     expect(afterNarrative.state[target].affliction).toBe(startingAffliction + 24);
-    expect(afterNarrative.light).toBe(afterCombat.runs[0]!.light + 96);
+    expect(afterNarrative.light).toBe(afterRelational.runs[0]!.light + 96);
     expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
 
@@ -133,7 +133,7 @@ describe("shared player chart", () => {
     expect(container.querySelector(".narrative-column")).toBeNull();
     expectStableChart();
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
-    expect(loadPrince()!.numEncounters).toBe(prince.numEncounters + 2);
+    expect(loadPrince()!.numRelationalEncounters).toBe(prince.numRelationalEncounters + 1);
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
     const ceiling = combustionCeiling(prince.chart.planets[target]);
     expect(element(".ps-ratio").textContent).toBe(`Resolve${ceiling - startingAffliction - 24}/${ceiling}`);

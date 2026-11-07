@@ -45,7 +45,7 @@ export function usePrinceDispatch(): Dispatch<PrinceAction> {
 }
 
 /** The active (tail) run, or null if the Prince has none yet. Callers check
- *  `isOver(run, prince.chart, prince.numEncounters)` to tell an in-progress
+ *  `isOver(run, prince.chart, prince.numRelationalEncounters)` to tell an in-progress
  *  run from a just-finished one. */
 export function useActiveRun(): Run | null {
   const prince = usePrince();

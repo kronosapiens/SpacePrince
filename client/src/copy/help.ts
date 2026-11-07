@@ -8,8 +8,7 @@
  *       never a systems manual (previews teach the numbers).
  *  Chrome register: plain second-person help, accurate to MECHANICS.md.
  *  Player-facing vocabulary is encounter / self / other —
- *  tension held and relieved; combat and adversary are internal dev
- *  metaphors and never appear here. Casing per SCREENS.md §1.2: named
+ *  tension held and relieved; adversary is an internal dev term. Casing per SCREENS.md §1.2: named
  *  quantities capped (Resolve, Fortune, Light — TermText golds these);
  *  substances, processes, and stats lowercase in prose. */
 

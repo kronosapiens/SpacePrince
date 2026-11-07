@@ -1,8 +1,8 @@
 import { pickScenario } from "@/data/narrative-scenarios";
 import { blankGains, blankSideState, cloneSideState, houseSign, runChart } from "./chart";
-import { fortuneChance, getEffectiveStats } from "./combat";
+import { fortuneChance, getEffectiveStats } from "./relational";
 import { isCombusted, newlyCombusted, uncombust } from "./combust";
-import { beginCombatEncounter, beginNarrativeEncounter } from "./encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter } from "./encounter";
 import { applyNecessity } from "./necessity";
 import { rollNodeContent } from "./map-content";
 import { buildMapGraph, ROOT_NODE_ID, TERMINAL_NODE_ID } from "./map-gen";
@@ -15,7 +15,7 @@ export const MAPS_PER_RUN = 7;
 
 export function newMapState(
   seed: number,
-  combatRulers: readonly PlanetName[] = unlockedPlanets(0),
+  relationalRulers: readonly PlanetName[] = unlockedPlanets(0),
 ): MapState {
   const graph = buildMapGraph(seed);
   // Every node's content is fixed at map creation, seeded on (map seed, node
@@ -28,7 +28,7 @@ export function newMapState(
     if (node.id === ROOT_NODE_ID) continue;
     rolledNodes[node.id] = rollNodeContent({
       rng: mulberry32(hashString(`${seed}_${node.id}`)),
-      combatRulers,
+      relationalRulers,
     });
   }
   return {
@@ -45,14 +45,14 @@ export function newMapState(
 export function beginRun(
   chart: Chart,
   seed = randomSeed(),
-  lifetimeEncounterCount = 0,
+  lifetimeRelationalEncounterCount = 0,
   devUnlockAll = false,
 ): Run {
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
-  const combatRulers = unlockedPlanets(lifetimeEncounterCount, devUnlockAll);
+  const relationalRulers = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
   const crossed = rollMapBoundary(
-    chart, blankSideState(), combatRulers,
+    chart, blankSideState(), relationalRulers,
     mulberry32(hashString(`${mapSeed}_boundary`)),
   );
   return {
@@ -61,7 +61,7 @@ export function beginRun(
     state: crossed.state,
     light: 0,
     gains: blankGains(),
-    map: { ...newMapState(mapSeed, combatRulers), boundary: crossed.boundary },
+    map: { ...newMapState(mapSeed, relationalRulers), boundary: crossed.boundary },
     mapsCompleted: 0,
     encounter: null,
     seenScenarioIds: [],
@@ -73,9 +73,9 @@ export interface EnterNodeInput {
   run: Run;
   chart: Chart;
   nodeId: string;
-  lifetimeEncounterCount: number;
+  lifetimeRelationalEncounterCount: number;
   devUnlockAll?: boolean;
-  /** Route forecasts only: replaces the live arrival draws — combat's opening
+  /** Route forecasts only: replaces the live arrival draws — the relational encounter's opening
    *  necessity and precommits, narrative's scenario pick — with a sampled
    *  seed. The opponent chart and the node bookkeeping are unchanged. */
   encounterIdSeed?: number;
@@ -85,18 +85,18 @@ export interface EnterNodeInput {
  *  encounter. A narrative scenario is drawn from the house's unseen pool,
  *  seeded on (run, house, node), and joins the no-repeat history. */
 export function enterNode(input: EnterNodeInput): Run {
-  const { run, chart, nodeId, lifetimeEncounterCount, devUnlockAll, encounterIdSeed } = input;
+  const { run, chart, nodeId, lifetimeRelationalEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const content = run.map.rolledNodes[nodeId];
   if (!content) throw new Error(`Node ${nodeId} has no content`);
   const entered: Run = {
     ...run,
     map: { ...run.map, currentNodeId: nodeId, visitedNodeIds: [...run.map.visitedNodeIds, nodeId] },
   };
-  if (content.kind === "combat") {
-    const encounter = beginCombatEncounter({
+  if (content.kind === "relational") {
+    const encounter = beginRelationalEncounter({
       run: entered,
       opponentSeed: content.opponentSeed,
-      lifetimeEncounterCount,
+      lifetimeRelationalEncounterCount,
       devUnlockAll,
       encounterIdSeed,
     });
@@ -108,7 +108,7 @@ export function enterNode(input: EnterNodeInput): Run {
     const wiped = encounter.roster.every((planet) => isCombusted(playerChart.planets[planet], opening.state[planet]));
     const next = { ...entered, state: opening.state, encounter: { ...encounter, selfNecessity: opening.necessity, resolved: wiped } };
     if (wiped) next.map = { ...next.map, outcomes: { ...next.map.outcomes, [nodeId]: {
-      nodeId, kind: "combat", summary: `Encounter · ${encounter.opponentChart.name}`, lightDelta: 0,
+      nodeId, kind: "relational", summary: `Encounter · ${encounter.opponentChart.name}`, lightDelta: 0,
       combusts: newlyCombusted(playerChart, entered.state, opening.state),
     } } };
     return next;
@@ -127,9 +127,9 @@ export function enterNode(input: EnterNodeInput): Run {
  *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
  *  because combustion is itself derived — affliction against each ceiling,
  *  which the run's gains raise. */
-export function isOver(run: Run, chart: Chart, numEncounters: number): boolean {
+export function isOver(run: Run, chart: Chart, numRelationalEncounters: number): boolean {
   if (run.mapsCompleted >= MAPS_PER_RUN) return true;
-  const tier = unlockedPlanets(numEncounters);
+  const tier = unlockedPlanets(numRelationalEncounters);
   const planets = runChart(chart, run).planets;
   return tier.length > 0 && tier.every((p) => isCombusted(planets[p], run.state[p]));
 }
@@ -160,8 +160,8 @@ export function rollMapBoundary(
 /** Whether the run crosses into its next map: the terminal node's encounter
  *  has cleared and the run is not over. Full combustion ends the run first,
  *  so a spent chart never reaches the boundary's uncombust rolls. */
-export function shouldRolloverMap(run: Run, chart: Chart, numEncounters: number): boolean {
-  return !run.encounter && run.map.currentNodeId === TERMINAL_NODE_ID && !isOver(run, chart, numEncounters);
+export function shouldRolloverMap(run: Run, chart: Chart, numRelationalEncounters: number): boolean {
+  return !run.encounter && run.map.currentNodeId === TERMINAL_NODE_ID && !isOver(run, chart, numRelationalEncounters);
 }
 
 /** Called at L7 traversal. Bumps `mapsCompleted`; for a non-final map it archives

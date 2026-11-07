@@ -5,10 +5,10 @@ import { PLANETS } from "@/game/data";
 import { seededChart, blankSideState } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { beginRun } from "@/game/run";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
-import type { CombatEncounter, PlanetName, Run } from "@/game/types";
+import type { RelationalEncounter, PlanetName, Run } from "@/game/types";
 
 describe("propagation projections", () => {
   it("returns no effects when source planet is combusted", () => {
@@ -146,14 +146,14 @@ describe("propagation — only the fielded roster conducts", () => {
   it("the resolver logs no hop into a ghost and leaves its affliction alone", () => {
     const prince = createStubPrince({ seed: 7 });
     const run = beginRun(prince.chart, 42);
-    const full = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 64 });
+    const full = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 64 });
     // Sun has a web on both charts, so the full roster has somewhere to
     // ripple; the same fight, that planet against itself, at the two rosters.
     const planet = "Sun";
     const withRoster = (roster: PlanetName[]): Run => {
       const sequence = [...full.sequence];
       sequence[full.turnIndex] = planet;
-      const enc: CombatEncounter = { ...full, roster, sequence };
+      const enc: RelationalEncounter = { ...full, roster, sequence };
       return { ...run, encounter: enc };
     };
     const rippling = resolveTurn(withRoster([...full.roster]), prince.chart, planet, "Affliction", () => 0)!;
@@ -162,7 +162,7 @@ describe("propagation — only the fielded roster conducts", () => {
     const solo = withRoster([planet]);
     const contained = resolveTurn(solo, prince.chart, planet, "Affliction", () => 0)!;
     expect(contained.log.propagation).toEqual([]);
-    const soloEnc = solo.encounter as CombatEncounter;
+    const soloEnc = solo.encounter as RelationalEncounter;
     for (const p of PLANETS) {
       if (p === planet) continue;
       expect(contained.run.state[p].affliction).toBe(run.state[p].affliction);

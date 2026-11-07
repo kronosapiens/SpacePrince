@@ -22,13 +22,13 @@ import { NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
 import "@/style/gallery.css";
 
 const chart = seededChart(42, "Gallery Prince");
-const numEncounters = UNLOCK_THRESHOLDS[UNLOCK_THRESHOLDS.length - 1]!;
-const run = beginRun(chart, 42, numEncounters);
+const numRelationalEncounters = UNLOCK_THRESHOLDS[UNLOCK_THRESHOLDS.length - 1]!;
+const run = beginRun(chart, 42, numRelationalEncounters);
 const prince: Prince = {
   id: "gallery-prince",
   position: { iso: "2000-01-01T12:00:00Z", lat: 0, lon: 0 },
   chart,
-  numEncounters,
+  numRelationalEncounters,
   achievements: 0,
   runs: [run],
 };

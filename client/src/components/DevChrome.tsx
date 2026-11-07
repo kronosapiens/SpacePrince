@@ -10,7 +10,7 @@ import type { Prince, Run } from "@/game/types";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
-type Surface = "title" | "index" | "gallery" | "token" | "mint" | "map" | "combat" | "narrative" | "end";
+type Surface = "title" | "index" | "gallery" | "token" | "mint" | "map" | "relational" | "narrative" | "end";
 
 interface Page {
   label: string;
@@ -23,8 +23,8 @@ const PAGES: Page[] = [
   { label: "Title", kind: "title" },
   { label: "Mint", kind: "mint" },
   { label: "Map", kind: "map" },
-  { label: "Encounter", kind: "combat" },
-  { label: "Narrative", kind: "narrative" },
+  { label: "Relational encounter", kind: "relational" },
+  { label: "Narrative encounter", kind: "narrative" },
   { label: "Finished Map", kind: "end" },
   { label: "Gallery", kind: "gallery" },
 ];
@@ -55,12 +55,12 @@ export function DevChrome() {
   }, [gridOn]);
 
   // Carry the current unlock tier across re-rolls so you can pin it and spin.
-  const tier = prince?.numEncounters;
+  const tier = prince?.numRelationalEncounters;
   const surface = currentSurface(location.pathname, prince, run);
 
   // The title's Prince can also be re-rolled while staying on the title.
   const regenKind: SpawnKind | null =
-    surface === "map" || surface === "combat" || surface === "narrative" || surface === "end"
+    surface === "map" || surface === "relational" || surface === "narrative" || surface === "end"
       ? surface
       : surface === "title" && prince ? "map" : null;
 
@@ -191,8 +191,8 @@ const SURFACE_LABEL: Record<Surface, string> = {
   token: "Token",
   mint: "Mint",
   map: "Map",
-  combat: "Encounter",
-  narrative: "Narrative",
+  relational: "Relational encounter",
+  narrative: "Narrative encounter",
   end: "Finished Map",
 };
 
@@ -203,7 +203,7 @@ function currentSurface(pathname: string, prince: Prince | null, run: Run | null
   if (pathname === ROUTES.token) return "token";
   if (pathname !== ROUTES.play) return "title";
   if (!prince || !run) return "mint";
-  if (run.encounter) return run.encounter.kind === "narrative" ? "narrative" : "combat";
-  if (isOver(run, prince.chart, prince.numEncounters)) return "end";
+  if (run.encounter) return run.encounter.kind === "narrative" ? "narrative" : "relational";
+  if (isOver(run, prince.chart, prince.numRelationalEncounters)) return "end";
   return "map";
 }

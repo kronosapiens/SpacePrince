@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
-import type { CombatEncounter, Run } from "@/game/types";
+import type { RelationalEncounter, Run } from "@/game/types";
 
 function setup(opponentSeed = 99) {
   const prince = createStubPrince({ seed: 7 });
   const run = beginRun(prince.chart, 42);
-  const enc = beginCombatEncounter({
+  const enc = beginRelationalEncounter({
     run,
     opponentSeed,
-    lifetimeEncounterCount: prince.numEncounters,
+    lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
   });
   const r: Run = { ...run, encounter: enc };
   return { prince, run: r };
@@ -21,7 +21,7 @@ function setup(opponentSeed = 99) {
 describe("sequential resolution — preemption", () => {
   it("combusting the opponent's acting planet in phase 1 zeroes its phase-2 response", () => {
     const { prince, run } = setup();
-    const enc = run.encounter as CombatEncounter;
+    const enc = run.encounter as RelationalEncounter;
     const active = enc.sequence[enc.turnIndex]!;
     // Park the opponent's acting planet one point under its ceiling — any
     // afflicting hit combusts it (affliction caps at the ceiling, §10).
@@ -41,7 +41,7 @@ describe("sequential resolution — preemption", () => {
 
   it("without a phase-1 combust, the opponent's action still lands on the player", () => {
     const { prince, run } = setup();
-    const enc = run.encounter as CombatEncounter;
+    const enc = run.encounter as RelationalEncounter;
     const active = "Saturn";
     enc.sequence[enc.turnIndex] = active;
     enc.opponentState[active].affliction = 0;
@@ -57,7 +57,7 @@ describe("sequential resolution — preemption", () => {
 
   it("affliction caps at the ceiling — the finishing blow applies only the remainder", () => {
     const { prince, run } = setup();
-    const enc = run.encounter as CombatEncounter;
+    const enc = run.encounter as RelationalEncounter;
     const active = enc.sequence[enc.turnIndex]!;
     const ceiling = combustionCeiling(enc.opponentChart.planets[active]);
     enc.opponentState[active].affliction = ceiling - 1;

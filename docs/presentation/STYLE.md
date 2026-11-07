@@ -201,14 +201,14 @@ They never compete.
 The screen receives an ambient tint in one planet's primary color, a full-canvas radial gradient composited over `Void`, not under it.
 The tint is the place, not the event: it belongs to whichever planet owns the surface, and it does not follow the turn.
 
-- **Encounter, combat and narrative alike:** the encounter's **ruler** ([MECHANICS.md §11](../mechanics/MECHANICS.md#11-encounter--map--run-flow)) — the planet whose colour the node carried on the map and whose theme the score plays.
+- **Encounter, relational and narrative alike:** the encounter's **ruler** ([MECHANICS.md §11](../mechanics/MECHANICS.md#11-encounter--map--run-flow)) — the planet whose colour the node carried on the map and whose theme the score plays.
   The other's acting planet is not repeated here; the sentence, the corona and the resolution flashes already carry it ([SCREENS.md §3.7](SCREENS.md#37-chrome)).
 - **Map:** the ruler of the node the player stands on, so walking into an encounter continues the light.
 - **Title:** neutral.
 
 The opacity and the shift between tints live in `tokens.css` and `motion.css`; the shift is slow enough to feel like the light changing in a room.
 
-Rejected: tinting combat by the other's acting planet, which was the rule until the ruler existed.
+Rejected: tinting relational encounters by the other's acting planet, which was the rule until the ruler existed.
 It gave each turn a mood, but it set the room's colour against the score's theme and re-stated a fact the chart already carries three times.
 
 ### Aspect, valence, and warning color
@@ -341,9 +341,9 @@ Stillness remains the default for unavailable controls.
 Desktop interaction takes priority: hover and keyboard focus carry previews, and focus remains visible.
 Mobile adaptation is deferred; it does not require extra desktop confirmation.
 
-### Combat turn composition
+### Relational turn composition
 
-In a combat turn the two charts resolve **sequentially** ([MECHANICS.md §6](../mechanics/MECHANICS.md#6-direct-resolution)): when the player commits, the opponent's chart lights up first — the player's action landing on it and propagating through its web — then, after a short pause, the player's chart resolves the opponent's reply.
+In a relational turn the two charts resolve **sequentially** ([MECHANICS.md §6](../mechanics/MECHANICS.md#6-direct-resolution)): when the player commits, the opponent's chart lights up first — the player's action landing on it and propagating through its web — then, after a short pause, the player's chart resolves the opponent's reply.
 Watching the opponent before yourself keeps the two readable and lets a phase-1 combust visibly preempt the response.
 The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
 

@@ -22,7 +22,7 @@ export function PrinceArtwork({ prince, draft = false }: { prince: Prince; draft
       >
         <Chart
           chart={prince.chart}
-          unlockedPlanets={unlockedPlanets(prince.numEncounters)}
+          unlockedPlanets={unlockedPlanets(prince.numRelationalEncounters)}
           passive
           hideAffliction
         />

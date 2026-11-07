@@ -30,7 +30,7 @@ Space Prince is intended as a **fully onchain game** with a thin presentation cl
 - **Client (browser, React + Vite + TypeScript).**
   The client is presentation-only: it reads game state and renders it.
   Currently it is a **local prototype** with no wallet, no RPC, and no contract calls.
-  Charts come from a real ephemeris, state lives in `localStorage`, and the focus is combat flow and chart readability.
+  Charts come from a real ephemeris, state lives in `localStorage`, and the focus is relational encounter flow and chart readability.
   Production integration with Starknet will replace the local generators; the rendering surface stays the same.
 
 - **Rendering medium.**
@@ -51,7 +51,7 @@ README.md     Design pitch
 ## Where things are
 
 - `docs/intent.md` holds premise, audience, experience, and influences.
-- `docs/mechanics/` holds the rules: `MECHANICS.md` (combat), `ENCOUNTERS.md` and `HOUSES.md` (house scenes), `STATE.md` (data), `CHART.md`, `MAP.md`.
+- `docs/mechanics/` holds the rules: `MECHANICS.md` (relational encounters), `ENCOUNTERS.md` and `HOUSES.md` (house scenes), `STATE.md` (data), `CHART.md`, `MAP.md`.
 - `docs/presentation/` holds `SCREENS.md`, `STYLE.md`, `MUSIC.md`, and `NFT.md`.
 - `docs/writing/` holds the authoring guide, the matrices, the planetary archetypes, the primer, and the 720 scene briefs.
 - `docs/research/` holds sources and historical findings; a recommendation there is not a rule.

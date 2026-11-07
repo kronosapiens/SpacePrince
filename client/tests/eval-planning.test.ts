@@ -1,24 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { combatActions, type PlayContext } from "@/eval/play";
-import { entryLeafValue, evaluateCombat, nextAnnouncements, preferred, type Candidate } from "@/eval/planning";
+import { relationalActions, type PlayContext } from "@/eval/play";
+import { entryLeafValue, evaluateRelational, nextAnnouncements, preferred, type Candidate } from "@/eval/planning";
 import { POLICIES, survivalPolicy } from "@/eval/policies";
 import { combustionCeiling } from "@/game/combust";
-import { beginCombatEncounter } from "@/game/encounter";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
-import { combatTurnRng } from "@/game/turn";
-import type { CombatEncounter, Run } from "@/game/types";
+import { relationalTurnRng } from "@/game/turn";
+import type { RelationalEncounter, Run } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 function fixture(seed = 2) {
   const prince = createStubPrince();
-  const run: Run = { ...beginRun(prince.chart, seed, prince.numEncounters), mapsCompleted: 2 };
-  const encounter = beginCombatEncounter({ run, opponentSeed: seed + 10, lifetimeEncounterCount: prince.numEncounters });
+  const run: Run = { ...beginRun(prince.chart, seed, prince.numRelationalEncounters), mapsCompleted: 2 };
+  const encounter = beginRelationalEncounter({ run, opponentSeed: seed + 10, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
   run.encounter = encounter;
   const play: PlayContext = {
     trial: { chartSeed: 7, gameSeed: seed, strategy: "survival", strategySeed: 0 },
-    prince, policy: survivalPolicy, rng: mulberry32(91), turnRng: combatTurnRng,
+    prince, policy: survivalPolicy, rng: mulberry32(91), turnRng: relationalTurnRng,
   };
   return { run, encounter, play };
 }
@@ -35,16 +35,16 @@ function leaf(capacity: number, luck = 60) {
   return result;
 }
 
-describe("combat planning", () => {
+describe("relational planning", () => {
   it("reduces the zero-allowance immediate rule to existing survival choices", () => {
     for (const seed of [1, 2, 5, 14, 32]) {
       const { run, encounter, play } = fixture(seed);
-      const actions = combatActions(run, play.prince.chart, encounter);
-      const original = survivalPolicy.combat({ ...play, rng: mulberry32(91) }, run, actions);
-      const planned = pickWeighted(preferred(evaluateCombat(play, run, actions)), mulberry32(91)).action;
+      const actions = relationalActions(run, play.prince.chart, encounter);
+      const original = survivalPolicy.relational({ ...play, rng: mulberry32(91) }, run, actions);
+      const planned = pickWeighted(preferred(evaluateRelational(play, run, actions)), mulberry32(91)).action;
       expect(planned).toEqual(original);
-      expect(POLICIES["combat-immediate"].combat({ ...play, rng: mulberry32(91) }, run, actions)).toEqual(original);
-      expect(POLICIES["narrative-immediate"].combat({ ...play, rng: mulberry32(91) }, run, actions)).toEqual(original);
+      expect(POLICIES["relational-immediate"].relational({ ...play, rng: mulberry32(91) }, run, actions)).toEqual(original);
+      expect(POLICIES["narrative-immediate"].relational({ ...play, rng: mulberry32(91) }, run, actions)).toEqual(original);
     }
   });
 
@@ -69,7 +69,7 @@ describe("combat planning", () => {
     encounter.opponentState.Venus.affliction = 120;
     const draws = nextAnnouncements(run);
     expect(draws.map(({ run: next, probability }) => {
-      const enc = next.encounter as CombatEncounter;
+      const enc = next.encounter as RelationalEncounter;
       return [enc.sequence[enc.turnIndex], enc.opponentActions[enc.turnIndex], probability];
     })).toEqual([
       ["Moon", "Affliction", 1 / 8], ["Moon", "Testimony", 3 / 8],
@@ -81,20 +81,20 @@ describe("combat planning", () => {
     const { run, encounter, play } = fixture(5);
     encounter.sequence = encounter.sequence.slice(0, 2);
     encounter.opponentActions = encounter.opponentActions.slice(0, 2);
-    const actions = combatActions(run, play.prince.chart, encounter);
+    const actions = relationalActions(run, play.prince.chart, encounter);
     const before = structuredClone(run);
     const hidden = structuredClone(run);
     hidden.seed += 123;
     hidden.id = "hidden_other_run";
-    const other = hidden.encounter as CombatEncounter;
+    const other = hidden.encounter as RelationalEncounter;
     other.id = "hidden_other_encounter";
     other.sequence[1] = "Mars";
     other.opponentActions[1] = "Affliction";
     const noRng = () => { throw new Error("Evaluation must not read live or tie draws"); };
     for (const anticipateEntry of [false, true]) {
       const options = { horizon: 2 as const, capacityAllowance: 12, anticipateEntry };
-      const expected = evaluateCombat(play, run, actions, options);
-      expect(evaluateCombat({ ...play, rng: noRng, turnRng: noRng }, hidden, actions, options)).toEqual(expected);
+      const expected = evaluateRelational(play, run, actions, options);
+      expect(evaluateRelational({ ...play, rng: noRng, turnRng: noRng }, hidden, actions, options)).toEqual(expected);
     }
     expect(run).toEqual(before);
     expect(play.rng()).toBe(mulberry32(91)());
@@ -116,11 +116,11 @@ describe("combat planning", () => {
     // Testify earns 12 Light and the Other heals our 12. Next turn equally
     // afflicts 12 or heals zero: expected capacity is 114. A later opening
     // costs 24 on half the draws, giving 102 with entry anticipation.
-    const immediate = evaluateCombat(play, run, actions, { anticipateEntry: true })[0]!;
+    const immediate = evaluateRelational(play, run, actions, { anticipateEntry: true })[0]!;
     expect(immediate.value).toEqual({ alive: 1, lit: 1, capacity: 120, light: 12 });
-    const defensive = evaluateCombat(play, run, actions, { horizon: 2 })[0]!;
+    const defensive = evaluateRelational(play, run, actions, { horizon: 2 })[0]!;
     expect(defensive.value).toEqual({ alive: 1, lit: 1, capacity: 114, light: 12 });
-    const entry = evaluateCombat(play, run, actions, { horizon: 2, anticipateEntry: true })[0]!;
+    const entry = evaluateRelational(play, run, actions, { horizon: 2, anticipateEntry: true })[0]!;
     expect(entry.value.alive).toBeCloseTo(1);
     expect(entry.value.lit).toBeCloseTo(1);
     expect(entry.value.capacity).toBeCloseTo(102);
@@ -180,7 +180,7 @@ describe("planning route controls", () => {
     const mapRun = { ...run, encounter: null };
     const ids = eligibleNext(mapRun.map.graph, mapRun.map.currentNodeId, mapRun.map.visitedNodeIds);
     const policy = POLICIES["two-turn-capacity-12"];
-    const guarded = { ...policy, combat: () => { throw new Error("Recursive planning forecast"); } };
+    const guarded = { ...policy, relational: () => { throw new Error("Recursive planning forecast"); } };
     expect(policy.route({ ...play, policy: guarded }, mapRun, ids))
       .toBe(survivalPolicy.route({ ...play, rng: mulberry32(91) }, mapRun, ids));
     for (const policy of Object.values(POLICIES).slice(3)) expect(policy.narrative).toBe(survivalPolicy.narrative);
@@ -189,25 +189,25 @@ describe("planning route controls", () => {
   it("prefers the named encounter kind before shortest distance and falls back when that kind is absent", () => {
     const { run, play } = fixture(61);
     const ids = ["2R", "3C"];
-    run.map.rolledNodes["2R"] = { kind: "combat", opponentSeed: 99 };
+    run.map.rolledNodes["2R"] = { kind: "relational", opponentSeed: 99 };
     run.map.rolledNodes["3C"] = { kind: "narrative", house: 4 };
     const noForecast = () => { throw new Error("Simple routes need no forecasts or strategy draws"); };
-    const context = { ...play, rng: noForecast, turnRng: noForecast, policy: { route: noForecast, combat: noForecast, narrative: noForecast } };
-    for (const name of ["combat-immediate", "combat-two-turn", "combat-two-turn-entry-aware"] as const) {
+    const context = { ...play, rng: noForecast, turnRng: noForecast, policy: { route: noForecast, relational: noForecast, narrative: noForecast } };
+    for (const name of ["relational-immediate", "relational-two-turn", "relational-two-turn-entry-aware"] as const) {
       expect(POLICIES[name].route(context, run, ids)).toBe("2R");
     }
     expect(POLICIES["narrative-immediate"].route(context, run, ids)).toBe("3C");
-    run.map.rolledNodes["3C"] = { kind: "combat", opponentSeed: 99 };
-    expect(POLICIES["combat-immediate"].route(context, run, ids)).toBe("3C");
+    run.map.rolledNodes["3C"] = { kind: "relational", opponentSeed: 99 };
+    expect(POLICIES["relational-immediate"].route(context, run, ids)).toBe("3C");
     expect(POLICIES["narrative-immediate"].route(context, run, ids)).toBe("3C");
   });
 
-  it("uses the historical shared route tie stream independently of combat choices", () => {
+  it("uses the historical shared route tie stream independently of relational choices", () => {
     const { run, play } = fixture(61);
     const ids = ["2L", "2R"];
-    for (const id of ids) run.map.rolledNodes[id] = { kind: "combat", opponentSeed: 99 };
+    for (const id of ids) run.map.rolledNodes[id] = { kind: "relational", opponentSeed: 99 };
     const expected = pickWeighted(ids, mulberry32(hashString(`difficulty_route_7_61_3_${run.map.currentNodeId}`)));
-    for (const name of ["combat-immediate", "combat-two-turn", "combat-two-turn-entry-aware", "narrative-immediate"] as const) {
+    for (const name of ["relational-immediate", "relational-two-turn", "relational-two-turn-entry-aware", "narrative-immediate"] as const) {
       const context = { ...play, trial: { ...play.trial, strategy: name, strategySeed: 99 }, rng: () => 0.999 };
       expect(POLICIES[name].route(context, { ...run, id: "other", seed: 999 }, ids)).toBe(expected);
     }

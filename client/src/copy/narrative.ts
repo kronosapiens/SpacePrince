@@ -1,4 +1,4 @@
-import { displayStat, STAT_LABEL } from "@/game/combat";
+import { displayStat, STAT_LABEL } from "@/game/relational";
 import { occupantLean, type NarrativeContext, type Occupant, type Option, type Outcome, type Selection, type Target } from "@/game/narrative";
 import type { Polarity } from "@/game/types";
 

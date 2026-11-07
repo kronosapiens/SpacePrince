@@ -71,7 +71,7 @@ export const CHART_STYLE = {
 
   /** Diagram — aspect web. One opacity across every screen; the active stroke
    *  (hover / select / propagation) is the only thing that emphasizes a line, so
-   *  there's no per-screen "resting brightness" to reason about. Combat reads the
+   *  there's no per-screen "resting brightness" to reason about. Relational reads the
    *  web to plan propagation, so it wants full clarity, same as the Title. */
   aspect: {
     opacity: 1,

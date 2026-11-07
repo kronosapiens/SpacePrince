@@ -11,7 +11,7 @@ export interface BatchOptions {
   strategies: Strategy[];
   strategySeed: number;
   /** Each trial begins at this lifetime count; omitted means a fully unlocked roster. */
-  startingLifetimeEncounterCount?: number;
+  startingLifetimeRelationalEncounterCount?: number;
 }
 
 /** Chart i, as a pure function of the master seed and its index. */
@@ -30,7 +30,7 @@ export const SEED_DERIVATIONS = {
   game: "hashString(`${seed}_game_${i}_${j}`) % 2**31",
   map1: "beginRun(chart, gameSeed): mulberry32(gameSeed) draws map 1's seed",
   maps2to7: "hashString(`${gameSeed}_map_${k}`) % 2**31",
-  strategy: "mulberry32(hashString(`strategy_${chartSeed}_${gameSeed}_${strategy}_${strategySeed}`))",
+  strategy: "mulberry32(hashString(`strategy_${chartSeed}_${gameSeed}_${strategy.replace(\"relational\", \"combat\")}_${strategySeed}`))",
   forecast: "hashString(`forecast_${chartSeed}_${gameSeed}_${strategySeed}_${map}_${nodeId}_${sample}`); arrival, ties and turns hash `${seed}_arrival|_ties|_turns`",
   bootstrap: "mulberry32(hashString(`${seed}_bootstrap`))",
 };

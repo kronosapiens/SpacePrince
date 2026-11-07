@@ -122,7 +122,7 @@ export function useCasting(enabled: boolean) {
         lon: roundLon(Number(form.lon)),
       },
       chart: computed,
-      numEncounters: 0,
+      numRelationalEncounters: 0,
       achievements: 0,
       runs: [beginRun(computed, undefined, 0, loadDevSettings().unlockAll)],
     };

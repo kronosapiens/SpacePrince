@@ -53,7 +53,7 @@ export interface NarrativeContext {
 /** The house and the run chart determine available joys, occupants, and targets. */
 export function narrativeContext(prince: Prince, run: Run, house: number, devUnlockAll = false): NarrativeContext {
   const { joy, ruler } = HOUSES[house - 1]!;
-  const unlocked = unlockedPlanets(prince.numEncounters, devUnlockAll);
+  const unlocked = unlockedPlanets(prince.numRelationalEncounters, devUnlockAll);
   const placements = runChart(prince.chart, run).planets;
   const sign = houseSign(prince.chart, house);
   return {

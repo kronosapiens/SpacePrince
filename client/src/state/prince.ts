@@ -3,10 +3,10 @@ import { refreshChartStats, runChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 
-// v5: the complete house–sign catalogue replaces the earlier house-only scenes.
-const PRINCE_KEY = "sp:prince:v5";
+// v6: relational encounter kinds and relational-only lifetime progression.
+const PRINCE_KEY = "sp:prince:v6";
 // Obsolete prototype shapes; cleared on first load (no migration).
-const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3", "sp:prince:v4"];
+const LEGACY_KEYS = ["sp:profile:v1", "sp:run:v1", "sp:prince:v1", "sp:prince:v2", "sp:prince:v3", "sp:prince:v4", "sp:prince:v5"];
 
 function capSavedAffliction(chart: Chart, state: SideState): void {
   for (const planet of PLANETS) {
@@ -23,7 +23,7 @@ export function loadPrince(): Prince | null {
     refreshChartStats(prince.chart);
     for (const run of prince.runs) {
       capSavedAffliction(runChart(prince.chart, run), run.state);
-      if (run.encounter?.kind === "combat") {
+      if (run.encounter?.kind === "relational") {
         refreshChartStats(run.encounter.opponentChart);
         capSavedAffliction(run.encounter.opponentChart, run.encounter.opponentState);
       }

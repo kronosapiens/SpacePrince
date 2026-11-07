@@ -1,6 +1,6 @@
 import { PLANETS } from "./data";
 import { propagatedMagnitude } from "./aspects";
-import { getProjectedPair } from "./combat";
+import { getProjectedPair } from "./relational";
 import { combustionCeiling, isCombusted, wouldCombust } from "./combust";
 import type { ScoredBeat } from "./score";
 import type {

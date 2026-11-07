@@ -1,11 +1,11 @@
 # Space Prince — Mechanics
 
-The maintained reference for combat: the rules and the reasoning behind them.
-The implementation lives in `client/src/game/` (`turn.ts`, `combat.ts`, `combust.ts`, `necessity.ts`, `score.ts`); when this document and the code disagree, investigate which is stale rather than assuming either is right.
+The maintained reference for relational encounters: the rules and the reasoning behind them.
+The implementation lives in `client/src/game/` (`turn.ts`, `relational.ts`, `combust.ts`, `necessity.ts`, `score.ts`); when this document and the code disagree, investigate which is stale rather than assuming either is right.
 Narrative encounters are specified in [ENCOUNTERS.md](ENCOUNTERS.md) and their references in [HOUSES.md](HOUSES.md); data shapes in [STATE.md](STATE.md); chart construction in [CHART.md](CHART.md); map topology in [MAP.md](MAP.md).
 
 **Number model — the sexagesimal lattice.** The mechanics use the arithmetic of their source material: the 360° circle.
-Combat stat divisions produce whole numbers without rounding.
+Stat divisions in relational encounters produce whole numbers without rounding.
 Effective stats are multiples of `12` — the smallest number every aspect fraction (§9) divides — so halves, thirds, quarters, and sixths of any stat are integers.
 Resolve is the combustion ceiling, also a multiple of `12` (§10).
 Necessity draws `12`, `24`, or `36` affliction; a successful Fortune roll blocks the draw entirely (§11.3).
@@ -53,7 +53,7 @@ These provisional values are being tuned through playtesting; the simulation fin
 
 Every chart — player or opponent — comes from one generator: real ephemeris positions for a birth moment and place, via `astronomy-engine` (`client/src/astronomy/compute.ts`).
 There are no fabricated skies.
-Onchain, the ephemeris runs only at mint, and each Other is a minted Prince ([SCREENS.md §3.4](../presentation/SCREENS.md#34-npc-opponents-combat)).
+Onchain, the ephemeris runs only at mint, and each Other is a minted Prince ([SCREENS.md §3.4](../presentation/SCREENS.md#34-npc-opponents-relational)).
 
 - **Player** Princes use the player's real birth data: ISO datetime, latitude, longitude.
 - **Opponent, dev, and preview** charts (`seededChart`) use a deterministic-random birth — a seeded moment over ~200 years and a random place — so they are reproducible from the seed yet astronomically real.
@@ -70,7 +70,7 @@ The onchain version of this computation is the subject of [CHART.md](CHART.md).
 ## 4. Stat Buffs
 
 Buffs are additive at generation, always in `+12` steps, so effective stats stay on the 12-lattice.
-A planet's effective stat is base + buffs — the value used in combat.
+A planet's effective stat is base + buffs — the value used in relational encounters.
 
 Element — each element buffs the one stat it expresses:
 
@@ -152,15 +152,15 @@ Fresh randomness enters only where the game is already pausing to reveal somethi
 
 - **Map creation.** The map seed comes from a VRF request; from it derive node content ([MAP.md](MAP.md)) and opening uncombust rolls (§11.3).
   These are settled and displayed before the first node is entered.
-- **Combat encounter arrival.** Both charts receive necessity before the first action (§11.3).
+- **Relational encounter arrival.** Both charts receive necessity before the first action (§11.3).
   In the prototype, each chart's opening affliction uses a separate seeded stream from the other's and from the turn sequence, so necessity draws do not change the announced actions.
 - **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5).
   By the time the resolution animation finishes, the next move has landed.
-  Combat's randomness is not knowing what comes next — never not knowing what your committed action will do.
+  Randomness in relational encounters is not knowing what comes next — never not knowing what your committed action will do.
 
 Narrative choices roll nothing: every option's effect is determined and previewed before commitment ([ENCOUNTERS.md](ENCOUNTERS.md)).
 
-Luck is therefore not a combat stat.
+Luck is therefore not a stat used during relational turns.
 Affliction, testimony, and Resolve decide what a planet does inside an encounter; luck decides uncombust rolls and relief from necessity.
 The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the one luck-based probability: the chance a combusted planet uncombusts at a map opening, and the chance an available planet's necessity draw is blocked (§11.3).
 One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fortune is its odds wherever fate is asked.
@@ -218,7 +218,7 @@ At 2° per point, this fills one affliction arc.
 Ceilings read directly as how much affliction a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few.
 Affliction **below** the ceiling is a recoverable margin: a planet never combusts from a hit that leaves it under the line, and resolving affliction back down restores the full margin.
 During an exchange, the player can read the exact combustion outcome before acting.
-Combat entry adds a Necessity draw (§11.3), so preparation must account for its possible amounts.
+Relational entry adds a Necessity draw (§11.3), so preparation must account for its possible amounts.
 
 Affliction is **capped at the ceiling** — a combusted planet holds `affliction = ceiling`, never more.
 Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further affliction, receives no testimony, and is skipped by propagation.
@@ -226,7 +226,7 @@ Testimony defends the margin; it never resurrects.
 
 The cap makes combustion **derived state**: a planet is combusted exactly when `affliction >= ceiling`, so no combust flag is stored anywhere ([STATE.md](STATE.md)) — affliction is the whole per-planet state.
 
-A combusted planet returns only by **uncombusting**, and uncombusting never happens in combat.
+A combusted planet returns only by **uncombusting**, and uncombusting never happens in relational encounters.
 Two processes exist: the map-boundary fortune roll (§11.3) and narrative revival choices ([ENCOUNTERS.md §2](ENCOUNTERS.md#2-outcomes-and-payment)).
 Both return the planet at `affliction = ceiling / 2` — back, but scarred, with half its margin already spent.
 Combustion is intended to be **frequent and recoverable**.
@@ -234,15 +234,15 @@ A strong Mars can combust a clean Moon in one action, while a clean Saturn survi
 Revival choices appear in scenes whose house supports a return ([ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario)), alongside the boundary rolls.
 Combustion scores only under Saturn's rule (§12); under every other ruler, combusting an opponent planet is a trade: denying its swing against forfeiting the harvest banked on it.
 
-**Dignity is not a combat input.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system ([HOUSES.md](HOUSES.md)), where a planet in the encounter's house makes the terms of its choices better or worse ([ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity)).
-The chart still computes each planet's dignity; combat simply does not read it.
+**Dignity is not an input to relational encounters.** Essential dignity (a planet's strength by sign — domicile, exaltation, detriment, fall) is reserved for the **house-encounter** system ([HOUSES.md](HOUSES.md)), where a planet in the encounter's house makes the terms of its choices better or worse ([ENCOUNTERS.md §4.2](ENCOUNTERS.md#42-occupants-and-dignity)).
+The chart still computes each planet's dignity; relational encounters simply do not read it.
 
 ## 11. Encounter / Map / Run Flow
 
 The game's progression is layered:
 
-- **Encounter** — one node traversal (combat or narrative).
-  Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters resolve one decision with immediate consequences ([ENCOUNTERS.md](ENCOUNTERS.md)).
+- **Encounter** — one node traversal (relational or narrative).
+  A relational encounter resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters resolve one decision with immediate consequences ([ENCOUNTERS.md](ENCOUNTERS.md)).
 - **Map** — one Sephirot-tree (per [MAP.md](MAP.md)).
   The player walks a path from L1 to L7, one encounter per node entered: 1 to 11 per map, depending on the layout and route.
 - **Run** — **up to seven maps** (`MAPS_PER_RUN` in `client/src/game/run.ts`).
@@ -254,10 +254,10 @@ The game's progression is layered:
 
 Per encounter:
 
-- Every combat encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
-  It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the combat theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
+- Every relational encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
+  It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the relational theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
   Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
-- Both charts receive **Necessity at combat entry** (§11.3): the player adds it to carried affliction, while the other begins with fresh state.
+- Both charts receive **Necessity at relational entry** (§11.3): the player adds it to carried affliction, while the other begins with fresh state.
   Fortune can leave a planet at zero affliction, while every fielded planet on the other chart arrives lit.
   Under the Moon's rule only resolution scores (§12), so an opening with no affliction to resolve can yield no Light.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
@@ -268,16 +268,16 @@ Per encounter:
 
 The player's affliction and combust state **persist across encounters and across maps within a run**.
 Each map opening applies uncombust rolls without adding affliction (§11.3).
-A new run begins with zero affliction; the first combat entry applies its first Necessity sweep.
+A new run begins with zero affliction; the first relational entry applies its first Necessity sweep.
 
 ### 11.1 Planet Unlock Schedule
 
-A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative combat encounter count** across the player's lifetime — not per run.
+A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative relational encounter count** across the player's lifetime — not per run.
 Narrative encounters do not count.
 The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward).
 The Moon is present from the first encounter; each subsequent planet unlocks at a cumulative count of `2^i` for `i = 0..5` (`UNLOCK_THRESHOLDS` in `client/src/game/data.ts`):
 
-| Cumulative combat encounters | Unlock | Total planets |
+| Cumulative relational encounters | Unlock | Total planets |
 |-----|--------|---------------|
 | 0 (start) | Moon | 1 |
 | 1 | Mercury | 2 |
@@ -287,14 +287,14 @@ The Moon is present from the first encounter; each subsequent planet unlocks at 
 | 16 | Jupiter | 6 |
 | 32 | Saturn | 7 |
 
-The first 32 combat encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
+The first 32 relational encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
 Saturn arrives last as the final teacher.
 
-**Encounter length and the mirrored opponent.** Combat length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
+**Encounter length and the mirrored opponent.** Relational encounter length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
 Difficulty therefore ramps on two axes.
 The opponent's *roster* mirrors the player's unlock tier — Moon vs Moon at the first encounter, up to a full seven-vs-seven — so the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
 Encounter *length* rides the run instead: one-turn encounters on the first map, full arcs on late maps.
-Necessity applies at every combat opening without a depth multiplier; the player's existing affliction carries forward.
+Necessity applies at every relational opening without a depth multiplier; the player's existing affliction carries forward.
 The length ramp is also a curriculum for the two-beat (§12): map 1 teaches resolving initial affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
 On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
 Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
@@ -303,9 +303,9 @@ Rejected: fixed 3-turn encounters — the final turn made afflict-for-setup dead
 
 Each unlock happens **between encounters**, on the Map screen: surfacing from the encounter that crossed a threshold presents the new planet's introduction card, and on dismissal the planet stands lit in its computed sign on the chart ([SCREENS.md §3.6.2](../presentation/SCREENS.md#362-the-info-card-summoned-and-queued)).
 
-A planet enters the **combat-encounter ruler rotation** when it unlocks.
-Before that threshold, no combat encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
-Each map samples its combat rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
+A planet enters the **relational-encounter ruler rotation** when it unlocks.
+Before that threshold, no relational encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
+Each map samples its relational rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
 The client prototype enforces this with deterministic rejection sampling: it generates Other charts until the Ascendant ruler belongs to that tier.
 Onchain, the Other is a minted Prince with an eligible ruler, picked at arrival; how the contract finds one remains unspecified.
 
@@ -322,10 +322,10 @@ Twelve candidate marks are defined in `client/src/data/achievements.ts`, selecte
 Earning is not implemented: the bitmap exists on the Prince ([STATE.md](STATE.md)) but no condition is evaluated yet, and the artwork preview shows every assigned mark as earned until it is.
 Candidates that depend on lasting narrative consequences stay provisional, since the narrative system has no persistent effects ([ENCOUNTERS.md §11](ENCOUNTERS.md#11-deferred-decisions)).
 
-### 11.3 Necessity at combat openings and revival at map openings
+### 11.3 Necessity at relational openings and revival at map openings
 
 Necessity is the affliction a chart brings into a new situation; Fortune offers relief from it.
-The same rule applies independently to both charts at every combat encounter opening (`applyNecessity` in `client/src/game/necessity.ts`).
+The same rule applies independently to both charts at every relational encounter opening (`applyNecessity` in `client/src/game/necessity.ts`).
 The player's state carries forward; each other chart begins with fresh state.
 
 For each available fielded planet:
@@ -339,15 +339,15 @@ Combusted and unfielded planets receive nothing.
 There is no map-depth multiplier, and necessity does not propagate or award Light.
 Fresh planets always survive: the maximum draw is 36, below the minimum fresh Resolve of 48.
 If Necessity combusts the player's entire fielded roster, the encounter resolves with zero actions and zero Light.
-Clearing that encounter still advances the lifetime combat count; a newly unlocked planet can keep the run alive.
+Clearing that encounter still advances the lifetime relational encounter count; a newly unlocked planet can keep the run alive.
 
 Map openings apply revival only: each combusted fielded planet rolls Fortune and, on success, returns at half Resolve (§10).
 Available planets retain their existing affliction, and revived planets receive no further affliction at the boundary.
 A new run starts at zero affliction, with no combusted planets to revive.
-Narrative entry applies no Necessity, and combat entry provides no resurrection.
+Narrative entry applies no Necessity, and relational entry provides no resurrection.
 
 The map seed determines revival in a separate stream from node content; results are applied and displayed before the first node is entered (§7).
-At combat arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
+At relational arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
 Encounter length still increases with map number, while repeated necessity adds to the player's carried affliction and revival provides a way back from combustion.
 The balancing study that arrived at these rules is summarised on [PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560).
 
@@ -394,7 +394,7 @@ Mercury and the Sun partition them by polarity relative to the Other's announced
 Venus and Jupiter govern the direct exchange on both charts, with Jupiter intentionally containing Venus as the greater benefic contains the lesser.
 No other ordinary rule strictly contains another.
 Within the unlocked rotation, rulership fixes relative frequencies: the luminaries rule one sign each, while the other planets rule two.
-Before Mercury unlocks, every combat encounter is necessarily Moon-ruled.
+Before Mercury unlocks, every relational encounter is necessarily Moon-ruled.
 
 A run's remaining **Light** is its permanent output.
 When the run ends — combustion or completion (§11) — that value shapes a star in the Prince's NFT field ([NFT.md](../presentation/NFT.md), "The Star-Field").

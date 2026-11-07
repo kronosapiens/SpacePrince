@@ -9,8 +9,8 @@ import type { Prince, Run } from "@/game/types";
 export type PrinceAction =
   | { kind: "mint"; prince: Prince }
   | { kind: "clear" }
-  | { kind: "setEncounters"; count: number }
-  | { kind: "incrementEncounters" }
+  | { kind: "setRelationalEncounters"; count: number }
+  | { kind: "incrementRelationalEncounters" }
   | { kind: "startRun"; run: Run }
   | { kind: "commitRun"; run: Run };
 
@@ -23,10 +23,10 @@ export function princeReducer(state: Prince | null, action: PrinceAction): Princ
   }
   if (!state) return state;
   switch (action.kind) {
-    case "setEncounters":
-      return { ...state, numEncounters: Math.max(0, action.count) };
-    case "incrementEncounters":
-      return { ...state, numEncounters: state.numEncounters + 1 };
+    case "setRelationalEncounters":
+      return { ...state, numRelationalEncounters: Math.max(0, action.count) };
+    case "incrementRelationalEncounters":
+      return { ...state, numRelationalEncounters: state.numRelationalEncounters + 1 };
     case "startRun":
       return { ...state, runs: [...state.runs, action.run] };
     case "commitRun": {

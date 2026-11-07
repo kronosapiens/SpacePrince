@@ -15,13 +15,13 @@ import { describeOption, occupantLine } from "@/copy/narrative";
 import { createStubPrince } from "./fixtures";
 import { INTERACTION_SCENE } from "./narrative-fixture";
 
-function setup(input: string | NarrativeScenario = INTERACTION_SCENE, numEncounters = 64) {
+function setup(input: string | NarrativeScenario = INTERACTION_SCENE, numRelationalEncounters = 64) {
   const scenario = typeof input === "string" ? getScenario(input) : input;
-  const prince = createStubPrince({ numEncounters });
+  const prince = createStubPrince({ numRelationalEncounters });
   prince.chart.ascendantSign = SIGNS[(SIGNS.indexOf(scenario.sign) - scenario.house + 13) % 12]!;
   // Keep these unit tests free of occupant adjustments unless one is explicitly added.
   for (const p of PLANETS) prince.chart.planets[p].sign = scenario.sign === "Aries" ? "Taurus" : "Aries";
-  const run = { ...beginRun(prince.chart, 42, numEncounters), light: 120 };
+  const run = { ...beginRun(prince.chart, 42, numRelationalEncounters), light: 120 };
   run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: scenario.scenarioId });
   const context = () => narrativeContext(prince, run, scenario.house);
   const option = (optionId: string) => scenario.options.find((o) => o.id === optionId)!;
@@ -139,7 +139,7 @@ describe("single-decision narrative", () => {
     const offered = () => offeredOptions(scenario, context()).map((o) => o.id);
     expect(offered()).toEqual(["leave"]);
     expect(resolveNarrative(run, prince, scenario, "joy", { chosen: "Moon" })).toBeNull();
-    prince.numEncounters = 1;
+    prince.numRelationalEncounters = 1;
     run.state.Mercury.affliction = 0;
     expect(offered()).toEqual(["leave", "joy"]);
     prince.chart.planets.Mercury.dignity = "Fall";
@@ -164,7 +164,7 @@ describe("single-decision narrative", () => {
     expect(resolveNarrative({ ...run, encounter: null }, prince, scenario, "gift", {})).toBeNull();
     expect(resolveNarrative(run, prince, getScenario("home-libra-mara"), "gift", {})).toBeNull();
     expect(resolveNarrative(run, prince, scenario, "invented", {})).toBeNull();
-    expect(prince.numEncounters).toBe(64);
+    expect(prince.numRelationalEncounters).toBe(64);
   });
 });
 

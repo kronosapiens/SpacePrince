@@ -12,7 +12,7 @@ function randomPrince(): Prince {
   const seed = randomSeed();
   const rng = mulberry32(seed);
   const chart = seededChart(seed);
-  const numEncounters = UNLOCK_THRESHOLDS[UNLOCK_THRESHOLDS.length - 1]!;
+  const numRelationalEncounters = UNLOCK_THRESHOLDS[UNLOCK_THRESHOLDS.length - 1]!;
   const starCount = Math.floor(rng() * 241);
   const achievementCount = Math.floor(rng() * (ACHIEVEMENTS.length + 1));
   const remaining = [...ACHIEVEMENTS];
@@ -22,12 +22,12 @@ function randomPrince(): Prince {
     achievements |= achievementBit(achievement!.id);
   }
   // Only the completed runs' Light is drawn; their unused map and state can be shared.
-  const run = beginRun(chart, seed, numEncounters);
+  const run = beginRun(chart, seed, numRelationalEncounters);
   return {
     id: `preview_${seed}`,
     position: { iso: "2000-01-01T00:00:00Z", lat: 0, lon: 0 },
     chart,
-    numEncounters,
+    numRelationalEncounters,
     achievements,
     runs: Array.from({ length: starCount }, (_, index) => ({
       ...run,

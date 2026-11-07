@@ -1,7 +1,7 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chart } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
-import { CombatGuide, type CombatGuidePhase } from "@/components/CombatGuide";
+import { RelationalGuide, type RelationalGuidePhase } from "@/components/RelationalGuide";
 import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
@@ -10,7 +10,7 @@ import { PlanetBands } from "@/components/PlanetBands";
 import { useEncounterAdvance } from "@/components/useEncounterAdvance";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { hashString, mulberry32 } from "@/game/rng";
-import { combatTurnRng, resolveTurn, type TurnResult } from "@/game/turn";
+import { relationalTurnRng, resolveTurn, type TurnResult } from "@/game/turn";
 import { isOver } from "@/game/run";
 import { runChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";
@@ -22,7 +22,7 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
 import { getAspects } from "@/game/aspects";
-import { directAmount, getEffectiveStats } from "@/game/combat";
+import { directAmount, getEffectiveStats } from "@/game/relational";
 import { isCombusted } from "@/game/combust";
 import { NEUTRAL, PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
@@ -30,10 +30,10 @@ import {
   EMPTY_EFFECT_MAP,
   EMPTY_PLANET_SET,
   EMPTY_PROPAGATION_KEYS,
-  useCombatAnimation,
-} from "@/components/useCombatAnimation";
+  useRelationalAnimation,
+} from "@/components/useRelationalAnimation";
 import type {
-  CombatEncounter,
+  RelationalEncounter,
   PlanetName,
   Polarity,
   Prince,
@@ -41,10 +41,10 @@ import type {
   TurnLogEntry,
 } from "@/game/types";
 
-interface CombatScreenProps {
+interface RelationalScreenProps {
   run: Run;
   prince: Prince;
-  encounter: CombatEncounter;
+  encounter: RelationalEncounter;
   /** Resolves and persists a turn; returns null if the click was rejected
    *  (e.g. encounter resolved). */
   onCommitTurn: (planet: PlanetName, valence: Polarity, rng: () => number) => TurnResult | null;
@@ -56,7 +56,7 @@ interface CombatScreenProps {
   devAnimationControls?: boolean;
 }
 
-export function EncounterCombatScreen(props: CombatScreenProps) {
+export function EncounterRelationalScreen(props: RelationalScreenProps) {
   const { run, prince, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const devAnimationControls = props.devAnimationControls ?? false;
   const { setActive } = useActivePlanet();
@@ -73,13 +73,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   const [inspectedOpponent, setInspectedOpponent] = useState<PlanetName | null>(null);
   const [otherStudy, setOtherStudy] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [guidePhase, setGuidePhase] = useState<CombatGuidePhase>("read");
+  const [guidePhase, setGuidePhase] = useState<RelationalGuidePhase>("read");
   const [guideAction, setGuideAction] = useState<Polarity | null>(null);
   const guideSnapshot = useRef<{
     selected: PlanetName | null;
     study: boolean;
   } | null>(null);
-  const { animation, start: startAnimation, skip: skipAnimation } = useCombatAnimation();
+  const { animation, start: startAnimation, skip: skipAnimation } = useRelationalAnimation();
   const openingId = `${run.id}/${run.map.id}/${run.map.currentNodeId}/${encounter.id}`;
   // A wipe on entry still plays its opening; temporary dev playback must not restart it.
   const openingEnabled = encounter.turnIndex === 0 && encounter.log.length === 0;
@@ -107,7 +107,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   }, [encounter.id, encounter.turnIndex]);
 
   // `over` is derived (STATE.md): the run ended once every fielded planet combust.
-  const runEnded = isOver(run, playerChart, prince.numEncounters);
+  const runEnded = isOver(run, playerChart, prince.numRelationalEncounters);
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -157,8 +157,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   );
 
   const playerUnlocked = useMemo(
-    () => unlockedPlanets(prince.numEncounters, devUnlockAll),
-    [prince.numEncounters, devUnlockAll],
+    () => unlockedPlanets(prince.numRelationalEncounters, devUnlockAll),
+    [prince.numRelationalEncounters, devUnlockAll],
   );
   const guidePlanet = useMemo(
     () => playerUnlocked.find(
@@ -169,13 +169,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
 
   // The encounter's ruler: the planet whose colour the node carried on the map,
   // and the one that says how you gain Light here (`score.ts` `RULER_RULES`).
-  // The score (MUSIC.md) and the screen tint follow it too — combat plays the
+  // The score (MUSIC.md) and the screen tint follow it too — relational plays the
   // ruler's theme at the up mix and glows the ruler's colour, both stable for
   // the whole fight. The per-turn actor is not repeated in the ambient layer:
   // the sentence, the corona and the resolution flashes already carry it.
   const ruler = encounterRuler(encounter);
   useEffect(() => {
-    setTheme(ruler, "combat");
+    setTheme(ruler, "relational");
     setActive(ruler);
   }, [ruler, setActive]);
   const scoreCharts = useMemo(
@@ -229,7 +229,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
   // Projection-deltas to actually display, per side. Pre-commit: the live
   // projection, and nothing at all until a planet is under consideration.
   // Mid-animation: the snapshot captured at commit, with each planet filtered
-  // out as its effect pulse fires (see useCombatAnimation).
+  // out as its effect pulse fires (see useRelationalAnimation).
   //
   // Rejected: the precommit drawn on every candidate at rest (SCREENS.md
   // §3.5.1). It is determined information and it made the seven-way comparison
@@ -318,7 +318,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     (planet: PlanetName, action: Polarity) => {
       if (guideOpen || openingActive || animation || encounter.resolved || !opponentTurn) return;
       if (isCombusted(playerChart.planets[planet], run.state[planet])) return;
-      const rng = combatTurnRng(run, encounter);
+      const rng = relationalTurnRng(run, encounter);
       const previousRun = run;
       const previousEncounter = encounter;
       // Snapshot the projection for the *chosen* action so the arcs shown
@@ -369,7 +369,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     }) => {
       if (openingActive) return;
       if (animation) skipAnimation();
-      const devEncounter: CombatEncounter = {
+      const devEncounter: RelationalEncounter = {
         ...encounter,
         sequence: [cfg.opponentPlanet],
         opponentActions: [cfg.valence],
@@ -441,7 +441,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     setGuidePhase("read");
     setGuideOpen(true);
   }, [animation, openingActive, selected, skipAnimation, study]);
-  useFirstGuide("combat", !openingActive, openGuide);
+  useFirstGuide("relational", !openingActive, openGuide);
 
   const closeGuide = useCallback(() => {
     const snapshot = guideSnapshot.current;
@@ -454,7 +454,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     guideSnapshot.current = null;
   }, []);
 
-  const changeGuidePhase = useCallback((next: CombatGuidePhase) => {
+  const changeGuidePhase = useCallback((next: RelationalGuidePhase) => {
     setGuidePhase(next);
     setHovered(null);
     setPreviewAction(null);
@@ -510,10 +510,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
     <>
       {/* The mint's bands, struck per resolution beat — self down the left edge,
           other down the right, matching the two charts. */}
-      <PlanetBands className="combat-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
-      <PlanetBands className="combat-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
+      <PlanetBands className="relational-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
+      <PlanetBands className="relational-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
       {!encounter.resolved && (
-        <CombatGuide
+        <RelationalGuide
           open={guideOpen}
           phase={guidePhase}
           ruler={ruler}
@@ -530,9 +530,9 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
       {!guideOpen && !openingActive && !animation && !encounter.resolved && (
         <Instruction text={selected ? INSTRUCTION.encounter.verb : INSTRUCTION.encounter.planet} />
       )}
-      <div className="combat-content">
-        <div className="combat-topbar">
-          <div className="combat-readouts">
+      <div className="relational-content">
+        <div className="relational-topbar">
+          <div className="relational-readouts">
             {/* Position in the encounter's turn sequence. Unlike Light this has
                 a real denominator — the sequence length — so a fraction states it
                 exactly rather than inventing a ceiling. Live, the numerator is the
@@ -545,13 +545,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 and cost the strip a second visual language — the pips carried no
                 baseline of their own, so they could not sit with the type beside
                 them. */}
-            <div className="combat-turns">
+            <div className="relational-turns">
               <span className="eyebrow">TURN</span>
-              <span className="combat-turns-v">
+              <span className="relational-turns-v">
                 {encounter.resolved && !animation
                   ? displayTurnIndex
                   : Math.min(displayTurnIndex + 1, encounter.sequence.length)}
-                <span className="combat-turns-sep">/</span>
+                <span className="relational-turns-sep">/</span>
                 {encounter.sequence.length}
               </span>
             </div>
@@ -565,10 +565,10 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 be learned before it said anything, and the bar read as progress
                 toward a maximum regardless — the exact misread it was built to
                 avoid. */}
-            <div className="combat-light" data-guide="light">
+            <div className="relational-light" data-guide="light">
               <span className="eyebrow">LIGHT</span>
               <span
-                className="combat-light-v"
+                className="relational-light-v"
                 style={
                   lightFlashColor
                     ? ({ "--flash-color": lightFlashColor } as CSSProperties)
@@ -580,7 +580,7 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                 {lightFlashEpoch > 0 && (
                   <span
                     key={lightFlashEpoch}
-                    className="combat-light-flash anim-light-flash"
+                    className="relational-light-flash anim-light-flash"
                     aria-hidden
                   />
                 )}
@@ -588,15 +588,15 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
                   key={`n-${lightFlashEpoch}`}
                   className={
                     lightFlashEpoch > 0
-                      ? "combat-light-n anim-light-pop"
-                      : "combat-light-n"
+                      ? "relational-light-n anim-light-pop"
+                      : "relational-light-n"
                   }
                 >
                   {Math.round(displayedRunLight)}
                 </span>
                 {/* What the indicated gesture would add. */}
                 {projectedLight && (
-                  <span className="combat-light-delta" data-guide-part style={{ color: projectedLight.color }}>
+                  <span className="relational-light-delta" data-guide-part style={{ color: projectedLight.color }}>
                     +{projectedLight.value}
                   </span>
                 )}
@@ -606,13 +606,13 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           {/* The sentence is the caption that teaches the marks — the ring's
               colour and the bites on the candidates say the same thing wordlessly,
               and nothing else says which of them is Saturn. */}
-          <div className="combat-announce">
+          <div className="relational-announce">
             {openingActive ? (
-              <p className="combat-announce-line">
+              <p className="relational-announce-line">
                 <span style={{ color: NEUTRAL.gold }}>Necessity</span> settles
               </p>
             ) : !settled && displayOpponentTurn && displayOpponentAction && (
-              <p className="combat-announce-line" data-guide="opponent-move">
+              <p className="relational-announce-line" data-guide="opponent-move">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
                   {displayOpponentTurn}
                 </span>{" "}
@@ -625,8 +625,8 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
           </div>
         </div>
 
-        <div className="combat-side" data-guide="chart-other">
-          <div className="combat-side-label">OTHER</div>
+        <div className="relational-side" data-guide="chart-other">
+          <div className="relational-side-label">OTHER</div>
           <Chart
             chart={encounter.opponentChart}
             state={displayOpponentState}
@@ -673,21 +673,21 @@ export function EncounterCombatScreen(props: CombatScreenProps) {
             carried on the map — how the meeting opens, and the rule it sets.
             What moves (the turn, the score, the other's move) reads above the
             charts; this reads below. */}
-        <div className="combat-foot">
-          <div className="combat-ruler" data-guide="ruler">
+        <div className="relational-foot">
+          <div className="relational-ruler" data-guide="ruler">
             <span className="eyebrow">RULER</span>
-            <span className="combat-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
+            <span className="relational-ruler-v" style={{ color: PLANET_PRIMARY[ruler] }}>
               {ruler}
             </span>
           </div>
-          <p className="combat-opening">
+          <p className="relational-opening">
             {/* How this meeting opens: what the Other seeks, in the manner of the
                 ruler's own sign in their chart (`copy/encounter-openings.ts`).
                 Keyed on the ruler's natal sign, not the rising sign that chose the
                 ruler. Fixed for the whole encounter, like the rule beneath it. */}
             {ENCOUNTER_OPENINGS[ruler][encounter.opponentChart.planets[ruler].sign]}
           </p>
-          <p className="combat-rule" data-guide="rule">
+          <p className="relational-rule" data-guide="rule">
             {/* The rule in the ruler's colour, under the name in the same colour.
                 Light itself stays neutral — no colour stands for it anywhere
                 else. */}

@@ -5,7 +5,7 @@ import type { PlanetName } from "@/game/types";
 /** Seven bands in Macrobian order, each the planet's primary, stacked down a
  *  viewport edge. Two levels: `on` rests dim, `current` sits bright. The mint
  *  reveals the chart through them; the encounter strikes them as each planet
- *  resolves (see `.combat-bands` in layout.css). */
+ *  resolves (see `.relational-bands` in layout.css). */
 export function PlanetBands({ on, current, className }: {
   on?: ReadonlySet<PlanetName>;
   current?: ReadonlySet<PlanetName>;

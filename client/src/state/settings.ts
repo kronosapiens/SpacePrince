@@ -5,14 +5,14 @@ export interface DevSettings {
   unlockAll: boolean;
   /** Force the next rolled node to a narrative of this house (dev steering). */
   forceNarrativeHouse: number | null;
-  /** Force the next rolled node to combat (dev steering). */
-  forceCombat: boolean;
+  /** Force the next rolled node to a relational encounter (dev steering). */
+  forceRelational: boolean;
 }
 
 const DEFAULT: DevSettings = {
   unlockAll: false,
   forceNarrativeHouse: null,
-  forceCombat: false,
+  forceRelational: false,
 };
 
 export function loadDevSettings(): DevSettings {

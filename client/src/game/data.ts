@@ -104,5 +104,5 @@ export const ASPECT_BASE: Record<Exclude<AspectType, "None">, { num: number; den
 
 export const TIME_BUCKET_MS = 5 * 60 * 1000;
 
-// Combat-vs-narrative split: 50/50.
+// Relational-vs-narrative split: 50/50.
 export const NARRATIVE_NODE_PROB = 0.5;

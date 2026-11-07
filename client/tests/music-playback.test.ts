@@ -96,8 +96,8 @@ describe("music playback", () => {
     engine.setMusicVolume(1);
     const score = createScore.mock.results[0]!.value;
 
-    engine.setTheme("Mercury", "combat");
-    expect(score.mix).toHaveBeenLastCalledWith("combat", expect.any(Number));
+    engine.setTheme("Mercury", "relational");
+    expect(score.mix).toHaveBeenLastCalledWith("relational", expect.any(Number));
     engine.setTheme("Mercury", "narrative");
     expect(score.mix).toHaveBeenLastCalledWith("narrative", expect.any(Number));
     engine.setMusicVolume(0.4);
@@ -116,7 +116,7 @@ describe("music playback", () => {
 
     engine.setTheme("Mars");
     vi.advanceTimersByTime(400);
-    engine.setTheme("Venus", "combat");
+    engine.setTheme("Venus", "relational");
     expect(moon.fade).toHaveBeenLastCalledWith(0, expect.any(Number));
     expect(createScore).toHaveBeenCalledTimes(1);
     vi.advanceTimersByTime(1000);
@@ -125,7 +125,7 @@ describe("music playback", () => {
 
     expect(moon.dispose).toHaveBeenCalledOnce();
     expect(createScore).toHaveBeenCalledTimes(2);
-    expect(createScore).toHaveBeenLastCalledWith(expect.anything(), THEMES.Venus, "combat", gains[0], undefined);
+    expect(createScore).toHaveBeenLastCalledWith(expect.anything(), THEMES.Venus, "relational", gains[0], undefined);
     expect(engine.currentTheme()).toBe("Venus");
   });
 

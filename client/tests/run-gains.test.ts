@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { blankGains, runChart } from "@/game/chart";
-import { deriveStatTable, fortuneChance, getEffectiveStats } from "@/game/combat";
+import { deriveStatTable, fortuneChance, getEffectiveStats } from "@/game/relational";
 import { combustionCeiling } from "@/game/combust";
-import { beginCombatEncounter, beginNarrativeEncounter } from "@/game/encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { resolveNarrative } from "@/game/narrative";
 import { mulberry32 } from "@/game/rng";
 import { beginRun, isOver, rolloverMap } from "@/game/run";
@@ -36,12 +36,12 @@ describe("run gains", () => {
 
   it("last from a narrative choice through later encounters and maps, and reset at a new run", () => {
     const scenario = getScenario("home-capricorn-salting");
-    let run = beginRun(prince.chart, 3, prince.numEncounters);
+    let run = beginRun(prince.chart, 3, prince.numRelationalEncounters);
     run = { ...run, encounter: beginNarrativeEncounter({ run, house: 4, scenarioId: scenario.scenarioId }) };
     const next = resolveNarrative(run, prince, scenario, "salt", { chosen: "Sun" })!;
     expect(next.gains.Sun.resolve).toBe(12);
-    const combat = { ...next, encounter: beginCombatEncounter({ run: next, opponentSeed: 5, lifetimeEncounterCount: 64 }) };
-    const turn = resolveTurn(combat, prince.chart, "Sun", "Testimony", mulberry32(1))!;
+    const relational = { ...next, encounter: beginRelationalEncounter({ run: next, opponentSeed: 5, lifetimeRelationalEncounterCount: 64 }) };
+    const turn = resolveTurn(relational, prince.chart, "Sun", "Testimony", mulberry32(1))!;
     expect(turn.run.gains).toEqual(next.gains);
     const crossed = rolloverMap({ ...turn.run, encounter: null }, prince.chart, unlockedPlanets(64), 9);
     expect(crossed.gains).toEqual(next.gains);
@@ -58,9 +58,9 @@ describe("run gains", () => {
 
   });
 
-  it("keep a planet lit in combat through a blow its natal Resolve could not hold", () => {
+  it("keep a planet lit in a relational encounter through a blow its natal Resolve could not hold", () => {
     const base = beginRun(prince.chart, 3, 64);
-    const encounter = beginCombatEncounter({ run: base, opponentSeed: 5, lifetimeEncounterCount: 64 });
+    const encounter = beginRelationalEncounter({ run: base, opponentSeed: 5, lifetimeRelationalEncounterCount: 64 });
     encounter.opponentActions[0] = "Affliction";
     const incoming = getEffectiveStats(encounter.opponentChart, encounter.sequence[0]!).affliction;
     const affliction = Math.max(0, combustionCeiling(prince.chart.planets.Sun) - incoming);

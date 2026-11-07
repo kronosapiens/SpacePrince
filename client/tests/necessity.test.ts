@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import { applyNecessity } from "@/game/necessity";
 import { blankSideState, derivePlacements, runChart, seededChart } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
-import { fortuneChance, getEffectiveStats } from "@/game/combat";
-import { beginCombatEncounter, rollOpponentTurns } from "@/game/encounter";
+import { fortuneChance, getEffectiveStats } from "@/game/relational";
+import { beginRelationalEncounter, rollOpponentTurns } from "@/game/encounter";
 import { beginRun, enterNode, newMapState } from "@/game/run";
 import { hashString, mulberry32 } from "@/game/rng";
 import { PLANETS, SIGNS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
-import type { Chart, CombatEncounter, PlanetName } from "@/game/types";
+import type { Chart, RelationalEncounter, PlanetName } from "@/game/types";
 
 const chart = seededChart(7);
 
@@ -84,48 +84,48 @@ describe("necessity", () => {
     const mapSeed = Math.floor(mulberry32(42)() * 2 ** 31);
     expect(run.map.rolledNodes).toEqual(newMapState(mapSeed, roster).rolledNodes);
     expect(run.state).toEqual(blankSideState());
-    const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "combat")!;
+    const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "relational")!;
     const content = run.map.rolledNodes[nodeId]!;
-    if (content.kind !== "combat") throw new Error("Expected combat");
+    if (content.kind !== "relational") throw new Error("Expected relational");
     const selfOpenings = [];
     for (const encounterIdSeed of [13, 99]) {
-      const enc = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 32, encounterIdSeed });
+      const enc = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
       const opening = applyNecessity(enc.opponentChart, blankSideState(), roster,
         mulberry32(hashString(`${encounterIdSeed}_affliction`)));
       expect(enc.opponentState).toEqual(opening.state);
       expect(enc.necessity).toEqual(opening.necessity);
       expect({ sequence: enc.sequence, opponentActions: enc.opponentActions })
         .toEqual(rollOpponentTurns(enc.opponentChart, roster, mulberry32(encounterIdSeed), 1));
-      expect(beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: 32, encounterIdSeed })).toEqual(enc);
+      expect(beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 32, encounterIdSeed })).toEqual(enc);
       expect(enc.selfNecessity).toBeUndefined(); // Direct dev encounters retain their manual Self state.
-      const entered = enterNode({ run, chart, nodeId, lifetimeEncounterCount: 32, encounterIdSeed });
+      const entered = enterNode({ run, chart, nodeId, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
       const self = applyNecessity(chart, run.state, roster,
         mulberry32(hashString(`${encounterIdSeed}_${run.map.seed}_${nodeId}_player_necessity`)));
       expect(entered.state).toEqual(self.state);
       expect(entered.encounter).toEqual({
-        ...beginCombatEncounter({ run, opponentSeed: content.opponentSeed, lifetimeEncounterCount: 32, encounterIdSeed }),
+        ...beginRelationalEncounter({ run, opponentSeed: content.opponentSeed, lifetimeRelationalEncounterCount: 32, encounterIdSeed }),
         selfNecessity: self.necessity,
       });
-      const hidden = enterNode({ run: { ...run, id: "other_run", seed: 888 }, chart, nodeId, lifetimeEncounterCount: 32, encounterIdSeed });
+      const hidden = enterNode({ run: { ...run, id: "other_run", seed: 888 }, chart, nodeId, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
       expect(hidden.state).toEqual(entered.state);
-      expect((hidden.encounter as CombatEncounter).selfNecessity).toEqual(self.necessity);
+      expect((hidden.encounter as RelationalEncounter).selfNecessity).toEqual(self.necessity);
       selfOpenings.push(JSON.stringify(self));
     }
     expect(new Set(selfOpenings).size).toBe(2);
     expect(run.state).toEqual(blankSideState());
   });
 
-  it.each([0, 32])("adds Self Necessity to retained state and gained stats for unlock tier %i", (lifetimeEncounterCount) => {
-    const run = beginRun(chart, 42, lifetimeEncounterCount);
+  it.each([0, 32])("adds Self Necessity to retained state and gained stats for unlock tier %i", (lifetimeRelationalEncounterCount) => {
+    const run = beginRun(chart, 42, lifetimeRelationalEncounterCount);
     run.gains.Moon.resolve = 24;
     run.gains.Moon.luck = 120;
     run.state.Moon.affliction = combustionCeiling(chart.planets.Moon) + 6;
     run.state.Sun.affliction = combustionCeiling(chart.planets.Sun);
     run.state.Mercury.affliction = 12;
     const before = structuredClone(run);
-    const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "combat")!;
-    const entered = enterNode({ run, chart, nodeId, lifetimeEncounterCount });
-    const encounter = entered.encounter as CombatEncounter;
+    const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "relational")!;
+    const entered = enterNode({ run, chart, nodeId, lifetimeRelationalEncounterCount });
+    const encounter = entered.encounter as RelationalEncounter;
     const opening = applyNecessity(runChart(chart, run), run.state, encounter.roster,
       mulberry32(hashString(`${run.id}_${run.map.seed}_${nodeId}_player_necessity`)));
     expect(entered.state).toEqual(opening.state);
@@ -137,7 +137,7 @@ describe("necessity", () => {
     expect(run).toEqual(before);
 
     const narrativeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "narrative")!;
-    expect(enterNode({ run, chart, nodeId: narrativeId, lifetimeEncounterCount }).state).toEqual(before.state);
+    expect(enterNode({ run, chart, nodeId: narrativeId, lifetimeRelationalEncounterCount }).state).toEqual(before.state);
     expect(run).toEqual(before);
   });
 });

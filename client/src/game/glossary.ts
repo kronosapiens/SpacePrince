@@ -1,6 +1,6 @@
 import type { PlanetName, PlanetPlacement, PlanetStats } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
-import { STAT_LABEL } from "./combat";
+import { STAT_LABEL } from "./relational";
 
 // Study-mode copy — the opt-in foothold for a player new to astrology
 // (docs/presentation/SCREENS.md §3.6.1). Authored, never generated.

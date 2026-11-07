@@ -2,12 +2,12 @@ import { PlayerChartLayout } from "@/components/PlayerChartLayout";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { EncounterCombatScreen } from "@/screens/EncounterCombat";
+import { EncounterRelationalScreen } from "@/screens/EncounterRelational";
 import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
-import { beginCombatEncounter, encounterRuler } from "@/game/encounter";
+import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
-import { getEffectiveStats } from "@/game/combat";
+import { getEffectiveStats } from "@/game/relational";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
 import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
@@ -64,8 +64,8 @@ function finishOpening() {
 
 function setup(settleOpening = true, openingCounts?: { self: number; other: number; combustSelf?: PlanetName; blocked?: boolean }, devAnimationControls = false) {
   const prince = createStubPrince();
-  const run = beginRun(prince.chart, 42, prince.numEncounters);
-  const encounter = beginCombatEncounter({ run, opponentSeed: 99, lifetimeEncounterCount: prince.numEncounters });
+  const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
+  const encounter = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
   encounter.sequence = ["Moon", "Mars"];
   encounter.opponentActions = ["Affliction", "Testimony"];
   encounter.opponentState.Moon.affliction = 12;
@@ -85,8 +85,8 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
   run.encounter = encounter;
   const onCommitTurn = vi.fn((planet: PlanetName, verb: Polarity, rng: () => number) =>
     resolveTurn(run, prince.chart, planet, verb, rng));
-  const render = () => act(() => root.render(<PlayerChartLayout className="combat" chart={prince.chart} unlockedPlanets={[]}>
-      <EncounterCombatScreen prince={prince} run={run} encounter={encounter}
+  const render = () => act(() => root.render(<PlayerChartLayout className="relational" chart={prince.chart} unlockedPlanets={[]}>
+      <EncounterRelationalScreen prince={prince} run={run} encounter={encounter}
     onCommitTurn={onCommitTurn} onClearEncounter={vi.fn()} devUnlockAll={false} devAnimationControls={devAnimationControls} />
     </PlayerChartLayout>));
   render();
@@ -102,8 +102,8 @@ describe("encounter interactions", () => {
     const natal: SignName = rising === "Pisces" ? "Aries" : "Pisces";
     encounter.opponentChart.planets[ruler].sign = natal;
     render();
-    expect(get(".combat-opening").textContent).toBe(ENCOUNTER_OPENINGS[ruler][natal]);
-    expect(get(".combat-opening").textContent).not.toBe(ENCOUNTER_OPENINGS[ruler][rising]);
+    expect(get(".relational-opening").textContent).toBe(ENCOUNTER_OPENINGS[ruler][natal]);
+    expect(get(".relational-opening").textContent).not.toBe(ENCOUNTER_OPENINGS[ruler][rising]);
   });
 
   it.each(["self", "other"] as const)("waits for the longer %s opening before allowing the first action", (longer) => {
@@ -272,17 +272,17 @@ describe("encounter interactions", () => {
     focus(testimony);
     expect(get(testimony).classList.contains("is-previewed")).toBe(true);
     const expected = resolveTurn(run, prince.chart, "Moon", "Testimony", () => 0)!;
-    expect(get(".combat-light-delta").textContent).toBe(`+${expected.log.lightGain}`);
+    expect(get(".relational-light-delta").textContent).toBe(`+${expected.log.lightGain}`);
     expect(get(otherIncoming).querySelectorAll(".invite-ring circle").length)
       .toBe(getEffectiveStats(prince.chart, "Moon").testimony / 12);
     hover(affliction);
     expect(get(affliction).classList.contains("is-previewed")).toBe(true);
     leave(affliction);
     expect(get(testimony).classList.contains("is-previewed")).toBe(true);
-    expect(get(".combat-light-delta").textContent).toBe(`+${expected.log.lightGain}`);
+    expect(get(".relational-light-delta").textContent).toBe(`+${expected.log.lightGain}`);
     act(() => (get(testimony) as HTMLElement).blur());
     expect(container.querySelector(otherIncoming)).toBeNull();
-    expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(container.querySelector(".relational-light-delta")).toBeNull();
     expect(onCommitTurn).not.toHaveBeenCalled();
   });
 
@@ -318,7 +318,7 @@ describe("encounter interactions", () => {
     expect(onCommitTurn.mock.results[0]?.value?.log.playerValence).toBe("Testimony");
     expect(container.querySelector(".ps-actions")).toBeNull();
     expect(vi.mocked(playUISound).mock.calls.filter(([cue]) => cue === "commit")).toHaveLength(1);
-    click(".combat");
+    click(".relational");
     expect(onCommitTurn).toHaveBeenCalledTimes(1);
   });
 
@@ -327,15 +327,15 @@ describe("encounter interactions", () => {
     click(moon);
     hover(affliction);
     click(mars);
-    expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(container.querySelector(".relational-light-delta")).toBeNull();
     hover(testimony);
     click('[aria-label="Study Mars"]');
-    expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(container.querySelector(".relational-light-delta")).toBeNull();
     click('[aria-label="Study Mars"]');
     hover(testimony);
     encounter.turnIndex = 1;
     render();
-    expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(container.querySelector(".relational-light-delta")).toBeNull();
     expect(onCommitTurn).not.toHaveBeenCalled();
   });
 
@@ -353,7 +353,7 @@ describe("encounter interactions", () => {
     expect(vi.mocked(playUISound).mock.calls.some(([cue]) => cue === "commit")).toBe(false);
     click(".guide-close");
     expect(get('[aria-label="Study Moon"]').getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelector(".combat-light-delta")).toBeNull();
+    expect(container.querySelector(".relational-light-delta")).toBeNull();
     expect(container.querySelector(otherIncoming)).toBeNull();
     click('[aria-label="Study Moon"]');
     expect(container.querySelector(".ps-action.is-previewed")).toBeNull();

@@ -41,7 +41,7 @@
 .screen.center { justify-content: center; align-items: center; }
 
 /* Default chart sizing. Chart.tsx renders <svg class="chart-svg">; consumers
-   override via more-specific selectors (e.g. `.combat-side > svg { width: ... }`). */
+   override via more-specific selectors (e.g. `.relational-side > svg { width: ... }`). */
 .chart-svg { display: block; width: 100%; height: auto; }
 /* PlanetGlyph and the map's nodes carry keyboard focus through their own rings. */
 .chart-svg g[role="button"],
@@ -74,7 +74,7 @@
 .chart-layout > .chart-layout-content,
 .chart-layout > .narrative-column,
 .chart-layout > .map-content { grid-column: 2; grid-row: 1; }
-.chart-layout > .combat-content { grid-column: 1 / -1; grid-row: 1; }
+.chart-layout > .relational-content { grid-column: 1 / -1; grid-row: 1; }
 .chart-inspection { width: 100%; }
 .chart-inspection[role="button"] { cursor: pointer; }
 .chart-layout-content {
@@ -94,7 +94,7 @@
   }
   .chart-layout-chart { max-width: 480px; }
   .chart-layout > .chart-layout-content,
-  .chart-layout > .combat-content,
+  .chart-layout > .relational-content,
   .chart-layout > .narrative-column,
   .chart-layout > .map-content { grid-column: 1; grid-row: 2; }
 }
@@ -203,7 +203,7 @@
 /* ── Planet bands ──────────────────────────────────────────────────────── */
 
 /* Shared by the mint (down the left edge) and the encounter (on
-   both edges — see `.combat-bands`). `.is-current` follows `.is-on` so the
+   both edges — see `.relational-bands`). `.is-current` follows `.is-on` so the
    bright level wins at equal specificity. */
 .planet-bands {
   width: 22px;
@@ -505,11 +505,11 @@
   .map-diagram-wrap { flex: none; height: min(600px, 75svh); min-height: 0; }
 }
 
-/* ── Combat ────────────────────────────────────────────────────────────── */
+/* ── Relational ────────────────────────────────────────────────────────────── */
 
 /* Encounter labels span both wheels; the other chart fills the right column
    and determines their vertical placement without moving the player's chart. */
-.combat-content {
+.relational-content {
   position: relative;
   display: grid;
   grid-template-columns: subgrid;
@@ -523,16 +523,16 @@
    it takes an effect and settles dim for the rest of the wave. A key strike
    wants a near-instant attack; the release is the shared 1200ms fade. Fixed
    inside the border, so nothing in the grid moves. */
-.combat-bands {
+.relational-bands {
   position: fixed;
   top: 0;
   bottom: 0;
   pointer-events: none;
 }
-.combat-bands.is-self  { left: 0; }
-.combat-bands.is-other { right: 0; }
-.combat-bands .planet-band.is-current { transition-duration: 80ms; }
-.combat-topbar {
+.relational-bands.is-self  { left: 0; }
+.relational-bands.is-other { right: 0; }
+.relational-bands .planet-band.is-current { transition-duration: 80ms; }
+.relational-topbar {
   position: absolute;
   inset: 0 0 auto;
   display: flex;
@@ -542,14 +542,14 @@
   z-index: 2;
   pointer-events: none;
 }
-.combat-topbar > * { pointer-events: auto; }
-.combat-announce {
+.relational-topbar > * { pointer-events: auto; }
+.relational-announce {
   display: flex;
   justify-content: center;
   font-size: 28px;
   min-height: 34px;
 }
-.combat-announce-line {
+.relational-announce-line {
   margin: 0;
   font-family: var(--serif);
   font-style: italic;
@@ -557,21 +557,21 @@
   color: var(--bone);
   text-align: center;
 }
-.combat.is-resolved { cursor: pointer; }
-.combat-readouts {
+.relational.is-resolved { cursor: pointer; }
+.relational-readouts {
   display: flex;
   align-items: baseline;
   justify-content: center;
   flex-wrap: wrap;
   gap: 6px 36px;
 }
-.combat-turns,
-.combat-ruler {
+.relational-turns,
+.relational-ruler {
   display: flex;
   align-items: baseline;
   gap: 12px;
 }
-.combat-foot {
+.relational-foot {
   position: absolute;
   top: calc(100% + 12px);
   left: 0;
@@ -583,23 +583,23 @@
   z-index: 2;
   pointer-events: none;
 }
-.combat-foot > * { pointer-events: auto; }
+.relational-foot > * { pointer-events: auto; }
 @media (min-width: 900px) {
-  .combat-topbar { transform: translateY(calc(-50% + var(--combat-chrome-shift))); }
+  .relational-topbar { transform: translateY(calc(-50% + var(--relational-chrome-shift))); }
   /* The foot hangs from the wheels' bottom edge. The ruler row alone is tucked
      up into the corner between the wheels, the chrome shift above that edge;
      the opening and the rule, too wide for the corner, hang below it. */
-  .combat-foot { top: 100%; }
-  .combat-foot > .combat-ruler {
+  .relational-foot { top: 100%; }
+  .relational-foot > .relational-ruler {
     position: absolute;
-    bottom: calc(100% + var(--combat-chrome-shift));
+    bottom: calc(100% + var(--relational-chrome-shift));
     left: 0;
     right: 0;
     width: max-content;
     margin-inline: auto;
   }
 }
-.combat-rule {
+.relational-rule {
   margin: 0;
   font-family: var(--serif);
   font-size: 26px;
@@ -608,17 +608,17 @@
   color: var(--mist);
   text-align: center;
 }
-.combat-opening {
+.relational-opening {
   margin: 0;
-  max-width: var(--combat-opening-width);
+  max-width: var(--relational-opening-width);
   font-family: var(--serif);
-  font-size: var(--combat-opening-size);
-  line-height: var(--combat-opening-leading);
+  font-size: var(--relational-opening-size);
+  line-height: var(--relational-opening-leading);
   color: var(--bone);
   text-align: center;
   text-wrap: balance;
 }
-.combat-side {
+.relational-side {
   position: relative;
   grid-column: 2;
   justify-self: center;
@@ -627,9 +627,9 @@
   aspect-ratio: 1;
   pointer-events: auto;
 }
-.combat-side > svg { display: block; width: 100%; height: auto; }
+.relational-side > svg { display: block; width: 100%; height: auto; }
 .chart-layout-label,
-.combat-side > .combat-side-label {
+.relational-side > .relational-side-label {
   position: absolute;
   bottom: calc(100% + var(--chart-label-gap));
   left: 0;
@@ -640,11 +640,11 @@
 }
 @media (min-width: 900px) {
   .chart-layout-label,
-  .combat-side > .combat-side-label {
-    bottom: calc(100% + var(--chart-label-gap) - var(--combat-chrome-shift));
+  .relational-side > .relational-side-label {
+    bottom: calc(100% + var(--chart-label-gap) - var(--relational-chrome-shift));
   }
 }
-.combat-side-label {
+.relational-side-label {
   font-family: var(--sans);
   font-size: 17px;
   letter-spacing: 0.32em;
@@ -656,7 +656,7 @@
   color: var(--mist);
   font-weight: 500;
 }
-.combat-light {
+.relational-light {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -666,9 +666,9 @@
    odd one out, and shape beside numerals in a two-item strip read as two
    languages. Tabular figures so the digits don't jitter as Light ticks up
    through a resolution wave. */
-.combat-turns-v,
-.combat-light-v,
-.combat-ruler-v {
+.relational-turns-v,
+.relational-light-v,
+.relational-ruler-v {
   font-family: var(--serif);
   font-size: 30px;
   font-weight: 500;
@@ -678,20 +678,20 @@
   font-feature-settings: "tnum";
 }
 /* Anchors the gain pulse, which is absolutely positioned behind the digits. */
-.combat-light-v { position: relative; }
+.relational-light-v { position: relative; }
 /* The denominator is context, not the reading — the turn you are on is. */
-.combat-turns-sep {
+.relational-turns-sep {
   color: var(--mist);
   margin: 0 0.12em;
 }
-.combat-light-n {
+.relational-light-n {
   position: relative;
   z-index: 1;
   display: inline-block;
 }
 /* The previewed gain appends beside the centered total without participating
    in its width, so appearing and disappearing never recenter the readout. */
-.combat-light-delta {
+.relational-light-delta {
   position: absolute;
   left: 100%;
   bottom: 0;
@@ -702,7 +702,7 @@
 }
 /* Gain pulse — a wash behind the number, replayed per resolution beat and
    tinted by the planet resolving on it. */
-.combat-light-flash {
+.relational-light-flash {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -974,31 +974,31 @@
 }
 
 @media (max-width: 899px) {
-  .combat-content {
+  .relational-content {
     grid-template-columns: minmax(0, 1fr);
     max-width: 480px;
     margin-top: 72px;
     margin-bottom: 72px;
   }
-  .combat-side { grid-column: 1; max-width: none; }
-  .combat-topbar { display: block; }
-  .combat-bands { width: 8px; }
-  .combat-readouts { justify-content: space-between; gap: 4px 18px; }
-  .combat-foot { gap: 4px; }
-  .combat-announce {
+  .relational-side { grid-column: 1; max-width: none; }
+  .relational-topbar { display: block; }
+  .relational-bands { width: 8px; }
+  .relational-readouts { justify-content: space-between; gap: 4px 18px; }
+  .relational-foot { gap: 4px; }
+  .relational-announce {
     position: absolute;
     bottom: calc(100% + 28px);
     left: 0;
     right: 0;
     font-size: 23px;
   }
-  .combat-light,
-  .combat-ruler { gap: 6px; }
-  .combat-turns-v,
-  .combat-light-v,
-  .combat-ruler-v { font-size: clamp(18px, 5vw, 22px); }
-  .combat-rule { font-size: 19px; }
-  .combat-opening { font-size: 19px; }
+  .relational-light,
+  .relational-ruler { gap: 6px; }
+  .relational-turns-v,
+  .relational-light-v,
+  .relational-ruler-v { font-size: clamp(18px, 5vw, 22px); }
+  .relational-rule { font-size: 19px; }
+  .relational-opening { font-size: 19px; }
 }
 
 /* ── Narrative ─────────────────────────────────────────────────────────── */
@@ -1102,7 +1102,7 @@
   border-right: 0;
   border-top: 0;
   /* Invite: a quiet breathing bar in the ruler's color marks each option
-     as a live choice (the row analog of the combat chart's glow); it brightens
+     as a live choice (the row analog of the relational chart's glow); it brightens
      to solid on hover. It follows the chart's shared breath. */
   box-shadow: inset 2px 0 0 0 color-mix(in srgb, var(--vc) calc(22% + 38% * var(--breath)), transparent);
 }

@@ -39,7 +39,7 @@ afterEach(() => {
 
 function mount(screen: "title" | "map") {
   const prince = createStubPrince();
-  const run = beginRun(prince.chart, 42, prince.numEncounters);
+  const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
   run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
   prince.runs = [run];
   savePrince(prince);
@@ -78,7 +78,7 @@ function planetPositions() {
 describe("entry screens", () => {
   it("finishes map revival before allowing travel and study", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
     run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) / 2;
     run.map.boundary = { uncombusts: [{ planet: "Moon", chance: 0.5, success: true }], necessity: [] };
     prince.runs = [run];
@@ -167,7 +167,7 @@ describe("entry screens", () => {
     const minted = loadPrince()!;
     expect(minted.runs).toHaveLength(1);
     const first = minted.runs[0]!;
-    expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numEncounters).state);
+    expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numRelationalEncounters).state);
     expect(first.state.Moon.affliction).toBe(0);
     expect(first.map.boundary!.necessity).toEqual([]);
     expect(container.querySelector(".map-boundary")).toBeNull();
@@ -243,7 +243,7 @@ describe("entry screens", () => {
 
   it("keeps a combusted run inspectable on a passive map and starts again on the same Prince", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
     for (const planet of PLANETS) {
       run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
     }
@@ -274,7 +274,7 @@ describe("entry screens", () => {
     expect(restarted.runs).toHaveLength(2);
     expect(restarted.runs[0]).toEqual(run);
     const fresh = restarted.runs[1]!;
-    expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numEncounters).state);
+    expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numRelationalEncounters).state);
     expect(fresh.state.Moon.affliction).toBe(0);
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
@@ -287,7 +287,7 @@ describe("entry screens", () => {
 
   it("finishes the seventh map in place and keeps that completed map after reload", () => {
     const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numEncounters);
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
     run.mapsCompleted = MAPS_PER_RUN - 1;
     run.map.currentNodeId = TERMINAL_NODE_ID;
     run.map.visitedNodeIds.push(TERMINAL_NODE_ID);

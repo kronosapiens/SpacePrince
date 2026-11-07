@@ -103,7 +103,7 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
     return { key, label: STAT_LABEL[key], core, placement, gains, total: core + placement + gains };
   });
 
-  // The resolver's own effective stats, so the panel can't drift from combat.
+  // The resolver's own effective stats, so the panel can't drift from relational.
   const eff = getEffectiveStatsFromPlacement(p);
   return {
     rows,

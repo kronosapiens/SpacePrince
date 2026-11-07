@@ -9,8 +9,8 @@ The historical studies used a smaller narrative catalogue, so establish a baseli
 
 Separate completion difficulty, Light earned, the benefit of planning, and repeated-run adaptation.
 A change can improve one while weakening another.
-The research aimed for the experience of FTL Normal and Slay the Spire A1, with combat providing the main challenge and narratives supporting it.
-That goal did not imply equal combat and narrative rewards.
+The research aimed for the experience of FTL Normal and Slay the Spire A1, with relational providing the main challenge and narratives supporting it.
+That goal did not imply equal relational and narrative rewards.
 The proposed 84% completion target was a temporary simulation proxy and was later relaxed; it is not a standing human difficulty target.
 
 Write down the candidate rules, primary policy and outcome, controls, and what result would change the recommendation before examining results.
@@ -30,7 +30,7 @@ Two-turn planning enumerates possible next announcements and their probabilities
 | --- | --- | --- |
 | Does another turn of planning help? | Hold routing, narrative choices, and capacity allowance fixed; vary the planning horizon. | Benefit within an encounter, not whole-run planning or human skill. |
 | Does accepting tactical risk improve score? | Hold horizon and routing fixed; vary the capacity allowance while preserving survival and lit-planet priorities. | A measured survival/score tradeoff. |
-| Does route forecasting add value? | Include simple combat- and narrative-preferring routes using the same action policies. | Whether elaborate forecasting beats a simple preference. |
+| Does route forecasting add value? | Include simple relational- and narrative-preferring routes using the same action policies. | Whether elaborate forecasting beats a simple preference. |
 | Does preparation for entry matter? | Compare ordinary two-turn defense with the same policy valuing the next Necessity sweep. | Sensitivity to preparation; that continuation omits intervening recovery and is not optimal play. |
 | Does an upgrade pay for its cost? | Branch from the same reachable state into accept, decline, and a same-cost/no-gain control, then compare matched future continuations. | Value of the gain in that state, separate from its cost. |
 
@@ -60,17 +60,17 @@ The sampled ephemeris charts are also a model of chart diversity, not an observe
 ## Measure pressure and choices, not only completion
 
 Capacity is the sum of remaining room before combustion across fielded planets, using their effective Resolve including gains.
-Track combat damage and healing separately, entry affliction, narrative effects, revival, Resolve gains, and capacity added by unlocks; reconcile them with the change in capacity.
-Combat measurements use actual logged effects after clamping and inversion, while narrative measurements use net changes per planet within a choice.
+Track relational damage and healing separately, entry affliction, narrative effects, revival, Resolve gains, and capacity added by unlocks; reconcile them with the change in capacity.
+Relational measurements use actual logged effects after clamping and inversion, while narrative measurements use net changes per planet within a choice.
 
-The pressure audit showed that combat could restore more capacity than it consumed.
+The pressure audit showed that relational could restore more capacity than it consumed.
 Consequently, extra turns can supply healing, extra opening affliction can create more room for recovery, and doubling damage can change combustion and propagation.
 Rerun the resolver under a candidate rule rather than scaling totals from old trajectories.
 More affliction on the Other also lowered preemption thresholds and could make survival easier; Self and Other tuning cannot be interpreted independently of initiative and healing.
 
 Report completion and failure maps, Light across all attempted runs, outcomes among completed runs, and encounter exposure.
 Separate planet losses at entry from losses during turns, full entry wipes, and final run failures after unlock handling.
-Use explicit denominators such as planet losses per 100 combat entries: longer-surviving policies encounter more opportunities to lose planets.
+Use explicit denominators such as planet losses per 100 relational entries: longer-surviving policies encounter more opportunities to lose planets.
 Keep deaths after revival as repeated losses rather than counting each planet only once.
 Inspect individual surviving planets and concrete action disagreements, since equal total capacity can conceal different future capabilities.
 
@@ -81,8 +81,8 @@ Actor usage and consecutive reuse can diagnose concentration, but specialization
 ## Evaluate onboarding and repeated play separately
 
 Use actual unlock progression as well as a fully unlocked control on matched starting seeds.
-The UI commits a resolved encounter, increments lifetime progress, and clears it before deciding whether the enlarged roster can continue.
-A new planet can rescue a zero-turn entry wipe; stopping at the combat resolver's earlier loss would mismeasure onboarding.
+The UI commits a resolved encounter, increments lifetime progress only for relational encounters, and clears it before deciding whether the enlarged roster can continue.
+A new planet can rescue a zero-turn entry wipe; stopping at the relational resolver's earlier loss would mismeasure onboarding.
 The comparison includes different roster-dependent encounters as well as fresh unlocks, so it does not isolate the value of the new planet alone.
 
 For replayability, run the same Prince across fresh seeds and compare routes, acting planets, gains, and whether earlier decisions change later plans.
@@ -101,5 +101,5 @@ Preserve the question, rule and policy definitions, controls, sampling and selec
 Record which game/content version was evaluated so later sessions know what needs remeasurement.
 Raw records and one-off scripts can serve validation during a study without becoming a permanent historical replay system.
 
-The next calibration should combine a current-catalogue baseline with human playtests of entry-risk comprehension, mistake recovery, combat avoidance versus scoring, and repeated runs on one Prince.
+The next calibration should combine a current-catalogue baseline with human playtests of entry-risk comprehension, mistake recovery, relational avoidance versus scoring, and repeated runs on one Prince.
 Simulation policies provide evidence about consequences; human playtesting establishes felt difficulty, enjoyment, and comparison with the reference games.
