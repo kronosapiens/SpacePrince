@@ -17,7 +17,7 @@ Because the target is onchain, structures are specified explicitly — field wid
 Prince {
   position:      Position,       -- birth lat/lon/dob; the uniqueness key (one Prince per quantized position)
   chart:         Chart,          -- memoized at mint: f(position) via compute_chart, stored to avoid re-running the ephemeris
-  numEncounters: u8,             -- cumulative lifetime encounters (saturating; only needs to reach 32); gates planet unlock (MECHANICS §11.1)
+  numCombats:    u8,             -- cumulative lifetime combat encounters (saturating; only needs to reach 32); gates planet unlock (MECHANICS §11.1)
   achievements:  u64,            -- bitmap of achievement marks (reserved; earning not implemented, MECHANICS §11.2)
   runs:          Array<Run>,     -- every run this Prince has played; the star-field derives from runs[].light
   -- ERC-721 standard fields (token id, ownerOf, approvals) come from the token base and are not re-listed here.
@@ -36,7 +36,7 @@ Chart {
 }
 
 Run {
-  seed:          felt252,        -- one true-RNG draw at run start; seeds all previewable map structure + gives between-run variety
+  seed:          felt252,        -- one VRF request at run start; seeds all previewable map structure + gives between-run variety
   light:         u64,            -- cumulative Light; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
   state:         u64,            -- per-planet run state: 7 × u9 affliction = 63 bits; combustion is derived, not stored (MECHANICS §10)
   gains:         u128,           -- per-planet stat gains from narrative choices, lasting the run: 7 planets × 4 stats × u4 count of +12 steps = 112 bits; zero at run start (ENCOUNTERS §2)
@@ -53,7 +53,7 @@ Map {
 Encounter = Opponent | Narrative -- tagged union
 
 Opponent {
-  placements: u32,               -- the other chart; drawn by true RNG on arrival (same packing as Chart)
+  placements: u32,               -- the other chart, copied from the minted Prince picked by a VRF request on arrival (same packing as Chart)
   state:      u64,               -- the other chart's per-planet state (same shape as Run.state)
   turn:       u3,                -- turn counter, 0..6 (turns per encounter = map number = mapsCompleted + 1, MECHANICS §11)
   precommit:  u4,                -- the opponent's locked-in verb this turn: planet (u3) + action (u1); shown before the player chooses
@@ -71,27 +71,28 @@ Narrative {
 
 A single RNG primitive supplies true randomness on demand (VRF-style).
 Combat and narrative resolution are deterministic.
-The intended onchain draw boundaries are listed below.
+The intended onchain VRF requests are listed below.
 The current prototype instead derives the Other chart from the map's stored opponent seed, so that chart is already derivable at map creation (`client/src/game/run.ts`).
-Its arrival and future-turn streams are seeded stand-ins for future draws; this tuning does not settle the eventual onchain source of those draws.
+Its arrival and future-turn streams are seeded stand-ins for future VRF requests; this tuning does not settle the eventual onchain source of that randomness.
 Any information derivable from public state remains available to the player.
 
 For the onchain design, randomness is spent deliberately:
 
-- **Once per run** — `Run.seed`, drawn at run start; the first map derives from it, and the player's affliction starts at zero.
+- **Once per run** — `Run.seed`, set by a VRF request at run start; the first map derives from it, and the player's affliction starts at zero.
 - **Once per map rollover** — the next map's seed; from it derive node content and opening uncombust rolls (MECHANICS §11.3), shown on entry.
   Revival uses a separate seeded stream from node content; map openings add no affliction.
-- **At combat encounter arrival** — the other chart and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with affliction capped at Resolve.
+- **At combat encounter arrival** — the minted Prince that supplies the other chart, and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with affliction capped at Resolve.
   A successful Fortune roll blocks that planet's entire draw.
   The player carries existing affliction; the other starts with fresh state.
   Carried affliction can cause combustion at entry; fresh planets survive every draw.
   In the prototype, each chart's Necessity uses a separate seeded stream from the other's and from the other chart's turn sequence.
 - **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
+  A combat's last turn has no next precommit, so it needs no VRF request.
 
 Everything else is **pseudorandom**: a deterministic function of committed state that the client computes to render and the contract re-derives to bind, storing nothing.
 Combat resolution itself is fully deterministic — no crits, no hidden rolls — so the client renders a committed turn instantly and the transaction confirms the identical result.
 The client shows the whole current map (node types, boundary results), so routing is informed (Slay-the-Spire-style).
-Under the intended arrival-draw design, the opposing chart and future precommits remain unknown until drawn.
+Under the intended design, the opposing chart and future precommits remain unknown until their VRF requests.
 The prototype's derivable opponent charts are an implementation difference, not information the client may conceal.
 
 ## Stored, derived, evented
@@ -118,8 +119,9 @@ Events cannot be read onchain, which is exactly why each run's `light` must stay
 
 ## Notes
 
-`numEncounters` is materialized on the Prince rather than derived, because per-run encounter counts are not recoverable from stored state once a run's maps are evented.
+`numCombats` is materialized on the Prince rather than derived, because per-run combat counts are not recoverable from stored state once a run's maps are evented.
 It is the planet-unlock counter; a saturating `u8` is plenty, since unlock completes at 32.
+The prototype's `numEncounters` still counts narrative encounters as well.
 
 Only the tail run carries live state; earlier runs are inert apart from `light`.
 Whether to physically prune a finished run's other fields or keep the full struct is an implementation choice — conceptually the array's payload is the Light values.

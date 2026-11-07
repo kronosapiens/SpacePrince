@@ -53,6 +53,7 @@ These provisional values are being tuned through playtesting; the simulation fin
 
 Every chart — player or opponent — comes from one generator: real ephemeris positions for a birth moment and place, via `astronomy-engine` (`client/src/astronomy/compute.ts`).
 There are no fabricated skies.
+Onchain, the ephemeris runs only at mint, and each Other is a minted Prince ([SCREENS.md §3.4](../presentation/SCREENS.md#34-npc-opponents-combat)).
 
 - **Player** Princes use the player's real birth data: ISO datetime, latitude, longitude.
 - **Opponent, dev, and preview** charts (`seededChart`) use a deterministic-random birth — a seeded moment over ~200 years and a random place — so they are reproducible from the seed yet astronomically real.
@@ -149,7 +150,7 @@ There are no crits and no hidden rolls: anything derivable before commitment is 
 
 Fresh randomness enters only where the game is already pausing to reveal something new, and every reveal rides a transaction the player is already waiting on:
 
-- **Map creation.** The map seed is a VRF draw; from it derive node content ([MAP.md](MAP.md)) and opening uncombust rolls (§11.3).
+- **Map creation.** The map seed comes from a VRF request; from it derive node content ([MAP.md](MAP.md)) and opening uncombust rolls (§11.3).
   These are settled and displayed before the first node is entered.
 - **Combat encounter arrival.** Both charts receive necessity before the first action (§11.3).
   In the prototype, each chart's opening affliction uses a separate seeded stream from the other's and from the turn sequence, so necessity draws do not change the announced actions.
@@ -243,7 +244,7 @@ The game's progression is layered:
 - **Encounter** — one node traversal (combat or narrative).
   Combat resolves in a fixed number of turns **equal to the map number** — 1 turn on map 1, up to 7 turns on map 7 (§11.1); narrative encounters resolve one decision with immediate consequences ([ENCOUNTERS.md](ENCOUNTERS.md)).
 - **Map** — one Sephirot-tree (per [MAP.md](MAP.md)).
-  The player walks a path from L1 to L7, traversing one encounter per layer (typically 7 encounters per map).
+  The player walks a path from L1 to L7, one encounter per node entered: 1 to 11 per map, depending on the layout and route.
 - **Run** — **up to seven maps** (`MAPS_PER_RUN` in `client/src/game/run.ts`).
   After completing a map, the next is generated and begun.
   The structure is similar to FTL's sectors.
@@ -260,7 +261,7 @@ Per encounter:
   Fortune can leave a planet at zero affliction, while every fielded planet on the other chart arrives lit.
   Under the Moon's rule only resolution scores (§12), so an opening with no affliction to resolve can yield no Light.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
-  The draw for turn N+1 happens at turn N's resolution — encounter arrival draws the first — so the reveal rides a transaction already in flight (§7).
+  The VRF request for turn N+1 happens at turn N's resolution — the encounter arrival request covers the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
 - Once the outcome settles, the encounter advances to the map by itself after a short pause, longer when the run has ended; a tap skips the pause (`useEncounterAdvance`).
@@ -271,11 +272,12 @@ A new run begins with zero affliction; the first combat entry applies its first 
 
 ### 11.1 Planet Unlock Schedule
 
-A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative encounter count** across the player's lifetime — not per run.
+A Prince's chart is fixed at mint, but planets are unlocked progressively as a **function of cumulative combat encounter count** across the player's lifetime — not per run.
+Narrative encounters do not count.
 The unlock order follows the **Macrobian ascent** (the Hellenistic ordering of the soul's ascent through the planetary spheres, Earth outward).
 The Moon is present from the first encounter; each subsequent planet unlocks at a cumulative count of `2^i` for `i = 0..5` (`UNLOCK_THRESHOLDS` in `client/src/game/data.ts`):
 
-| Cumulative encounters | Unlock | Total planets |
+| Cumulative combat encounters | Unlock | Total planets |
 |-----|--------|---------------|
 | 0 (start) | Moon | 1 |
 | 1 | Mercury | 2 |
@@ -285,7 +287,7 @@ The Moon is present from the first encounter; each subsequent planet unlocks at 
 | 16 | Jupiter | 6 |
 | 32 | Saturn | 7 |
 
-The first 32 encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
+The first 32 combat encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
 Saturn arrives last as the final teacher.
 
 **Encounter length and the mirrored opponent.** Combat length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
@@ -305,15 +307,16 @@ A planet enters the **combat-encounter ruler rotation** when it unlocks.
 Before that threshold, no combat encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
 Each map samples its combat rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
 The client prototype enforces this with deterministic rejection sampling: it generates Other charts until the Ascendant ruler belongs to that tier.
-The eventual onchain sampling mechanism remains unspecified.
+Onchain, the Other is a minted Prince with an eligible ruler, picked at arrival; how the contract finds one remains unspecified.
 
-The Prince NFT artifact reveals planets on the same cumulative-encounter schedule: an unrevealed planet renders as a **ghost** at hairline weight (per [STYLE.md](../presentation/STYLE.md)), present as potential but not yet awakened.
+The Prince NFT artifact reveals planets on the same schedule: an unrevealed planet renders as a **ghost** at hairline weight (per [STYLE.md](../presentation/STYLE.md)), present as potential but not yet awakened.
 See [NFT.md](../presentation/NFT.md).
 
 The dev setting `unlockAll` (`client/src/state/settings.ts`) reveals all seven planets regardless of the schedule; it is a development aid, never active for players.
 
 ### 11.2 Achievements
 
+Achievements carry a Prince's progression past the planet unlocks.
 The Prince artifact reserves a fixed set of achievement slots, drawn as empty rings until earned ([NFT.md](../presentation/NFT.md), Placement).
 Twelve candidate marks are defined in `client/src/data/achievements.ts`, selected from the [achievement research](../research/ACHIEVEMENTS.md) — first completed run, a run without a combustion, every ruler scored under, and the like.
 Earning is not implemented: the bitmap exists on the Prince ([STATE.md](STATE.md)) but no condition is evaluated yet, and the artwork preview shows every assigned mark as earned until it is.
@@ -336,7 +339,7 @@ Combusted and unfielded planets receive nothing.
 There is no map-depth multiplier, and necessity does not propagate or award Light.
 Fresh planets always survive: the maximum draw is 36, below the minimum fresh Resolve of 48.
 If Necessity combusts the player's entire fielded roster, the encounter resolves with zero actions and zero Light.
-Clearing that encounter still advances the lifetime encounter count; a newly unlocked planet can keep the run alive.
+Clearing that encounter still advances the lifetime combat count; a newly unlocked planet can keep the run alive.
 
 Map openings apply revival only: each combusted fielded planet rolls Fortune and, on success, returns at half Resolve (§10).
 Available planets retain their existing affliction, and revived planets receive no further affliction at the boundary.

@@ -50,7 +50,7 @@ Two boundaries keep the rule workable:
   The mint reveal dramatizes the arrival of knowledge; it withholds nothing from a choice.
   The rule bites only where the player is asked to *decide*.
 
-When a design genuinely needs hidden information, it must be hidden onchain — entropy that doesn't exist yet (the per-map VRF draw, [MAP.md §4](../mechanics/MAP.md#4-seeding)) or a commitment scheme — never client-side concealment.
+When a design genuinely needs hidden information, it must be hidden onchain — entropy that doesn't exist yet (the per-map VRF request, [MAP.md §4](../mechanics/MAP.md#4-seeding)) or a commitment scheme — never client-side concealment.
 
 ### 1.2 Player-facing register: no martial language
 
@@ -422,7 +422,7 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 - **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, affliction on the arc (§3.5.1).
   The "chart is always present" principle made literal on this surface.
   At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-combat-openings-and-revival-at-map-openings)).
-- **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
+- **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative combat encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
 - **New Run** appears in place of the next step once the run is over (§6).
 
 ### 4.2 Nodes
@@ -480,7 +480,7 @@ This lets dev tooling reproduce exact map states for screen-iteration work, and 
 
 A map is fully determined the moment it is created:
 
-- The **map seed** is a VRF draw at map creation ([MAP.md §4](../mechanics/MAP.md#4-seeding)) — one call per map, never per node.
+- The **map seed** comes from a VRF request at map creation ([MAP.md §4](../mechanics/MAP.md#4-seeding)) — one call per map, never per node.
 - The **topology** derives from the seed (per [MAP.md](../mechanics/MAP.md)).
 - **Encounter content** (combat opponent, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
 
@@ -553,7 +553,7 @@ Each planet appears at its computed sign placement, in its glyph and color, with
 The ceremony is intentionally long enough to mask an onchain confirmation and to give the act its weight.
 After all seven planets have appeared, the chart sits whole for a brief held moment.
 
-This is the **only time** the player sees their full chart until cumulative encounter 32 (Saturn, the final unlock — [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+This is the **only time** the player sees their full chart until cumulative combat encounter 32 (Saturn, the final unlock — [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
 
 The chart then **dims whole**: all seven planets recede to **ghost** (hairline outline, no color), the Moon included, and the planet-colored bands down the screen edge go dark and stay dark — past the reveal they only mark planets acting in an encounter.
 After a beat, the Moon's **planet introduction** (§3.6.2) presents, and the Moon stands lit behind it in its computed sign.
@@ -592,7 +592,7 @@ There is no standing "preview" of the full chart in the artifact; a verification
 
 End-of-run presentation is being developed as the run's closing beat, where the run's Light becomes a star ([#34](https://github.com/kronosapiens/SpacePrince/issues/34)).
 For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
-Starting again preserves the Prince's identity, encounter count, unlocks, and run records.
+Starting again preserves the Prince's identity, combat count, unlocks, and run records.
 
 ---
 

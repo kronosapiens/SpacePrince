@@ -123,9 +123,14 @@ Inspecting the Prince, waiting, and returning are always free.
 
 The Prince is a standard ERC-721, freely transferable.
 Its value is as an artwork that records play: each run leaves a star and each earned mark a glyph, so a played Prince is a different object from a fresh one ([NFT.md](presentation/NFT.md)).
-The intended pricing is a flat mint fee of about $5 that includes five runs, then about $1 per run, with the game paying the gas.
-Keeping a whole run's gas well under that dollar is a constraint on the onchain design.
-What maturity means for a Prince, and whether a free sample run precedes the mint, remain open ([#31](https://github.com/kronosapiens/SpacePrince/issues/31)).
+The intended pricing is a flat mint fee of about $5 that includes five runs, then about $1 per run, with a paymaster covering the gas.
+The target is an average of about $0.50 of gas per run; a single long run may cost more.
+If gas runs over, the game gets harder or shorter; the price and the paymaster stay.
+The ephemeris runs only at mint, and the Others are minted Princes.
+
+Achievements carry a Prince's progression past the planet unlocks.
+A free sample run stays in the browser, so it costs no gas.
+What happens if a game reaches a gas limit remains open ([#31](https://github.com/kronosapiens/SpacePrince/issues/31)).
 
 ## Open questions
 

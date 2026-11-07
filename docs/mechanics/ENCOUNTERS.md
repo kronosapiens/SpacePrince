@@ -283,7 +283,7 @@ Previewing another option leaves the selected targeting option unchanged.
 Choosing another option replaces it; background click or Escape cancels targeting.
 Outside targeting, planet activation remains safe inspection.
 A resolved encounter cannot resolve again.
-Its consequence is shown before returning to the map; the lifetime encounter count advances on leaving the resolved scene.
+Its consequence is shown before returning to the map; narrative encounters do not advance the planet-unlock count.
 
 ### 5.3 Exits
 

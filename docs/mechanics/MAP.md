@@ -112,7 +112,7 @@ The canonical `[1, 2, 2, 1, 2, 1, 1]` pattern produces exactly 22 edges, matchin
 
 ## 4. Seeding
 
-The map seed is a **VRF draw at map creation** — one call per map, never per node.
+The map seed comes from a **VRF request at map creation** — one call per map, never per node.
 A map is unknowable before it exists; once created, topology and per-node encounter content derive deterministically from the seed (content is seeded per-node on `(map seed, node id)`, so rolls are path-independent).
 The run as a whole is therefore never solvable in advance: each map's fate is fixed only when the previous map completes.
 
