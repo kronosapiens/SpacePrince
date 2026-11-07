@@ -140,7 +140,6 @@ Selected next: [#35](https://github.com/kronosapiens/SpacePrince/issues/35), giv
 - [#23](https://github.com/kronosapiens/SpacePrince/issues/23): the emotional meaning of the journey, the encounters, and Light.
 - [#25](https://github.com/kronosapiens/SpacePrince/issues/25): how encounters generate Light.
 - [#26](https://github.com/kronosapiens/SpacePrince/issues/26): a worded reading of each encounter from its facts and beats.
-- [#30](https://github.com/kronosapiens/SpacePrince/issues/30): aligning the Cairo quantizer with the mint identity grid.
 - [#31](https://github.com/kronosapiens/SpacePrince/issues/31): the per-run gas budget, maturity, and a free sample run.
 - [#34](https://github.com/kronosapiens/SpacePrince/issues/34): the end-of-run beat, where the run's Light becomes a star.
 - [#32](https://github.com/kronosapiens/SpacePrince/issues/32): deferred presentation (run history, chart study layers, map valence cue, shareable runs).

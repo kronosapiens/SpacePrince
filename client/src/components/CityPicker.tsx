@@ -12,7 +12,6 @@ interface Props {
   onChange: (lat: number, lon: number, tz: string) => void;
 }
 
-const round1 = (v: number) => Math.round(v * 10) / 10;
 const isAlphaAdmin = (a: string) => a.length > 0 && /^[A-Za-z]+$/.test(a);
 
 function formatCity(c: CityRow): string {
@@ -121,7 +120,7 @@ export function CityPicker({ lat, lon, initialCityLabel, onChange }: Props) {
     setSelected(formatCity(c));
     setQuery("");
     setOpen(false);
-    onChange(round1(c[3]), round1(c[4]), c[6]);
+    onChange(c[3], c[4], c[6]);
     playUISound("select");
   };
 
@@ -130,8 +129,8 @@ export function CityPicker({ lat, lon, initialCityLabel, onChange }: Props) {
   const enterManual = () => {
     // Two decimals so a prefilled city coord round-trips through maskCoord
     // (which floats the decimal two from the right).
-    setManLat(selected ? round1(lat).toFixed(2) : "");
-    setManLon(selected ? round1(lon).toFixed(2) : "");
+    setManLat(selected ? lat.toFixed(2) : "");
+    setManLon(selected ? lon.toFixed(2) : "");
     setManual(true);
     setOpen(false);
   };
@@ -142,7 +141,7 @@ export function CityPicker({ lat, lon, initialCityLabel, onChange }: Props) {
     const nLo = Number.parseFloat(lo);
     if (Number.isFinite(nLa) && Number.isFinite(nLo)) {
       setSelected(null);
-      onChange(round1(nLa), round1(nLo), "");
+      onChange(nLa, nLo, "");
     }
   };
 

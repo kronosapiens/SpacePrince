@@ -83,13 +83,16 @@ function computeAscendant(time: ReturnType<typeof MakeTime>, latitude: number, l
   const gastHours = SiderealTime(time);
   const lstDeg = normalizeLongitude(gastHours * 15 + longitudeDeg);
   const obliquityDeg = e_tilt(time).tobl; // true obliquity of date in degrees
-  const phi = (Math.max(-66.5, Math.min(66.5, latitude)) * Math.PI) / 180;
+  const phi = (latitude * Math.PI) / 180;
   const eps = (obliquityDeg * Math.PI) / 180;
   const lst = (lstDeg * Math.PI) / 180;
 
-  // Choose the eastern intersection; the opposite signs give the descendant.
   const y = Math.cos(lst);
   const x = -(Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(lst));
   const ascRad = Math.atan2(y, x);
-  return normalizeLongitude((ascRad * 180) / Math.PI);
+
+  // Past the polar circles this branch can be the setting point, so keep the
+  // eastern intersection, as engine_v6 does.
+  const yWest = Math.sin(lst) * Math.cos(ascRad) - Math.cos(lst) * Math.sin(ascRad) * Math.cos(eps);
+  return normalizeLongitude(((yWest > 0 ? ascRad + Math.PI : ascRad) * 180) / Math.PI);
 }

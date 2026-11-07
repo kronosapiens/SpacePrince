@@ -24,7 +24,7 @@ Two things live in this repository, at different stages.
 - **The client** (`client/`) is a local prototype: React, Vite, and TypeScript, rendering everything as SVG.
   It has no wallet, no RPC, and no contract calls.
   Charts come from a real ephemeris, state lives in `localStorage`, and the focus is combat flow and chart legibility.
-- **The onchain game** (`cairo/`) is the ambition: chart derivation, game state, resolution, and the Prince NFT computed on Starknet, with astronomy supplied by the separate [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) package.
+- **The onchain game** (`cairo/`) is the ambition: chart derivation, game state, resolution, and the Prince NFT computed on Starknet, with astronomy supplied by the `engine_v6` crate from the separate [`astronomy-cairo`](https://github.com/kronosapiens/astronomy-cairo) repository.
   The chart-derivation crate exists; the game contracts do not yet.
 
 The public landing page lives in `landing/` ([spaceprince.xyz](https://spaceprince.xyz)).

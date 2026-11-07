@@ -23,8 +23,8 @@ Space Prince is intended as a **fully onchain game** with a thin presentation cl
 
 - **Backend (Starknet / Cairo).**
   Game state, chart derivation, and run resolution are meant to be computed onchain, and the Prince NFT generated onchain as SVG.
-  Astronomical computation comes from a separate, reusable Cairo package, the [`astronomy-engine`](https://github.com/kronosapiens/astronomy-engine) repo, which `cairo/crates/star_chart` consumes as a path dependency.
-  This repo does not vendor that package; the workspace is expected to live as a sibling on disk.
+  Astronomical computation comes from a separate, reusable Cairo package, the `engine_v6` crate in the [`astronomy-cairo`](https://github.com/kronosapiens/astronomy-cairo) repo, which `cairo/crates/star_chart` consumes as a git dependency pinned to a commit.
+  This repo does not vendor that package.
   Today only the chart-derivation crate exists.
 
 - **Client (browser, React + Vite + TypeScript).**
@@ -79,4 +79,4 @@ README.md     Design pitch
 
 - Client package manager: **pnpm**. Dev: `pnpm dev` in `client/`.
 - **Tuner** (dev only): `d` in the running client opens the dev console, whose tuner drives whatever is still unsettled live (`client/src/svg/tuning.ts`). Its defaults *are* the committed tokens, so it is an override layer, never a second source of truth; settled values get written back by hand.
-- Cairo: standard `scarb` workflow inside `cairo/crates/star_chart`. Build expects the sibling `astronomy-engine` workspace to resolve the path dependency.
+- Cairo: standard `scarb` workflow inside `cairo/`, on scarb 2.16.1 (pinned in `cairo/.tool-versions`). Scarb fetches `engine_v6` from its git dependency.

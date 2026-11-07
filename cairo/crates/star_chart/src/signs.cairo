@@ -1,4 +1,4 @@
-use astronomy_engine_v1::fixed::norm360_i64_1e9;
+use engine_v6::fixed::norm360_i64_1e9;
 
 pub const SCALE_1E9: i64 = 1_000_000_000;
 pub const SIGN_ARC_1E9: i64 = 30 * SCALE_1E9;

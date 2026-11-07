@@ -1,33 +1,40 @@
-use astronomy_engine_v1::ascendant::approximate_ascendant_longitude_1e9;
-use astronomy_engine_v1::oracle_signs::planet_sign_from_minute;
+use engine_v6::ascendant::approximate_ascendant_longitude_pg_1e9;
+use engine_v6::planets::all_planet_longitudes_pg_1e9;
 
 use crate::derive::{
     chart_is_day_from_sun_house, chart_sect_code, derive_dignity, derive_house, planet_is_in_sect,
     sign_aspect_class,
 };
-use crate::quantization::floor_to_15m_slot;
+use crate::quantization::floor_to_5m_slot;
 use crate::signs::longitude_to_sign;
 use crate::types::{CanonicalChart, ChartInput, CORE_VERSION, DATA_VERSION};
 
 const PLANETS: usize = 7;
 
-pub const MINUTE_2100_END: u32 = 105_190_559; // 2100-12-31T23:59Z
+pub const MINUTE_2100_END: u32 = 105_716_159; // 2100-12-31T23:59Z
+
+/// 1900-01-01T00:00Z in the engine's minutes since 0001-01-01 (proleptic Gregorian).
+const MINUTE_1900_SINCE_PG: i64 = 998_776_800;
 
 #[inline(never)]
 pub fn compute_chart(input: ChartInput) -> CanonicalChart {
-    let q_slot = floor_to_15m_slot(input.time_minute_since_1900);
-    let q_minute = q_slot * 15;
+    let q_slot = floor_to_5m_slot(input.time_minute_since_1900);
+    let q_minute = q_slot * 5;
+    let q_minute_pg: i64 = q_minute.into() + MINUTE_1900_SINCE_PG;
 
-    let asc_lon = approximate_ascendant_longitude_1e9(q_minute, input.lat_bin, input.lon_bin);
+    let asc_lon = approximate_ascendant_longitude_pg_1e9(
+        q_minute_pg, input.lat_bin, input.lon_bin,
+    );
 
+    let planet_lon = all_planet_longitudes_pg_1e9(q_minute_pg);
     let planet_sign: [u8; PLANETS] = [
-        planet_sign_from_minute(0, q_minute),
-        planet_sign_from_minute(1, q_minute),
-        planet_sign_from_minute(2, q_minute),
-        planet_sign_from_minute(3, q_minute),
-        planet_sign_from_minute(4, q_minute),
-        planet_sign_from_minute(5, q_minute),
-        planet_sign_from_minute(6, q_minute),
+        longitude_to_sign(*planet_lon.span().at(0)),
+        longitude_to_sign(*planet_lon.span().at(1)),
+        longitude_to_sign(*planet_lon.span().at(2)),
+        longitude_to_sign(*planet_lon.span().at(3)),
+        longitude_to_sign(*planet_lon.span().at(4)),
+        longitude_to_sign(*planet_lon.span().at(5)),
+        longitude_to_sign(*planet_lon.span().at(6)),
     ];
 
     let asc_sign = longitude_to_sign(asc_lon);

@@ -1,4 +1,4 @@
-use astronomy_engine_v1::types::{JUPITER, MARS, MERCURY, MOON, SATURN, SUN, VENUS};
+use engine_v6::planets::{JUPITER, MARS, MERCURY, MOON, SATURN, SUN, VENUS};
 
 use crate::types::{
     ASPECT_CONJUNCTION, ASPECT_INCONJUNCT, ASPECT_OPPOSITION, ASPECT_SEMISEXTILE, ASPECT_SEXTILE,
@@ -167,7 +167,7 @@ pub fn chart_sect_code(is_day_chart: bool) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use astronomy_engine_v1::types::{MARS, SUN, VENUS};
+    use engine_v6::planets::{MARS, SUN, VENUS};
 
     use crate::types::{DIGNITY_DETRIMENT, DIGNITY_DOMICILE, DIGNITY_EXALTATION};
 
