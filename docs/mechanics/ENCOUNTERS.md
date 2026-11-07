@@ -90,7 +90,7 @@ Debts, vows with later consequences, Omen, Lore, and other persistent effects ar
 
 | Outcome | Meaning |
 |---|---|
-| `affliction { target, delta }` | Positive adds affliction; negative heals, clamped at zero. |
+| `affliction { target, delta }` | Positive adds affliction up to Resolve; negative heals, clamped at zero. |
 | `uncombust { target }` | Return a combusted planet at half its ceiling, through the shared uncombust rule. |
 | `light { delta }` | Gather Light or incur an ordinary loss, clamped at zero. |
 | `gain { target, stat, amount }` | Raise a lit planet's stat for the rest of the run; a Resolve gain raises its combustion ceiling. |
@@ -101,8 +101,8 @@ Ordinary losses remain payable at zero and cannot make Light negative.
 Paid healing requires some actual recovery; clean planets cannot consume Light for no benefit.
 
 All outcomes are atomic.
-An invalid target or unaffordable planetary cost rejects the whole choice, including any reward.
-Positive affliction must fit within the target's remaining combustion margin; landing exactly at its ceiling is permitted and combusts it.
+An invalid target or unaffordable Light purchase rejects the whole choice, including any reward.
+Positive affliction can exceed the target's remaining capacity; it caps at Resolve and combusts the planet without reducing the choice's reward.
 
 ### 2.1 Exchange value
 
@@ -137,6 +137,8 @@ Ordinary affliction effects require lit planets; revival requires a combusted pl
 Target roles bind against the state before the choice.
 `ruler` binds the fixed `HOUSES[].ruler`, not the traditional ruler of the house's natal sign.
 Authored effects then apply in order to a copy of that state.
+A planet lit before the choice remains eligible for its later effects even if an earlier effect combusts it.
+A later recovery or Resolve gain in the same choice can leave it lit in the final result.
 An unavailable themed target never silently drops its cost or redirects it to someone else.
 
 Selected targets are the usual grammar for individual harm and recovery.

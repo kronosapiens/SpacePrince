@@ -97,7 +97,8 @@ export type AppliedOutcome = { ok: true; run: Run } | { ok: false; reason: strin
 const invalid = (reason: string): AppliedOutcome => ({ ok: false, reason });
 
 /** Atomic application: a missing target or unpaid cost discards every effect.
- *  Effects apply in order, each against the ceilings the earlier ones left. */
+ *  Effects apply in order, each against the ceilings the earlier ones left.
+ *  Planets lit before the choice remain eligible for its remaining effects. */
 export function applyOutcomes(
   run: Run, ctx: NarrativeContext, outcomes: Outcome[], selection: Selection = {}, cost = 0,
 ): AppliedOutcome {
@@ -117,13 +118,12 @@ export function applyOutcomes(
       if (effect.kind === "uncombust") {
         if (!dark) return invalid(`${p} is already lit.`);
         uncombust(placement, ps);
-      } else if (dark) {
+      } else if (dark && combusted(boundCtx, p)) {
         return invalid(`${p} is combusted.`);
       } else if (effect.kind === "gain") {
         gains[p] = { ...gains[p], [effect.stat]: gains[p][effect.stat] + effect.amount };
       } else {
-        if (effect.delta > combustionCeiling(placement) - ps.affliction) return invalid(`${p} cannot absorb ${effect.delta} affliction.`);
-        ps.affliction = Math.max(0, ps.affliction + effect.delta);
+        ps.affliction = Math.max(0, Math.min(combustionCeiling(placement), ps.affliction + effect.delta));
       }
     }
   }
