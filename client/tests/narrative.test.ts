@@ -8,9 +8,9 @@ import {
 import { joyChoice, trade, L } from "@/data/narrative/shared";
 import { runChart } from "@/game/chart";
 import { beginNarrativeEncounter } from "@/game/encounter";
-import { combustionCeiling } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import { PLANETS, SIGNS } from "@/game/data";
-import { beginRun } from "@/game/run";
+import { beginRun, isOver } from "@/game/run";
 import { describeOption, occupantLine } from "@/copy/narrative";
 import { createStubPrince } from "./fixtures";
 import { INTERACTION_SCENE } from "./narrative-fixture";
@@ -90,18 +90,29 @@ describe("single-decision narrative", () => {
     expect(previewOption(run, context(), option("work"), { chosen: "Venus" }).ok).toBe(false);
     darken("Moon");
     expect(resolveNarrative(run, prince, scenario, "work", { chosen: "Moon" })).toBeNull();
+    expect(applyOutcomes(run, context(), [RESOLVE], { chosen: "Moon" }).ok).toBe(false);
     expect(run.light).toBe(120);
   });
 
-  it("requires the full affliction cost, allowing exact-ceiling combustion", () => {
-    const { run, context, option, prince } = setup();
-    const ceiling = combustionCeiling(prince.chart.planets.Saturn);
-    run.state.Saturn.affliction = ceiling - 24;
-    expect(previewOption(run, context(), option("work"), { chosen: "Saturn" }).ok).toBe(false);
-    run.state.Saturn.affliction = ceiling - 48;
-    const preview = previewOption(run, context(), option("work"), { chosen: "Saturn" });
-    expect(preview.ok && preview.success.state.Saturn.affliction).toBe(ceiling);
-    expect(describeOption(context(), option("work"), { chosen: "Saturn" })).toBe("Afflict 48 on Saturn · Gain 48 Light");
+  it.each([24, 48])("allows lethal affliction with %i capacity, caps it, and retains the reward", (capacity) => {
+    const { run, context, option, prince, scenario } = setup(INTERACTION_SCENE, 0);
+    const ceiling = combustionCeiling(prince.chart.planets.Moon);
+    run.state.Moon.affliction = ceiling - capacity;
+    const before = structuredClone(run);
+    const selection = { chosen: "Moon" as const };
+    expect(availableSelections(run, context(), option("work"))).toEqual([selection]);
+    const preview = previewOption(run, context(), option("work"), selection);
+    if (!preview.ok) throw new Error(preview.reason);
+    const next = resolveNarrative(run, prince, scenario, "work", selection)!;
+    expect(next.state).toEqual(preview.success.state);
+    expect(next.light).toBe(preview.success.light);
+    expect(next.state.Moon.affliction).toBe(ceiling);
+    expect(next.light).toBe(run.light + 48);
+    expect(next.encounter?.resolved).toBe(true);
+    expect(next.map.outcomes[run.map.currentNodeId]).toMatchObject({ lightDelta: 48, combusts: ["Moon"] });
+    expect(isOver(next, prince.chart, 0)).toBe(true);
+    expect(run).toEqual(before);
+    expect(describeOption(context(), option("work"), selection)).toBe("Afflict 48 on Moon · Gain 48 Light");
   });
 
   it("healthiest means greatest remaining combustion margin", () => {
@@ -217,21 +228,43 @@ describe("accepted house-and-sign scenes", () => {
     expect(occupantLine(context().occupants)).toBe("Moon and Saturn are in this house: the terms are unchanged.");
   });
 
-  it("applies a stat gain after the effects before it, against the ceiling they left", () => {
+  it("retains a stat reward when earlier harm combusts its recipient", () => {
+    const { prince, run, scenario } = setup("home-leo-harvest", 0);
+    const ceiling = combustionCeiling(prince.chart.planets.Moon);
+    run.state.Moon.affliction = ceiling - 6;
+    const next = resolveNarrative(run, prince, scenario, "earnest", { chosen: "Moon" })!;
+    expect(next.state.Moon.affliction).toBe(ceiling);
+    expect(next.gains.Moon.affliction).toBe(12);
+    expect(isOver(next, prince.chart, 0)).toBe(true);
+    expect(run.gains.Moon.affliction).toBe(0);
+  });
+
+  it("applies a later Resolve gain even when earlier harm reaches the old ceiling", () => {
     const { prince, run, context } = setup("home-capricorn-salting");
     const ceiling = combustionCeiling(prince.chart.planets.Moon);
     const salt = [A(12), RESOLVE];
-    run.state.Moon.affliction = ceiling - 12; // the take lands on the ceiling, so nothing is left to raise
-    expect(applyOutcomes(run, context(), salt, { chosen: "Moon" }).ok).toBe(false);
-    expect(applyOutcomes(run, context(), [RESOLVE, A(12)], { chosen: "Moon" }).ok).toBe(true);
-    run.state.Moon.affliction = ceiling - 24;
+    run.state.Moon.affliction = ceiling - 6;
     const applied = applyOutcomes(run, context(), salt, { chosen: "Moon" });
     if (!applied.ok) throw new Error(applied.reason);
+    expect(applied.run.state.Moon.affliction).toBe(ceiling);
     expect(applied.run.gains.Moon.resolve).toBe(12);
     expect(run.gains.Moon.resolve).toBe(0);
-    expect(combustionCeiling(runChart(prince.chart, applied.run).planets.Moon)).toBe(ceiling + 12);
+    const placement = runChart(prince.chart, applied.run).planets.Moon;
+    expect(combustionCeiling(placement)).toBe(ceiling + 12);
+    expect(isCombusted(placement, applied.run.state.Moon)).toBe(false);
+    const reversed = applyOutcomes(run, context(), [RESOLVE, A(12)], { chosen: "Moon" });
+    expect(reversed.ok && reversed.run.state.Moon.affliction).toBe(ceiling + 6);
     expect(describeOption(context(), { id: "salt", text: "", result: { effects: salt } }, { chosen: "Moon" }))
       .toBe("Afflict 12 on Moon · +12 Resolve");
+  });
+
+  it("applies recovery after harm within the same choice", () => {
+    const { prince, run, context } = setup("livelihood-taurus-good-bowl", 0);
+    const ceiling = combustionCeiling(prince.chart.planets.Moon);
+    run.state.Moon.affliction = ceiling - 6;
+    const applied = applyOutcomes(run, context(), [A(12), A(-36)], { chosen: "Moon" });
+    expect(applied.ok && applied.run.state.Moon.affliction).toBe(ceiling - 36);
+    expect(run.state.Moon.affliction).toBe(ceiling - 6);
   });
 
   it("records the option's own text when it carries no result text", () => {
