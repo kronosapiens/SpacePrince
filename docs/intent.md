@@ -94,6 +94,12 @@ Other Princes are Govinda: different coordinates, different journeys, no judgmen
 Familiar kindness and difficult exchange can both generate Light; an encounter need not teach a lesson.
 The archived v1 action space, the Think / Wait / Fast postures ([archive](archive/v1/DESIGN.md)), came from Siddhartha's answer to Kamaswami; the postures did not survive, the sensibility did.
 
+### The Prophet (Kahlil Gibran)
+
+The prose reference for authored encounter narration and dialogue.
+[VOICE.md](writing/VOICE.md) adapts its developed images, balanced clauses, and direct observations of ordinary wants.
+The Prince's feelings and interpretation remain the player's.
+
 ### FTL: Faster Than Light
 
 The structural reference.

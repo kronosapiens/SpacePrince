@@ -33,6 +33,7 @@ Start with [MECHANICS.md](mechanics/MECHANICS.md) for relational encounters (the
 Composition (where things go, how large, how fast) is decided in the running client and lives beside its tokens.
 
 **Writing.**
+[VOICE.md](writing/VOICE.md) sets encounter tone and prose style through passages from *The Prophet* and instructions for applying them.
 [SCENES.md](writing/SCENES.md) for how house scenes are written and reviewed, then the matrices: [HOUSE_MATRIX.md](writing/HOUSE_MATRIX.md), [HOUSE_PLANET_MATRIX.md](writing/HOUSE_PLANET_MATRIX.md), and [PLANET_MATRIX.md](writing/PLANET_MATRIX.md).
 [DRIVES.md](writing/DRIVES.md) covers motive and emotional range, [PLANETS.md](writing/PLANETS.md) each planet's archetype and voice, [PRIMER.md](writing/PRIMER.md) the game explaining itself, and the [briefs](writing/briefs/) hold all 720 scene briefs.
 Player copy itself lives in `client/src/copy/`.

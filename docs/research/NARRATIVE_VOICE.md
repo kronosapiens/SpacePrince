@@ -1,8 +1,8 @@
 # Narrative voice research
 
-Sources and comparisons for short narrative encounters, consulted 2026-10-08.
-The question is how short scenes can carry a specific human situation while borrowing some of a newspaper horoscope's intimacy and confidence.
-The comparisons below inform an experiment; they do not establish a tested voice for Space Prince.
+Sources and comparisons for short narrative encounters.
+The game and horoscope research was consulted on 2026-10-08, asking how short scenes can carry a specific human situation while borrowing some of a newspaper horoscope's intimacy and confidence.
+The [Gibran reading and comparisons](#gibran-and-encounter-prose) record the later prose direction; current authoring guidance lives in [VOICE.md](../writing/VOICE.md) and [SCENES.md](../writing/SCENES.md).
 
 ## Scope and source limits
 
@@ -150,3 +150,96 @@ The walking simulator contribution is the sense that these people have lives and
 
 Overuse could still produce a succession of polished little lessons.
 Whether that voice is enjoyable across repeated encounters remains a reading and playtesting question.
+
+## Scene development feedback
+
+Reader feedback from the catalogue's development, retained separately from the [comparison method](../writing/SCENES.md#review-through-comparisons).
+
+| Comparison | Reader feedback | Working implication |
+| --- | --- | --- |
+| Mara speaking directly versus narration reporting her request | The direct request was preferred. | Let people say what they want. |
+| Lena's shared history versus a joke in dialogue | The history “evokes a larger backstory,” but screaming could mean joy or pain. | Keep the sense of an earlier shared experience and clarify its emotional character. |
+| A mother gives you a key while your brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
+| House IV under Libra, Capricorn, Leo, and Pisces | “Each of these scenes has something to draw the reader in.” | The sign can carry the situation; proceed to house–sign scenes. |
+
+## Gibran and encounter prose
+
+Readings and scene comparisons, 2026-11-08.
+The [voice reference](../writing/VOICE.md) pairs passages from *The Prophet* with instructions for adapting their techniques to encounters.
+The readings use the original English text published in 1923, with chapter sources linked beside each passage.
+
+| Exercise | Reader feedback | Editorial application |
+| --- | --- | --- |
+| Existing cup, pear, and funeral scenes compared with revised versions | Preferred all three revisions because the writing flows more nicely. | Retain the more fluent cadence; this preference alone does not establish which individual device caused it. |
+| Fresh scenes about competing claims and an actor borrowing a voice | Both created interpretable scenes and stakes. | Keep the situation and possible participation understandable. |
+| A seamstress requesting help as her sight fails | The first version had unclear conflict and choices; the apprentice's contribution remained unclear after revision; removing him made the scene stronger. | Establish the practical request and let the situation determine the number of participants and choices. |
+
+These judgments concern readability and flow in the passages reviewed.
+
+### A/B scene comparisons
+
+A is the catalogue opening used in the comparison; B is the revised version preferred by the reader.
+The passages are retained here as reviewed, with their original possible participation.
+
+#### A gift from your sister
+
+[House IV, Taurus, handmade cup](../../client/src/data/narrative/house-04.ts).
+Participation: drink from the cup, buy bread to share with the pot on the hearth, or set the cup within reach; revival uses the second cup.
+
+**A**
+
+> Your sister makes you a cup shaped like the one you broke years ago.
+> When you reach toward the high shelf, she catches your wrist.
+> “For drinking.”
+> A pot simmers on the hearth.
+> Beside her tools sits a second cup, still warm from its firing.
+
+**B**
+
+> Your sister makes you a cup like the one you broke years ago.
+> You reach toward the high shelf.
+> She catches your wrist.
+> “It will hold nothing there, however long it lasts.”
+> A pot simmers on the hearth.
+> Beside her tools sits a second cup, still warm.
+
+#### The first ripe pear
+
+[House V, Taurus, ripe pears](../../client/src/data/narrative/house-05.ts).
+Participation: enjoy the pear, divide it among others, or offer your companion the first bite; Venus's joy permits sharing it closely with her.
+
+**A**
+
+> Your companion gives you the first ripe pear and catches your wrist before you bite.
+> “Smell it.”
+> You turn it over, admiring its shape.
+> She looks almost offended.
+> “Yes, very pretty.
+> I have been waiting three days for it to smell like this.”
+
+**B**
+
+> Your companion gives you the first ripe pear.
+> You turn it to admire the shape.
+> She draws your hand toward your nose.
+> “Three days I have waited for this smell.
+> You may praise its looks when we have eaten it.”
+
+#### The funeral meal
+
+[House VIII, Taurus, feast](../../client/src/data/narrative/house-08.ts).
+Participation: eat the full portion, pass the dishes, or thank the cook without taking a plate.
+
+**A**
+
+> The funeral cook will not let the mourners pick at their plates.
+> “He would have asked for seconds.”
+> She gives you a portion large enough to support the claim.
+> At the end of the table, untouched dishes wait beside people who have forgotten to pass them.
+
+**B**
+
+> The funeral cook fills your plate.
+> “He would have asked for seconds.”
+> Farther down the table, full dishes stand untouched.
+> She knows how to feed the man who has died; she is still learning how to feed the people who miss him.
