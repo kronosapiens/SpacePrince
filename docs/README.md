@@ -34,6 +34,7 @@ Composition (where things go, how large, how fast) is decided in the running cli
 
 **Writing.**
 [VOICE.md](writing/VOICE.md) sets encounter tone and prose style through passages from *The Prophet* and instructions for applying them.
+[SETTING.md](writing/SETTING.md) guides the cosmic fable setting, its science-fantasy references, and encounters that remain meaningful in any order.
 [SCENES.md](writing/SCENES.md) for how house scenes are written and reviewed, then the matrices: [HOUSE_MATRIX.md](writing/HOUSE_MATRIX.md), [HOUSE_PLANET_MATRIX.md](writing/HOUSE_PLANET_MATRIX.md), and [PLANET_MATRIX.md](writing/PLANET_MATRIX.md).
 [DRIVES.md](writing/DRIVES.md) covers motive and emotional range, [PLANETS.md](writing/PLANETS.md) each planet's archetype and voice, [PRIMER.md](writing/PRIMER.md) the game explaining itself, and the [briefs](writing/briefs/) hold all 720 scene briefs.
 Player copy itself lives in `client/src/copy/`.
