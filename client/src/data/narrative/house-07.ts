@@ -3,363 +3,363 @@ import { A, G, L, scene, trade } from "./shared";
 
 export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
   scene("relationships-aries-first-oar", 7, "Aries",
-    "The ferryman’s new partner pushes off while you are still finding your seat. “My first turn.” He offers you the second oar, then she names the passenger fare. The bank is already behind you; reaching the nearer landing would mean rowing against her turning boat.", [
-      trade("row", "Take the strenuous second oar for the full crossing’s wage.", [A("chosen", 24), L(84)]),
-      trade("passage", "Pay the passenger fare and let her take the first turn.", [], { cost: 36 }),
-      trade("shore", "Row back to the nearer landing and end the crossing there.", [A("chosen", 12)]),
+    "The new ferryman pushes off before you have chosen between passage and work. “First customer,” he says proudly. His partner names the fare and points to the spare oar. The canal carries you past the near landing; reaching it again will mean rowing against his enthusiastic turn.", [
+      trade("row", "Take the second oar and earn the full crossing's wage.", [A("chosen", 24), L(84)]),
+      trade("passage", "Pay for passage and let the new ferryman row.", [], { cost: 36 }),
+      trade("shore", "Row against the turn and return to the nearer landing.", [A("chosen", 12)]),
     ]),
   scene("relationships-aries-wedding-fire", 7, "Aries",
-    "The bride and groom each bring a coal from their household fire. Neither will put theirs in second. The empty brazier stands between them while the coals slowly dim. The groom asks you to hold the hot pans together. The bride points toward fresh tinder instead.", [
-      trade("tinder", "Buy fresh tinder and let both coals catch together.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("hold", "Hold the hot pans through the long, careful lighting.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("wait", "Leave the first flame to the couple.", []),
+    "Each partner brings a living coal from the hearth that raised them. The coals whisper different songs in their pans. Neither wants to enter the wedding brazier second. You stand between the hot handles while both fires diminish, still singing of places that once kept them warm.", [
+      trade("tinder", "Buy fresh tinder and kindle both coals together for the gathering.", [A("allUnlocked", -24)], { cost: 48 }),
+      trade("hold", "Hold the hot pans steadily until their flames meet.", [A("chosen", 12), G("chosen", "resolve", 12)]),
+      trade("wait", "Leave the first flame for the partners to agree.", []),
     ]),
   scene("relationships-aries-challenge", 7, "Aries",
-    "Your old practice partner brings the padded sticks you used as children. She notices you reaching for the lighter one. “You needn't let me win anymore.” Then she offers the careful stretches she uses after practice, leaving both sticks on the mat between you.", [
-      trade("practice", "Practice hard with her until both arms tire.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("stretch", "Accept the slow stretches she offers.", [A("chosen", -24)]),
-      trade("sit", "Sit beside the mat and leave the sticks down.", []),
+    "Your old practice partner switches off the lesson's painted opponent and hands you a padded stick. “That one lets me win.” She offers you either weight, then lays out the stretches she uses afterward. The artificial figure continues bowing in the corner until she remembers to unplug it.", [
+      trade("practice", "Practice with her until your arms ache and your strokes strengthen.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("stretch", "Take the slow stretching session she offers.", [A("chosen", -24)]),
+      trade("sit", "Sit by the mat and leave both sticks down.", []),
     ]),
   scene("relationships-aries-lambing", 7, "Aries",
-    "The shepherd puts a dry cloak around you while you hold the newborn lamb. His wife arrives in the rain and recognizes it. He admits it was hers to lend. “I can see that,” she says, looking at the warm lamb inside it.", [
-      trade("clean", "Pay for cleaning the cloak and keep its warmth for now.", [A("chosen", -36)], { cost: 36 }),
-      trade("rain", "Give her the dry place and take the long turn outside.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("return", "Return the cloak and hand the lamb to its keeper.", []),
+    "The shepherd wraps you and the newborn winged lamb in a dry cloak. His wife arrives soaked and recognizes the clasp. “Mine,” she says. He looks down at the sleeping creature as though it might explain borrowing. You can feel its little wings opening against the wool.", [
+      trade("clean", "Pay to clean the cloak and keep its warmth for now.", [A("chosen", -36)], { cost: 36 }),
+      trade("rain", "Give her the shelter and take the long watch in the rain.", [A("chosen", 12), G("chosen", "resolve", 12)]),
+      trade("return", "Return the cloak and put the lamb in its keeper's arms.", []),
     ]),
   scene("relationships-aries-apology", 7, "Aries",
-    "The mason's apology is loud enough for everyone in the quiet inn to hear what he shouted at you earlier. He brings bread. “The roof is finished. Come and see, if you like.” He offers a fee for helping inspect the high side, or supper here.", [
-      trade("meal", "Accept the bread and stay for supper.", [A("chosen", -24)]),
-      trade("roof", "Take the paid climb and inspect the finished roof beside him.", [A("chosen", 24), L(84)]),
-      trade("words", "Accept the apology and leave the rest of his offer.", []),
+    "The builder apologizes through the same speaking horn he used to shout at you. Every window opens. He lowers it at last and offers bread in his ordinary voice. The roof you disputed is finished; he will pay for a difficult inspection, or share supper here below it.", [
+      trade("meal", "Accept his bread and stay for the meal.", [A("chosen", -24)]),
+      trade("roof", "Make the paid climb and inspect the high roof together.", [A("chosen", 24), L(84)]),
+      trade("words", "Accept the spoken apology and leave the other offers.", []),
     ]),
   scene("relationships-taurus-bench", 7, "Taurus",
-    "The bench is halfway through your companion’s cottage window when the frame catches. You are holding the outside end. “Still a good bench,” she says from inside. A porter passing the gate offers to take your place; lowering it together will mean crouching beneath the sill.", [
-      trade("lift", "Finish the heavy lift through the window for her offered payment.", [A("chosen", 24), L(84)]),
-      trade("meal", "Pay the porter to take your end through the window.", [], { cost: 24 }),
-      trade("go", "Lower your end carefully while she slides the bench back outside.", [A("chosen", 12)]),
+    "The bench is lodged halfway through your companion's round doorway, with its outer weight in your arms. “It fitted the old house.” The new house has grown a narrower entrance. A passing porter offers to take your end; she offers payment if you finish the lift together.", [
+      trade("lift", "Lift the heavy bench through for her offered fee.", [A("chosen", 24), L(84)]),
+      trade("meal", "Pay the porter to take your end of the bench.", [], { cost: 24 }),
+      trade("go", "Crouch beneath the sill and lower the weight carefully.", [A("chosen", 12)]),
     ]),
   scene("relationships-taurus-last-slice", 7, "Taurus",
-    "The baker cuts a rich cake for you and her husband. He slides his larger piece toward you; she slides it back. “I know how you both are.” Neither has tasted anything. He looks at you over the plate, plainly prepared to insist again.", [
-      trade("accept", "Accept the generous portion he keeps offering.", [A("chosen", -36)]),
-      trade("divide", "Divide the remaining cake across the table.", [A("allUnlocked", -12)]),
-      trade("leave", "Leave him the portion his wife cut.", []),
+    "The baker gives you a slice and her husband a larger one. He pushes his toward you; she puts it back. His broad horns lean over the plate as he insists again. “You could both eat,” she says. The cake has made no objection yet.", [
+      trade("accept", "Take the rich portion he keeps offering you.", [A("chosen", -36)]),
+      trade("divide", "Cut enough smaller slices for everyone at the table.", [A("allUnlocked", -12)]),
+      trade("leave", "Leave him the serving his wife chose.", []),
     ]),
   scene("relationships-taurus-draught", 7, "Taurus",
-    "The farmer agrees to share the ploughing but will not let you lead his ox. “He knows my voice.” He offers you the heavy handle and a wage, or to finish the strip himself for a fee. The ox waits without taking either side.", [
-      trade("handle", "Take the heavy handle beside him.", [A("chosen", 24), L(84)]),
-      trade("fee", "Pay him to finish while you take a long rest.", [A("chosen", -36)], { cost: 36 }),
-      trade("cancel", "End today's bargain before the first furrow.", []),
+    "Your farming partner agrees to share the work, but his great burrowing animal follows only his voice. That leaves you the heavy plough handle. He offers wages for holding it or a price for finishing alone. The animal rests its chin on the soil while you settle the human part.", [
+      trade("handle", "Work the heavy handle beside him for the agreed wage.", [A("chosen", 24), L(84)]),
+      trade("fee", "Pay him to finish and take a long sheltered rest.", [A("chosen", -36)], { cost: 36 }),
+      trade("cancel", "End the bargain before either of you starts the furrow.", []),
     ]),
   scene("relationships-taurus-duet", 7, "Taurus",
-    "The singer invites you into a duet but will not change the low key. “This is where my voice lives.” Her accompanist can transpose your part for a fee. She sings the opening again, then waits to hear what you will ask of her.", [
-      trade("low", "Practice the difficult low part until it holds.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("transpose", "Pay the accompanist to fit your part around hers.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("listen", "Listen to her sing where her voice lives.", [A("chosen", -12)]),
+    "The singer's lowest note makes the cups tremble. She invites you into her duet but will not lift it. “This is where my voice has room.” An accompanist offers to arrange your part for a fee. She waits beside the vibrating cups, leaving the next sound to you.", [
+      trade("low", "Practice the difficult low part until your tired voice holds it.", [A("chosen", 12), G("chosen", "resolve", 12)]),
+      trade("transpose", "Pay for a part that supports your voice alongside hers.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("listen", "Rest and listen while she sings in her own range.", [A("chosen", -12)]),
     ]),
   scene("relationships-taurus-ring", 7, "Taurus",
-    "The potter sets out two new wedding cups. Her partner brings the chipped old pair back to the table. “You made these for us too.” She offers to repair them, or use the new pair for today's tea. The kettle is ready for either.", [
-      trade("repair", "Pay for the old cups' repair and share tea from them.", [A("chosen", -36)], { cost: 36 }),
-      trade("new", "Accept today's tea in the new cups.", [A("chosen", -24)]),
-      trade("them", "Leave the pair to choose their own cups.", []),
+    "The potter sets out new cups for the anniversary. Her partner fetches the old chipped pair from the shelf. You can see where both thumbs have worn the glaze. She offers to repair them for a fee, or serve tea in the new ones. The kettle steams between the generations.", [
+      trade("repair", "Pay to mend the old cups and linger over their tea.", [A("chosen", -36)], { cost: 36 }),
+      trade("new", "Accept a warm cup from the new pair.", [A("chosen", -24)]),
+      trade("them", "Leave the couple to choose what holds their tea.", []),
     ]),
   scene("relationships-gemini-translation", 7, "Gemini",
-    "Halfway down the stairs, your interpreter explains that the merchant meant the other entrance. The heavy sample case rests across your arms. Both offer the carrying fee at once. A porter can take it onward; the nearest landing is behind you, up three awkward steps.", [
-      trade("case", "Carry the samples to the other entrance for their agreed fee.", [A("chosen", 24), L(84)]),
-      trade("lunch", "Pay the porter to finish while you settle the wording with the interpreter.", [], { cost: 36 }),
-      trade("cancel", "Carry the case back onto the landing and end the arrangement.", [A("chosen", 12)]),
+    "The entrance sign changes language halfway down the stairs. Your interpreter discovers that the merchant meant the door on the other side. The sample case presses into your arms. Both offer a carrying fee; a porter waits below, and the nearest place to set it down is three steps behind you.", [
+      trade("case", "Carry the samples to the other entrance for their fee.", [A("chosen", 24), L(84)]),
+      trade("lunch", "Pay the porter and settle the directions with the interpreter.", [], { cost: 36 }),
+      trade("cancel", "Lift the case back onto the landing and end the arrangement.", [A("chosen", 12)]),
     ]),
   scene("relationships-gemini-sides", 7, "Gemini",
-    "The debaters ask you to exchange sides halfway through their practice. One immediately objects: he has prepared answers only to your objections. His partner offers you a small fee for the first round, or the chance to work through the difficult full exchange together.", [
-      trade("short", "Take the short paid turn on the expected side.", [L(24)]),
-      trade("full", "Work through the full exchange, changing sides halfway.", [G("chosen", "luck", 12)]),
-      trade("watch", "Let the two practice with one another.", []),
+    "The two debaters ask you to change sides during their rehearsal. One objects immediately: he has written replies only to the person he expected you to be. His partner places a practice fee on the table. You may take the short part, or stay and try the whole exchange.", [
+      trade("short", "Play the expected side for the short rehearsal fee.", [L(24)]),
+      trade("full", "Change sides midway and work out the argument together.", [G("chosen", "luck", 12)]),
+      trade("watch", "Leave them to exchange their own parts.", []),
     ]),
   scene("relationships-gemini-window", 7, "Gemini",
-    "The new neighbor calls from the window where your companion once left scratched messages. He asks whether you can read the smallest one. “Tea first, if you prefer.” A sheet of thin paper lies ready against the sill, but he has not covered the marks yet.", [
-      trade("tea", "Sit with the new neighbor over tea.", [A("chosen", -24)]),
-      trade("trace", "Copy the small scratched message together.", [G("chosen", "luck", 12)]),
-      trade("unread", "Leave the old marks unread today.", []),
+    "The new neighbor calls you to a window scratched with an old private alphabet. He has decoded most of it, except the tiny line beside the latch. You recognize the hand of someone you once knew. He offers tea before asking you to make the marks speak for him.", [
+      trade("tea", "Sit with the new neighbor and his offered tea.", [A("chosen", -24)]),
+      trade("trace", "Copy the small marks together and work out their meaning.", [G("chosen", "luck", 12)]),
+      trade("unread", "Leave the message unread on the glass today.", []),
     ]),
   scene("relationships-gemini-double-booking", 7, "Gemini",
-    "The musician promised you a quiet hour. Another traveler arrives carrying the same promise. She puts both deposits on the table and admits she made the mistake. “You can share the room, or one of you can have the next hour alone.”", [
-      trade("share", "Share the quiet session at its reduced price.", [A("allUnlocked", -12)], { cost: 24 }),
-      trade("alone", "Pay for the uninterrupted hour alone.", [A("chosen", -48)], { cost: 48 }),
-      trade("refund", "Take back your deposit and leave the session.", [L(24)]),
+    "The musician has promised you an hour alone in her listening room. Another guest arrives with the same promise written on the same blue paper. She lays out both deposits. “I remembered two people and one appointment.” A shared session costs less; the following hour is still private.", [
+      trade("share", "Pay the reduced price and share the quiet session.", [A("allUnlocked", -12)], { cost: 24 }),
+      trade("alone", "Buy the following hour for uninterrupted private rest.", [A("chosen", -48)], { cost: 48 }),
+      trade("refund", "Take your deposit back and end the booking.", [L(24)]),
     ]),
   scene("relationships-gemini-handshake", 7, "Gemini",
-    "The conjurer returns the coins from your purse and asks for his handkerchief back. You have been holding it since the trick began. “Keep the money, or let me show you how.” His empty hands are open between you, for whatever that assurance is worth.", [
-      trade("learn", "Return the handkerchief and learn the trick from him.", [G("chosen", "luck", 12)]),
-      trade("money", "Return the handkerchief and take your money back.", [L(36)]),
-      trade("end", "Hand it back and end the encounter without another exchange.", []),
+    "The conjurer produces coins from the handkerchief you have been holding. He calls them your prize, then offers the trick instead if you return his cloth. You inspect his open hands. He waits with the mild expression of someone whose best explanation may still be another performance.", [
+      trade("learn", "Return the cloth and learn how he made the coins appear.", [G("chosen", "luck", 12)]),
+      trade("money", "Take the coin prize and give him back his handkerchief.", [L(36)]),
+      trade("end", "Return both cloth and prize and finish the exchange.", []),
     ]),
   scene("relationships-cancer-tide", 7, "Cancer",
-    "Your boat companion wants to wait for the tide at the tavern where her husband always stopped. She still orders his bread before remembering. Then she offers you a place at the table, or pay for preparing the boat while she stays a little longer.", [
-      trade("table", "Stay and share the bread she ordered.", [A("chosen", -24)]),
-      trade("boat", "Take her paid turn preparing the heavy gear.", [A("chosen", 12), L(48)]),
-      trade("bank", "Wait for the tide on the bank.", []),
+    "Your boat companion orders bread for two at the tavern where her late husband always waited for the tide. She notices the extra plate only when you sit down. The boat still needs preparing. She offers you the bread or pay for taking her turn while she stays here.", [
+      trade("table", "Stay beside her and eat the bread she ordered.", [A("chosen", -24)]),
+      trade("boat", "Prepare the boat's heavy gear for her offered wage.", [A("chosen", 12), L(48)]),
+      trade("bank", "Wait for the rising tide outside on the bank.", []),
     ]),
   scene("relationships-cancer-room", 7, "Cancer",
-    "The innkeeper has saved the room you once shared with your lover. Your companion sets a separate bag on the counter. The innkeeper notices and brings out another key. “Two smaller rooms, if you prefer. Or the old one to yourself.” Neither key moves yet.", [
-      trade("separate", "Buy two quiet rooms and give each person their own rest.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("old", "Take the old room alone for a deeper rest.", [A("chosen", -48)], { cost: 48 }),
-      trade("decline", "Decline the lodging before accepting a key.", []),
+    "The innkeeper brings the key to the room you once shared. Your companion sets a separate bag on the counter, and the keeper returns with two smaller keys. Outside, frost closes the harbor. She offers equal prices for separate shelter or the old room alone, leaving the choice unnamed.", [
+      trade("separate", "Buy two rooms so each person can rest separately.", [A("allUnlocked", -24)], { cost: 48 }),
+      trade("old", "Buy the old room for an uninterrupted rest by yourself.", [A("chosen", -48)], { cost: 48 }),
+      trade("decline", "Leave the keys on the counter and decline the lodging.", []),
     ]),
   scene("relationships-cancer-recipe", 7, "Cancer",
-    "Your partner asks you to stop guessing what her mother put in the stew. She has offered supper, not a puzzle. Then she sets the unfamiliar spice beside your bowl. “You may taste it. You don't have to name everything before you enjoy it.”", [
-      trade("supper", "Accept the supper without another guess.", [A("chosen", -24)]),
-      trade("taste", "Taste the spice and ask her to show you how she uses it.", [G("chosen", "luck", 12)]),
-      trade("table", "Admit defeat and help set the table.", []),
+    "Your partner catches you trying to identify the spice in her mother's stew. “She taught me how much, not what to call it.” She puts the jar beside your bowl anyway. It smells of a shoreline neither of you can see from this kitchen, high above the city.", [
+      trade("supper", "Eat the warm stew without another guess.", [A("chosen", -24)]),
+      trade("taste", "Taste the spice and learn how she measures it.", [G("chosen", "luck", 12)]),
+      trade("table", "Set the jar down and help arrange the table.", []),
     ]),
   scene("relationships-cancer-gangplank", 7, "Cancer",
-    "The boat shifts while you and its owner cross the gangplank with your bags. She catches the rail with her walking stick; your shoulder takes both straps. “I once carried yours,” she says. A dockhand offers a steadying rope, naming his fee over the water.", [
-      trade("accept", "Pay the dockhand to steady the crossing and take the bags.", [], { cost: 24 }),
-      trade("both", "Carry both heavy bags across for the fee the owner offers.", [A("chosen", 24), L(84)]),
-      trade("divide", "Divide the bags again and make the awkward crossing together.", [A("chosen", 12)]),
+    "The gangplank tilts as your older companion catches the rail with her walking stick. Both bags slide onto your shoulder. “I used to carry yours.” A dockhand offers a steadying rope for a fee; she offers you payment for the bags, with the same firmness she once used for help.", [
+      trade("accept", "Pay the dockhand to steady the plank and take the bags.", [], { cost: 24 }),
+      trade("both", "Carry both heavy bags across for her fee.", [A("chosen", 24), L(84)]),
+      trade("divide", "Divide the straps again and make the rough crossing together.", [A("chosen", 12)]),
     ]),
   scene("relationships-cancer-quiet-cup", 7, "Cancer",
-    "After the argument, the brewer pours two cups. Yours stops just within reach. She does not look up, but she has moved the comfortable chair away from the draft. A little warmth remains in the pot between you; she waits to see whether you stay.", [
-      trade("stay", "Take the chair and stay for the long, quiet cup.", [A("chosen", -36)]),
-      trade("share", "Divide the remaining warmth across those at the table.", [A("allUnlocked", -12)]),
-      trade("leave", "Leave the cup gently where she put it.", []),
+    "The brewer has turned down the music you asked her to stop. She sets a cup within your reach and shifts the comfortable chair out of the draft. You hear the last soft notes above the kettle. She leaves the invitation in the furniture, without repeating the argument.", [
+      trade("stay", "Take the comfortable chair and stay for the long warm cup.", [A("chosen", -36)]),
+      trade("share", "Pour the remaining tea for everyone at the table.", [A("allUnlocked", -12)]),
+      trade("leave", "Leave the offered cup where she placed it.", []),
     ]),
   scene("relationships-leo-bow", 7, "Leo",
-    "Your duet partner insists you take the last bow. The listeners are calling her name. She presses the collection purse toward you anyway. “I know what they heard. I know what you did.” The supper stall is still open beside the emptying floor.", [
-      trade("purse", "Accept the purse she offers.", [L(48)]),
-      trade("supper", "Spend the collection on a generous supper together.", [A("allUnlocked", -12)]),
-      trade("hers", "Leave the purse with her and call her back for the bow.", []),
+    "Your duet partner pushes the collection purse into your hand while the audience calls her name. You carried the rhythm; she carried the bright melody they remember. “They heard me because you stayed,” she says. Beside the emptying dance floor, the supper stall is still lit.", [
+      trade("purse", "Accept the full collection she offers you.", [L(48)]),
+      trade("supper", "Use the collection to feed the company together.", [A("allUnlocked", -12)]),
+      trade("hers", "Leave her the purse and send her back for the bow.", []),
     ]),
   scene("relationships-leo-shade", 7, "Leo",
-    "The hunter gives you the only shaded seat and begins a story whose ending you know. He reaches the part you witnessed and improves it considerably. A drinks seller passes. The hunter pauses, either for your correction or for you to buy the next cup.", [
-      trade("listen", "Keep the comfortable seat and hear his ending.", [A("chosen", -24)]),
-      trade("drinks", "Buy cooling drinks for the table and tell your part.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("correct", "Correct the account without accepting more hospitality.", []),
+    "The desert hunter gives you the only shaded chair and retells the journey you shared. His beast acquires another pair of horns at every pause. You can still see the actual hide above the door. A drinks seller passes; the hunter looks at you before improving the ending.", [
+      trade("listen", "Keep the shaded seat and listen to the larger ending.", [A("chosen", -24)]),
+      trade("drinks", "Buy cold drinks for the gathering and tell your part.", [A("allUnlocked", -24)], { cost: 48 }),
+      trade("correct", "Correct the account and decline further hospitality.", []),
     ]),
   scene("relationships-leo-banner", 7, "Leo",
-    "Your rival’s banner is level with yours when the procession turns into a gust. Both poles pull hard against your shoulders. “Neither higher,” she reminds you. The organizer offers the front position’s fee, or hired bearers; a sheltered side street would let you lower the banners early.", [
-      trade("carry", "Hold the front position beside her for the procession fee.", [A("chosen", 24), L(84)]),
-      trade("bearers", "Hire bearers and walk beside your rival without the weight.", [], { cost: 48 }),
-      trade("decline", "Carry the poles into the side street and lower them together.", [A("chosen", 12)]),
+    "Your rival insists the two banners stay level as the parade turns into the wind. Both poles pull at your shoulders. The organizer offers the front rank's fee or hired bearers. Beside you, a sheltered lane would let both colors come down without either descending first.", [
+      trade("carry", "Hold the front rank through the full paid procession.", [A("chosen", 24), L(84)]),
+      trade("bearers", "Hire bearers and walk together without the poles.", [], { cost: 48 }),
+      trade("decline", "Carry the banners into shelter and lower them side by side.", [A("chosen", 12)]),
     ]),
   scene("relationships-leo-feast", 7, "Leo",
-    "Your host has ordered an enormous supper for two. He asks you not to mention that he cannot finish it. Beyond the doorway, the waiting musicians keep looking at the dishes. He sees them looking. “You could say we invited them,” he suggests.", [
-      trade("eat", "Remain his honored guest and eat at leisure.", [A("chosen", -36)]),
-      trade("invite", "Invite the musicians to share the whole supper.", [A("allUnlocked", -12)]),
-      trade("cup", "Take only the cup he has already poured.", []),
+    "The dining machine produces another splendid course for the two of you. Your host insists the order was correct; his untouched plate suggests otherwise. Musicians wait in the doorway, watching the dishes arrive. He lowers his voice. “You might tell them we meant to invite them.”", [
+      trade("eat", "Remain the honored guest and eat slowly at leisure.", [A("chosen", -36)]),
+      trade("invite", "Invite the musicians to share the whole extravagant meal.", [A("allUnlocked", -12)]),
+      trade("cup", "Take only the cup already beside your place.", []),
     ]),
   scene("relationships-leo-rematch", 7, "Leo",
-    "The woman who outthrew you has kept both stones. She offers you first choice this time, then puts a small gift beside them. “For coming back. You needn't throw for it.” The heavier stone still bears the scrape from her last attempt.", [
-      trade("practice", "Practice the heavy throw with her until your arm tires.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("gift", "Accept her welcome-back gift and leave the practice for another day.", [L(24)]),
-      trade("thanks", "Congratulate her and leave both stones down.", []),
+    "The woman who outthrew you has brought both stones and a small purse. The heavier stone still carries its old scrape. She offers first choice, then notices your glance at the money. “For coming back,” she says. “You don't have to make an arm ache for everything.”", [
+      trade("practice", "Practice the heavy throw beside her until your arm tires.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("gift", "Accept the welcome gift without taking up a stone.", [L(24)]),
+      trade("thanks", "Congratulate her and leave both stones resting.", []),
     ]),
   scene("relationships-virgo-mended-cuff", 7, "Virgo",
-    "The tailor begins correcting your cuff before you explain who made its uneven stitches. Your partner watches from beside the chair. The tailor stops with the needle raised. “I can make it sound. Or show you how.” The old thread is still intact.", [
-      trade("repair", "Pay for the sound, comfortable repair.", [A("chosen", -36)], { cost: 36 }),
-      trade("learn", "Learn the repair and make the next stitch yourself.", [G("chosen", "luck", 12)]),
-      trade("keep", "Keep the uneven stitches as they are.", []),
+    "The tailor's measuring moth lands on the uneven cuff and begins signaling corrections. Your partner made those stitches. You see the tailor understand as she lifts the moth away. She offers a comfortable paid repair or a lesson in making it sound; the old thread has not been cut.", [
+      trade("repair", "Pay for the careful repair and rest in its comfortable fit.", [A("chosen", -36)], { cost: 36 }),
+      trade("learn", "Learn the repair and place the next stitch yourself.", [G("chosen", "luck", 12)]),
+      trade("keep", "Keep the existing thread and its uneven course.", []),
     ]),
   scene("relationships-virgo-contract", 7, "Virgo",
-    "The carrier’s axle breaks after your bags have crossed the yard. She reads the agreement again: it promises carriage, not a sound cart. “Then we amend it.” She offers a carrying fee if you help, or can hire another cart. Your bags block the narrow passage.", [
-      trade("fair", "Pay your agreed share for another cart to carry the bags out.", [], { cost: 36 }),
-      trade("shared", "Share the heavy carrying and take her offered fee.", [A("chosen", 24), L(84)]),
-      trade("cancel", "Carry your bags back through the narrow passage and cancel the rest.", [A("chosen", 12)]),
+    "The carrier's cart folds its tired legs in the narrow passage, leaving your bags across the exit. She reads the agreement aloud, then stops. “It promises arrival. It doesn't explain this.” She offers a carrying fee if you help, or another cart at a shared cost.", [
+      trade("fair", "Pay your share of a second cart to clear the bags.", [], { cost: 36 }),
+      trade("shared", "Carry the heavy bags together for her offered fee.", [A("chosen", 24), L(84)]),
+      trade("cancel", "Haul your bags back through the passage and cancel the rest.", [A("chosen", 12)]),
     ]),
   scene("relationships-virgo-seeds", 7, "Virgo",
-    "Your gardening partner rejects the seed you saved together. “Look closely.” She shows you the damaged kernels, then offers to buy your share or pay you to sort the good ones from the whole stock. The little saved handful lies between her practical offers.", [
-      trade("sort", "Sort the full stock through the long, cramped work.", [A("chosen", 12), L(48)]),
-      trade("share", "Take the smaller payment for your share.", [L(24)]),
-      trade("plant", "Leave the seeds untouched today.", []),
+    "Your gardening partner spreads the seeds you saved together beneath a lens. Several have split before their season. She offers to buy your share or pay you to sort the whole stock. You can see green beginning in the damaged ones; beginning does not make them ready for this journey.", [
+      trade("sort", "Sort the whole stock through the long cramped session.", [A("chosen", 12), L(48)]),
+      trade("share", "Accept the smaller payment for your share.", [L(24)]),
+      trade("plant", "Leave the seeds spread out for today.", []),
     ]),
   scene("relationships-virgo-footnotes", 7, "Virgo",
-    "The scholar invites you to share her study this afternoon. Her little agreement has footnotes reserving every shelf for herself. She has placed two books at your seat. “Those are the ones I thought you would want.” The rest of the shelves remain within reach.", [
-      trade("chosen", "Work steadily through the two books she chose.", [G("chosen", "resolve", 12)]),
-      trade("shelves", "Ask to choose from her shelves and compare your findings with hers.", [G("chosen", "luck", 12)]),
-      trade("decline", "Decline this afternoon's arrangement.", []),
+    "The scholar has cleared a chair for you in her floating study. Her written invitation reserves every shelf for herself, but supplies two books she thinks you will like. You steady one against the drift. She has imagined your comfort very thoroughly, including what you ought to read.", [
+      trade("chosen", "Study the two chosen books with steady attention.", [G("chosen", "resolve", 12)]),
+      trade("shelves", "Choose from the shelves and compare your findings with hers.", [G("chosen", "luck", 12)]),
+      trade("decline", "Decline the afternoon's carefully arranged invitation.", []),
     ]),
   scene("relationships-virgo-bandage", 7, "Virgo",
-    "The healer offers her practiced hands or her apprentice's slower care. The apprentice stands beside her while she names the two prices: a full fee and none. “Both will be careful.” The apprentice has already warmed the cloth and is waiting for your choice.", [
-      trade("healer", "Buy the healer's thorough treatment.", [A("chosen", -48)], { cost: 48 }),
-      trade("apprentice", "Accept the apprentice's modest care.", [A("chosen", -12)]),
-      trade("leave", "Leave the dressing as it is for now.", []),
+    "The healer offers her own quick hands or her apprentice's slower ones. The prices are a full fee and nothing. You watch the apprentice fold the warmed cloth again, making its edges meet. “She has time,” the healer says. “I have practice.” Both wait for your answer.", [
+      trade("healer", "Buy the healer's thorough practiced treatment.", [A("chosen", -48)], { cost: 48 }),
+      trade("apprentice", "Accept the apprentice's modest, unhurried care.", [A("chosen", -12)]),
+      trade("leave", "Leave your present dressing in place for now.", []),
     ]),
   scene("relationships-libra-uninvited-guest", 7, "Libra",
-    "Supper is finished before your partner admits she invited your old opponent to reconcile you. The guest asks for the bill. “Everyone ate well,” your partner says. The innkeeper names your share and offers washing in payment; a longer kitchen turn would leave wages after the meal is settled.", [
-      trade("supper", "Pay your share and let the attempted reconciliation end here.", [], { cost: 24 }),
-      trade("drink", "Wash your share of the supper dishes to settle the bill.", [A("chosen", 12)]),
-      trade("leave", "Work the full kitchen turn and collect the wages left after supper.", [A("chosen", 24), L(60)]),
+    "Only after supper does your partner admit she invited your former rival to reconcile you. The rival asks for the bill. You have all eaten well, which settles none of the other questions. The keeper offers your meal's price, dishwashing instead, or a longer kitchen turn with wages left over.", [
+      trade("supper", "Pay your meal's share and end the evening here.", [], { cost: 24 }),
+      trade("drink", "Wash enough dishes to settle your supper.", [A("chosen", 12)]),
+      trade("leave", "Work the full kitchen turn and collect the remaining wages.", [A("chosen", 24), L(60)]),
     ]),
   scene("relationships-libra-dance", 7, "Libra",
-    "Your partner asks you to lead the unfamiliar turn. She is tired of apologizing for knowing it better. “I could show you, if we stopped being polite.” She offers her hand again. Beside the floor, a bench gives both of you a comfortable view.", [
-      trade("learn", "Practice the demanding turn until your feet follow it.", [A("chosen", 12), G("chosen", "luck", 12)]),
-      trade("easy", "Share the easy dance you already know.", [A("chosen", -24)]),
-      trade("watch", "Take the bench together and watch.", [A("allUnlocked", -12)]),
+    "Your partner has three hands and offers each in turn while asking you to lead. She knows the unfamiliar dance better and keeps apologizing for it. “We could stop being polite for a moment.” A broad bench waits beside the floor, requiring no agreement about whose foot moves first.", [
+      trade("learn", "Practice the difficult turn with her until your feet learn it.", [A("chosen", 12), G("chosen", "luck", 12)]),
+      trade("easy", "Choose an easy dance and enjoy it together.", [A("chosen", -24)]),
+      trade("watch", "Rest on the bench with the waiting company.", [A("allUnlocked", -12)]),
     ]),
   scene("relationships-libra-seal", 7, "Libra",
-    "The merchant asks you to break the disputed seal together so neither can claim the other opened it. He sets the agreed fee beside the chest. A clerk offers to witness for part of it. The merchant keeps his finger on the seal until you answer.", [
-      trade("together", "Break the seal beside him and take the agreed fee.", [L(48)]),
-      trade("witness", "Have the clerk witness and accept the smaller payment.", [L(24)]),
-      trade("withdraw", "Withdraw your claim before the seal is broken.", []),
+    "The merchant rests one finger on the seal of the chest holding your agreed payment. He wants it opened together so neither can be accused of changing the contents. A clerk offers to witness for part of your fee. You can hear small coins shift when the merchant breathes.", [
+      trade("together", "Open the chest together and take the full agreed payment.", [L(48)]),
+      trade("witness", "Pay the witness from your fee and accept the remainder.", [L(24)]),
+      trade("withdraw", "Withdraw the claim before anyone breaks the seal.", []),
     ]),
   scene("relationships-libra-two-gifts", 7, "Libra",
-    "Your former lover brings a gift exactly equal to the one you returned. “This makes it simpler.” The jeweler has already written its price on a slip. Across the lane, your old supper place has a free table. Neither of you unfolds the slip.", [
-      trade("value", "Accept the gift and realize its written value.", [L(48)]),
-      trade("meal", "Use its value for one last comfortable supper together.", [A("chosen", -36)]),
-      trade("return", "Return it without matching another gift.", []),
+    "Your former lover brings a gift equal in value to the one you returned. The jeweler has attached a receipt with exceptional care. You stand beside a supper place you both remember. “That should make us even,” your companion says, without looking at either the receipt or the empty table.", [
+      trade("value", "Accept the gift and exchange it for its stated value.", [L(48)]),
+      trade("meal", "Use its value for one long, comfortable supper together.", [A("chosen", -36)]),
+      trade("return", "Return the gift without starting another exchange.", []),
     ]),
   scene("relationships-libra-veranda", 7, "Libra",
-    "Your host offers the quiet veranda cheaply if you will sit with a guest she cannot dismiss. “Only until tea.” The guest is already explaining why tea takes too little time. A private room is available at its usual price; your host admits the difference plainly.", [
-      trade("veranda", "Take the cheap veranda and hear the guest out.", [A("chosen", -36)], { cost: 12 }),
-      trade("room", "Buy the separate room and its quiet.", [A("chosen", -48)], { cost: 48 }),
-      trade("leave", "Leave her to the conversation.", []),
+    "Your host offers the cool veranda cheaply if you sit with a guest she cannot bring herself to dismiss. The guest remembers the first tree planted here and intends to describe all the others. A private room costs more. Your host tells you both prices without pretending the shade is different.", [
+      trade("veranda", "Buy the inexpensive veranda and rest through the long account.", [A("chosen", -36)], { cost: 12 }),
+      trade("room", "Pay for the separate room and its deeper quiet.", [A("chosen", -48)], { cost: 48 }),
+      trade("leave", "Leave your host to the unfinished conversation.", []),
     ]),
   scene("relationships-scorpio-cellar-key", 7, "Scorpio",
-    "Your business partner hands you the cellar key but keeps his hand on the door. “What are you taking?” The cash settlement is ready, and the stored cordial can be opened here instead. He wants the division named before either of you reaches inside.", [
-      trade("cash", "Name your share and take the cash settlement.", [L(48)]),
-      trade("cordial", "Take the cordial as your share and rest over it together.", [A("chosen", -36)]),
-      trade("close", "Close the account without taking a share.", []),
+    "Your business partner gives you the cellar key while keeping his hand against the door. Inside are the coins and cordial from your shared venture. “Which are you taking?” he asks. You have access, but he still wants the division spoken before either of you reaches into the dark.", [
+      trade("cash", "Name your share and take the cash waiting inside.", [L(48)]),
+      trade("cordial", "Choose the cordial and settle beside him to drink your share.", [A("chosen", -36)]),
+      trade("close", "Close the account without claiming a portion.", []),
     ]),
   scene("relationships-scorpio-thorn", 7, "Scorpio",
-    "The gardener flinches as you lift the lamp toward the thorn beneath her nail. Hot oil spills across your hand. The healer draws up a second chair and names the dressing fee. “I did ask for steady,” the gardener says, then looks at your hand and falls quiet.", [
-      trade("care", "Pay for the careful dressing and a supporting wrap.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("lamp", "Keep the lamp steady through the long treatment for the healer’s fee.", [A("chosen", 24), L(84)]),
-      trade("set", "Cool your hand in the plain basin and leave the longer treatment.", [A("chosen", 12)]),
+    "The gardener flinches from the thorn beneath her nail and knocks hot lamp oil over your hand. The healer pulls up another chair. Your patient has become your fellow patient. A paid dressing would support the burn; keeping the lamp steady through her treatment earns a fee.", [
+      trade("care", "Buy the dressing and a firm supporting wrap.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("lamp", "Hold the lamp through the long treatment despite the sting.", [A("chosen", 24), L(84)]),
+      trade("set", "Cool your hand in the plain basin and leave with the burn.", [A("chosen", 12)]),
     ]),
   scene("relationships-scorpio-retraction", 7, "Scorpio",
-    "The man who accused you will retract it in the courtyard, provided you stand beside him through the long outdoor hearing. He offers compensation for the hours on the cold steps. Or, he says, the two of you can settle privately at the inn now.", [
-      trade("hearing", "Stand through the cold hearing for the public retraction and compensation.", [A("chosen", 24), L(84)]),
-      trade("private", "Accept the private settlement over the meal he offers.", [A("chosen", -24)]),
-      trade("refuse", "Refuse both arrangements.", []),
+    "The trader admits he mistook your hired sled for the one missing from his yard. He will retract his accusation publicly if you stand beside him through the cold hearing, with compensation. Or he offers a private meal now. You can see that each proposal repairs a different part of the day.", [
+      trade("hearing", "Stand through the cold public hearing for his compensation.", [A("chosen", 24), L(84)]),
+      trade("private", "Accept the private settlement over the warm meal.", [A("chosen", -24)]),
+      trade("refuse", "Refuse both of the arrangements he offers.", []),
     ]),
   scene("relationships-scorpio-bitter-fruit", 7, "Scorpio",
-    "Your companion cuts the dark orchard fruit and eats her piece first. “It is ripe. It is also bitter.” She offers you the other half without pretending one changes the other. Beside her knife lie two uncut fruits she can show you how to distinguish.", [
-      trade("fruit", "Share the ripe fruit she has cut.", [A("chosen", -24)]),
-      trade("learn", "Ask her to show you the difference before tasting.", [G("chosen", "luck", 12)]),
-      trade("own", "Keep to your own provisions.", []),
+    "Your companion opens a dark fruit grown below the orchard's roots. She eats first and lets the bitterness show on her face. “Ripe,” she says. “Also bitter.” Two uncut fruits wait beside the knife. You can learn the difference without needing either taste to become something kinder.", [
+      trade("fruit", "Eat the ripe half she offers and rest beside her.", [A("chosen", -24)]),
+      trade("learn", "Learn how she distinguishes the fruit before tasting it.", [G("chosen", "luck", 12)]),
+      trade("own", "Leave the cut fruit with her and keep your own provisions.", []),
     ]),
   scene("relationships-scorpio-duel-ended", 7, "Scorpio",
-    "Your old practice partner lays both padded blades on the ground. He wants one last lesson in the move he never managed to answer. “Then we stop.” He offers a teaching fee or the technique he has kept to himself. His hand remains open between the choices.", [
-      trade("teach", "Teach through the full, strenuous session for his fee.", [A("chosen", 24), L(84)]),
-      trade("exchange", "Exchange techniques and practice his difficult movement.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("hands", "Take his hand and stop here.", []),
+    "Your old practice partner lays the padded sticks between you. He asks for one last lesson in the movement he never answered. In return he offers a fee or the technique he kept private. “Then we finish.” His open hand waits beside the tools rather than reaching for them.", [
+      trade("teach", "Teach the full strenuous lesson for his offered fee.", [A("chosen", 24), L(84)]),
+      trade("exchange", "Trade lessons and work through the tiring movement he offers.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("hands", "Take his hand and let the practice end here.", []),
     ]),
   scene("relationships-sagittarius-wrong-road", 7, "Sagittarius",
-    "At the far end of a rough ridge, your guide admits the scenic route was her idea. “I should have asked.” The short road lies below a steep descent now. She offers part of her fee for the next climb; a passing cart can take you down for payment.", [
-      trade("climb", "Make the harder onward climb for the share she offers.", [A("chosen", 24), L(84)]),
-      trade("ride", "Pay for the cart down to the turning.", [], { cost: 36 }),
-      trade("short", "Descend the rough slope alone to recover the short road.", [A("chosen", 12)]),
+    "At the ridge, your guide admits the longer route was chosen for the view. Below, the road you requested winds through the plain. She offers part of her fee if you continue climbing. A passing cart can take you down; the direct descent is rough enough to remember in your knees.", [
+      trade("climb", "Make the harder onward climb for her offered payment.", [A("chosen", 24), L(84)]),
+      trade("ride", "Pay the cart driver to take you down.", [], { cost: 36 }),
+      trade("short", "Descend the rough slope to rejoin the shorter road.", [A("chosen", 12)]),
     ]),
   scene("relationships-sagittarius-tent", 7, "Sagittarius",
-    "Your companion proposes sleeping beneath the stars and gives you the tent. When you start toward it, she admits she hoped you would stay outside too. “It was an offer, though.” She unties the blankets so you can divide them whichever way you choose.", [
-      trade("tent", "Accept the tent's sheltered rest alone.", [A("chosen", -36)]),
-      trade("blankets", "Spread the blankets into a shared resting place outside.", [A("allUnlocked", -12)]),
-      trade("night", "Wish her a clear night and make your own arrangements.", []),
+    "Your companion gives you the tent and announces she will sleep beneath the migrating lights. When you take its rope, she admits she hoped you would stay outside too. “It's still yours.” She opens the blanket roll so you can see how much warmth each arrangement would leave.", [
+      trade("tent", "Accept the tent and take its sheltered rest alone.", [A("chosen", -36)]),
+      trade("blankets", "Spread the blankets for shared rest beneath the lights.", [A("allUnlocked", -12)]),
+      trade("night", "Wish her a clear night and choose your own stopping place.", []),
     ]),
   scene("relationships-sagittarius-table", 7, "Sagittarius",
-    "The stranger invites you to an enormous supper and asks for an honest opinion of a speech for his beloved. He has prepared several endings. “The food is yours either way.” He offers a small fee if you will rehearse the reply aloud before choosing one.", [
-      trade("eat", "Eat at leisure while he tries the endings.", [A("chosen", -24)]),
-      trade("reply", "Take the paid rehearsal and answer him plainly.", [L(24)]),
-      trade("brief", "Give a brief opinion and leave the table.", []),
+    "A stranger invites you to supper and asks for help proposing a journey to his beloved. His speech has several endings; none mentions that he has already packed. He offers a small rehearsal fee if you answer aloud. “Eat first,” he adds. “The food isn't conditional.”", [
+      trade("eat", "Eat at leisure while he tries his different endings.", [A("chosen", -24)]),
+      trade("reply", "Take the rehearsal fee and answer as plainly as you can.", [L(24)]),
+      trade("brief", "Offer a brief opinion and leave him the table.", []),
     ]),
   scene("relationships-sagittarius-boundary", 7, "Sagittarius",
-    "At the ridge your traveling partner decides the view is enough. He no longer wants to cross. The bags still need carrying to the nearby shelter; he offers you the porter's fee if you take both, or an equal share of the sheltered rest if you stay.", [
-      trade("bags", "Carry both heavy bags to the shelter for his fee.", [A("chosen", 12), L(48)]),
-      trade("shelter", "Pay your share and rest at the ridge with him.", [A("chosen", -36)], { cost: 36 }),
-      trade("part", "Part here without another payment.", []),
+    "Your traveling partner stops where the ridge opens onto the whole valley. He has seen enough and no longer wants to cross. The shelter nearby charges for rest; he will pay you to carry both bags there. His map still shows a route, but he is no longer asking it for one.", [
+      trade("bags", "Take his carrying fee and bear both bags to shelter.", [A("chosen", 12), L(48)]),
+      trade("shelter", "Pay your share and take a long sheltered rest beside him.", [A("chosen", -36)], { cost: 36 }),
+      trade("part", "Part at the ridge without accepting another arrangement.", []),
     ]),
   scene("relationships-sagittarius-pardon", 7, "Sagittarius",
-    "Your rival laughs at the sharp reply and offers to buy another round. You have not yet said whether the conversation is continuing. “A good answer deserves a drink.” He leaves his purse open on the table, giving you time to answer less indirectly.", [
-      trade("accept", "Accept the drink and stay for his company.", [A("chosen", -24)]),
-      trade("round", "Buy a generous round for everyone at the table.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("farewell", "Make the farewell plain and leave.", []),
+    "Your rival at the card table laughs at your sharp farewell and offers another drink. “A good answer deserves one.” You have not agreed to another game. He leaves the purse open between you, generous enough to make staying easy and still waiting for you to say whether you will.", [
+      trade("accept", "Accept the drink and rest in his company.", [A("chosen", -24)]),
+      trade("round", "Pay for a cooling round to pass around the table.", [A("allUnlocked", -24)], { cost: 48 }),
+      trade("farewell", "Repeat the farewell plainly and take your leave.", []),
     ]),
   scene("relationships-capricorn-snowline", 7, "Capricorn",
-    "Snow fills the survey trench behind you. Your partner sets her pack down on the far side and studies the broken footholds. Her apprentice can guide you back, or finish the weighted survey beside you. A hired sledge driver waits above the bank with a stated fare.", [
-      trade("pack", "Finish the weighted survey beside the apprentice and learn the difficult footing.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
-      trade("hands", "Pay for the sledge crossing with the packs aboard.", [], { cost: 36 }),
-      trade("stop", "End the survey and climb back through the broken footholds.", [A("chosen", 12)]),
+    "Snow erases the survey trench behind you faster than your partner can mark it. Her apprentice studies the broken footholds beneath your weighted pack. You can finish the work together, climb back, or hire the sledge waiting above the bank. The neat line on the chart has become a difficult place.", [
+      trade("pack", "Finish the weighted survey and learn the hard footing.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
+      trade("hands", "Pay for the sledge to carry you and the packs across.", [], { cost: 36 }),
+      trade("stop", "Climb back through the broken footholds and end the survey.", [A("chosen", 12)]),
     ]),
   scene("relationships-capricorn-kiln", 7, "Capricorn",
-    "For thirty years the smith's partner has brought supper to the forge. Tonight she asks him to sit at her table instead. He looks toward the bellows, then offers you the watch fee. She puts the covered dish down, waiting to hear whether he is coming.", [
-      trade("bellows", "Work the long bellows turn for his fee.", [A("chosen", 24), L(84)]),
-      trade("pause", "Share the warm supper pause before the fire is left to settle.", [A("chosen", -12)]),
-      trade("leave", "Leave them to decide how to go home.", []),
+    "The smith's partner has carried supper to the forge for thirty years. Tonight she sets the covered dish down and asks him to come to her table. You hear the bellows draw another breath. He offers you the paid watch, then waits with her to see whether the fire can release him.", [
+      trade("bellows", "Work the long bellows watch for his offered wage.", [A("chosen", 24), L(84)]),
+      trade("pause", "Share a warm supper pause while the fire settles.", [A("chosen", -12)]),
+      trade("leave", "Leave the pair to arrange their own departure.", []),
     ]),
   scene("relationships-capricorn-joke", 7, "Capricorn",
-    "The stonecutter makes his proposal of partnership sound like a joke, then looks offended when you smile. “A trial, then.” He names a wage for working beside him today, or a fee for a shorter lesson with the same tools. The stone waits between you.", [
-      trade("trial", "Work the hard paid trial beside him today.", [A("chosen", 24), L(84)]),
-      trade("lesson", "Buy the short, supported lesson.", [G("chosen", "affliction", 12)], { cost: 24 }),
-      trade("no", "Decline the arrangement plainly.", []),
+    "The stonecutter proposes a partnership as though delivering a joke, then stops smiling when you laugh. He turns the stone between you. A paid trial today, he suggests, or a shorter lesson for a fee. The work has given him clear terms that the invitation could not find.", [
+      trade("trial", "Take the hard paid trial beside him.", [A("chosen", 24), L(84)]),
+      trade("lesson", "Buy the shorter supported lesson with the same tools.", [G("chosen", "affliction", 12)], { cost: 24 }),
+      trade("no", "Decline the proposed arrangement in plain words.", []),
     ]),
   scene("relationships-capricorn-cloak", 7, "Capricorn",
-    "Your companion has repaired the winter cloak so carefully that you cannot find the old tear. She refuses the payment agreed beforehand. When you mention the agreement, she points to a supper stall. “You could spend it on something we both want.”", [
-      trade("warmth", "Accept the repaired cloak and its restorative warmth.", [A("chosen", -24)]),
-      trade("meal", "Spend the money on a substantial meal to share.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("thanks", "Thank her and continue without another exchange.", []),
+    "Your companion has mended the winter cloak so well that the tear is visible only when the cloth catches starlight. She refuses the fee you agreed. Across the road, a supper stall begins setting out hot bowls. “You can still spend it,” she says. “I just don't want to sell you this.”", [
+      trade("warmth", "Wear the repaired cloak and rest in its warmth.", [A("chosen", -24)]),
+      trade("meal", "Buy a substantial meal for everyone traveling with you.", [A("allUnlocked", -24)], { cost: 48 }),
+      trade("thanks", "Thank her and leave the exchange complete.", []),
     ]),
   scene("relationships-capricorn-last-step", 7, "Capricorn",
-    "Your older climbing partner wants you to reach the lookout first. She cannot resist correcting your footing on the final rise. “Go on. No, the other foot.” Below the rise is a broad resting ledge. She admits the view is nearly as good from there.", [
-      trade("ascent", "Practice the hard final ascent with her corrections.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("ledge", "Rest together on the broad ledge.", [A("chosen", -24)]),
-      trade("lead", "Let her take the last step first.", []),
+    "Your older climbing partner urges you toward the lookout first, then corrects your leading foot. “Go on. The other one.” You stand above a broad ledge where the wind is gentle. She glances back at it and admits the view is almost the same, except for the satisfaction of arriving higher.", [
+      trade("ascent", "Practice the hard final rise under her corrections.", [A("chosen", 12), G("chosen", "resolve", 12)]),
+      trade("ledge", "Rest together on the sheltered ledge.", [A("chosen", -24)]),
+      trade("lead", "Let her choose the last foothold and go first.", []),
     ]),
   scene("relationships-aquarius-pipe", 7, "Aquarius",
-    "The frozen pipe splits between its two owners just as you lean over their drawing. Water soaks your coat. Each claims the other end caused it. They offer a repair fee; the bathkeeper will hire you dry clothes while they argue, and the road outside is cold.", [
-      trade("whole", "Work the long repair beside them for the full fee.", [A("chosen", 24), L(84)]),
-      trade("pans", "Hire dry clothes from the bathkeeper and leave the repair to its owners.", [], { cost: 36 }),
-      trade("leave", "Continue along the cold road in your wet coat.", [A("chosen", 12)]),
+    "On a frozen reservoir, two greenhouse owners show you the pipe they share. It bursts over your coat. Each points at the other’s valve. The bathkeeper arrives with dry clothes for hire; the owners, suddenly in agreement, offer you a fee to mend it.", [
+      trade("whole", "Brace the pipe through the long repair and collect their fee.", [A("chosen", 24), L(84)]),
+      trade("pans", "Hire dry clothes and leave the pipe with its owners.", [], { cost: 36 }),
+      trade("leave", "Take the cold road in your dripping coat.", [A("chosen", 12)]),
     ]),
   scene("relationships-aquarius-separate-rooms", 7, "Aquarius",
-    "Your host designed the lodging with separate entrances so guests could have company without intrusion. When you use yours, he looks hurt. “The common bath is open too.” He names both prices, then says he would rather know what you actually prefer.", [
-      trade("private", "Buy the private room and its uninterrupted rest.", [A("chosen", -48)], { cost: 48 }),
-      trade("bath", "Join the common bath for shared relief.", [A("allUnlocked", -12)], { cost: 24 }),
-      trade("leave", "Explain your departure without buying either.", []),
+    "Your host has built silent rooms around a noisy bath. Beyond the windows, snow climbs the mountain on the wind. He quotes both prices, then admits he sleeps beside the pool. “I like knowing someone’s there, even when I don’t want to talk.”", [
+      trade("private", "Buy a quiet room and rest with the door closed.", [A("chosen", -48)], { cost: 48 }),
+      trade("bath", "Pay to join the bath and share its warmth.", [A("allUnlocked", -12)], { cost: 24 }),
+      trade("leave", "Thank him for showing you around and leave.", []),
     ]),
   scene("relationships-aquarius-example", 7, "Aquarius",
-    "The glassmaker offers to repeat the mistake you accused her of hiding. “Watch closely this time.” She can demonstrate at the lesson price, or let you work through it yourself. The flawed piece lies beside the sound one, with no cloth over either.", [
-      trade("demonstration", "Pay for the careful demonstration and learn the distinction.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("practice", "Work through the demanding repeated shaping yourself.", [A("chosen", 12), G("chosen", "luck", 12)]),
-      trade("withdraw", "Withdraw the accusation and leave the pieces with her.", []),
+    "The glassworker sets your disputed lens between you and shines a bottled star through it. Two stars appear on the wall. “The crack isn’t hidden,” she says. “You were looking through it.” She offers a lesson, or the furnace and her tools.", [
+      trade("demonstration", "Pay her to show you where the glass went wrong.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("practice", "Shape a new lens beside her, through the furnace heat.", [A("chosen", 12), G("chosen", "luck", 12)]),
+      trade("withdraw", "Withdraw your complaint and leave her the lens.", []),
     ]),
   scene("relationships-aquarius-cistern", 7, "Aquarius",
-    "Your companion has walked all day, but asks that the water offered to her go into the public cistern. The keeper has already filled her cup. “It is still a gift if other people drink it,” she says. The full cup remains in reach.", [
-      trade("cup", "Offer her the full cup and take the deep rest beside her.", [A("chosen", -36)]),
-      trade("share", "Pour the gift into the shared basin.", [A("allUnlocked", -12)]),
-      trade("keeper", "Leave the water in the keeper's hands.", []),
+    "At a well beneath the ice, the keeper gives your travelling companion a jug. She tips it toward the public basin, then stops to drink from the spout. “It belongs to everyone,” she says, wiping her mouth. “I’m one of everyone.”", [
+      trade("cup", "Keep the jug between you and rest beside the well.", [A("chosen", -36)]),
+      trade("share", "Pour what remains into the basin for everyone to drink.", [A("allUnlocked", -12)]),
+      trade("keeper", "Return the jug to the keeper.", []),
     ]),
   scene("relationships-aquarius-terms", 7, "Aquarius",
-    "The contract writer has removed every word naming rank. He asks whether you still want today's work. The equal shares include the same heavy carrying, and he offers to buy yours out for a smaller sum. The ink beneath your unnamed place is still wet.", [
-      trade("equal", "Take the equal carrying share for its full wage.", [A("chosen", 24), L(84)]),
-      trade("buyout", "Accept the smaller payment and release today's share.", [L(24)]),
-      trade("decline", "Decline without claiming precedence.", []),
+    "The freight contract gives you equal shares. Your partner signs with a thumb as broad as your palm, then lifts two crates under one arm. “Equal work, too,” he says. He will buy your share if you prefer; he has brought his own straps.", [
+      trade("equal", "Sign for the full share and carry your half of the freight.", [A("chosen", 24), L(84)]),
+      trade("buyout", "Take his smaller payment and hand over your share.", [L(24)]),
+      trade("decline", "Leave your name off the contract.", []),
     ]),
   scene("relationships-pisces-two-boats", 7, "Pisces",
-    "Your companion ties the boats together to finish talking. Opposing currents draw the knot hard around your wrist before you can release it. She reaches for the oars, offering the fee meant for a towman. He waits nearby with a boat hook and room for both of you.", [
-      trade("row", "Row the joined boats hard toward the bank for her fee.", [A("chosen", 24), L(84)]),
-      trade("tow", "Pay the towman to take the strain and bring both boats to shore.", [], { cost: 24 }),
-      trade("untie", "Work the taut knot off your wrist and separate the boats now.", [A("chosen", 12)]),
+    "Your companion ties the two boats together because she has not finished talking. A loop catches your wrist as their currents pull apart. She reaches for the oars and offers the money meant for a towman. He waits nearby with a long hook, ready to bring both conversations ashore.", [
+      trade("row", "Row the joined boats hard toward shore for her fee.", [A("chosen", 24), L(84)]),
+      trade("tow", "Pay the towman to take the strain and bring both boats in.", [], { cost: 24 }),
+      trade("untie", "Work the taut loop off your wrist and separate now.", [A("chosen", 12)]),
     ]),
   scene("relationships-pisces-wet-hem", 7, "Pisces",
-    "The painter has spent your portrait sitting telling you about her missing dog. Your wet clothes dry beside her stove. At last she offers back the sitting fee. “I haven't looked at you properly once.” She also offers to keep the fire going if you stay.", [
-      trade("warmth", "Stay by the stove and accept the warm rest.", [A("chosen", -24)]),
-      trade("refund", "Take back the sitting fee and end the portrait session.", [L(24)]),
-      trade("leave", "Leave the fee with her and let her go to the door.", []),
+    "You sit for your portrait while the painter watches the door for her missing dog. Your wet coat dries by her stove. At last she offers your fee back. The canvas holds one careful ear and no face. “I haven't looked properly,” she says, and puts another log on the fire.", [
+      trade("warmth", "Stay beside the stove and accept its warm rest.", [A("chosen", -24)]),
+      trade("refund", "Take back your sitting fee and end the session.", [L(24)]),
+      trade("leave", "Leave the fee with her and free her to watch the door.", []),
     ]),
   scene("relationships-pisces-pardon", 7, "Pisces",
-    "Your counterpart pushes the repayment back across the table. The old debt is forgiven. Then she apologizes for making you bring the money. You can settle it anyway, accept the returned sum, or buy the supper neither of you has yet ordered. She waits for your answer.", [
-      trade("accept", "Accept the returned sum and close the debt.", [L(48)]),
-      trade("supper", "Use the returned payment for supper together.", [A("allUnlocked", -12)]),
-      trade("settle", "Leave the repayment with her and conclude the old settlement.", []),
+    "Your counterpart pushes the repayment back across the table, forgiving the old debt and apologizing for the journey you made to settle it. You can still leave the money, take it back, or turn it into supper. The server waits with two bowls and no interest in who owed whom.", [
+      trade("accept", "Accept the returned money and close the debt.", [L(48)]),
+      trade("supper", "Spend the returned share on supper for the table.", [A("allUnlocked", -12)]),
+      trade("settle", "Leave the repayment with her and finish the settlement.", []),
     ]),
   scene("relationships-pisces-net", 7, "Pisces",
-    "The fisher wants the beautiful unwanted catch released. His partner points to the torn net beneath it. “And who pays for that?” The fisher asks whether you would cover the repair, help mend it beside them, or leave the decision with its owners.", [
-      trade("pay", "Pay for the damaged net so they can release the catch.", [], { cost: 24 }),
-      trade("mend", "Work through the long, tight mending and learn the knots.", [A("chosen", 12), G("chosen", "luck", 12)]),
-      trade("owners", "Leave the catch and the net to their owners.", []),
+    "The creature in the torn net carries a moving picture of the sky beneath each transparent fin. The fisher wants to release it; his partner asks who will pay for the tear. You are offered a place beside the mending basket. Beauty has arrived with a very ordinary repair bill.", [
+      trade("pay", "Pay for the torn net so the creature can go.", [], { cost: 24 }),
+      trade("mend", "Mend through the tight knots and learn their pattern.", [A("chosen", 12), G("chosen", "luck", 12)]),
+      trade("owners", "Leave the catch and its cost with the owners.", []),
     ]),
   scene("relationships-pisces-silence", 7, "Pisces",
-    "The traveling priest invites you to sit beside the warm pool. “For a while, could neither of us comfort the other?” She makes room on the dry stone. Beyond it, a wider basin is ready for company. She has offered quiet, but has not required you to take it.", [
-      trade("quiet", "Accept the quiet resting place beside her.", [A("chosen", -36)]),
-      trade("pool", "Join the wider pool and share its warmth.", [A("allUnlocked", -12)]),
-      trade("solitude", "Leave her the solitude.", []),
+    "The traveling priest makes room for you beside a warm pool. She has listened to troubles all day. “For a little while, could we let each other be?” A wider basin holds other bathers beyond the reeds. Her invitation includes a dry stone and leaves your answer entirely unfilled.", [
+      trade("quiet", "Take the quiet place and rest beside her.", [A("chosen", -36)]),
+      trade("pool", "Join the wider basin and share its warmth with the bathers.", [A("allUnlocked", -12)]),
+      trade("solitude", "Leave her the stone and the silence.", []),
     ]),
 ];

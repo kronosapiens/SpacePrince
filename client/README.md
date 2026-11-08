@@ -219,6 +219,38 @@ pnpm exec vite-node scripts/eval-narrative-catalogue.ts --menus-only --out eval-
 `runs-0.jsonl` and `runs-32.jsonl` retain whole runs and route alternatives; reports and `paired.json` summarize their results.
 Pool counts are not encounter probabilities, and the small fixed-policy cohort does not establish human win rates or equal balance across rising signs.
 
+### Prose playtest
+
+The rewrite for [issue #48](https://github.com/kronosapiens/SpacePrince/issues/48) covers all 720 house scenes, their choices, and all 84 relational openings.
+The Leo-rising Prince below reaches the first reviewed pool of 60 scenes, including joy and revival choices.
+Cast other charts to explore the pools selected by the other eleven rising signs.
+
+1. Run `pnpm dev` from `client/` and open its local URL in a fresh browser profile.
+2. Choose **Begin**, then **Continue** to reach casting.
+   Set **Date** to `2000-01-01` and **Time** to `19:00`; leave the default **Los Angeles, CA · United States** place selected.
+3. Choose **Cast Chart**, continue past the Moon introduction, and enter the map.
+   This casts `prince_2565931920`: Leo rising, at `2000-01-02T03:00:00.000Z`, latitude `34.05`, longitude `-118.24`.
+
+| House | Sign | House | Sign |
+| --- | --- | --- | --- |
+| I · Self | Leo | VII · Relationships | Aquarius |
+| II · Livelihood | Virgo | VIII · Transformation | Pisces |
+| III · Communication | Libra | IX · Pilgrimage | Aries |
+| IV · Home | Scorpio | X · Achievement | Taurus |
+| V · Creativity | Sagittarius | XI · Friendship | Gemini |
+| VI · Labor | Capricorn | XII · The Hidden | Cancer |
+
+Play normally to assess successive encounters.
+For a particular house, visit `/__index`, set **Force narrative house**, then follow **Play** and enter map nodes.
+The selector exhausts that house's five scenes before repeating within a run.
+Clear the override by selecting **(none)** when returning to ordinary play.
+Use `d` and the **Planets** slider to review later unlock tiers; joy still requires its planet to be eligible, and revival requires a combusted planet and sufficient Light.
+The `r` key and the dev page picker spawn a different Prince, so use the map and index controls to retain this chart.
+
+For feedback, note the house and opening words, what you understood was happening, and any choice whose participation or cost felt unclear.
+After several scenes, note repeated premises or phrasing, which inhabitants felt distinct, and where the prose was enjoyable or tiring.
+Also check the prompt and every choice at your usual window size, including options reached by scrolling.
+
 ## Verification
 
 - `pnpm exec tsc -b --noEmit`: typecheck

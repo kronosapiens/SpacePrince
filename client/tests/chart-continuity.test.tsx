@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NARRATIVE_SCENARIOS } from "@/data/narrative-scenarios";
+import { getScenario, NARRATIVE_SCENARIOS } from "@/data/narrative-scenarios";
 import { Chart } from "@/components/Chart";
 import { PLANETS } from "@/game/data";
 import { combustionCeiling } from "@/game/combust";
@@ -118,7 +118,9 @@ describe("shared player chart", () => {
     act(() => document.querySelector(".chorus-continue")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expectStableChart();
     closeFirstGuide("Read the scene");
-    expect(element('[data-guide="option-2"]').textContent).toContain("Tell your uncle her name, and leave his table.");
+    expect(element('[data-guide="option-2"]').textContent).toContain(
+      getScenario("home-libra-mara").options.find((option) => option.id === "name")!.text,
+    );
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     const target = PLANETS.find((planet) =>

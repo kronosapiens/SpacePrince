@@ -3,366 +3,366 @@ import { A, G, L, revival, scene, trade } from "./shared";
 
 export const HOUSE_08_SCENARIOS: NarrativeScenario[] = [
   scene("transformation-aries-forge", 8, "Aries",
-    "Your arms ache from working the dead smith’s last firing. The executor wants the forge cold before the buyer arrives, but the apprentice has one piece left. She names the finishing fee and offers a shorter paid lesson at the cooler bench, where you can sit between strokes.", [
-      trade("work", "Finish the last piece through the long hammering for its fee.", [A("chosen", 36), L(168)]),
-      trade("stroke", "Buy the supported lesson at the cooler bench and practice the smith’s stroke.", [G("chosen", "affliction", 24)], { cost: 48 }),
-      trade("cold", "End your turn and leave with the strain from the firing.", [A("chosen", 12)]),
+    "Your arms ache beside the dead smith's last firing. The little sun inside his forge must be extinguished before the sale, but his apprentice has one piece unfinished. She offers its finishing wage or a paid lesson at the cool bench. Her hammer is warm where his hand once held it.", [
+      trade("work", "Finish the piece through the long hammering for its wage.", [A("chosen", 36), L(168)]),
+      trade("stroke", "Buy a supported lesson in his strongest stroke at the cool bench.", [G("chosen", "affliction", 24)], { cost: 48 }),
+      trade("cold", "Set down the hammer with the firing's strain still in your arms.", [A("chosen", 12)]),
     ]),
   scene("transformation-aries-unfinished-race", 8, "Aries",
-    "The runner's widow brings the entry purse he never used. She asks whether you will finish his short hill course today. “You needn't run like him.” She names the purse's amount, then points to the place beside her where he would have waited to start.", [
-      trade("run", "Run the hard hill course for the offered purse.", [A("chosen", 24), L(60)]),
-      trade("sit", "Sit beside her at the starting place.", [A("chosen", -12)]),
-      trade("return", "Leave the purse in her hands.", []),
+    "The runner's widow meets you at the hill course with his unused entry purse. The starting gate still knows his name. She asks whether you will run it today. “You can take the corners differently,” she adds. “He always thought slowing down was an insult to the road.”", [
+      trade("run", "Run the hard hill course for the purse she offers.", [A("chosen", 24), L(60)]),
+      trade("sit", "Sit with her beside the waiting gate.", [A("chosen", -12)]),
+      trade("return", "Leave the purse and the course in her hands.", []),
     ]),
   scene("transformation-aries-cut-cord", 8, "Aries",
-    "Morning finds the heirs measuring the tent you slept in. They mean to divide it today, but your last night’s lodging is still unsettled. The keeper accepts coins or help striking camp. One heir offers a larger clearing wage after that bill is covered; the other already holds the cord.", [
-      trade("shelter", "Pay the lodging bill and leave before the tent is divided.", [], { cost: 48 }),
-      trade("dismantle", "Dismantle the full heavy camp and collect the wage left after lodging.", [A("chosen", 36), L(156)]),
-      trade("relinquish", "Strike your own part of the camp to settle the lodging without coins.", [A("chosen", 24)]),
+    "The heirs begin measuring the tent before you have folded your sleeping blanket. Its living canvas stretches away from the scissors. Your final lodging bill is due; the keeper accepts coins or dismantling work. One heir offers wages for clearing the whole camp after that debt is settled.", [
+      trade("shelter", "Pay the lodging bill and leave before the cutting begins.", [], { cost: 48 }),
+      trade("dismantle", "Dismantle the heavy camp and take the wages left after lodging.", [A("chosen", 36), L(156)]),
+      trade("relinquish", "Strike your own portion of camp to settle the bill.", [A("chosen", 24)]),
     ]),
   scene("transformation-aries-first-flame", 8, "Aries",
-    "The funeral keeper holds out the taper, then admits this is her first ceremony without her teacher. His instructions lie beneath the bowl used for returns. She knows the words. What she cannot stop doing is looking toward the place where he used to stand.", [
-      trade("tend", "Take the long, hot tending watch for its fee.", [A("chosen", 24), L(60)]),
-      trade("stand", "Stand beside her while the first flame catches.", []),
-      revival("Pay for the return and speak the name over the waiting bowl."),
+    "The funeral keeper offers you the taper, then admits this is her first rite without her teacher. She has his notes and all the right words. You see her glance toward his empty place. Beside the return bowl lie the ceremony's fee dish and wages for a long tending watch.", [
+      trade("tend", "Keep the hot tending watch for its offered wage.", [A("chosen", 24), L(60)]),
+      trade("stand", "Stand beside her while she lights the first flame.", []),
+      revival("Pay for the return and speak a name over the bowl."),
     ]),
   scene("transformation-aries-smashed-lock", 8, "Aries",
-    "The creditor has broken the surrendered chest's lock when its owner arrives with the key. He names the remaining balance without mentioning the broken wood. The owner looks at you. A carrying fee is offered for the heavy contents if the division proceeds now.", [
-      trade("carry", "Carry the heavy contents away for your share of the fee.", [A("chosen", 24), L(60)]),
-      trade("settle", "Pay the remaining balance and leave the chest with its owner.", [], { cost: 36 }),
-      trade("refuse", "Refuse a part in the division.", []),
+    "The creditor has broken open the surrendered chest when its owner arrives with the key. You watch her set it beside the splintered lock. A small balance remains; the creditor offers a carrying fee if the contents are divided now. Neither document mentions the smell of cedar escaping into the street.", [
+      trade("carry", "Take the carrying fee and shoulder the chest’s heavy contents.", [A("chosen", 24), L(60)]),
+      trade("settle", "Pay the remaining balance and leave her the chest.", [], { cost: 36 }),
+      trade("refuse", "Take no part in the proposed division.", []),
     ]),
   scene("transformation-taurus-orchard", 8, "Taurus",
-    "The orchard sale is complete. Your final pruning bill lies beside the new owner’s papers. The gardener accepts payment or clearing work today; the hanging fruit can cover a larger wage if you harvest it too. Your aunt turns a small pear over without putting it in either basket.", [
-      trade("fruit", "Pay the final pruning bill and close your part in the orchard.", [], { cost: 48 }),
-      trade("harvest", "Clear the cuttings and harvest the whole crop for the remaining sale payment.", [A("chosen", 48), L(192)]),
-      trade("leave", "Clear the heavy cuttings to settle the bill and leave the fruit behind.", [A("chosen", 24)]),
+    "The orchard has been sold, roots and fruit together. Your unpaid pruning bill lies beside the papers. You may settle it in coins or clearing work; harvesting the hanging crop as well would earn a larger payment. Your aunt turns one pear over, testing its ripeness without choosing a basket.", [
+      trade("fruit", "Pay the pruning bill and close your share in the orchard.", [], { cost: 48 }),
+      trade("harvest", "Clear the cuttings and harvest the full crop for the remaining wages.", [A("chosen", 48), L(192)]),
+      trade("leave", "Clear the heavy cuttings to settle the bill without coins.", [A("chosen", 24)]),
     ]),
   scene("transformation-taurus-chair", 8, "Taurus",
-    "The widower gives you his wife's excellent chair, then keeps explaining where she liked it placed. A dealer waits outside with an offer. When you sit, the widower adjusts the cushion before asking whether you intend to take it. He has not moved his own chair.", [
-      trade("rest", "Stay in the chair for a quiet rest beside him.", [A("chosen", -24)]),
-      trade("sale", "Take the dealer's offer for your bequest.", [L(48)]),
-      trade("return", "Leave the chair with him as a gift.", []),
+    "The widower gives you his wife's chair, grown from a vine that still leans toward his seat. A dealer waits outside with an offer. When you sit, he adjusts the cushion before asking whether you will take it. The vine has found its old position again, for the moment.", [
+      trade("rest", "Stay in the chair and rest beside him.", [A("chosen", -24)]),
+      trade("sale", "Accept the dealer's price for the chair you were given.", [L(48)]),
+      trade("return", "Give the chair back without asking him to offer it again.", []),
     ]),
   scene("transformation-taurus-feast", 8, "Taurus",
-    "The funeral cook will not let the mourners pick at their plates. “He would have asked for seconds.” She gives you a portion large enough to support the claim. At the end of the table, untouched dishes wait beside people who have forgotten to pass them.", [
-      trade("seconds", "Eat the full nourishing portion she gives you.", [A("chosen", -36)]),
-      trade("pass", "Pass the dishes until everyone has a share.", [A("allUnlocked", -12)]),
-      trade("thanks", "Thank her without taking a plate.", []),
+    "The funeral cook warms your plate between her broad palms before filling it. “He hated cold food.” She serves as though the absent guest might still inspect the portions. Farther down the table, dishes have stopped moving between people. The food remains warm enough to pass, whether anyone finds words or not.", [
+      trade("seconds", "Eat the full sustaining portion she gives you.", [A("chosen", -36)]),
+      trade("pass", "Pass the dishes until everyone at the table has a share.", [A("allUnlocked", -12)]),
+      trade("thanks", "Thank her and leave the warmed plate for another guest.", []),
     ]),
   scene("transformation-taurus-bull", 8, "Taurus",
-    "The estate’s old bull leans against the rope in your hands. His groom has taken the empty harness to the buyer; you stand where the two roads divide. The short road is hard, the grassy one long. A hired drover offers to finish while the buyer names both delivery fees.", [
-      trade("short", "Lead him along the hard short road for its payment.", [A("chosen", 24), L(96)]),
-      trade("grass", "Take the full grassy route for the larger delivery fee.", [A("chosen", 36), L(168)]),
-      trade("decline", "Pay the drover to take over the pulling rope and finish the delivery.", [], { cost: 48 }),
+    "The estate's old bull leans against the rope in your hands. His groom has gone to the buyer with the empty harness. You stand between the hard short road and a longer grassy one, each with its delivery fee. A hired drover waits while the bull keeps choosing the grass.", [
+      trade("short", "Lead him down the hard short road for its fee.", [A("chosen", 24), L(96)]),
+      trade("grass", "Take the full grassy route for the larger payment.", [A("chosen", 36), L(168)]),
+      trade("decline", "Pay the waiting drover to take over the pulling rope.", [], { cost: 48 }),
     ]),
   scene("transformation-taurus-cellar", 8, "Taurus",
-    "The partners closing the wine shop have counted your settlement. Beside it stands the last good bottle, already uncorked. One offers the money; the other asks whether you would rather drink your share at their table. They have finally agreed which chairs belong to whom.", [
-      trade("cash", "Take the counted cash and close the account.", [L(48)]),
-      trade("bottle", "Take your share as a long, restful cup at their table.", [A("chosen", -24)]),
-      trade("release", "Release the share and leave the bottle with them.", []),
+    "The wine shop's last bottle stands open between its separating owners. You have a settlement waiting beside it. One offers coins; the other offers your share as a long cup at their table. Their argument about the chairs is finally over, leaving three places to sit among the packed crates.", [
+      trade("cash", "Take the counted money and close the account.", [L(48)]),
+      trade("bottle", "Choose the bottle's warmth and linger at their table.", [A("chosen", -24)]),
+      trade("release", "Leave them both your share and the open bottle.", []),
     ]),
   scene("transformation-gemini-two-wills", 8, "Gemini",
-    "The executors disagree about the two wills but agree your copy of the account has been delivered. Its copying bill waits beside it. You may pay the clerk, finish his cramped indexing work, or take the larger wage for carrying the archive after the bill is settled.", [
-      trade("cash", "Pay the copying bill and take your completed account.", [], { cost: 48 }),
-      trade("papers", "Complete the long indexing in place of payment and study the conflicting instructions.", [A("chosen", 24), G("chosen", "luck", 24)]),
-      trade("waive", "Carry the heavy archive and collect the wages remaining after the copying bill.", [A("chosen", 36), L(168)]),
+    "One will speaks from a little cylinder; the other lies on paper and disagrees. The executors have finished your copy of the account anyway. Its bill must be paid in coins or indexing work. You can earn more by carrying the heavy archive once the copying debt is covered.", [
+      trade("cash", "Pay the copying bill and take the finished account.", [], { cost: 48 }),
+      trade("papers", "Index the conflicting instructions through the long cramped session.", [A("chosen", 24), G("chosen", "luck", 24)]),
+      trade("waive", "Carry the archive and collect the wages left after the bill.", [A("chosen", 36), L(168)]),
     ]),
   scene("transformation-gemini-last-letter", 8, "Gemini",
-    "The courier's last delivery is a recipe full of jokes. His sister asks you to read it at the vigil, where a fee is set aside for the long night. She has cooked the dish too. “He never told me it was supposed to be funny.”", [
-      trade("vigil", "Stay through the cold vigil and read his letter during it.", [A("chosen", 24), L(60)]),
-      trade("supper", "Share the supper she made from his recipe.", [A("chosen", -24)]),
-      trade("letter", "Return the letter unread.", []),
+    "The courier's final delivery is a recipe annotated with rude jokes. His sister has cooked it for the vigil and asks you to read during the paid night watch. You smell the warm dish behind her. “I followed everything except the comment about the mayor,” she says. “That needed no salt.”", [
+      trade("vigil", "Keep the cold vigil and read the letter through the night.", [A("chosen", 24), L(60)]),
+      trade("supper", "Share the warm dish she made from his instructions.", [A("chosen", -24)]),
+      trade("letter", "Return the folded letter without reading it aloud.", []),
     ]),
   scene("transformation-gemini-parting-act", 8, "Gemini",
-    "The conjurers can divide every prop except the trick requiring both pairs of hands. They offer to teach you one part, or share the last collection if you help carry the heavy apparatus through a final show. For once, neither interrupts the other's explanation.", [
-      trade("learn", "Learn one part of the shared trick.", [G("chosen", "luck", 12)]),
-      trade("show", "Carry the apparatus through the final show for a share.", [A("chosen", 24), L(60)]),
-      trade("watch", "Watch the farewell without joining the division.", []),
+    "The conjurers divide their props around you, but one illusion requires both pairs of hands. They explain it without their usual interruptions. You may learn a part or earn a share of the final show by carrying its heavy cabinet. Inside the cabinet, two painted doors still open onto the same place.", [
+      trade("learn", "Learn one half of the illusion from its departing makers.", [G("chosen", "luck", 12)]),
+      trade("show", "Carry the cabinet through the final show for a share.", [A("chosen", 24), L(60)]),
+      trade("watch", "Watch the farewell without joining its arrangements.", []),
     ]),
   scene("transformation-gemini-book-sale", 8, "Gemini",
-    "Your shoulders ache from the dead scholar’s books. His student keeps taking the smallest volumes from the sale pile. The dealer offers the full carrying wage, or a paid reading hour at the quiet table. The student holds another book out to you, then draws it back.", [
-      trade("read", "Buy the quiet reading hour and study a chosen volume at the table.", [G("chosen", "luck", 24)], { cost: 48 }),
-      trade("carry", "Carry the remaining heavy lot through the long closing turn.", [A("chosen", 36), L(156)]),
-      trade("leave", "End the carrying and leave with the strain from the books already moved.", [A("chosen", 12)]),
+    "Your shoulders ache beneath the dead scholar's metal-bound books. His student keeps withdrawing the smallest volumes from the sale pile. The dealer offers a full carrying wage or a paid hour of study at the quiet table. You see the student hesitate over another book too light to explain its weight.", [
+      trade("read", "Buy the quiet hour and study a volume at the table.", [G("chosen", "luck", 24)], { cost: 48 }),
+      trade("carry", "Carry the remaining heavy lot through the closing turn.", [A("chosen", 36), L(156)]),
+      trade("leave", "Put down the books with the ache of the earlier loads.", [A("chosen", 12)]),
     ]),
   scene("transformation-gemini-answering-voice", 8, "Gemini",
-    "At the return-house, two mourners remember the missing person's laugh differently. They ask which voice should be called. The keeper says the name will suffice. A quiet resting room is offered beside the ceremony, away from the argument over a sound both miss.", [
-      revival("Pay for the return and call the person by name."),
-      trade("room", "Buy the quiet room and rest beyond their argument.", [A("chosen", -36)], { cost: 48 }),
-      trade("listen", "Listen without choosing a memory for them.", []),
+    "At the return ceremony, two mourners disagree about the missing person's laugh. You hear one make it bright and high, the other low and nearly silent. The keeper asks only for a name. A quiet room is available for a separate fee, beyond the sounds they both want back.", [
+      revival("Pay the keeper and use the missing person’s name to call them back."),
+      trade("room", "Buy the quiet room and rest beyond the competing memories.", [A("chosen", -36)], { cost: 48 }),
+      trade("listen", "Listen without selecting one remembered voice over the other.", []),
     ]),
   scene("transformation-cancer-receipt", 8, "Cancer",
-    "The widow brings a receipt for your old passage. On its back, her husband listed places he meant to show her. Two names are crossed out. She asks you to find the remaining ports on a chart, keeping one finger beneath his cramped handwriting.", [
-      trade("chart", "Study the chart together and trace the ports named in his hand.", [G("chosen", "luck", 12)]),
-      trade("receipt", "Return the receipt without unfolding the chart.", []),
+    "The widow brings a receipt for a passage you once took. On the back, her husband listed ports he hoped to show her. You find two crossed out and several crowded into the margin. She has brought a chart large enough for all of them, including the places he ran out of paper for.", [
+      trade("chart", "Study the chart with her and trace the ports in his handwriting.", [G("chosen", "luck", 12)]),
+      trade("receipt", "Return the receipt without opening the chart today.", []),
     ]),
   scene("transformation-cancer-bedroom", 8, "Cancer",
-    "The drowned sailor’s bed rests across your shoulder on the narrow stairs. His mother replaces the wet boots beneath it whenever the keeper moves them. He names the full clearing wage or the porter’s fee to take over. She asks about a return, keeping one hand on the bedrail.", [
-      revival("Pay for the return and leave the boots ready beneath the bed."),
-      trade("clear", "Carry the heavy furnishings down through the full clearing turn.", [A("chosen", 36), L(168)]),
-      trade("sit", "Lower the bed onto the landing and end the carry.", [A("chosen", 24)]),
-      trade("porter", "Pay the porter to take the weight and finish the clearing.", [], { cost: 48 }),
+    "The drowned sailor's bed presses into your shoulder on the narrow stair. His mother keeps placing his wet boots beneath it, wherever it goes. The keeper offers the clearing wage or a porter's fee to take over. She asks about calling him back, one hand following the moving bedrail.", [
+      revival("Pay for his return and leave the boots ready by the bed."),
+      trade("clear", "Complete the paid clearing, carrying the heavy furnishings down.", [A("chosen", 36), L(168)]),
+      trade("sit", "Lower the bed onto the landing through a deep strained crouch.", [A("chosen", 24)]),
+      trade("porter", "Hire the porter to take the weight and finish the clearing.", [], { cost: 48 }),
     ]),
   scene("transformation-cancer-tureen", 8, "Cancer",
-    "Three relatives want the battered soup pot. Nobody has claimed the estate's silver. The executor offers you the silver's sale value; the cook offers a last paid meal from the disputed pot before it goes anywhere. One handle is held together with the old familiar wire.", [
-      trade("silver", "Accept the silver's sale value as your share.", [L(48)]),
-      trade("soup", "Buy the nourishing meal cooked in the old pot.", [A("chosen", -36)], { cost: 48 }),
-      trade("division", "Give up your place in the division.", []),
+    "Three relatives want the dented soup pot, and none has claimed the silver. You watch them take turns holding its wired handle. The executor offers the silver's sale value as your share. The cook proposes one last paid meal from the pot, before someone has to say whose cupboard will hold it.", [
+      trade("silver", "Take the silver's sale value as your portion.", [L(48)]),
+      trade("soup", "Buy a nourishing last meal from the old soup pot.", [A("chosen", -36)], { cost: 48 }),
+      trade("division", "Leave your claim out of the household’s division.", []),
     ]),
   scene("transformation-cancer-shoreline", 8, "Cancer",
-    "While the warehouse settlement is counted, the tide covers the lower steps. The merchant holds your small purse above the water. She offers much more for hauling the last stock to the upper landing. A boat waits outside for paying passengers; the ordinary way out is now a cold wade.", [
-      trade("cash", "Take the smaller settlement and wade out through the cold water.", [A("chosen", 24), L(60)]),
-      trade("stock", "Haul the full remaining stock to the upper landing for its closing price.", [A("chosen", 48), L(192)]),
-      trade("refuse", "Pay the boat fare and leave the settlement with the merchant.", [], { cost: 48 }),
+    "The tide reaches your knees before the warehouse settlement is counted. The merchant holds your smaller purse above the water and offers much more for hauling the stock upstairs. You can wade out with the money, or pay for the waiting boat. The stairs disappear one ordinary step at a time.", [
+      trade("cash", "Take the smaller settlement and wade through the cold water.", [A("chosen", 24), L(60)]),
+      trade("stock", "Haul all the remaining stock upstairs for the larger closing fee.", [A("chosen", 48), L(192)]),
+      trade("refuse", "Buy boat passage and leave the settlement with the merchant.", [], { cost: 48 }),
     ]),
   scene("transformation-cancer-lullaby", 8, "Cancer",
-    "The mortuary attendant remembers the next verse of the song your nurse sang. She asks permission to sing while she folds the linen. A resting chair stands near her work; beyond it, mourners wait on bare benches. She can arrange cushions and warmth for them for a fee.", [
-      trade("chair", "Stay in the chair and hear the remembered verse.", [A("chosen", -24)]),
-      trade("common", "Pay for warmth and rest shared among those waiting.", [A("allUnlocked", -24)], { cost: 72 }),
-      trade("go", "Leave her humming at the linen table.", []),
+    "The mortuary attendant folds linen to a tune your nurse once sang. You know where your version stopped; she knows another verse. She asks before beginning it. A comfortable chair stands by her work, while the waiting families sit on bare benches that can be furnished for a fee.", [
+      trade("chair", "Rest in the chair and listen to the verse she remembers.", [A("chosen", -24)]),
+      trade("common", "Pay for cushions and warmth for the waiting families.", [A("allUnlocked", -24)], { cost: 72 }),
+      trade("go", "Leave her quietly humming beside the linen.", []),
     ]),
   scene("transformation-leo-crown", 8, "Leo",
-    "The dead festival king left you his enormous wooden crown. The undertaker cannot fit it into the coffin. A dealer wants its gold leaf; the procession keeper offers a carrying fee. The king's sister looks at the crown and laughs once, then asks for a handkerchief.", [
-      trade("leaf", "Sell the gold leaf from your bequest.", [L(36)]),
-      trade("carry", "Carry the heavy crown through the full procession.", [A("chosen", 24), L(60)]),
-      trade("grave", "Lay the crown beside the grave.", []),
+    "The festival king left you a wooden crown too large for his coffin. The undertaker has tried every angle. His sister begins to laugh, then asks you for a cloth. A dealer wants its gold leaf; the procession keeper offers a carrying fee for letting it make one more oversized entrance.", [
+      trade("leaf", "Sell the crown's gold leaf as your bequest.", [L(36)]),
+      trade("carry", "Bear the oversized crown through the procession for its fee.", [A("chosen", 24), L(60)]),
+      trade("grave", "Set the crown beside the grave without taking payment.", []),
     ]),
   scene("transformation-leo-lioncloth", 8, "Leo",
-    "The hunter's finest pelt is laid over the bed where he died. His sister pulls it away. “He was miserable here. Stop making it look grand.” The executor offers you the pelt's sale share, while the undertaker names the cost of the plain burial she wants.", [
-      trade("plain", "Pay for the plain burial she requests.", [], { cost: 48 }),
-      trade("pelt", "Take your share of the pelt's sale.", [L(48)]),
-      trade("sister", "Leave the decision and the share with his sister.", []),
+    "The hunter's pelt covers the bed where he died, arranged to make the room look triumphant. You see his sister pull it back. “He wanted the plain blanket.” The executor offers your share of the pelt's sale; the undertaker names the price of the unadorned burial she is asking for.", [
+      trade("plain", "Pay for the plain burial his sister requests.", [], { cost: 48 }),
+      trade("pelt", "Take your share of the valuable pelt's sale.", [L(48)]),
+      trade("sister", "Leave both the decision and the share with her.", []),
     ]),
   scene("transformation-leo-last-bow", 8, "Leo",
-    "The actor has leaned his weight onto your arm after his final bow. He wants the front door; the crowd still asks for an encore. His former rival names the escort fee or offers to hire a carrying chair. The nearest bench is behind you, across the crowded floor.", [
-      trade("escort", "Bear his weight through the long front-door exit for the escort fee.", [A("chosen", 24), L(108)]),
-      trade("room", "Pay for the carrying chair and let the bearers take his weight.", [], { cost: 48 }),
-      trade("path", "Support him back across the floor and settle him on the nearest bench.", [A("chosen", 12)]),
+    "The retiring actor leans his whole weight onto your arm after the final bow. His painted antlers tilt as the audience asks for more. He wants the front door. The manager offers an escort fee or a hired carrying chair; behind you, a bench waits across the crowded floor.", [
+      trade("escort", "Support him through the long front exit for the escort fee.", [A("chosen", 24), L(108)]),
+      trade("room", "Hire the chair and let its bearers take his weight.", [], { cost: 48 }),
+      trade("path", "Bear him back across the crowd to the nearest bench.", [A("chosen", 12)]),
     ]),
   scene("transformation-leo-summer-watch", 8, "Leo",
-    "The slow procession reaches the garden in fierce heat. Your clothes cling and the flowers hang limp. The keeper offers a fee for staying through the full vigil, or a rented shaded resting place. The family sets the ceremonial chair where the deceased liked to see the afternoon sun.", [
-      trade("watch", "Remain through the whole hot vigil for the watch fee.", [A("chosen", 36), L(168)]),
-      trade("shade", "Buy the shaded rest and supported breathing practice.", [G("chosen", "resolve", 24)], { cost: 48 }),
-      trade("chair", "Share the carrying and tending of the outdoor vigil across the available hands.", [A("allUnlocked", 12), L(120)]),
-      trade("leave", "Leave after the procession with the heat already borne.", [A("chosen", 12)]),
+    "You reach the glass garden with the slow procession, clothes clinging in the trapped heat. The ceremonial chair stands where the deceased liked the sun. The keeper offers a full vigil fee, shared tending, or paid shaded support. The flowers have begun to lower their heads without waiting for permission.", [
+      trade("watch", "Stay through the entire hot vigil for its fee.", [A("chosen", 36), L(168)]),
+      trade("shade", "Buy shaded rest and a supported breathing session.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("chair", "Share the outdoor carrying and tending among available hands.", [A("allUnlocked", 12), L(120)]),
+      trade("leave", "Leave after the procession with its heat still in your body.", [A("chosen", 12)]),
     ]),
   scene("transformation-leo-nameplate", 8, "Leo",
-    "The executor offers you a larger settlement if your old benefactor's nameplate goes into the silver melting pot. The kitchen has kept a meal for those staying through the division. He names the smaller payment with the plate preserved, then the larger one without looking at it.", [
-      trade("melt", "Permit the nameplate to be melted and take the full settlement.", [L(72)]),
-      trade("keep", "Preserve the plate, take the smaller share, and stay for the meal.", [L(24), A("chosen", -24)]),
-      trade("claim", "Give up the claim entirely.", []),
+    "The kitchen's silver nameplate bears the benefactor who paid for its first meals. You can take a larger settlement if it goes into the melting pot. Keeping it leaves a smaller share and supper with the remaining staff. The executor reads both figures; behind him, someone begins ladling soup.", [
+      trade("melt", "Send the plate to the melting pot and take the full settlement.", [L(72)]),
+      trade("keep", "Keep the plate, accept the smaller share, and stay for supper.", [L(24), A("chosen", -24)]),
+      trade("claim", "Withdraw your claim to the settlement.", []),
     ]),
   scene("transformation-virgo-inventory", 8, "Virgo",
-    "You have stood through half the estate inventory when the executor finds another cupboard. Your legs have stiffened beside the counting table. She names the full sorting fee; a hired clerk can take over your place. The purse in her apron still has no line of its own.", [
-      trade("fee", "Pay the clerk to take over the remaining inventory.", [], { cost: 48 }),
-      trade("count", "Stand through the full count and sort the last heavy stores for the fee.", [A("chosen", 36), L(156)]),
-      trade("list", "End your part in the count and leave with the stiffness already taken.", [A("chosen", 12)]),
+    "Your legs have stiffened beside the estate's counting table when the wall unfolds another cupboard. The executor opens her ledger to a fresh page. She offers the full sorting wage or a hired clerk to finish your place. You have counted every empty jar; the cupboards keep contributing more emptiness.", [
+      trade("fee", "Hire the clerk to complete the inventory in your place.", [], { cost: 48 }),
+      trade("count", "Stay through the full count and sort the last heavy stores.", [A("chosen", 36), L(156)]),
+      trade("list", "End your counting with the stiffness already in your legs.", [A("chosen", 12)]),
     ]),
   scene("transformation-virgo-remedies", 8, "Virgo",
-    "The herbalist's assistant has laid out the preparations left at her death. “They will spoil. Keeping them won't keep her.” She offers one complete treatment or smaller portions to share. The labels are in the dead woman's careful hand, including instructions to use them promptly.", [
-      trade("whole", "Accept one complete restorative treatment.", [A("chosen", -36)]),
-      trade("share", "Divide the useful preparations among those present.", [A("allUnlocked", -12)]),
-      trade("decline", "Leave them for the next people who need them.", []),
+    "The herbalist's assistant lays out the last treatments prepared before her death. Each label carries a date and the same instruction to use it soon. You can take a complete treatment or divide the smaller portions. The assistant smooths one label, then opens the jar instead of saving it again.", [
+      trade("whole", "Accept a complete restorative treatment while it is still useful.", [A("chosen", -36)]),
+      trade("share", "Share the smaller preparations among the waiting people.", [A("allUnlocked", -12)]),
+      trade("decline", "Leave the treatments for whoever comes next.", []),
     ]),
   scene("transformation-virgo-corrected-name", 8, "Virgo",
-    "Your fingers ache from the first strokes correcting the memorial. The woman’s son holds her own spelling clear of the dust; the employer’s version is almost gone. The cutter names his price to finish while showing the remaining letters. You can still leave the unfinished stone with him.", [
-      trade("pay", "Pay the cutter to finish and study his careful strokes from the bench.", [G("chosen", "luck", 24)], { cost: 48 }),
-      trade("carve", "Finish the hard lettering yourself and learn its deeper strokes.", [A("chosen", 24), G("chosen", "affliction", 24)]),
-      trade("leave", "Set down the chisel and leave with the strain of the work already done.", [A("chosen", 12)]),
+    "Your fingers ache around the chisel correcting the memorial. Every employment record called her Mera; the letters her son holds say Mira. The cutter offers to finish and teach from the bench for a fee. You have removed the wrong vowel, leaving a small clean space in the stone.", [
+      trade("pay", "Pay the cutter to finish while you study his precise strokes.", [G("chosen", "luck", 24)], { cost: 48 }),
+      trade("carve", "Carve the remaining letters yourself through the hard handwork.", [A("chosen", 24), G("chosen", "affliction", 24)]),
+      trade("leave", "Set the chisel down with the ache of the first cuts.", [A("chosen", 12)]),
     ]),
   scene("transformation-virgo-last-account", 8, "Virgo",
-    "Your former steward has closed the account but left out her final day's wage. “I hadn't finished.” She slides the full sum toward you, keeping her hand on the page. Behind her, supper is set for two, as it was whenever you came to check the books.", [
-      trade("settled", "Accept the full sum she has counted for you.", [L(48)]),
-      trade("wage", "Set aside her final wage and stay to share supper.", [L(12), A("chosen", -24)]),
-      trade("release", "Leave the whole sum with her and close the account.", []),
+    "The steward's last account excludes her own final wage. “I didn't finish everything.” You can see every other expense in its proper place. She offers the full purse, then uncovers supper for two. The ledger has room for the missing line; her hand stays on the edge of the page.", [
+      trade("settled", "Accept the full purse she has counted out.", [L(48)]),
+      trade("wage", "Set aside her wage and share supper with the smaller balance.", [L(12), A("chosen", -24)]),
+      trade("release", "Leave her the whole purse and close the account.", []),
     ]),
   scene("transformation-virgo-washed-linen", 8, "Virgo",
-    "The funeral attendant lays out clean linen in several sizes. She asks what the person being called back used to find comfortable. “People remember the ceremonial clothes. I ask about sleep.” Beside the return bowl she has prepared a resting treatment at a separate price.", [
-      revival("Pay for the return and choose the linen they would sleep in."),
-      trade("rest", "Buy the quiet resting treatment.", [A("chosen", -36)], { cost: 48 }),
-      trade("fold", "Help fold the linen without asking for a return.", []),
+    "The return attendant asks which linen the missing person would sleep in. You look past ceremonial robes to the soft pile she has warmed. “Some people kick everything off,” she adds, without disapproval. The return rite and a quiet resting treatment have separate prices; folding the cloth costs nothing.", [
+      revival("Pay for the return and choose something comfortable for their sleep."),
+      trade("rest", "Buy the quiet treatment beside the warmed linen.", [A("chosen", -36)], { cost: 48 }),
+      trade("fold", "Fold the cloth with her without requesting a return.", []),
     ]),
   scene("transformation-libra-scales", 8, "Libra",
-    "The heirs have divided everything equally except the little dog. It keeps walking from one lap to the other. Your cash share is ready, but both ask you to settle the remaining question. The cook can bring a shared meal if anyone is prepared to stop counting.", [
-      trade("cash", "Accept your counted cash share.", [L(36)]),
-      trade("meal", "Buy the shared meal and give their discussion time.", [A("allUnlocked", -24)], { cost: 72 }),
-      trade("dog", "Decline to divide the dog's affection for them.", []),
+    "The heirs have agreed equal shares of every possession except the little dog, which keeps changing laps. You have a cash portion ready. Both ask you to settle the dog. The cook offers a shared meal for a fee, while the creature settles briefly with whoever has stopped pointing.", [
+      trade("cash", "Take your counted share in coins.", [L(36)]),
+      trade("meal", "Buy supper for everyone and let the discussion rest.", [A("allUnlocked", -24)], { cost: 72 }),
+      trade("dog", "Decline to allot the dog's affection between them.", []),
     ]),
   scene("transformation-libra-farewell-price", 8, "Libra",
-    "The separating couple has priced every household object. Neither knows what to pay for the hour you spent helping them. They offer a small sum or supper from the last full pantry. On the list, your name occupies the only line without a number beside it.", [
-      trade("payment", "Accept the payment they offer for your help.", [L(24)]),
-      trade("supper", "Take a comfortable supper instead.", [A("chosen", -24)]),
-      trade("gift", "Call the help a gift and leave the line blank.", []),
+    "The separating couple has priced every object in the room, but neither knows how to price the hour you spent helping. They offer coins or supper from the last unpacked cupboard. You see your name on the list between a lamp and a mirror, with a generous space for the answer.", [
+      trade("payment", "Accept their small payment for your help.", [L(24)]),
+      trade("supper", "Take a comfortable supper in place of the coins.", [A("chosen", -24)]),
+      trade("gift", "Leave your help as a gift and the space unnumbered.", []),
     ]),
   scene("transformation-libra-two-processions", 8, "Libra",
-    "Your shoulder is beneath one bier when the processions meet at the narrow gate. Each family insists the other pass first. The other bearers begin to shake. The keeper offers the long route’s wage or can hire resting stands; lowering the bier now would mean a deep, awkward crouch.", [
-      trade("carry", "Bear your share around the full long route for the offered wage.", [A("chosen", 36), L(168)]),
-      trade("pause", "Hire the resting stands and release the weight together.", [], { cost: 48 }),
-      trade("wait", "Lower the bier carefully with the bearers and end your carrying turn.", [A("chosen", 24)]),
+    "Your shoulder is beneath the bier when another funeral reaches the narrow gate. Each family asks the other to go first. The bearers begin to shake beneath this courtesy. The keeper offers wages for the longer route or hired stands; setting the weight down unaided means a deep crouch.", [
+      trade("carry", "Carry your share around the full long route for its wage.", [A("chosen", 36), L(168)]),
+      trade("pause", "Hire the stands and release the weight with the other bearers.", [], { cost: 48 }),
+      trade("wait", "Lower the bier carefully through the strained crouch.", [A("chosen", 24)]),
     ]),
   scene("transformation-libra-portrait-share", 8, "Libra",
-    "The executor proposes cutting the double portrait between its two surviving owners. Each asks for the other person's half. You hold a small claim on the picture; a dealer will buy it whole. The cutter waits to learn whether there will be one sale or two pieces.", [
-      trade("sale", "Sell the whole picture through the dealer and take your share.", [L(60)]),
-      trade("separate", "Pay for careful separation so each receives the half requested.", [], { cost: 36 }),
-      trade("claim", "Surrender your claim and leave them the whole picture.", []),
+    "The double portrait follows you with two painted pairs of eyes. Its surviving owners each want the other person's half. You hold a small claim on the whole; a dealer offers to buy it intact. The cutter waits with his knife lowered, while both painted faces continue looking across the proposed division.", [
+      trade("sale", "Sell the intact portrait through the dealer and take your share.", [L(60)]),
+      trade("separate", "Pay to separate it carefully as the two owners request.", [], { cost: 36 }),
+      trade("claim", "Surrender your claim and leave them the whole painting.", []),
     ]),
   scene("transformation-libra-equal-lamps", 8, "Libra",
-    "You have waited beside the equal lamps until the cold reaches through your clothes. One family paid for the warm place by the window. The keeper offers the return rite or rented blankets for the common benches. The lamps themselves remain alike, including the one nearest the draft.", [
-      revival("Pay for a return and speak the name by its lamp."),
-      trade("common", "Hire blankets and settle into supported warmth on the common bench.", [G("chosen", "resolve", 24)], { cost: 48 }),
-      trade("vigil", "End your wait and leave with the chill already taken.", [A("chosen", 24)]),
+    "The lamps for the waiting families are identical and give no warmth. You have stood beside yours until the cold reaches your bones. One family paid for the heated window seat. The keeper offers a return rite or rented blankets and firm supports for the common benches, naming each price separately.", [
+      revival("Pay for the return and speak the name beside the lamp."),
+      trade("common", "Hire blankets and a firm backrest for supported warmth.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("vigil", "End the wait and leave with the cold already borne.", [A("chosen", 24)]),
     ]),
   scene("transformation-scorpio-sealed-room", 8, "Scorpio",
-    "The executor follows you into the sealed room, then retreats from the smell of spoiled preserves. You have already lifted the first heavy jar. He offers a smaller settlement for clearing the doorway, much more for the whole room, or names the cleaners’ fee to take over now.", [
-      trade("clean", "Clear the doorway and take the smaller settlement.", [A("chosen", 24), L(84)]),
-      trade("jars", "Carry out every heavy spoiled jar for the larger closing share.", [A("chosen", 36), L(168)]),
-      trade("leave", "Pay the cleaners to take over the room and its burdens.", [], { cost: 48 }),
+    "The executor follows you into the sealed room, then steps back from the spoiled preserves. You have already lifted the first heavy jar. Labels promise winters their owner did not live to see. Clearing the doorway earns a smaller settlement; clearing everything earns more, and hired cleaners can take over.", [
+      trade("clean", "Clear the doorway with its heavy jars for the smaller share.", [A("chosen", 24), L(84)]),
+      trade("jars", "Carry every spoiled jar out for the full closing payment.", [A("chosen", 36), L(168)]),
+      trade("leave", "Pay the cleaners to take the room and its weight from you.", [], { cost: 48 }),
     ]),
   scene("transformation-scorpio-last-question", 8, "Scorpio",
-    "The man who accused you died before hearing your answer. His companion brings the fee he saved for that meeting. “He left no instruction for this part.” She offers the money or a place at the vigil's resting table. The old question remains on the folded note.", [
-      trade("fee", "Accept the settlement and give her the answer he requested.", [L(36)]),
-      trade("rest", "Use the fee for a long rest beside the vigil.", [A("chosen", -24)]),
-      trade("together", "Leave the answer and the money together.", []),
+    "The man who accused you died before your meeting. His companion brings the fee he set aside and the folded question he meant to ask. You may take the money or use it for rest beside the vigil. She has been told how to settle the appointment, but not where to put its answer.", [
+      trade("fee", "Accept the money and give her the answer he requested.", [L(36)]),
+      trade("rest", "Use the fee for a long quiet rest beside the vigil.", [A("chosen", -24)]),
+      trade("together", "Leave the folded question and the money together.", []),
     ]),
   scene("transformation-scorpio-root", 8, "Scorpio",
-    "You have dug beside the dead orchard owner’s daughter until the root shows white. It still holds. She offers the full digging wage, keeping her hands on the spade. Hired hands wait nearby. “I asked you to work with me,” she says, then looks at your trembling arms.", [
-      trade("dig", "Finish the deep, stubborn digging beside her for its full wage.", [A("chosen", 36), L(168)]),
-      trade("hands", "Pay the waiting hands and take supported rest while they finish.", [G("chosen", "resolve", 24)], { cost: 48 }),
-      trade("hers", "Put down the spade and leave with the exertion already borne.", [A("chosen", 12)]),
+    "You have dug beside the dead grower's daughter until the root lies white above the soil. It still holds the old tree. She offers the finishing wage, then notices your shaking arms. Hired workers wait beyond the pit with resting supports; her hands remain around the spade she meant to share.", [
+      trade("dig", "Finish the stubborn deep digging beside her for its wage.", [A("chosen", 36), L(168)]),
+      trade("hands", "Hire the waiting workers and take their supported resting place.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("hers", "Put the spade down with the exertion already in your arms.", [A("chosen", 12)]),
     ]),
   scene("transformation-scorpio-black-bowl", 8, "Scorpio",
-    "The keeper rinses the black return bowl until the water runs clear. She asks whose name you mean to speak. The fee for the rite is counted separately from the wage for keeping the long night watch. She leaves you room to choose neither.", [
-      revival("Pay for the return and speak the name over the clear water."),
-      trade("watch", "Take the long, cold watch for its wage.", [A("chosen", 24), L(60)]),
-      trade("bowl", "Set the bowl down and leave the water clear.", []),
+    "The keeper rinses the black return bowl beneath a little pump. A grain of rice comes free; someone has brought a whole dinner for a person not yet here. You are offered the return rite or the paid cold watch. She dries the bowl without asking which absence brought you.", [
+      revival("Pay for the return and speak a name over the clean water."),
+      trade("watch", "Keep the long cold watch for its wage.", [A("chosen", 24), L(60)]),
+      trade("bowl", "Leave the empty bowl ready for the next visitor.", []),
     ]),
   scene("transformation-scorpio-hidden-purse", 8, "Scorpio",
-    "Your estranged partner left two purses: settlement and apology. Both contain exactly the same amount. The messenger says you may choose either, but was told nothing about choosing both. A room has been offered at the inn in exchange for whichever purse you take.", [
-      trade("money", "Accept the purse labeled settlement.", [L(36)]),
-      trade("apology", "Accept the purse labeled apology.", [L(36)]),
-      trade("room", "Use one purse for a quiet room and rest.", [A("chosen", -24)]),
-      trade("terms", "Refuse both labels and leave the money.", []),
+    "Your departed partner has left two purses, one marked settlement and one apology. You open them to find equal sums. The messenger says you may take one; the inn will exchange either for a quiet room. Nothing in the instructions explains why the same money needed two different names.", [
+      trade("money", "Take the purse offered as settlement.", [L(36)]),
+      trade("apology", "Take the purse offered as apology.", [L(36)]),
+      trade("room", "Exchange either purse for a quiet restorative room.", [A("chosen", -24)]),
+      trade("terms", "Leave both labeled purses with the messenger.", []),
     ]),
   scene("transformation-sagittarius-ashes", 8, "Sagittarius",
-    "Your shoulders stiffen beneath the urn at the hill the traveler named. His friend now thinks he meant the next one. “A wider view.” She offers much more for carrying it farther. This shrine rents a warm resting place; you can also lower the urn here and end your part.", [
-      trade("farther", "Carry the heavy urn over the next ridge for the larger wage.", [A("chosen", 48), L(192)]),
-      trade("shrine", "Buy the warm resting place and supported stretching at this shrine.", [G("chosen", "resolve", 24)], { cost: 48 }),
-      trade("friend", "Lower the urn here and leave with the strain from the climb.", [A("chosen", 12)]),
+    "The urn has stiffened your shoulders by the time you reach the named hill. The traveler's friend points to the next ridge and suggests he meant that view instead. You can earn more by carrying farther, buy warm supported rest at this shrine, or set the urn down here.", [
+      trade("farther", "Shoulder the urn again and cross the farther ridge for her larger fee.", [A("chosen", 48), L(192)]),
+      trade("shrine", "Buy warmth and supported stretching at this shrine.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("friend", "Lower the urn here and leave with the climb's strain.", [A("chosen", 12)]),
     ]),
   scene("transformation-sagittarius-saddle-sale", 8, "Sagittarius",
-    "The horsewoman left you the sale value of her saddle or a lesson from the pupil she trained. The pupil has brought the money and a patient horse. “She said you would choose for yourself.” The old saddle has been polished where her hands always rested.", [
-      trade("money", "Take the saddle's sale value.", [L(48)]),
-      trade("lesson", "Take the demanding riding lesson she arranged.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("keep", "Let the pupil keep the money and the saddle.", []),
+    "The horsewoman left you the value of her saddle or a lesson with the pupil she trained. You find him waiting with a patient mount and the counted money. His hands rest where hers wore the leather smooth. “She said to let you choose before I started recommending things.”", [
+      trade("money", "Take the saddle's sale value from his hand.", [L(48)]),
+      trade("lesson", "Work through the demanding riding lesson she arranged.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("keep", "Leave the saddle and the money with her pupil.", []),
     ]),
   scene("transformation-sagittarius-wager-settled", 8, "Sagittarius",
-    "The valley is longer than you claimed. Your old rival died before the measurement returned, but his companions have your wager written beside his. They accept the payment or a carrying turn in its place. Walking the whole survey with the equipment would leave a larger wage after settlement.", [
-      trade("share", "Pay the lost wager and close the account here.", [], { cost: 48 }),
-      trade("measure", "Carry the equipment through the full valley survey for the remaining wage.", [A("chosen", 48), L(192)]),
-      trade("release", "Take the shorter carrying turn to settle the wager without coins.", [A("chosen", 24)]),
+    "The valley is longer than you claimed, and the survey has returned after your rival's funeral. His companions show you both sides of the wager. They accept coins or a carrying turn to settle yours. A full survey with the heavy equipment would earn wages beyond that old argument.", [
+      trade("share", "Pay the lost wager and close it here.", [], { cost: 48 }),
+      trade("measure", "Carry the equipment through the full survey for the remaining wage.", [A("chosen", 48), L(192)]),
+      trade("release", "Take the shorter heavy turn to settle the wager through work.", [A("chosen", 24)]),
     ]),
   scene("transformation-sagittarius-empty-map", 8, "Sagittarius",
-    "The caravan master sells his familiar route and keeps the blank map. “Retirement is not an instruction to stay home.” He offers a paid lesson from the marked sheet or wages for carrying his last heavy loads. The blank one is already tucked inside his coat.", [
-      trade("route", "Buy the practical lesson from the route he knows.", [G("chosen", "luck", 12)], { cost: 48 }),
-      trade("loads", "Carry the last heavy loads for his closing wage.", [A("chosen", 24), L(60)]),
-      trade("farewell", "Wish him well with the empty map.", []),
+    "The caravan master sells his familiar route between moons and keeps the blank chart. You can buy a practical lesson from the marked one or earn wages carrying his last packed loads. He folds the empty sheet into his coat. “I've spent enough years knowing where I'll sleep.”", [
+      trade("route", "Buy his practical lesson in the familiar route.", [G("chosen", "luck", 12)], { cost: 48 }),
+      trade("loads", "Carry the final heavy loads for his closing wage.", [A("chosen", 24), L(60)]),
+      trade("farewell", "Wish him well and leave the empty chart with him.", []),
     ]),
   scene("transformation-sagittarius-feast-road", 8, "Sagittarius",
-    "The family at the roadside funeral asks every stranger for a memory of their father. Most have none. His son unfolds a map instead. “Then tell us about the road.” His sister keeps a place for you at the table, waiting for your answer.", [
-      trade("table", "Say you never met him and accept the place at their table.", [A("chosen", -24)]),
-      trade("roads", "Trade accounts of the roads with his son over the map.", [G("chosen", "luck", 12)]),
-      trade("greeting", "Offer an honest greeting and continue past the gathering.", []),
+    "The roadside funeral welcomes strangers by asking for a memory of the dead traveler. You arrive as another guest admits having none. His son unfolds a map. “Then tell us where you've been.” His sister shifts the plates to make a place; the welcome has survived the missing acquaintance.", [
+      trade("table", "Say you never met him and accept the warm meal.", [A("chosen", -24)]),
+      trade("roads", "Compare the roads you know with his son over the map.", [G("chosen", "luck", 12)]),
+      trade("greeting", "Offer an honest greeting and continue along the road.", []),
     ]),
   scene("transformation-capricorn-tools", 8, "Capricorn",
-    "The miner's daughter has polished even the tools worn beyond use. She asks you to choose before she loses courage. A buyer offers cash for the sound ones. Beside them stands the stone bench her father began, with his chisel marks stopping halfway across the seat.", [
-      trade("sale", "Accept the buyer's price for the sound tools.", [L(48)]),
-      trade("bench", "Use the sound chisel to learn the hard strokes and finish his bench.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("together", "Leave the tools together with his daughter.", []),
+    "The miner's daughter has polished the broken tools as carefully as the sound ones. She asks you to choose before she puts them away again. A buyer offers money; the unfinished stone bench offers a use for the chisel. You can still see where her father's last stroke ended.", [
+      trade("sale", "Take the buyer's price for the usable tools.", [L(48)]),
+      trade("bench", "Practice the hard strokes needed to complete the bench.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("together", "Leave the whole set together with his daughter.", []),
     ]),
   scene("transformation-capricorn-winter-grave", 8, "Capricorn",
-    "The funeral cart leaves while you stand beside the unfinished grave. The keeper has reached frozen earth and names the digging wage. Behind him, the warm room rents by the hour. The road back is a long white slope; the family holds its gloves between the hole and the door.", [
-      trade("dig", "Break the frozen ground through the long digging shift.", [A("chosen", 36), L(168)]),
-      trade("room", "Buy the warm room and a supported rest before the next journey.", [G("chosen", "resolve", 24)], { cost: 48 }),
-      trade("privacy", "Leave the family its privacy and walk back down the cold slope.", [A("chosen", 24)]),
+    "The funeral cart has left you beside ground frozen harder than the keeper expected. He offers the digging wage. Behind him, a warm room rents by the hour; below, the road home runs white and steep. The family holds its gloves between the unfinished grave and the unopened door.", [
+      trade("dig", "Break the frozen ground through the long paid digging turn.", [A("chosen", 36), L(168)]),
+      trade("room", "Buy the warm room and a firm supported resting place.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("privacy", "Give the family privacy and walk down the long cold slope.", [A("chosen", 24)]),
     ]),
   scene("transformation-capricorn-pension", 8, "Capricorn",
-    "The retired steward counts his final payment while his colleagues wait with the farewell meal. Each interruption makes him begin again. “I shall enjoy myself when I know.” A colleague lifts the covered dish toward his counting table; he moves one stack of coins to make room.", [
-      trade("count", "Help him complete the careful count before the meal.", [G("chosen", "resolve", 12)]),
-      trade("table", "Bring the meal to his table and share it around the coins.", [A("allUnlocked", -12)]),
-      trade("finish", "Give him room to finish on his own.", []),
+    "The retired steward counts his last payment while his colleagues wait with supper. A congratulation makes him begin again. You watch him shift one stack to make room when a dish is finally placed beside the coins. He wants to know what he has before enjoying what they brought.", [
+      trade("count", "Help complete the careful count before eating.", [G("chosen", "resolve", 12)]),
+      trade("table", "Bring the dishes close and share supper around the coins.", [A("allUnlocked", -12)]),
+      trade("finish", "Let him finish counting in his own time.", []),
     ]),
   scene("transformation-capricorn-boundary-stone", 8, "Capricorn",
-    "Your back tightens over the half-exposed boundary stone. The buyer can read enough for a modest settlement; the full old mark would bring much more. Your aunt sets the lever beside you. A surveyor offers to finish and explain the marks while you sit above the hole.", [
-      trade("settle", "Finish the short clearing and take the modest settlement.", [A("chosen", 24), L(84)]),
-      trade("stone", "Dig and lever the entire stone clear for the larger payment.", [A("chosen", 48), L(192)]),
-      trade("clear", "Pay the surveyor to finish and teach the old boundary marks.", [G("chosen", "luck", 24)], { cost: 48 }),
+    "Your back tightens above the half-buried boundary stone. Enough of the old mark shows for a small settlement; exposing all of it would bring more. Your aunt lays down the lever. A surveyor offers to finish and explain the inscription while you sit, naming the price before touching your tools.", [
+      trade("settle", "Clear the short remaining strip and take the smaller settlement.", [A("chosen", 24), L(84)]),
+      trade("stone", "Dig and lever the whole stone free for the larger payment.", [A("chosen", 48), L(192)]),
+      trade("clear", "Pay the surveyor to finish and teach you the boundary marks.", [G("chosen", "luck", 24)], { cost: 48 }),
     ]),
   scene("transformation-capricorn-night-fire", 8, "Capricorn",
-    "The widow tends the return-house fire through the longest night. She will call a name you bring, but refuses to call anyone who asked to stay gone. A watch fee lies beside the woodpile. Outside, the frost has reached the underside of the door.", [
-      revival("Pay for the return and bring a name to her fire."),
-      trade("watch", "Keep the cold night's fire watch for the offered fee.", [A("chosen", 24), L(60)]),
-      trade("leave", "Leave the fire in her care.", []),
+    "The widow keeps the return fire on the longest night, carrying wood across the frozen yard between names. You may pay to call someone back or take the night's paid watch. She asks only that you bring no name belonging to someone who asked to remain gone. Frost whitens the outer latch.", [
+      revival("Pay the keeper and speak a name into the return fire."),
+      trade("watch", "Keep the long cold watch and carry its wood for the wage.", [A("chosen", 24), L(60)]),
+      trade("leave", "Leave the fire and its names in her care.", []),
     ]),
   scene("transformation-aquarius-water-share", 8, "Aquarius",
-    "The engineer left equal shares of the warm spring to his apprentices. They agree on the water and dispute the empty bucket. Your share can be sold to the bathkeeper or used for a common bath today. Steam rises while one apprentice measures the bucket's handle.", [
-      trade("sell", "Sell your share to the bathkeeper.", [L(36)]),
-      trade("bath", "Use the share for a warm bath together.", [A("allUnlocked", -12)]),
-      trade("claim", "Renounce your claim and leave them the bucket.", []),
+    "The engineer left equal rights to the warm spring to his apprentices. You find them agreeing about the water and arguing about the single bucket. Your share can be sold or used for a common bath. Steam rises past their measurements, freely occupying a space nobody thought to divide.", [
+      trade("sell", "Sell your water share to the waiting bathkeeper.", [L(36)]),
+      trade("bath", "Use your share for a warm bath everyone can join.", [A("allUnlocked", -12)]),
+      trade("claim", "Give up your claim and leave the bucket with them.", []),
     ]),
   scene("transformation-aquarius-model", 8, "Aquarius",
-    "You have held the scholar’s heavy crank through the student’s last turn of the heavens. Your arm shakes. Her family wants the model dismantled for sale. They offer the moving wage, or a paid hour studying it from the fixed stand. The student rests his hand on the still-turning ring.", [
-      trade("hour", "Buy the hour and study the supported model from the fixed stand.", [G("chosen", "resolve", 24)], { cost: 60 }),
-      trade("dismantle", "Dismantle and carry down the heavy rings for the closing wage.", [A("chosen", 36), L(168)]),
-      trade("leave", "Release the crank and leave with the strain from its last turning.", [A("chosen", 12)]),
+    "Your arm shakes at the dead scholar's heavy model of the heavens. Her student has asked for one last orbit before the family dismantles it. You can take the moving wage or buy a lesson using its fixed support. The little planets continue slowly, without noticing which hand is tired.", [
+      trade("hour", "Buy the supported lesson and practice the model's steady movements.", [G("chosen", "resolve", 24)], { cost: 60 }),
+      trade("dismantle", "Dismantle and carry the heavy rings down for the closing wage.", [A("chosen", 36), L(168)]),
+      trade("leave", "Release the crank with the strain of its last orbit.", [A("chosen", 12)]),
     ]),
   scene("transformation-aquarius-no-speech", 8, "Aquarius",
-    "The funeral instructions forbid speeches. Every mourner seems to have a page hidden inside a coat. The keeper offers a private resting room where the pages may be read, or blankets for the silent courtyard at a common price. Someone unfolds a corner, then folds it back.", [
-      trade("room", "Buy the quiet room, read the waiting pages, and rest.", [A("chosen", -24)], { cost: 36 }),
-      trade("blankets", "Pay for blankets and share the courtyard's silent rest.", [A("allUnlocked", -12)], { cost: 48 }),
-      trade("silence", "Honor the silence in the courtyard.", []),
+    "The funeral instructions ask for silence. You notice a folded speech beneath nearly every coat. The keeper offers a private room where the pages can be read, or blankets for the common courtyard, each at a price. One mourner smooths her paper without unfolding it, keeping something prepared for someone absent.", [
+      trade("room", "Buy the quiet room, read the waiting pages, and take your rest.", [A("chosen", -24)], { cost: 36 }),
+      trade("blankets", "Pay for blankets and share the courtyard's silent warmth.", [A("allUnlocked", -12)], { cost: 48 }),
+      trade("silence", "Remain in the courtyard without breaking its silence.", []),
     ]),
   scene("transformation-aquarius-rooftop", 8, "Aquarius",
-    "You have helped the observatory partners lift their last lens onto the roof landing. Its weight still presses into your forearms. They offer the full moving fee; the porters below name their own price to take over. Retreating without the lens means the steep outside ladder.", [
-      trade("carry", "Lower the heavy lens through the full move for its fee.", [A("chosen", 48), L(192)]),
-      trade("porters", "Pay the porters to take over the lens and guide you down.", [], { cost: 48 }),
-      trade("division", "Leave the lens braced on the landing and descend the steep ladder.", [A("chosen", 24)]),
+    "The observatory's last lens rests across your forearms on the roof landing. Its partners have divided the instruments and now need them moved. They offer the full carrying fee; hired porters wait below. Without the lens, your way down is still the steep outside ladder, shining with old rain.", [
+      trade("carry", "Complete the paid move, bearing the lens through the long descent.", [A("chosen", 48), L(192)]),
+      trade("porters", "Hire the porters to take the lens and guide your descent.", [], { cost: 48 }),
+      trade("division", "Brace the lens on the landing and climb down the steep ladder.", [A("chosen", 24)]),
     ]),
   scene("transformation-aquarius-thaw-basin", 8, "Aquarius",
-    "The keeper has thawed the basin used for returns. Waiting families warm their hands in its water while she prepares the rite. Deeper rest is available in the heated room for a fee. She gives the basin another turn so the smallest hands can reach.", [
-      revival("Pay for the return and speak over the thawed basin."),
-      trade("room", "Buy a long rest in the heated room.", [A("chosen", -36)], { cost: 48 }),
-      trade("warmth", "Warm your hands with the waiting families before leaving.", [A("chosen", -12)]),
+    "The basin for returns has thawed, and the waiting families warm their hands before the rite. You watch the keeper turn it to admit a child's shorter reach. A heated room offers deeper rest for a fee. For now, no one has to name the missing person to receive a little warmth.", [
+      revival("Pay for the return and speak a name above the thawed water."),
+      trade("room", "Buy a long undisturbed rest in the heated room.", [A("chosen", -36)], { cost: 48 }),
+      trade("warmth", "Warm your hands beside the waiting families before leaving.", [A("chosen", -12)]),
     ]),
   scene("transformation-pisces-unclaimed-boat", 8, "Pisces",
-    "You step into the drowned fisher’s boat as the current pulls it clear of the landing. His sister holds the slack rope, then lets it go. “He always rowed once around.” She offers the last circuit’s fee. A towman waits downstream; the bank must be reached against the current.", [
-      trade("row", "Row the last full circuit against the current for her fee.", [A("chosen", 48), L(192)]),
-      trade("bench", "Pay the towman to bring you and the boat to the landing.", [], { cost: 48 }),
-      trade("tied", "Row straight back against the current and tie the boat up.", [A("chosen", 24)]),
+    "You climb into a dead fisher’s boat as the tide tears its rope free. His sister calls from the landing: one last circuit before she sells it, for his old fee. A towboat waits upstream. Below the clear water, the drowned town’s windows begin to glow.", [
+      trade("row", "Row his full circuit against the tide and take her fee.", [A("chosen", 48), L(192)]),
+      trade("bench", "Hire the towboat to bring you and the boat back.", [], { cost: 48 }),
+      trade("tied", "Row straight against the tide and fasten the boat at the landing.", [A("chosen", 24)]),
     ]),
   scene("transformation-pisces-charity-box", 8, "Pisces",
-    "The closing sanctuary's final gift is a sealed box of buttons. The keeper stares at the benefactor's grand inscription. A tailor offers a little money for the metal ones if someone sorts them. There is still soup in the kitchen, enough to serve without counting.", [
-      trade("buttons", "Sort the metal buttons and accept the tailor's small payment.", [L(12)]),
-      trade("soup", "Take a bowl of the sanctuary's last warm soup.", [A("chosen", -24)]),
-      trade("box", "Leave the remaining buttons with the keeper.", []),
+    "You help empty a sanctuary before it is sold. The last benefactor’s chest contains buttons, each wrapped like a jewel. “For the needy,” reads the lid. The cook snorts and offers soup; a tailor begins counting how many coats she can close.", [
+      trade("buttons", "Sort her a handful of useful buttons and accept her coins.", [L(12)]),
+      trade("soup", "Sit among the packed bowls and eat the cook’s soup.", [A("chosen", -24)]),
+      trade("box", "Close the chest and leave it for the tailor.", []),
     ]),
   scene("transformation-pisces-last-cup", 8, "Pisces",
-    "The dying innkeeper gave away the drinks his partner meant to sell. Your small settlement is offered as cash or supper. Behind the curtain, he calls for another cup to be given out. His partner names the cost of this round and looks toward him.", [
-      trade("cash", "Take the small cash settlement.", [L(24)]),
-      trade("supper", "Accept the settlement as a sustaining supper.", [A("chosen", -24)]),
-      trade("round", "Pay for his last round so his partner can join him.", [], { cost: 36 }),
-      trade("forgive", "Release your share and leave them together.", []),
+    "You come to collect your share of a closing inn. Its owner is giving away the drinks his partner counted as stock. Outside, the last shuttle waits. “One more,” he calls. His partner offers you coins or supper, then looks at her untouched glass.", [
+      trade("cash", "Take your share in coins from the till.", [L(24)]),
+      trade("supper", "Take your share as supper at the last occupied table.", [A("chosen", -24)]),
+      trade("round", "Buy this round and ask her to sit with him.", [], { cost: 36 }),
+      trade("forgive", "Leave your share with them and go.", []),
     ]),
   scene("transformation-pisces-flood-mark", 8, "Pisces",
-    "Floodwater seeps from the chair you have carried across the estate’s sale room. Your clothes are wet through. The buyer offers a small payment for that piece, much more for sawing the dry wood from the rest. The keeper rents the drying room while the sale is counted.", [
-      trade("share", "Take the first chair’s payment and leave in the wet clothes.", [A("chosen", 24), L(60)]),
-      trade("salvage", "Saw the stubborn joints and carry out the whole dry remainder.", [A("chosen", 36), L(168)]),
-      trade("decline", "Hire the drying room and a supported warming rest.", [G("chosen", "resolve", 24)], { cost: 48 }),
+    "You haul a chair upstairs from an inherited house’s flooded rooms. Water streams into your boots. The buyer wants its sound timber and the rest of the furniture stripped. A caretaker offers a heated back brace. Below you, fish nose the family portraits, finding nothing to eat.", [
+      trade("share", "Take the chair’s payment and walk away in your wet clothes.", [A("chosen", 24), L(60)]),
+      trade("salvage", "Saw through the swollen joints and carry out the sound timber.", [A("chosen", 36), L(168)]),
+      trade("decline", "Buy the heated brace and rest your back in its support.", [G("chosen", "resolve", 24)], { cost: 48 }),
     ]),
   scene("transformation-pisces-returning-song", 8, "Pisces",
-    "The choir leaves a gap for the voice someone wants returned. The youngest singer keeps trying to fill it. The keeper sets out the return bowl, while the choirmaster makes space beside the waiting families. She gives the child her hand before the next verse.", [
-      revival("Pay for the return and let the choir call the missing voice."),
-      trade("listen", "Sit with the families and rest through the quiet song.", [A("chosen", -12)]),
-      trade("gap", "Leave the gap for the voice it belongs to.", []),
+    "You enter a hall where singing draws the lost home across the sea. The choir leaves one line empty for the returning voice. A child keeps filling it. “I don’t want them to get lost again,” she says. The conductor takes her hand.", [
+      revival("Pay the choir to call someone back across the water."),
+      trade("listen", "Sit with the waiting families and rest through the song.", [A("chosen", -12)]),
+      trade("gap", "Let the next verse pass with its line unfilled.", []),
     ]),
 ];
