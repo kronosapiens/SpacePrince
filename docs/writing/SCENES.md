@@ -2,6 +2,7 @@
 
 The maintained guide for the house–sign scene catalogue: how a scene is developed, how its choices are composed, and how drafts are compared.
 The [prose and voice guide](VOICE.md) sets the Gibran-inspired tone through passages from *The Prophet* and instructions for adapting their techniques.
+The [setting guide](SETTING.md) describes the cosmic fable, its mixture of technology and magic, and encounters that work in any order.
 The catalogue holds 720 scenes, five for each of the 144 house–sign pairs, in the [house modules](../../client/src/data/narrative) assembled by [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts).
 Each scene's one-line brief, with its source reasoning, sits in the [briefs](#briefs) beside this file.
 Economic terms, eligibility, and resolution are specified in [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md); the references a scene draws on are grouped in [HOUSES.md §3](../mechanics/HOUSES.md#3-chart-conditioning-model).
@@ -11,6 +12,7 @@ The catalogue is complete; this guide serves revisions, replacements, and additi
 ## Authoring workflow
 
 1. Develop a [brief](#plan-variety-with-briefs) from the house and sign references, identifying the people, their concern or pleasure, and possible participation.
+   Use [SETTING.md](SETTING.md) to choose the inhabitants, surroundings, and a few details that establish the place.
 2. Draft the scene and possible actions using the source passages and instructions in [VOICE.md](VOICE.md).
    Keep the situation understandable without the author's explanation.
 3. [Review the prose](#review-the-prose) before assigning prices or mechanical effects.
@@ -49,6 +51,7 @@ Use them as a source of situations, not as a checklist.
 
 Names are for flavor.
 Each scene's relationships stand alone: a Prince's rising sign selects a pool of 60 scenes, and they need not agree on who that Prince's mother or brother is.
+Supply enough context for the encounter to be meaningful in any order, without earlier meetings or a later payoff.
 Write so a scene does not depend on the Prince having exactly one of anyone.
 Villains, antagonists, and epic stakes are out of register; the people in a scene want ordinary things for understandable reasons.
 
@@ -67,15 +70,18 @@ For house scenes:
 ## Review the prose
 
 Read the scene and possible participation before its drafting rationale.
-Apply [VOICE.md](VOICE.md) while checking:
+Apply [VOICE.md](VOICE.md) and [SETTING.md](SETTING.md) while checking:
 
 - What is happening, and what matters to the people here?
 - What does each response change, and is that understandable without interpreting a metaphor?
+- Can the scene be understood on its own, including the practical consequences of any unfamiliar condition?
+- Do a few concrete details establish the place without burdening the scene with explanation?
 - What does the imagery or reflection add to the reader's understanding?
 - Do the sentences flow when read aloud, and does the dialogue suit the speaker?
 - Does the Prince retain room to respond without accepting an assigned motive or feeling?
 
 Across a batch, check for repeated situations, sentence shapes, and uniformly wise or solemn speakers.
+Vary places, inhabitants, and material surroundings, allowing setting to provide atmosphere as well as shape decisions.
 Revise unclear situations before polishing their cadence.
 
 ## Choices and economics
@@ -124,7 +130,7 @@ Avoid automatically compensating that refusal with another reward, or making eve
 
 Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its economic choices.
 Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
-Five scenes in one house–sign pair should differ in people, register, and economic decisions.
+Five scenes in one house–sign pair should differ in people, surroundings, register, and economic decisions.
 Mix the choice structures where the fiction supports them; there is no requirement to assign one scene to each structure.
 Apply the [authoring workflow](#authoring-workflow) to each batch.
 Review across batches for repeated situations and economic menus, and playtest several rising signs so coverage is not judged from one Prince alone.

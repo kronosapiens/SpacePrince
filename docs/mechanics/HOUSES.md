@@ -15,6 +15,7 @@ Map topology is specified in [MAP.md](MAP.md).
 | [HOUSE_MATRIX.md](../writing/HOUSE_MATRIX.md) | Each house's classifications, situations, and original authoring guidance |
 | [HOUSE_PLANET_MATRIX.md](../writing/HOUSE_PLANET_MATRIX.md) and [PLANET_MATRIX.md](../writing/PLANET_MATRIX.md) | Planetary wants in each house and their expression through signs |
 | [DRIVES.md](../writing/DRIVES.md) | Motives, emotional range, and the distinction between Prince and player |
+| [SETTING.md](../writing/SETTING.md) and [VOICE.md](../writing/VOICE.md) | The imagined world and the prose used to describe it |
 | This document, §3 | Fixed references and the dependencies that select and combine them |
 | [ENCOUNTERS.md](ENCOUNTERS.md) | Scenario composition, economic terms, eligibility, resolution, and review |
 | [SCENES.md](../writing/SCENES.md) | How scenes are written: voice, length, briefs, worked examples |

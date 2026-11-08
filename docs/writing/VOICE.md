@@ -6,6 +6,7 @@ The passages below demonstrate the techniques to adapt.
 The [research record](../research/NARRATIVE_VOICE.md#gibran-and-encounter-prose) retains scenario comparisons and reader feedback.
 
 [SCENES.md](SCENES.md) governs scene construction, length, choices, and review.
+[SETTING.md](SETTING.md) guides the cosmic fable setting and its independent encounters.
 For planetary copy, preserve the individual registers in [PLANETS.md](PLANETS.md).
 Instructional and mechanical copy uses the plain explanatory register in [SCREENS.md](../presentation/SCREENS.md#12-player-facing-register-no-martial-language).
 

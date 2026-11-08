@@ -11,7 +11,7 @@ A player mints a **Prince**: one moment and place, a latitude, a longitude, and 
 The position is recognized, not invented, and it can be recognized only once.
 The chart is the character sheet, the save file, and the artifact the player owns, all the same object.
 
-Play is a journey of encounters, with other charts and with the houses of the player's own, and the journey is Siddhartha's (below).
+Play is a journey of encounters, with other charts and with the houses of the player's own, informed by Siddhartha's attention to lived experience (below).
 In each encounter the player chooses which planet answers and how, and the chart's own structure, its signs and aspects, carries the consequences.
 Encounters create **Light**: the energy a meeting leaves behind, carried into what comes next, with what remains at a journey's end shaping one star in the Prince's sky.
 Affliction accumulates, planets combust and return, and a run ends by completion or by every planet going dark.
@@ -20,6 +20,9 @@ A run ends in combustion as readily as in completion, and either way the world r
 
 Progress does not increase power.
 It increases specificity: over many runs the chart fills in, one planet at a time, and the player's reading of it deepens.
+
+The setting is a cosmic fable in a science-fantasy universe, with varied worlds and inhabitants, suggestive technology, and magic.
+[SETTING.md](writing/SETTING.md) guides its atmosphere, limited exposition, and encounters that stand alone in any order.
 
 ## Audience and exposition
 
@@ -56,7 +59,7 @@ It is not trying to entertain so much as to reward attention.
 
 You are the Prince.
 Your own chart is the character sheet, and the position is how you were recognized: one place and time, once.
-The journey has Siddhartha's shape, lived as your own: self-discovery through lived experience rather than instruction, each encounter a partial teacher, and no one else's path to follow.
+Siddhartha guides the Prince's openness to lived experience: each encounter offers a partial view, and interpretation belongs to the player.
 Enlightenment is the player's, not the game's: more stars and more marks point to mastery, but it is not something a run can complete or the artifact can represent.
 The Prince is addressed in the second person, in the scenes and in the house–planet entries.
 No two Princes occupy the same position; many may share a chart, and chart twins are siblings in nature, not duplicates.
@@ -86,8 +89,8 @@ The game asserts nothing about whether astrology is true, only that it is useful
 
 ### Siddhartha (Hermann Hesse)
 
-The spine of the game, not only a reference: playing Space Prince is living a journey of Siddhartha's shape as your own, never re-living his.
-Self-discovery comes through lived experience rather than instruction, and its meaning may emerge later.
+The spiritual reference for self-discovery through lived experience.
+Each encounter is meaningful on its own in any order; the player may find connections without following a prescribed sequence of lessons.
 The planets are partial teachers, each giving something and none the whole.
 The cosmos is the river, a presence to listen to rather than an opponent to defeat.
 Other Princes are Govinda: different coordinates, different journeys, no judgment between them.
@@ -99,6 +102,16 @@ The archived v1 action space, the Think / Wait / Fast postures ([archive](archiv
 The prose reference for authored encounter narration and dialogue.
 [VOICE.md](writing/VOICE.md) adapts its developed images, balanced clauses, and direct observations of ordinary wants.
 The Prince's feelings and interpretation remain the player's.
+
+### Hyperion (Dan Simmons)
+
+Travellers' different perspectives offer glimpses of a larger, wondrous universe.
+Each encounter can reveal another facet of that universe while supplying its own context, as developed in [SETTING.md](writing/SETTING.md#hyperion).
+
+### Star Wars
+
+The tonal reference for technology and magic coexisting among varied worlds and inhabitants.
+Unfamiliar things can be ordinary to the people who live with them; [SETTING.md](writing/SETTING.md#star-wars) applies that familiarity and limited technical exposition to encounters.
 
 ### FTL: Faster Than Light
 
