@@ -248,6 +248,7 @@ The writing method itself — voice, length, briefs, and review through comparis
 1. **Generate and review the narrative.**
    Read the House's topics, geometry, favorability, joy affinity, and fixed game ruler together, then use Sign to shape the situation's manner and mood.
    In a joy house, use the joyful planet's house–planet wants to develop its choice.
+   Draft with the tone and voice in [VOICE.md](../writing/VOICE.md), then apply the [prose review](../writing/SCENES.md#review-the-prose) before composing offers.
    Write concrete situations, competing wants, actions, and immediate fictional consequences that work for any occupant and without an available joy.
    Evaluate emotional range, specificity, repetition, and whether the sign changes who is present and what they want.
    Keep the Prince's motives distinct from the player's possible experience.

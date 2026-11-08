@@ -14,7 +14,7 @@ Observations keep the dates and qualifications they were written with; update th
 ## Games
 
 - [FTL](FTL.md) and [Slay the Spire](STS.md) inventory the two games' text events; [SURVEY.md](SURVEY.md) is the analysis drawn from them, written against the narrative encounters as they stood in September 2026.
-- [Narrative voice](NARRATIVE_VOICE.md) compares opening lengths and voice across selected game encounters, walking-simulator developer accounts, and newspaper horoscope columns.
+- [Narrative voice](NARRATIVE_VOICE.md) retains the game and horoscope comparisons, scene development feedback, and Gibran reading behind the [voice reference](../writing/VOICE.md).
 - [Achievement research](ACHIEVEMENTS.md), with the [FTL](FTL_ACHIEVEMENTS.md) and [Slay the Spire](STS_ACHIEVEMENTS.md) achievement inventories, compares the two catalogues and proposes twenty candidates; the client draws twelve of them as reserved marks on the Prince artwork, with no earning logic yet.
 
 ## Balance

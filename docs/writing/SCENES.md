@@ -1,11 +1,23 @@
 # Writing narrative scenes
 
-The maintained guide for the house–sign scene catalogue: how a scene is developed, what its voice is, how its choices are composed, and how drafts are compared.
+The maintained guide for the house–sign scene catalogue: how a scene is developed, how its choices are composed, and how drafts are compared.
+The [prose and voice guide](VOICE.md) sets the Gibran-inspired tone through passages from *The Prophet* and instructions for adapting their techniques.
 The catalogue holds 720 scenes, five for each of the 144 house–sign pairs, in the [house modules](../../client/src/data/narrative) assembled by [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts).
 Each scene's one-line brief, with its source reasoning, sits in the [briefs](#briefs) beside this file.
 Economic terms, eligibility, and resolution are specified in [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md); the references a scene draws on are grouped in [HOUSES.md §3](../mechanics/HOUSES.md#3-chart-conditioning-model).
-The [narrative voice research](../research/NARRATIVE_VOICE.md) retains the source evidence behind the voice and length guidance.
+The [narrative voice research](../research/NARRATIVE_VOICE.md) retains the source comparisons and reader feedback behind the guidance.
 The catalogue is complete; this guide serves revisions, replacements, and additions, and its prices follow the balancing work tracked in [issue #12](https://github.com/kronosapiens/SpacePrince/issues/12).
+
+## Authoring workflow
+
+1. Develop a [brief](#plan-variety-with-briefs) from the house and sign references, identifying the people, their concern or pleasure, and possible participation.
+2. Draft the scene and possible actions using the source passages and instructions in [VOICE.md](VOICE.md).
+   Keep the situation understandable without the author's explanation.
+3. [Review the prose](#review-the-prose) before assigning prices or mechanical effects.
+   Use [comparisons](#review-through-comparisons) when a writing question remains unresolved.
+4. [Compose the economic offers](#choices-and-economics) from the participation the scene supports.
+5. Review the integrated scene and choices, then validate their resolution under [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md#10-validation).
+   If an economic change alters the fiction, return it to prose review.
 
 ## Develop the scene and participation together
 
@@ -18,6 +30,7 @@ Ask what makes participating a meaningful decision.
 Most decision encounters need something unresolved: a demand, competing wants, an opportunity with conditions, or a reason different forms of participation matter.
 Pleasure can contain tension without becoming a quarrel.
 Avoid making every encounter a moral confrontation.
+Let the situation determine the number of choices; an additional character needs a purpose beyond supplying another option.
 
 Keep the Prince's motive open during this pass.
 Other characters can express wants directly; the Prince's eventual drive and the player's experience remain distinct under [DRIVES.md](DRIVES.md).
@@ -41,21 +54,29 @@ Villains, antagonists, and epic stakes are out of register; the people in a scen
 
 ## Voice and length
 
+Use [VOICE.md](VOICE.md) for prose style, imagery, rhythm, and reflection.
+For house scenes:
+
 - Aim for **30–50 words in one paragraph**, excluding participation notes; reconsider anything above 60.
   Shorter scenes need no padding, and necessary context can justify an exception.
   The [selected FTL and Slay the Spire openings](../research/NARRATIVE_VOICE.md#opening-length-comparison) inform this target without establishing a corpus average.
-- Use second person, present tense, familiar words, and active verbs.
-  Let people ask, object, tease, or say what they want in their own manner.
-- Use details that establish a relationship, history, practical condition, or particular pleasure.
-  Age, beauty, and a final gesture do not by themselves supply significance.
-- Let a concrete exchange carry meaning without explaining it again afterward.
-  Cut repeated interpretation and incidental staging before cutting the detail that explains why someone cares.
-- Keep the narrator observant and capable of affection or dry humor.
-  An observation needs evidence in the scene; it should leave the Prince's feelings and response available to the player.
-- Treat the horoscope influence as an experiment in direct address and compressed social observation.
-  Avoid generic reassurance, unsupported predictions, prescribed responses, and assumptions about the Prince's personality.
+- Avoid generic reassurance, unsupported predictions, prescribed responses, and assumptions about the Prince's personality.
   The encounter's sign is not necessarily the Prince's Sun sign.
 - Keep mechanics out of the prose; amounts and costs belong in the option's aside ([ENCOUNTERS.md §9](../mechanics/ENCOUNTERS.md#9-prose-and-mechanical-copy)).
+
+## Review the prose
+
+Read the scene and possible participation before its drafting rationale.
+Apply [VOICE.md](VOICE.md) while checking:
+
+- What is happening, and what matters to the people here?
+- What does each response change, and is that understandable without interpreting a metaphor?
+- What does the imagery or reflection add to the reader's understanding?
+- Do the sentences flow when read aloud, and does the dialogue suit the speaker?
+- Does the Prince retain room to respond without accepting an assigned motive or feeling?
+
+Across a batch, check for repeated situations, sentence shapes, and uniformly wise or solemn speakers.
+Revise unclear situations before polishing their cadence.
 
 ## Choices and economics
 
@@ -105,12 +126,12 @@ Before writing prose, give each scene a one-line brief: who is there, which side
 Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
 Five scenes in one house–sign pair should differ in people, register, and economic decisions.
 Mix the choice structures where the fiction supports them; there is no requirement to assign one scene to each structure.
-Work in batches: briefs first, then scenes and offers, then editorial review and resolver validation before integration.
+Apply the [authoring workflow](#authoring-workflow) to each batch.
 Review across batches for repeated situations and economic menus, and playtest several rising signs so coverage is not judged from one Prince alone.
 
 ## Review through comparisons
 
-This is the evaluation method the catalogue was developed with, and it applies to any revision.
+Use comparisons when a question about the scene or voice remains unresolved.
 Compare a small number of scenes before expanding a change.
 Show the scene and possible participation without an explanation of why the writing is supposed to work.
 
@@ -126,14 +147,7 @@ Show the scene and possible participation without an explanation of why the writ
    Keep only feedback useful to the next iteration.
    A model's approval does not establish the reader's preference or readiness to generate at scale.
 
-The comparisons that shaped the catalogue produced these findings:
-
-| Comparison | Reader feedback | Working implication |
-| --- | --- | --- |
-| Mara speaking directly versus narration reporting her request | The direct request was preferred. | Let people say what they want. |
-| Lena's shared history versus a joke in dialogue | The history “evokes a larger backstory,” but screaming could mean joy or pain. | Keep the sense of an earlier shared experience and clarify its emotional character. |
-| A mother gives you a key while your brother must still wait up | Neither version established clear drama. | Rework the situation before adjusting narrator commentary or sentence order. |
-| House IV under Libra, Capricorn, Leo, and Pisces | “Each of these scenes has something to draw the reader in.” | The sign can carry the situation; proceed to house–sign scenes. |
+The [research record](../research/NARRATIVE_VOICE.md#scene-development-feedback) retains the reader feedback from catalogue development.
 
 ## House IV worked examples
 
