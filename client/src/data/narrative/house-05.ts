@@ -17,11 +17,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("curl", "Curl the drooping horns around his belly and admire him.", [A("chosen", -24)]),
     ]),
   scene("creativity-aries-red-thread", 5, "Aries",
-    "Two children appoint you the turning post for a game involving an alarming length of red thread. One runs around you; the other changes the rules. “Posts don't ask questions,” she explains, just as you are about to ask one.", [
-      trade("post", "Stay planted while they wind the whole thread.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("turn", "Try their quicker game of ducking under each turn.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
-      trade("untie", "Ask them to untie their post.", []),
-      joyChoice("pattern", "Join the circle and make the winding a dance.", [A("allUnlocked", -12)]),
+    "The children have wound their red thread around your ankles before announcing the next rule. You lean against their turning post; the knot tightens. One child brings scissors, then remembers the thread belongs to her mother. “She sells it by the length.”", [
+      trade("post", "Unwind the tight turns slowly, crouching beside the post.", [A("chosen", 12)]),
+      trade("turn", "Duck and twist through the whole winding game before untying it.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
+      trade("untie", "Pay for the thread and let them cut it loose.", [], { cost: 24 }),
+      joyChoice("pattern", "Have each child follow their own thread back around the post.", [A("allUnlocked", -12)]),
     ]),
   scene("creativity-aries-new-song", 5, "Aries",
     "The singer starts her love song while her companion is still counting the coins in their cap. At your table she reaches a rhyme requiring somebody's name. She waits, smiling. Her companion stops counting. Apparently this has happened before.", [
@@ -45,11 +45,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("beside", "Sit close and share it with her before it softens further.", [A("chosen", -24), G("joy", "luck", 12)]),
     ]),
   scene("creativity-taurus-pottery-animal", 5, "Taurus",
-    "The potter's daughter has given every clay animal a contented belly. Her father says one might make a useful cup. She considers them, then looks at you. “Which would you hollow out?” None of their expressions makes the choice easier.", [
-      trade("cup", "Work the stiff clay into a broad animal cup.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("soft", "Buy fresh soft clay and let her show you the shapes.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("admire", "Leave every belly full and admire the row.", []),
-      joyChoice("useless", "Make an animal that is good for nothing but looking pleased.", [A("chosen", -24)]),
+    "The clay animal has a contented belly and your hands have begun to ache from making it. The potter’s daughter pats more clay onto its back. “A friend could ride him.” Her father offers a warm hand treatment at his usual price; the daughter waits with her unfinished rider.", [
+      trade("cup", "Work the stiff clay into a rider and practice the harder shapes.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("soft", "Buy the warm treatment and learn how to support your hands at the wheel.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("admire", "Stop shaping and leave with the ache from the work already done.", [A("chosen", 12)]),
+      joyChoice("useless", "Have her finish the rider while you rest your hands in the warm clay water.", [A("chosen", -24)]),
     ]),
   scene("creativity-taurus-held-note", 5, "Taurus",
     "The singer asks you to listen after her instrument stops. One low note hangs in the room, then breaks when she smiles. “Again,” she says. “I want to hear where it ends.” She makes room for your chair beside hers.", [
@@ -94,11 +94,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("sing", "Sing the awkward word as if it were someone's beloved name.", [G("joy", "affliction", 12), A("chosen", -12)]),
     ]),
   scene("creativity-gemini-two-flutes", 5, "Gemini",
-    "The musician plays a phrase on one flute, sets it down, and answers on the other. “I know both parts,” she says. “I have never heard them meet.” She offers you the smaller flute and waits while you find a place for your fingers.", [
-      trade("phrase", "Learn the answering phrase.", [G("chosen", "luck", 12)]),
-      trade("whole", "Keep practicing until you can play the whole demanding tune.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("listen", "Ask to hear the two parts once more.", [A("chosen", -12)]),
-      joyChoice("exchange", "Trade short phrases with her instead of playing over one another.", [G("chosen", "resolve", 12), A("joy", -12)]),
+    "The musician hands you the answering flute. Its split mouthpiece catches your lip before either of you finishes the first phrase. She puts her own flute down at once. A repairer nearby offers a smooth replacement; the reed can also be trimmed by hand.", [
+      trade("phrase", "Trim the rough reed and test the answer through the sting.", [A("chosen", 12), G("chosen", "luck", 12)]),
+      trade("whole", "Put the flute down and leave your stinging lip to settle.", [A("chosen", 12)]),
+      trade("listen", "Pay the repairer for a smooth mouthpiece and careful fitting.", [G("chosen", "luck", 12)], { cost: 24 }),
+      joyChoice("exchange", "Let her soften and trim the reed while you rest, then trade short phrases.", [G("chosen", "resolve", 12), A("joy", -12)]),
     ]),
   scene("creativity-gemini-paper-bird", 5, "Gemini",
     "Pull the paper from the bird's tail and its wings open. The young maker demonstrates twice, then offers you the blank strip. “It should say something worth all that.” She waits with one finger on each wing, ready to make your words fly.", [
@@ -122,11 +122,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("pace", "Ask her to sing it slowly enough for you to answer.", [G("joy", "resolve", 12), A("chosen", -12)]),
     ]),
   scene("creativity-cancer-hidden-feast", 5, "Cancer",
-    "The feast is beneath the table. Its hostess lifts the cloth for you, revealing three children and a plate of sugared bread. “Upstairs is too grand,” she says. There is a place beside her if you can fold yourself into it.", [
-      trade("fold", "Crouch through their entire elaborate feast.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("bread", "Accept a piece of bread at the edge.", [A("chosen", -12)]),
-      trade("leave", "Bow to the hostess and leave them their table.", []),
-      joyChoice("cloth", "Lift one side of the cloth and sit where everyone can reach you.", [A("allUnlocked", -12), G("joy", "luck", 12)]),
+    "The feast beneath the table has reached its fourth course of sugared bread. Your legs have cramped in the low space. The child hosting it lifts the cloth toward a cushion seller. “We could make a better room.” The other guests are already naming the next course.", [
+      trade("fold", "Stay crouched through the entire feast and practice holding the awkward posture.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("bread", "Hire cushions and a padded mat for a comfortable place beside the table.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("leave", "Crawl out and leave with the stiffness from the long meal.", [A("chosen", 12)]),
+      joyChoice("cloth", "Lift one side of the cloth and move the guests onto the long bench together.", [A("allUnlocked", -12), G("joy", "luck", 12)]),
     ]),
   scene("creativity-cancer-shell-music", 5, "Cancer",
     "Your companion gives each shell a voice. The great spiral is pompous; the cracked little one has a complaint. She keeps a third against her ear. “This one is shy.” She holds it toward you. “It might answer somebody else.”", [
@@ -144,10 +144,10 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       revival("Invite the missing cloud back when she is ready to sit beside you."),
     ]),
   scene("creativity-leo-lion-tail", 5, "Leo",
-    "The lion has a splendid mane and a tail too heavy to drag. Its maker crawls out of the costume and studies your legs. “You could be the back.” She says it as a considerable honor. The front is plainly already taken.", [
-      trade("tail", "Carry the tail through the whole lion's progress.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "resolve", 12)]),
-      trade("cloth", "Buy lighter cloth so she can be the whole lion.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("applaud", "Remain among the admiring spectators.", [A("chosen", -12)]),
+    "You are already inside the lion when its maker discovers the tail will not turn through the gate. The canvas pulls hard across your back. From the front she calls, “A magnificent entrance.” A cloth seller offers to replace the heavy train with a lighter one.", [
+      trade("tail", "Carry the heavy train around the long way and finish the lion’s progress.", [A("chosen", 24), G("chosen", "affliction", 24)]),
+      trade("cloth", "Buy the lighter train and practice the lion’s turning step.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("applaud", "Back out of the tight costume and lower its heavy frame.", [A("chosen", 12)]),
       joyChoice("train", "Invite the children to carry the tail as a royal train.", [A("allUnlocked", -12), G("joy", "affliction", 12)]),
     ]),
   scene("creativity-leo-last-verse", 5, "Leo",
@@ -186,11 +186,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("bend", "Give the path one bend that exists only because you like it.", [G("joy", "resolve", 12), A("chosen", -12)]),
     ]),
   scene("creativity-virgo-wrong-stitch", 5, "Virgo",
-    "Every embroidered flower has one crooked petal. The child pushes the needle toward you. “If they're all correct, it will become a cloth grown-ups won't let us use.” She points to an empty corner. Your flower can be as wrong as you like.", [
-      trade("stitch", "Stitch a flower without correcting its crooked petal.", [G("chosen", "luck", 12)]),
-      trade("spread", "Spread the unfinished cloth and enjoy the flowers together.", [A("allUnlocked", -12)]),
-      trade("choose", "Choose a flower already there and leave the needle.", []),
-      joyChoice("large", "Make your wrong petal large enough for everyone to admire.", [G("joy", "affliction", 12), A("chosen", -12)]),
+    "Every flower has a crooked petal, including the one you have been stitching so carefully that your fingers cramp. Its young maker studies it. “That is a very exact mistake.” A stitcher nearby sells hand salve and shows how she supports her wrist for a long sitting.", [
+      trade("stitch", "Finish the difficult flower through the long handwork.", [A("chosen", 24), G("chosen", "luck", 24)]),
+      trade("spread", "Buy the salve and learn the stitcher’s supported grip.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("choose", "Put the needle down and leave the cramped fingers to loosen.", [A("chosen", 12)]),
+      joyChoice("large", "Let the child complete your imperfect petal while you rest beside her.", [G("joy", "affliction", 12), A("chosen", -12)]),
     ]),
   scene("creativity-virgo-exact-recipe", 5, "Virgo",
     "Two friends weigh the flour for a cake smaller than your thumb. One holds the scale while the other removes a single grain. “We could make a bigger one,” she admits. Beside them, a perfectly ordinary cake is cooling without this degree of attention.", [
@@ -242,11 +242,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("awkward", "Keep the one awkward sentence that sounds like he wants an answer.", [G("chosen", "luck", 12), A("joy", -12)]),
     ]),
   scene("creativity-libra-grape-dance", 5, "Libra",
-    "The two grape-treaders move in perfect time until they invite you into the tub. Each holds out the opposite hand. Neither will withdraw it. “We have been very graceful up to now,” one says. On the bench, their shoes stand neatly together.", [
-      trade("dance", "Climb in and tread through the whole song.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("cup", "Buy a cup for the bench and enjoy the dancing.", [A("chosen", -36)], { cost: 24 }),
-      trade("beat", "Keep the beat from your seat.", [A("chosen", -12)]),
-      joyChoice("song", "Take their hands and begin a song all three can follow.", [A("allUnlocked", -12), G("joy", "luck", 12)]),
+    "The grape-treaders draw you into their tub just as its entry plank cracks. Both catch your hands. “Less graceful than usual,” one says. The rim is high and rough; the vintner will rent a ladder. Their shoes still stand neatly together on the bench outside.", [
+      trade("dance", "Tread through the whole song, then haul yourself over the rim.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("cup", "Hire the ladder and step out steadily.", [], { cost: 24 }),
+      trade("beat", "Climb the rough rim now with both dancers steadying you.", [A("chosen", 12)]),
+      joyChoice("song", "Have the dancers brace the sound half of the plank as a shared step.", [A("allUnlocked", -12), G("joy", "luck", 12)]),
     ]),
   scene("creativity-scorpio-secret-mask", 5, "Scorpio",
     "Your companion gives you a mask she has made in private. Its expression is almost familiar. “You may wear it,” she says, “if you don't ask who it is.” Music begins beyond the curtain. She is holding a second mask against her skirt.", [
@@ -263,11 +263,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("choose", "Ask the undertaker which step his puppet should attempt next.", [A("chosen", -24), G("joy", "luck", 12)]),
     ]),
   scene("creativity-scorpio-hidden-flower", 5, "Scorpio",
-    "Inside the ruined wall, one pale flower fills the air with scent. The gardener lets you through, then closes the little gate. “I haven't told anyone. They would want a cutting.” A dry place beside the roots is just large enough for two.", [
-      trade("rest", "Sit beside her and enjoy the scent.", [A("chosen", -36)]),
-      trade("look", "Ask her to show you the flower's smallest details.", [G("chosen", "luck", 12)]),
-      trade("leave", "Leave her alone with it.", []),
-      joyChoice("nothing", "Tell her you would like nothing from the flower but this visit.", [G("joy", "resolve", 12), A("chosen", -24)]),
+    "Inside the ruined wall, one pale flower fills the air with scent. The gardener closes the little gate behind you; its rusty hinge drops into the nettles. “Nobody comes here,” she says, looking at the thorn-grown gap. Her neighbor lends cutting tools for a fee.", [
+      trade("rest", "Clear the thorn-grown gap by hand before taking a last look at the flower.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("look", "Hire the cutting tools and open a path without tearing your hands.", [], { cost: 24 }),
+      trade("leave", "Squeeze through the narrow gap and its scratching branches.", [A("chosen", 12)]),
+      joyChoice("nothing", "Let her show you how to fold the old gate panel flat over the nettles.", [G("joy", "resolve", 12), A("chosen", -24)]),
     ]),
   scene("creativity-scorpio-unfinished-scene", 5, "Scorpio",
     "The actors have stopped just before forgiveness. One still holds out his hand. The woman who should take it says, “I like this bit better.” Nobody moves. The director offers you the empty stool from which the next line is supposed to come.", [
@@ -292,11 +292,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("cook", "Make a little dumpling for the cook to enjoy first.", [A("chosen", -24), G("joy", "luck", 12)]),
     ]),
   scene("creativity-sagittarius-hobby-horse", 5, "Sagittarius",
-    "The wooden horses are lined up at the gate. A child hands you the tallest one but refuses to let you mount until it neighs convincingly. “We don't know you,” he explains, “and we certainly don't know your horse.” The other horses listen closely.", [
-      trade("gallop", "Give it a voice and gallop the whole long course.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("finish", "Be the welcoming stable at the finish.", [A("chosen", -24)]),
-      trade("watch", "Remain a spectator of the unknown horses.", []),
-      joyChoice("sound", "Give your horse a ridiculous sound and invite the others to answer.", [G("chosen", "luck", 12), A("joy", -12)]),
+    "The wooden-horse race has reached the far meadow. Your legs ache, but the children insist the stable lies beyond the next hill. “Horses need exercise.” A hay cart is heading back to the gate; its driver names a fare and makes room among the empty baskets.", [
+      trade("gallop", "Gallop the whole remaining circuit and practice the high jumping step.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("finish", "Buy a ride back in the hay cart.", [], { cost: 24 }),
+      trade("watch", "End your race and walk the shorter way back with tired legs.", [A("chosen", 12)]),
+      joyChoice("sound", "Declare the meadow a new stable and have everyone rest their horses together.", [G("chosen", "luck", 12), A("joy", -12)]),
     ]),
   scene("creativity-sagittarius-travel-tale", 5, "Sagittarius",
     "The storyteller offers you three impossible destinations. You choose one, and she admits she has only written its first sentence. “A good first sentence,” she adds. Her empty cup waits beside the collection bowl. She looks ready to travel as far as you will listen.", [
@@ -327,11 +327,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("name", "Give the least respectable goat a name and compliment the baker.", [A("chosen", -24), G("joy", "luck", 12)]),
     ]),
   scene("creativity-capricorn-lena-sled", 5, "Capricorn",
-    "Lena has dragged the sled past the village slope to the steep orchard track. Last winter, her shrieks of laughter could be heard from the village. She pats the place behind her. “No braking until the gate.” Your heel is already beside the brake.", [
-      trade("steep", "Hold tight through the steep descent and haul the sled back up.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "resolve", 12)]),
-      trade("gentle", "Take the gentle village slope together.", [A("chosen", -24)]),
-      trade("watch", "Stay at the gate and listen for her laughter.", []),
-      joyChoice("pace", "Agree where to brake, then take the orchard track beside her.", [G("chosen", "luck", 12), A("joy", -12)]),
+    "The orchard track is steeper than it looked from the village. Lena’s sled is already moving beneath you. “The gate,” she calls, pointing beyond a patch of exposed roots. Your heel reaches the brake; turning uphill would drag the runners through rough, frozen grass.", [
+      trade("steep", "Hold the fast line over the roots and learn to keep the runners straight.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
+      trade("gentle", "Brake hard through the frozen grass to stop above the gate.", [A("chosen", 12)]),
+      trade("watch", "Turn uphill and absorb the jolt as the runners stop.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      joyChoice("pace", "Call the braking rhythm to Lena and turn together along the smooth bank.", [G("chosen", "luck", 12), A("joy", -12)]),
     ]),
   scene("creativity-capricorn-miniature-wall", 5, "Capricorn",
     "During his rest, the mason builds a wall scarcely higher than your finger. He has spent most of the afternoon on its gate. “It has to open.” Nothing could pass through except an insect. He offers you a little stone for the unfinished corner.", [
@@ -377,11 +377,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("person", "Keep the ungainly shape that makes her recognize somebody.", [A("chosen", -24), G("joy", "resolve", 12)]),
     ]),
   scene("creativity-aquarius-rooftop-kite", 5, "Aquarius",
-    "Elegant failed kites hang beneath the eaves. The square one aloft looks like a crooked window. Its maker hands you the line. “That one flies.” A gust pulls your arm straight. He has a stool and a harness ready if you would rather sit.", [
-      trade("line", "Hold the line through the long gusts.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("harness", "Hire the harness and enjoy a supported turn.", [A("chosen", -36)], { cost: 24 }),
-      trade("seat", "Watch the crooked window from the stool.", [A("chosen", -12)]),
-      joyChoice("ribbon", "Add a ribbon that makes its ungainly movement worth following.", [G("chosen", "luck", 12), A("joy", -12)]),
+    "The square kite aloft looks like a crooked window. You have held it through a long series of gusts, and the cord bites your palm. “That one flies,” its maker says proudly. He offers his harness for hire or reaches for the line when he sees your hand.", [
+      trade("line", "Hold through the long gusts and bring the kite down by steady pulls.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("harness", "Hire the harness to take the strain while you learn to guide the kite.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("seat", "Hand the line back and leave your sore hand to settle.", [A("chosen", 12)]),
+      joyChoice("ribbon", "Take alternating short turns with him and rest between the gusts.", [G("chosen", "luck", 12), A("joy", -12)]),
     ]),
   scene("creativity-aquarius-silent-concert", 5, "Aquarius",
     "The musicians ask you to put your hands on the table. A low vibration travels up your arms before you hear the note. “Everyone keeps asking us to play louder,” one says. They have moved the collection bowl aside to make room for you.", [
@@ -405,11 +405,11 @@ export const HOUSE_05_SCENARIOS: NarrativeScenario[] = [
       joyChoice("both", "Read your reply through the laughter and give her time to answer.", [G("chosen", "luck", 12), A("joy", -24)]),
     ]),
   scene("creativity-pisces-paper-fleet", 5, "Pisces",
-    "The children have painted passengers on their paper boats. They ask you to guide the smallest through the shallow runnel without wetting its little faces. A child points to one passenger leaning over the edge. “He shouldn't be doing that, but he won't listen.”", [
-      trade("guide", "Kneel along the whole winding channel to guide the boat.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("fold", "Sit on the dry bank and fold a steadier boat.", [G("chosen", "luck", 12)]),
-      trade("watch", "Let the little passenger find his own shore.", [A("chosen", -12)]),
-      joyChoice("garden", "Give the stranded boat a garden of floating petals.", [A("allUnlocked", -12)]),
+    "The children’s boats drift beneath the footbridge as you kneel to guide them. A sluice opens upstream, soaking your clothes before you reach the bank. One painted passenger leans over his paper rail. “He should have listened,” his maker says. The miller rents dry wraps beside the wheel.", [
+      trade("guide", "Guide the whole fleet to shore through the cold runnel.", [A("chosen", 24), G("chosen", "luck", 12), G("chosen", "affliction", 12)]),
+      trade("fold", "Hire a dry wrap and fold a steadier boat on the bank.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("watch", "Leave the fleet to the children and walk on in your wet clothes.", [A("chosen", 12)]),
+      joyChoice("garden", "Join the children beneath the mill’s warm drying canopy and float petals from there.", [A("allUnlocked", -12)]),
     ]),
   scene("creativity-pisces-borrowed-melody", 5, "Pisces",
     "The song begins as a lullaby and becomes something usually sung over beer. Its singer has no ending yet. She asks you to stay until it feels finished. On the table, her companion taps the rhythm with one hand and holds a collection cup in the other.", [

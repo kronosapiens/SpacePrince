@@ -3,10 +3,10 @@ import { A, G, L, scene, trade } from "./shared";
 
 export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
   scene("relationships-aries-first-oar", 7, "Aries",
-    "The ferryman's new partner insists on the first rowing turn. She has already untied the boat. He offers you a paid place at the second oar, then she offers to carry you as a passenger instead. The boat begins to turn between their proposals.", [
-      trade("row", "Take the strenuous second oar for the offered wage.", [A("chosen", 24), L(84)]),
-      trade("passage", "Buy the crossing and let her row first.", [A("chosen", -36)], { cost: 36 }),
-      trade("shore", "Step back onto the bank while they settle the turns.", []),
+    "The ferryman’s new partner pushes off while you are still finding your seat. “My first turn.” He offers you the second oar, then she names the passenger fare. The bank is already behind you; reaching the nearer landing would mean rowing against her turning boat.", [
+      trade("row", "Take the strenuous second oar for the full crossing’s wage.", [A("chosen", 24), L(84)]),
+      trade("passage", "Pay the passenger fare and let her take the first turn.", [], { cost: 36 }),
+      trade("shore", "Row back to the nearer landing and end the crossing there.", [A("chosen", 12)]),
     ]),
   scene("relationships-aries-wedding-fire", 7, "Aries",
     "The bride and groom each bring a coal from their household fire. Neither will put theirs in second. The empty brazier stands between them while the coals slowly dim. The groom asks you to hold the hot pans together. The bride points toward fresh tinder instead.", [
@@ -33,10 +33,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("words", "Accept the apology and leave the rest of his offer.", []),
     ]),
   scene("relationships-taurus-bench", 7, "Taurus",
-    "Your companion sits on the bench she bought, outside the cottage it cannot enter. “It is a good bench.” She offers supper if you stay beside her, or payment for helping lift it through the window. From here, both offers have a comfortable view.", [
-      trade("lift", "Help lift the heavy bench through the window.", [A("chosen", 24), L(84)]),
-      trade("meal", "Share supper on the bench where it stands.", [A("chosen", -24)]),
-      trade("go", "Wish her enjoyment of the bench and continue.", []),
+    "The bench is halfway through your companion’s cottage window when the frame catches. You are holding the outside end. “Still a good bench,” she says from inside. A porter passing the gate offers to take your place; lowering it together will mean crouching beneath the sill.", [
+      trade("lift", "Finish the heavy lift through the window for her offered payment.", [A("chosen", 24), L(84)]),
+      trade("meal", "Pay the porter to take your end through the window.", [], { cost: 24 }),
+      trade("go", "Lower your end carefully while she slides the bench back outside.", [A("chosen", 12)]),
     ]),
   scene("relationships-taurus-last-slice", 7, "Taurus",
     "The baker cuts a rich cake for you and her husband. He slides his larger piece toward you; she slides it back. “I know how you both are.” Neither has tasted anything. He looks at you over the plate, plainly prepared to insist again.", [
@@ -63,10 +63,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("them", "Leave the pair to choose their own cups.", []),
     ]),
   scene("relationships-gemini-translation", 7, "Gemini",
-    "Your interpreter says the merchant agreed to carry the samples. The merchant says the interpreter did. Neither touches the heavy case. Both offer you the carrying fee, speaking at once. The interpreter then suggests a quiet lunch at which the agreement might become clearer.", [
-      trade("case", "Carry the samples yourself for the disputed fee.", [A("chosen", 24), L(84)]),
-      trade("lunch", "Buy lunch and settle the wording at a quiet table.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("cancel", "Cancel the meeting before the case moves.", []),
+    "Halfway down the stairs, your interpreter explains that the merchant meant the other entrance. The heavy sample case rests across your arms. Both offer the carrying fee at once. A porter can take it onward; the nearest landing is behind you, up three awkward steps.", [
+      trade("case", "Carry the samples to the other entrance for their agreed fee.", [A("chosen", 24), L(84)]),
+      trade("lunch", "Pay the porter to finish while you settle the wording with the interpreter.", [], { cost: 36 }),
+      trade("cancel", "Carry the case back onto the landing and end the arrangement.", [A("chosen", 12)]),
     ]),
   scene("relationships-gemini-sides", 7, "Gemini",
     "The debaters ask you to exchange sides halfway through their practice. One immediately objects: he has prepared answers only to your objections. His partner offers you a small fee for the first round, or the chance to work through the difficult full exchange together.", [
@@ -111,10 +111,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("table", "Admit defeat and help set the table.", []),
     ]),
   scene("relationships-cancer-gangplank", 7, "Cancer",
-    "The boat's owner takes your bag because you once carried hers. She walks with a stick now. When you reach for both bags, she names a carrying fee. “If you insist on making it work.” The gangplank is only wide enough for one of you.", [
-      trade("accept", "Let her carry your bag and take the easy crossing.", [A("chosen", -24)]),
-      trade("both", "Carry both heavy bags for the fee she offers.", [A("chosen", 12), L(48)]),
-      trade("divide", "Each carry your own bag and leave the payment aside.", []),
+    "The boat shifts while you and its owner cross the gangplank with your bags. She catches the rail with her walking stick; your shoulder takes both straps. “I once carried yours,” she says. A dockhand offers a steadying rope, naming his fee over the water.", [
+      trade("accept", "Pay the dockhand to steady the crossing and take the bags.", [], { cost: 24 }),
+      trade("both", "Carry both heavy bags across for the fee the owner offers.", [A("chosen", 24), L(84)]),
+      trade("divide", "Divide the bags again and make the awkward crossing together.", [A("chosen", 12)]),
     ]),
   scene("relationships-cancer-quiet-cup", 7, "Cancer",
     "After the argument, the brewer pours two cups. Yours stops just within reach. She does not look up, but she has moved the comfortable chair away from the draft. A little warmth remains in the pot between you; she waits to see whether you stay.", [
@@ -135,10 +135,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("correct", "Correct the account without accepting more hospitality.", []),
     ]),
   scene("relationships-leo-banner", 7, "Leo",
-    "Your rival in the procession offers to carry her banner beside yours. “Neither higher.” She marks the shafts with a piece of chalk. The organizer offers a fee for carrying them at the front, or you can hire bearers and walk together without the weight.", [
-      trade("carry", "Take the heavy front position beside her.", [A("chosen", 24), L(84)]),
-      trade("bearers", "Hire bearers and share an easy place in the procession.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("decline", "Leave the procession to its other banners.", []),
+    "Your rival’s banner is level with yours when the procession turns into a gust. Both poles pull hard against your shoulders. “Neither higher,” she reminds you. The organizer offers the front position’s fee, or hired bearers; a sheltered side street would let you lower the banners early.", [
+      trade("carry", "Hold the front position beside her for the procession fee.", [A("chosen", 24), L(84)]),
+      trade("bearers", "Hire bearers and walk beside your rival without the weight.", [], { cost: 48 }),
+      trade("decline", "Carry the poles into the side street and lower them together.", [A("chosen", 12)]),
     ]),
   scene("relationships-leo-feast", 7, "Leo",
     "Your host has ordered an enormous supper for two. He asks you not to mention that he cannot finish it. Beyond the doorway, the waiting musicians keep looking at the dishes. He sees them looking. “You could say we invited them,” he suggests.", [
@@ -159,10 +159,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("keep", "Keep the uneven stitches as they are.", []),
     ]),
   scene("relationships-virgo-contract", 7, "Virgo",
-    "The carrier corrects every line of your agreement except the fee. Her partner points at that line after she has finished explaining the punctuation. She offers to carry the bags for a fair payment, or divide the weight and charge you less. Both await your answer.", [
-      trade("fair", "Pay the fair carrying fee and rest your shoulders.", [A("chosen", -36)], { cost: 36 }),
-      trade("shared", "Pay less and share the load with her.", [A("chosen", -12)], { cost: 12 }),
-      trade("cancel", "Cancel the carrying agreement before anyone lifts.", []),
+    "The carrier’s axle breaks after your bags have crossed the yard. She reads the agreement again: it promises carriage, not a sound cart. “Then we amend it.” She offers a carrying fee if you help, or can hire another cart. Your bags block the narrow passage.", [
+      trade("fair", "Pay your agreed share for another cart to carry the bags out.", [], { cost: 36 }),
+      trade("shared", "Share the heavy carrying and take her offered fee.", [A("chosen", 24), L(84)]),
+      trade("cancel", "Carry your bags back through the narrow passage and cancel the rest.", [A("chosen", 12)]),
     ]),
   scene("relationships-virgo-seeds", 7, "Virgo",
     "Your gardening partner rejects the seed you saved together. “Look closely.” She shows you the damaged kernels, then offers to buy your share or pay you to sort the good ones from the whole stock. The little saved handful lies between her practical offers.", [
@@ -183,10 +183,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("leave", "Leave the dressing as it is for now.", []),
     ]),
   scene("relationships-libra-uninvited-guest", 7, "Libra",
-    "Your partner invited someone you quarreled with to supper to prove there is no awkwardness. The guest has immediately asked for the bill. Your partner tells you how comfortable everybody looks. Three untouched plates wait for a decision nobody wants to name.", [
-      trade("supper", "Buy the long supper and invite both to stay.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("drink", "Settle for a brief drink at the table.", [A("chosen", -24)], { cost: 24 }),
-      trade("leave", "Leave the attempted reconciliation before supper.", []),
+    "Supper is finished before your partner admits she invited your old opponent to reconcile you. The guest asks for the bill. “Everyone ate well,” your partner says. The innkeeper names your share and offers washing in payment; a longer kitchen turn would leave wages after the meal is settled.", [
+      trade("supper", "Pay your share and let the attempted reconciliation end here.", [], { cost: 24 }),
+      trade("drink", "Wash your share of the supper dishes to settle the bill.", [A("chosen", 12)]),
+      trade("leave", "Work the full kitchen turn and collect the wages left after supper.", [A("chosen", 24), L(60)]),
     ]),
   scene("relationships-libra-dance", 7, "Libra",
     "Your partner asks you to lead the unfamiliar turn. She is tired of apologizing for knowing it better. “I could show you, if we stopped being polite.” She offers her hand again. Beside the floor, a bench gives both of you a comfortable view.", [
@@ -219,10 +219,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("close", "Close the account without taking a share.", []),
     ]),
   scene("relationships-scorpio-thorn", 7, "Scorpio",
-    "The gardener asks you to hold the lamp without mentioning the thorn beneath her nail. At the healer's bench there is room for two, with warm basins ready. She looks at the light you are holding. “Please. Just keep that steady.”", [
-      trade("care", "Pay for careful hand care at the bench beside her.", [A("chosen", -36)], { cost: 36 }),
-      trade("lamp", "Hold the lamp through the long treatment for the healer's fee.", [A("chosen", 12), L(48)]),
-      trade("set", "Set the lamp within reach and leave her privacy.", []),
+    "The gardener flinches as you lift the lamp toward the thorn beneath her nail. Hot oil spills across your hand. The healer draws up a second chair and names the dressing fee. “I did ask for steady,” the gardener says, then looks at your hand and falls quiet.", [
+      trade("care", "Pay for the careful dressing and a supporting wrap.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("lamp", "Keep the lamp steady through the long treatment for the healer’s fee.", [A("chosen", 24), L(84)]),
+      trade("set", "Cool your hand in the plain basin and leave the longer treatment.", [A("chosen", 12)]),
     ]),
   scene("relationships-scorpio-retraction", 7, "Scorpio",
     "The man who accused you will retract it in the courtyard, provided you stand beside him through the long outdoor hearing. He offers compensation for the hours on the cold steps. Or, he says, the two of you can settle privately at the inn now.", [
@@ -243,10 +243,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("hands", "Take his hand and stop here.", []),
     ]),
   scene("relationships-sagittarius-wrong-road", 7, "Sagittarius",
-    "Your guide admits the scenic route is longer because she wanted to show you her favorite hill. “I should have asked.” She offers part of her fee if you will make the climb, or points out a passing cart that can carry you to the turning.", [
-      trade("climb", "Make the hard climb for the share she offers.", [A("chosen", 24), L(84)]),
-      trade("ride", "Pay for the cart and rest on the way to the turning.", [A("chosen", -36)], { cost: 36 }),
-      trade("short", "Take the short road alone.", []),
+    "At the far end of a rough ridge, your guide admits the scenic route was her idea. “I should have asked.” The short road lies below a steep descent now. She offers part of her fee for the next climb; a passing cart can take you down for payment.", [
+      trade("climb", "Make the harder onward climb for the share she offers.", [A("chosen", 24), L(84)]),
+      trade("ride", "Pay for the cart down to the turning.", [], { cost: 36 }),
+      trade("short", "Descend the rough slope alone to recover the short road.", [A("chosen", 12)]),
     ]),
   scene("relationships-sagittarius-tent", 7, "Sagittarius",
     "Your companion proposes sleeping beneath the stars and gives you the tent. When you start toward it, she admits she hoped you would stay outside too. “It was an offer, though.” She unties the blankets so you can divide them whichever way you choose.", [
@@ -273,10 +273,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("farewell", "Make the farewell plain and leave.", []),
     ]),
   scene("relationships-capricorn-snowline", 7, "Capricorn",
-    "The surveyor will not cross the snowy boundary until you carry the same weight as her apprentice. “Or pay for another pair of hands.” She sets both packs beside the line. The apprentice says nothing, but watches which one you reach toward.", [
-      trade("pack", "Take the demanding weighted climb beside the apprentice.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("hands", "Pay for extra hands and make the crossing unburdened.", [A("chosen", -36)], { cost: 36 }),
-      trade("stop", "Stop at the boundary and end the survey here.", []),
+    "Snow fills the survey trench behind you. Your partner sets her pack down on the far side and studies the broken footholds. Her apprentice can guide you back, or finish the weighted survey beside you. A hired sledge driver waits above the bank with a stated fare.", [
+      trade("pack", "Finish the weighted survey beside the apprentice and learn the difficult footing.", [A("chosen", 24), G("chosen", "affliction", 12), G("chosen", "luck", 12)]),
+      trade("hands", "Pay for the sledge crossing with the packs aboard.", [], { cost: 36 }),
+      trade("stop", "End the survey and climb back through the broken footholds.", [A("chosen", 12)]),
     ]),
   scene("relationships-capricorn-kiln", 7, "Capricorn",
     "For thirty years the smith's partner has brought supper to the forge. Tonight she asks him to sit at her table instead. He looks toward the bellows, then offers you the watch fee. She puts the covered dish down, waiting to hear whether he is coming.", [
@@ -303,10 +303,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("lead", "Let her take the last step first.", []),
     ]),
   scene("relationships-aquarius-pipe", 7, "Aquarius",
-    "The partners own opposite ends of a frozen pipe. Each wants the thaw begun at his end. They offer you a fee to do the whole job, or a warm bath once the water flows if you supply two heating pans. Neither will concede the first pan.", [
-      trade("whole", "Do the long thawing work yourself for the full fee.", [A("chosen", 24), L(84)]),
-      trade("pans", "Pay for both warming pans and take the promised bath.", [A("chosen", -36)], { cost: 36 }),
-      trade("leave", "Leave them to thaw their own ends.", []),
+    "The frozen pipe splits between its two owners just as you lean over their drawing. Water soaks your coat. Each claims the other end caused it. They offer a repair fee; the bathkeeper will hire you dry clothes while they argue, and the road outside is cold.", [
+      trade("whole", "Work the long repair beside them for the full fee.", [A("chosen", 24), L(84)]),
+      trade("pans", "Hire dry clothes from the bathkeeper and leave the repair to its owners.", [], { cost: 36 }),
+      trade("leave", "Continue along the cold road in your wet coat.", [A("chosen", 12)]),
     ]),
   scene("relationships-aquarius-separate-rooms", 7, "Aquarius",
     "Your host designed the lodging with separate entrances so guests could have company without intrusion. When you use yours, he looks hurt. “The common bath is open too.” He names both prices, then says he would rather know what you actually prefer.", [
@@ -333,10 +333,10 @@ export const HOUSE_07_SCENARIOS: NarrativeScenario[] = [
       trade("decline", "Decline without claiming precedence.", []),
     ]),
   scene("relationships-pisces-two-boats", 7, "Pisces",
-    "Your companion ties the boats together so you can finish talking. The currents pull them in different directions. She laughs, then offers you the rowing fee she meant for a towman. The towman waits nearby, willing to take both of you to the quiet bank.", [
+    "Your companion ties the boats together to finish talking. Opposing currents draw the knot hard around your wrist before you can release it. She reaches for the oars, offering the fee meant for a towman. He waits nearby with a boat hook and room for both of you.", [
       trade("row", "Row the joined boats hard toward the bank for her fee.", [A("chosen", 24), L(84)]),
-      trade("tow", "Pay for the tow and share the easy crossing.", [A("allUnlocked", -12)], { cost: 24 }),
-      trade("untie", "Untie the boats and finish the farewell now.", []),
+      trade("tow", "Pay the towman to take the strain and bring both boats to shore.", [], { cost: 24 }),
+      trade("untie", "Work the taut knot off your wrist and separate the boats now.", [A("chosen", 12)]),
     ]),
   scene("relationships-pisces-wet-hem", 7, "Pisces",
     "The painter has spent your portrait sitting telling you about her missing dog. Your wet clothes dry beside her stove. At last she offers back the sitting fee. “I haven't looked at you properly once.” She also offers to keep the fire going if you stay.", [

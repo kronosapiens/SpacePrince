@@ -66,17 +66,19 @@ Use the [encounter economy and eligibility rules](../mechanics/ENCOUNTERS.md) an
 - **Compose a small set of choices.**
   Trades exchange Light, affliction, recovery, or run-long stat gains.
   Gifts and mutually exclusive benefits need no matching payment: choosing one can mean forgoing another.
-  Include a valid way through at zero Light and every unlock tier, usually an exit or an available gift.
-  An exit may cost a little Light in an averse house; declining an offer can be the comfortable or decent course.
+  Include a valid way through at zero Light and every unlock tier; it may be a gift, an exit, or a harmful or fatal choice.
+  A compulsory cost follows from the situation already entered, rather than a penalty invented for declining an optional offer.
 - **Vary the decision.**
   Use the [choice structures in ENCOUNTERS.md §1.2](../mechanics/ENCOUNTERS.md#12-choice-families): choose a benefit, commitment size, payment, or concentrated versus distributed effects.
   Their example amounts are provisional; let the situation justify the offers.
   Compare recovery with Resolve's immediate capacity, group effects with actual lit recipients, and costs after occupant terms.
   Keep the whole visible menu within five choices, including joy and revival, and use at most one independently chosen planet per option.
 - **The house guides the terms.**
-  Houses that aspect the Ascendant generally offer more favorable opportunities; II, VI, VIII, and XII can offer harsher terms.
+  Houses that aspect the Ascendant generally offer milder, more dependable benefits and occasional unavoidable costs; II, VI, VIII, and XII can carry more entry risk and greater potential benefits.
   Use the going rates as a reference and compare opportunities across the house–sign pool and representative run states.
   Do not require the same surplus from every choice.
+  Count harmless choices across the whole menu, including free benefits and Light losses clamped at zero.
+  Compare complete outcomes: recovery or Resolve can offset a nominal affliction payment, and joy or favorable occupants may remove a cost.
   Value recovery at 2 Light per point and affliction taken at 3, as in [ENCOUNTERS.md §6](../mechanics/ENCOUNTERS.md#6-provisional-amounts).
 - **The fiction justifies each exchange.**
   Revise the fiction if it does not support the proposed exchange.

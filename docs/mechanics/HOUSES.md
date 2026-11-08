@@ -30,7 +30,7 @@ The matrices supply writing possibilities; the authoring spec determines which e
 
 - Provide a second encounter type shaped by house, sign, and planet references selected through natal placements and current condition.
 - Give each of the twelve houses a distinct mechanical identity.
-- Give each Prince chart-specific approaches while keeping ordinary economic opportunity equivalent across charts.
+- Give each Prince chart-specific approaches, with aggregate economic opportunity across charts subject to balancing.
 - Keep each encounter to one decision, with target selection and previews before commitment.
 - Influences include Slay the Spire and Faster Than Light, whose events connect available resources to the choices ahead.
 
@@ -42,7 +42,7 @@ The matrices supply writing possibilities; the authoring spec determines which e
   Dignity is not an input to relational encounters (`MECHANICS.md §10`).
 - Twelve house archetypes: topics, fixed geometry, favorability, and joy.
 - Outcome vocabulary: what resources narrative encounters can move.
-- Encounter shape: one decision, immediate consequences, previews, and exits.
+- Encounter shape: committed entry, one decision, immediate consequences, and previews.
 
 ### Open
 
@@ -101,6 +101,8 @@ An occupant shares its house's classification.
 This fixed relationship is distinct from aspects cast by planets elsewhere in an individual chart.
 Historical favorability informs our **valence**: favorable houses tend toward assistance and opportunity; adverse houses toward necessity, constraint, and extraction.
 These are authoring tendencies rather than guaranteed outcomes or prescribed emotional tones.
+Favorable houses can impose occasional unavoidable costs; adverse houses can pair greater entry risk with greater potential benefits.
+An entered scene still offers a valid choice at zero Light and every unlock tier, even when that choice is harmful or fatal.
 II can concern abundance as well as scarcity; VIII can offer a gain without making a loss beneficial.
 Angularity and favorability remain distinct attributes of House: potency does not itself make an offer generous.
 
@@ -178,7 +180,7 @@ For an encounter in VI with Sagittarius rising, Venus in Taurus, and Mars in Aqu
    Mars in Aquarius occupies III, but its condition can still enable VI's joy choice.
    Read the current resources and eligible targets for each proposed choice.
 5. **Compose and validate the offers.**
-   Apply the shared encounter rules to the trades, exit, and joy choice using [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
+   Apply the shared encounter rules to the full menu, including its joy choice, using [ENCOUNTERS.md §4.6](ENCOUNTERS.md#46-composing-and-revising-a-scenario).
 
 ---
 

@@ -3,11 +3,11 @@ import { A, G, L, joyChoice, revival, scene, trade } from "./shared";
 
 export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
   scene("labor-aries-hot-bricks", 6, "Aries",
-    "The builder wants the wall begun before the bricks cool. His carrier holds out the cloth used yesterday; a burned hole marks the center. “He says fold it twice.” Beside the stack lie the iron carrying handles nobody has stopped to fit.", [
-      trade("short", "Carry one small load in the doubled cloth.", [A("chosen", 12), L(24)]),
-      trade("stack", "Carry the whole hot stack for the larger wage.", [A("chosen", 36), L(96)]),
-      trade("leave", "Leave the bricks where they are.", []),
-      joyChoice("handles", "Fit the handles and carry only the agreed stack.", [A("joy", 12), L(96)]),
+    "The first hot bricks are already in your arms when the carrier shows you the burned hole in the cloth. “Fold it twice, he says.” The builder names the short load’s wage and a larger sum for the stack. Iron handles lie beside the place where you can set it down.", [
+      trade("short", "Carry the short hot load to the wall for its wage.", [A("chosen", 24), L(84)]),
+      trade("stack", "Carry the whole hot stack for the full building wage.", [A("chosen", 48), L(192)]),
+      trade("leave", "Set the load down carefully and end the turn with scorched hands.", [A("chosen", 12)]),
+      joyChoice("handles", "Fit the iron handles and carry only the agreed stack.", [A("joy", 12), L(132)]),
     ]),
   scene("labor-aries-shearing-bell", 6, "Aries",
     "The steward rings the finishing bell because the first flock is shorn. Another flock waits behind it. The shearer cannot uncurl his fingers from the tool. “Does the bell pay us twice?” he asks. The steward offers you the next turn instead of answering.", [
@@ -17,11 +17,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("edge", "Sharpen the blade and finish one clearly counted pen.", [A("joy", 12), L(60)]),
     ]),
   scene("labor-aries-new-broom", 6, "Aries",
-    "The new overseer orders the ash swept while the furnace breathes it back across the floor. The cleaner lends you her spare cloth. “For your mouth,” she says. He has put the cleaning wage on a shelf already turning gray again.", [
-      trade("sweep", "Sweep through one full furnace cycle for the wage.", [A("chosen", 24), L(60)]),
-      trade("together", "Share the sweep across all available hands.", [A("allUnlocked", 12), L(60)]),
-      trade("refuse", "Hand back the cloth and refuse the work.", []),
-      joyChoice("draft", "Close the draft before sweeping the settled ash.", [L(36)]),
+    "Ash washes over you as the furnace breathes into the cleaning room. The overseer calls for another sweep. The cleaner ties a cloth across your mouth and points toward the yard. “Fresh air there. Wages here.” The draft lever remains open behind the overseer’s shoulder.", [
+      trade("sweep", "Finish the full sweep through the furnace cycle for the wage.", [A("chosen", 36), L(156)]),
+      trade("together", "Share the dirty work across the available hands.", [A("allUnlocked", 12), L(108)]),
+      trade("refuse", "Leave through the ash-filled passage and clear your lungs outside.", [A("chosen", 12)]),
+      joyChoice("draft", "Close the draft and collect the smaller fee for sweeping settled ash.", [L(72)]),
     ]),
   scene("labor-aries-sprained-hand", 6, "Aries",
     "The runner says the sore hand can manage one more pot. The cook has put out a chair and salve, but he stands between them and the stove. “It will take longer to explain where it goes.” She looks at you over the handles.", [
@@ -38,11 +38,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("line", "Agree on one line, then finish the digging without another restart.", [A("joy", 12), G("joy", "resolve", 12), L(36)]),
     ]),
   scene("labor-taurus-heavy-dough", 6, "Taurus",
-    "The baker says the dough is ready when it feels right. Her apprentice tries to turn it and cannot move the mass. “Then it isn't ready,” the baker says. She offers you the kneading wage; the apprentice keeps both small hands buried in the same place.", [
-      trade("knead", "Knead the heavy batch until it turns freely.", [A("chosen", 24), L(60)]),
-      trade("strength", "Work a smaller piece slowly to strengthen your grip.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("stop", "Withdraw your hands from the task.", []),
-      joyChoice("divide", "Divide the dough into pieces the hands can actually turn.", [A("joy", 12), L(60)]),
+    "Your hands are buried in the dough when the baker decides it needs another turn. Her apprentice cannot move the mass at all. “It will loosen,” she says. Your wrists ache. The bath next door sells a warm hand treatment; the kneading fee remains on the shelf.", [
+      trade("knead", "Finish the heavy batch for the full kneading fee.", [A("chosen", 36), L(156)]),
+      trade("strength", "Buy the warm treatment and practice a supported grip afterward.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("stop", "Pull your hands free and stop with the strain already taken.", [A("chosen", 12)]),
+      joyChoice("divide", "Divide the dough into pieces the hands can actually turn.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-taurus-lame-ox", 6, "Taurus",
     "The drover wants the stall cleaned without disturbing the resting ox. The ox occupies almost all of it. When the drover lifts the feed bowl, one enormous eye opens. “Don't encourage him,” he tells you. The cleaning fee waits beside the empty stall next door.", [
@@ -59,11 +59,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("fix", "Fix the feed bowl within reach and learn with both hands free.", [G("joy", "resolve", 12)]),
     ]),
   scene("labor-taurus-full-buckets", 6, "Taurus",
-    "The gardener fills each bucket to the brim, then complains about the water on the carrier's shoes. “Walk more steadily.” The carrier asks you to try. A line worn halfway down the oldest bucket shows that somebody once had a different idea.", [
-      trade("carry", "Carry the full pair to the far beds for pay.", [A("chosen", 24), L(60)]),
-      trade("spread", "Pass the buckets along a line of helping hands.", [A("allUnlocked", 12), L(60)]),
-      trade("refuse", "Set the pair down and decline the wage.", []),
-      joyChoice("line", "Fill to the old line and carry what stays in the buckets.", [A("joy", 12), L(60)]),
+    "The first full buckets have soaked your shoes by the time the gardener calls you back. “Walk more steadily.” He offers the far beds’ wage or a smaller payment to empty this pair. The carrier beside you points to an old halfway mark inside the bucket.", [
+      trade("carry", "Carry the full pair through the long round of beds.", [A("chosen", 36), L(156)]),
+      trade("spread", "Pass the watering round across all available hands.", [A("allUnlocked", 12), L(108)]),
+      trade("refuse", "Empty this pair at the nearest bed and collect the smaller payment.", [A("chosen", 24), L(72)]),
+      joyChoice("line", "Fill to the old line and finish a measured watering round.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-taurus-resting-song", 6, "Taurus",
     "The threshers work to a slow song. The steward asks for a quicker tune; the singer finishes the verse at precisely the same pace. She offers you a place beside her. The faster day's wage is posted above the lower rate her group has accepted.", [
@@ -73,11 +73,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("pace", "Keep the work to the singer's pace and finish the measured task.", [A("joy", 12), L(48)]),
     ]),
   scene("labor-gemini-two-orders", 6, "Gemini",
-    "The porter receives a new destination each time a supervisor passes. Both supervisors say the other is mistaken. He has lifted the same crate three times. One offers you the farther route's wage, while the other points emphatically toward the nearer gate.", [
-      trade("far", "Take the crate the full farther route.", [A("chosen", 24), L(60)]),
-      trade("near", "Accept the smaller wage for the nearer gate.", [A("chosen", 12), L(24)]),
-      trade("wait", "Leave the crate down until they agree.", []),
-      joyChoice("one", "Have them name one destination and its payment before lifting.", [A("joy", 12), L(60)]),
+    "You and the porter are halfway up the loading stairs when the supervisors disagree again. One names the far gate; the other points back to the near one. The crate presses into your arms. Both wages are stated now, while a hired carrier waits beside the upper landing.", [
+      trade("far", "Take the crate to the far gate for the larger wage.", [A("chosen", 36), L(156)]),
+      trade("near", "Return down the stairs and finish at the nearer gate.", [A("chosen", 24), L(84)]),
+      trade("wait", "Pay the waiting carrier to take over the crate here.", [], { cost: 48 }),
+      joyChoice("one", "Settle one destination and use the porter’s sling before carrying farther.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-gemini-copying-hands", 6, "Gemini",
     "The clerk copies one speaker with each hand. Neither speaker pauses when he tries to stretch his fingers. He offers you either pen and a share of the fee. “The left one is the shorter account,” he says. The left speaker looks unconvinced.", [
@@ -94,11 +94,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("side", "Bring the voice and the grooming hands to the same side.", [G("joy", "resolve", 12)]),
     ]),
   scene("labor-gemini-talkative-washer", 6, "Gemini",
-    "The washer explains the history of every stain while her companion scrubs. Her stories are excellent. The companion has finished the whole basket. “Do the stains in the next one have histories too?” she asks. The washer offers you a paid place at the trough.", [
-      trade("basket", "Scrub the next basket while she tells its stories.", [A("chosen", 24), L(60)]),
-      trade("cuffs", "Take only the small pile of cuffs for a smaller wage.", [A("chosen", 12), L(24)]),
-      trade("leave", "Leave the next basket untouched.", []),
-      joyChoice("together", "Put the storyteller's hands into the work beside yours.", [A("joy", 12), L(60)]),
+    "The washer is halfway through a stain’s history when your hands begin to shake in the cold trough. Her companion points to the basket you have already scrubbed. “That one has a history too.” The next basket pays much more; the warm washroom rents by the hour.", [
+      trade("basket", "Scrub the next full basket for the larger washing wage.", [A("chosen", 36), L(156)]),
+      trade("cuffs", "Buy the warm washroom and learn the supported washing posture.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("leave", "End the turn and walk on with cold, cramped hands.", [A("chosen", 12)]),
+      joyChoice("together", "Bring the storyteller’s hands into one shared, measured basket.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-gemini-silent-hour", 6, "Gemini",
     "The tutor has lost his voice. His pupils write questions on the board beside his resting chair, and he keeps lifting a finger to answer. A cup cools in his other hand. The bath attendant asks whether you want the next quiet chair.", [
@@ -115,18 +115,18 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("call", "Agree to answer a call and let the sleeper stay asleep.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
     ]),
   scene("labor-cancer-wet-sheets", 6, "Cancer",
-    "The laundry keeper wants the sheets inside before the river mist reaches them. The washer lifts a corner; water pours over her shoes. “They are already wet.” The keeper names a carrying fee anyway and points to the drying room up the stairs.", [
-      trade("bundle", "Carry the entire sodden bundle upstairs.", [A("chosen", 36), L(96)]),
-      trade("share", "Pass the burden across the available hands.", [A("allUnlocked", 12), L(72)]),
-      trade("leave", "Leave the bundle and its fee.", []),
-      joyChoice("wring", "Wring the sheets at the riverside before carrying them.", [A("joy", 12), L(72)]),
+    "The sodden sheets slide against your chest as the washer passes them across the landing. Water fills your shoes. The keeper still wants them indoors before the mist comes. He names the upstairs fee; the warm drying room can also be hired without taking another bundle.", [
+      trade("bundle", "Carry the whole sodden load upstairs for the full fee.", [A("chosen", 36), L(168)]),
+      trade("share", "Pass the wet carrying across the available hands.", [A("allUnlocked", 12), L(120)]),
+      trade("leave", "Hire the drying room and warm your clothes before leaving.", [G("chosen", "resolve", 12)], { cost: 48 }),
+      joyChoice("wring", "Wring the sheets on the landing before carrying them upstairs.", [A("joy", 12), L(120)]),
     ]),
   scene("labor-cancer-saved-shift", 6, "Cancer",
-    "The boatman has kept your old place in the crew. He shows you the same splintered oar, plainly proud to have remembered. “Fits your hands.” The grip has not improved with keeping. He offers either the short ferry turn or the long trip upriver.", [
-      trade("ferry", "Take the short turn at the old oar.", [A("chosen", 12), L(24)]),
-      trade("river", "Row the full upriver trip for the larger wage.", [A("chosen", 36), L(96)]),
-      trade("decline", "Thank him for remembering and decline the place.", []),
-      joyChoice("grip", "Replace the grip before taking the upriver turn.", [A("joy", 12), L(72)]),
+    "The boat clears the jetty while you settle into the place the boatman remembered for you. The old oar still has its splintered grip. “Fits your hands.” He offers the short ferry wage or the upriver rate; passengers pay for a padded seat beside the covered stern.", [
+      trade("ferry", "Row the short ferry turn with the old grip.", [A("chosen", 24), L(84)]),
+      trade("river", "Row the whole upriver trip for the larger wage.", [A("chosen", 48), L(192)]),
+      trade("decline", "Buy the padded passenger seat and let another rower take the oar.", [G("chosen", "resolve", 12)], { cost: 48 }),
+      joyChoice("grip", "Bind the splintered grip before taking a measured upriver turn.", [A("joy", 12), L(144)]),
     ]),
   scene("labor-cancer-sick-cook", 6, "Cancer",
     "The cook leans against the stove between bowls. She says nobody else remembers which patient refuses the broth. A helper asks her to sit and name them. “By then it will be cold.” Your own bowl waits beside a stool nobody is using.", [
@@ -143,18 +143,18 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("mat", "Put the familiar mat beside the basin before settling the dog.", [G("joy", "resolve", 12), A("chosen", -12)]),
     ]),
   scene("labor-leo-white-apron", 6, "Leo",
-    "The head cook checks every apron before supper. The worker nearest the frying pan fails the inspection again. “Cleanliness is care,” he says. She points at the spitting oil. He offers you her hot turn, with the same spotless cloth and the same wage.", [
-      trade("pan", "Take the full turn beside the splattering pan.", [A("chosen", 24), L(60)]),
-      trade("short", "Take only the first hot batch for less pay.", [A("chosen", 12), L(24)]),
-      trade("refuse", "Leave the spotless apron on its hook.", []),
-      joyChoice("screen", "Set up the metal screen and finish the cooking turn behind it.", [A("joy", 12), L(60)]),
+    "Hot oil has spotted your apron by the time the head cook begins his inspection. “Cleanliness is care.” The worker beside you holds out the next pan and names its wage. You can stop after the first batch, but your arms are already smarting from the splatter.", [
+      trade("pan", "Finish the full cooking turn beside the splattering pan.", [A("chosen", 36), L(144)]),
+      trade("short", "Finish one shorter hot batch for its wage.", [A("chosen", 24), L(84)]),
+      trade("refuse", "End the turn and leave the apron with the marks of the first batch.", [A("chosen", 12)]),
+      joyChoice("screen", "Put the metal screen between the oil and the worker before finishing.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-leo-canopy", 6, "Leo",
-    "The servants hold the canopy high so the guests can admire the decorated roof behind it. Their arms tremble. The employer offers you a corner and names the evening's wage. A stack of canopy poles lies under the table, hidden from the guests' view.", [
-      trade("corner", "Hold one corner through the long banquet.", [A("chosen", 36), L(96)]),
-      trade("spread", "Pass the corner through all available hands.", [A("allUnlocked", 12), L(72)]),
-      trade("leave", "Decline the place under the canopy.", []),
-      joyChoice("poles", "Set the canopy on its poles and take the smaller setup fee.", [L(36)]),
+    "Your corner of the canopy must stay high enough for the guests to admire the roof. Your arms begin to tremble. The employer names the full banquet wage; the servant beside you knows the smaller fee for bringing it down early. Unused poles lie beneath the table.", [
+      trade("corner", "Hold the corner through the entire banquet for the full wage.", [A("chosen", 36), L(168)]),
+      trade("spread", "Pass the holding turn across all available hands.", [A("allUnlocked", 12), L(120)]),
+      trade("leave", "Help lower the canopy early and accept the smaller fee.", [A("chosen", 24), L(72)]),
+      joyChoice("poles", "Set the canopy on its poles and take the setup fee.", [L(72)]),
     ]),
   scene("labor-leo-restored-tools", 6, "Leo",
     "The butcher polishes his tools before opening. His assistant shows you the loose handle beneath the brightest blade. “He doesn't use this one.” When the butcher hears, he blushes and offers either a paid preparation turn or time to practice with a sound tool.", [
@@ -184,11 +184,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("cuff", "Separate the one cuff and settle for its smaller washing fee.", [L(24)]),
     ]),
   scene("labor-virgo-low-shelf", 6, "Virgo",
-    "The jars are arranged perfectly by name. Unfortunately, the heaviest names come first, on the floor. The clerk asks you to fill an order while she straightens her back. “Don't disturb the alphabet.” An empty shelf at waist height waits for lighter letters.", [
-      trade("order", "Fill the whole order through the repeated lifting.", [A("chosen", 24), L(60)]),
-      trade("share", "Divide the low lifting across the available hands.", [A("allUnlocked", 12), L(60)]),
-      trade("leave", "Leave the alphabet undisturbed.", []),
-      joyChoice("height", "Move the heavy jars to the empty shelf before filling the order.", [A("joy", 12), L(60)]),
+    "You have filled half the order from the lowest shelves when your back tightens. The clerk checks the alphabetical list. “The heavy names are nearly finished.” An empty shelf at waist height waits for lighter letters. A porter offers to finish the lifting for a stated fee.", [
+      trade("order", "Finish the entire order through the repeated low lifting.", [A("chosen", 36), L(144)]),
+      trade("share", "Divide the remaining low lifting across the available hands.", [A("allUnlocked", 12), L(108)]),
+      trade("leave", "Pay the porter to complete the order and release you from the lifting.", [], { cost: 48 }),
+      joyChoice("height", "Move the heavy jars to waist height before finishing the measured order.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-virgo-salve-label", 6, "Virgo",
     "The attendant has copied every salve label in a beautiful hand. Her own fingers are split at the joints. She reads the price and treatment to you without looking up. An open pot stands close enough for her to touch, beside the unfinished labels.", [
@@ -205,18 +205,18 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("shears", "Sharpen the shears and make the careful cut once.", [G("joy", "luck", 12)]),
     ]),
   scene("labor-virgo-grain-dust", 6, "Virgo",
-    "The assistant's new sieve works twice as fast. The miller has doubled the quota. Between coughs, the assistant shows you the clever mesh and asks whether it was an improvement. The paid batch waits beneath a cloud nobody has found a way to measure.", [
-      trade("quota", "Work through the doubled quota for the offered wage.", [A("chosen", 36), L(96)]),
-      trade("batch", "Take one original-sized batch for less pay.", [A("chosen", 12), L(24)]),
-      trade("leave", "Leave the sieve and its quota alone.", []),
-      joyChoice("cover", "Enclose the sieve and agree to finish one measured batch.", [A("joy", 12), L(60)]),
+    "The new sieve throws a cloud across your face before the assistant finishes praising it. The miller has doubled the quota. Between coughs, the assistant offers the batch wage or points to the door. A washing attendant sells a long steam treatment outside; the sieve’s cover is still folded away.", [
+      trade("quota", "Work through the doubled quota for the full wage.", [A("chosen", 36), L(168)]),
+      trade("batch", "Buy the steam treatment and guided breathing practice.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("leave", "Leave the dust and finish coughing in the open yard.", [A("chosen", 12)]),
+      joyChoice("cover", "Enclose the sieve and finish one agreed batch.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-libra-equal-bales", 6, "Libra",
-    "The foreman gives each worker three bales. Half the bales are wet. He calls the division fair and offers you the last share, which darkens the ground beneath it. The woman beside you asks whether counting them again will make them any lighter.", [
-      trade("share", "Carry the heavy share for its stated wage.", [A("chosen", 36), L(96)]),
-      trade("spread", "Spread the heavy lifting across the available hands.", [A("allUnlocked", 12), L(72)]),
-      trade("refuse", "Refuse the counted share.", []),
-      joyChoice("weight", "Divide the work by weight before accepting a carrying turn.", [A("joy", 12), L(72)]),
+    "The foreman counts three bales into your turn. Only after the first lift do you feel how much rain they hold. “Equal shares.” The woman beside you offers to exchange turns; a porter names his fee for your remaining load. Water runs down the stacked ropes.", [
+      trade("share", "Carry the heavy share for the full stated wage.", [A("chosen", 36), L(168)]),
+      trade("spread", "Spread the wet lifting across all available hands.", [A("allUnlocked", 12), L(120)]),
+      trade("refuse", "Pay the porter to take over the remaining load.", [], { cost: 48 }),
+      joyChoice("weight", "Divide the work by weight and finish one measured turn.", [A("joy", 12), L(120)]),
     ]),
   scene("labor-libra-polite-bell", 6, "Libra",
     "The new bedside bell saves the patients' voices. The attendant answers every ring with an apology, even when somebody is only trying the sound. She offers you a paid watch or a resting place. Before you answer, the bell rings twice more.", [
@@ -226,11 +226,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("signal", "Agree which ring calls for help and let the testing end.", [A("joy", 12), L(60)]),
     ]),
   scene("labor-libra-two-treatments", 6, "Libra",
-    "The attendants charge the same price. One offers warm, gentle care; the other says the firmer treatment will prepare your legs for work. Neither criticizes the other. Between them is a free resting chair, and both move aside to let you choose.", [
-      trade("gentle", "Buy the warm treatment for relief now.", [A("chosen", -36)], { cost: 48 }),
-      trade("firm", "Buy the supporting treatment and work into it.", [G("chosen", "resolve", 12)], { cost: 48 }),
-      trade("chair", "Take the free resting chair.", [A("chosen", -12)]),
-      joyChoice("signal", "Agree a stopping signal before beginning the firmer treatment.", [G("chosen", "resolve", 12), A("joy", -12)], { cost: 36 }),
+    "Your work boot has tightened around a swelling ankle by the time you reach the attendants. They quote the same price for different care: warm treatment or a fitted support. Neither criticizes the other. The untreated walk continues beyond their chairs, uphill on hard paving.", [
+      trade("gentle", "Buy the warm treatment for deep relief now.", [A("chosen", -48)], { cost: 48 }),
+      trade("firm", "Buy the fitted support and practice standing securely in it.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("chair", "Loosen the boot yourself and continue up the hard paving.", [A("chosen", 24)]),
+      joyChoice("signal", "Set the stopping signal and fit only the support needed for the next stretch.", [G("chosen", "resolve", 24), A("joy", -12)], { cost: 36 }),
     ]),
   scene("labor-libra-vintage-feet", 6, "Libra",
     "The vintner praises the treaders' graceful rhythm. One worker lifts a cramped foot from the grapes and asks to slow down. “You were doing it beautifully.” The vintner offers you the next paid turn; a basin of warm water waits beside the changing stool.", [
@@ -247,11 +247,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("return", "Give each unstarted task back to the person who assigned it.", [A("joy", -24), G("joy", "resolve", 12)]),
     ]),
   scene("labor-scorpio-blocked-drain", 6, "Scorpio",
-    "The steward calls the blocked drain a small nuisance, speaking from several paces away. The cleaner shows how far her arm must reach. He names the fee without moving nearer. A long hook hangs behind him, used to keep his own steps clear.", [
-      trade("reach", "Take the long, awkward clearing task for the fee.", [A("chosen", 24), L(60)]),
-      trade("share", "Divide the bodily work among the available hands.", [A("allUnlocked", 12), L(60)]),
-      trade("refuse", "Leave the nuisance to its steward.", []),
-      joyChoice("hook", "Lift the grate and use the steward's long hook.", [A("joy", 12), L(60)]),
+    "The blocked drain overflows across your boots as the steward calls it a small nuisance. He speaks from dry steps. The cleaner shows the clearing fee and offers you her spare gloves. A long hook hangs behind him; the shortest way out crosses the filthy channel again.", [
+      trade("reach", "Clear the drain through the full awkward reach for the fee.", [A("chosen", 36), L(156)]),
+      trade("share", "Divide the dirty bodily work among the available hands.", [A("allUnlocked", 12), L(108)]),
+      trade("refuse", "Cross the channel out and rinse yourself in the cold yard.", [A("chosen", 12)]),
+      joyChoice("hook", "Lift the grate and use the steward’s long hook.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-scorpio-covered-injury", 6, "Scorpio",
     "The packer keeps one hand beneath the bench. She says the overseer sends complainers home unpaid. The next crate waits beside a pile of labels no one has written. She asks you to take her lifting turn without telling him why she cannot.", [
@@ -261,11 +261,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("labels", "End the lifting and take the label-writing work at its smaller wage.", [L(24), A("joy", -12)]),
     ]),
   scene("labor-scorpio-cellar-air", 6, "Scorpio",
-    "The cellar keeper says he has known this smell all his life. His helper climbs the stairs again to clear his head. “You get used to it.” The paid casks stand beneath a closed hatch, and the keeper carries its key around his neck.", [
-      trade("casks", "Move the full row of casks for the wage.", [A("chosen", 36), L(96)]),
-      trade("one", "Carry only the first small load.", [A("chosen", 12), L(24)]),
-      trade("outside", "Stay outside the cellar.", []),
-      joyChoice("hatch", "Have him open the hatch before taking a measured lifting turn.", [A("joy", 12), L(60)]),
+    "The cellar air makes your head ache halfway down the steps. Its keeper says he has known the smell all his life. He offers the cask-moving wage; the hired ventilator upstairs can clear the room for a fee. The keeper still wears the hatch key around his neck.", [
+      trade("casks", "Move the full row of heavy casks through the close air.", [A("chosen", 48), L(192)]),
+      trade("one", "Pay for ventilation before leaving by the cellar stairs.", [], { cost: 48 }),
+      trade("outside", "Climb back through the close air and recover outside.", [A("chosen", 24)]),
+      joyChoice("hatch", "Have the keeper open the hatch before a short, measured lifting turn.", [A("joy", 12), L(132)]),
     ]),
   scene("labor-scorpio-trusted-washer", 6, "Scorpio",
     "The employer trusts only this washer with his private linen. He tells her so as the other workers leave. She has stopped looking pleased by the compliment. He offers you a share of the fee, provided you ask no questions about the stains.", [
@@ -289,18 +289,18 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("closed", "Close the empty stalls and finish the occupied ones only.", [A("joy", 12), L(60)]),
     ]),
   scene("labor-sagittarius-short-errand", 6, "Sagittarius",
-    "The delivery is just over the hill. Once the pack is on your back, the steward mentions the hill beyond it. “You will already be most of the way.” He names a larger fee, while the local basket still waits beside the gate.", [
-      trade("hills", "Take the full route over both hills.", [A("chosen", 36), L(96)]),
-      trade("local", "Choose the smaller local load and its fee.", [A("chosen", 12), L(24)]),
-      trade("down", "Put the pack down before agreeing.", []),
-      joyChoice("turning", "Name the turning point and payment before taking the pack.", [A("joy", 12), L(60)]),
+    "You reach the first hill with the delivery pack digging into your shoulders. The steward catches up to name the hill beyond it. “You are nearly there.” He offers a much larger fee. A mule driver can carry the load onward, or you can bring it back down yourself.", [
+      trade("hills", "Carry the pack over the next hill for the full expanded wage.", [A("chosen", 48), L(192)]),
+      trade("local", "Pay the mule driver to finish the delivery from here.", [], { cost: 48 }),
+      trade("down", "Bring the heavy pack back down and end the errand.", [A("chosen", 24)]),
+      joyChoice("turning", "Set one final turning point and rebind the load before continuing.", [A("joy", 12), L(120)]),
     ]),
   scene("labor-sagittarius-big-pot", 6, "Sagittarius",
-    "The cook has promised broth to everyone in the yard. Her assistant stands on tiptoe to stir the pot, reaching barely halfway across. “Plenty for all,” the cook says. The assistant asks whether that includes arms and offers you the next paid turn.", [
-      trade("stir", "Take the full stirring turn over the heat.", [A("chosen", 24), L(60)]),
-      trade("portion", "Accept a simple bowl and stay out of the work.", [A("chosen", -12)]),
-      trade("leave", "Leave the promised broth to its cook.", []),
-      joyChoice("step", "Move the pot from the fiercest heat and stir from a steady step.", [A("joy", 12), L(60)]),
+    "The cook has promised broth to everyone in the yard. You have been stirring long enough for the heat to climb your arms. Her assistant offers the full turn’s wage or a share for dividing the work. “Plenty for all,” the cook says, setting out another row of bowls.", [
+      trade("stir", "Stir through the full hot turn for the larger wage.", [A("chosen", 36), L(156)]),
+      trade("portion", "Share the remaining hot work across the available hands.", [A("allUnlocked", 24), L(120)]),
+      trade("leave", "Set down the stirrer and end the turn with aching arms.", [A("chosen", 12)]),
+      joyChoice("step", "Move the pot off the fiercest heat and stir from a steady step.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-sagittarius-horse-stretch", 6, "Sagittarius",
     "The groom offers to ease the strain of riding. His demonstration grows more ambitious as he enjoys the reach of his own legs. “A little farther.” Beside his treatment bench, an ordinary warm wrap waits for people who have had enough stretching today.", [
@@ -324,11 +324,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("warm", "Warm and wrap the handles before taking the measured piece.", [A("joy", 12), L(60)]),
     ]),
   scene("labor-capricorn-old-pace", 6, "Capricorn",
-    "The quarry master says the day's measure has not changed in thirty years. The worker who taught it to him cannot lift today's stone. Neither looks at the other. The master offers you the wage for the old measure, pointing to the waiting blocks.", [
-      trade("measure", "Carry the old measure for its wage.", [A("chosen", 36), L(96)]),
-      trade("share", "Pass the burden across the available hands.", [A("allUnlocked", 12), L(72)]),
-      trade("leave", "Leave the old measure unclaimed.", []),
-      joyChoice("cut", "Cut the load to a steady carrying size and finish the agreed task.", [A("joy", 12), L(60)]),
+    "You stand beside the quarry worker with a stone balanced on the carrying sling. He cannot take another step. The master repeats the measure he has used for thirty years and names its wage. Splitting the stone would take time; lowering it together would end today’s carry.", [
+      trade("measure", "Carry the old full measure onward for the full wage.", [A("chosen", 48), L(192)]),
+      trade("share", "Pass the carrying through the available hands.", [A("allUnlocked", 12), L(120)]),
+      trade("leave", "Lower the sling through the deep crouch and end the carry.", [A("chosen", 24)]),
+      joyChoice("cut", "Split the stone into steady carrying sizes and finish the measured task.", [A("joy", 12), L(132)]),
     ]),
   scene("labor-capricorn-accepted-chair", 6, "Capricorn",
     "Your older coworker has put a chair beside your usual task. You have not asked for one. “You needn't make the leg worse before using it,” she says. She leaves a folded cloth on its seat and continues her own work without watching your decision.", [
@@ -345,18 +345,18 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("end", "Put the tools aside and let this turn end at the cup.", [A("joy", -24), G("joy", "resolve", 12)]),
     ]),
   scene("labor-capricorn-soot", 6, "Capricorn",
-    "The household wants the chimney cleaned and the hearth kept warm. The cleaner shows you the fee, then looks up through the smoke. “They might manage one cold hour.” A full bucket stands ready by the fire; nobody inside has agreed to use it.", [
-      trade("climb", "Take the long, hot climb for the full fee.", [A("chosen", 36), L(96)]),
-      trade("short", "Take only the lower cleaning for a smaller payment.", [A("chosen", 12), L(24)]),
-      trade("leave", "Decline the climb.", []),
-      joyChoice("out", "Put the fire out before taking the full cleaning turn.", [A("joy", 12), L(72)]),
+    "Soot falls over your shoulders as you step into the hearth. The household wants the chimney cleaned without losing its winter fire. The cleaner names the upper flue’s fee and the lower one’s. “One cold hour would do it.” A full bucket waits beyond the firelight.", [
+      trade("climb", "Take the long hot climb and clear the upper flue.", [A("chosen", 48), L(204)]),
+      trade("short", "Clear the lower flue through the shorter smoky turn.", [A("chosen", 24), L(108)]),
+      trade("leave", "Back out through the soot and leave the cleaning unfinished.", [A("chosen", 12)]),
+      joyChoice("out", "Put the fire out before taking the full cleaning turn.", [A("joy", 12), L(144)]),
     ]),
   scene("labor-aquarius-perfect-pump", 6, "Aquarius",
-    "The engineer's pump supplies the whole yard. He demonstrates the flow while its smallest worker cranks at shoulder height. “Efficient,” he says. The worker asks you to take a paid turn. A lower mounting hole waits unused beneath the handle.", [
-      trade("crank", "Crank through the full watering turn.", [A("chosen", 24), L(60)]),
-      trade("share", "Pass the turning burden through the available hands.", [A("allUnlocked", 12), L(60)]),
-      trade("leave", "Leave the handle untouched.", []),
-      joyChoice("lower", "Lower the handle before working the pump.", [A("joy", 12), L(60)]),
+    "The pump supplies the whole yard. You have cranked at shoulder height through its demonstration, and your arm is shaking. “Efficient,” the engineer says. He offers the watering wage; his assistant can take over for a fee. A lower mounting hole sits unused beneath the handle.", [
+      trade("crank", "Finish the whole watering turn at the high crank.", [A("chosen", 36), L(156)]),
+      trade("share", "Pay the assistant to take over and show you a supported turning posture.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("leave", "Release the handle and leave the strained arm to settle.", [A("chosen", 12)]),
+      joyChoice("lower", "Lower the handle before finishing a measured watering turn.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-aquarius-identical-shifts", 6, "Aquarius",
     "The scheduler has made every shift equal. One worker spends half hers hauling tools to the remote bench. “Then begin earlier,” he suggests. He offers you that bench's wage. The tools, currently beside him, are the same weight whichever hour is written down.", [
@@ -366,11 +366,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("count", "Count the carrying inside the paid turn before beginning.", [A("joy", 12), L(60)]),
     ]),
   scene("labor-aquarius-glass-room", 6, "Aquarius",
-    "The new window was meant to help the glass polisher see. Every surface throws its brightness back at him. He covers his eyes before describing the paid work. A plain cloth lies folded on the old table where the light was never considered sufficient.", [
-      trade("polish", "Polish the full row under the glare.", [A("chosen", 24), L(60)]),
-      trade("small", "Take one small piece for a short polishing turn.", [A("chosen", 12), L(24)]),
-      trade("leave", "Leave the bright room.", []),
-      joyChoice("cloth", "Hang the plain cloth to soften the light before polishing.", [A("joy", 12), L(60)]),
+    "Every pane reflects the new window into your eyes. You have polished one row when the worker beside you admits he can no longer see its edges. The full room’s fee is generous; a shorter turn pays less. A plain cloth lies on the old shaded table.", [
+      trade("polish", "Finish the full room under the reflected glare.", [A("chosen", 36), L(156)]),
+      trade("small", "Finish one shorter row for its smaller wage.", [A("chosen", 24), L(84)]),
+      trade("leave", "End the turn and leave with the strain from the bright room.", [A("chosen", 12)]),
+      joyChoice("cloth", "Hang the plain cloth to soften the light before finishing.", [A("joy", 12), L(108)]),
     ]),
   scene("labor-aquarius-chair-experiment", 6, "Aquarius",
     "The attendant has built an adjustable chair and offers you a fee to test its positions. Beside it, a tired worker asks whether sitting down must be a demonstration. The attendant considers this. She also has an ordinary stool and a price for private care.", [
@@ -394,11 +394,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("turns", "Give each pair a proper turn and change the water between them.", [A("chosen", -24), A("joy", -12)]),
     ]),
   scene("labor-pisces-drifting-nets", 6, "Pisces",
-    "The fisher stops mending whenever a passing boat calls for help. Her partner still holds the full weight of the net. “She will be back,” he says. He offers you the paid holding turn. A stout rail runs along the bank beside his trembling arms.", [
-      trade("hold", "Hold the net through the whole mending turn.", [A("chosen", 24), L(60)]),
-      trade("share", "Spread its weight across the available hands.", [A("allUnlocked", 12), L(60)]),
-      trade("down", "Leave the net down rather than take the turn.", []),
-      joyChoice("rail", "Fix the net to the rail before the fisher is called away again.", [L(36)]),
+    "The fisher has stepped away to answer another boat. You and her partner still hold the wet net where she left it. His arms shake. “She will be back.” He offers the full mending wage or a share for spreading the weight; a stout rail runs along the bank.", [
+      trade("hold", "Hold the wet net through the entire mending turn.", [A("chosen", 36), L(168)]),
+      trade("share", "Spread its weight across the available hands until the mending is done.", [A("allUnlocked", 24), L(120)]),
+      trade("down", "Lower the dragging net into the mud and end the holding turn.", [A("chosen", 12)]),
+      joyChoice("rail", "Fix the net to the rail and take the smaller setup fee.", [L(72)]),
     ]),
   scene("labor-pisces-patient-stories", 6, "Pisces",
     "The caregiver hears every patient's story to the end. One has saved broth for her; it is cold now. She starts to thank him, then stops to answer another voice. The ward keeper offers you the paid watch and leaves the resting bench clear.", [
@@ -415,11 +415,11 @@ export const HOUSE_06_SCENARIOS: NarrativeScenario[] = [
       joyChoice("warm", "Keep the prepared bed warm while her arms have a rest.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
     ]),
   scene("labor-pisces-returned-carer", 6, "Pisces",
-    "The helper returns from her break because she heard someone calling. She stops beside the resting bed she left, unsure which way to turn. Another attendant is already answering the call. “I thought they meant me.” Her blanket is still warm.", [
-      trade("task", "Take her next heavy task and its modest wage.", [A("chosen", 12), L(24)]),
-      trade("care", "Pay for warm rest shared across the exhausted helpers.", [A("allUnlocked", -24)], { cost: 72 }),
-      trade("wait", "Let the assigned attendant answer the call.", []),
-      joyChoice("break", "Keep the full break clear and put the blanket back around her.", [A("joy", -24), G("joy", "resolve", 12)]),
+    "You have reached the end of the helper’s long watch when she returns at another patient’s call. Her blanket is still warm, but your shoulders ache. Another attendant is answering already. The ward keeper offers a larger fee for the next heavy task or a paid, protected resting place.", [
+      trade("task", "Take the next heavy task through the rest of the watch.", [A("chosen", 36), L(156)]),
+      trade("care", "Buy the protected resting place and learn to support your shoulders between tasks.", [G("chosen", "resolve", 24)], { cost: 72 }),
+      trade("wait", "End your watch and leave with the exhaustion already taken.", [A("chosen", 12)]),
+      joyChoice("break", "Keep the break clear while the assigned attendant answers the call.", [A("joy", -24), G("joy", "resolve", 12)]),
       revival("Bring a spent helper back to the resting bed, with no task waiting there."),
     ]),
 ];

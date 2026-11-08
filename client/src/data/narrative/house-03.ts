@@ -3,11 +3,11 @@ import { A, G, L, joyChoice, scene, trade } from "./shared";
 
 export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
   scene("communication-aries-new-door", 3, "Aries",
-    "Your brother has cut a door between the neighboring yards. He wants you to be its first visitor. The rubble still reaches your knees. “The important part is open,” he says, holding out a drink through the space where the rest of you should go.", [
-      trade("drink", "Take the drink through the opening.", [A("chosen", -12)]),
-      trade("clear", "Clear the heavy rubble from his new threshold for a fee.", [A("chosen", 24), L(84)]),
-      trade("gate", "Visit through the old gate.", []),
-      joyChoice("knock", "Knock the childhood rhythm against the new doorpost.", [A("allUnlocked", -12)]),
+    "You step through your brother's new doorway and the loose rubble shifts around your legs. “The important part is open,” he says, then sets down the welcome drink. The mason is still next door. Your brother brings his shovel, looking less certain about being the first visitor himself.", [
+      trade("drink", "Work your legs free and scramble back across the broken stone.", [A("chosen", 12)]),
+      trade("clear", "Clear the heavy rubble with him for the mason's clearing fee.", [A("chosen", 24), L(84)]),
+      trade("gate", "Pay the mason to shore the opening and lift the rubble clear.", [], { cost: 24 }),
+      joyChoice("knock", "Ask for the old garden plank and bridge the loose rubble together.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-aries-hot-pan", 3, "Aries",
     "Your neighbor returns your pan with supper still sizzling in it. She could not wait for it to cool before telling you how well the recipe worked. Now neither of you knows where to put it. “Take a piece,” she says, still holding both handles.", [
@@ -45,11 +45,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("spoons", "Exchange spoons and settle the matter at her table.", [G("joy", "resolve", 12)]),
     ]),
   scene("communication-taurus-slow-cart", 3, "Taurus",
-    "Your cousin drives the local cart slowly enough for neighbors to finish their sentences beside it. He offers you a seat or a wage for lifting the baskets aboard. The oldest passenger is still saying farewell to a woman who has already reached the next corner.", [
-      trade("seat", "Take the seat and let the slow journey rest your legs.", [A("chosen", -24)]),
-      trade("baskets", "Lift the remaining baskets aboard for his wage.", [A("chosen", 24), L(84)]),
-      trade("walk", "Walk on at your own pace.", []),
-      joyChoice("pace", "Let the oldest passenger finish, then follow the pace she sets.", [G("chosen", "luck", 12)]),
+    "Your cousin's slow local cart settles sharply when a wheel pin breaks. You are seated above the tilted baskets. The oldest passenger finishes her farewell before noticing. A wheelwright waits by the corner; your cousin offers a lifting wage if you can unload enough to free the axle.", [
+      trade("seat", "Pay for the replacement pin and wait safely while the wheelwright fits it.", [], { cost: 24 }),
+      trade("baskets", "Lower the heavy baskets from the tilted cart for the lifting wage.", [A("chosen", 24), L(84)]),
+      trade("walk", "Clamber over the tilted load and jump heavily to the lane.", [A("chosen", 12)]),
+      joyChoice("pace", "Follow the oldest passenger's instruction for lowering the folding side.", [G("chosen", "luck", 12)]),
     ]),
   scene("communication-taurus-common-wall", 3, "Taurus",
     "The singer next door has held the same low note all morning. Now she taps the wall. “Steadier from your side?” A second tap asks whether you are there. The note starts again, softer, leaving you room to answer without raising your voice.", [
@@ -93,11 +93,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("both", "Say the word while completing the gesture he has begun.", [G("chosen", "resolve", 12)]),
     ]),
   scene("communication-gemini-window-line", 3, "Gemini",
-    "A note arrives at your window on a string: tea next door. Your neighbor has built a little pulley so neither of you needs to shout. She holds up the laden tray, considering whether the invention might save the walking as well.", [
-      trade("visit", "Walk next door and settle in for tea.", [A("chosen", -24)]),
-      trade("answer", "Send your answer back along the string.", [G("chosen", "luck", 12)]),
-      trade("tray", "Haul the heavy tray across and share its contents between the windows.", [A("chosen", 12), A("allUnlocked", -12)]),
-      joyChoice("cup", "Send the old cup you share before any written answer.", [G("joy", "resolve", 12)]),
+    "Your neighbor's tea tray stops halfway between the windows. The pulley line tightens around your wrist as its peg bends. “Don't pull.” She reaches for a stool beneath the tray; the repairer below offers his long hook. A note still hangs from the line, inviting you to tea.", [
+      trade("visit", "Pay the repairer to support the tray and ease the line from your wrist.", [], { cost: 24 }),
+      trade("answer", "Pull your wrist free against the tight line and let the tray drop.", [A("chosen", 12)]),
+      trade("tray", "Haul the loaded tray through the window against the stuck pulley.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("cup", "Have her loop the old cup's handle over the line to hold its weight.", [G("joy", "resolve", 12)]),
     ]),
   scene("communication-gemini-song-ending", 3, "Gemini",
     "Your sister remembers a street song that ends in a flood. The baker remembers it beginning with a sausage. Both insist you know the join. He brings breakfast to the table while she sings the first half again, making no room at all for the sausage.", [
@@ -120,11 +120,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("greeting", "Set her cup beside yours and make room without asking why she came.", [G("joy", "affliction", 12)]),
     ]),
   scene("communication-cancer-tide-path", 3, "Cancer",
-    "Your aunt waits by the flooded path with a basket for her sister. The tide will uncover the stones before long. “She'll say I needn't have come,” she tells you, checking the cloth again. A ferryman holds his little boat against the near bank.", [
-      trade("wait", "Wait beside her and share the bread she offers.", [A("chosen", -12)]),
-      trade("ferry", "Pay the ferry fare and rest during the short crossing.", [A("chosen", -24)], { cost: 24 }),
-      trade("wade", "Wade the basket across for the delivery money in her hand.", [A("chosen", 12), L(48)]),
-      joyChoice("hour", "Sit with her until the crossing hour you both remember.", [G("chosen", "resolve", 12)]),
+    "You meet your aunt halfway across the tidal path as water washes over the stones behind you. She lifts her basket higher. “My sister will say I needn't have come.” A ferryman holds his boat nearby; the dry landing is now beyond a long stretch of cold water.", [
+      trade("wait", "Wade back to the near landing through the cold rising water.", [A("chosen", 12)]),
+      trade("ferry", "Pay the ferryman to bring you and the basket onto dry ground.", [], { cost: 24 }),
+      trade("wade", "Carry the heavy basket through the full crossing for the delivery fee.", [A("chosen", 24), L(84)]),
+      joyChoice("hour", "Lead her onto the high ledge you used to wait on together.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-cancer-birthday-cup", 3, "Cancer",
     "The tavern keeper sets out the cup your brother always uses on your birthday. Your brother arrives with another cup for you. “You gave me this one last year.” The keeper folds his arms over the drinks list and waits for the exchange to stop.", [
@@ -148,11 +148,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("first", "Tell the story of the first time it nearly managed the latch.", [G("chosen", "resolve", 12)]),
     ]),
   scene("communication-leo-hot-step", 3, "Leo",
-    "Your neighbor holds that his doorstep is the best place in the lane for conversation. Afternoon sun has made the stone almost too hot to touch. He offers a small fee to anyone who can improve matters without requiring him to admit he chose the wrong spot.", [
-      trade("drinks", "Buy cooling drinks for the people on the step.", [A("allUnlocked", -12)], { cost: 24 }),
-      trade("bench", "Carry his heavy bench into the shade for the offered fee.", [A("chosen", 12), L(48)]),
-      trade("stand", "Have the conversation standing.", []),
-      joyChoice("cushion", "Move his usual cushion into the shade and rest beside it.", [A("chosen", -24)]),
+    "Your neighbor's heavy bench slips as you sit beside him on the hot doorstep. One end hangs above the cellar stair. “Best place in the lane,” he says, holding the other end. The joiner across the street puts down her cup; he offers you the moving fee if you help.", [
+      trade("drinks", "Pay the joiner to brace the bench so you can step away safely.", [], { cost: 24 }),
+      trade("bench", "Carry the heavy bench clear of the stair for his moving fee.", [A("chosen", 24), L(84)]),
+      trade("stand", "Scramble off the sloping bench and land hard on the step.", [A("chosen", 12)]),
+      joyChoice("cushion", "Wedge his familiar thick cushion beneath the short leg before getting up.", [A("chosen", -12)]),
     ]),
   scene("communication-leo-family-story", 3, "Leo",
     "Your sister tells a visitor how bravely you climbed the orchard's tallest tree. She remembers every branch on the way up. You are already halfway through supper when the visitor asks about the descent. “Oh,” she says, looking at you. “That was less remarkable.”", [
@@ -189,11 +189,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("lids", "Mark the lids in the kitchen shorthand you both know.", [G("chosen", "luck", 12)]),
     ]),
   scene("communication-virgo-missing-step", 3, "Virgo",
-    "The familiar stair has a loose tread. Before repairing it, the mender asks which foot each neighbor puts there. Her little tally disagrees with every demonstration. She watches you approach. “Please don't think about it first.” The step creaks while you decide where to begin.", [
-      trade("climb", "Climb the steep stair until you can show her your usual stride.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("repair", "Pay for the repair and rest while she makes the stair sound.", [A("chosen", -36)], { cost: 48 }),
-      trade("lane", "Take the lane around.", []),
-      joyChoice("rhyme", "Recite the old stair rhyme, with its pause at the loose tread.", [G("joy", "resolve", 12)]),
+    "The familiar tread drops as your foot lands on it. You catch the rail while the mender sets down her tally. “That answers which foot.” The lane below is out of reach. She has a sound replacement ready, or can hold the rail while you climb past the gap.", [
+      trade("climb", "Climb past the gap with your weight hanging from the rail.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("repair", "Pay her to fit the sound tread beneath you.", [], { cost: 24 }),
+      trade("lane", "Lower yourself to the lane and take the hard drop at the bottom.", [A("chosen", 24)]),
+      joyChoice("rhyme", "Use the old stair rhyme to find the solid side supports beneath the gap.", [G("joy", "resolve", 12)]),
     ]),
   scene("communication-virgo-borrowed-book", 3, "Virgo",
     "Your neighbor returns your cookery book with its torn pages neatly repaired. Beside one recipe is a broad greasy thumbprint. “That one works.” She has brought you a piece to prove it, and asks whether the book might stay open while she finishes the next batch.", [
@@ -224,11 +224,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("greeting", "Ask what each sibling most wants their cousin to hear, and begin there.", [G("chosen", "luck", 12)]),
     ]),
   scene("communication-libra-polished-message", 3, "Libra",
-    "Your neighbor asks you to read her complaint aloud. It praises the weather, the recipient's good health, and the agreeable stair they share. “Can you tell it's about his boots?” she asks. She wants them moved off the landing before someone trips over them again.", [
-      trade("written", "Read the letter exactly as she wrote it.", []),
-      trade("request", "Help her put the request about the boots into words.", [G("chosen", "resolve", 12)]),
-      trade("tea", "Keep her company over tea while she works out what to say.", [A("chosen", -24)]),
-      joyChoice("hello", "Practice the request with her until she can say it without reading.", [G("joy", "affliction", 12)]),
+    "You trip over the boots on your neighbor's shared landing as she brings out her carefully worded complaint. She catches your sleeve. “That is what I meant.” The passage remains crowded with heavy pairs; a porter below offers to move them, while their owner is still upstairs.", [
+      trade("written", "Pick your way back over the boots on your sore ankle.", [A("chosen", 12)]),
+      trade("request", "Carry the heavy boots downstairs so the landing is clear.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("tea", "Pay the porter to clear the passage and support you down the stair.", [], { cost: 24 }),
+      joyChoice("hello", "Call the owner by his familiar greeting and have him bring the boots inside.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-libra-grape-basket", 3, "Libra",
     "Your cousins each claim the smaller basket so the other can have more grapes. Neither will begin eating. The stallholder next door offers to buy whatever they leave. “Only after you,” says one cousin, moving the larger basket back across the table for the fourth time.", [
@@ -266,11 +266,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("beside", "Take her second spoon and taste beside her without agreeing to like it.", [G("joy", "resolve", 12)]),
     ]),
   scene("communication-scorpio-cellar-voice", 3, "Scorpio",
-    "Your neighbor calls you down to her cellar in a voice barely loud enough to reach the step. A full cask stands between her and the door. “I can move it,” she says. “I would prefer two people.” She holds out the lifting strap and a fee.", [
-      trade("lift", "Help her haul the full cask up the steps for the fee.", [A("chosen", 24), L(84)]),
-      trade("hands", "Pay for another pair of hands and rest while the cask is moved.", [A("chosen", -24)], { cost: 36 }),
-      trade("stool", "Bring the stool she asks for and let her decide the next step.", []),
-      joyChoice("rhythm", "Lift on the work rhythm the two of you already know.", [A("chosen", 12), L(84)]),
+    "Your neighbor meets you halfway up the cellar stair with a full cask. Its lifting strap tightens around your wrist as she loses her footing. “Together,” she says, keeping her voice low. A porter waits above. The carrying fee rests on the upper step beside her empty glass.", [
+      trade("lift", "Take the cask's weight and haul it up for the carrying fee.", [A("chosen", 24), L(84)]),
+      trade("hands", "Pay the porter to take your side of the cask.", [], { cost: 36 }),
+      trade("stool", "Lower the heavy cask together, spreading the strain across the available hands.", [A("allUnlocked", 12)]),
+      joyChoice("rhythm", "Lift on the work rhythm you both know and finish the carrying together.", [A("chosen", 12), L(84)]),
     ]),
   scene("communication-scorpio-scratched-out", 3, "Scorpio",
     "Someone has scratched your cousin's joke off the familiar noticeboard. He asks whether you remember the exact words. One line remains, which is no longer funny by itself. He has brought a drink and a scrubbing cloth, and has not yet chosen which to hand you.", [
@@ -280,11 +280,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("private", "Tell the private version that made both of you laugh first.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-sagittarius-long-way", 3, "Sagittarius",
-    "Your brother calls the next village a tiny stroll. His lunch basket suggests a longer expedition. A local cart offers you a seat as far as the turning, while he offers a carrying fee if you stay on foot. “Hardly worth calling a journey,” he says.", [
-      trade("cart", "Pay for the short ride and rest your feet.", [A("chosen", -36)], { cost: 24 }),
-      trade("basket", "Carry his heavy basket to the turning for the fee.", [A("chosen", 12), L(48)]),
-      trade("lunch", "Ask to share lunch before either of you sets out.", [A("chosen", -12)]),
-      joyChoice("bench", "Settle beside him at the turning and share the picnic he packed for everyone.", [A("allUnlocked", -24)]),
+    "Your brother's tiny stroll ends at a steep cutting with the village still beyond it. The path behind climbs just as sharply. He lowers his generous lunch basket and looks at your tired feet. A local cart waits at the turning; he offers a carrying fee for finishing on foot.", [
+      trade("cart", "Pay for the cart to carry you through the steep cutting.", [], { cost: 24 }),
+      trade("basket", "Carry the heavy basket up the remaining climb for his fee.", [A("chosen", 24), L(84)]),
+      trade("lunch", "Turn back up the steep path without carrying his basket.", [A("chosen", 12)]),
+      joyChoice("bench", "Take the old level footpath you used to walk together behind the cutting.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-sagittarius-blunt-postscript", 3, "Sagittarius",
     "Your neighbor dictates a splendid letter thanking her cousin for a visit. The postscript says his boots ruined her floor. She asks which part sounds more like her. Her cousin is still within calling distance, walking very carefully through the flowerbed to avoid the wet path.", [
@@ -329,11 +329,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("another", "Put the list down and ask whether she has another joke.", [G("joy", "affliction", 12)]),
     ]),
   scene("communication-capricorn-frozen-latch", 3, "Capricorn",
-    "The oldest neighbor borrows warm water for his frozen latch. He insists on showing you which hinge needs it. “Everyone pours it over the keyhole.” He traces the hinge on your table with one cold finger, then reaches for the full kettle.", [
-      trade("carry", "Carry the heavy kettle over the icy steps and learn the trick beside him.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("warm", "Sit him down and share a warming rest before the errand.", [A("allUnlocked", -12)]),
-      trade("kettle", "Hand him the kettle as he asks.", []),
-      joyChoice("handles", "Carry one handle each, free the latch together, and warm yourselves inside.", [A("allUnlocked", -24)]),
+    "Your neighbor pulls his door shut behind you both, and its latch freezes before he can turn back. The kettle is inside. “The hinge,” he says, rubbing his hands, “not the keyhole.” The locksmith next door has warm oil for sale; the steps are beginning to whiten beneath your feet.", [
+      trade("carry", "Work the frozen hinge by hand until the stiff door opens.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("warm", "Buy the locksmith's warm oil and free the latch promptly.", [], { cost: 24 }),
+      trade("kettle", "Leave the locked doorstep and cross the freezing lane to shelter.", [A("chosen", 12)]),
+      joyChoice("handles", "Lift the door at the worn place you both know and ease the latch clear.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-capricorn-short-letter", 3, "Capricorn",
     "Your brother writes that everything is adequate. Before you can answer, he arrives with a cake he had no particular reason to bake. “The oven was on.” He sets it down beside the letter and asks whether you have a knife that cuts decent slices.", [
@@ -357,11 +357,11 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("names", "Let each household add its own name beneath the number.", [G("joy", "resolve", 12)]),
     ]),
   scene("communication-aquarius-roof-conversation", 3, "Aquarius",
-    "Two neighbors converse across their roofs because neither likes visitors inside. They lower a ladder for you, then disagree about whose roof it belongs against. Both have brought cushions up. You stand below while they explain the advantages of their respective views of the other person.", [
-      trade("climb", "Climb the steep ladder and rest on one host's cushions.", [A("chosen", 12), A("chosen", -36)]),
-      trade("stool", "Set a stool in the lane and speak where both can hear.", [G("chosen", "resolve", 12)]),
-      trade("wave", "Wave up to them and continue along the lane.", []),
-      joyChoice("between", "Ask them to bring their cushions down and keep you company between the houses.", [A("allUnlocked", -12)]),
+    "You reach one neighbor's roof just as the other pulls the shared ladder toward his own window. Both begin explaining where it belongs. You are left above a steep, bare wall. The mason below offers her ladder for hire; their cushions remain on opposite sides of the gap.", [
+      trade("climb", "Climb down the rough wall with a hard drop onto the lane.", [A("chosen", 12)]),
+      trade("stool", "Hire the mason's long ladder and descend safely.", [], { cost: 24 }),
+      trade("wave", "Haul the shared ladder back across the gap despite its weight.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("between", "Remind them of the old connecting hatch and walk down through the house.", [A("allUnlocked", -12)]),
     ]),
   scene("communication-aquarius-identical-cups", 3, "Aquarius",
     "Your neighbor replaces his visiting cups with identical ones so nobody feels slighted. His sister no longer stays for a second drink. He asks whether the new cups are too small. Her old chipped cup sits on the upper shelf, carefully turned so the chip faces away.", [
@@ -412,10 +412,10 @@ export const HOUSE_03_SCENARIOS: NarrativeScenario[] = [
       joyChoice("phrases", "Read the sender's familiar phrases aloud so he can help you find the missing words.", [G("joy", "affliction", 12)]),
     ]),
   scene("communication-pisces-two-shores", 3, "Pisces",
-    "Your siblings wave to one another across the millstream. Neither will be the first to stop. The little ferry drifts between them with a seat for you and a fee for anyone willing to row. Your sister changes hands. Your brother takes this as a fresh greeting.", [
-      trade("seat", "Take the offered seat and rest during the crossing.", [A("chosen", -24)]),
-      trade("row", "Row the short crossing against the current for the fee.", [A("chosen", 12), L(48)]),
-      trade("wave", "Join their farewell from the boat.", []),
-      joyChoice("arrived", "Give the signal that means safely arrived and let both hands come down.", [A("allUnlocked", -12)]),
+    "Your siblings wave across the millstream while your ferry slips its loose rope. The current turns the boat away from both landings. Your sister changes hands, still waving. The ferryman reaches for an oar and names the rowing wage; the towman on shore holds out his line at a price.", [
+      trade("seat", "Pay the towman to draw the ferry back to the landing.", [], { cost: 24 }),
+      trade("row", "Row against the current for the ferryman's wage.", [A("chosen", 24), L(84)]),
+      trade("wave", "Take the near rope and haul the boat back with your own arms.", [A("chosen", 12)]),
+      joyChoice("arrived", "Give the familiar pull-together signal and have both siblings catch the line.", [A("allUnlocked", -12)]),
     ]),
 ];

@@ -268,6 +268,7 @@ Give that backing a concrete use in the present undertaking.
 
 **Game fit:** Do not conceal a future debt inside generosity when the game records none.
 Individual and shared assistance can be ordinary alternatives before Jupiter adds an option.
+Occasional shared difficulties can impose a cost without turning the circle's ordinary generosity into a trap.
 
 ## XII — The Hidden
 
@@ -288,6 +289,7 @@ The Prince can change a bounded part of the situation without acquiring power ov
 
 **Game fit:** Saturn's alternative should establish a workable limit within the situation.
 Tie burdens to the specific action or obstacle, leaving room for wanted solitude and relief.
+Confinement can require a choice about how to bear a cost, while strenuous opportunities can offer larger rewards.
 
 ## Applying the matrix to scenario copy
 
@@ -304,7 +306,8 @@ For copy revisions that preserve current mechanics:
 
 When revising copy, preserve scenario IDs, amounts, costs, targets, predicates, and the existing menu unless a separate mechanics change is agreed.
 The encounter limit is five visible choices, including joy and revival.
-Keep the existing valid exit at zero Light and with only the Moon unlocked.
+Keep a valid choice at zero Light and every unlock tier, including with only the Moon lit.
+When revising mechanics, that choice can be harmful or fatal if the revealed situation supports it; an empty exit is not required.
 The [scenario data](../../client/src/data/narrative-scenarios.ts) and [resolver](../../client/src/game/narrative.ts) remain authoritative for those details.
 
 Avoid promises of future rewards, tracked relationships, persistent possessions, or random wagers.

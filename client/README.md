@@ -74,7 +74,9 @@ Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-sh
 
 ### Planetary chorus at encounter entry
 
-`useEnterNode` applies development overrides and commits the initialized encounter through `enterNode`.
+`useEnterNode` applies development overrides, samples a fresh entry seed, and commits the initialized encounter through `enterNode`.
+That seed selects the narrative scene or the relational opening action and independent Necessity streams; the map's houses, rulers, and assigned Other remain fixed.
+Tests and forecasts can inject an entry seed, while seeded evaluation retains its deterministic default draws.
 The catalogue in `copy/chorus.ts` imports the seven canonical YAML files under `docs/research/chorus/` through `@rollup/plugin-yaml` in both Vite and Vitest.
 
 `PlaySurface` mounts an opening component keyed by encounter ID, which selects a random passage once and holds it in local UI state.
@@ -91,8 +93,14 @@ The boundary lets the same logic be called from screens (via thunks), from tests
 
 Determinism has a deliberate boundary inside this layer:
 
-- **Resolution is deterministic.** `resolveTurn` computes the whole turn from state; its only draw is the opponent's *next* precommit, from a per-(run, encounter, turn) seeded stream (`relationalTurnRng`), so a run replays from its seed. Narrative resolution has no randomness. This is the part that must match the Cairo implementation.
-- **Edges are not.** Entity ids use `Date.now()` (`encounter.ts`, `turn.ts`), and a new run's or map's seed comes from `randomSeed()` (`rng.ts`, `Math.random`), the prototype's stand-in for the VRF. These are the call sites that change for onchain parity.
+- **Resolution is deterministic.**
+  `resolveTurn` computes the whole turn from state; its only draw is the opponent's *next* precommit, from a per-(run, encounter, turn) seeded stream (`relationalTurnRng`), so an initialized encounter replays its subsequent turns.
+  Narrative resolution has no randomness.
+  This is the part that must match the Cairo implementation.
+- **Edges are not.**
+  Entity ids use `Date.now()` (`encounter.ts`, `turn.ts`), and a new run, map, or live entry samples `randomSeed()` (`rng.ts`, `Math.random`), the prototype's stand-in for the VRF.
+  Live entry saves its initialized result; the run seed alone does not reconstruct those opening draws.
+  These are the call sites that change for onchain parity.
 
 Adding a new `Math.random()` or `Date.now()` inside resolution-path game code is a bug; pass RNG in.
 
@@ -187,6 +195,29 @@ pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> -
 
 For study design, measurements, and interpretation, see the [evaluation methods guide](src/eval/README.md).
 The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the earlier findings and their limitations.
+
+### Narrative catalogue review
+
+The catalogue study resolves all 720 scenes in nine named chart/resource states and reports ordinary costs separately from joy and occupant exceptions.
+Its whole-run cohort takes the first two real charts of each rising sign from master seed `20261022`, preserving their original chart and game seeds.
+Five game seeds and three policies run at starting encounter counts 0 and 32: 720 runs per revision.
+
+```sh
+pnpm exec vite-node scripts/eval-narrative-catalogue.ts --out eval-results/issue-41-catalogue
+```
+
+For a paired comparison, run the same script and `tests/narrative-catalogue-fixtures.ts` in the baseline checkout, retaining that checkout's game code and locked dependencies.
+The issue #41 foundation is `c472fe174c847db75d43a2e1e79670726c51391e`.
+Write its results to a separate directory, then compare against the current results:
+
+```sh
+pnpm exec vite-node scripts/eval-narrative-catalogue.ts --menus-only --out eval-results/issue-41-catalogue --compare /path/to/baseline-results
+```
+
+`config.json` records exact cohorts and named states; `source.diff` captures uncommitted source changes.
+`scenes.json`, `menus.md`, `menus.jsonl`, and `pools.json` retain full authored menus and actual outcomes for every eligible recipient.
+`runs-0.jsonl` and `runs-32.jsonl` retain whole runs and route alternatives; reports and `paired.json` summarize their results.
+Pool counts are not encounter probabilities, and the small fixed-policy cohort does not establish human win rates or equal balance across rising signs.
 
 ## Verification
 

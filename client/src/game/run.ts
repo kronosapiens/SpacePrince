@@ -75,15 +75,15 @@ export interface EnterNodeInput {
   nodeId: string;
   lifetimeRelationalEncounterCount: number;
   devUnlockAll?: boolean;
-  /** Route forecasts only: replaces the live arrival draws — the relational encounter's opening
-   *  necessity and precommits, narrative's scenario pick — with a sampled
-   *  seed. The opponent chart and the node bookkeeping are unchanged. */
+  /** Entry randomness for the narrative scene or relational opening and Necessity.
+   *  Live entry samples this in the store; forecasts and tests inject a seed.
+   *  Omission retains deterministic evaluation. Map content is unchanged. */
   encounterIdSeed?: number;
 }
 
-/** Step onto a node: mark it current and visited, and open its pre-rolled
- *  encounter. A narrative scenario is drawn from the house's unseen pool,
- *  seeded on (run, house, node), and joins the no-repeat history. */
+/** Commit a node and initialize its encounter from entry randomness.
+ *  The map's kind, house and Other stay fixed; narrative selection draws from
+ *  the matching house/sign's unseen pool and joins the no-repeat history. */
 export function enterNode(input: EnterNodeInput): Run {
   const { run, chart, nodeId, lifetimeRelationalEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const content = run.map.rolledNodes[nodeId];
