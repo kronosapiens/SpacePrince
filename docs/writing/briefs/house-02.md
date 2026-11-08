@@ -9,96 +9,96 @@ Every menu remains playable without a purchase, although the required exertion m
 
 ## Aries
 
-1. `livelihood-aries-first-loaf` — An eaten, priced breakfast needs immediate settlement; brief washing clears it, while the full hot batch earns a substantial net wage.
-2. `livelihood-aries-fleece` — A wool buyer will pay for the dirty first clipping by weight, but the shearer says washing it brings more and points to the steaming trough; wool trade and haste, practical dilemma; take the small commission, exert yourself for a larger return, or buy relief instead.
-3. `livelihood-aries-first-wages` — An apprentice bursts out of the smithy with his first wages and tries to repay a kindness you had forgotten, though he has bought nothing for himself; first earnings and direct gratitude, awkward generosity; accept the coins, spend part on immediate care for both of you, or return them without turning the exchange into a debt.
-4. `livelihood-aries-coals` — Hot grit makes leaving a small burden; conserving usable fuel through greater exposure yields much larger returns.
-5. `livelihood-aries-new-tongs` — A smith has made spring tongs so strong that she challenges anyone to close them once, then offers the use of her bench instead of a sale; new tools and direct trial, playful practicality; pay for controlled grip practice, earn a fee through the harder demonstration, or leave the tool where it belongs.
+1. `livelihood-aries-first-loaf` — A baker serves a waking train and accepts labor for a finished meal; Aries' first warmth and immediate work, settlement; pay, scrub through modest strain, or carry the full batch for higher earnings.
+2. `livelihood-aries-fleece` — A fleece buyer distinguishes usable wool from the weight of its dirt; Aries' shearing and spring work, practical bargain; sell immediately, take paid strain, hire help, or retain the resource.
+3. `livelihood-aries-first-wages` — A foundry apprentice uses his first earnings to remember earlier help; Aries' first wages and frank gratitude, generosity; accept money, turn part into shared care, or release the obligation.
+4. `livelihood-aries-coals` — A furnace worker prices still-hot fragments while the visitor already bears hot grit; Aries' fire and direct exertion, compulsory strain; escape the heat or take increasing burdens for increasing salvage earnings.
+5. `livelihood-aries-new-tongs` — A smith's ambitious oyster tongs require more force than their maker expected; Aries' spring tools and contests, comic opportunity; buy grip training, earn through strain, or decline.
 
 ## Taurus
 
-1. `livelihood-taurus-cheese` — Entering the deep cheese cellar commits the return climb or lift fare; carrying the wheel offers a larger payment than ordinary neighborhood work.
-2. `livelihood-taurus-good-bowl` — A potter offers to buy the cracked bowl you have carried because its clay can mend three others, or to repair it for you to use at her table now; durable usefulness and attachment, quiet dilemma; realize its value as Light, pay for restored comfort, or spend effort grinding the repair yourself before eating.
-3. `livelihood-taurus-two-handles` — A farmer brings back the carrying yoke you sold him years ago, saying the handles have finally worn to fit someone with your hands; familiar assets and stubborn generosity, gift; accept its sale value, use it for a strengthening exercise before returning it, or let him keep it without payment.
-4. `livelihood-taurus-full-larder` — A cook must clear a crowded larder before new milk arrives and lets you choose between a rich private supper and simple portions for everyone with you; abundance held too long, generosity; concentrated or distributed recovery, with a small sale payment as another benefit.
-5. `livelihood-taurus-worn-handle` — The broken carrying handle costs effort or a durable repair; the repair supplies greater capacity rather than a compulsory work-for-coins menu.
+1. `livelihood-taurus-cheese` — A deep dairy offers different ways to bring body and provisions uphill; Taurus' stored food and material weight, bodily choice; climb, take heavy paid work, or buy safe transport with or without nourishment.
+2. `livelihood-taurus-good-bowl` — A potter sees several possible uses in one damaged possession; Taurus' durable clay and food, small dilemma; sell, buy repair and care, trade hand strain for supper, or keep the bowl.
+3. `livelihood-taurus-two-handles` — A farmer offers a useful possession whose wear records his work; Taurus' lasting tools and attachment, gift; turn it into money, learn balance and return it, or leave the gift with its user.
+4. `livelihood-taurus-full-larder` — A cook has abundance that must soon make room for more; Taurus' provisions and bodily pleasure, generous settlement; choose concentrated care, shared nourishment, or money.
+5. `livelihood-taurus-worn-handle` — A basket's worn handle fails while its contents still need carrying; Taurus' useful possessions and physical weight, predicament; endure awkward transport, work a stronger grip, or purchase lasting support.
 
 ## Gemini
 
-1. `livelihood-gemini-two-purses` — A money changer pays you from both purses while answering two customers, then looks up expecting the ordinary farewell; divided attention and commerce, clean moral choice; keep the duplicate payment, return the excess and accept her small thanks, or return both payments rather than complete the exchange.
-2. `livelihood-gemini-mixed-lot` — A mislabelled sample creates an immediate need for care; sorting offers a greater return without making the seller a villain.
-3. `livelihood-gemini-songs-for-supper` — An innkeeper offers supper for one song or coins for three, while her son insists your speaking voice already sounds musical; music and easy commerce, pleasure; take the meal, undertake a longer vocal effort for Light, or accept a cup without performing.
-4. `livelihood-gemini-travel-chest` — A wedged chest on a steep stair makes withdrawing physically awkward; intact sale and dismantling offer distinct returns.
-5. `livelihood-gemini-trade-language` — A merchant pays you to repeat a market call in your own accent, then offers either money or a lesson in the answering calls; language as a usable skill, curiosity; choose immediate Light or run-long Fortune through practice, with a paid fuller lesson available.
+1. `livelihood-gemini-two-purses` — A two-mouthed money changer duplicates a payment beneath a promise of careful checking; Gemini's divided attention and trade, tempting error; keep the double sum, return the excess for thanks, or withdraw.
+2. `livelihood-gemini-mixed-lot` — A pair of sellers confuse matching bundles with different uses; Gemini's doubled goods and labels, bodily mishap; buy protection, wash through pain, or earn by sorting the irritating stock.
+3. `livelihood-gemini-songs-for-supper` — An innkeeper values a visitor's voice among faraway transmissions; Gemini's song and exchange, convivial opportunity; trade a song for care, endure a longer paid performance, or accept a small refreshment.
+4. `livelihood-gemini-travel-chest` — Two buyers value different parts of luggage blocking a narrow stair; Gemini's divided uses and trade, bodily negotiation; earn through two levels of strain, squeeze out, or buy safe handling.
+5. `livelihood-gemini-trade-language` — A merchant treats bargaining as a language with playful answers; Gemini's accents and exchange, curious opportunity; choose money, practical instruction, or a longer paid lesson.
 
 ## Cancer
 
-1. `livelihood-cancer-saved-supper` — The familiar reserved supper has been served; settlement is immediate, and unloading the full delivery offers a larger return.
-2. `livelihood-cancer-grain-boat` — The grounded boat requires a fare or difficult disembarkation; rescuing soaked grain has a much larger upside.
-3. `livelihood-cancer-copper-cup` — A brewer admits she dented the copper cup you left in her keeping and offers its full price, although it still sits perfectly in your hand; keeping and remembered use, reconciliation without a demand; take compensation, accept her care and refreshments instead, or release her from the offer.
-4. `livelihood-cancer-emergency-jar` — A provisioner opens the jar reserved for unexpected guests and invites you to choose food or the coins tucked beneath it; protective keeping, gift; take recovery or Light, while helping lift the remaining stores earns a larger immediate share.
-5. `livelihood-cancer-kept-earnings` — A boatwoman returns the earnings she kept safe for you, carefully separating the coins from a little extra she insists must have been there all along; protective thrift and concealed generosity, tenderness; accept the whole purse, take only what is yours, or use part of the money for a shared rest now.
+1. `livelihood-cancer-saved-supper` — A ferry keeper's saved meal becomes an ordinary bill with work offered against it; Cancer's remembered customers and provisions, settlement; pay, carry a small load, or take a larger paid burden.
+2. `livelihood-cancer-grain-boat` — A grain merchant's overloaded boat leaves passenger and cargo stranded together; Cancer's boats and stores, bodily predicament; buy passage, endure mud or rope, or take the heaviest salvage work for pay.
+3. `livelihood-cancer-copper-cup` — A brewer's careful keeping has left a small mark on a familiar possession; Cancer's custody and remembered habits, uneasy kindness; accept money, choose care, or release the claim.
+4. `livelihood-cancer-emergency-jar` — A provisioner makes unplanned arrivals part of her stores; Cancer's reserves and protective hospitality, gift with an opportunity; choose food or money, or carry a heavier burden for more.
+5. `livelihood-cancer-kept-earnings` — A boatwoman hides generosity inside faithfully kept earnings; Cancer's custody and indirect care, tenderness; accept the gift, take only wages, or turn the extra into shared rest.
 
 ## Leo
 
-1. `livelihood-leo-best-cut` — A butcher wants you to taste the cut he calls the king of supper, but his assistant quietly points out a cheaper piece that will feed more people; magnificence and butchery, appetite with a choice; concentrate recovery or spread it, or accept the small free sample.
-2. `livelihood-leo-gold-chain` — The caught clasp makes the material choice immediate; a strong sale competes with keeping the ornament through a paid fitting.
-3. `livelihood-leo-prize-fruit` — A grower ribbons the melon you have already bought, then offers a refund to keep it whole as her stall's showpiece; pride in yield, gentle absurdity; cut and eat your fruit, take the refund, cut and share the actual prize, or leave it with her as a gift.
-4. `livelihood-leo-purse-string` — Your employer announces a lavish gratuity in front of his assistants, then asks you to choose between the public purse and the larger wages he still owes for today's work; pride and extravagant appearances, uncomfortable clarity; take either immediate payment or insist on being paid quietly without the gratuity.
-5. `livelihood-leo-summer-ice` — The exposed uphill exit gives the ice seller's transport practical value; moving his cargo earns a high return for greater exertion.
+1. `livelihood-leo-best-cut` — A proud seller grants a giant fruit the ranks of a royal household; Leo's display and abundance, comic pleasure; buy rich individual care, simpler shared food, or accept a taste.
+2. `livelihood-leo-gold-chain` — A ceremonial possession becomes uncomfortable metal against a living body; Leo's gold and display, predicament; accept pain for a sale, buy support, or force the clasp free.
+3. `livelihood-leo-prize-fruit` — A grower's pride delays the purpose of a ripe prize; Leo's display and harvest, affectionate dilemma; choose nourishment, a refund, shared food, or an unrepaid gift.
+4. `livelihood-leo-purse-string` — An employer's public generosity is smaller than his private obligation; Leo's recognition and pride, ordinary negotiation; accept the lesser display or claim the same owed amount publicly or privately.
+5. `livelihood-leo-summer-ice` — An ice seller trades shelter and labor during a prolonged noon; Leo's fixed heat and costly comfort, bodily choice; buy support, endure the climb, or take heavier paid work.
 
 ## Virgo
 
-1. `livelihood-virgo-short-weight` — A grain seller discovers her scoop has been shaving every portion short and offers you either the missing grain or its value; exact measures and honest correction, gift; choose nourishment or Light without needing to accuse her.
-2. `livelihood-virgo-unclaimed-pay` — A clerk has found a small underpayment in your old wages and places the exact coins beside a larger sum offered if you will check the day's remaining tallies; precision and stewardship, honest opportunity; take what is owed, exert yourself over the full counting task for more, or spend the refund on care at the adjoining bath.
-3. `livelihood-virgo-leftovers` — The carefully priced meal is already finished; exact settlement and a larger cleaning wage make distinct commitments.
-4. `livelihood-virgo-unravel` — A cloth merchant will buy the thread from an unfinished sleeve, but unwinding it neatly takes longer than cutting it free; practical recovery of value, dilemma; accept a small return, take a careful hand-work burden for more, or pay for a lesson that improves your grip.
-5. `livelihood-virgo-blunt-knife` — A slipping blunt tool makes the safer grip useful immediately; paid instruction remains valid at full health and the long demonstration pays well.
+1. `livelihood-virgo-short-weight` — A grain seller discovers that her scales are set for weaker gravity and offers the food missing from the Prince's portion or its price; Virgo's precise measures and provisions, restitution; take a warm meal or its value without having to accuse her.
+2. `livelihood-virgo-unclaimed-pay` — A dock clerk corrects old wages while his accounting machine keeps insisting the matter is closed; Virgo's stewardship and attention to a particular worker, opportunity; collect the correction, earn more through a tiring audit, or spend it on the neighboring bath.
+3. `livelihood-virgo-leftovers` — A cook in an underwater canteen presents the bill for a meal already eaten, with washing allowances carefully marked; Virgo's practical household accounts, settlement; pay for supper, wash heavy pots for it, or clean the whole set for an additional wage.
+4. `livelihood-virgo-unravel` — A repairer can salvage the silver heating thread from the Prince's worn coat, whose sleeve still warms a hand; Virgo's recovery of useful material, small dilemma; cut it for a little money, unwind it through cramping fingers for more, learn the careful handling instead, or keep it.
+5. `livelihood-virgo-blunt-knife` — A gripping orchard weed has caught the Prince's knife and wrist, and a gardener offers help or paid work clearing the bed; Virgo's useful tools and exact technique, bodily predicament; wrench free, purchase a supported cutting lesson, or undertake the tiring clearance for wages.
 
 ## Libra
 
-1. `livelihood-libra-split-loaf` — The split loaf becomes an immediate settled purchase; measured labor provides a zero-Light way through and a larger earning opportunity.
-2. `livelihood-libra-tasting` — Two vintners invite you to judge their autumn wine, each offering to pay in drink or coin and both watching the other pour; vintage and negotiation, pleasurable pressure; choose recovery or Light, or undertake the longer carrying work for a larger payment.
-3. `livelihood-libra-fee` — A broker offers to divide a payment equally with you for finding its owner, although she kept the money safely all winter and you pointed across the street; comparison and civil negotiation, awkward windfall; accept half, take a smaller finder’s share, or let her keep the full sum.
-4. `livelihood-libra-counterweight` — A failed goods-platform brake gives the scales a physical consequence; settlement remains immediate and rescuing the goods increases the return.
-5. `livelihood-libra-third-plate` — A market cook has made two excellent plates and a third from the trimmings, then asks whether you want elegance or enough for your whole company; proportion and presentation, abundance; concentrate recovery, spread it, or take a little Light for yielding your place.
+1. `livelihood-libra-split-loaf` — A mask maker's equal hire becomes due after the festival; Libra's paired appearances and agreed measures, settlement; pay, take modest cleaning strain, or earn more through a larger kneading commitment.
+2. `livelihood-libra-tasting` — Rival vintners want a particular difference recognized in balanced measures; Libra's vintage and comparison, sensory pleasure; choose refreshment, money, or instruction.
+3. `livelihood-libra-fee` — A broker values one useful moment alongside months of keeping; Libra's fair shares and judgment, generous opportunity; accept half, choose less, or leave the reward.
+4. `livelihood-libra-counterweight` — A weighmaster's balanced platform leaves worker and payment apart; Libra's measures and settlement, bodily predicament; climb for earnings, purchase safe passage, or lift goods for a larger return.
+5. `livelihood-libra-third-plate` — A cook gives useful abundance equal visibility with elegant portions; Libra's presentation and comparison, practical pleasure; choose expensive individual care, cheaper shared food, or a small payment for leaving the queue.
 
 ## Scorpio
 
-1. `livelihood-scorpio-hidden-seam` — A pawnbroker opens the concealed seam in a coat you brought to sell and lays its forgotten coins beside her offer without a word; hidden value and exact candor, unexpected abundance; take the coins and keep the coat, sell both for more, or pay for a restorative mending session before leaving.
-2. `livelihood-scorpio-cellar-cask` — The shifted cask changes the way out; salvage pays for sustained effort while the vintner remains an ordinary person protecting his stock.
-3. `livelihood-scorpio-hidden-change` — A money keeper returns the coin stuck beneath her tray before you notice it is missing and asks whether you prefer it as supper; concealed value and exact loyalty, gift; choose Light or nourishment, with a larger meal available for payment.
-4. `livelihood-scorpio-root-basket` — Soft autumn ground makes retreat exertion; moving the gardener's useful harvest adds substantial upside without moralizing acquisition.
-5. `livelihood-scorpio-old-price` — A trader honors an old promise to buy a clasp from you, although it is worth less now, and you can see she remembers the original price exactly; long memory and loyalty, uncomfortable generosity; accept the old offer, settle at the present value, or use the clasp in a grip exercise before keeping it.
+1. `livelihood-scorpio-hidden-seam` — A pawnbroker exposes forgotten value without claiming it; Scorpio's hidden compartments and candid appraisal, discovery; keep the find, sell both forms of value, or trade the money for care.
+2. `livelihood-scorpio-cellar-cask` — A vintner's stored wine becomes weight against the cellar entrance; Scorpio's cellars and guarded reserves, bodily predicament; squeeze out, take paid salvage strain, or purchase release.
+3. `livelihood-scorpio-hidden-change` — A keeper returns unnoticed change and leaves room for shared time; Scorpio's concealed value and quiet loyalty, modest invitation; choose money, a little food, or pay for deeper care.
+4. `livelihood-scorpio-root-basket` — A gardener's apparently solid path gives way beside useful winter roots; Scorpio's mud and underground stores, bodily choice; extricate painfully, hire support, or carry a heavier paid load.
+5. `livelihood-scorpio-old-price` — A trader preserves an old offer for a still-useful clasp; Scorpio's memory and commitments, quiet negotiation; accept the remembered price, take today's value, or retain it for grip practice.
 
 ## Sagittarius
 
-1. `livelihood-sagittarius-overfilled` — A provisioner keeps adding food to your order because she cannot bear to send anyone toward the hills with a small parcel; abundance and travel, comic generosity; take a modest gift, pay for deeper nourishment, or spread the food across companions.
-2. `livelihood-sagittarius-borrowed-saddle` — The borrowed fitting fails after mounting; repair, dismount, and bareback work offer different uses of money and strength.
-3. `livelihood-sagittarius-foreign-spice` — An unexpectedly fierce sample creates a small immediate bodily cost; the milk is a separate purchase and the heavy chest offers a larger return.
-4. `livelihood-sagittarius-extra-share` — A wood seller knowingly gives you a bonus at both ends of his stall while his assistant insists it was one job; abundance and deliberate generosity, comic gift; accept the extra bonus, take only one share, or use the extra for warmth shared now.
-5. `livelihood-sagittarius-plain-answer` — A vendor admits the expensive tonic tastes awful and the cheap soup is delicious, then asks which truth should go on his sign; bluntness and optimism, playful bargain; choose recovery or stimulating practice, with an unpaid sample for helping word the sign.
+1. `livelihood-sagittarius-overfilled` — An expansive provisioner feeds an imagined journey beyond its immediate need; Sagittarius' breadth and generosity, uncomplicated abundance; take personal care, buy a fuller meal, or share the gift.
+2. `livelihood-sagittarius-borrowed-saddle` — A borrowed saddle fails to fit a confident hill mount; Sagittarius' riding and freedom, bodily predicament; dismount through strain, buy support, or take a harder paid ride.
+3. `livelihood-sagittarius-foreign-spice` — A generous foreign sample arrives with more heat than explanation; Sagittarius' distant tastes and excess, bodily surprise; endure it, buy relief from the immediate harm, or earn through a heavier task.
+4. `livelihood-sagittarius-extra-share` — A wood seller extends a good day's abundance beyond strict accounting; Sagittarius' expansive reward and sociability, generosity; accept both shares, take one, or convert the extra into shared warmth.
+5. `livelihood-sagittarius-plain-answer` — An honest vendor struggles with praise his trained advertisements repeat; Sagittarius' candor and useful appetite, comedy; buy comfort, invest in strength, or earn a small taste through advice.
 
 ## Capricorn
 
-1. `livelihood-capricorn-last-sack` — A failed winter sack puts the Prince in the dust; recovering usable provisions offers a larger return for a longer burden.
-2. `livelihood-capricorn-warm-stones` — A mason sells stones warmed beside the kiln but lends a smaller one freely after seeing your hands; fire craft and winter provision, restrained kindness; choose hand relief, pay for a full warming rest, or carry the cooling rack for wages.
-3. `livelihood-capricorn-reserve` — A former employer has kept your unpaid last wages untouched through three winters and now offers them with a small sum for making you wait; patient keeping and respect, late settlement; take the whole payment, refuse the addition, or spend the addition on immediate warmth together.
-4. `livelihood-capricorn-old-tools` — A familiar spring catches and bruises the Prince's palm through the glove; leaving carries the soreness, paid wrapping supports the hand, and finishing the cooper's work pays coin and practiced strength.
-5. `livelihood-capricorn-holiday-crust` — During the winter holiday a severe baker sells the crusts for almost nothing and refuses to explain why every crust has so much cake attached; restrained celebration and dry humor, gift; choose individual richness or a shared plate, with paid stocking work for those wanting Light.
+1. `livelihood-capricorn-last-sack` — A bakery's failing sack threatens its last stored flour and dusts the visitor; Capricorn's winter reserves and hard work, predicament; endure an exit, purchase protection, or take substantial salvage strain.
+2. `livelihood-capricorn-warm-stones` — A mason distinguishes a personal gift from a larger useful purchase; Capricorn's stone and winter provision, practical kindness; accept modest relief or fund warmth for everyone.
+3. `livelihood-capricorn-reserve` — An aging mechanical clerk keeps an obligation through several winters; Capricorn's custody and time, restrained restitution; accept the addition, take wages alone, or turn the extra into warmth.
+4. `livelihood-capricorn-old-tools` — A smith recognizes his old work where it now hurts its user; Capricorn's durable tools and exacting labor, bodily choice; leave sore, purchase support, or undertake paid work that also trains the hand.
+5. `livelihood-capricorn-holiday-crust` — A severe baker keeps a distant winter custom through disguised generosity; Capricorn's tradition and provision, quiet pleasure; buy individual or shared food, or accept the offered piece.
 
 ## Aquarius
 
-1. `livelihood-aquarius-same-price` — The portioning mechanism fails under load; the cost follows supporting the pot, with a strong reward for saving its contents.
-2. `livelihood-aquarius-fountain-cup` — A fountain keeper sells warm drinks beside water anyone may take freely and is irritated when customers mistake one for the other; common provision and clear distinctions, brisk hospitality; take modest free relief, buy greater recovery, or carry fuel for a wage.
-3. `livelihood-aquarius-glass-scraps` — The failed basket leaves an awkward way out of the sorting pit; recovering both useful glass grades carries a high return.
-4. `livelihood-aquarius-empty-crate` — A carrier offers you the use of a costly counterweighted frame because it stands idle whenever he goes to lunch; engineering and unpossessive usefulness, gift; try a supported strength exercise, pay him to adjust it for a longer session, or take the small payment for watching the frame while he eats.
-5. `livelihood-aquarius-winter-share` — A storekeeper divides a winter surplus among strangers and refuses to learn anyone's rank before offering food or coins; impersonal generosity, relief; choose recovery or Light, with a larger shared meal available at a stated price.
+1. `livelihood-aquarius-same-price` — An inventor's equal-serving device meets the weight omitted from its trial; Aquarius' universal schemes and practical experiment, predicament; lower it painfully, hire support, or earn by bearing the load.
+2. `livelihood-aquarius-fountain-cup` — A keeper separates common water from the work of making a hot drink; Aquarius' public provision and independent craft, ordinary exchange; accept water, buy care, or take paid exertion.
+3. `livelihood-aquarius-glass-scraps` — Two glass buyers offer different escapes and a shared use for fallen scraps; Aquarius' glasswork and practical systems, bodily predicament; climb painfully, purchase safety, or take demanding paid sorting.
+4. `livelihood-aquarius-empty-crate` — A carrier finds several uses for equipment between loads; Aquarius' ingenuity and independence, practical opportunity; take modest support, buy deeper training, or earn by watching.
+5. `livelihood-aquarius-winter-share` — A storekeeper offers help before requiring an identity; Aquarius' common provision and equal access, generosity; choose personal food or money, or buy a larger shared meal.
 
 ## Pisces
 
-1. `livelihood-pisces-fish-supper` — A fisher has cooked more than she can sell because every buyer looked hungry, and asks you to choose supper or help carrying the unsold catch; river trade and porous generosity, warm dilemma; take food, pay for a fuller shared meal, or work for Light.
-2. `livelihood-pisces-two-nets` — The net's weight creates an immediate entanglement; saving copper competes with freeing the ankle or buying a careful release.
-3. `livelihood-pisces-soft-bread` — A sanctuary baker gives away bread soaked by the thaw and charges only for the warm soup that makes it appetizing; water and refuge, practical kindness; take a free modest portion, buy deeper recovery, or help lift the dry flour for wages.
-4. `livelihood-pisces-unfinished-basket` — A reed seller has quietly paid your bill after hearing you count your coins twice and now pretends she cannot remember the amount; sympathetic giving and evasion, tender discomfort; accept the saved Light, repay her plainly, or spend part of the saving on care shared at her stall.
-5. `livelihood-pisces-drifting-wood` — The committed descent needs a climb or lift fare; fuel recovery offers different commitments while the bird remains a voluntary concern.
+1. `livelihood-pisces-fish-supper` — A fisher's generous estimate leaves food exposed at the landing; Pisces' water and abundant care, hospitality with work available; accept food, buy shared care, or carry the unsold catch for pay.
+2. `livelihood-pisces-two-nets` — A damaged net ties the holder to the value sinking below; Pisces' paired assistance and water, bodily predicament; recover metal through heavy strain, free the ankle painfully, or purchase supported release.
+3. `livelihood-pisces-soft-bread` — A sanctuary baker salvages nourishment as thaw water rises; Pisces' softened boundaries and practical care, modest provision; accept bread, buy a meal, or earn by moving dry flour.
+4. `livelihood-pisces-unfinished-basket` — A precise weaver uses an unlikely lapse to offer help quietly; Pisces' indirect generosity and reed craft, tenderness; accept the gift, repay it, or share care while keeping a little.
+5. `livelihood-pisces-drifting-wood` — A trapped visitor can earn from driftwood that also shelters a bird; Pisces' water and overlapping claims, bodily dilemma; climb, buy passage, or choose between two burdens and salvage values.

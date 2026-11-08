@@ -269,8 +269,9 @@ describe("accepted house-and-sign scenes", () => {
 
   it("records the option's own text when it carries no result text", () => {
     const { run, prince, scenario } = setup("home-libra-mara");
+    const text = scenario.options.find((option) => option.id === "thank")!.text;
     const next = resolveNarrative(run, prince, scenario, "thank", {})!;
-    expect(next.encounter?.kind === "narrative" && next.encounter.resolutionText).toBe("Thank Mara by name.");
-    expect(next.map.outcomes[run.map.currentNodeId]?.summary).toBe("Home · Thank Mara by name.");
+    expect(next.encounter?.kind === "narrative" && next.encounter.resolutionText).toBe(text);
+    expect(next.map.outcomes[run.map.currentNodeId]?.summary).toBe(`Home · ${text}`);
   });
 });

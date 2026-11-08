@@ -8,13 +8,12 @@
  *  play). */
 
 export const PRIMER_FRAMING: string[] = [
-  "Astrology is one of humanity's oldest systems of knowledge. For four thousand years, astrologers have been making sense of the stars.",
-  "Space Prince is a game about relationships.",
-  "But it's not like other games you've played.",
-  "Instead of playing as a character, you play as yourself: your birth chart is your stats sheet. Instead of getting stronger and dominating others, you play by creating and relieving tension.",
-  "**You are a cosmic entity, traveling the universe through encounters with others.**",
-  "Light is the energy those meetings create. A kindness can warm you; a difficult exchange can stir you. You carry it into what comes next, and what remains at the end of each journey shapes a star in your sky.",
-  "The goal isn't to win, but to better understand yourself, and the inner architecture that sustains you.",
+  "People have been reading the stars for thousands of years. Space Prince borrows astrology's language of planets, signs, and relationships.",
+  "Your birth chart becomes a Prince: seven planets, each with a way of meeting the world.",
+  "**You are a cosmic entity, traveling among strange worlds and familiar concerns: a welcome, a day's work, something someone cannot quite let go.**",
+  "Choose which planet answers when you meet another chart. In the houses of your own chart, choose how to take part in the lives you find there.",
+  "Your choices create and relieve tension. The meetings can give you Light or ask you to spend it; you carry what remains into the next encounter.",
+  "At the end of a journey, that Light shapes a star in your sky. The chart remains yours; each return gives you another chance to read it.",
 ];
 
 /** The instruction above the cast form. */
