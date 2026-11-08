@@ -33,6 +33,8 @@ export function GameLayout() {
   const isCasting = !isTitle && (!prince || !run);
   const isEncounter = !isTitle && !!run?.encounter;
   const casting = useCasting(isCasting);
+  const isFraming = isCasting && casting.stage === "framing";
+  const cycleSample = !prince && (isTitle || isFraming);
   const [sample, setSample] = useState(() => seededChart(randomSeed(), "Sample"));
   const surface = isTitle ? "title" : isCasting ? "mint-screen" : run?.encounter?.kind ?? "map-screen";
   // The guide belongs to the surface it opened on, so leaving that surface
@@ -44,13 +46,13 @@ export function GameLayout() {
   const reroll = useCallback(() => setSample(seededChart(randomSeed(), "Sample")), []);
 
   useEffect(() => {
-    if (!isTitle || prince) return;
+    if (!cycleSample) return;
     const timer = window.setInterval(reroll, RECHART_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [isTitle, prince, reroll]);
+  }, [cycleSample, reroll]);
 
   const chart = isCasting ? casting.chart ?? sample : princeChart ?? sample;
-  const unlocked = isCasting ? casting.revealedPlanets
+  const unlocked = isFraming ? PLANETS : isCasting ? casting.revealedPlanets
     : prince ? unlockedPlanets(prince.numRelationalEncounters, loadDevSettings().unlockAll) : PLANETS;
   const emptyState = useMemo(blankSideState, []);
   const opening = useNecessityAnimation({
