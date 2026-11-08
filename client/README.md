@@ -196,6 +196,29 @@ pnpm -s eval:balance --replay <chartSeed>:<gameSeed>:<strategy>:<strategySeed> -
 For study design, measurements, and interpretation, see the [evaluation methods guide](src/eval/README.md).
 The [research summary on PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560) records the earlier findings and their limitations.
 
+### Narrative catalogue review
+
+The catalogue study resolves all 720 scenes in nine named chart/resource states and reports ordinary costs separately from joy and occupant exceptions.
+Its whole-run cohort takes the first two real charts of each rising sign from master seed `20261022`, preserving their original chart and game seeds.
+Five game seeds and three policies run at starting encounter counts 0 and 32: 720 runs per revision.
+
+```sh
+pnpm exec vite-node scripts/eval-narrative-catalogue.ts --out eval-results/issue-41-catalogue
+```
+
+For a paired comparison, run the same script and `tests/narrative-catalogue-fixtures.ts` in the baseline checkout, retaining that checkout's game code and locked dependencies.
+The issue #41 foundation is `c472fe174c847db75d43a2e1e79670726c51391e`.
+Write its results to a separate directory, then compare against the current results:
+
+```sh
+pnpm exec vite-node scripts/eval-narrative-catalogue.ts --menus-only --out eval-results/issue-41-catalogue --compare /path/to/baseline-results
+```
+
+`config.json` records exact cohorts and named states; `source.diff` captures uncommitted source changes.
+`scenes.json`, `menus.md`, `menus.jsonl`, and `pools.json` retain full authored menus and actual outcomes for every eligible recipient.
+`runs-0.jsonl` and `runs-32.jsonl` retain whole runs and route alternatives; reports and `paired.json` summarize their results.
+Pool counts are not encounter probabilities, and the small fixed-policy cohort does not establish human win rates or equal balance across rising signs.
+
 ## Verification
 
 - `pnpm exec tsc -b --noEmit`: typecheck

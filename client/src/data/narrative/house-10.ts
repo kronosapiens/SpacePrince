@@ -9,10 +9,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("visible", "Forgo the purse and ask her to turn the named face outward.", []),
     ]),
   scene("achievement-aries-bell", 10, "Aries",
-    "The fire captain hands you the all-clear bell. Her youngest worker points at a thread of smoke still rising through the roof. The captain lowers your wrist before you ring. She has pay for another inspection, and nobody volunteers to climb the hot ladder.", [
-      trade("inspect", "Climb through the hot roof and finish the paid inspection.", [A("chosen", 24), L(96)]),
-      trade("crew", "Hire two fresh hands to inspect while the workers rest.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("return", "Return the bell and let the captain decide when to ring.", []),
+    "On the roof beside the fire captain, you can still see smoke beneath the tiles. She lowers the all-clear bell. The ladder below is hot enough to sting your hands. A relief crew offers its insulated cradle, while the captain names the fee for finishing the inspection.", [
+      trade("inspect", "Cross the hot roof and finish the paid inspection.", [A("chosen", 24), L(96)]),
+      trade("crew", "Hire the relief crew’s insulated cradle for the descent.", [], { cost: 36 }),
+      trade("return", "Take turns supporting one another down the hot ladder and leave the bell with the captain.", [A("allUnlocked", 12)]),
     ]),
   scene("achievement-aries-starting-line", 10, "Aries",
     "The organizer wants you to start the race. Its oldest entrant is still approaching the line, carrying the stool she plans to leave there. Your ceremonial fee is ready. Behind you, the starting frame leans in the wind; someone must keep holding it until you ring.", [
@@ -52,10 +52,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("present", "Let the baker decide who receives the purse.", []),
     ]),
   scene("achievement-taurus-fixed-weight", 10, "Taurus",
-    "The market inspector asks you to hold the official weight while she tests the stalls. At the last one, the seller greets her by her childhood name. She tightens the strap around your wrist. “Same weight,” she says, and begins the test.", [
-      trade("hold", "Carry the official weight through the full paid inspection.", [A("chosen", 24), L(96)]),
-      trade("share", "Hire another bearer to share the weight and the fee.", [A("chosen", 12), L(96)], { cost: 36 }),
-      trade("set", "Set the weight down and leave the inspector to find a bearer.", []),
+    "The official weight is strapped to your wrist when the inspector reaches the last stall. Its seller greets her by her childhood name. Your arm trembles beneath the iron. She points to the padded unloading block and counts out the fee for the remaining tests. “Same weight,” she says.", [
+      trade("hold", "Carry the weight through the remaining tests for the full inspection fee.", [A("chosen", 24), L(96)]),
+      trade("share", "Divide the carrying into short turns and share the inspection fee.", [A("allUnlocked", 12), L(60)]),
+      trade("set", "Lower the iron onto the block yourself and end your part in the inspection.", [A("chosen", 12)]),
     ]),
   scene("achievement-taurus-low-song", 10, "Taurus",
     "The town has paid you to introduce its singer. She reads the page over your shoulder and crosses out the description of her jewels. “There is a voice somewhere in here.” She offers to teach you its first low note before you go to the lectern.", [
@@ -70,10 +70,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("decline", "Return the commendation with the wrong name.", []),
     ]),
   scene("achievement-gemini-herald", 10, "Gemini",
-    "The herald's voice fails halfway through the honors. He hands you the scroll at a name that occupies most of the next line. Below the platform, the waiting recipients begin rehearsing their pronunciations for you. His purse lies open beside the water jug.", [
-      trade("read", "Read the remaining honors for the full fee.", [A("chosen", 24), L(96)]),
-      trade("assistant", "Hire a second reader and divide the long roll between you.", [A("allUnlocked", 12), L(108)], { cost: 24 }),
-      trade("return", "Return the scroll and give the herald his water.", []),
+    "Your voice thins halfway through the honors roll. The herald sets warm water beside you and points to the names still waiting. A second reader offers to take over for a fee. Below the platform, the recipients rehearse their pronunciations, making every remaining name sound longer.", [
+      trade("read", "Forgo the fee and practice the herald’s full carrying voice through the remaining names.", [A("chosen", 24), G("chosen", "affliction", 24)]),
+      trade("assistant", "Pay the second reader to finish while you rest your voice over the warm water.", [], { cost: 24 }),
+      trade("return", "End your reading with a sore throat and give the roll back.", [A("chosen", 12)]),
     ]),
   scene("achievement-gemini-two-accounts", 10, "Gemini",
     "The inquiry gives you the owner's statement and the worker's. They describe the same hour so differently that you check the dates. The chair asks you to read both without combining them. Each speaker has brought a stool; the reader's place is a narrow standing desk.", [
@@ -112,10 +112,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("wait", "Leave the wall unmarked for the surveyor.", []),
     ]),
   scene("achievement-cancer-public-pot", 10, "Cancer",
-    "The cook is receiving an award for feeding the town. The hall's keeper refuses to admit her battered pot. “Then how will they know which soup?” she asks you. The reception is upstairs, and the organizers offer a carrying fee if the pot must come too.", [
-      trade("meal", "Buy a place at her celebratory supper.", [A("chosen", -36)], { cost: 36 }),
-      trade("pot", "Carry the heavy pot up to the reception for the fee.", [A("chosen", 24), L(96)]),
-      trade("door", "Stay beside her while she speaks to the keeper.", []),
+    "Halfway up the reception stairs, the award-winning cook steadies her heavy soup pot in your arms. The keeper has moved its presentation table to the top. “They could have honored a smaller pot.” Below you, a carrier offers his padded trolley; the cook points to the broad landing.", [
+      trade("meal", "Hire the padded trolley and give the carrier the pot.", [], { cost: 24 }),
+      trade("pot", "Carry the pot to the reception for the organizers’ full carrying fee.", [A("chosen", 24), L(96)]),
+      trade("door", "Lower the pot onto the landing with the cook steadying it.", [A("chosen", 12)]),
     ]),
   scene("achievement-cancer-ship-name", 10, "Cancer",
     "The new ship's name honors its donor. Beneath the official speech, you can hear the crew using the old one. The captain offers your naming fee and asks you to begin. A small supper for the crew waits under the awning, still unpaid for.", [
@@ -137,10 +137,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("chairs", "Ask the chamberlain to settle the seating before you enter.", []),
     ]),
   scene("achievement-leo-procession", 10, "Leo",
-    "The procession's brightest banner is waiting for you. Its bearer shows you the harness, then points to the shaded arch where it may be received instead. The square beyond shimmers in summer heat. “Both are honors,” she says. “One has more carrying in it.”", [
-      trade("arch", "Receive the banner's small purse beneath the shaded arch.", [L(24)]),
-      trade("carry", "Bear the banner through the full procession for the larger purse.", [A("chosen", 36), L(132)]),
-      trade("decline", "Leave the harness with its practiced bearer.", []),
+    "The procession’s bright banner pulls against your harness in the summer heat. At the next arch, its practiced bearer offers to take it back. A bathkeeper advertises a cool resting room beside her. The marshal names the larger purse for anyone carrying through the whole square.", [
+      trade("arch", "Hire the cool resting room and let the bearer ease the harness from your shoulders.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("carry", "Bear the banner through the full hot procession for the larger purse.", [A("chosen", 36), L(132)]),
+      trade("decline", "Give the banner back at the arch and leave with the harness’s ache.", [A("chosen", 12)]),
     ]),
   scene("achievement-leo-portrait", 10, "Leo",
     "The official painter has drawn the scar the crowd recognizes. Her commissioner asks her to remove it. She leaves the brush suspended and turns the canvas toward you. A long public sitting earns a fee; the small private study can be finished while you rest.", [
@@ -162,10 +162,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("return", "Return the commendation while the account remains incomplete.", []),
     ]),
   scene("achievement-virgo-clean-step", 10, "Virgo",
-    "The bathhouse is spotless for its inspection. Everyone has stepped carefully over the same covered drain. The inspector asks you to lift it before she signs. The keeper offers a fee for doing the dirty work, with a private bath afterward at the usual price.", [
-      trade("drain", "Lift the cover and complete the grimy inspection for pay.", [A("chosen", 24), L(96)]),
-      trade("bath", "Buy the private bath and leave the inspection to the keeper.", [A("chosen", -36)], { cost: 36 }),
-      trade("decline", "Decline to sign before the drain is opened.", []),
+    "At the bathhouse inspection, your foot goes through the cover everyone has stepped over. The keeper catches your arm; cold drain water fills your boot. She offers the clearing fee and a private bath at its usual price. The inspector waits with her pen still capped.", [
+      trade("drain", "Lift the broken cover and finish clearing the drain for pay.", [A("chosen", 24), L(96)]),
+      trade("bath", "Buy the private bath and a supported rest after climbing out.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("decline", "Climb out, empty your boot, and leave the inspection with wet feet.", [A("chosen", 12)]),
     ]),
   scene("achievement-virgo-certificate", 10, "Virgo",
     "The apprentice's certificate lists every tool except the one she can mend. She reads it twice, then brings the repaired hinge to you. Her master has offered a fee for demonstrating it to the judges. The apprentice asks whether the hinge might speak for itself.", [
@@ -192,11 +192,11 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("tie", "Announce the tie and decline the fee for breaking it.", []),
     ]),
   scene("achievement-libra-open-hearing", 10, "Libra",
-    "The merchant speaks quickly. The worker needs time to form each sentence. You have been hired to chair the hearing and allow them equal minutes. A reader stands ready to speak the worker’s written account; her fee is more than the worker has brought.", [
-      trade("bell", "Stand at the desk and ring after equal minutes for the standard fee.", [A("chosen", 12), L(60)]),
-      trade("time", "Remain standing through an extended hearing so the worker can finish.", [A("chosen", 24), L(96)]),
-      trade("reader", "Hire the reader and study both written accounts with her.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("return", "Return the bell and decline to chair the hearing.", []),
+    "The hearing has outlasted the chair’s promised hour. You stand at its narrow desk, calves aching, while the worker forms another careful sentence. The merchant’s account was shorter. A clerk brings a price for a seated replacement reader and sets it beside your unfinished fee slip.", [
+      trade("bell", "End your chairing at the promised hour and step down stiff-legged.", [A("chosen", 12)]),
+      trade("time", "Remain standing until both accounts are heard and take the full hearing fee.", [A("chosen", 24), L(96)]),
+      trade("reader", "Pay the replacement reader and sit while she completes both accounts.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("voices", "Share the remaining standing turns with both speakers and study their competing accounts.", [A("allUnlocked", 12), G("chosen", "luck", 24)]),
     ]),
   scene("achievement-libra-paired-statues", 10, "Libra",
     "The neighboring patrons unveil matching statues. One stands a head higher on its plinth. The lower patron looks at you, then at the mason, who has brought a lifting bar. Your unveiling gift is ready; so is a work fee if the base must be moved.", [
@@ -236,10 +236,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("refuse", "Refuse the praise and the purse.", []),
     ]),
   scene("achievement-scorpio-cellar-inspection", 10, "Scorpio",
-    "The public hall's dedication is ready above a flooded cellar. Its steward stops you at the stair before the speeches begin. Water moves around the lowest step. He offers an inspection fee; beside him, the pump crew waits for payment before lowering its hose.", [
-      trade("descend", "Take the paid inspection through the cold flooded cellar.", [A("chosen", 24), L(96)]),
-      trade("pump", "Pay the pump crew and inspect the drained cellar for the fee.", [L(96)], { cost: 60 }),
-      trade("withhold", "Withhold your presence at the dedication until it is inspected.", []),
+    "Inside the hall’s cellar, cold water reaches your knees. The steward raises his lamp toward the dedication floor above. Its speeches can wait. The inspection fee is still available; the pump crew names a price for the dry passage its hose could clear back to the stair.", [
+      trade("descend", "Complete the inspection through the flooded cellar for the full fee.", [A("chosen", 24), L(96)]),
+      trade("pump", "Pay the pump crew to clear and warm the passage back.", [], { cost: 36 }),
+      trade("withhold", "Wade straight back to the stair and leave the dedication unsigned.", [A("chosen", 12)]),
     ]),
   scene("achievement-scorpio-signed-retraction", 10, "Scorpio",
     "The critic brings a signed retraction to the public desk. When you reach for the signature, he keeps hold of the page. “All the words.” He has paid for a reading and a printed posting; the clerk asks which work you will undertake.", [
@@ -255,10 +255,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("correct", "Correct the introduction and return the speaking purse.", []),
     ]),
   scene("achievement-sagittarius-high-marker", 10, "Sagittarius",
-    "The town's new road marker stands on its highest ridge, far from the fork it is meant to mark. The mayor offers you the unveiling fee. Below, a carter studies the bare fork. A mason waits there with a plain spare stone and his tools.", [
-      trade("ridge", "Carry the unveiling supplies up the steep ridge for the full fee.", [A("chosen", 24), L(96)]),
-      trade("below", "Pay the mason and learn to set the useful marker at the fork.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("decline", "Decline the unveiling and point the carter toward town.", []),
+    "At the ridge’s new road marker, the mayor finishes his unveiling speech. The fork it should mark is far below. Your descent crosses a long stretch of loose stone. A mule keeper names her carrying price; the mason offers a fee for bringing the unused presentation tools down.", [
+      trade("ridge", "Carry the tools down with the mason for a smaller fee and a lesson in balancing their load.", [A("chosen", 24), L(48), G("chosen", "affliction", 12)]),
+      trade("below", "Hire the mule for the descent to the actual fork.", [], { cost: 24 }),
+      trade("decline", "Make the steep descent on foot with your own load.", [A("chosen", 12)]),
     ]),
   scene("achievement-sagittarius-open-purse", 10, "Sagittarius",
     "The benefactor offers you a purse and announces that you may spend it on anyone present. Stablehands begin approaching from the edge of the reception. He looks surprised, then opens his hand wider. The bathkeeper has heard the announcement too and is making room.", [
@@ -285,10 +285,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("wait", "Wait beside the worker until his ledger is heard.", []),
     ]),
   scene("achievement-capricorn-top-step", 10, "Capricorn",
-    "The elder stops halfway up the ceremonial steps. She waves away the first offered arm, then grips the rail with both hands. You stand beside the reception table above her. The steward offers a carrying fee if the heavy furniture is brought down to the square.", [
-      trade("carry", "Carry the reception furniture down for the steward's fee.", [A("chosen", 24), L(96)]),
-      trade("hands", "Hire porters and join the elder at the seated reception below.", [A("chosen", -36)], { cost: 36 }),
-      trade("wait", "Wait at the rail without urging her onward.", []),
+    "You are carrying the reception table down toward the elder when its far leg catches the rail. She steadies a corner from below. “I said I could wait.” The steward offers the moving fee; a porter shows you the padded shoulder yoke he rents for heavy furniture.", [
+      trade("carry", "Lift the table clear and carry it down for the steward’s fee.", [A("chosen", 24), L(96)]),
+      trade("hands", "Hire the padded yoke and have the porter take the table’s weight.", [], { cost: 24 }),
+      trade("wait", "Lower the table onto the nearest step and release your cramped grip.", [A("chosen", 12)]),
     ]),
   scene("achievement-capricorn-inspection-hour", 10, "Capricorn",
     "The inspector arrives just as you close the workroom. You point to the hours he posted himself. He reads them, then reaches into his purse. “A fair objection.” There is a small apology gift, or overtime pay if you reopen and help him move the inspection weights.", [
@@ -327,10 +327,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("leave", "Leave your bench for another craftsperson.", []),
     ]),
   scene("achievement-aquarius-rooftop-ballot", 10, "Aquarius",
-    "The neighborhood's vote is on the only roof large enough to hold everyone. Below its ladder, three older residents wait with their voting stones. You are meant to announce the result. The organizer offers a moving fee if the tables and urn are carried into the lane instead.", [
-      trade("move", "Carry the heavy voting tables down for the moving fee.", [A("chosen", 24), L(96)]),
-      trade("porters", "Pay porters from your purse and receive the moving fee after their work.", [L(96)], { cost: 60 }),
-      trade("wait", "Decline to announce a result while the residents wait below.", []),
+    "The rooftop vote is counted, but its narrow ladder faces the winter wind. Below, three residents wait with stones they could not bring up. You stand beside the heavy urn. The organizer offers a moving fee; a carrier can lower people and furniture in his hired sling.", [
+      trade("move", "Pass the urn and tables down in short turns for the moving fee.", [A("allUnlocked", 12), L(96)]),
+      trade("porters", "Hire the carrier’s sling for your descent.", [], { cost: 24 }),
+      trade("wait", "Climb down the exposed ladder with the result still unannounced.", [A("chosen", 12)]),
     ]),
   scene("achievement-aquarius-glass-trophy", 10, "Aquarius",
     "The glass trophy reflects the whole workshop in its many faces. The patron wants your name painted across the largest. Its maker turns it once, showing you the hands and benches caught inside. You may accept the prize money or spend it on the workshop's afternoon rest.", [
@@ -352,11 +352,10 @@ export const HOUSE_10_SCENARIOS: NarrativeScenario[] = [
       trade("fisher", "Give the fisher room to name the helpers herself.", []),
     ]),
   scene("achievement-pisces-blurred-banner", 10, "Pisces",
-    "Rain has blurred your name on the festival banner. Its young bearers insist they still know whom it means. They have brought the welcome purse wrapped in a dry cloth. Behind them, a shelter keeper waits with towels, asking who will pay for the whole wet procession.", [
-      trade("purse", "Accept the dry welcome purse.", [L(36)]),
-      trade("carry", "Take the soaked banner and carry it steadily through the full route.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("warm", "Pay for warm towels and join the bearers under shelter.", [A("allUnlocked", -24)], { cost: 48 }),
-      trade("walk", "Walk beside the banner until the procession ends.", []),
+    "Rain has blurred your name on the banner and soaked you through. Its young bearers insist they still know whom it means. Their welcome purse is dry beneath a cloth. A shelter keeper offers warm towels, while the marshal names a larger fee for finishing the wet procession.", [
+      trade("purse", "Take the dry welcome purse and leave in your soaked clothes.", [A("chosen", 12), L(24)]),
+      trade("carry", "Carry the soaked banner through the remaining route for the marshal’s fee.", [A("chosen", 24), L(96)]),
+      trade("warm", "Pay for warm towels, then settle into a supported rest with the bearers.", [G("chosen", "resolve", 12)], { cost: 48 }),
     ]),
   scene("achievement-pisces-merciful-fine", 10, "Pisces",
     "The official waives a fine in your name, then asks whether you will cover the missing sum. The relieved traveler has already begun thanking you. Beside the payment desk, sacks need carrying to the store; the clerk offers the full sum for finishing them now.", [

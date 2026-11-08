@@ -10,11 +10,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("draw", "Take the tongs and draw the bright iron with her.", [G("joy", "affliction", 12), A("chosen", -12)]),
     ]),
   scene("pilgrimage-aries-first-step", 9, "Aries",
-    "At the spring shrine, pilgrims crowd the first thawed step. Each has a reason to go first. The keeper has lit the warming room behind them and laid out the climbing ropes. “I would like,” she says, “to see the second step sometime.”", [
-      trade("room", "Pay for the warming room while they decide.", [A("chosen", -36)], { cost: 36 }),
-      trade("rope", "Carry the keeper's ropes to the upper shrine for her fee.", [A("chosen", 24), L(84)]),
-      trade("wait", "Wait beside the keeper.", []),
-      joyChoice("song", "Begin the climbing song and take the first step together.", [G("chosen", "resolve", 12)]),
+    "The thawed shrine step breaks beneath the arriving pilgrims. You catch the rope above the gap. The keeper steadies it from the landing. “So much for going first.” A guide offers her ladder for hire; the keeper offers wages for hauling the spare planks up.", [
+      trade("room", "Hire the guide’s ladder and climb out of the gap.", [], { cost: 24 }),
+      trade("rope", "Haul the spare planks up the rope for the keeper’s fee.", [A("chosen", 24), L(84)]),
+      trade("wait", "Climb back over the broken step with the keeper holding the rope.", [A("chosen", 12)]),
+      joyChoice("song", "Call a common hauling rhythm and have the waiting pilgrims pull together.", [G("chosen", "resolve", 12)]),
     ]),
   scene("pilgrimage-aries-red-ink", 9, "Aries",
     "Your teacher abroad marks disputed words in red. Before reaching the passage you came for, her pen runs dry. She holds the page toward the light. “Perhaps we should begin with something we agree on.” The pupils have been waiting to hear this.", [
@@ -52,11 +52,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("answer", "Hold the answering note until the chamber rings.", [G("joy", "resolve", 12), A("allUnlocked", -12)]),
     ]),
   scene("pilgrimage-taurus-sacred-ox", 9, "Taurus",
-    "Nobody crosses the shrine bridge until the sacred ox finishes eating. Its keeper arrives with another armful of hay. Behind you, a pilgrim lowers the foot he had raised. The keeper points out the upper path, then offers bread to everyone still waiting.", [
-      trade("bread", "Sit with the waiting pilgrims and accept the bread.", [A("allUnlocked", -12)]),
-      trade("upper", "Carry the shrine's provisions over the upper path for a fee.", [A("chosen", 36), L(120)]),
-      trade("wait", "Find a place beside the bridge.", []),
-      joyChoice("feed", "Join the keeper in feeding the ox.", [A("chosen", -36)]),
+    "Halfway across the shrine bridge, the sacred ox settles against your legs. Its keeper arrives with hay and an apologetic bow. The railing is low enough to climb, but the drop is awkward. “He usually waits until everyone is off,” she says, shaking the hay.", [
+      trade("bread", "Brace together until the ox rises and the bridge clears.", [A("allUnlocked", 12)]),
+      trade("upper", "Help the keeper heave the ox upright for her handling fee.", [A("chosen", 24), L(84)]),
+      trade("wait", "Climb over the low rail and drop onto the rough bank.", [A("chosen", 12)]),
+      joyChoice("feed", "Have the keeper lead with the hay while the pilgrims clear one passage.", [A("chosen", -36)]),
     ]),
   scene("pilgrimage-taurus-clay-map", 9, "Taurus",
     "A teacher pours water down her clay valley to show you where floods go. Her best pupil keeps smoothing the channels. “They spoil the model,” he says. She hands him the cup. “Then perhaps you can persuade the river to admire it.”", [
@@ -80,11 +80,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("greeting", "Teach them the greeting used at your own table.", [G("chosen", "luck", 12), A("joy", -12)]),
     ]),
   scene("pilgrimage-gemini-moving-stars", 9, "Gemini",
-    "At the observatory, the stars wheel over your head until a child lets go of the crank. “That is the daily motion,” her teacher says. “That is my arm hurting,” she answers. Visitors pay to see the machine; helpers are paid to keep it turning.", [
-      trade("study", "Pay to study both motions beside the teacher.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("crank", "Turn the heavy crank through the whole demonstration.", [A("chosen", 24), L(84)]),
-      trade("stop", "Let the stars stand while the child rests.", []),
-      joyChoice("explain", "Ask the child to explain the sky while you turn one slow circuit.", [A("joy", 12), G("chosen", "luck", 24), L(12)]),
+    "You take a turn at the observatory’s crank. The daily motion is heavier than it looks; your wrist aches before the first circle ends. The teacher offers a padded brace for hire. Her pupil points out the remaining circles, each following a different wandering light.", [
+      trade("study", "Hire the padded brace and have the teacher relieve your wrist before continuing.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("crank", "Finish the heavy circles and learn each light’s motion.", [A("chosen", 24), G("chosen", "luck", 24)]),
+      trade("stop", "Give the crank back and leave with the strain of the first circle.", [A("chosen", 12)]),
+      joyChoice("explain", "Ask the pupil to take the crank while the teacher tends your wrist and explains.", [A("chosen", -12), G("chosen", "luck", 12)]),
     ]),
   scene("pilgrimage-gemini-double-chant", 9, "Gemini",
     "The shrine sings one verse in two languages at once. A visitor asks which language the god understands. The singers stop, looking toward the keeper. “I understand both,” he says, “and I cannot understand either when you all try to be louder.”", [
@@ -115,11 +115,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("answer", "Give the name you choose and answer the sanctuary's welcome.", [G("chosen", "resolve", 12)]),
     ]),
   scene("pilgrimage-cancer-tide-table", 9, "Cancer",
-    "The navigator teaches tides from stains on the wall. Her pupil unfolds a beautiful table that puts today's water somewhere above your head. She touches the dry plaster. “Shall we move the sea, or shall we move your line?” He brings out his ruler.", [
-      trade("marks", "Pay to learn the wall's sequence of tides.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("measure", "Carry the surveying pole along the shore for her fee.", [A("chosen", 24), L(84)]),
-      trade("look", "Watch the water against the old stains.", []),
-      joyChoice("compare", "Set the pupil's table beside the visible tide and trace the difference.", [G("chosen", "luck", 24)]),
+    "You reach the navigator’s measuring ledge as the tide fills its approach. Her pupil’s beautiful table predicted another hour. She points him toward the boat hire, then shows you the handholds above the water. “We shall correct the table after we leave the ledge.”", [
+      trade("marks", "Hire the boat and compare the mistaken table during the crossing.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("measure", "Carry the surveying pole over the high rocks for the navigator’s fee.", [A("chosen", 24), L(84)]),
+      trade("look", "Use the handholds to climb back above the tide.", [A("chosen", 12)]),
+      joyChoice("compare", "Read the older tide marks and lead the pair along the still-dry shelf.", [G("chosen", "luck", 24)]),
     ]),
   scene("pilgrimage-cancer-bowl", 9, "Cancer",
     "At the river temple, pilgrims carry water in bowls inherited from their mothers. The keeper offers you a plain one from the shelf. “Whose was it?” asks another pilgrim. The keeper turns it over. “Someone who was kind enough to wash it.”", [
@@ -143,11 +143,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("shores", "Draw a new map with both shores in view.", [G("chosen", "luck", 24)]),
     ]),
   scene("pilgrimage-leo-empty-throne", 9, "Leo",
-    "At this sanctuary, each visitor sits for a moment on the empty throne. The attendant straightens its cushion for you as carefully as he did for the porter ahead of you. A hymn begins behind the screen. He offers his hand before you climb the broad step.", [
-      trade("seat", "Pay the attendant to guide you through the seated observance.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("arcade", "Rest in the arcade and watch the visitors take their turns.", [A("chosen", -24)]),
-      trade("pass", "Leave the throne for the next visitor.", []),
-      joyChoice("hymn", "Take the seat and join the attendants in the welcoming hymn.", [G("joy", "resolve", 12), A("chosen", -12)]),
+    "From the sanctuary’s high ceremonial seat, you can finally see the whole valley. Below it, the return stair descends steeply without a rail. The attendant offers a hired carrying chair or a lesson in the bearers’ descending step. “Looking out is the easy part,” he says.", [
+      trade("seat", "Hire the carrying chair for the descent.", [], { cost: 24 }),
+      trade("arcade", "Make the steep descent on foot.", [A("chosen", 12)]),
+      trade("pass", "Carry a practice weight down with the bearers and learn their descending step.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("hymn", "Ask the attendant to lead the return hymn along the broad service ramp.", [G("joy", "resolve", 12)]),
     ]),
   scene("pilgrimage-leo-lion-teacher", 9, "Leo",
     "You came for the hunter's famous lion story. Instead, he shows you two tracks in a patch of dust. His pupils name every large beast they know. He covers the larger print with his foot and waits. The small one has claws too.", [
@@ -199,11 +199,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("record", "Read your account beside the keeper's own failed harvest.", [G("chosen", "resolve", 12)]),
     ]),
   scene("pilgrimage-virgo-small-letters", 9, "Virgo",
-    "Your translator reads the temple's splendid inscription but skips the little letters below. The cleaner taps them with her brush. “Those tell you which stone covers the drain.” She offers a day's pay to anyone who will finally lift it before praising the building again.", [
-      trade("read", "Pay the translator to teach you the smaller lettering.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("drain", "Lift the cover and clean the drain for the offered pay.", [A("chosen", 24), L(84)]),
-      trade("aside", "Step out of the cleaner's way.", []),
-      joyChoice("instructions", "Read the instructions aloud, lift the cover at its marked hinge, and clean the drain.", [A("joy", 12), L(84)]),
+    "The temple flagstone tilts beneath you, pressing your ankle against the drain’s edge. Your translator bends over its splendid inscription. The cleaner taps the small letters with her brush. “Those explain the hinge.” She offers wages for clearing the drain; a mason nearby rents lifting bars.", [
+      trade("read", "Rent the mason’s bar and lift the stone clear of your ankle.", [], { cost: 24 }),
+      trade("drain", "Heave the cover aside and clear the blocked drain for the cleaner’s pay.", [A("chosen", 24), L(84)]),
+      trade("aside", "Pull your ankle free while the cleaner steadies the stone.", [A("chosen", 12)]),
+      joyChoice("instructions", "Read the small instructions and roll the stone at its marked hinge.", [G("chosen", "luck", 12)]),
     ]),
   scene("pilgrimage-virgo-ritual-fold", 9, "Virgo",
     "The novice folds your ceremonial cloth toward the east. Her teacher folds it back the other way. They look at one another, then both laugh. Each learned from a different keeper. The bowl is ready between them, and they ask which fold you would like to make.", [
@@ -234,11 +234,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("song", "Ask both temples to join one song before their services divide.", [A("allUnlocked", -12)]),
     ]),
   scene("pilgrimage-libra-polished-mirror", 9, "Libra",
-    "The shrine's processional mirror is polished on one side only. The guide asks which face you will carry. Behind you, two pilgrims have begun defending opposite answers. He offers you the handle. “You will have plenty of time to hear them on the walk.”", [
-      trade("carry", "Carry the heavy mirror through the full procession.", [A("chosen", 24), G("chosen", "resolve", 24)]),
-      trade("listen", "Rest with the guide and hear the observance explained.", [A("chosen", -24)]),
-      trade("pass", "Pass the handle to one of the eager pilgrims.", []),
-      joyChoice("sunward", "Carry the sunward face for the short opening hymn.", [G("joy", "resolve", 12)]),
+    "The processional mirror swings loose as you pass beneath it. You catch its rim against your shoulder; the guide grabs the other side. The pilgrims stop debating which face should lead. A porter offers his padded carrying frame, while the guide points to an empty stand across the court.", [
+      trade("carry", "Bear the mirror to the distant stand and finish the carrying lesson.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("listen", "Hire the porter’s padded frame to take the mirror’s weight.", [], { cost: 24 }),
+      trade("pass", "Lower your end to the paving with the guide holding his.", [A("chosen", 12)]),
+      joyChoice("sunward", "Ask the debating pilgrims to take a place along each rim and lower it together.", [G("joy", "resolve", 12)]),
     ]),
   scene("pilgrimage-libra-guest-law", 9, "Libra",
     "The teacher reads a law granting equal portions to visitors. Your hired porter waits beyond the table. When you ask about him, she turns the question toward her pupils. A bowl steams in front of every pupil; the porter's bowl is still on the shelf.", [
@@ -269,11 +269,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("speak", "Speak plainly about what you came to say, then let the room fall quiet.", [G("chosen", "resolve", 12)]),
     ]),
   scene("pilgrimage-scorpio-drain-map", 9, "Scorpio",
-    "The temple architect takes you below the marble floor. Her fee includes the famous hall, she says, but first you will see its drains. Above, a guide praises the building's purity. She hands you a lamp. “Excellent. Let us find where the purity goes.”", [
-      trade("below", "Pay for the full inspection and descend the cramped channels.", [A("chosen", 12), G("chosen", "luck", 24)], { cost: 24 }),
-      trade("plan", "Buy a quiet lesson over the drainage plan upstairs.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("return", "Return the lamp before descending.", []),
-      joyChoice("explain", "Ask her to show the waiting visitors how the hall drains.", [G("chosen", "resolve", 12)]),
+    "You reach the bottom of the temple architect’s inspection route. Above, a guide praises the marble floor’s purity. The architect points to the return ladder, the low channel leading outside, and the maintenance crew’s hired hoist. “Every visitor admires the hall. Fewer admire getting out from under it.”", [
+      trade("below", "Crawl the full cramped drainage route and learn where every channel emerges.", [A("chosen", 24), G("chosen", "luck", 24)]),
+      trade("plan", "Pay the maintenance crew for the hoist back to the hall.", [], { cost: 24 }),
+      trade("return", "Climb the long return ladder.", [A("chosen", 12)]),
+      joyChoice("explain", "Explain the drainage route to the waiting visitors in exchange for their crew’s hoist.", [G("chosen", "resolve", 12)]),
     ]),
   scene("pilgrimage-scorpio-last-question", 9, "Scorpio",
     "The orchard teacher washes her knife and allows one last question. A pupil leans toward you. “Not whether she enjoyed our visit.” On the table lie the diseased root she removed and the sound branch it had been feeding. She has left both uncovered.", [
@@ -311,11 +311,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("show", "Show how your dish is eaten and ask its neighbor's maker to do the same.", [A("allUnlocked", -12), G("joy", "luck", 12)]),
     ]),
   scene("pilgrimage-sagittarius-windy-lesson", 9, "Sagittarius",
-    "The hilltop teacher says the wind belongs in a lesson about weather. His pupils chase every page down the slope. You catch one beneath your boot. It is the fee schedule for lessons in the sheltered room below. He asks you to return it face down.", [
-      trade("hill", "Climb after the scattered pages and finish the outdoor lesson.", [A("chosen", 24), G("chosen", "luck", 24)]),
-      trade("indoors", "Pay for the sheltered lesson below.", [G("chosen", "luck", 12)], { cost: 24 }),
-      trade("page", "Hand back the schedule and leave the hill.", []),
-      joyChoice("below", "Ask him to teach this same weather through the room's open window.", [G("chosen", "luck", 12), A("joy", -24)]),
+    "The hilltop teacher’s pages blow across the path as you reach his class. You step aside onto loose shale; the firm trail is now above your knees. He lowers a hand. The sheltered school’s porter offers a rope lift, keeping his fee schedule pinned beneath one boot.", [
+      trade("hill", "Climb the long slope, collecting the scattered lesson pages as you go.", [A("chosen", 24), G("chosen", "luck", 24)]),
+      trade("indoors", "Pay the porter to lift you back to the firm trail.", [], { cost: 24 }),
+      trade("page", "Scramble straight up with the teacher steadying your hand.", [A("chosen", 12)]),
+      joyChoice("below", "Have the class brace a walking pole and guide you over the stable stones.", [G("chosen", "luck", 12)]),
     ]),
   scene("pilgrimage-capricorn-old-measure", 9, "Capricorn",
     "The quarry school measures stone by the arm of its founder. Your teacher's arm is shorter. A pupil quietly reaches farther each time she checks his block. “We are preserving a tradition,” she says. The pupil looks relieved to have a name for the difficulty.", [
@@ -332,11 +332,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("tapers", "Invite the pilgrims to pass the old flame from taper to taper, then light the new candle together.", [G("joy", "resolve", 12), A("allUnlocked", -12)]),
     ]),
   scene("pilgrimage-capricorn-threshold", 9, "Capricorn",
-    "The mountain sanctuary admits no muddy boots. Its newest attendant holds yours while searching for somewhere dry to put them. All the shelves are full of pilgrims' shoes. “Very old rule,” she says, lifting one foot from the wet floor. “Rather new problem.”", [
-      trade("wash", "Pay for the foot-washing room and a dry place to rest.", [A("chosen", -36)], { cost: 36 }),
-      trade("steps", "Scrub the muddy steps in exchange for warm lodging.", [A("chosen", 12), A("chosen", -48)]),
-      trade("boots", "Take your boots back and remain outside.", []),
-      joyChoice("shelf", "Help her arrange a dry shelf, then enter the observance together.", [G("chosen", "resolve", 12), A("joy", -12)]),
+    "Snow has filled your boots on the last stretch to the mountain sanctuary. Its attendant feels how cold they are and opens the washing room’s price slate. The guest stove needs fuel; she offers its carrying wage. Her own boots stand beneath a little warming lamp.", [
+      trade("wash", "Buy heated stones and dry your feet before moving on.", [], { cost: 24 }),
+      trade("steps", "Carry the fuel across the icy yard for the wage, then dry beside the guest stove.", [A("chosen", 24), L(84)]),
+      trade("boots", "Empty the boots and continue with cold, wet feet.", [A("chosen", 12)]),
+      joyChoice("shelf", "Ask to share the small warming lamp and dry one boot at a time.", [A("chosen", -12), G("joy", "resolve", 12)]),
     ]),
   scene("pilgrimage-capricorn-smelter", 9, "Capricorn",
     "Your sponsor asks the foreign metalworker to open the mold sooner. She sets a cooled casting beside a broken one and asks him to choose. He looks to you. She has already turned back to the apprentices, who are watching the molds rather than the visitors.", [
@@ -374,11 +374,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("restore", "Explain the changed motions and restore the star yourself.", [G("chosen", "resolve", 12), G("joy", "luck", 12)]),
     ]),
   scene("pilgrimage-aquarius-purification", 9, "Aquarius",
-    "Midwinter bathers call the cold pool cleansing. The keeper pours hot water into the next basin and asks you which you want. “Does that one cleanse too?” you ask. She looks into its clear water. “I should hope so. I have just scrubbed it.”", [
-      trade("warm", "Pay for a long rest in the warm basin.", [A("chosen", -36)], { cost: 36 }),
-      trade("cold", "Join the brief cold immersion and its measured breathing.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("dry", "Keep your clothes dry and listen from the benches.", []),
-      joyChoice("anthem", "Lead the bathers' anthem from the warm pool.", [A("chosen", -36), G("joy", "resolve", 12)], { cost: 24 }),
+    "You step into the midwinter sanctuary’s basin. Its bathers have left out the kettle water, calling the cold cleansing. Your teeth begin to chatter with theirs. The keeper sets towels by the step and names the kitchen’s warming price. “The hot basin cleans just as well,” she says.", [
+      trade("warm", "Buy kettle water and finish the bath in warmth.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("cold", "Stay for the cold immersion and practice the bathers’ measured breathing.", [A("chosen", 24), G("chosen", "affliction", 24)]),
+      trade("dry", "Climb out shivering and dry yourself with the waiting towels.", [A("chosen", 12)]),
+      joyChoice("anthem", "Ask the keeper to open the small working basin and lead the bathers there.", [A("chosen", -24), G("joy", "resolve", 12)]),
     ]),
   scene("pilgrimage-aquarius-roof-reader", 9, "Aquarius",
     "You point out a misplaced line on the rooftop reader's chart. She brings her pupils over before you can lower your finger. “Show us.” A small purse lies beside the chart for useful corrections; the demonstration table is open to paying students.", [
@@ -402,11 +402,11 @@ export const HOUSE_09_SCENARIOS: NarrativeScenario[] = [
       joyChoice("melody", "Carry the wordless melody beneath the youngest singers.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
     ]),
   scene("pilgrimage-pisces-two-pilgrims", 9, "Pisces",
-    "Two pilgrims tied their packs together so neither would leave the other behind. Now each points toward a different shrine. They offer you a carrying fee while they decide which road to take. Between them, the knot has tightened beyond either pair of fingers.", [
-      trade("carry", "Carry the joined packs to the resting house for their fee.", [A("chosen", 24), L(84)]),
-      trade("rest", "Pay for a quiet place at the resting house while they talk.", [A("chosen", -36)], { cost: 36 }),
-      trade("road", "Leave them to choose their roads.", []),
-      joyChoice("untie", "Loosen the knot and help each pilgrim carry one pack to the house.", [A("joy", 12), L(84)]),
+    "Your ferry grounds between the two pilgrims’ shrines. Their joined packs have slid across the rowing bench, and each points toward a different bank. The ferryman has a hired punt tied astern. Beyond the mud, both paths climb steeply toward the resting house.", [
+      trade("carry", "Carry the joined packs up the steep path for the pilgrims’ fee.", [A("chosen", 24), L(84)]),
+      trade("rest", "Hire the punt to reach the resting house’s landing.", [], { cost: 24 }),
+      trade("road", "Climb the muddy bank and take the path with your own load.", [A("chosen", 12)]),
+      joyChoice("untie", "Untie the packs, clear the bench, and row the lightened ferry off with the pilgrims.", [G("chosen", "luck", 12)]),
     ]),
   scene("pilgrimage-pisces-dream-account", 9, "Pisces",
     "You describe a room from your dream. The interpreter asks where its door stood, and you discover you have drawn none. She sets bread beside your paper. “Take your time.” Her private readings cost a fee; visitors may sit at this table as long as they need.", [

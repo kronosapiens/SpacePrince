@@ -213,12 +213,16 @@ All costs remain visible and immediate.
 ### 4.5 House–sign economic balance
 
 Narrative variation should be available throughout the chart, including empty houses.
-Comparable aggregate economic opportunity across charts remains a balancing aim; a bounded pilot does not establish it.
+Comparable aggregate economic opportunity across charts remains a balancing aim, evaluated through whole runs as well as individual menus.
 
 The house guides the tendency of its offers.
 Houses that aspect the Ascendant generally offer milder, more dependable benefits, with a smaller but nonzero chance of unavoidable cost.
 Averse houses (II, VI, VIII, and XII) can impose costs more often and offer greater potential benefits.
 These are learnable tendencies, not guarantees about a particular menu.
+The current catalogue starts with two compulsory-cost scenes out of five in each II/VI/VIII/XII sign pool and one in each other house's sign pool.
+These are provisional counts for ordinary menus with empty occupants; joys and favorable occupants can remove costs.
+They apply to every rising sign, while encounter history and routing determine which scenes a player actually sees.
+Frequencies and amounts remain open to playtesting.
 The going rates (§6) are provisional references, not a requirement that every choice have the same nominal advantage.
 Gifts, trades, and choices among benefits can coexist within a house–sign pool.
 Some scenes require a loss of carried Light, useful remaining capacity, or an available planet even after the player chooses a preferred option.

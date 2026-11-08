@@ -24,11 +24,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("return", "Ask what they called her at the finish.", [G("chosen", "luck", 12)]),
     ]),
   scene("self-aries-sleeves", 1, "Aries",
-    "You try to raise a hand to the smith, but your stiff cuffs catch. She catches the greeting anyway. “Off with those.” She has soft leather for the wrists and a pair of firm braces, both left from fitting her own working sleeves.", [
-      trade("soft", "Let her replace the cuffs with soft leather.", [A("chosen", -24)]),
-      trade("braces", "Ask her to fit the supporting braces.", [G("chosen", "resolve", 12)]),
-      trade("bow", "Bow instead and keep the cuffs.", []),
-      joyChoice("fastening", "Show her where a turning clasp would free the whole sleeve.", [A("allUnlocked", -12)]),
+    "You raise a hand to the smith and the stiff cuff locks across your wrist. She catches the greeting, then sees your fingers. “Hold still.” Her apprentice brings cutters; she lays out soft leather and the firm braces she uses in her own working sleeves.", [
+      trade("soft", "Pull your hand through the tight cuff and rub the bruised wrist.", [A("chosen", 12)]),
+      trade("braces", "Pay her to cut the cuff away and fit a supporting brace.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("bow", "Work the rigid fastening open with your other hand despite the strain.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("fastening", "Show her the turning clasp hidden beneath the sleeve.", [A("chosen", -12)]),
     ]),
   scene("self-aries-spring-water", 1, "Aries",
     "Two lambing girls are washing at the spring after a night awake. One offers you a warm cloth. The other pats the water beside her, teeth chattering. “Lovely once you're in.” Her sister has the decency to laugh.", [
@@ -52,11 +52,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("answer", "Answer her questions on the note that comes easily.", [G("chosen", "resolve", 12)]),
     ]),
   scene("self-taurus-sole", 1, "Taurus",
-    "The cobbler knows you by the worn edge of your heel before she looks up. She bends two new soles between her hands: one thick with felt, one firm. “Same price. But tell me which part of walking you want to change.”", [
-      trade("felt", "Buy the padded soles for relief now.", [A("chosen", -36)], { cost: 36 }),
-      trade("firm", "Buy the firm soles and stand into them.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("old", "Keep the old soles a little longer.", []),
-      joyChoice("divide", "Ask for felt at the heel and support beneath the toes.", [A("chosen", -24), G("chosen", "resolve", 12)], { cost: 48 }),
+    "Your old sole splits across the cobbler's threshold. She recognizes the worn edge of your heel before looking up. Two replacements bend between her hands: thick felt and firm leather. “Tell me which part of walking you want to change.” The split flaps beneath your foot.", [
+      trade("felt", "Buy the padded soles and rest your sore feet while she fits them.", [A("chosen", -36)], { cost: 36 }),
+      trade("firm", "Buy the firm soles and find a supported stance in them.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("old", "Walk on with the split sole rubbing beneath your foot.", [A("chosen", 12)]),
+      joyChoice("divide", "Turn the loose leather inward and secure it beneath the heel.", [G("chosen", "resolve", 12)]),
     ]),
   scene("self-taurus-clay-print", 1, "Taurus",
     "The potter brings out the handprint you left when her kiln was new. Your palm covers it now. “You slapped that down before I could stop you.” She puts fresh clay beside it and sets a bowl of warm water within reach.", [
@@ -101,11 +101,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("unexpected", "Greet him in the voice he used for himself.", [G("joy", "luck", 24)]),
     ]),
   scene("self-gemini-travel-coat", 1, "Gemini",
-    "The clothes seller turns your coat inside out. “This side says you have just arrived. The other says you're leaving.” He brushes a patch of road dust from both. The lining is soft, but its torn edge has been rubbing your wrist.", [
-      trade("brush", "Let him brush off the road dust.", [A("chosen", -12)]),
-      trade("mend", "Pay him to mend the lining and wear it outward.", [A("chosen", -36)], { cost: 36 }),
-      trade("turn", "Turn it back and introduce yourself.", []),
-      joyChoice("arrival", "Ask him which side someone wears when they live here.", [G("chosen", "luck", 12)]),
+    "The clothes seller lifts your travel coat from your shoulders. Grit in its lining has already rubbed your wrists raw. “Arriving or leaving?” he asks, turning it inside out. He brings a needle and a washing basin, still deciding which side should face the street.", [
+      trade("brush", "Set the coat aside and carry on with your sore wrists.", [A("chosen", 12)]),
+      trade("mend", "Pay him to wash and refit the lining so the coat supports your shoulders.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("turn", "Pull out the stiff stitches yourself, working a firmer grip through aching wrists.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("arrival", "Rinse your wrists, then fold the rough edge between the two faces of the coat.", [A("chosen", -12)]),
     ]),
   scene("self-cancer-height-mark", 1, "Cancer",
     "The woman who used to mind you reaches up to straighten your collar. Her hand stops short. “Do you still like it that way?” On the doorpost behind her, the marks of your height stop years below your shoulder.", [
@@ -122,11 +122,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("toast", "Give the old toast and leave its last word to her.", [A("allUnlocked", -12)]),
     ]),
   scene("self-cancer-shell", 1, "Cancer",
-    "At the baths, a woman brings a screen for your scarred shoulder. The attendant shakes his head. “Everyone has something.” The shoulder itself is sore. Between them they have prepared warm water, clean cloths, and two opinions you did not request.", [
-      trade("screen", "Pay for the screened basin.", [A("chosen", -36)], { cost: 24 }),
-      trade("wash", "Join the others at the shared basin.", [A("chosen", -24)]),
-      trade("leave", "Put your shirt back on.", []),
-      joyChoice("shoulder", "Ask them to wash the shoulder and leave its history alone.", [A("chosen", -48)]),
+    "A loose splinter in the bathhouse screen catches your scarred shoulder as you turn. Its owner apologizes and offers privacy; the attendant reaches for a clean dressing. “The shoulder first,” he says. Your shirt hangs beside the shared basin, with the splinter still caught in its seam.", [
+      trade("screen", "Pay for a clean dressing and a firm shoulder wrap behind the screen.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("wash", "Pull out the splinter and wash the raw shoulder yourself.", [A("chosen", 12)]),
+      trade("leave", "Put the shirt on and walk with the seam against the scrape.", [A("chosen", 24)]),
+      joyChoice("shoulder", "Unpick the seam around the splinter before asking them to wash the shoulder.", [A("chosen", -24)]),
     ]),
   scene("self-cancer-rocking", 1, "Cancer",
     "The ferry cook has built a chair that rocks like her boat. She offers it as a kindness to your tired legs. “Settles anybody.” You have only just stopped feeling the deck move. She gives the chair a proud little shove.", [
@@ -150,11 +150,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("cowlick", "Ask what he can make of the cowlick that refuses him.", [G("chosen", "resolve", 12)]),
     ]),
   scene("self-leo-carved-seat", 1, "Leo",
-    "The carver watches you sit in his ceremonial chair. Two carved lions press their noses into your ribs. “A commanding seat,” he says. His apprentice brings a cushion. He offers a testing fee if you can remain commanding while he marks the trouble.", [
-      trade("cushion", "Accept the cushion and sit comfortably.", [A("chosen", -12)]),
-      trade("test", "Hold the formal pose while he marks every pressure point.", [A("chosen", 24), L(96)]),
-      trade("stand", "Stand up and show him the marks already left.", []),
-      joyChoice("lions", "Turn sideways and rest your arms on the lions.", [L(36), A("chosen", -12)]),
+    "You settle into the carver's ceremonial chair and the two wooden lions catch beneath your ribs. “A commanding seat,” he begins, then kneels to inspect the arms. His apprentice brings wedges. He offers a testing fee if you can hold the pose while he marks the trouble.", [
+      trade("cushion", "Pay the apprentice to ease the joints apart without bruising your ribs.", [], { cost: 24 }),
+      trade("test", "Hold the cramped formal pose while he marks every pressure point.", [A("chosen", 24), L(96)]),
+      trade("stand", "Wriggle past the carved lions and stand with bruised sides.", [A("chosen", 12)]),
+      joyChoice("lions", "Turn sideways and slip through the space between the lions' noses.", [L(24)]),
     ]),
   scene("self-leo-unbowed", 1, "Leo",
     "The retired acrobat watches you duck through a doorway well above your head. “Who lowered that?” she asks. When you look back, she is looking at your shoulders. She offers a hand, then waits for you to decide what it is for.", [
@@ -178,11 +178,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("cut", "Pay him to cut the fine cloth like the fitting shirt.", [G("chosen", "resolve", 12)], { cost: 36 }),
     ]),
   scene("self-virgo-seam", 1, "Virgo",
-    "The mender watches you take three steps, turns your trouser leg, and finds a seam no wider than a fingernail. “There.” She offers a soft patch for now or a complete refitting. The old stitch has shaped the way you walk.", [
-      trade("patch", "Accept the soft patch over the seam.", [A("chosen", -12)]),
-      trade("refit", "Pay for the refitting and test your footing.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("later", "Leave the seam until another day.", []),
-      joyChoice("move", "Turn the cloth and show her where the seam could sit instead.", [A("chosen", -36)]),
+    "The mender stops you after three uneven steps. A hidden seam has rubbed your ankle raw; lifting the cloth shows where each hard stitch has scraped it. “There.” She turns the trouser leg carefully. Her fine shears and cool dressings lie beside a complete refitting laid out on the bench.", [
+      trade("patch", "Pick out the hard stitches yourself through the sore, awkward work.", [A("chosen", 12)]),
+      trade("refit", "Pay for the refitting and test your newly supported footing.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("later", "Roll the trouser leg clear and continue on the sore ankle.", [A("chosen", 24)]),
+      joyChoice("move", "Fold the seam away and fit her cool dressing exactly over the scrape.", [A("chosen", -24)]),
     ]),
   scene("self-virgo-description", 1, "Virgo",
     "The clerk has reached “distinguishing marks.” He runs a finger down his list, then looks at you for help. His assistant offers a stool. “Standing measurement or seated description?” he asks. “People become surprisingly different when they get comfortable.”", [
@@ -241,18 +241,18 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("function", "Have her fasten each clasp where it carries the weight best.", [A("chosen", -36)], { cost: 24 }),
     ]),
   scene("self-libra-autumn-bath", 1, "Libra",
-    "The first autumn bath has divided its attendants. One has warmed the water; the other has opened the windows. “We are waking the body,” says one. “We are welcoming it,” says the other. They turn to you, each holding a towel.", [
-      trade("warm", "Buy the warm bath and close your eyes.", [A("chosen", -36)], { cost: 24 }),
-      trade("bracing", "Take the cold rub and work the chill out of your limbs.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("face", "Accept a towel and wash only your face.", [A("chosen", -12)]),
-      joyChoice("short", "Ask them to alternate in a short treatment you can direct.", [G("chosen", "luck", 12), A("chosen", -12)]),
+    "The first autumn bath strikes colder than either attendant expected. One reaches for the warm-water kettle; the other offers a vigorous rub. “Waking the body,” he says, less confidently now. Your skin prickles as you stand between their towels and wait for them to agree.", [
+      trade("warm", "Buy the warm finishing treatment and settle into its firm wrap.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("bracing", "Take the rough rub and work the chill out through vigorous movement.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("face", "Dry yourself and leave with the cold still in your limbs.", [A("chosen", 12)]),
+      joyChoice("short", "Direct them to alternate the warm cloth and dry towel in a short treatment.", [A("chosen", -12), G("chosen", "luck", 12)]),
     ]),
   scene("self-scorpio-held-elbow", 1, "Scorpio",
-    "At the narrow crossing, your companion catches your elbow. She has done it ever since she pulled you from the river. This time you stop. She loosens her hand without letting go. “We can sit first,” she says. The low rail is dry.", [
-      trade("rest", "Sit with her until the hurry leaves your legs.", [A("chosen", -24)]),
-      trade("rail", "Cross along the low rail under your own balance.", [A("chosen", 12), G("chosen", "luck", 12)]),
-      trade("hand", "Take her hand and cross together.", []),
-      joyChoice("company", "Offer your elbow back and ask her to walk beside you.", [A("allUnlocked", -12)]),
+    "A board gives beneath your foot at the narrow crossing. Your companion catches your elbow, as she did when she pulled you from this river years ago. “I've got you.” The near bank is steep; a boat waits below. She loosens her grip enough for you to move.", [
+      trade("rest", "Pay the boatman to bring you both down safely and across.", [], { cost: 24 }),
+      trade("rail", "Climb along the remaining rail under your own balance.", [A("chosen", 24), G("chosen", "luck", 12)]),
+      trade("hand", "Take her hand and scramble back up the steep bank.", [A("chosen", 12)]),
+      joyChoice("company", "Brace the loose board across the gap and cross shoulder to shoulder.", [A("allUnlocked", -12)]),
     ]),
   scene("self-scorpio-old-boast", 1, "Scorpio",
     "The man who watched you lose your grip years ago has set up the same handhold. This time a chair stands beneath it. He lays down a testing fee. “Your feet may stay on the chair. I should have thought of that then.”", [
@@ -283,11 +283,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("whisper", "Answer her in a whisper she has to listen for.", [G("chosen", "luck", 12)]),
     ]),
   scene("self-sagittarius-saddle", 1, "Sagittarius",
-    "“A high horse improves anybody's bearing,” says the riding instructor. She sees you looking at the stirrup and brings a stool. A short supported lesson has a fee; riders who exercise the horse around the field can learn through their own effort.", [
-      trade("supported", "Pay for the supported lesson and find your seat.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("field", "Ride the full circuit until your thighs ache.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("ground", "Stay on the ground and greet the horse.", []),
-      joyChoice("dismount", "Ask her to teach you how to get down before you get up.", [A("chosen", -24)]),
+    "The practice horse sidesteps as your stirrup strap slips. You are already in the saddle. “A high horse improves anybody's bearing,” says the instructor, catching the reins. She brings a mounting block and offers to fit a secure harness. The horse waits with much less concern.", [
+      trade("supported", "Pay for the secure harness and finish with supported riding practice.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("field", "Ride the remaining circuit without the stirrup, working hard to stay balanced.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("ground", "Slide down onto the block with a hard pull through your thighs.", [A("chosen", 12)]),
+      joyChoice("dismount", "Ask her to turn the horse alongside the block before you swing down.", [A("chosen", -12)]),
     ]),
   scene("self-sagittarius-tall-story", 1, "Sagittarius",
     "The traveler introduces you as the person who leapt a ravine on horseback. You interrupt before the horse grows wings. He laughs and draws over a stool. “Then what should I have said?” His audience waits to see whether the correction will be better.", [
@@ -331,11 +331,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("both", "Set down your pack as a second seat and invite her to rest.", [A("allUnlocked", -12)]),
     ]),
   scene("self-capricorn-bare-head", 1, "Capricorn",
-    "At the first frost, the hat maker removes your cap and studies the ridge it has pressed into your hair. “A second skull.” He warms a cloth beside the stove. His new caps sit firmly; the old one has a seam he keeps touching.", [
-      trade("cloth", "Accept the warm cloth against the pressed ridge.", [A("chosen", -12)]),
+    "At the first frost, the hat maker lifts your old cap and finds its hardened seam digging into your scalp. “A second skull.” He brings a warm cloth. Outside, sleet taps the window; the old cap pinches, and going bareheaded will be colder still.", [
+      trade("cloth", "Wrap your head in the borrowed cloth and cross the sleet without a cap.", [A("chosen", 12)]),
       trade("new", "Buy a cap that supports without pinching.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("old", "Put your familiar cap back on.", []),
-      joyChoice("seam", "Ask him to open the old seam before judging the fit.", [A("chosen", -36)]),
+      trade("old", "Put the hard old seam back against your head for the walk.", [A("chosen", 12)]),
+      joyChoice("seam", "Ask him to turn the old seam outward before judging the fit.", [A("chosen", -24)]),
     ]),
   scene("self-capricorn-slow-portrait", 1, "Capricorn",
     "The sculptor asks you to stand as you expect to stand in old age. She rejects the solemn pose. “That is acting.” She will pay for a long sitting, but keeps watching what you do between poses more closely than the poses themselves.", [
@@ -352,11 +352,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("exchange", "Take the second cloth and return her clean start.", [A("allUnlocked", -12)]),
     ]),
   scene("self-aquarius-measuring-line", 1, "Aquarius",
-    "The bath engineer has drawn a line for every bather's height. None quite matches yours. He offers to pay you to test the new shower; his assistant points out the basin already working perfectly below it. He adds another line before you answer.", [
-      trade("basin", "Buy a wash at the working basin.", [A("chosen", -36)], { cost: 24 }),
-      trade("test", "Stand through the jolting streams while he tests the shower.", [A("chosen", 24), L(96)]),
-      trade("wait", "Wait until he has finished adding lines.", []),
-      joyChoice("adjust", "Move the shower head to your height instead of moving yourself.", [G("chosen", "resolve", 12)]),
+    "The engineer opens the shower before checking which height mark you stand beneath. The stream strikes your shoulders in hard jolts. His assistant reaches for the valve and misses it. “One moment.” He offers a testing fee, while the working basin waits beyond the spray.", [
+      trade("basin", "Pay for a padded wrap and a supported rest at the working basin.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("test", "Stay beneath the jolting streams while he completes the test.", [A("chosen", 24), L(96)]),
+      trade("wait", "Push through the hard stream and wrestle the valve shut.", [A("chosen", 12)]),
+      joyChoice("adjust", "Turn the shower head toward the empty basin before stepping out.", [G("chosen", "resolve", 12)]),
     ]),
   scene("self-aquarius-no-title", 1, "Aquarius",
     "The attendant hangs your embroidered clothes beside everybody else's and offers a plain robe. “What shall we call you?” You glance at the covered embroidery. He shakes his head. “I can read that. I was asking you.”", [
@@ -386,11 +386,11 @@ export const HOUSE_01_SCENARIOS: NarrativeScenario[] = [
       joyChoice("follow", "Ask her to adjust the drip to the rhythm of your breathing.", [G("chosen", "luck", 12)]),
     ]),
   scene("self-pisces-footbath", 1, "Pisces",
-    "The ferryman has warmed a footbath for you. Each time you look toward the door, he pours in more water. “No hurry.” A fresh kettle begins to sing. He charges for a long treatment, but seems unable to recognize a short one ending.", [
-      trade("short", "Enjoy the first kettle and lift your feet out.", [A("chosen", -12)]),
-      trade("long", "Pay for his unhurried attention and stay.", [A("chosen", -36)], { cost: 24 }),
-      trade("leave", "Dry your feet and take your leave.", []),
-      joyChoice("limit", "Agree on one kettle before settling into the bath.", [G("chosen", "resolve", 12)]),
+    "The ferryman lifts your foot from the warm basin and finds a thorn beneath the softened skin. “That explains the limp.” He brings clean wrapping and his fine tweezers. The road outside is stony. His kettle sings while he waits for you to offer the foot again.", [
+      trade("short", "Pull the thorn free yourself and bear the sharp sting.", [A("chosen", 12)]),
+      trade("long", "Pay for careful removal and a firm protective foot wrap.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("leave", "Put your boot back on and take the thorn onto the stony road.", [A("chosen", 24)]),
+      joyChoice("limit", "Use the softened skin and the cloth's edge to ease the thorn out cleanly.", [A("chosen", -24)]),
     ]),
   scene("self-pisces-blurred-portrait", 1, "Pisces",
     "At the mill pool, the painter holds your finished portrait above your reflection. The water keeps changing its expression. “I got the chin right,” she says. A leaf crosses the reflected mouth. She lowers the picture to see what you are looking at.", [

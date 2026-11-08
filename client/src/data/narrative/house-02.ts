@@ -3,16 +3,15 @@ import { A, G, L, scene, trade } from "./shared";
 
 export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
   scene("livelihood-aries-first-loaf", 2, "Aries",
-    "The baker thrusts the first spring loaf toward you. “Cheap while it's hot. Once they smell it, I can ask more.” Behind him another tray is ready, and the boy carrying it has burnt through both cloths around the handles.", [
-      trade("heel", "Buy the hot heel and eat it on the step.", [A("chosen", -12)], { cost: 12 }),
-      trade("loaf", "Buy the loaf and make a full meal of it.", [A("chosen", -36)], { cost: 48 }),
-      trade("tray", "Carry the remaining hot trays for the boy's wages.", [A("chosen", 24), L(60)]),
-      trade("leave", "Leave before the smell brings the queue.", []),
+    "The first spring loaf is gone from your breakfast plate when the baker brings the bill. Its chalked price is still beside the oven. “Coins or a hand with the next batch.” His apprentice lifts a hot tray with two worn cloths and looks hopefully toward you.", [
+      trade("heel", "Pay the chalked breakfast price and put down the empty plate.", [], { cost: 24 }),
+      trade("loaf", "Clear and scrub the breakfast pans until the meal is paid for.", [A("chosen", 12)]),
+      trade("tray", "Carry the full hot batch for the breakfast and the remaining wages.", [A("chosen", 24), L(132)]),
     ]),
   scene("livelihood-aries-fleece", 2, "Aries",
     "The buyer weighs your first clipping with the dirt still in it. The shearer points to the steaming trough. “Wash it and she'll pay properly.” The buyer names both prices without looking offended. The washer will also do the job for a fee.", [
       trade("dirty", "Sell the clipping as it is.", [L(24)]),
-      trade("wash", "Wash and wring the heavy fleece yourself.", [A("chosen", 12), L(60)]),
+      trade("wash", "Wash and wring the heavy fleece yourself.", [A("chosen", 12), L(84)]),
       trade("washer", "Pay the washer and sell the cleaned fleece.", [L(60)], { cost: 24 }),
       trade("keep", "Take the fleece off the scales.", []),
     ]),
@@ -23,11 +22,10 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("return", "Close his hand around the coins and call the kindness paid.", []),
     ]),
   scene("livelihood-aries-coals", 2, "Aries",
-    "The foundry worker lets you take the charcoal fallen beside the furnace. The cold sweepings will sell for a little. Larger pieces lie farther in, where the ground still gives off heat. He lends you a shovel and points out where his own boots stop.", [
-      trade("sweepings", "Gather the cold sweepings at the edge.", [L(12)]),
-      trade("pieces", "Kneel near the heat and reach the larger pieces.", [A("chosen", 12), L(36)]),
-      trade("haul", "Work the full stretch with the shovel.", [A("chosen", 24), L(72)]),
-      trade("leave", "Hand the shovel back.", []),
+    "The furnace opens as you reach the charcoal heap, blowing hot grit into your boots. The worker points to a clear patch beyond the shovel. “Empty them there.” Larger pieces still glow farther in; he names the price he will pay for raking them clear before they burn away.", [
+      trade("sweepings", "Cross to the clear patch and shake the hot grit from your boots.", [A("chosen", 12)]),
+      trade("pieces", "Rake the near pieces clear through the heat for his payment.", [A("chosen", 24), L(120)]),
+      trade("haul", "Work the whole glowing heap with the shovel for the full salvage price.", [A("chosen", 36), L(180)]),
     ]),
   scene("livelihood-aries-new-tongs", 2, "Aries",
     "The smith has made spring tongs that nobody can close twice. She offers a demonstration fee, then catches you testing the handles. “Practice on the bench if you prefer. Less money for you, less embarrassment for my apprentice.” The apprentice brings the bench.", [
@@ -36,10 +34,11 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("leave", "Let the apprentice reclaim the tongs.", []),
     ]),
   scene("livelihood-taurus-cheese", 2, "Taurus",
-    "The cheesemaker cuts the heel from an aged wheel and offers it to you. The whole round must still reach her scales. “Eat, or earn,” she says. “If you carry it first, I cannot promise the heel will still be here.”", [
-      trade("heel", "Eat the offered heel while it is yours.", [A("chosen", -12)]),
-      trade("carry", "Carry the heavy round to the scales for a share of its sale.", [A("chosen", 24), L(60)]),
-      trade("portion", "Buy enough of the aged cheese for a proper meal.", [A("chosen", -24)], { cost: 36 }),
+    "The cheesemaker's cellar is deeper than its little door suggests. You reach the bottom as she winds up the delivery cradle. “I can send you back with it.” The narrow ladder bows against the wall; her heaviest wheel waits below, with a carrying fee chalked on its cloth.", [
+      trade("heel", "Climb the long, awkward ladder back to the shop.", [A("chosen", 12)]),
+      trade("carry", "Shoulder the heavy wheel up the ladder for its carrying fee.", [A("chosen", 36), L(168)]),
+      trade("portion", "Pay to ride the delivery cradle up with a portion of cheese.", [A("chosen", -36)], { cost: 48 }),
+      trade("cradle", "Pay for the cradle to lift you back without a meal.", [], { cost: 24 }),
     ]),
   scene("livelihood-taurus-good-bowl", 2, "Taurus",
     "The potter turns your cracked bowl over. Its clay would mend three others; she offers to buy it. Or she can patch it for your supper here. The grinding stone is free to use, if you want to make the patch yourself.", [
@@ -56,15 +55,15 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
     ]),
   scene("livelihood-taurus-full-larder", 2, "Taurus",
     "The cook owes you supper. New milk arrives tonight, and her larder still holds yesterday's cream. She offers a rich plate alone, simple portions to share, or the meal's price in coins. “Choose before I have to put another shelf in.”", [
-      trade("rich", "Take the rich plate and eat at her table.", [A("chosen", -24)]),
+      trade("rich", "Take the rich plate and eat at her table.", [A("chosen", -36)]),
       trade("shared", "Have her divide the simple food for sharing.", [A("allUnlocked", -12)]),
-      trade("coins", "Take the price of the supper in coins.", [L(24)]),
+      trade("coins", "Take the price of the supper in coins.", [L(48)]),
     ]),
   scene("livelihood-taurus-worn-handle", 2, "Taurus",
-    "The tool seller watches your hand settle around a worn handle. His bright new ones remain untouched. He offers a small fee if you will demonstrate the difference, or his harder grip exercise if you want something besides money from the visit.", [
-      trade("show", "Work the handle long enough to show his customers.", [A("chosen", 12), L(36)]),
-      trade("grip", "Take the harder grip exercise instead of the fee.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("drink", "Accept the drink he sets beside the old tools.", [A("chosen", -12)]),
+    "The handle of your basket cracks on the tool seller's counter. You catch the load before it reaches your foot. He brings a replacement and his winding cord. “That one fitted your hand, didn't it?” Your fingers are still holding the broken edges together above the basket's weight.", [
+      trade("show", "Lower the heavy basket carefully and carry it onward by its rough rim.", [A("chosen", 24)]),
+      trade("grip", "Bind a new grip yourself, working the stiff cord through aching fingers.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+      trade("drink", "Pay him to fit a supported handle and carry the basket comfortably.", [G("chosen", "resolve", 24)], { cost: 48 }),
     ]),
   scene("livelihood-gemini-two-purses", 2, "Gemini",
     "The money changer pays your commission from one purse, answers a customer, and pays you again from the other. Both purses snap shut. She looks up for your farewell. A sign above her head says every transaction is counted twice.", [
@@ -73,23 +72,23 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("cancel", "Return both payments and withdraw from the exchange.", []),
     ]),
   scene("livelihood-gemini-mixed-lot", 2, "Gemini",
-    "The seller has tied soothing herbs and sharp scented ones into identical bundles. His companion identifies them by touch while wrapping purchases with her other hand. “He likes a surprise,” she says. “Customers generally prefer knowing what they are rubbing on themselves.”", [
-      trade("soothing", "Buy the soothing preparation she picks out.", [A("chosen", -24)], { cost: 48 }),
-      trade("sharp", "Buy the sharp rub and work it into your arms.", [G("chosen", "affliction", 12)], { cost: 48 }),
-      trade("sort", "Sort and retie the stock until your fingers ache.", [A("chosen", 12), L(24)]),
-      trade("leave", "Leave the bundles with their two experts.", []),
+    "The herb seller's sample burns sharply on your wrists. His companion picks up its twin bundle and sniffs. “You exchanged the labels.” She brings wash water and a prepared dressing. The rest of the stock lies in identical knots; the seller offers a sorting fee while she uncorks the wash.", [
+      trade("soothing", "Pay for the protective dressing after she washes the sharp rub away.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("sharp", "Scrub the sharp preparation off with water and bear the raw skin.", [A("chosen", 12)]),
+      trade("sort", "Work through the sharp bundles with sore hands for the sorting fee.", [A("chosen", 36), L(156)]),
     ]),
   scene("livelihood-gemini-songs-for-supper", 2, "Gemini",
     "The innkeeper offers supper for one song or coins for three. Her son says your speaking voice already counts. “Then he can speak through supper,” she says, filling a cup. A fiddle rests against the bench, but she leaves the choice of song to you.", [
       trade("song", "Sing one song and take your supper.", [A("chosen", -24)]),
-      trade("three", "Sing the full set for coins, through a tiring last verse.", [A("chosen", 24), L(72)]),
+      trade("three", "Sing the full set for coins, through a tiring last verse.", [A("chosen", 24), L(120)]),
       trade("cup", "Take the cup and listen to somebody else.", [A("chosen", -12)]),
     ]),
   scene("livelihood-gemini-travel-chest", 2, "Gemini",
-    "The broker admires your empty travel chest. The carpenter beside him admires its hinges. Their offers differ more than you expected. The carpenter will pay more, but only if you help prise the fittings loose; the broker keeps a hand on the undamaged lid.", [
-      trade("whole", "Sell the chest whole to the broker.", [L(24)]),
-      trade("hinges", "Prise off the stiff hinges and sell them separately.", [A("chosen", 12), L(60)]),
-      trade("refuse", "Close the chest and refuse both offers.", []),
+    "Your travel chest jams sideways on the broker's steep stair. Its handle has come away in your hand. The carpenter below admires its hinges and offers more than the broker, provided you help free them. A porter waits above with a lifting strap and his own price.", [
+      trade("whole", "Drag the chest down the narrow stair and sell it whole.", [A("chosen", 24), L(96)]),
+      trade("hinges", "Brace the chest while prising off its stiff fittings for the larger sale.", [A("chosen", 36), L(168)]),
+      trade("refuse", "Squeeze past the wedged chest and leave the sale behind.", [A("chosen", 12)]),
+      trade("porter", "Pay the porter to free the chest and clear your passage.", [], { cost: 36 }),
     ]),
   scene("livelihood-gemini-trade-language", 2, "Gemini",
     "The merchant hears her market call in your accent and pays attention. She will pay coins to hear it again, or teach you the answering calls. “That one means the price is absurd,” she says, pointing toward a remarkably cheerful customer.", [
@@ -98,17 +97,17 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("lesson", "Pay for the full lesson and practice both sides of the bargaining.", [G("chosen", "luck", 24)], { cost: 48 }),
     ]),
   scene("livelihood-cancer-saved-supper", 2, "Cancer",
-    "The tavern keeper has saved the portion you like. With the ferry late, she could sell it twice over. “Buy it, or bring in the replacement sack before my cook sees.” She sets out a little broth anyway. “That part doesn't require negotiations.”", [
-      trade("buy", "Buy the supper she kept for you.", [A("chosen", -36)], { cost: 48 }),
-      trade("sack", "Carry in the heavy sack, then eat your supper.", [A("chosen", 12), A("chosen", -36)]),
-      trade("broth", "Drink the broth and let her sell the portion.", [A("chosen", -12)]),
+    "The tavern keeper has served the supper you reserved while the ferry ran late. You put down the empty bowl as she brings its bill. “Same price as always.” Her cook points to the replacement sacks outside; the larger delivery comes with wages after the meal is settled.", [
+      trade("buy", "Pay for the reserved supper you have eaten.", [], { cost: 36 }),
+      trade("sack", "Carry in the replacement sack to settle the supper.", [A("chosen", 12)]),
+      trade("broth", "Unload the full delivery for the supper and the remaining wages.", [A("chosen", 36), L(156)]),
     ]),
   scene("livelihood-cancer-grain-boat", 2, "Cancer",
-    "The grain merchant offers a cheap bowl from the boat's cooking pot before unloading begins. Then he looks at the waterline. “Or I could pay you to make us lighter.” The sacks nearest the bank are dry. Those farther in have swollen with river water.", [
-      trade("bowl", "Buy a bowl and eat on the bank.", [A("chosen", -12)], { cost: 24 }),
-      trade("dry", "Unload the dry sacks nearest the bank.", [A("chosen", 12), L(36)]),
-      trade("wet", "Haul the heavy wet sacks out of the hold.", [A("chosen", 24), L(72)]),
-      trade("leave", "Leave the boat to its crew.", []),
+    "The grain boat settles into river mud while you stand beside its cooking pot. The gangplank no longer reaches the bank. “Too much grain,” says the merchant. A skiff circles the stern; he will pay well for clearing the swollen sacks before the next rise of water.", [
+      trade("bowl", "Pay the skiff to take you from the stranded boat to the bank.", [], { cost: 36 }),
+      trade("dry", "Wade ashore through the sucking river mud.", [A("chosen", 24)]),
+      trade("wet", "Haul the wet sacks into the skiff for the merchant's full salvage fee.", [A("chosen", 48), L(192)]),
+      trade("leave", "Climb the mooring rope to the bank without taking cargo.", [A("chosen", 12)]),
     ]),
   scene("livelihood-cancer-copper-cup", 2, "Cancer",
     "The brewer brings back the copper cup you left in her keeping. There is a dent where your thumb naturally rests. She offers its full price, looking more troubled than the damage warrants. Your usual drink waits beside the coins, untouched.", [
@@ -120,7 +119,7 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
     "The provisioner opens the jar she keeps for unexpected guests. There are cakes inside and coins underneath. “Either is useful when you weren't expected.” A heavier jar needs lifting back onto its shelf; she offers a larger share if you will manage it.", [
       trade("cakes", "Eat the cakes from the open jar.", [A("chosen", -24)]),
       trade("coins", "Take the coins reserved beneath them.", [L(36)]),
-      trade("lift", "Lift the heavy jar back into place for the larger share.", [A("chosen", 12), L(60)]),
+      trade("lift", "Lift the heavy jar back into place for the larger share.", [A("chosen", 12), L(84)]),
     ]),
   scene("livelihood-cancer-kept-earnings", 2, "Cancer",
     "The boatwoman returns the earnings she kept for you. A few extra coins remain when you finish counting. “Must have been there before.” She will not meet your eyes. Across the landing, the rest house has begun warming its benches for the evening.", [
@@ -135,15 +134,15 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("taste", "Accept the small cooked taste on his knife.", [A("chosen", -12)]),
     ]),
   scene("livelihood-leo-gold-chain", 2, "Leo",
-    "The jeweler weighs your ceremonial chain, then names a handsome price for the gold. Its links are hollow; its clasp has been rubbing your neck. “It will still look splendid repaired,” she says quietly. She leaves the coins where you can see them.", [
-      trade("sell", "Sell the chain for the gold it contains.", [L(60)]),
-      trade("repair", "Pay for the clasp repair and rest while she works.", [A("chosen", -24)], { cost: 36 }),
-      trade("keep", "Take the chain off the scales and keep it as it is.", []),
+    "The jeweler tries your ceremonial chain's stiff clasp, and it snaps shut against your neck. She puts down the scales. “Don't pull.” Her fine cutters are ready; a new clasp can preserve the chain, while the gold buyer will pay for the links once she has separated them.", [
+      trade("sell", "Hold the chain taut through the painful cutting and sell its gold.", [A("chosen", 24), L(132)]),
+      trade("repair", "Pay for the careful release and a supporting clasp fitted to you.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("keep", "Work the stiff clasp loose yourself, scraping your neck as it opens.", [A("chosen", 12)]),
     ]),
   scene("livelihood-leo-prize-fruit", 2, "Leo",
     "The grower ties a ribbon around the melon you have bought. As you reach for the knife, he puts the cushion back beneath it. “I hoped you'd leave it whole.” He offers your money back if it can remain his stall's showpiece.", [
       trade("cut", "Cut your prize now and eat it while it is at its best.", [A("chosen", -36)]),
-      trade("display", "Take the refund and leave the melon whole on his cushion.", [L(36)]),
+      trade("display", "Take the refund and leave the melon whole on his cushion.", [L(60)]),
       trade("share", "Cut the prize into portions for the people waiting beside you.", [A("allUnlocked", -12)]),
       trade("gift", "Leave him the showpiece without taking the refund.", []),
     ]),
@@ -154,11 +153,10 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("quiet", "Ask for the wages quietly, without the gratuity.", [L(48)]),
     ]),
   scene("livelihood-leo-summer-ice", 2, "Leo",
-    "The ice seller lifts the insulating cloth for every customer, though the summer heat takes a little more each time. He offers a cold compress, cheaper shade and water, or wages for moving the chest under the awning. He lifts the cloth for you.", [
-      trade("ice", "Buy the cold compress while the ice lasts.", [A("chosen", -36)], { cost: 60 }),
-      trade("shade", "Buy shade and water to share beneath the awning.", [A("allUnlocked", -12)], { cost: 36 }),
-      trade("chest", "Move the heavy insulated chest for his wages.", [A("chosen", 24), L(60)]),
-      trade("leave", "Ask him to cover the ice and leave.", []),
+    "The summer street rises steeply beyond the ice stall, with no shade until the ridge. You arrive hot and shaking. The seller covers his last block and offers a place on his cooled cart. He also needs the heavy chest pushed uphill, and names a generous carrying wage.", [
+      trade("ice", "Buy the cooled cart ride and a firm resting place beneath its awning.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("shade", "Walk the steep, sun-struck street under your own strength.", [A("chosen", 24)]),
+      trade("chest", "Push the loaded ice chest up the hot slope for the full wage.", [A("chosen", 36), L(168)]),
     ]),
   scene("livelihood-virgo-short-weight", 2, "Virgo",
     "The roasted-grain seller has discovered a false bottom in her measuring scoop. She lays your missing portion beside its price in coins. “I've been calling that a full measure all week.” Her new scoop is conspicuously larger than the old one.", [
@@ -168,15 +166,14 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
   scene("livelihood-virgo-unclaimed-pay", 2, "Virgo",
     "The clerk has found a small error in your old wages. He sets out the exact coins and a larger fee for checking the rest of today's tallies. Through the adjoining door, the bath keeper is calling the last quiet hour.", [
       trade("owed", "Collect the amount you were owed.", [L(24)]),
-      trade("count", "Bend over the tallies until every remaining entry balances.", [A("chosen", 24), L(72)]),
+      trade("count", "Bend over the tallies until every remaining entry balances.", [A("chosen", 24), L(120)]),
       trade("bath", "Use the refund for the bath's quiet hour.", [A("chosen", -24)]),
     ]),
   scene("livelihood-virgo-leftovers", 2, "Virgo",
-    "The cook has labeled every remaining dish with the hour it must be eaten. She offers one filling plate or several lighter portions for the same price. Another label reads “table cleared,” with a small wage beneath it. She begins crossing out the hours.", [
-      trade("plate", "Buy the filling plate before its hour passes.", [A("chosen", -24)], { cost: 36 }),
-      trade("portions", "Buy the lighter portions for sharing.", [A("allUnlocked", -12)], { cost: 36 }),
-      trade("clear", "Clear and scrub the table for the posted wage.", [A("chosen", 12), L(24)]),
-      trade("leave", "Leave her to mark the remaining dishes.", []),
+    "The cook clears your empty plate and checks the hour written beside it. The supper price is precise; so is the washing allowance beneath it. “You can settle either way.” Several heavy serving pots remain, with an extra wage posted for cleaning the whole set before closing.", [
+      trade("plate", "Pay the posted price for the supper already eaten.", [], { cost: 24 }),
+      trade("portions", "Wash your share of the heavy pans to settle the meal.", [A("chosen", 12)]),
+      trade("clear", "Scrub the entire serving set for the meal and the extra wage.", [A("chosen", 24), L(120)]),
     ]),
   scene("livelihood-virgo-unravel", 2, "Virgo",
     "The cloth merchant will buy the thread from your unfinished sleeve. Cut loose, it brings very little. Unwound carefully, it is worth more. She shows you the first loop, then sets the sleeve beside the shears and waits to see what your hands choose.", [
@@ -186,17 +183,16 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("keep", "Keep the unfinished sleeve.", []),
     ]),
   scene("livelihood-virgo-blunt-knife", 2, "Virgo",
-    "The repairer weighs your blunt knife for scrap, then tries one stroke against his stone. A clean edge appears. He names a price for teaching the stroke with his guided tool. The ordinary stone is free, if your arms can do the work.", [
-      trade("scrap", "Sell the knife for its metal.", [L(24)]),
-      trade("guided", "Pay to learn the sharpening stroke with his guide.", [G("chosen", "affliction", 12)], { cost: 48 }),
-      trade("stone", "Work at the stone until you can repeat the stroke yourself.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("keep", "Take the knife away as it is.", []),
+    "Your knife slips as the repairer tests its blunt edge. You catch the handle against your palm. He sets down a clean bandage and his guided sharpening tool. “A dull edge needs too much force.” His demonstration fee is still chalked beside the ordinary stone.", [
+      trade("scrap", "Pull the handle free and bind the bruised palm yourself.", [A("chosen", 12)]),
+      trade("guided", "Pay for a firm hand wrap and learn the safer guided stroke.", [G("chosen", "resolve", 12), G("chosen", "affliction", 12)], { cost: 48 }),
+      trade("stone", "Work the knife through the long sharpening demonstration for his fee.", [A("chosen", 24), L(132)]),
     ]),
   scene("livelihood-libra-split-loaf", 2, "Libra",
-    "The seller cuts a loaf into equal halves. Almost every raisin lands in one. She weighs them again, offended on behalf of her scales. “Same weight, same price?” Behind you, two children are dividing a plain roll with much less equipment.", [
-      trade("raisins", "Buy the rich half and eat it yourself.", [A("chosen", -24)], { cost: 36 }),
-      trade("plain", "Buy the plain half and cut it into portions to share.", [A("allUnlocked", -12)], { cost: 36 }),
-      trade("crumb", "Accept the small taste she cut off before weighing.", [A("chosen", -12)]),
+    "The seller brings your bread bill after you finish the two uneven halves. “Same weight,” she says, though almost every raisin was on one side. You have eaten both, so that argument is over. She offers to count labor against the bill; a large dough batch waits nearby.", [
+      trade("raisins", "Pay the weighed price for both halves.", [], { cost: 24 }),
+      trade("plain", "Work an agreed share of the stiff dough to settle the bill.", [A("chosen", 12)]),
+      trade("crumb", "Knead the whole heavy batch for your breakfast and its remaining wage.", [A("chosen", 24), L(120)]),
     ]),
   scene("livelihood-libra-tasting", 2, "Libra",
     "The vintners pour their autumn wines at exactly the same moment. Each offers drink or coins for your judgment. Each watches the other's measure. When you ask what distinguishes them, both begin answering, then stop to hear which difference the other will name.", [
@@ -206,15 +202,15 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
     ]),
   scene("livelihood-libra-fee", 2, "Libra",
     "You point across the street to the owner of a purse. The broker offers you half the reward. She has kept the purse safe all winter. “You found him,” she says. You are still close enough to touch the place where you were standing.", [
-      trade("half", "Accept the half she offers.", [L(48)]),
+      trade("half", "Accept the half she offers.", [L(60)]),
       trade("share", "Take a smaller share for the moment's help.", [L(24)]),
       trade("hers", "Leave the whole reward with her.", []),
     ]),
   scene("livelihood-libra-counterweight", 2, "Libra",
-    "The weighmaster balances your employer's payment against an honest set of weights. It comes up short. Your employer offers the difference in coins or supper and rest in his booth. He would prefer a smaller settlement; the weighmaster leaves both scales uncovered.", [
-      trade("balance", "Collect the full balance owed.", [L(36)]),
-      trade("care", "Accept supper and rest instead of the missing money.", [A("chosen", -24)]),
-      trade("settle", "Take the smaller settlement and end the argument.", [L(12)]),
+    "The weighmaster's counterweight sinks as you stand on the goods platform. Your payment rests on the table above. “The brake,” he says, bracing its lever. The repairer names a fee; a rope ladder hangs beside you. He will add a salvage payment if you lift the trapped goods too.", [
+      trade("balance", "Climb the swaying ladder and collect the payment above.", [A("chosen", 24), L(96)]),
+      trade("care", "Pay for the brake repair and a safe lift back to the table.", [], { cost: 36 }),
+      trade("settle", "Haul the trapped goods up with you for the full payment and salvage fee.", [A("chosen", 36), L(168)]),
     ]),
   scene("livelihood-libra-third-plate", 2, "Libra",
     "The market cook has made two beautiful plates and a third from their generous trimmings. “Elegance, or enough to share?” An impatient customer offers coins for your place in the queue. The cook keeps the third plate within reach, lest somebody mistake it for waste.", [
@@ -229,23 +225,22 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("mend", "Use the found coins for mending and a rest while she works.", [A("chosen", -24)]),
     ]),
   scene("livelihood-scorpio-cellar-cask", 2, "Scorpio",
-    "The vintner points out the dark patch beneath a cellar cask before his customers arrive. He will pay for turning the leak upward, more for hauling the whole cask clear. “I would rather they tasted it in a glass.” He sets one on the table.", [
-      trade("turn", "Brace the cask and turn the leaking stave upward.", [A("chosen", 12), L(36)]),
-      trade("move", "Haul the heavy cask clear of the damp place.", [A("chosen", 24), L(72)]),
-      trade("glass", "Buy a glass and rest at the cellar table.", [A("chosen", -24)], { cost: 48 }),
-      trade("leave", "Leave before the customers arrive.", []),
+    "The cellar cask shifts against the door as you step inside. Wine runs beneath your boots. The vintner braces it with his shoulder. “I would rather they tasted it in a glass.” The side hatch is narrow; he offers the full salvage fee if you can empty the cask safely.", [
+      trade("turn", "Squeeze through the narrow side hatch and leave the cask to him.", [A("chosen", 12)]),
+      trade("move", "Brace and drain the heavy cask into fresh vessels for the full fee.", [A("chosen", 36), L(168)]),
+      trade("glass", "Pay for the outside porter to lift the cask away from the door.", [], { cost: 36 }),
     ]),
   scene("livelihood-scorpio-hidden-change", 2, "Scorpio",
     "The money keeper catches you at the door with a coin that stuck beneath her tray. You had not noticed it missing. “Supper, if you'd rather,” she says, nodding to the pot beside her stove. The smell suggests she has been waiting to eat too.", [
       trade("coin", "Take the missing coin.", [L(12)]),
       trade("supper", "Accept a little supper in its place.", [A("chosen", -12)]),
-      trade("full", "Add your own payment for a full meal by the stove.", [A("chosen", -36)], { cost: 36 }),
+      trade("full", "Add your own payment for a full meal by the stove.", [A("chosen", -48)], { cost: 36 }),
     ]),
   scene("livelihood-scorpio-root-basket", 2, "Scorpio",
-    "The gardener's roots look like things nobody meant to eat. She watches you look, then pushes over a cooked taste. “The faces people make before the first mouthful.” The remaining bed needs digging; she will pay anyone who appreciates the roots enough to fetch them.", [
-      trade("taste", "Eat the offered taste and give it your attention.", [A("chosen", -12)]),
-      trade("bowl", "Buy a full bowl of the slow-cooked roots.", [A("chosen", -36)], { cost: 48 }),
-      trade("dig", "Dig the remaining roots from the heavy soil.", [A("chosen", 24), L(60)]),
+    "The garden path gives beneath your boot beside the root bed. The gardener lays a plank across the mud. “It looked firm to me too.” Her heavy baskets stand beyond it; she offers their carrying wage, or the use of her wheeled frame for its usual hire.", [
+      trade("taste", "Pull your feet free and work back across the sucking mud.", [A("chosen", 12)]),
+      trade("bowl", "Hire the frame to carry you and your load back over the soft ground.", [], { cost: 24 }),
+      trade("dig", "Haul her loaded root baskets back with you for the full carrying wage.", [A("chosen", 36), L(156)]),
     ]),
   scene("livelihood-scorpio-old-price", 2, "Scorpio",
     "The trader remembers the price she promised for your clasp, although nobody pays that much now. Its hard spring still snaps shut beneath your thumb. She counts the old amount exactly, then waits. The sign behind her gives today's lower price in large clear figures.", [
@@ -256,20 +251,20 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
   scene("livelihood-sagittarius-overfilled", 2, "Sagittarius",
     "The provisioner adds another piece of food when she hears you are going toward the hills. “That parcel looked lonely.” She offers a proper meal for a price, but the extras are already yours. Her assistant starts wrapping them into smaller portions before she can add more.", [
       trade("gift", "Eat the modest parcel she has given you.", [A("chosen", -24)]),
-      trade("meal", "Pay for the full meal before heading toward the hills.", [A("chosen", -48)], { cost: 60 }),
+      trade("meal", "Pay for the full meal before heading toward the hills.", [A("chosen", -60)], { cost: 60 }),
       trade("share", "Share the extra food in smaller portions.", [A("allUnlocked", -12)]),
     ]),
   scene("livelihood-sagittarius-borrowed-saddle", 2, "Sagittarius",
-    "You ask the price of the fine saddle. The groom laughs and puts it on the practice horse. “Borrowing does everything buying would do today.” He charges to adjust it for a full exercise, or pays riders who will work the horse bareback.", [
-      trade("borrow", "Use the borrowed saddle for a few easy circuits.", [A("chosen", -12)]),
-      trade("fit", "Pay for the adjusted saddle and supported exercise.", [G("chosen", "resolve", 12)], { cost: 48 }),
-      trade("bareback", "Work the practice horse bareback for his fee.", [A("chosen", 24), L(60)]),
+    "The borrowed saddle rolls sideways as the practice horse starts uphill. The groom catches its bridle. “Borrowing did everything buying would do, until that.” He holds out a sound girth at its price. The horse still needs exercise; he will pay well if you finish the circuit bareback.", [
+      trade("borrow", "Slide down from the twisted saddle and land heavily on your feet.", [A("chosen", 12)]),
+      trade("fit", "Pay for the sound girth and finish the supported riding exercise.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("bareback", "Work the horse through the long uphill circuit bareback for his fee.", [A("chosen", 36), L(168)]),
     ]),
   scene("livelihood-sagittarius-foreign-spice", 2, "Sagittarius",
-    "The spice seller's account of his stew reaches another port, and he offers you another taste. His traveling chest still blocks the doorway. “That came all the way with me.” He will pay to have it carried inside, though the story might come with it.", [
-      trade("taste", "Take the offered portion and hear about the next port.", [A("chosen", -12)]),
-      trade("bowl", "Buy a full bowl and settle in for the story.", [A("chosen", -36)], { cost: 48 }),
-      trade("chest", "Carry the heavy chest inside for his payment.", [A("chosen", 24), L(72)]),
+    "The seller's generous taste of stew catches fire in your mouth. He stops halfway through naming its distant port. “Too much of that one.” The milk seller sets out her price; his heavy spice chest still blocks the way to her stall, and he offers its carrying wage.", [
+      trade("taste", "Drink plain water and wait through the fierce sting.", [A("chosen", 12)]),
+      trade("bowl", "Buy the milk seller's cooling portion and let the burning subside.", [], { cost: 24 }),
+      trade("chest", "Carry the heavy spice chest across the market for the seller's wage.", [A("chosen", 24), L(132)]),
     ]),
   scene("livelihood-sagittarius-extra-share", 2, "Sagittarius",
     "The wood seller pays you a bonus at each end of his stall. “That was one job,” his assistant objects. “I know,” says the seller, paying the second share anyway. He has had an excellent day and is selling bundles for the evening fire.", [
@@ -284,10 +279,10 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("sign", "Tell him to write both truths and accept the soup sample.", [A("chosen", -12)]),
     ]),
   scene("livelihood-capricorn-last-sack", 2, "Capricorn",
-    "The baker has kept the oldest flour for her own supper. “Still good. Merely unfashionable.” She offers you a small portion before opening the winter store. The richer meal costs more; kneading the stiff new batch earns a wage and takes stronger arms than hers.", [
-      trade("portion", "Share a little of the supper she made for herself.", [A("chosen", -12)]),
-      trade("rich", "Buy the richer meal from the new flour.", [A("chosen", -36)], { cost: 48 }),
-      trade("knead", "Knead the heavy new batch for her wages.", [A("chosen", 24), L(60)]),
+    "The baker opens her last flour sack and its old seam gives. Dust rises around your face and coats the passage to the door. “Still good flour,” she coughs. Her spare face cloths have a price; saving the spilled winter stock earns considerably more than the usual kneading wage.", [
+      trade("portion", "Cover your mouth with your sleeve and make your way out through the dust.", [A("chosen", 12)]),
+      trade("rich", "Buy a close-fitting cloth and leave through the flour safely.", [], { cost: 24 }),
+      trade("knead", "Gather and sift the heavy spill for the winter-stock payment.", [A("chosen", 36), L(168)]),
     ]),
   scene("livelihood-capricorn-warm-stones", 2, "Capricorn",
     "The mason sells stones warmed beside her kiln. Seeing your hands, she lends you a small one without weighing it. A whole basket could warm the benches outside. “Those are for sale,” she says before you can mistake the first kindness for a new price.", [
@@ -296,16 +291,15 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
     ]),
   scene("livelihood-capricorn-reserve", 2, "Capricorn",
     "Your former employer has kept the last wages untouched through three winters. “I knew you'd come back.” He adds a small payment for the wait. The old booth is still cold, though the neighboring cook will bring a hot meal for the extra coins.", [
-      trade("whole", "Take the wages and the added payment.", [L(60)]),
+      trade("whole", "Take the wages and the added payment.", [L(72)]),
       trade("wages", "Collect only the wages you earned.", [L(48)]),
       trade("meal", "Spend the addition on a hot meal here and keep your wages.", [L(48), A("chosen", -12)]),
     ]),
   scene("livelihood-capricorn-old-tools", 2, "Capricorn",
-    "The smith finds his old mark on your tongs. A cooper waits beside a heap of bent hoops. “Those jaws would suit this job.” He offers a scrap price now, or a fee to use the tongs for this repair before returning them.", [
-      trade("scrap", "Sell the tools for their scrap value now.", [L(48)]),
-      trade("use", "Let him finish this repair with them, then take them back with his fee.", [L(24)]),
-      trade("together", "Work the stubborn hoops with him and learn the repair as you earn.", [A("chosen", 12), L(24), G("chosen", "affliction", 12)]),
-      trade("keep", "Take the tools away without a sale or a job.", []),
+    "Your old tongs clamp shut as the smith tests them on a bent hoop. The twisted handles have already bruised your palm through the glove. He reaches for a wedge. “I made that spring.” The cooper needs the hoop repaired now, and will pay well for hands willing to work through the remaining heat.", [
+      trade("scrap", "Slip off the glove, set the tongs down, and leave with your sore hand.", [A("chosen", 12)]),
+      trade("use", "Pay for a supporting hand wrap and a firm new grip fitted to the tongs.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("together", "Work the stubborn hoops through the heat for the cooper's payment.", [A("chosen", 24), L(108), G("chosen", "affliction", 12)]),
     ]),
   scene("livelihood-capricorn-holiday-crust", 2, "Capricorn",
     "For the winter holiday, the severe baker sells crusts for almost nothing. Every crust has a great deal of cake attached. You point this out. “A poor knife,” he says, cutting another generous failure. The knife goes cleanly through the loaf.", [
@@ -314,11 +308,10 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("crumb", "Accept the piece he leaves beside your hand.", [A("chosen", -12)]),
     ]),
   scene("livelihood-aquarius-same-price", 2, "Aquarius",
-    "The food seller charges the same price for every portion. Her new ladle produces several sizes, depending on which lever you press. “An engineer was being helpful.” She will pay you to test it through the pot, or serve whatever shape of meal you choose.", [
-      trade("large", "Buy one large portion.", [A("chosen", -24)], { cost: 36 }),
-      trade("small", "Buy several small portions for sharing.", [A("allUnlocked", -12)], { cost: 36 }),
-      trade("test", "Work the ladle through the full heavy pot for her fee.", [A("chosen", 12), L(36)]),
-      trade("leave", "Leave the levers to the next customer.", []),
+    "The ingenious ladle tips its heavy pot as you press the portion lever. You catch the stand against your hip. The seller stops discussing equal prices. Her assistant can brace it with a hired frame; she offers a generous fee if you can empty the pot without losing the meal.", [
+      trade("large", "Lower the heavy pot to the ground with your back braced against it.", [A("chosen", 12)]),
+      trade("small", "Pay for the frame to take the pot's weight off you.", [], { cost: 24 }),
+      trade("test", "Hold and empty the full pot into portions for the promised fee.", [A("chosen", 24), L(132)]),
     ]),
   scene("livelihood-aquarius-fountain-cup", 2, "Aquarius",
     "“The water is free. The hot drink is mine.” The fountain keeper repeats this whenever someone reaches across the wrong side of her stall. She offers you a clean cup, then notices the fuel basket is empty. The next hot pot needs someone to carry wood.", [
@@ -327,16 +320,15 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("fuel", "Carry the fuel from the yard for a wage.", [A("chosen", 12), L(36)]),
     ]),
   scene("livelihood-aquarius-glass-scraps", 2, "Aquarius",
-    "The glassmaker wants the clear pieces in your basket for lenses. Her neighbor will pay more for its colored scraps, which he weighs without looking through them. Neither wants the whole mixed lot. Sorting it for both would mean an afternoon bent over sharp edges.", [
-      trade("clear", "Sell the clear pieces to the glassmaker.", [L(24)]),
-      trade("colored", "Sell the colored pieces by weight to her neighbor.", [L(36)]),
-      trade("both", "Sort both lots carefully through the long afternoon.", [A("chosen", 24), L(84)]),
-      trade("keep", "Keep the mixed basket.", []),
+    "Your basket gives way over the glassmakers' sorting pit. A narrow rim is all that remains beneath your feet. One buyer brings a ladder, the other his padded lifting sling. Both still want the scraps below; separating the clear pieces from the colored ones would pay handsomely.", [
+      trade("clear", "Work your way along the narrow rim and climb the rough ladder.", [A("chosen", 12)]),
+      trade("colored", "Pay for the padded sling to lift you clear of the pit.", [], { cost: 36 }),
+      trade("both", "Sort the fallen glass through a long crouching shift for both buyers.", [A("chosen", 36), L(180)]),
     ]),
   scene("livelihood-aquarius-empty-crate", 2, "Aquarius",
     "The carrier's expensive lifting frame stands idle while he eats. He offers its counterweight for a supported exercise, or a small payment if you simply watch it. “Owning the thing hasn't taught it to guard itself.” A longer adjusted session has a stated fee.", [
       trade("try", "Try the supported exercise while the frame is free.", [G("chosen", "resolve", 12)]),
-      trade("adjust", "Pay for the longer session with the counterweight fitted to you.", [G("chosen", "resolve", 24)], { cost: 72 }),
+      trade("adjust", "Pay for the longer session with the counterweight fitted to you.", [G("chosen", "resolve", 24)], { cost: 48 }),
       trade("watch", "Watch the frame while he eats and take the small payment.", [L(24)]),
     ]),
   scene("livelihood-aquarius-winter-share", 2, "Aquarius",
@@ -349,13 +341,13 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
     "The fisher has cooked more than she can sell. “Everyone looked hungry when I started.” She offers supper, a fuller meal to share at a price, or wages for carrying the unsold catch indoors. The gulls have already understood how much is left.", [
       trade("supper", "Accept the supper she has cooked.", [A("chosen", -12)]),
       trade("share", "Buy the fuller meal for sharing.", [A("allUnlocked", -12)], { cost: 36 }),
-      trade("catch", "Carry the heavy unsold catch inside before the gulls reach it.", [A("chosen", 24), L(60)]),
+      trade("catch", "Carry the heavy unsold catch inside before the gulls reach it.", [A("chosen", 24), L(120)]),
     ]),
   scene("livelihood-pisces-two-nets", 2, "Pisces",
-    "The fisher rejects your torn net for swift water. His partner could still use it in her quiet pond. A scrap dealer offers more for the copper weights. The sound ropes lie coiled between them, strong enough for the fisher's own pulling exercise.", [
-      trade("copper", "Sell the net for its copper weights.", [L(48)]),
-      trade("pond", "Accept the smaller price and leave the net useful in the pond.", [L(24)]),
-      trade("ropes", "Practice the pull with its sound ropes, then leave it with the pair.", [G("chosen", "affliction", 12)]),
+    "The copper weights of your torn net slide into the pond, drawing its rope tight around your ankle. The fisher catches the other end. His partner brings shears. The scrap dealer still wants the weights; hauling them back through the mud would fetch much more than the rope alone.", [
+      trade("copper", "Haul the heavy weights back through the mud and sell the copper.", [A("chosen", 36), L(168)]),
+      trade("pond", "Work your ankle free while the fisher holds the wet net steady.", [A("chosen", 12)]),
+      trade("ropes", "Pay for a clean cut through the net and a firm wrap around the strained ankle.", [G("chosen", "resolve", 24)], { cost: 48 }),
     ]),
   scene("livelihood-pisces-soft-bread", 2, "Pisces",
     "The thaw has soaked the sanctuary baker's bread. She gives it away and charges for the soup that makes it good. Dry flour still waits in the cart, above the wet wheel rims. She offers wages to bring it in before the water rises farther.", [
@@ -370,10 +362,10 @@ export const HOUSE_02_SCENARIOS: NarrativeScenario[] = [
       trade("wash", "Use part for a wash together and keep the rest.", [L(12), A("allUnlocked", -12)]),
     ]),
   scene("livelihood-pisces-drifting-wood", 2, "Pisces",
-    "The miller lets you take fuel caught at his sluice. Loose twigs come away easily; heavier wood has wedged beneath the gate. A tired bird stands on the best branch. “Leave that one for now,” he asks, opening the door to his warm mill.", [
-      trade("loose", "Gather the loose driftwood for a small sale.", [L(12)]),
-      trade("careful", "Pull out the heavy wood while leaving the bird's branch.", [A("chosen", 24), L(60)]),
-      trade("all", "Take the whole heavy haul, including the branch it stands on.", [A("chosen", 24), L(84)]),
-      trade("fire", "Leave the wood and warm yourself at the miller's fire.", [A("chosen", -24)]),
+    "The sluice gate closes behind you while you stand on the driftwood ledge. The miller calls an apology from above. The return ladder is steep and slick; his hauling cradle has a price. A bird grips the best branch beside a heap he will pay to have lifted clear.", [
+      trade("loose", "Climb the slick ladder back to the mill yard.", [A("chosen", 12)]),
+      trade("careful", "Haul the heavy wood up while leaving the bird's branch in place.", [A("chosen", 24), L(120)]),
+      trade("all", "Lift the entire heap, including its branch, for the full salvage payment.", [A("chosen", 36), L(180)]),
+      trade("fire", "Pay to ride the hauling cradle back to the yard.", [], { cost: 24 }),
     ]),
 ];

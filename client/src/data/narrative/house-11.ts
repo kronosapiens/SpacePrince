@@ -17,11 +17,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("everyone", "Use the group's credit to fit the walkers whose old boots are hurting too.", [A("allUnlocked", -12)]),
     ]),
   scene("friendship-aries-start-now", 11, "Aries",
-    "The friends who talked through winter have finally gathered to build the common shed. The youngest has already dug a post hole inside the marked doorway. He looks up at you, delighted with his progress. The tool fund is open, and everyone is waiting to begin.", [
-      trade("dig", "Take the paid heavy digging and move the post hole.", [A("chosen", 24), L(96)]),
-      trade("tools", "Buy proper tools and practice setting a sound post with the builders.", [G("chosen", "resolve", 12)], { cost: 36 }),
-      trade("mark", "Help him mark the doorway before he digs farther.", []),
-      joyChoice("parts", "Give the eager volunteers a post each and raise the frame together.", [G("chosen", "resolve", 12), A("joy", -24)]),
+    "At the common shed, your foot slips into the youngest builder’s misplaced post hole. Your friends catch you beneath the arms. “I was going to mark it,” he says. The tool seller offers a lifting sling; the circle’s digging purse waits beside the half-finished doorway.", [
+      trade("dig", "Climb out and finish moving the misplaced post hole for the digging fee.", [A("chosen", 24), L(96)]),
+      trade("tools", "Hire the padded sling and let your friends lift you clear.", [], { cost: 24 }),
+      trade("mark", "Brace against the narrow hole and pull yourself up with their hands.", [A("chosen", 12)]),
+      joyChoice("parts", "Have the builders widen one side and take your weight together.", [A("chosen", -12), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-aries-practice-yard", 11, "Aries",
     "“You came when I could barely lift this.” Your companion holds up the practice weight, then points out a place she saved for you. She has hired the yard for everyone who encouraged her. Some visitors have come in work clothes; one has brought a folding chair.", [
@@ -52,11 +52,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("credit", "Use the group's credit to open the back table to the waiting friends.", [A("allUnlocked", -12)]),
     ]),
   scene("friendship-taurus-strong-rope", 11, "Taurus",
-    "The gardening circle gives you its soundest rope for the stone you offered to move. They remain standing beside it after you thank them. One rolls up her sleeves. The work purse is ready, but nobody seems eager to leave you alone with the stone.", [
-      trade("alone", "Move the heavy stone yourself and take the full work purse.", [A("chosen", 24), L(96)]),
-      trade("hire", "Pay for a winch and collect the work purse after moving it.", [L(96)], { cost: 60 }),
-      trade("wait", "Leave the stone until the circle is ready to work.", []),
-      joyChoice("hands", "Accept the hands they have already come to lend.", [A("joy", 12), L(72)]),
+    "The garden’s loose boundary stone rolls across the narrow lane as you enter with the circle. Everyone catches the rope before it can roll farther. Your hands burn against it. The winch seller opens his hire board; your friends point out the nearby hollow where it could safely settle.", [
+      trade("alone", "Haul the stone all the way into its bed for the garden’s repair fee.", [A("chosen", 24), L(96)]),
+      trade("hire", "Hire the winch to take the rope’s weight.", [], { cost: 24 }),
+      trade("wait", "Lower the stone into the hollow, taking the rope’s strain with the circle.", [A("chosen", 12)]),
+      joyChoice("hands", "Accept the practiced gardeners’ arrangement of short pulls and braced holds.", [L(48), A("joy", -12)]),
     ]),
   scene("friendship-taurus-quiet-song", 11, "Taurus",
     "Your friends have decided to welcome you quietly. The singer can no longer hear the accompaniment, and the accompanist has stopped to hear the singer. From your chair, you can hear both asking whether they have begun. A warm drink waits at your elbow.", [
@@ -122,11 +122,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("welcome", "Pull up another chair and ask her to stay at the table with you.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-cancer-high-tide", 11, "Cancer",
-    "Your friends have gathered their boats for the grain crossing. Each quietly removes a sack from yours. By the time you reach it, the boat rides almost empty. The keeper still offers you an equal share of the crossing pay, and nobody objects when he says it.", [
-      trade("light", "Accept the light boat and your offered share of the pay.", [L(24)]),
-      trade("heavy", "Take the heaviest load for the larger crossing payment.", [A("chosen", 24), L(96)]),
-      trade("shore", "Stay ashore and let the experienced crews cross.", []),
-      joyChoice("crossing", "Arrange one common crossing with each crew carrying what it can.", [L(48), A("joy", -12)]),
+    "Your friends have lightened your grain boat, but the rising tide pulls its boarding line tight around the landing post. You are halfway across, holding both sides. They reach from the boat. The harbor crew offers a hired bridge; the grain keeper offers wages for freeing the loaded boats.", [
+      trade("light", "Hire the harbor crew’s boarding bridge and cross safely.", [], { cost: 24 }),
+      trade("heavy", "Work the taut lines and free the loaded boats for the keeper’s fee.", [A("chosen", 24), L(96)]),
+      trade("shore", "Pull yourself back onto the landing while your friends steady the boat.", [A("chosen", 12)]),
+      joyChoice("crossing", "Have the neighboring crews slacken their lines together and bring the boat alongside.", [L(24), A("joy", -12)]),
     ]),
   scene("friendship-cancer-repaired-net", 11, "Cancer",
     "The fishing circle has mended your net during your absence. One knot remains loose in the corner where you used to begin. Your friend holds it out to you. She offers the sale money from today's shared catch, or an afternoon showing you the repairs they learned together.", [
@@ -150,11 +150,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("helpers", "Bring the first model's helpers into the places beside you.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-leo-big-banner", 11, "Leo",
-    "The club's new banner needs three poles. Its maker points to the largest letters, where your name has been fitted among the others. “Room for everyone.” The treasurer offers a fee for the heavy center pole; the smaller poles have already attracted more volunteers than they need.", [
-      trade("center", "Carry the heavy center pole through the club's procession.", [A("chosen", 24), L(96)]),
-      trade("bearers", "Hire extra bearers and collect the fee after their work.", [L(96)], { cost: 60 }),
-      trade("watch", "Watch the banner rise from beside the makers.", []),
-      joyChoice("club", "Spread the poles through the willing club and walk beneath it together.", [L(48), A("allUnlocked", -12)]),
+    "The club’s new banner needs three poles. You take the center one as its maker points out your name among the others. The weight settles hard across your shoulder. A carrier offers his padded frame; the treasurer names the fee for the whole procession while your friends steady the side poles.", [
+      trade("center", "Bear the center pole through the procession for the full fee.", [A("chosen", 24), L(96)]),
+      trade("bearers", "Hire the carrier’s frame to relieve your shoulder.", [], { cost: 24 }),
+      trade("watch", "Lower the center pole carefully and step out with its short carrying ache.", [A("chosen", 12)]),
+      joyChoice("club", "Ask the willing members to rotate the center pole while you share the lighter sides.", [L(48), A("allUnlocked", -12)]),
     ]),
   scene("friendship-leo-front-row", 11, "Leo",
     "Your performing friend has saved the best seat for you. She points out the person who paid for her first lesson, then looks at the empty place beside yours. The usher is waiting to sell it. Your friend has to go onstage before she can finish asking.", [
@@ -185,11 +185,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("circle", "Name the need that the whole willing circle could meet together.", [A("chosen", -36), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-virgo-spare-tools", 11, "Virgo",
-    "Every borrowed tool at the repair circle has a name tied to it except the little awl everyone uses. You ask whose it is. Five people point to the same quiet woman. She slides it toward you, then shows you the paid repairs and the practice scraps.", [
-      trade("practice", "Practice her careful repair on a scrap.", [G("chosen", "luck", 12)]),
-      trade("shift", "Work through the heavy stack of repairs for the circle's fee.", [A("chosen", 24), L(96)]),
-      trade("return", "Pass the awl to the next waiting hand.", []),
-      joyChoice("share", "Arrange the repairs so the shared awl keeps every pair of hands working.", [G("joy", "luck", 12), L(48)]),
+    "At the repair circle, the little shared awl cramps your hand before the first seam is finished. Its quiet owner loosens your grip and sets down the practice scraps. A visiting hand tender offers a treatment. The circle still has its paid stack of repairs beside the bench.", [
+      trade("practice", "Buy the hand treatment and learn the owner’s looser grip afterward.", [G("chosen", "luck", 12)], { cost: 24 }),
+      trade("shift", "Finish the paid stack despite the strain in your hand.", [A("chosen", 24), L(96)]),
+      trade("return", "Pass the awl back and leave the work with your hand still cramped.", [A("chosen", 12)]),
+      joyChoice("share", "Accept the circle’s spare padded handle and let them ease your fingers before trying again.", [G("joy", "luck", 12), A("chosen", -12)]),
     ]),
   scene("friendship-virgo-clean-sheets", 11, "Virgo",
     "The friends preparing your resting room disagree about how the sheets should fold. One bed is ready; every other mattress is bare. You find them demonstrating rival corners on the same pillow. At your arrival, both finally put it down and ask where you want to lie.", [
@@ -227,11 +227,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("ask", "Use the circle's unspent balance to include the member still waiting outside.", [A("allUnlocked", -12)]),
     ]),
   scene("friendship-libra-paired-tables", 11, "Libra",
-    "Two circles supporting the same work have arranged separate welcome tables for you. Each host assures you the other will understand if you sit here. The food is cooling. Between the tables, the porters have left just enough space to carry one alongside the other.", [
-      trade("table", "Choose one table and eat at leisure.", [A("chosen", -24)]),
-      trade("move", "Pay the porters to join the tables and share the meal.", [A("allUnlocked", -24)], { cost: 36 }),
-      trade("thanks", "Thank both hosts without taking a place.", []),
-      joyChoice("welcome", "Ask each host to welcome the other's guests and pull the benches together.", [A("allUnlocked", -12), G("joy", "resolve", 12)]),
+    "Between your friends’ two welcome tables, a passing tray tips hot tea across your wrist. Both hosts set their cups down at once. One brings a cooling cloth; the other calls the bathkeeper, who names her treatment price. The serving benches still leave too little space between them.", [
+      trade("table", "Take the cooling cloth and leave the gathering with the burn still stinging.", [A("chosen", 12)]),
+      trade("move", "Buy a padded wrist support while the hosts clear a place for you.", [G("chosen", "resolve", 12)], { cost: 24 }),
+      trade("thanks", "Shift the heavy serving benches yourself and learn the porters’ carrying grip.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      joyChoice("welcome", "Accept the hosts’ pooled treatment money and let their guests rearrange the benches.", [A("chosen", -24), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-libra-good-review", 11, "Libra",
     "Your friends have reviewed the poem you read at their feast. They praise its beginning; the notes on the last verse fill another sheet. Beside them is the reader’s purse they saved for you. One friend has cleared her afternoon to rehearse the closing lines together.", [
@@ -255,11 +255,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("party", "Draw the curtain and invite the whole waiting party to settle with you.", [A("allUnlocked", -12)]),
     ]),
   scene("friendship-scorpio-deep-root", 11, "Scorpio",
-    "Your friend asks for help with the root blocking the shared garden. She opens a box of gloves, each marked with a member's name. Yours still has its old patch. The digging purse is ready; around the root, several friends are testing the ground with their heels.", [
-      trade("dig", "Take the heavy digging for the full purse.", [A("chosen", 36), L(132)]),
-      trade("hire", "Hire extra hands and collect the remaining work payment.", [A("chosen", 12), L(132)], { cost: 60 }),
-      trade("gloves", "Return the gloves until the group begins.", []),
-      joyChoice("pull", "Put on the old gloves and accept the gardeners' help with the pull.", [A("joy", 12), L(96)]),
+    "The root beneath the shared garden’s paving catches your ankle as a slab tips. Your friend kneels beside you with the old patched gloves. The others hold the stone steady. She offers the digging purse for clearing the obstruction; the neighboring tool yard rents a narrow lifting jack.", [
+      trade("dig", "Free your ankle and dig out the root for the garden’s full purse.", [A("chosen", 36), L(132)]),
+      trade("hire", "Rent the narrow jack and have the gardeners lift the slab clear.", [], { cost: 24 }),
+      trade("gloves", "Pull your ankle through the cramped gap while the others hold the slab.", [A("chosen", 12)]),
+      joyChoice("pull", "Have the gardeners loosen the root in sections before lifting the slab together.", [A("chosen", -12), L(24)]),
     ]),
   scene("friendship-scorpio-private-pool", 11, "Scorpio",
     "The circle has reserved a secluded bathing pool. Nobody asks why anyone prefers it to the public baths. The keeper shows you the price for a long private treatment and for a shorter shared visit. Your friends have also arranged a group rate, if you all enter together.", [
@@ -297,11 +297,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("answer", "Answer with a toast to the people gathered here today.", [G("chosen", "resolve", 12), A("joy", -24)]),
     ]),
   scene("friendship-sagittarius-hill-game", 11, "Sagittarius",
-    "Your friends moved their game to the far hill for the view. The ball has rolled into the valley twice. They have saved you a gentle practice turn and offer a fee for the long carrying demonstration afterward. From the bench, the oldest player keeps calling for the ball.", [
-      trade("practice", "Take the gentle practice turn with your friends.", [A("chosen", -24)]),
-      trade("demonstrate", "Run the full carrying course for the demonstration fee.", [A("chosen", 24), L(96)]),
-      trade("bench", "Join the watchers on the bench.", []),
-      joyChoice("round", "Bring the watchers into a close passing circle on the level ground.", [A("allUnlocked", -12), G("joy", "affliction", 12)]),
+    "You reach the hill game by its short slope, then discover why your friends use the longer path. Loose gravel shifts beneath your feet. They lower a walking pole. The game’s keeper offers a carrying fee for the balls below; a shepherd rents rides along the firm track.", [
+      trade("practice", "Hire the shepherd’s pony to take you up the firm track.", [], { cost: 24 }),
+      trade("demonstrate", "Collect the balls and carry them up the long slope for the keeper’s fee.", [A("chosen", 24), L(96)]),
+      trade("bench", "Climb the short loose slope with your friends steadying the pole.", [A("chosen", 12)]),
+      joyChoice("round", "Have the friends form a braced line along the firm edge and guide you up.", [A("chosen", -12), G("joy", "affliction", 12)]),
     ]),
   scene("friendship-sagittarius-many-roads", 11, "Sagittarius",
     "Friends from three countries argue over your best route. Each is quietly packing provisions for whichever one you choose. They set a common travel purse beside the bundles. One has drawn a bed on his map, exactly where he thinks you should stop and rest today.", [
@@ -333,11 +333,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("evening", "Accept their help tending the common stove through a full evening together.", [A("allUnlocked", -24)]),
     ]),
   scene("friendship-capricorn-scaffold", 11, "Capricorn",
-    "The builders lend their sound scaffold for your inspection. Its eldest member checks every knot before letting you climb. The inspection fee waits below, beside a hire purse for extra hands. Your friends remain at the foot of the scaffold, pretending they merely want to watch.", [
-      trade("climb", "Carry the heavy inspection kit up yourself for the full fee.", [A("chosen", 24), L(96)]),
-      trade("hire", "Hire an assistant to share the kit and collect the fee.", [A("chosen", 12), L(96)], { cost: 36 }),
-      trade("wait", "Leave the inspection until the knots have all been checked.", []),
-      joyChoice("hands", "Ask the waiting builders to send the kit up through their practiced hands.", [L(60), G("joy", "luck", 12)]),
+    "Your friends checked every knot before you climbed their scaffold. At the top, the inspection kit is heavier than you expected. Your forearms ache against its straps. They offer the inspection purse and call up the price of a hired hoist, keeping the foot of the ladder clear.", [
+      trade("climb", "Carry the kit through the full inspection and back down for the fee.", [A("chosen", 24), L(96)]),
+      trade("hire", "Hire the hoist to lower you and the kit together.", [], { cost: 24 }),
+      trade("wait", "Climb straight down with the kit, ending the inspection early.", [A("chosen", 12)]),
+      joyChoice("hands", "Send the kit down through the practiced hands already waiting beneath you.", [L(24), G("joy", "luck", 12)]),
     ]),
   scene("friendship-capricorn-old-joke", 11, "Capricorn",
     "Your reserved friend has kept a joke for your return. The others begin laughing before he reaches its bad part. He looks at you for help remembering how it goes. Beside his chair are the practical gift they collected and a place cleared for a long visit.", [
@@ -354,11 +354,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("work", "Combine the grant with the members' offered work and prepare together.", [G("chosen", "resolve", 12), A("joy", -24)]),
     ]),
   scene("friendship-aquarius-water-wheel", 11, "Aquarius",
-    "The shared garden's little waterwheel is ready for its first release. Your friends have saved the handle for you. They offer their spare grant money, or a work payment for helping set the heavy lower channel. The waiting gardeners hold their watering cans beneath a perfectly dry spout.", [
-      trade("grant", "Accept the spare grant and turn the first water on.", [L(24)]),
-      trade("channel", "Set the heavy lower channel for the work payment.", [A("chosen", 24), L(96)]),
-      trade("watch", "Leave the handle to the people who built the wheel.", []),
-      joyChoice("gardeners", "Have the waiting gardeners steady the channel while you release the water.", [L(48), G("joy", "luck", 12)]),
+    "You turn the garden’s shared waterwheel. Its first gush runs over the loose lower channel and fills your boots. The gardeners shut the gate at once. They offer the channel-setting fee; a nearby stove keeper has dry wraps for hire. Everyone’s watering cans are finally full.", [
+      trade("grant", "Hire dry wraps and warm your feet at the stove.", [], { cost: 24 }),
+      trade("channel", "Set the heavy lower channel for the garden’s repair payment.", [A("chosen", 24), L(96)]),
+      trade("watch", "Empty your boots and leave with wet, cold feet.", [A("chosen", 12)]),
+      joyChoice("gardeners", "Let the gardeners lend their spare wraps while the circle sets the channel together.", [A("chosen", -24), G("joy", "luck", 12)]),
     ]),
   scene("friendship-aquarius-no-speeches", 11, "Aquarius",
     "The circle forbids welcoming speeches. Five members have prepared diagrams instead. You are taken from one easel to the next while your unused chair waits by the stove. The fifth diagram shows the position of the chair, with an arrow indicating where they hope you will sit.", [
@@ -389,11 +389,11 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("help", "Accept the friends' offered practical care as well as the funded bath.", [A("chosen", -36), G("joy", "resolve", 12)]),
     ]),
   scene("friendship-pisces-moored-boat", 11, "Pisces",
-    "Your friends have kept a place for you in the boat. Each has also brought someone who needs the crossing. The ferryman studies the crowded landing and lays out a second set of oars. He offers a fee if you will crew the second passage instead of taking your reserved seat.", [
-      trade("seat", "Take the easy crossing in your reserved place.", [A("chosen", -24)]),
-      trade("crew", "Row the second passage for the ferryman's fee.", [A("chosen", 24), L(96)]),
-      trade("give", "Give your place to someone waiting on the landing.", []),
-      joyChoice("crews", "Divide the willing rowers into two crews and cross together.", [L(48), A("allUnlocked", -12)]),
+    "Your friends have given their spare rowing places to travelers needing the crossing. You take an oar as the crowded boat leaves its landing. Against the current, your shoulders soon ache. The ferryman offers the crew fee; a hired towboat waits by the next mooring.", [
+      trade("seat", "Pay for the towboat and rest your shoulders through the remaining crossing.", [], { cost: 24 }),
+      trade("crew", "Row the crowded boat all the way across for the ferryman’s crew fee.", [A("chosen", 24), L(96)]),
+      trade("give", "Row only to the next mooring and leave the longer crossing to the others.", [A("chosen", 12)]),
+      joyChoice("crews", "Divide the willing passengers into short rowing turns and settle into the spare seat.", [L(24), A("allUnlocked", -12)]),
     ]),
   scene("friendship-pisces-unfinished-song", 11, "Pisces",
     "The welcome song reaches the verse nobody quite remembers. Three friends supply three endings, all sung with confidence. Your own place in the refrain remains empty. Someone pats the cushioned bench beside the singers and gives you time to decide whether to fill it.", [

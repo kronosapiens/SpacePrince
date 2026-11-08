@@ -1,8 +1,8 @@
 import { blankGains, blankSideState, derivePlacements, getDignity, runChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { combustionCeiling, isCombusted } from "@/game/combust";
 import { PLANETS, SIGNS } from "@/game/data";
 import { beginNarrativeEncounter } from "@/game/encounter";
-import type { NarrativeScenario } from "@/game/narrative";
+import { narrativeContext, previewOption, resolveNarrative, visibleOptions, type NarrativeScenario } from "@/game/narrative";
 import { beginRun } from "@/game/run";
 import type { PlanetName, Prince, Run } from "@/game/types";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -12,6 +12,18 @@ export const BASE_PRINCE = createStubPrince();
 const BASE_RUN = beginRun(BASE_PRINCE.chart, 42, 64);
 export type Occupancy = "empty" | "favorable" | "adverse" | "neutral" | "balanced";
 export type Condition = "clean" | "injured" | "near combustion" | "one lit";
+
+export const CATALOGUE_STATES = [
+  { name: "first-healthy-penniless", tier: 0, condition: "clean", light: 0, occupancy: "empty" },
+  { name: "first-near-combustion-penniless", tier: 0, condition: "near combustion", light: 0, occupancy: "empty" },
+  { name: "four-wounded-funded", tier: 4, condition: "injured", light: 120, occupancy: "empty" },
+  { name: "full-healthy-funded", tier: 32, condition: "clean", light: 360, occupancy: "empty" },
+  { name: "full-wounded-funded", tier: 32, condition: "injured", light: 360, occupancy: "empty" },
+  { name: "full-near-combustion-penniless", tier: 32, condition: "near combustion", light: 0, occupancy: "empty" },
+  { name: "full-one-lit-penniless", tier: 32, condition: "one lit", light: 0, occupancy: "empty" },
+  { name: "favorable-wounded-funded", tier: 32, condition: "injured", light: 360, occupancy: "favorable" },
+  { name: "adverse-wounded-funded", tier: 32, condition: "injured", light: 360, occupancy: "adverse" },
+] as const;
 
 export function chartFor(scene: NarrativeScenario, occupancy: Occupancy) {
   const signIndex = SIGNS.indexOf(scene.sign);
@@ -45,4 +57,39 @@ export function stateFor(scene: NarrativeScenario, prince: Prince, condition: Co
   }
   run.encounter = beginNarrativeEncounter({ run, house: scene.house, scenarioId: scene.scenarioId });
   return run;
+}
+
+export function catalogueState(scene: NarrativeScenario, sample: typeof CATALOGUE_STATES[number]) {
+  const prince = { ...BASE_PRINCE, chart: chartFor(scene, sample.occupancy), numRelationalEncounters: sample.tier };
+  return { prince, run: stateFor(scene, prince, sample.condition, sample.light) };
+}
+
+export function narrativeMeasures(prince: Prince, run: Run) {
+  const chart = runChart(prince.chart, run);
+  const roster = unlockedPlanets(prince.numRelationalEncounters);
+  const remaining = Object.fromEntries(roster.map((p) =>
+    [p, Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction)])) as Partial<Record<PlanetName, number>>;
+  return {
+    light: run.light,
+    capacity: Object.values(remaining).reduce((sum, amount) => sum + amount, 0),
+    remaining,
+    lit: roster.filter((p) => !isCombusted(chart.planets[p], run.state[p])),
+    gains: run.gains,
+  };
+}
+
+export function narrativeOutcomes(prince: Prince, run: Run, scene: NarrativeScenario) {
+  const ctx = narrativeContext(prince, run, scene.house);
+  const before = narrativeMeasures(prince, run);
+  return visibleOptions(run, ctx, scene).flatMap(({ option, selections }) => selections.map((selection) => {
+    const preview = previewOption(run, ctx, option, selection);
+    const next = resolveNarrative(run, prince, scene, option.id, selection);
+    if (!preview.ok || !next) throw new Error(`Invalid narrative choice: ${scene.scenarioId}/${option.id}`);
+    const after = narrativeMeasures(prince, next);
+    return {
+      option, selection, preview: preview.success, next, after,
+      harmless: after.light >= before.light && before.lit.every((p) => after.lit.includes(p)) &&
+        Object.entries(before.remaining).every(([p, amount]) => after.remaining[p as PlanetName]! >= amount),
+    };
+  }));
 }

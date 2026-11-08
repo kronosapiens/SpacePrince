@@ -31,11 +31,11 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       trade("full", "Tell your aunt the house is full.", []),
     ]),
   scene("home-aries-first-fire", 4, "Aries",
-    "Your sister serves the first meal in her new house at the hearth. Smoke rolls beneath the ceiling. Her coughing partner carries the child's bowl outside. “We ought to begin properly,” your sister says, holding your plate where the firelight can reach it.", [
-      trade("hearth", "Eat beside her through the smoke and take the richest portion.", [A("chosen", 12), A("chosen", -48)]),
-      trade("flue", "Climb up and force the blocked flue clear.", [A("chosen", 24), G("chosen", "resolve", 12), G("chosen", "affliction", 12)]),
-      trade("outside", "Take a small bowl outside with her partner and child.", [A("chosen", -12)]),
-      revival("Open the new home to someone waiting beyond the smoke."),
+    "Smoke fills your sister's new house as she serves its first supper. The flue has stopped drawing. Her partner carries the child outside and calls you toward the door. “We ought to begin properly,” your sister says, coughing over the plate. The chimney sweep waits in the yard.", [
+      trade("hearth", "Pay the sweep to clear the flue and settle into the restored hearth's shelter.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("flue", "Climb through the smoke and force the blocked flue clear.", [A("chosen", 24), G("chosen", "affliction", 24)]),
+      trade("outside", "Cough your way out through the smoke and leave the supper behind.", [A("chosen", 12)]),
+      revival("Open the cleared home to someone waiting beyond the smoke."),
     ]),
   scene("home-aries-cut-door", 4, "Aries",
     "Your uncle cuts a wider doorway and carries the old timber toward the fire. Your sister catches the piece marked with your childhood heights. “There are other logs.” He says these are already indoors. She keeps her hand on the notch where she finally overtook you.", [
@@ -67,11 +67,11 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Make a place inside for someone who has stayed away."),
     ]),
   scene("home-taurus-old-table", 4, "Taurus",
-    "Your father refuses to replace the kitchen table. One corner rocks whenever he cuts bread, but your place is set where it always was. “It knows us,” he says. He puts a hand on the unsteady corner and asks you to sit down before supper cools.", [
-      trade("supper", "Take your usual place and eat the supper he made.", [A("chosen", -24)]),
-      trade("brace", "Lift and brace the heavy table while he fits a new support.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("repair", "Pay for a sound repair and share a comfortable supper around it.", [A("allUnlocked", -24)], { cost: 48 }),
-      revival("Draw out the unused chair at the kitchen table."),
+    "The kitchen table's weak corner gives as you take your usual place. You catch its weight across your knees; your father catches the bread. “It knows us,” he says, then calls for the carpenter next door. The familiar table lies too heavily for either of you to shift it easily.", [
+      trade("supper", "Ease your knees from beneath the table and bear its scraping weight.", [A("chosen", 12)]),
+      trade("brace", "Lift and brace the heavy table while your father fits a support.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("repair", "Pay the carpenter to raise the table and make its familiar place sound.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      revival("Draw out the unused chair once the kitchen table stands again."),
     ]),
   scene("home-taurus-garden-wall", 4, "Taurus",
     "Your aunt grows a sweet-smelling vine over the wall your grandfather built. She has rooted cuttings for the household doorways and asks where to put them. The oldest entrance is nearly hidden. “He liked a clean wall,” she says, breathing in the flowers with evident satisfaction.", [
@@ -116,10 +116,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Find a dry place beneath the roof for someone returning."),
     ]),
   scene("home-gemini-folding-bed", 4, "Gemini",
-    "Your sister's work covers your old folding bed. She will not pack it away just because you have arrived. Her partner begins explaining what each piece will become. “Visitors usually admire it,” he says. Your sister sets a thin sleeping mat on the floor without looking up.", [
-      trade("floor", "Take the thin mat and the little rest the hard floor allows.", [A("chosen", -12)]),
-      trade("move", "Pay for help moving the work and rest on the unfolded bed.", [A("chosen", -36)], { cost: 36 }),
-      trade("bed", "Ask her to clear your bed and sleep there after she leaves the room.", [A("chosen", -24)]),
+    "After hours on the thin floor mat, you rise stiff and unrested. Your sister's work covers the old folding bed. “I'm using this room now.” Her partner points to a porter still awake downstairs. He can move the work upstairs for a fee; she will not let anyone fold it into a heap.", [
+      trade("floor", "Leave the household now, carrying the stiffness from the hard floor.", [A("chosen", 12)]),
+      trade("move", "Pay the porter to move the work and prepare a properly supported bed.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("bed", "Carry the heavy work upstairs yourself before the short night's rest.", [A("chosen", 24), G("chosen", "affliction", 12)]),
       revival("Make a place for someone who need not admire the work to be welcome."),
     ]),
   scene("home-gemini-names-in-cupboard", 4, "Gemini",
@@ -158,10 +158,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Wash the road from a returning person's hands at the household cistern."),
     ]),
   scene("home-cancer-night-latch", 4, "Cancer",
-    "Your brother bars the door when supper is served. Your younger sister knocks from outside. “Latecomers can eat elsewhere,” he says. She calls through the wood that this is still her house. He puts the serving dish beside your place and leaves the bar where it is.", [
-      trade("table", "Stay at the warm table and accept the generous supper.", [A("chosen", -36)]),
-      trade("step", "Take your plate out and sit with her on the cold step.", [A("chosen", 12)]),
-      trade("open", "Lift the bar and give her your place at the table.", []),
+    "Your brother bars the door just as you and your younger sister reach the cold step. “Latecomers can eat elsewhere.” She knocks again and reminds him whose house this is. An upstairs window is open. Across the lane, the innkeeper lights the sign for her remaining beds.", [
+      trade("table", "Buy the inn's sheltered sleeping place for the night.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("step", "Wait with your sister on the cold step until he opens the door.", [A("chosen", 12)]),
+      trade("open", "Climb the rough wall to the upstairs window and open the door from within.", [A("chosen", 24), G("chosen", "affliction", 12)]),
       revival("Open the door to another homecomer without checking the hour."),
     ]),
   scene("home-cancer-shell-box", 4, "Cancer",
@@ -179,11 +179,11 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Offer the hearth's best place to someone newly returned."),
     ]),
   scene("home-leo-family-banner", 4, "Leo",
-    "Your brother hangs his splendid household banner across the kitchen window. Your aunt, who sews there, cuts a small hole through its grandest emblem. He arrives to find her threading a needle in the new patch of light. “That was the lion,” he says. “I can see,” she answers.", [
-      trade("shade", "Rest in the room cooled by the great hanging.", [A("chosen", -24)]),
-      trade("lift", "Lift the heavy hanging to a place that leaves her window clear.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("opening", "Stand beside your aunt at the opening she cut.", []),
-      revival("Hold the banner aside so someone returning can see the household within."),
+    "By the time supper reaches you, the kitchen's close heat has made you faint. Your brother's banner covers the only open window. Your aunt cuts a hole through its lion to see her sewing. The heavy pole keeps the rest pinned shut. He loosens his collar.", [
+      trade("shade", "Leave the table and struggle out into the cooler yard.", [A("chosen", 12)]),
+      trade("lift", "Lift the heavy pole overhead and carry the hanging clear of the window.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("opening", "Pay the joiner to move the heavy hanging and give the household air.", [], { cost: 24 }),
+      revival("Hold the banner aside so someone returning can reach the cooler room."),
     ]),
   scene("home-leo-last-toast", 4, "Leo",
     "Everyone praises your aunt's supper, so she fills the cups again. The cook waits beside the doorway with her apron loosened. Your aunt starts another toast before the woman can sit. “We haven't had an evening like this in years.” Another rich dish comes toward your place.", [
@@ -214,10 +214,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Prepare another plate outside her count."),
     ]),
   scene("home-virgo-moving-marks", 4, "Virgo",
-    "Your uncle measures the kitchen before moving its great cupboard. Behind it he finds your grandmother's pencil marks for the very arrangement he proposes. A second set leads back to where it stands now. He checks his measure again. “She may not have tried it properly.”", [
-      trade("room", "Rest in the kitchen as your grandmother left it.", [A("chosen", -12)]),
-      trade("shift", "Help him shift the heavy cupboard and test the arrangement.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("movers", "Pay for movers and enjoy the cleared, comfortable room.", [A("allUnlocked", -24)], { cost: 48 }),
+    "Your uncle's great cupboard jams across the kitchen doorway as you step behind it. Your grandmother's pencil marks are visible on the wall, including an arrow pointing back. “She may not have tried it properly.” He braces the cupboard while the movers outside name their price for lifting it clear.", [
+      trade("room", "Squeeze through the narrow gap with the cupboard scraping your back.", [A("chosen", 12)]),
+      trade("shift", "Lift and turn the heavy cupboard with him until the doorway clears.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("movers", "Pay the movers to clear the doorway without forcing your way past.", [], { cost: 24 }),
       revival("Free the narrowed doorway for someone coming home."),
     ]),
   scene("home-virgo-clean-threshold", 4, "Virgo",
@@ -257,10 +257,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Lay another good napkin without assigning anyone a rank."),
     ]),
   scene("home-libra-hinged-screen", 4, "Libra",
-    "Your brother divides the sitting room with a folding screen so everyone can have privacy. Conversation travels around both ends. He asks you to try the quiet side, then walks around to explain its advantages. Your sister calls her answer from the side he has just left.", [
-      trade("private", "Close one end and take a private rest behind the screen.", [A("chosen", -24)]),
-      trade("move", "Shift the heavy screen until both sides have a useful opening.", [A("chosen", 12), G("chosen", "luck", 12)]),
-      trade("open", "Fold back the middle panel and rest together in the open room.", [A("allUnlocked", -12)]),
+    "You catch your brother's falling privacy screen in the doorway. A hinge clamps your wrist beneath the heavy panels. Your sister calls from the other side that she can still hear everything. Your brother braces the far end while the fitter outside reaches for her lifting straps.", [
+      trade("private", "Hold the tight hinge while your brother works the panels apart.", [A("chosen", 12)]),
+      trade("move", "Shift the whole heavy screen and learn where its weight turns.", [A("chosen", 24), G("chosen", "luck", 12)]),
+      trade("open", "Pay the fitter to lift the jammed panels out of the doorway.", [], { cost: 24 }),
       revival("Open a panel toward someone waiting at the household threshold."),
     ]),
   scene("home-scorpio-locked-cupboard", 4, "Scorpio",
@@ -292,10 +292,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Set another place without requiring a confession."),
     ]),
   scene("home-scorpio-root-cellar", 4, "Scorpio",
-    "Your sister brings you down to the root cellar with a lamp. Behind the crates she scratched her height each year when nobody upstairs thought to measure her. “That was the summer I grew.” She points into the narrow gap, holding the light where you can see.", [
-      trade("listen", "Sit beside her and share the food she brought while she tells you.", [A("chosen", -24)]),
-      trade("crates", "Shift the heavy crates until both of you can see the marks plainly.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("protected", "Leave the crates where they have protected her marks.", []),
+    "Your sister brings you down to the root cellar to see her hidden height marks. A crate shifts from its stack onto the stair behind you. She steadies the lamp. “That one was empty last year.” The marks remain visible; the narrow climb out now needs the loaded crate moved.", [
+      trade("listen", "Pull yourself over the loaded crate and squeeze back up the stair.", [A("chosen", 12)]),
+      trade("crates", "Shift the heavy stacks until both the marks and the stair stand clear.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("protected", "Pay the carrier upstairs to lift the crate clear of the stair.", [], { cost: 24 }),
       revival("Bring another lamp down for someone returning to the old cellar."),
     ]),
   scene("home-sagittarius-long-table", 4, "Sagittarius",
@@ -313,10 +313,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Ask her to bring the other returning traveler inside."),
     ]),
   scene("home-sagittarius-stable-room", 4, "Sagittarius",
-    "Your cousin offers you the warm room above the horses. He says their movement makes every night feel like setting off. Something stamps beneath the bed. He has a quieter room for paying guests, but cannot imagine why anyone would prefer to wake without the sound of hooves.", [
-      trade("horses", "Take the free rest in the warm room above the horses.", [A("chosen", -24)]),
-      trade("quiet", "Pay for the still room and a full undisturbed sleep.", [A("chosen", -48)], { cost: 36 }),
-      trade("bedding", "Carry the heavy bedding downstairs and make a quiet place for yourself.", [A("chosen", 12), A("chosen", -36)]),
+    "By midnight, the stamping horses have jolted you awake so often that your shoulders ache. Every movement shakes your cousin's bed above the stalls. “Like setting off,” he says, then sees your tired face. His quiet guest room still has a price. The spare bedding downstairs needs two pairs of hands.", [
+      trade("horses", "Leave the stable room with the ache of the broken night's sleep.", [A("chosen", 12)]),
+      trade("quiet", "Pay for the quiet room and its firm, undisturbed sleeping place.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("bedding", "Carry and arrange the heavy spare bedding downstairs before the night is over.", [A("chosen", 24), G("chosen", "affliction", 12)]),
       revival("Make another sleeping place beside the stable stove."),
     ]),
   scene("home-sagittarius-open-shelf", 4, "Sagittarius",
@@ -341,10 +341,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Clear the fireside stool for someone coming in from the cold."),
     ]),
   scene("home-capricorn-last-lock", 4, "Capricorn",
-    "Your aunt gives everyone a room but keeps every key. Your brother asks whether being trusted to sleep here includes shutting his own door. “You can shut it,” she says, gathering the keys. He looks toward the old outbuilding, whose door can still be barred from within.", [
-      trade("room", "Accept the unlocked warm room and its comfortable bed.", [A("chosen", -36)]),
-      trade("outbuilding", "Take the cold outbuilding and bar its door for yourself.", [A("chosen", 12)]),
-      trade("screen", "Carry the heavy screen upstairs to give your brother some privacy.", [A("chosen", 12), G("chosen", "affliction", 12)]),
+    "You have spent half the evening searching the cold courtyard with your aunt. Your fingers are numb. Every warm-room key is inside the chest whose key is missing. Your brother tests the outbuilding's bar. “At least we can shut that door.” The locksmith names a price while your aunt checks the same pocket again.", [
+      trade("room", "Pay the locksmith to open the chest and settle into a secure warm room.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      trade("outbuilding", "End the search and leave the household with your fingers still numb.", [A("chosen", 12)]),
+      trade("screen", "Carry the heavy hearth screen and bedding out to make the outbuilding usable.", [A("chosen", 24), G("chosen", "affliction", 12)]),
       revival("Put a room key into the hand of the person returning."),
     ]),
   scene("home-capricorn-family-apron", 4, "Capricorn",
@@ -390,11 +390,11 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Let someone returning choose their own plate from the shelf."),
     ]),
   scene("home-aquarius-winter-sky", 4, "Aquarius",
-    "Your uncle cuts a little window in the attic roof so the household can see the winter stars from bed. Cold follows the view inside. He offers another blanket before anyone complains. “Clearer tonight,” he says, pointing upward with the hand he has not tucked beneath his arm.", [
-      trade("blankets", "Share the thick bedding and rest beneath the visible sky.", [A("allUnlocked", -12)]),
-      trade("window", "Climb into the cold rafters and work the stiff new window shut.", [A("chosen", 12), G("chosen", "affliction", 12)]),
-      trade("downstairs", "Pay for extra fuel and settle into deep warmth downstairs.", [A("chosen", -48)], { cost: 48 }),
-      revival("Lay another thick blanket beneath the new opening."),
+    "Your uncle's new attic window will not close. You are already under the blankets when the winter wind lifts their edge. “Clearer tonight,” he says, pointing at the stars with a shaking hand. The latch is high in the rafters, and the room below needs more fuel before anyone can sleep there.", [
+      trade("blankets", "Stay beneath the blankets through the wind entering the attic.", [A("chosen", 12)]),
+      trade("window", "Climb into the cold rafters and force the stiff window shut.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("downstairs", "Buy fuel and settle into a properly warmed sleeping place downstairs.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      revival("Lay another thick blanket in the shelter made for a homecomer."),
     ]),
   scene("home-pisces-two-kitchens", 4, "Pisces",
     "Your family opens a passage between the two kitchens. Each household keeps sending supper through, certain the other must be hungry. Your aunt meets your cousin in the opening with matching dishes. Neither has eaten. They turn sideways, trying to pass without withdrawing either offer.", [
@@ -418,10 +418,10 @@ export const HOUSE_04_SCENARIOS: NarrativeScenario[] = [
       revival("Set a dry pair of boots ready for someone at the door."),
     ]),
   scene("home-pisces-sleepless-guest", 4, "Pisces",
-    "Your aunt gives her bed to a guest who cannot sleep. From her chair, she wakes each time he turns over and asks whether he is comfortable. He says yes more quietly every time. She offers you a place in the common room, then turns toward his door again.", [
-      trade("common", "Take the common room's quiet rest.", [A("chosen", -24)]),
-      trade("watch", "Keep the tiring night watch so your aunt can finally lie down.", [A("chosen", 12), G("chosen", "resolve", 12)]),
-      trade("warmth", "Pay for fresh fuel and bedding so everyone can settle warmly.", [A("allUnlocked", -24)], { cost: 48 }),
-      revival("Offer someone an untroubled sleeping place beside the fire."),
+    "Your aunt's sleepless guest walks from bed to hearth and back all night. She rises each time to ask whether he is comfortable. Your place is beside that hearth. The inn next door still has a quiet room; your aunt asks whether you can take one turn keeping him company.", [
+      trade("common", "Take what sleep you can beside the guest's repeated footsteps.", [A("chosen", 12)]),
+      trade("watch", "Keep the long night watch so your aunt can finally lie down.", [A("chosen", 24), G("chosen", "affliction", 12)]),
+      trade("warmth", "Pay for the inn's quiet room and a sound sleeping place.", [G("chosen", "resolve", 12)], { cost: 36 }),
+      revival("Offer someone a sheltered sleeping place beside the fire."),
     ]),
 ];
