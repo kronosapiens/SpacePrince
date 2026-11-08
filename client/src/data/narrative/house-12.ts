@@ -104,38 +104,39 @@ export const HOUSE_12_SCENARIOS: NarrativeScenario[] = [
       joyChoice("mark", "Mark the gate key after trying it and return the study key untouched.", [G("joy", "luck", 12), A("chosen", -12)]),
     ]),
   scene("hidden-cancer-seawall", 12, "Cancer",
-    "From beyond the sea wall, the banished sailor can see smoke from his old kitchen. He offers you a fee for telling him what the harbor sounds like today. The wall catches the wind. He has brought a small blanket, carefully spread on the colder of its two sides.", [
-      trade("brief", "Give a brief account through the cold wind for his small fee.", [A("chosen", 12), L(24)]),
-      trade("evening", "Stay through the cold evening and give the fuller paid account.", [A("chosen", 24), L(60)]),
-      trade("decline", "Tell him you cannot stay beside the wall.", []),
-      joyChoice("lee", "Move the blanket into the wall's lee and describe today's harbor once.", [L(36), A("joy", -12)]),
+    "The sea gate shuts for the night behind you. A banished sailor watches his old kitchen's smoke. The outer steps are steep and cold; a boatman offers passage home. The sailor spreads his blanket against the wall. “I'll pay you to tell me about the harbor while we wait.”", [
+      trade("steps", "Take the long climb up the exposed outer steps.", [A("chosen", 24)]),
+      trade("boat", "Pay the boatman to carry you back around the wall.", [], { cost: 48 }),
+      trade("evening", "Stay through the cold wait and tell the sailor about the harbor for his fee.", [A("chosen", 36), L(144)]),
+      joyChoice("lee", "Share the wall's lee and his smaller fee for one account of what you saw today.", [A("joy", 12), L(96)]),
     ]),
   scene("hidden-cancer-curtained-window", 12, "Cancer",
-    "The woman in the curtained room asks you to bring the sound of rain closer. When you reach toward the curtains, she stops you. The neighbors can see through that window. A heavy screen stands in the hallway; she will pay to have it moved inside.", [
-      trade("screen", "Carry the heavy screen into place for her fee.", [A("chosen", 24), L(60)]),
-      trade("listen", "Sit briefly with her and hear the rain through the glass.", [A("chosen", -12)]),
+    "The woman behind the curtains wants to hear the rain, but not the neighbors calling through her window. She offers a good fee to move a heavy screen from the hall. Then she sets down a second cup. “You can also sit. The glass doesn't keep all of it out.”", [
+      trade("screen", "Carry the heavy screen into place for her fee.", [A("chosen", 24), L(108)]),
+      trade("listen", "Stay over the second cup and hear the rain through the glass.", [A("chosen", -24)]),
       trade("leave", "Leave the curtains as she has arranged them.", []),
-      joyChoice("pane", "Open only the high sheltered pane and sit where the rain can be heard.", [A("chosen", -24), G("joy", "resolve", 12)]),
+      joyChoice("pane", "Open only the high sheltered pane and sit where the rain can be heard.", [A("chosen", -36), G("joy", "resolve", 12)]),
     ]),
   scene("hidden-cancer-locked-cupboard", 12, "Cancer",
-    "The retired host has locked away the cups people still expect her to fill. She offers you the plain one she uses alone. When someone knocks, she stays seated. “There is a basin by the door,” she tells you. “For your cup, when you have finished.”", [
-      trade("drink", "Accept the warm drink in the plain cup.", [A("chosen", -12)]),
+    "The retired host keeps her visitors' cups locked away. Today she lends you her own plain one and brings a pot that will last the afternoon. Someone knocks; she stays seated. “There is a basin for your cup,” she says. “The cupboard can stay shut.”", [
+      trade("drink", "Warm yourself with the pot of tea in her plain cup.", [A("chosen", -36)]),
+      trade("quiet", "Spend the unhurried afternoon with her, letting the knocks go unanswered.", [G("chosen", "resolve", 12)]),
       trade("leave", "Leave her the drink and the quiet room.", []),
-      joyChoice("wash", "Wash your own cup and leave the cupboard closed while you sit together.", [A("chosen", -24), G("joy", "resolve", 12)]),
+      joyChoice("wash", "Wash your own cup and settle into the afternoon without opening the cupboard.", [A("allUnlocked", -24), G("joy", "resolve", 12)]),
     ]),
   scene("hidden-cancer-island-room", 12, "Cancer",
-    "The sanctuary keeper shows you a room beyond the tidal causeway. You may rest briefly without payment or rent it through the next tide. When you begin explaining why you came, she points out the tide mark instead. “That is the only thing you need to tell me you understand.”", [
-      trade("brief", "Take the short quiet rest before the tide turns.", [A("chosen", -12)]),
-      trade("stay", "Pay to remain sheltered through the rising tide.", [A("chosen", -36)], { cost: 60 }),
-      trade("return", "Return across the causeway while it is dry.", []),
-      joyChoice("interval", "Agree on the marked interval and take the keeper's quiet watch room.", [A("chosen", -24), G("joy", "resolve", 12)]),
+    "The causeway is under water when you reach the sanctuary door. Its keeper has a warm room for rent and an exposed stone landing where you can wait. Water rises in the storeroom below. “I'd pay someone to work the pump,” she says, “but it's a long night.”", [
+      trade("wait", "Wait out the tide on the cold stone landing.", [A("chosen", 24)]),
+      trade("stay", "Rent the warm room and sleep until the causeway clears.", [G("chosen", "resolve", 24)], { cost: 48 }),
+      trade("pump", "Work the pump through the long night for the keeper's full payment.", [A("chosen", 48), L(180)]),
+      joyChoice("interval", "Agree to keep the tide watch from the narrow dry room above the landing.", [A("chosen", -24), G("joy", "resolve", 12)]),
     ]),
   scene("hidden-cancer-mother-silence", 12, "Cancer",
-    "Excluded from her family's visits, the woman keeps their old letters face down. She asks you to sort only the envelopes. Some dates are nearly rubbed away. She offers a small fee for one bundle and more for the heavy trunk, keeping its unsealed letters close beside her.", [
-      trade("bundle", "Sort and carry one bundle for the smaller fee.", [A("chosen", 12), L(24)]),
-      trade("trunk", "Work through the whole heavy trunk for the full payment.", [A("chosen", 36), L(84)]),
+    "Her family no longer visits, but their letters fill a trunk she cannot lift. She asks you to sort the envelopes without reading inside. “They used to write more often.” She offers a fee for one bundle and considerably more to finish the trunk, keeping the open letters beside her.", [
+      trade("bundle", "Sort and carry one bundle for the smaller fee.", [A("chosen", 12), L(60)]),
+      trade("trunk", "Sort and move the whole heavy trunk for the full payment.", [A("chosen", 36), L(168)]),
       trade("return", "Return the bundle unopened.", []),
-      joyChoice("dates", "Make broad date bundles and leave the unsealed letters in her keeping.", [A("joy", 12), L(60)]),
+      joyChoice("dates", "Take the agreed fee for broad date bundles, leaving the open letters in her keeping.", [A("joy", 12), L(108)]),
     ]),
   scene("hidden-leo-back-curtain", 12, "Leo",
     "Behind the back curtain, the former singer listens to her successor begin the song she made famous. She has saved you the second cushioned stool. When the audience applauds the new phrasing, she reaches for the curtain, then stops. “Perhaps just the next verse.”", [

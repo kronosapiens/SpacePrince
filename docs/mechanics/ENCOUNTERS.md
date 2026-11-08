@@ -79,7 +79,7 @@ The test is whether the player can explain who needs recovery, who can carry a c
 
 ### 1.4 Valence and dignity
 
-Valence and geometry are house attributes: valence sets the terms of a house's trades (§4.5), while geometry guides agency and narrative emphasis without an additional angularity bonus.
+Valence and geometry are house attributes: valence guides a house's entry risk and opportunities (§4.5), while geometry guides agency and narrative emphasis without an additional angularity bonus.
 Planets in the house change those terms by a fixed rule, with dignity deciding whether for better or worse (§4.2).
 Exact balance remains deferred.
 
@@ -213,12 +213,19 @@ All costs remain visible and immediate.
 ### 4.5 House–sign economic balance
 
 Narrative variation should be available throughout the chart, including empty houses.
-Every chart should receive equivalent aggregate economic opportunity across the encounter catalogue.
+Comparable aggregate economic opportunity across charts remains a balancing aim; a bounded pilot does not establish it.
 
 The house guides the tendency of its offers.
-Houses that aspect the Ascendant generally offer more favorable terms; averse houses (II, VI, VIII, and XII) can offer harsher terms or a small cost to leave.
+Houses that aspect the Ascendant generally offer milder, more dependable benefits, with a smaller but nonzero chance of unavoidable cost.
+Averse houses (II, VI, VIII, and XII) can impose costs more often and offer greater potential benefits.
+These are learnable tendencies, not guarantees about a particular menu.
 The going rates (§6) are provisional references, not a requirement that every choice have the same nominal advantage.
 Gifts, trades, and choices among benefits can coexist within a house–sign pool.
+Some scenes require a loss of carried Light, useful remaining capacity, or an available planet even after the player chooses a preferred option.
+Review the whole menu: an empty exit, a free benefit, or a Light loss clamped at zero can all remove that risk.
+Recovery or Resolve can offset nominal affliction, so compare complete outcomes rather than authored payments alone.
+Joy and favorable occupants can legitimately provide a harmless way through; report that exception when comparing pools.
+Make costs follow the situation already entered, revising an optional offer if simply removing its refusal would make no sense.
 
 Compare the opportunities across each house–sign pool and representative run states, including early unlock tiers, affliction, remaining maps, and available Light.
 Account for encounter frequency, payment methods, benefit types, target restrictions, and occupant and joy effects.
@@ -269,13 +276,17 @@ Keep unresolved writing questions separate from economic or implementation quest
 
 ### 5.1 One decision
 
-Each scene has one prompt and a small set of choices, usually two offers and a way to decline.
+Each scene has one prompt and a small set of choices about how to participate or bear its immediate circumstances.
 Trades and choices among benefits may use the same single-decision structure.
 A joy choice and a revival choice can be added when they apply; keep the visible menu within five choices.
 There are no child nodes, intermediate rewards, cash-outs, or traversal state.
 Choosing an option that needs a target and inspecting previews are preparation for the decision, with no gameplay effects.
 
 ### 5.2 Commitment
+
+Choosing a visible house commits entry before its scenario and menu are revealed.
+The initialized encounter is saved before the chorus; every dismissal path and reload resumes that same gameplay state.
+The chorus passage is presentation-only and can change on reload without changing the encounter.
 
 Hover or keyboard focus previews an option's determined effects without committing.
 Activate an option without a requested target once to resolve it.
@@ -287,11 +298,12 @@ Outside targeting, planet activation remains safe inspection.
 A resolved encounter cannot resolve again.
 Its consequence is shown before returning to the map; narrative encounters do not advance the planet-unlock count.
 
-### 5.3 Exits
+### 5.3 A valid way through
 
 Every scene must offer a valid choice at every unlock tier and at zero Light.
-Usually an exit provides it, with no effect or a small ordinary Light loss in an averse house, clamped at zero.
-A choice among gifts can instead provide a valid way through without a separate empty exit.
+That choice may be an exit, a gift, or a harmful or fatal way through the revealed situation.
+Validity does not promise survival, and there is no universal narrative-entry cost.
+Keep an affordable option with a valid target even when only one planet remains lit.
 
 ## 6. Provisional Amounts
 
@@ -325,8 +337,10 @@ Prefer unseen scenarios for the house and the Prince's sign on it.
 When all five are exhausted, repeat matching-sign scenes.
 Never substitute a scene authored for another sign.
 The earlier house-only scenes and fallback selection have been removed.
-The scenario is chosen on entry and persists through reloads.
-Save schema v5 resets earlier saves, including v4 saves that may reference retired scenes.
+The live prototype samples fresh entry randomness independently of the map's fixed content, then saves the chosen scenario through the existing encounter model.
+Tests, forecasts, and seeded evaluations can inject deterministic entry draws.
+Production will select through VRF after entry commitment; transaction and VRF implementation remain separate work.
+The unseen-scene history still supports inference about the remaining pool; commitment prevents inspecting an initialized opening and then choosing another node.
 
 ## 9. Prose and Mechanical Copy
 

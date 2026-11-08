@@ -74,7 +74,9 @@ Dev settings (`state/settings.ts`, key `sp:settings:v1`) are small and toggle-sh
 
 ### Planetary chorus at encounter entry
 
-`useEnterNode` applies development overrides and commits the initialized encounter through `enterNode`.
+`useEnterNode` applies development overrides, samples a fresh entry seed, and commits the initialized encounter through `enterNode`.
+That seed selects the narrative scene or the relational opening action and independent Necessity streams; the map's houses, rulers, and assigned Other remain fixed.
+Tests and forecasts can inject an entry seed, while seeded evaluation retains its deterministic default draws.
 The catalogue in `copy/chorus.ts` imports the seven canonical YAML files under `docs/research/chorus/` through `@rollup/plugin-yaml` in both Vite and Vitest.
 
 `PlaySurface` mounts an opening component keyed by encounter ID, which selects a random passage once and holds it in local UI state.
@@ -91,8 +93,14 @@ The boundary lets the same logic be called from screens (via thunks), from tests
 
 Determinism has a deliberate boundary inside this layer:
 
-- **Resolution is deterministic.** `resolveTurn` computes the whole turn from state; its only draw is the opponent's *next* precommit, from a per-(run, encounter, turn) seeded stream (`relationalTurnRng`), so a run replays from its seed. Narrative resolution has no randomness. This is the part that must match the Cairo implementation.
-- **Edges are not.** Entity ids use `Date.now()` (`encounter.ts`, `turn.ts`), and a new run's or map's seed comes from `randomSeed()` (`rng.ts`, `Math.random`), the prototype's stand-in for the VRF. These are the call sites that change for onchain parity.
+- **Resolution is deterministic.**
+  `resolveTurn` computes the whole turn from state; its only draw is the opponent's *next* precommit, from a per-(run, encounter, turn) seeded stream (`relationalTurnRng`), so an initialized encounter replays its subsequent turns.
+  Narrative resolution has no randomness.
+  This is the part that must match the Cairo implementation.
+- **Edges are not.**
+  Entity ids use `Date.now()` (`encounter.ts`, `turn.ts`), and a new run, map, or live entry samples `randomSeed()` (`rng.ts`, `Math.random`), the prototype's stand-in for the VRF.
+  Live entry saves its initialized result; the run seed alone does not reconstruct those opening draws.
+  These are the call sites that change for onchain parity.
 
 Adding a new `Math.random()` or `Date.now()` inside resolution-path game code is a bug; pass RNG in.
 

@@ -2,7 +2,8 @@
 
 [House XII](../HOUSE_MATRIX.md#xii--the-hidden) concerns lives outside ordinary access, including chosen solitude as well as imposed confinement.
 [Sign references](../../research/SIGN_NOTES.md) make those lives particular; [Saturn in XII](../HOUSE_PLANET_MATRIX.md#saturn-xii--the-hidden) adds a workable limit or method within the circumstances.
-No visit cures an exile or creates a later obligation, and no choice must purchase its way out; participation and its costs end in the scene.
+No visit cures an exile or creates a later obligation; participation and its costs end in the scene.
+A revealed confinement can require Light or affliction to bear, alongside scenes of wanted solitude and relief.
 
 ## Aries
 
@@ -30,11 +31,11 @@ No visit cures an exile or creates a later obligation, and no choice must purcha
 
 ## Cancer
 
-1. `hidden-cancer-seawall`: A banished sailor sits where he can see his home's kitchen smoke and pays for an account of what the harbor sounds like today; sea memory and separation, tenderness; tell a brief account or stay through a cold paid evening; Saturn: describe today's harbor once and share the lee of the wall.
-2. `hidden-cancer-curtained-window`: A woman keeps her room curtained after an absence and asks you to bring the sound of the rain closer without letting neighbors see in; protected feeling and water, relief; buy deep private rest beside her or carry the heavy screen; Saturn: open only the sheltered upper pane.
-3. `hidden-cancer-locked-cupboard`: A retired host has locked away the cups people still expect her to fill and offers you the plain one she uses alone; hospitality withdrawn, quiet pleasure; accept a modest drink or pay for private lodging; Saturn: wash your own cup and leave the cupboard shut.
-4. `hidden-cancer-island-room`: A sanctuary's tide-cut room is available until the causeway floods, and its keeper insists you need no reason to want it; water and bounded retreat, gift; take brief rest or pay for deeper shelter; Saturn: choose the full quiet interval and leave at the marked tide.
-5. `hidden-cancer-mother-silence`: A person excluded by her kin keeps their old letters face down and asks you to sort only the envelopes; memory under protection, delicate work; take a modest paid sorting or a longer tiring task; Saturn: bundle them by date without opening the letters.
+1. `hidden-cancer-seawall`: The sea gate closes behind you beside a banished sailor watching his old kitchen's smoke; sea memory and separation, imposed confinement; pay a boatman, climb the cold outer steps, or endure the longer wait for the sailor's substantial fee; Saturn: share the wall's lee and limit the paid account to what you saw today.
+2. `hidden-cancer-curtained-window`: A woman wants rain within hearing while keeping her neighbors outside, and offers either a cup or a fee for moving her heavy screen; protected feeling and water, relief; accept private rest, take strenuous well-paid work, or leave the curtains alone; Saturn: open only the sheltered upper pane for deeper rest and Resolve.
+3. `hidden-cancer-locked-cupboard`: A retired host lends you her own cup while leaving the visitors' set locked away and their knocks unanswered; hospitality withdrawn, quiet pleasure; take deep warmth, spend an afternoon gaining Resolve, or leave her the room; Saturn: wash your own cup and settle into shared recovery without opening the cupboard.
+4. `hidden-cancer-island-room`: The sanctuary's causeway is already covered and its keeper has a warm room, an exposed landing, and a flooded storeroom; water and bounded retreat, shelter under constraint; pay for a night's rest that adds Resolve, bear the cold wait, or work the long pump shift for a large fee; Saturn: accept a limited tide watch in the narrow dry room.
+5. `hidden-cancer-mother-silence`: A woman excluded from family visits pays to sort the envelopes filling a trunk she cannot lift; memory under protection, delicate work; take a short paid bundle, the more tiring and better-paid trunk, or return it unopened; Saturn: agree to broad date bundles and leave the open letters in her keeping.
 
 ## Leo
 

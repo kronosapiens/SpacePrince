@@ -73,39 +73,39 @@ export const HOUSE_11_SCENARIOS: NarrativeScenario[] = [
       joyChoice("together", "Bring the separate tables together for a shared afternoon of making.", [G("chosen", "luck", 12), A("allUnlocked", -12)]),
     ]),
   scene("friendship-gemini-three-letters", 11, "Gemini",
-    "Your host has received three letters recommending you. One calls you quiet; another says you tell splendid stories; the third asks her not to believe the second. She lays out the enclosed travel money and shows you a prepared room. “I hope at least one of you sleeps.”", [
+    "Your host unfolds three letters recommending you. One calls you quiet, one praises your stories, and one asks her not to believe the second. Your friends have paid for a room and enclosed travel money. She sets both keys and purse on the table. “Which account should I expect?”", [
       trade("room", "Take the room your friends arranged.", [A("chosen", -24)]),
       trade("money", "Take the travel money they sent.", [L(36)]),
       trade("letters", "Read the letters and thank her for keeping them.", []),
-      joyChoice("writers", "Invite your host to sit with you and hear the stories behind the letters.", [A("allUnlocked", -12)]),
+      joyChoice("writers", "Share the stories behind the letters over supper, then accept the remaining travel money.", [A("allUnlocked", -12), L(24)]),
     ]),
   scene("friendship-gemini-swapped-lessons", 11, "Gemini",
-    "At the circle's lesson exchange, your friend offers to show you the knot you once taught him. His version holds. He remembers yours differently from you. Someone has saved a quiet seat by the demonstration table, and he asks whether you want to watch or try it.", [
+    "At the lesson exchange, your friend demonstrates the knot you once taught him. His version holds. “You missed a turn,” he says, though neither of you remembers who was teaching whom. He slides a length of cord toward you; someone else saves you a seat among the listeners.", [
       trade("learn", "Work through his version of the knot.", [G("chosen", "luck", 12)]),
       trade("seat", "Take the quiet seat and watch the lessons pass around.", [A("chosen", -24)]),
       trade("remember", "Tell him how you remember teaching it.", []),
       joyChoice("exchange", "Pair each learner with someone whose trick they can teach in return.", [G("joy", "luck", 12), A("allUnlocked", -12)]),
     ]),
   scene("friendship-gemini-street-choir", 11, "Gemini",
-    "The neighborhood choir has brought two versions of the same song. Neither group is willing to abandon its ending, and both invite you to join. The conductor offers a fee for carrying the long middle part. Several listeners have made a comfortable bench from their coats.", [
-      trade("part", "Sing the demanding middle part for the conductor's fee.", [A("chosen", 12), L(60)]),
-      trade("listen", "Settle on the improvised bench and hear both endings.", [A("chosen", -24)]),
+    "The neighborhood choir has brought two endings to the same song. Neither group will surrender its sheet. The conductor offers you a fee for the long middle part while they argue. Your friends have spread their coats across a bench. “We can listen to both,” one says, moving over.", [
+      trade("part", "Sing the demanding middle part for the conductor's fee.", [A("chosen", 12), L(48)]),
+      trade("listen", "Make room on the bench and rest together through both endings.", [A("allUnlocked", -12)]),
       trade("quiet", "Leave the competing singers to their song.", []),
       joyChoice("refrain", "Carry the refrain both groups share and invite them in together.", [G("joy", "affliction", 12), A("allUnlocked", -12)]),
     ]),
   scene("friendship-gemini-copy-table", 11, "Gemini",
-    "At the copying table, your friends have left a clear place and a pen you recognize. Their notice must be ready by evening. The treasurer offers a small fee for one stack and more for all three. Somebody has already put a cushion on your chair.", [
-      trade("one", "Copy one stack for the smaller fee.", [A("chosen", 12), L(60)]),
-      trade("three", "Copy all three stacks before evening.", [A("chosen", 36), L(132)]),
-      trade("visit", "Visit the table without taking up the pen.", []),
-      joyChoice("rotate", "Rotate writing and sorting among the willing hands around you.", [L(48), G("joy", "luck", 12)]),
+    "A gust strips the awning from your friends' copying table as you reach it. Your coat and their notices are soaked. The upstairs stove is cold. A wood seller waits with his cart; he offers a fee for unloading it, or you can buy a few dry logs.", [
+      trade("fuel", "Buy enough dry wood to warm yourself and the notices before leaving.", [], { cost: 24 }),
+      trade("walk", "Leave the notices with your friends and walk on in your wet coat.", [A("chosen", 12)]),
+      trade("wood", "Unload the seller's heavy cart for his fee, then dry out by the stove.", [A("chosen", 24), L(60)]),
+      joyChoice("rotate", "Ask the neighbors for spare logs and dry the notices together.", [A("allUnlocked", -12)]),
     ]),
   scene("friendship-gemini-news-window", 11, "Gemini",
-    "Your friend keeps a window open so travelers can add news to the circle's map. Your route is the last empty strip. She has saved a small contribution for you and cleared the whole table, though you had only mentioned stopping long enough to say hello.", [
+    "Your friend leans through the open window to ask which road you took. Inside, the circle's map has one blank strip. She has saved a small contribution for your journey; the travelers around her offer contradictory shortcuts. “Come and settle this,” she says, clearing a place at the table.", [
       trade("gift", "Take the contribution and point out the road you followed.", [L(24)]),
       trade("map", "Stay to compare the circle's road notes with your own.", [G("chosen", "luck", 12)]),
       trade("greet", "Say hello and leave the map for a longer visit.", []),
-      joyChoice("connections", "Call the other travelers over to fill in the roads that meet yours.", [G("chosen", "luck", 24)]),
+      joyChoice("connections", "Sit with the other travelers and fill in the roads that meet yours.", [G("chosen", "luck", 12), A("allUnlocked", -12)]),
     ]),
   scene("friendship-cancer-dry-coat", 11, "Cancer",
     "A dry coat waits at the harbor with your name pinned inside. Three friends disagree about who first remembered you would need it. You stand between them dripping onto the quay. One finally stops arguing long enough to open the coat and hold it around your shoulders.", [

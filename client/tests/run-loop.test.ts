@@ -10,7 +10,7 @@ import { unlockedPlanets } from "@/game/unlocks";
 import { rollNodeContent } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
-import { pickScenario } from "@/data/narrative-scenarios";
+import { getScenario, pickScenario } from "@/data/narrative-scenarios";
 import type { RelationalEncounter, NarrativeEncounter, NodeContent, Run, PlanetName } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
@@ -187,7 +187,7 @@ describe("Shared run transitions", () => {
   const enter = (r: Run, nodeId: string, encounterIdSeed?: number) =>
     enterNode({ run: r, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters, encounterIdSeed });
 
-  it("entering a node marks it visited and opens its encounter from the live seeds", () => {
+  it("entering a node marks it visited and retains deterministic default draws", () => {
     const relationalId = nodeOf("relational");
     const { opponentSeed } = run.map.rolledNodes[relationalId] as { opponentSeed: number };
     const relational = enter(run, relationalId);
@@ -208,22 +208,35 @@ describe("Shared run transitions", () => {
         const narrative = enter(r, nodeId);
         expect(narrative.encounter).toMatchObject({ kind: "narrative", house, scenarioId });
         expect(narrative.seenScenarioIds).toEqual([scenarioId]);
-        // Once seen, another matching or house-only scene is available.
+        // Once seen, another matching scene is available.
         expect(enter({ ...r, seenScenarioIds: [scenarioId] }, nodeId).encounter).not.toMatchObject({ scenarioId });
       }
     }
   });
 
-  it("an encounterIdSeed resamples arrival draws from what the map shows, never the live seeds", () => {
+  it("entry seeds vary openings independently of map content and later-turn draws", () => {
     const before = structuredClone(run);
-    // Same map, different live seeds: a forecast must not tell the runs apart.
+    // Forecasts and deterministic callers can supply the same opening independently of run identity.
     const other: Run = { ...run, id: "run_other", seed: run.seed + 1 };
     const relationalId = nodeOf("relational");
-    const live = enter(run, relationalId).encounter as RelationalEncounter;
-    const forecast = enter(run, relationalId, 7).encounter as RelationalEncounter;
-    expect(forecast.opponentChart).toEqual(live.opponentChart);
-    expect(forecast.necessity).not.toEqual(live.necessity);
-    expect({ ...enter(other, relationalId, 7).encounter, id: forecast.id }).toEqual(forecast);
+    const draws = Array.from({ length: 8 }, (_, seed) => enter(run, relationalId, seed));
+    const encounters = draws.map((draw) => draw.encounter as RelationalEncounter);
+    for (const draw of draws) {
+      expect(draw.map.rolledNodes).toEqual(run.map.rolledNodes);
+      expect(draw.map.graph).toEqual(run.map.graph);
+      expect(draw.map.seed).toBe(run.map.seed);
+      expect((draw.encounter as RelationalEncounter).opponentChart).toEqual(encounters[0]!.opponentChart);
+    }
+    expect(new Set(encounters.map((enc) => `${enc.sequence[0]}_${enc.opponentActions[0]}`)).size).toBeGreaterThan(1);
+    expect(new Set(encounters.map((enc) => JSON.stringify(enc.necessity))).size).toBeGreaterThan(1);
+    expect(new Set(encounters.map((enc) => JSON.stringify(enc.selfNecessity))).size).toBeGreaterThan(1);
+    expect(enter(run, relationalId, 7)).toEqual(draws[7]);
+    expect({ ...enter(other, relationalId, 7).encounter, id: encounters[7]!.id }).toEqual(encounters[7]);
+    const laterDraws = encounters.map((enc) => {
+      const rng = relationalTurnRng(run, { ...enc, turnIndex: 1 });
+      return [rng(), rng(), rng()];
+    });
+    expect(laterDraws.every((values) => JSON.stringify(values) === JSON.stringify(laterDraws[0]))).toBe(true);
 
     const narrativeId = nodeOf("narrative");
     const scenarios = (r: Run) => [0, 1, 2, 3, 4, 5, 6, 7].map(
@@ -231,6 +244,18 @@ describe("Shared run transitions", () => {
     );
     expect(new Set(scenarios(run)).size).toBeGreaterThan(1);
     expect(scenarios(other)).toEqual(scenarios(run));
+    const seenScenarioIds: string[] = [];
+    for (let seed = 0; seed < 5; seed++) {
+      const next = enter({ ...run, seenScenarioIds }, narrativeId, seed);
+      const encounter = next.encounter as NarrativeEncounter;
+      expect(getScenario(encounter.scenarioId)).toMatchObject({
+        house: encounter.house, sign: houseSign(prince.chart, encounter.house),
+      });
+      expect(seenScenarioIds).not.toContain(encounter.scenarioId);
+      expect(next.state).toEqual(run.state); // Narrative entry applies no Necessity.
+      expect(next.map.rolledNodes).toEqual(run.map.rolledNodes);
+      seenScenarioIds.push(encounter.scenarioId);
+    }
     expect(run).toEqual(before);
   });
 

@@ -2,7 +2,8 @@
 
 [House XI](../HOUSE_MATRIX.md#xi--friendship) supplies remembered ties, welcomed membership, and practical support for a shared intention.
 [Sign references](../../research/SIGN_NOTES.md) distinguish the circles and their manner; [Jupiter in XI](../HOUSE_PLANET_MATRIX.md#jupiter-xi--friendship) adds an opportunity through belonging rather than a future debt.
-The possible gifts are used now, and any contribution buys an immediate effect; declining remains available.
+The possible gifts are used now, and any contribution buys an immediate effect.
+Ordinary generosity can coexist with occasional costs imposed by the shared situation; there is no later debt.
 
 ## Aries
 
@@ -22,11 +23,11 @@ The possible gifts are used now, and any contribution buys an immediate effect; 
 
 ## Gemini
 
-1. `friendship-gemini-three-letters`: Three friends have separately written to recommend you to the same host, who wants to know which account you prefer; overlapping networks and wit, comedy; accept lodging or the travel purse they enclosed; Jupiter: invite the host to sit with you and hear the stories behind the letters.
-2. `friendship-gemini-swapped-lessons`: A circle trades short lessons, and your friend offers to teach you the trick you taught him badly years ago; shared knowledge and nimble correction, pleasure; choose a focused Fortune lesson or easy listening; Jupiter: arrange the lessons so everyone both teaches and receives.
-3. `friendship-gemini-street-choir`: The neighborhood choir has two different sheets of music and is enjoying the disagreement too much to stop; paired voices and sociability, playful quarrel; join a demanding paid part or listen at rest; Jupiter: carry the refrain both versions share.
-4. `friendship-gemini-copy-table`: Friends copying a public notice have left your place at the table and a purse for anyone whose hand lasts longest; letters and collective work, invitation; take a short paid turn or a long tiring one; Jupiter: rotate the writing with the willing hands around you.
-5. `friendship-gemini-news-window`: A friend keeps the window open so travelers can add news to the circle's map, and your route is the last empty strip; roads and exchange, welcome; receive their small contribution or buy time for careful instruction; Jupiter: share your route while others fill in its missing connections.
+1. `friendship-gemini-three-letters`: A host lays out lodging and a purse sent by friends whose recommendations contradict each other; overlapping networks and wit, comedy; accept concentrated rest, travel money, or simply thank her; Jupiter: share the letters' stories over a restorative supper and take the remaining travel money.
+2. `friendship-gemini-swapped-lessons`: A friend demonstrates the knot you once taught him while both dispute who missed a turn; shared knowledge and nimble correction, pleasure; choose a focused Fortune lesson, easy listening, or reminiscence; Jupiter: pair learners and teachers so everyone receives support.
+3. `friendship-gemini-street-choir`: Friends save a bench beside a choir arguing over two endings to one song; paired voices and sociability, playful quarrel; sing the tiring paid middle, share a rest, or leave the choir to its disagreement; Jupiter: carry the common refrain with shared recovery and stronger Afflict.
+4. `friendship-gemini-copy-table`: A gust strips the copying table's awning, soaking you and your friends' notices beside an unlit stove; letters and collective work, affectionate burden; buy dry fuel, walk on wet, or unload the wood seller's heavy cart for his fee; Jupiter: gather the neighbors' spare logs for shared recovery.
+5. `friendship-gemini-news-window`: A friend welcomes your road news while travelers disagree over shortcuts on the circle's unfinished map; roads and exchange, welcome; receive their contribution, compare notes for Fortune, or greet them and leave; Jupiter: sit together to fill missing connections, combining the lesson with shared rest.
 
 ## Cancer
 

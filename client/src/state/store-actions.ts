@@ -55,6 +55,7 @@ export function useEnterNode() {
       nodeId,
       lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
       devUnlockAll: settings.unlockAll,
+      encounterIdSeed: randomSeed(),
     });
     if (!nextRun.encounter) return;
     dispatch({ kind: "commitRun", run: nextRun });
