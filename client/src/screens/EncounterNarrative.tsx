@@ -215,6 +215,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   const chartRef = usePlayerChart({
     props: {
       chart,
+      activeHouse: encounter.house,
       state: run.state,
       unlockedPlanets: ctx.unlocked,
       activePlanet: !targeting && joyPresent(ctx) ? joyPlanet : null,

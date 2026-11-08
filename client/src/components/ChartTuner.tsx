@@ -64,6 +64,19 @@ export function ChartTuner() {
           />
           Glow
         </label>
+        <label className="dev-console-check">
+          <input
+            type="checkbox"
+            checked={tuning.showHouseHighlight}
+            onPointerEnter={playHoverSound}
+            onFocus={playFocusSound}
+            onChange={(e) => {
+              playUISound("select");
+              setTuning({ showHouseHighlight: e.target.checked });
+            }}
+          />
+          House highlight
+        </label>
       </div>
 
       {TUNING_KNOBS.map((knob) => (

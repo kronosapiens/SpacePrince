@@ -31,7 +31,7 @@ export const CHART_STYLE = {
   /** Diagram — the twelve sign-division ticks. */
   tick: { opacity: 0.85, stroke: STROKE_MEDIUM },
   /** Word — sign name + glyph labels on the outer band. */
-  signLabel: { opacity: 0.7 },
+  signLabel: { opacity: 0.7, activeOpacity: 1, glow: 6 },
 
   /** Diagram — aspect web. One opacity everywhere; the active stroke (hover) is
    *  the only thing that emphasizes a line. */

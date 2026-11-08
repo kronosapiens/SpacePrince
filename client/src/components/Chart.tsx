@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
+import { houseSign } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
+import { HOUSES } from "@/data/houses";
 import {
   PlanetStatsPanel,
   PLANET_STATS_PANEL_W,
@@ -124,6 +126,8 @@ export interface ChartProps {
   selectedPlanet?: PlanetName | null;
   /** Always-active planet (e.g. opponent-of-the-turn). Pulses with full halo. */
   activePlanet?: PlanetName | null;
+  /** Encountered house: its sign glows steadily in the house ruler's color. */
+  activeHouse?: number;
   /** When true, every visible planet renders in active state (full halo + larger glyph).
    *  Used for ceremonial / hero stages like the Title screen. */
   allActive?: boolean;
@@ -205,6 +209,7 @@ export function Chart(props: ChartProps) {
     unlockedPlanets,
     selectedPlanet,
     activePlanet,
+    activeHouse,
     allActive = false,
     hoveredPlanet,
     showColorField = true,
@@ -246,7 +251,6 @@ export function Chart(props: ChartProps) {
 
   const tuning = useTuning();
   const points = useMemo(() => buildPlanetPoints(chart, PLANET_R_REST), [chart]);
-  const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
   // Place the panel in the emptiest interior wedge — the wheel's middle isn't
   // reliably clear (same-sign planets cluster toward the center). Reserve the
   // taller action height so the spot doesn't shift when buttons appear.
@@ -423,7 +427,7 @@ export function Chart(props: ChartProps) {
       <circle cx={CHART_CENTER} cy={CHART_CENTER} r={INNER_RING_R}
         fill="none" stroke={NEUTRAL.gold} strokeOpacity={CHART_STYLE.ring.inner.opacity} strokeWidth={CHART_STYLE.ring.inner.stroke} />
       <SignTicks />
-      <SignLabels ascSignIdx={ascSignIdx} />
+      <SignLabels chart={chart} activeHouse={tuning.showHouseHighlight ? activeHouse : undefined} showGlow={tuning.showGlow} />
       {aspectLines}
       {propagationLines}
 
@@ -998,24 +1002,31 @@ function SignTicks() {
   return <g>{lines}</g>;
 }
 
-function SignLabels({ ascSignIdx }: { ascSignIdx: number }) {
+function SignLabels({ chart, activeHouse, showGlow }: Pick<ChartProps, "chart" | "activeHouse"> & { showGlow: boolean }) {
+  const ascSignIdx = SIGNS.indexOf(chart.ascendantSign);
+  const activeSign = activeHouse ? houseSign(chart, activeHouse) : undefined;
+  const activeColor = activeHouse ? PLANET_PRIMARY[HOUSES[activeHouse - 1]!.ruler] : undefined;
   const out = [];
   for (let i = 0; i < 12; i++) {
     const sign = SIGNS[i]!;
+    const active = sign === activeSign;
     const offset = (i - ascSignIdx + 12) % 12;
     const ang = 180 + offset * 30 + 15;
     const p = polar(CHART_CENTER, CHART_CENTER, SIGN_LABEL_R, ang);
     out.push(
-      <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}>
+      <g key={`sl_${i}`} transform={`translate(${p.x}, ${p.y})`}
+        fill={active ? activeColor : NEUTRAL.bone}
+        fillOpacity={active ? CHART_STYLE.signLabel.activeOpacity : CHART_STYLE.signLabel.opacity}
+        style={active && showGlow ? { filter: `drop-shadow(0 0 ${CHART_STYLE.signLabel.glow}px ${activeColor})` } : undefined}>
         <text textAnchor="middle" dominantBaseline="central" y={-12}
-          fontSize={20} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
+          fontSize={20}
           letterSpacing="2"
           fontFamily="'Cormorant Garamond', serif" fontWeight={500}
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_LABELS[sign]}
         </text>
         <text textAnchor="middle" dominantBaseline="central" y={14}
-          fontSize={22} fill={NEUTRAL.bone} fillOpacity={CHART_STYLE.signLabel.opacity}
+          fontSize={22}
           fontFamily="'Cormorant Garamond', 'Noto Sans Symbols 2', 'Apple Symbols', serif"
           style={{ pointerEvents: "none", userSelect: "none" }}>
           {SIGN_GLYPH[sign]}

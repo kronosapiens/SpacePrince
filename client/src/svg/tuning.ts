@@ -30,6 +30,7 @@ export interface ChartTuning {
    *  void, which is the only way to see what the line work is doing on its own.
    *  Scaffolding. */
   showGlow: boolean;
+  showHouseHighlight: boolean;
 }
 
 /** The keys the slider list can drive — every knob whose value is a number. */
@@ -39,6 +40,7 @@ type NumericKey = {
 
 export const TUNING_DEFAULTS: ChartTuning = {
   showGlow: true,
+  showHouseHighlight: true,
 };
 
 /** Slider ranges for the console. Bounds are generous rather than safe — the
