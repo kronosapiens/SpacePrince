@@ -1,8 +1,8 @@
 # Writing narrative scenes
 
 The maintained guide for the house–sign scene catalogue: how a scene is developed, how its choices are composed, and how drafts are compared.
-The [prose and voice guide](VOICE.md) sets the Gibran-inspired tone through passages from *The Prophet* and instructions for adapting their techniques.
-The [setting guide](SETTING.md) describes the cosmic fable, its mixture of technology and magic, and encounters that work in any order.
+The [prose and voice guide](VOICE.md) keeps the narrator plain and gives convictions to speakers, with *The Little Prince* and *The Prophet* as references.
+The [setting guide](SETTING.md) describes the cosmic fable, its strange details, and encounters that work in any order.
 The catalogue holds 720 scenes, five for each of the 144 house–sign pairs, in the [house modules](../../client/src/data/narrative) assembled by [narrative-scenarios.ts](../../client/src/data/narrative-scenarios.ts).
 Each scene's one-line brief, with its source reasoning, sits in the [briefs](#briefs) beside this file.
 Economic terms, eligibility, and resolution are specified in [ENCOUNTERS.md](../mechanics/ENCOUNTERS.md); the references a scene draws on are grouped in [HOUSES.md §3](../mechanics/HOUSES.md#3-chart-conditioning-model).
@@ -57,7 +57,7 @@ Villains, antagonists, and epic stakes are out of register; the people in a scen
 
 ## Voice and length
 
-Use [VOICE.md](VOICE.md) for prose style, imagery, rhythm, and reflection.
+Use [VOICE.md](VOICE.md) for the narrator's prose and the speakers' dialogue.
 For house scenes:
 
 - Aim for **30–50 words in one paragraph**, excluding participation notes; reconsider anything above 60.
