@@ -13,8 +13,8 @@ The chart is the character sheet, the save file, and the artifact the player own
 
 Play is a journey of encounters, with other charts and with the houses of the player's own, informed by Siddhartha's attention to lived experience (below).
 In each encounter the player chooses which planet answers and how, and the chart's own structure, its signs and aspects, carries the consequences.
-Encounters create **Light**: the energy a meeting leaves behind, carried into what comes next, with what remains at a journey's end shaping one star in the Prince's sky.
-Affliction accumulates, planets combust and return, and a run ends by completion or by every planet going dark.
+The Prince generates **Light** by responding skillfully to each circumstance: energy gathered across the journey and expended to restore the chart, with what is left at a journey's end becoming one star in the Prince's sky.
+Tension wears down each planet's Resolve, planets combust and return, and a run ends by completion or by every planet going dark.
 Nothing resets.
 A run ends in combustion as readily as in completion, and either way the world records the Light that remains.
 
@@ -35,7 +35,7 @@ A newcomer should arrive knowing why this matters and what they will do, enough 
 Exposition is generous in availability and invisible by default.
 It is delivered deepest-on-demand: a short framing at first arrival, each screen's guide the first time a Prince meets it, the inspect annotations and the glossary when summoned, and the long-form primer for whoever wants it.
 Offer a foothold; never force a lesson.
-The guides use plain, conventional game words where those teach fastest; that is a deliberate teaching choice, not a lapse in register.
+The guides teach in the game's own words, each paired with one plain descriptive word ([SCREENS.md §1.2](presentation/SCREENS.md)).
 
 ## The experience
 

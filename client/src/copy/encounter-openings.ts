@@ -11,7 +11,7 @@ import type { PlanetName, SignName } from "@/game/types";
  *  Placement colour draws on docs/writing/PLANET_MATRIX.md and the planet
  *  introductions. */
 export const ENCOUNTER_OPENINGS: Record<PlanetName, Record<SignName, string>> = {
-  // Gain Light from healing on the Other's chart.
+  // Gain Light from tension eased on the Other's chart.
   Moon: {
     Aries: "Their complaint is ready before the kettle boils. They want to get it out into the open, where your answer might make it easier to bear.",
     Taurus: "The station keeps a borrowed summer behind glass. They are looking for that kind of warmth from you: something their tired body can trust for a while.",
@@ -41,7 +41,7 @@ export const ENCOUNTER_OPENINGS: Record<PlanetName, Record<SignName, string>> = 
     Aquarius: "Their companions all call the design revolutionary. They want you to question the part everyone, including them, has mistaken for ordinary.",
     Pisces: "The picture in their mind changes whenever they describe it. They want you to answer from the far shore, where its shape might look different.",
   },
-  // Gain Light from direct healing on both charts.
+  // Gain Light from tension eased directly on both charts.
   Venus: {
     Aries: "The second bowl is already on the table. They hope the two of you can answer kindness with kindness before either thinks of a reason to wait.",
     Taurus: "The fruit grows slowly on this cold moon. They want to enjoy its sweetness with you, giving each other enough time to feel restored.",
@@ -71,7 +71,7 @@ export const ENCOUNTER_OPENINGS: Record<PlanetName, Record<SignName, string>> = 
     Aquarius: "Their common room began as a drawing on a wall. They want your answer in the same spirit as their own.",
     Pisces: "They know the tune before they know its name. They want an answer in accord with what they offer, a voice that can meet the same note.",
   },
-  // Gain Light from damage on the Other's chart.
+  // Gain Light from tension created on the Other's chart.
   Mars: {
     Aries: "The new handles still have splinters. They want you to put their eager strength under real pressure.",
     Taurus: "Their hands know the weight of a day's work. They want you to press them beyond the familiar load and discover what their steadiness can bear.",
@@ -101,7 +101,7 @@ export const ENCOUNTER_OPENINGS: Record<PlanetName, Record<SignName, string>> = 
     Aquarius: "Their workshop has tools for different hands. They want support or challenge to pass both ways, reaching each of you.",
     Pisces: "They hope to let the meeting reach both of you without deciding its shape in advance. There is room in their welcome for comfort and for difficulty.",
   },
-  // Gain Light from knockouts on both charts.
+  // Gain Light from planets going dark on both charts.
   Saturn: {
     Aries: "Their hands cannot finish all they began. They want to find where either person's strength runs out and work must stop.",
     Taurus: "The winter store has a last jar, however carefully it is counted. They want to learn what happens when either of you reaches the end of a reserve.",

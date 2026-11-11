@@ -5,9 +5,10 @@
  *  Register: direct game instructions, accurate to MECHANICS.md, limited to
  *  what the player needs to act on the screen — the instruction line already
  *  names what to click, and the screen shows its own numbers. Pair the
- *  game's terms with familiar meanings at first mention, once per screen's
- *  full tutorial: Afflict deals damage, Testify heals, and combusted means
- *  knocked out until revived.
+ *  game's terms with their descriptive words at first mention, once per
+ *  screen's full tutorial: Afflict presses and creates tension, Testify
+ *  eases it, Resolve is what a planet has left, and a combusted planet
+ *  goes dark until it returns (SCREENS.md §1.2).
  *  Casing per SCREENS.md §1.2: named quantities capped
  *  (Resolve, Fortune, Light, Afflict, Testify — TermText accents these,
  *  plus aspect/aspects and combust/combusted in any case);
@@ -32,23 +33,23 @@ export const GUIDE_COPY = {
     notes: {
       self: {
         label: "Self",
-        body: "Your chart. The arc around each planet is its health; at zero it combusts (knocked out until revived).",
+        body: "Your chart. The arc around each planet is its Resolve; at zero it combusts and goes dark until it returns.",
       },
       activePlanet: {
         label: "Incoming move",
-        body: "Their acting planet will damage or heal the planet you choose, by this much. You act first, and your action lands on it.",
+        body: "Their acting planet will press or ease the planet you choose, by this much. You act first, and your action lands on it.",
       },
       ruler: {
         label: "Ruler and scoring",
-        body: "Light is your run's score. The ruler, {ruler}, decides what earns it: {rule}.",
+        body: "Light is your run's score. The ruler, {ruler}, decides what generates it: {rule}.",
       },
       actions: {
-        label: "Damage or heal",
-        body: "Afflict damages, Testify heals. Either can earn Light, depending on the ruler. Hover or focus to preview.",
+        label: "Press or ease",
+        body: "Afflict presses, creating tension; Testify eases it. Either can generate Light, depending on the ruler. Hover or focus to preview.",
       },
       projection: {
         label: "{action} preview",
-        body: "This move would gather {light} Light.",
+        body: "This move would generate {light} Light.",
       },
     },
   },
@@ -67,15 +68,15 @@ export const GUIDE_COPY = {
       },
       encounter: {
         label: "An encounter",
-        body: "Another chart to meet. Its ruler, {ruler}, decides what earns Light there.",
+        body: "Another chart to meet. Its ruler, {ruler}, decides what generates Light there.",
       },
       house: {
         label: "A house",
-        body: "A story event. Its choices trade between health and Light.",
+        body: "A story event. Its choices trade between Resolve and Light.",
       },
       chart: {
         label: "Your chart",
-        body: "Damage carries from one encounter to the next. Click a planet to inspect it.",
+        body: "Tension carries from one encounter to the next. Click a planet to inspect it.",
       },
       crossing: {
         label: "The crossing",

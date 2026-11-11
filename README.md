@@ -10,7 +10,7 @@ The chart is the character sheet, the save file, and the artifact, all the same 
 
 Play is a journey of encounters.
 When two charts meet, each turn the player chooses which planet to send and whether it afflicts or testifies; the effect lands on the other chart and travels along that chart's own aspects.
-Every such encounter has a ruler, the planet ruling the other chart's rising sign, and the ruler decides what earns **Light**.
+Every such encounter has a ruler, the planet ruling the other chart's rising sign, and the ruler decides what generates **Light**.
 In the houses of the player's own chart, each scene asks for one choice about the chart they carry onward.
 Affliction accumulates, planets combust and return, and runs end.
 Over a lifetime of encounters the chart fills in, one planet at a time, and every run leaves one star in the Prince's sky, shaped by the Light it carried out.
@@ -60,8 +60,8 @@ It increases specificity.
 
 - **The chart is the economy.**
   No HP, gold, energy, or inventory.
-  A run holds seven affliction values, a few stat gains that last the run, and the Light gathered.
-  Affliction builds tension, testimony relieves it, combustion silences; Light is what remains.
+  A run holds seven planets' Resolve, a few stat gains that last the run, and the Light gathered.
+  Afflict creates tension, Testify eases it, combustion silences; Light is what a skillful answer generates.
 
 - **Aspects propagate with polarity.**
   Internal aspects carry effects between planets: trines and sextiles transmit, squares and oppositions invert, conjunctions fuse.

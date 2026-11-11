@@ -56,7 +56,7 @@ When a design genuinely needs hidden information, it must be hidden onchain — 
 
 The game is about creating and relieving tension — being *with* others — and the player-facing vocabulary carries that.
 The surfaces are **Map**, **Encounter**, and **Narrative**; the encounter shows **self** and **other**.
-Affliction builds tension, testimony relieves it; planets combust and return; nothing fights, wounds, or wins.
+Afflict creates tension, Testify eases it; planets combust and return; nothing fights, wounds, or wins.
 Generated other-charts are named `Other N`, never `Adversary`.
 
 **Encounter** is the shared unit, with two types: **relational** and **narrative**.
@@ -65,13 +65,14 @@ They do not reach player prose: not the openings, the scenes, the primer, the he
 The mechanical terms the player sees are the verbs Afflict/Testify, the operational readouts Resolve and Fortune, and Light.
 The underlying stats are **affliction, testimony, Resolve, and luck**.
 
-**The guides are the deliberate exception.**
-The screen guides (`client/src/copy/guide.ts`) and help (`client/src/copy/help.ts`) gloss the verbs in plain conventional game words — damage, heal, knocked out — because playtesters needed a vocabulary they already had before the game's own could mean anything.
-That choice was made on purpose and confirmed when the encounter openings shipped ([#27](https://github.com/kronosapiens/SpacePrince/issues/27)); the guides are not to be rewritten against this register.
-Whether the game's own words can eventually carry the first encounter is the question under [#35](https://github.com/kronosapiens/SpacePrince/issues/35).
+**One descriptive word per term.**
+Each game term is paired with one plain word, and never two: **press** for Afflict, **ease** for Testify, and **tension** for Resolve used up.
+Resolve is what a planet has left; its maximum is its ceiling.
+Affliction names what a planet sends when it Afflicts; as an amount that builds up on a planet it is internal accounting (`MECHANICS.md` §10) and does not reach player prose.
+The screen guides (`client/src/copy/guide.ts`) and help (`client/src/copy/help.ts`) teach in these words too; damage, heal, and health are not used.
 
 **Casing.**
-Named quantities are capitalized in prose — **Resolve, Fortune, Light** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").
+Named quantities are capitalized in prose — **Resolve, Fortune, Light** — the capital marking the term of art against the common noun ("resolving tension restores its Resolve").
 Other substances, processes, and stats stay lowercase — affliction, testimony, tension, combustion, aspects, and luck in flowing text; the fortune roll is a process and stays lowercase.
 Verbs follow mention vs use: named as actions they are capped ("choose Afflict or Testify"); used as English they are not ("afflict their actor before it swings").
 Display labels — table headers, stat lines, the uppercase micro-type (SELF, OTHER) — take title or upper case as chrome styling, independent of prose casing.
