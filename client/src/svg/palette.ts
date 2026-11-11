@@ -56,7 +56,8 @@ export const ASPECT_HEAD_COLOR = {
 
 /** Action valence colors — afflict (amber) / testify (violet). Kept off the
  *  aspect red/green. Shared by the action buttons, the opponent's precommitted-
- *  verb label, and the affliction arc's projection. */
+ *  verb label, the affliction arc's projection, and the two verbs named in
+ *  prose (TermText). */
 export const VALENCE_COLOR = {
   Affliction: "#E8913A",
   Testimony: "#9D86D9",
