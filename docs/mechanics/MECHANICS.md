@@ -401,7 +401,7 @@ When the run ends — combustion or completion (§11) — that value shapes a st
 Nothing else about the run is recorded: not how it ended, not which planets combust.
 Only the Light, and the star it shapes.
 
-What Light means to the player, and whether these rules are the right way to generate it, remain open explorations ([#23](https://github.com/kronosapiens/SpacePrince/issues/23), [#25](https://github.com/kronosapiens/SpacePrince/issues/25)).
+What Light means to the player, and whether these rules are the right way to generate it, remain open ([#52](https://github.com/kronosapiens/SpacePrince/issues/52)).
 
 ## 13. Interaction Chart Semantics
 

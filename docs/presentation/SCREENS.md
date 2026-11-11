@@ -68,7 +68,7 @@ The underlying stats are **affliction, testimony, Resolve, and luck**.
 **The guides are the deliberate exception.**
 The screen guides (`client/src/copy/guide.ts`) and help (`client/src/copy/help.ts`) gloss the verbs in plain conventional game words — damage, heal, knocked out — because playtesters needed a vocabulary they already had before the game's own could mean anything.
 That choice was made on purpose and confirmed when the encounter openings shipped ([#27](https://github.com/kronosapiens/SpacePrince/issues/27)); the guides are not to be rewritten against this register.
-Whether the game's own words can eventually carry the first encounter is the question under [#22](https://github.com/kronosapiens/SpacePrince/issues/22) and [#26](https://github.com/kronosapiens/SpacePrince/issues/26).
+Whether the game's own words can eventually carry the first encounter is the question under [#35](https://github.com/kronosapiens/SpacePrince/issues/35).
 
 **Casing.**
 Named quantities are capitalized in prose — **Resolve, Fortune, Light** — the capital marking the term of art against the common noun ("resolving affliction restores the margin below its Resolve").

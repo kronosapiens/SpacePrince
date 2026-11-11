@@ -159,12 +159,11 @@ What happens if a game reaches a gas limit remains open ([#31](https://github.co
 
 ## Open questions
 
-Selected next: [#35](https://github.com/kronosapiens/SpacePrince/issues/35), giving the chart-to-chart encounter its words at every level, an ending, and fixes for the turns with no human reading, alongside the run-end beat.
+The plan for completing the design is [#51](https://github.com/kronosapiens/SpacePrince/issues/51): three items that decide whether chart-to-chart encounters land, then four that finish the design.
 
-- [#22](https://github.com/kronosapiens/SpacePrince/issues/22): the first encounter, what the actions mean and why to choose one.
-- [#23](https://github.com/kronosapiens/SpacePrince/issues/23): the emotional meaning of the journey, the encounters, and Light.
-- [#25](https://github.com/kronosapiens/SpacePrince/issues/25): how encounters generate Light.
-- [#26](https://github.com/kronosapiens/SpacePrince/issues/26): a worded reading of each encounter from its facts and beats.
-- [#31](https://github.com/kronosapiens/SpacePrince/issues/31): the per-run gas budget, maturity, and a free sample run.
+- [#52](https://github.com/kronosapiens/SpacePrince/issues/52): what Light is, and what has to change to fit it.
+- [#24](https://github.com/kronosapiens/SpacePrince/issues/24): making the Other respond to the player, by remaining Resolve or by answering in kind.
+- [#35](https://github.com/kronosapiens/SpacePrince/issues/35): the chart-to-chart encounter's words at every level.
 - [#34](https://github.com/kronosapiens/SpacePrince/issues/34): the end-of-run beat, where the run's Light becomes a star.
+- [#31](https://github.com/kronosapiens/SpacePrince/issues/31): the per-run gas budget, maturity, and a free sample run.
 - [#32](https://github.com/kronosapiens/SpacePrince/issues/32): deferred presentation (run history, chart study layers, map valence cue, shareable runs).
