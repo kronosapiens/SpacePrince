@@ -2,18 +2,18 @@
  *  stakes beat (SCREENS.md §9.6), and the line that opens the cast form after
  *  it. PRIMER.md holds the voice notes and the codex; the words themselves
  *  live here. One string per paragraph, rendered through `TermText`: `**…**`
- *  marks emphasis, and Light takes the gold term accent on its own.
- *  Register: spare, confident, unhurried — assumes no astrology and stays
- *  above the named mechanics (Resolve, affliction, testimony are taught in
- *  play). */
+ *  marks emphasis, and the named terms take their accent on their own.
+ *  Register: spare, confident, unhurried — assumes no astrology. It names
+ *  Afflict, Testify, and Resolve and says what each means; how they work is
+ *  taught in play. */
 
 export const PRIMER_FRAMING: string[] = [
-  "People have been reading the stars for thousands of years. Space Prince borrows astrology's language of planets, signs, and relationships.",
-  "Your birth chart becomes a Prince: seven planets, each with a way of meeting the world.",
-  "**You are a cosmic entity, traveling among strange worlds and familiar concerns: a welcome, a day's work, something someone cannot quite let go.**",
-  "Choose which planet answers when you meet another chart. In the houses of your own chart, choose how to take part in the lives you find there.",
-  "Your choices create and relieve tension. The meetings can give you Light or ask you to spend it; you carry what remains into the next encounter.",
-  "At the end of a journey, that Light shapes a star in your sky. The chart remains yours; each return gives you another chance to read it.",
+  "Astrology is one of humanity's oldest systems of knowledge. For millennia, people have made meaning through the stars.",
+  "**Space Prince** is a game: about yourself, your relationships, and the inner architecture that sustains you.",
+  "Your time and place of birth define your chart: seven planets in seven placements yield your unique personality.",
+  "**You are a cosmic entity, traveling the universe gathering Light.**",
+  "On your journey, you will meet others: their planets act and yours answer. A planet can Afflict, creating tension, or Testify, easing it. A planet's Resolve is the tension it can bear.",
+  "Answer according to the circumstance, and you generate Light. At journey's end, your Light becomes a star in the sky.",
 ];
 
 /** The instruction above the cast form. */

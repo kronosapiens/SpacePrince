@@ -9,7 +9,7 @@
  *  full tutorial: Afflict deals damage, Testify heals, and combusted means
  *  knocked out until revived.
  *  Casing per SCREENS.md §1.2: named quantities capped
- *  (Resolve, Fortune, Light, Afflict, Testify — TermText golds these,
+ *  (Resolve, Fortune, Light, Afflict, Testify — TermText accents these,
  *  plus aspect/aspects and combust/combusted in any case);
  *  substances, processes, and stats lowercase in prose.
  *  A note runs two beats: the label names the thing, the body says what it is

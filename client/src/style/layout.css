@@ -1472,7 +1472,8 @@
   margin: 0;
 }
 /* Named terms (SCREENS.md §1.2) — gold accent replaces bold in player prose.
-   Terms of art only, never free emphasis; wrapped mechanically by TermText. */
+   Terms of art only, never free emphasis; wrapped mechanically by TermText,
+   which gives Afflict and Testify their action colours inline. */
 .term {
   color: var(--gold);
 }

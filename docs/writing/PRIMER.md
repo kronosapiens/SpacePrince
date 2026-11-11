@@ -18,7 +18,7 @@ The foothold principle holds ([intent](../intent.md), "Audience and exposition")
 Spare, confident, unhurried: Space Prince explaining itself, not a textbook.
 Assumes no astrology.
 Introduces every term on first use.
-Stays above the named mechanics; testimony, affliction, combustion, Resolve, and fortune are taught later, in play.
+The framing names Afflict, Testify, and Resolve and says what each means; how they work, and combustion and fortune, are taught later, in play.
 
 ---
 
