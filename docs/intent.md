@@ -21,7 +21,7 @@ A run ends in combustion as readily as in completion, and either way the world r
 Progress does not increase power.
 It increases specificity: over many runs the chart fills in, one planet at a time, and the player's reading of it deepens.
 
-The setting is a cosmic fable in a science-fantasy universe, with varied worlds and inhabitants, suggestive technology, and magic.
+The setting is a cosmic fable: many small worlds under a sky people come from and return to, with wonders that go unexplained.
 [SETTING.md](writing/SETTING.md) guides its atmosphere, limited exposition, and encounters that stand alone in any order.
 
 ## Audience and exposition
@@ -99,19 +99,24 @@ The archived v1 action space, the Think / Wait / Fast postures ([archive](archiv
 
 ### The Prophet (Kahlil Gibran)
 
-The prose reference for authored encounter narration and dialogue.
-[VOICE.md](writing/VOICE.md) adapts its developed images, balanced clauses, and direct observations of ordinary wants.
+The reference for what a person in a scene may believe and say: a precise claim about an ordinary thing, which the listener is free to dispute.
+Its chapters share the houses' subjects, among them houses, children, work, marriage, friendship, and death.
+[VOICE.md](writing/VOICE.md) gives such convictions to speakers and keeps the narrator plain.
 The Prince's feelings and interpretation remain the player's.
+
+### The Little Prince (Antoine de Saint-Exupéry)
+
+The setting and prose reference.
+Its narrator is plain and its convictions sit with its speakers ([VOICE.md](writing/VOICE.md)).
+Small worlds, each with someone on it and one thing they care about; a traveller who arrives, asks a plain question, and goes on.
+The sky is a place people come from and return to, and nothing in it is explained by machinery.
+Its inhabitants are caricatures and its episodes carry morals; ours are people with understandable wants, and an encounter need not teach.
+[SETTING.md](writing/SETTING.md#the-little-prince) applies it to encounters.
 
 ### Hyperion (Dan Simmons)
 
-Travellers' different perspectives offer glimpses of a larger, wondrous universe.
-Each encounter can reveal another facet of that universe while supplying its own context, as developed in [SETTING.md](writing/SETTING.md#hyperion).
-
-### Star Wars
-
-The tonal reference for technology and magic coexisting among varied worlds and inhabitants.
-Unfamiliar things can be ordinary to the people who live with them; [SETTING.md](writing/SETTING.md#star-wars) applies that familiarity and limited technical exposition to encounters.
+Travellers share a road and carry private reasons for it.
+An encounter shows one of those reasons and leaves the rest of that life unseen, which bears most on encounters with other Princes ([SETTING.md](writing/SETTING.md#hyperion)).
 
 ### FTL: Faster Than Light
 
@@ -127,6 +132,7 @@ Its events shape the house scenes: a deterministic decision with a few offers an
 
 ### Others, briefly
 
+- **Star Wars**: a lived-in world, where things are worn and mended and the mysterious is taken for granted.
 - **Hades**: failure as forward motion; a personified cast on its model was considered and rejected, so the planets stay ambient.
 - **Loot Survivor**: proof that a roguelike can live onchain; Space Prince asks what that looks like when identity replaces inventory.
 - **Into the Breach**: perfect information and weighty single actions, which became client honesty.
