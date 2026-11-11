@@ -65,11 +65,11 @@ Every menu remains playable without a purchase, although the required exertion m
 
 ## Scorpio
 
-1. `livelihood-scorpio-hidden-seam` — A pawnbroker exposes forgotten value without claiming it; Scorpio's hidden compartments and candid appraisal, discovery; keep the find, sell both forms of value, or trade the money for care.
-2. `livelihood-scorpio-cellar-cask` — A vintner's stored wine becomes weight against the cellar entrance; Scorpio's cellars and guarded reserves, bodily predicament; squeeze out, take paid salvage strain, or purchase release.
-3. `livelihood-scorpio-hidden-change` — A keeper returns unnoticed change and leaves room for shared time; Scorpio's concealed value and quiet loyalty, modest invitation; choose money, a little food, or pay for deeper care.
-4. `livelihood-scorpio-root-basket` — A gardener's apparently solid path gives way beside useful winter roots; Scorpio's mud and underground stores, bodily choice; extricate painfully, hire support, or carry a heavier paid load.
-5. `livelihood-scorpio-old-price` — A trader preserves an old offer for a still-useful clasp; Scorpio's memory and commitments, quiet negotiation; accept the remembered price, take today's value, or retain it for grip practice.
+1. `livelihood-scorpio-hidden-seam` — A pawnbroker finds coins sewn into the lining of the coat you came to sell and lays them on the counter instead of in her apron; “Whoever sewed these in meant them for the day you'd have to sell the coat; I'd keep it”; keep the coat and take the coins [Light], sell the coat as well [more Light], or spend the coins on having her mend the lining while you rest [recover].
+2. `livelihood-scorpio-cellar-cask` — A cask has slipped its chocks and pinned the cellar door with you and the wine keeper inside, and the year's best is running across the floor; “Don't just shove it; every cup down there is a week of my year”; squeeze out through the coal hatch [cost], hold the cask while he draws it off into jars, for a share [large cost → Light], or shout up to the porter and pay him to lever the door [pay].
+3. `livelihood-scorpio-hidden-change` — A money changer runs after you with a coin she short-counted, then stops at her own door, where supper for one is on the stove; “I'd sooner owe you a supper than a coin; a coin I'd lie awake over”; take the coin [Light], take a small helping in its place [recover], or put money down and make it a proper meal for two [pay → large recover].
+4. `livelihood-scorpio-root-basket` — You are sunk to the knee in a root grower's wet bed, the frost is due tonight, and her full baskets sit in the far corner where she no longer goes; “The ground's got you already; you may as well bring the baskets”; drag yourself out and go [cost], pay for her mud sledge to fetch you [pay], or haul the baskets out for a wage [large cost → Light].
+5. `livelihood-scorpio-old-price` — A trader promised you a price for your blade last season, and the price has since halved; she counts out the old sum while her son points at today's sign: “I said it; the sign changed, I didn't”; take the price she promised [Light], take today's and spare her the loss [less Light], or keep the blade and let her show you the edge it can take [Afflict].
 
 ## Sagittarius
 

@@ -75,6 +75,17 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   return devPrince(seed, tier, run);
 }
 
+/** The same Prince every time, with the given rising sign, on a fresh run at
+ *  the root of the first map. Used to play one rising sign's house scenes. */
+export function spawnRising(sign: SignName, opts: SpawnOpts = {}): Prince {
+  let chartSeed = 1;
+  while (seededChart(chartSeed).ascendantSign !== sign) chartSeed++;
+  const chart = seededChart(chartSeed, "Dev Prince");
+  const seed = randomSeed();
+  const tier = opts.tier ?? DEFAULT_TIER;
+  return devPrince(seed, tier, beginRun(chart, seed, tier), chart);
+}
+
 export function spawnRelational(opts: SpawnOpts = {}): Prince {
   const seed = randomSeed();
   const tier = opts.tier ?? DEFAULT_TIER;
@@ -185,12 +196,12 @@ function devPlayerChart(seed: number): Chart {
   return seededChart(hashString(`${seed}_player`), "Dev Prince");
 }
 
-function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
+function devPrince(seed: number, tier = DEFAULT_TIER, run: Run, chart = devPlayerChart(seed)): Prince {
   const rng = mulberry32(hashString(`${seed}_history`));
   const history = Array.from({ length: 8 + Math.floor(rng() * 73) }, (_, index): Run => {
     const pastSeed = hashString(`${seed}_history_${index}`);
     return {
-      ...beginRun(devPlayerChart(seed), pastSeed, tier),
+      ...beginRun(chart, pastSeed, tier),
       map: walkMap(pastSeed, true, tier),
       mapsCompleted: MAPS_PER_RUN,
       // Sample doublings to expose both faint and bright stars in the preview.
@@ -200,7 +211,7 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
   return {
     id: `dev_${seed}`,
     position: { iso: "1970-01-01T00:00:00.000Z", lat: 0, lon: 0 },
-    chart: devPlayerChart(seed),
+    chart,
     numRelationalEncounters: tier,
     achievements: 0,
     runs: [...history, run],

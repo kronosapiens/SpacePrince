@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
 import { isOver } from "@/game/run";
-import { spawn, type SpawnKind } from "@/state/dev-spawn";
+import { spawn, spawnRising, type SpawnKind } from "@/state/dev-spawn";
 import { DevConsole } from "@/components/DevConsole";
 import gridStyles from "@/style/dev-grid.css?raw";
 import type { Prince, Run } from "@/game/types";
@@ -29,10 +29,12 @@ const PAGES: Page[] = [
   { label: "Gallery", kind: "gallery" },
 ];
 
-/** Dev chrome: four keys, and a small legend for
+/** Dev chrome: five keys, and a small legend for
  *  them in the lower-left whose words are buttons too. `d` opens the console,
  *  `r` re-rolls the current surface — spawning a fresh real game there — and
  *  `p` lists the surfaces, where a digit picks one; `g` outlines layout boxes.
+ *  `l` starts a fresh run for one fixed Libra-rising Prince, whose house
+ *  scenes are the set under review.
  *  The play surfaces all live at /play,
  *  so the current surface is read from state, not the URL. */
 export function DevChrome() {
@@ -87,6 +89,12 @@ export function DevChrome() {
     dispatch({ kind: "mint", prince: spawn(regenKind, { tier }) });
   };
 
+  const launchLibra = () => {
+    playUISound("commit");
+    dispatch({ kind: "mint", prince: spawnRising("Libra", { tier }) });
+    navigate(ROUTES.play);
+  };
+
   // The list and the console share the corner, so opening one shuts the other.
   const togglePages = () => {
     playUISound(pagesOpen ? "dismiss" : "select");
@@ -105,18 +113,19 @@ export function DevChrome() {
 
   // The key handler reads the latest state and actions through a ref, so it
   // is bound once rather than on every render.
-  const latest = useRef({ pagesOpen, go, regenerate, togglePages, toggleConsole, toggleGrid });
-  latest.current = { pagesOpen, go, regenerate, togglePages, toggleConsole, toggleGrid };
+  const latest = useRef({ pagesOpen, go, regenerate, launchLibra, togglePages, toggleConsole, toggleGrid });
+  latest.current = { pagesOpen, go, regenerate, launchLibra, togglePages, toggleConsole, toggleGrid };
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
       // Typing — the city picker, the console's own fields — is not a shortcut.
       if ((event.target as Element | null)?.closest?.("input, textarea, select, [contenteditable]")) return;
-      const { pagesOpen, go, regenerate, togglePages, toggleConsole, toggleGrid } = latest.current;
+      const { pagesOpen, go, regenerate, launchLibra, togglePages, toggleConsole, toggleGrid } = latest.current;
       if (event.key === "d") toggleConsole();
       else if (event.key === "r") regenerate();
       else if (event.key === "p") togglePages();
+      else if (event.key === "l") launchLibra();
       else if (event.key.toLowerCase() === "g") toggleGrid();
       else if (event.key === "Escape" && pagesOpen) togglePages();
       else if (pagesOpen && /^[1-7]$/.test(event.key)) {
@@ -160,6 +169,10 @@ export function DevChrome() {
         <span aria-hidden>·</span>
         <button type="button" onClick={toggleGrid} onPointerEnter={playHoverSound} onFocus={playFocusSound} aria-pressed={gridOn}>
           <kbd>g</kbd>grid
+        </button>
+        <span aria-hidden>·</span>
+        <button type="button" onClick={launchLibra} onPointerEnter={playHoverSound} onFocus={playFocusSound}>
+          <kbd>l</kbd>libra
         </button>
       </div>
       {pagesOpen && (

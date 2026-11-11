@@ -87,7 +87,8 @@ Revise unclear situations before polishing their cadence.
 ## Choices and economics
 
 Once the scene and participation are convincing, turn the participation into choices.
-A developed option is **choice narration and economic effect**; there is no separate outcome narration.
+A developed option is **choice narration, economic effect, and one outcome line**.
+The outcome line is shown after the choice: what someone here does or says in answer, without assigning the Prince a feeling or motive, and without a promise the game cannot track.
 Use the [encounter economy and eligibility rules](../mechanics/ENCOUNTERS.md) and the going rates in [economy.ts](../../client/src/data/economy.ts).
 
 - **Compose a small set of choices.**
@@ -109,7 +110,8 @@ Use the [encounter economy and eligibility rules](../mechanics/ENCOUNTERS.md) an
   Value recovery at 2 Light per point and affliction taken at 3, as in [ENCOUNTERS.md §6](../mechanics/ENCOUNTERS.md#6-provisional-amounts).
 - **The fiction justifies each exchange.**
   Revise the fiction if it does not support the proposed exchange.
-  A disagreement alone does not justify affliction; leaving shelter, hard work, or a cold floor can.
+  Affliction is whatever the choice costs the Prince: hard work, cold, a lost night, a place given up, an embarrassment, a welcome withdrawn.
+  The cost follows from what the Prince does, not from someone else's displeasure alone.
   An obvious response should not disappear solely to manufacture a cost.
 - **Joy houses add a joy choice.**
   In the seven houses with a joy, each scene also writes one choice for its joyful planet, shown when that planet is present under [ENCOUNTERS.md §4.1](../mechanics/ENCOUNTERS.md#41-planetary-joys).
@@ -128,7 +130,10 @@ Avoid automatically compensating that refusal with another reward, or making eve
 
 ## Plan variety with briefs
 
-Before writing prose, give each scene a one-line brief: who is there, which side of the sign drives it (season, trade, place, or manner), its register (gift, pleasure, dilemma, burden, or quarrel), and its economic choices.
+Before writing prose, give each scene a one-line brief that states an incident: who wants what from the Prince, what stands against it, and how each choice answers them.
+A brief that can only name a theme is not ready to draft.
+The sign still decides who is there and in what season, trade, place, or manner.
+A revision keeps the scene's economic effects by default; it may propose a different menu when the existing options cannot be made into answers.
 Review the briefs down each house and across each sign before writing, to catch repetition such as every Capricorn scene turning on thrift.
 Five scenes in one house–sign pair should differ in people, surroundings, register, and economic decisions.
 Mix the choice structures where the fiction supports them; there is no requirement to assign one scene to each structure.
@@ -250,7 +255,7 @@ The loft's gain depends on how many planets are lit: −24 with one, +48 with fo
 
 ## Briefs
 
-One line per scene: who is there, which side of the sign drives it, its register, and its economic choices, with the house's source rationale at the top of each file.
+One line per scene: who wants what, what stands against it, and how each choice answers, with the house's source rationale at the top of each file.
 The briefs precede pricing; the finished prose and offers are in the runtime house modules.
 Every brief id matches a scene id in the catalogue (all 720 checked on 2026-11-05).
 
