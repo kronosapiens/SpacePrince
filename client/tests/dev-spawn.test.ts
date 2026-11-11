@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { spawn, spawnEnd } from "@/state/dev-spawn";
+import { spawn, spawnEnd, spawnRising } from "@/state/dev-spawn";
+import { ROOT_NODE_ID } from "@/game/map-gen";
 import { isOver } from "@/game/run";
 import { loadPrince, savePrince } from "@/state/prince";
 
@@ -24,6 +25,16 @@ describe("development snapshots", () => {
 
     savePrince(prince);
     expect(loadPrince()!.runs.slice(0, -1)).toEqual(history);
+  });
+
+  it("starts the same Libra-rising Prince on a fresh first map", () => {
+    const prince = spawnRising("Libra");
+    const run = prince.runs.at(-1)!;
+
+    expect(prince.chart.ascendantSign).toBe("Libra");
+    expect(spawnRising("Libra").chart).toEqual(prince.chart);
+    expect(run).toMatchObject({ mapsCompleted: 0, light: 0, encounter: null });
+    expect(run.map.currentNodeId).toBe(ROOT_NODE_ID);
   });
 
   it("derives final Light from synthetic node deltas", () => {
