@@ -249,7 +249,7 @@ export const CODEX: CodexGroup[] = [
         paragraphs: [
           "A planet is afflicted when something harms it — the malefics Mars and Saturn, a hard aspect from them, or standing too near the Sun. An afflicted planet struggles to deliver what it signifies.",
         ],
-        inPlay: "Afflict is one of the two verbs: a planet sends its affliction, and what it reaches accumulates it. The arc around each planet shows how much more it can take.",
+        inPlay: "Afflict is one of the two verbs: a planet sends its affliction, creating tension that wears down the Resolve of what it reaches. The arc around each planet shows the Resolve it has left.",
         see: ["testimony", "combustion"],
       },
       {
@@ -258,7 +258,7 @@ export const CODEX: CodexGroup[] = [
         paragraphs: [
           "A planet testifies to a matter when it bears witness to it — aspecting it, ruling it, lending it strength. The more testimony a matter gathers, the surer its outcome.",
         ],
-        inPlay: "Testify is the other verb: a planet sends its testimony, which relieves affliction. It defends a planet, but never brings back one that has combusted.",
+        inPlay: "Testify is the other verb: a planet sends its testimony, which eases tension and restores Resolve. It defends a planet, but never brings back one that has combusted.",
         see: ["affliction", "combustion"],
       },
       {
@@ -267,7 +267,7 @@ export const CODEX: CodexGroup[] = [
         paragraphs: [
           "A planet too close to the Sun is combust — its light overwhelmed, unable to show itself or act. The tradition counted it among the worst conditions a planet could suffer.",
         ],
-        inPlay: "A planet combusts when its affliction reaches its Resolve, and goes dark. It can return between maps on a roll of its Fortune, or be called back in a house — at half Resolve.",
+        inPlay: "A planet combusts when its Resolve runs out, and goes dark. It can return between maps on a roll of its Fortune, or be called back in a house — at half Resolve.",
         see: ["affliction", "testimony"],
       },
     ],

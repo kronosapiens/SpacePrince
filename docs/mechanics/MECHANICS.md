@@ -207,6 +207,7 @@ Each planet takes **at most one** affliction application per turn — the direct
 Combustion is checked once, at that application, and only for affliction.
 
 Affliction accumulates toward **Resolve**, the combustion ceiling.
+To the player, Resolve is what a planet has left, the ceiling less its affliction; this document keeps the upward accounting the code uses, and [SCREENS.md §1.2](../presentation/SCREENS.md) holds the player-facing words.
 A planet combusts **the moment its affliction reaches the ceiling** — deterministic, no roll:
 
 - `ceiling = base.resolve + buffs.resolve` (§4), in the same units as affliction and testimony.
