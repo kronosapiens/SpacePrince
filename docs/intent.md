@@ -18,6 +18,11 @@ Tension wears down each planet's Resolve, planets combust and return, and a run 
 Nothing resets.
 A run ends in combustion as readily as in completion, and either way the world records the Light that remains.
 
+The canonical definition of Light:
+
+> Light is the energy you generate by responding skillfully to your circumstance.
+> You can expend it to restore yourself, and what is left at a run's end becomes a star.
+
 Progress does not increase power.
 It increases specificity: over many runs the chart fills in, one planet at a time, and the player's reading of it deepens.
 
