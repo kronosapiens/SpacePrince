@@ -147,7 +147,7 @@ export function computeProjectedEffects(
     polarity: Polarity,
     magnitude: number,
   ) => {
-    beats.push({ kind: "hit", side, target, polarity, magnitude, channel: "propagated" });
+    beats.push({ kind: "hit", side, target, polarity, magnitude });
     if ((final[target]?.finalValue ?? 0) >= combustionCeiling(chart.planets[target])) {
       beats.push({ kind: "combust", side, target });
     }
@@ -169,7 +169,7 @@ export function computeProjectedEffects(
   );
   beats.push({
     kind: "hit", side: "other", target: opponentPlanet,
-    polarity: playerValence, magnitude: direct, channel: "direct",
+    polarity: playerValence, magnitude: direct,
   });
   if (!preempts && projected.playerToOpponent > 0) {
     for (const a of opponentAspects) {
@@ -196,7 +196,7 @@ export function computeProjectedEffects(
   );
   beats.push({
     kind: "hit", side: "self", target: playerPlanet,
-    polarity: opponentValence, magnitude: caught, channel: "direct",
+    polarity: opponentValence, magnitude: caught,
   });
   const catcherCombusts =
     opponentValence === "Affliction" &&

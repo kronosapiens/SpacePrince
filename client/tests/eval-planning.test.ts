@@ -113,18 +113,21 @@ describe("relational planning", () => {
     run.state.Moon.affliction = 12;
     encounter.opponentState.Moon.affliction = 12;
     const actions = [{ planet: "Moon" as const, verb: "Testimony" as const }];
-    // Testify earns 12 Light and the Other heals our 12. Next turn equally
-    // afflicts 12 or heals zero: expected capacity is 114. A later opening
-    // costs 24 on half the draws, giving 102 with entry anticipation.
+    // The Moon rules, and the lone fielded Moon has the least Resolve left, so
+    // its 12 Testimony on the Other counts double: 24 Light. The Other's
+    // Testimony clears our 12. Next turn it equally afflicts 12 or testifies
+    // to nothing: expected capacity is 114. Either way the best reply afflicts
+    // its cleared Moon for 12, doubled again: 48 Light. A later opening costs
+    // 24 on half the draws, giving 102 with entry anticipation.
     const immediate = evaluateRelational(play, run, actions, { anticipateEntry: true })[0]!;
-    expect(immediate.value).toEqual({ alive: 1, lit: 1, capacity: 120, light: 12 });
+    expect(immediate.value).toEqual({ alive: 1, lit: 1, capacity: 120, light: 24 });
     const defensive = evaluateRelational(play, run, actions, { horizon: 2 })[0]!;
-    expect(defensive.value).toEqual({ alive: 1, lit: 1, capacity: 114, light: 12 });
+    expect(defensive.value).toEqual({ alive: 1, lit: 1, capacity: 114, light: 48 });
     const entry = evaluateRelational(play, run, actions, { horizon: 2, anticipateEntry: true })[0]!;
     expect(entry.value.alive).toBeCloseTo(1);
     expect(entry.value.lit).toBeCloseTo(1);
     expect(entry.value.capacity).toBeCloseTo(102);
-    expect(entry.value.light).toBe(12);
+    expect(entry.value.light).toBe(48);
   });
 });
 

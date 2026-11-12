@@ -178,10 +178,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     setTheme(ruler, "relational");
     setActive(ruler);
   }, [ruler, setActive]);
-  const scoreCharts = useMemo(
-    () => ({ self: playerChart, other: encounter.opponentChart }),
-    [playerChart, encounter.opponentChart],
-  );
 
   // Inspection pins the panel so its action buttons remain reachable.
   const inspected = selected;
@@ -221,7 +217,14 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
   const projectedLight =
     !settled && indicatedVerb && previewPlanet && projection
       ? {
-          value: scoreBeats(ruler, projection.beats, scoreCharts, opponentAction),
+          value: scoreBeats(ruler, projection.beats, {
+            self: playerChart,
+            other: encounter.opponentChart,
+            selfState: run.state,
+            roster: encounter.roster,
+            playerPlanet: previewPlanet,
+            opponentAction,
+          }),
           color: VALENCE_COLOR[indicatedVerb],
         }
       : null;
