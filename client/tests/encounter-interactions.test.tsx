@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EncounterRelationalScreen } from "@/screens/EncounterRelational";
-import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
+import { ENCOUNTER_OPENINGS, ENCOUNTER_RULES } from "@/copy/encounter-openings";
 import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
@@ -13,7 +13,7 @@ import { PLANETS } from "@/game/data";
 import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
 import { playUISound } from "@/audio/engine";
 import { NEUTRAL, VALENCE_COLOR } from "@/svg/palette";
-import type { NecessityEntry, PlanetName, Polarity, SignName } from "@/game/types";
+import type { NecessityEntry, PlanetName, Polarity } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -95,15 +95,12 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
 }
 
 describe("encounter interactions", () => {
-  it("opens with the sentence for the ruler's own natal sign, not the rising sign", () => {
-    const { encounter, render } = setup();
+  it("opens with the ruler's sentence and states the ruler's rule beneath it", () => {
+    const { encounter } = setup();
     const ruler = encounterRuler(encounter);
-    const rising = encounter.opponentChart.ascendantSign;
-    const natal: SignName = rising === "Pisces" ? "Aries" : "Pisces";
-    encounter.opponentChart.planets[ruler].sign = natal;
-    render();
-    expect(get(".relational-opening").textContent).toBe(ENCOUNTER_OPENINGS[ruler][natal]);
-    expect(get(".relational-opening").textContent).not.toBe(ENCOUNTER_OPENINGS[ruler][rising]);
+    const { lead, rule } = ENCOUNTER_RULES[ruler];
+    expect(get(".relational-opening").textContent).toBe(ENCOUNTER_OPENINGS[ruler]);
+    expect(get(".relational-rule").textContent).toBe(`${lead} ${rule}.`);
   });
 
   it.each(["self", "other"] as const)("waits for the longer %s opening before allowing the first action", (longer) => {

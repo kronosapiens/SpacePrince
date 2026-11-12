@@ -405,7 +405,7 @@ What Light is, and so what these conditions are held to, is defined in [intent.m
 ### 12.1 Draft conditions
 
 The conditions above in the player's words, with what each Other seeks.
-The Rule Text lines are drafts of the line the encounter screen shows; the code still shows the lines written for the previous conditions.
+The Flavor Text and Rule Text lines are the two the encounter screen shows under the wheels (`client/src/copy/encounter-openings.ts`).
 
 Tentative principles every condition holds to:
 - Light comes from effects on the Other's chart.

@@ -2,7 +2,7 @@ import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState }
 import { Chart } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { RelationalGuide, type RelationalGuidePhase } from "@/components/RelationalGuide";
-import { ENCOUNTER_OPENINGS } from "@/copy/encounter-openings";
+import { ENCOUNTER_OPENINGS, ENCOUNTER_RULES } from "@/copy/encounter-openings";
 import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
@@ -17,7 +17,7 @@ import { PLANETS } from "@/game/data";
 import { playUISound, setTheme } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { encounterRuler } from "@/game/encounter";
-import { RULER_RULES, scoreBeats } from "@/game/score";
+import { scoreBeats } from "@/game/score";
 import { unlockedPlanets } from "@/game/unlocks";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { computeProjectedEffects, type ProjectedEffect } from "@/game/projections";
@@ -520,7 +520,7 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
           open={guideOpen}
           phase={guidePhase}
           ruler={ruler}
-          rule={RULER_RULES[ruler].label}
+          rule={ENCOUNTER_RULES[ruler].rule}
           opponentPlanet={displayOpponentTurn}
           examplePlanet={guidePlanet}
           previewAction={indicatedVerb}
@@ -684,17 +684,16 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
             </span>
           </div>
           <p className="relational-opening">
-            {/* How this meeting opens: what the Other seeks, in the manner of the
-                ruler's own sign in their chart (`copy/encounter-openings.ts`).
-                Keyed on the ruler's natal sign, not the rising sign that chose the
-                ruler. Fixed for the whole encounter, like the rule beneath it. */}
-            {ENCOUNTER_OPENINGS[ruler][encounter.opponentChart.planets[ruler].sign]}
+            {/* How this meeting opens: what the Other seeks, one sentence per
+                ruler (`copy/encounter-openings.ts`). Fixed for the whole
+                encounter, like the rule beneath it. */}
+            {ENCOUNTER_OPENINGS[ruler]}
           </p>
           <p className="relational-rule" data-guide="rule">
             {/* The rule in the ruler's colour, under the name in the same colour.
                 Light itself stays neutral — no colour stands for it anywhere
                 else. */}
-            Gain Light from <span style={{ color: PLANET_PRIMARY[ruler] }}>{RULER_RULES[ruler].label}</span>.
+            {ENCOUNTER_RULES[ruler].lead} <span style={{ color: PLANET_PRIMARY[ruler] }}>{ENCOUNTER_RULES[ruler].rule}</span>.
           </p>
         </div>
       </div>
