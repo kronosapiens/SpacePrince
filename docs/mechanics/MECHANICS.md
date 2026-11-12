@@ -169,9 +169,6 @@ One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fo
 
 Affliction is integer-valued — every direct and propagated effect is a whole number.
 
-- direct and propagated effects apply their full amounts
-- testimony clamps affliction at zero
-
 ## 9. Aspects and Propagation
 
 The four aspects carry **circle-fraction** multipliers — each aspect's share of the 360° circle; hard aspects invert.
@@ -280,7 +277,7 @@ The Moon is present from the first encounter; each subsequent planet unlocks at 
 
 | Cumulative relational encounters | Unlock | Total planets |
 |-----|--------|---------------|
-| 0 (start) | Moon | 1 |
+| 0 | Moon | 1 |
 | 1 | Mercury | 2 |
 | 2 | Venus | 3 |
 | 4 | Sun | 4 |
@@ -358,23 +355,26 @@ UI label: `Light`.
 
 Light sums integer magnitudes from the turn log, or Resolve ceilings, which are multiples of `12`.
 What gathers it is decided by the encounter's **ruler** (§11): each ruler admits a different set of beats (`RULER_RULES` in `client/src/game/score.ts`).
+Only effects on the Other's chart generate Light, direct and propagated alike.
 
-| Ruler | Polarity condition | Chart | Channel | Payout |
-|---|---|---|---|---|
-| Moon | Testimony | Other | All | Applied magnitude |
-| Mercury | Contrary | Other | All | Applied magnitude |
-| Venus | Testimony | Both | Direct | Applied magnitude |
-| Sun | Accord | Other | All | Applied magnitude |
-| Mars | Affliction | Other | All | Applied magnitude |
-| Jupiter | Either | Both | Direct | Applied magnitude |
-| Saturn | Affliction | Both | Combustion | Target's ceiling |
+| Ruler | Counts | Acting planet | Payout |
+|---|---|---|---|
+| Venus | Testimony | Any | Applied magnitude |
+| Mars | Affliction | Any | Applied magnitude |
+| Jupiter | Accord | Any | Applied magnitude |
+| Mercury | Contrary | Any | Applied magnitude |
+| Moon | Either | Least Resolve | Twice the applied magnitude |
+| Sun | Either | Most Resolve | Twice the applied magnitude |
+| Saturn | Combustion | Any | Target's ceiling |
 
-`Other` means the Other's chart, while `Both` includes the Prince's chart and the Other's chart.
-`All` includes direct and propagated applied effects, while `Direct` includes only the initial effect on each chart.
 `Accord` means that a resolved beat has the same polarity as the Other's announced action.
 `Contrary` means that it has the opposite polarity.
 Each beat is checked after any aspect inversion, so one action can produce both Accord and Contrary beats.
-The announced action remains the reference if the Other is preempted, and its zero-magnitude response still pays zero.
+The announced action remains the reference if the Other is preempted.
+
+Under the Moon and the Sun only one of the Prince's planets generates Light: the lit planet with the least Resolve left under the Moon, and the one with the most under the Sun.
+Resolve left is a planet's ceiling less its affliction, read before the turn resolves, and planets tied for least or most all count.
+What that planet does to the Other's chart counts twice, and the other planets generate nothing.
 
 Per turn, the resolution is read as **beats** — the direct hit and each propagation hop, with a combust marker wherever a hit reaches a ceiling — and `lightGain` is the sum of the beats the ruler admits.
 The projection preview produces the same beats, so a previewed Light and an awarded one are one function.
@@ -384,16 +384,14 @@ Applied-magnitude rules pay the actual magnitude after clamping, not the attempt
 A hit that causes combustion remains an applied-effect beat and also emits a separate combust marker.
 Only Saturn admits the marker, and Saturn pays the target's ceiling rather than the hit magnitude.
 
-Under the Moon only real reductions count — testifying a planet already at zero affliction scores nothing — so each turn is a two-beat: afflict to set up, testify to cash.
+Under Venus only real reductions count — testifying a planet already at zero affliction scores nothing — so each turn is a two-beat: afflict to set up, testify to cash.
 Under Mars the two-beat inverts.
-Mercury and the Sun instead ask whether each effect runs contrary to or in accord with the Other's announced action.
-Under Venus, Jupiter, and Saturn, the Other's reply on the Prince's chart can pay, so the choice includes which planet stands in the way.
+Mercury and Jupiter instead ask whether each effect runs contrary to or in accord with the Other's announced action.
 The rule is stated on the encounter screen for the whole encounter, beneath a sentence saying what the Other seeks from the exchange ([SCREENS.md §3.7](../presentation/SCREENS.md#37-chrome)), and the node's colour on the map is the same ruler, so a route is chosen with the rotation in view.
 
-Moon and Mars partition effects on the Other's chart by absolute polarity.
-Mercury and the Sun partition them by polarity relative to the Other's announced action.
-Venus and Jupiter govern the direct exchange on both charts, with Jupiter intentionally containing Venus as the greater benefic contains the lesser.
-No other ordinary rule strictly contains another.
+Venus and Mars partition effects on the Other's chart by absolute polarity.
+Mercury and Jupiter partition them by polarity relative to the Other's announced action.
+The Moon and the Sun divide them by which of the Prince's planets acts.
 Within the unlocked rotation, rulership fixes relative frequencies: the luminaries rule one sign each, while the other planets rule two.
 Before Mercury unlocks, every relational encounter is necessarily Moon-ruled.
 
@@ -402,7 +400,51 @@ When the run ends — combustion or completion (§11) — that value shapes a st
 Nothing else about the run is recorded: not how it ended, not which planets combust.
 Only the Light, and the star it shapes.
 
-What Light means to the player, and whether these rules are the right way to generate it, remain open ([#52](https://github.com/kronosapiens/SpacePrince/issues/52)).
+What Light is, and so what these conditions are held to, is defined in [intent.md](../intent.md#premise).
+
+### 12.1 Draft conditions
+
+The conditions above in the player's words, with what each Other seeks.
+The Rule Text lines are drafts of the line the encounter screen shows; the code still shows the lines written for the previous conditions.
+
+Tentative principles every condition holds to:
+- Light comes from effects on the Other's chart.
+- Every condition has roughly the same potential to generate Light.
+
+**Venus**
+- Rule Logic: Testimony on their chart.
+- Flavor Text: They are weary and want to be eased.
+- Rule Text: Gain Light from tension eased in the Other.
+
+**Mars**
+- Rule Logic: Affliction on their chart.
+- Flavor Text: They want their strength tested.
+- Rule Text: Gain Light from tension created in the Other.
+
+**Jupiter**
+- Rule Logic: Effects aligned with their own action.
+- Flavor Text: They want to be met as they are.
+- Rule Text: Gain Light from effects in accord with the Other.
+
+**Mercury**
+- Rule Logic: Effects opposite to their own action.
+- Flavor Text: They want an answer they could not give themselves.
+- Rule Text: Gain Light from effects contrary to the Other.
+
+**Moon**
+- Rule Logic: Acting with your planet with the least resolve, 2x.
+- Flavor Text: They want to see you at your most vulnerable.
+- Rule Text: Gain Light through your planet with the least Resolve, doubled.
+
+**Sun**
+- Rule Logic: Acting with your planet with the most resolve, 2x.
+- Flavor Text: They want to see you at your strongest.
+- Rule Text: Gain Light through your planet with the most Resolve, doubled.
+
+**Saturn**
+- Rule Logic: Affliction which combusts a planet, for that planet's full resolve.
+- Flavor Text: They want to be pressed past their limit.
+- Rule Text: Gain Light from planets going dark on the Other.
 
 ## 13. Interaction Chart Semantics
 

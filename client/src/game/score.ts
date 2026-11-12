@@ -1,12 +1,13 @@
-import { combustionCeiling } from "./combust";
-import type { Chart, PlanetName, Polarity, TurnLogEntry } from "./types";
+import { combustionCeiling, isCombusted } from "./combust";
+import type { Chart, PlanetName, Polarity, SideState, TurnLogEntry } from "./types";
 
 /**
  * Light is one additive number on the lattice (MECHANICS §12), and each
- * ruler pays for what that planet values: the encounter's scoring rule is keyed
- * on the ruler of the opponent's chart. "Your own chart never scores" is now the
- * Moon's rule, not the game's. The star canon is unchanged — a run's final
- * Light is still the permanent mark it leaves on the NFT.
+ * ruler counts what that planet values: the encounter's scoring rule is keyed
+ * on the ruler of the opponent's chart. Only effects on the Other's chart
+ * generate Light; nothing on your own chart counts under any ruler. The star
+ * canon is unchanged — a run's final Light is still the permanent mark it
+ * leaves on the NFT.
  *
  * Scoring runs over normalized beats, which both the resolver's turn log
  * (`logToBeats`) and the projection preview (`projections.ts`) produce, so a
@@ -20,7 +21,6 @@ export type ScoredBeat =
       target: PlanetName;
       polarity: Polarity;
       magnitude: number;
-      channel: "direct" | "propagated";
     }
   | { kind: "combust"; side: "self" | "other"; target: PlanetName };
 
@@ -28,62 +28,63 @@ export type PolarityCondition = Polarity | "Either" | "Contrary" | "Accord";
 
 export interface ScoringRule {
   polarity: PolarityCondition;
-  chart: "other" | "both";
-  channel: "all" | "direct" | "combust";
+  /** `magnitude` counts hits at what applied; `ceiling` counts combust markers
+   *  at the planet's full Resolve. */
   payout: "magnitude" | "ceiling";
+  /** Only your lit planet with the least (or most) Resolve left generates
+   *  Light, and its hits count double. */
+  actor?: "least" | "most";
   /** Player-facing phrase completing "Gain Light from …". */
   label: string;
 }
 
 /**
- * Moon and Mars partition effects on the Other by absolute polarity; Mercury
- * and Sun partition them relative to the Other's announced action. Venus and
- * Jupiter score the direct exchange on both charts, while Saturn scores the
- * terminal combust markers on both charts.
+ * Venus and Mars partition hits on the Other by absolute polarity; Jupiter and
+ * Mercury partition them relative to the Other's announced action. The Moon
+ * and the Sun count hits of either polarity, by which of your planets acts.
+ * Saturn counts the Other's planets going dark.
  */
 export const RULER_RULES: Record<PlanetName, ScoringRule> = {
-  Moon:    { polarity: "Testimony",  chart: "other", channel: "all",     payout: "magnitude", label: "tension eased on the Other's chart" },
-  Mercury: { polarity: "Contrary",   chart: "other", channel: "all",     payout: "magnitude", label: "effects contrary to the Other's action" },
-  Venus:   { polarity: "Testimony",  chart: "both",   channel: "direct",  payout: "magnitude", label: "tension eased directly on both charts" },
-  Sun:     { polarity: "Accord",     chart: "other", channel: "all",     payout: "magnitude", label: "effects in accord with the Other's action" },
-  Mars:    { polarity: "Affliction", chart: "other", channel: "all",     payout: "magnitude", label: "tension created on the Other's chart" },
-  Jupiter: { polarity: "Either",     chart: "both",   channel: "direct",  payout: "magnitude", label: "direct effects on both charts" },
-  Saturn:  { polarity: "Affliction", chart: "both",   channel: "combust", payout: "ceiling",   label: "planets going dark on both charts" },
+  Moon:    { polarity: "Either",     payout: "magnitude", actor: "least", label: "tension eased on the Other's chart" },
+  Mercury: { polarity: "Contrary",   payout: "magnitude",                 label: "effects contrary to the Other's action" },
+  Venus:   { polarity: "Testimony",  payout: "magnitude",                 label: "tension eased directly on both charts" },
+  Sun:     { polarity: "Either",     payout: "magnitude", actor: "most",  label: "effects in accord with the Other's action" },
+  Mars:    { polarity: "Affliction", payout: "magnitude",                 label: "tension created on the Other's chart" },
+  Jupiter: { polarity: "Accord",     payout: "magnitude",                 label: "direct effects on both charts" },
+  Saturn:  { polarity: "Affliction", payout: "ceiling",                   label: "planets going dark on both charts" },
 };
 
-export interface ScoreCharts {
+/** What the scorer reads beside the beats, all of it as it stood before the
+ *  turn resolved. */
+export interface ScoreTurn {
+  /** The player's run chart, for the Resolve ceilings of their planets. */
   self: Chart;
   other: Chart;
+  /** The player's affliction before the turn. */
+  selfState: SideState;
+  /** The fielded planets; only the lit ones are compared for least and most. */
+  roster: PlanetName[];
+  playerPlanet: PlanetName;
+  /** The Other's announced action. */
+  opponentAction: Polarity;
 }
 
 /**
- * One beat's contribution under a ruler. Accord and Contrary compare the
- * beat's resolved polarity with the Other's precommitted action. Applied-effect
- * channels admit hits only; the combust channel admits markers only.
+ * What one beat generates under a ruler. Only beats on the Other's chart
+ * count, each at the polarity it landed with. Accord and Contrary compare that
+ * polarity with the Other's announced action.
  */
-export function beatScore(
-  ruler: PlanetName,
-  beat: ScoredBeat,
-  charts: ScoreCharts,
-  opponentAction: Polarity,
-): number {
+export function beatScore(ruler: PlanetName, beat: ScoredBeat, turn: ScoreTurn): number {
+  if (beat.side !== "other") return 0;
   const rule = RULER_RULES[ruler];
-  if (rule.chart === "other" && beat.side !== "other") return 0;
-  if (!channelMatches(rule.channel, beat)) return 0;
   const beatPolarity = beat.kind === "combust" ? "Affliction" : beat.polarity;
-  if (!polarityMatches(rule.polarity, beatPolarity, opponentAction)) return 0;
+  if (!polarityMatches(rule.polarity, beatPolarity, turn.opponentAction)) return 0;
   if (rule.payout === "ceiling") {
-    if (beat.kind !== "combust") return 0;
-    const chart = beat.side === "self" ? charts.self : charts.other;
-    return combustionCeiling(chart.planets[beat.target]);
+    return beat.kind === "combust" ? combustionCeiling(turn.other.planets[beat.target]) : 0;
   }
-  return beat.kind === "hit" ? beat.magnitude : 0;
-}
-
-function channelMatches(channel: ScoringRule["channel"], beat: ScoredBeat): boolean {
-  if (channel === "combust") return beat.kind === "combust";
-  if (beat.kind === "combust") return false;
-  return channel === "all" || beat.channel === channel;
+  if (beat.kind !== "hit") return 0;
+  if (!rule.actor) return beat.magnitude;
+  return actorMatches(rule.actor, turn) ? 2 * beat.magnitude : 0;
 }
 
 function polarityMatches(
@@ -97,16 +98,18 @@ function polarityMatches(
   return beatPolarity === condition;
 }
 
-export function scoreBeats(
-  ruler: PlanetName,
-  beats: ScoredBeat[],
-  charts: ScoreCharts,
-  opponentAction: Polarity,
-): number {
-  return beats.reduce(
-    (sum, beat) => sum + beatScore(ruler, beat, charts, opponentAction),
-    0,
-  );
+/** Whether the acting planet has the least (or most) Resolve left of the
+ *  player's lit planets. Planets tied for it all match. */
+function actorMatches(actor: "least" | "most", turn: ScoreTurn): boolean {
+  const left = (p: PlanetName) =>
+    combustionCeiling(turn.self.planets[p]) - turn.selfState[p].affliction;
+  const lit = turn.roster.filter((p) => !isCombusted(turn.self.planets[p], turn.selfState[p]));
+  const bound = (actor === "least" ? Math.min : Math.max)(...lit.map(left));
+  return left(turn.playerPlanet) === bound;
+}
+
+export function scoreBeats(ruler: PlanetName, beats: ScoredBeat[], turn: ScoreTurn): number {
+  return beats.reduce((sum, beat) => sum + beatScore(ruler, beat, turn), 0);
 }
 
 /**
@@ -124,7 +127,7 @@ export function logToBeats(entry: TurnLogEntry): ScoredBeat[] {
     magnitude: number,
     combust: boolean,
   ) => {
-    beats.push({ kind: "hit", side, target, polarity, magnitude, channel: "direct" });
+    beats.push({ kind: "hit", side, target, polarity, magnitude });
     for (const p of entry.propagation) {
       if (p.side !== side) continue;
       if (p.note === "Combusts") beats.push({ kind: "combust", side, target: p.target });
@@ -135,7 +138,6 @@ export function logToBeats(entry: TurnLogEntry): ScoredBeat[] {
           target: p.target,
           polarity: p.polarity,
           magnitude: Math.abs(p.delta),
-          channel: "propagated",
         });
     }
     if (combust) beats.push({ kind: "combust", side, target });
@@ -152,10 +154,17 @@ export function logToBeats(entry: TurnLogEntry): ScoredBeat[] {
   return beats;
 }
 
+/** The Light a resolved turn generates. `before` is the player's side as it
+ *  stood before the turn; the acting planet and the Other's action come from
+ *  the log entry. */
 export function turnLight(
   entry: TurnLogEntry,
   ruler: PlanetName,
-  charts: ScoreCharts,
+  before: Omit<ScoreTurn, "playerPlanet" | "opponentAction">,
 ): number {
-  return scoreBeats(ruler, logToBeats(entry), charts, entry.opponentValence);
+  return scoreBeats(ruler, logToBeats(entry), {
+    ...before,
+    playerPlanet: entry.playerPlanet,
+    opponentAction: entry.opponentValence,
+  });
 }

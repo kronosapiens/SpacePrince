@@ -5,7 +5,7 @@ import { getAspects } from "@/game/aspects";
 import { combustionCeiling } from "@/game/combust";
 import { computeProjectedEffects } from "@/game/projections";
 import { PLANETS } from "@/game/data";
-import { logToBeats, scoreBeats, turnLight, type ScoreCharts } from "@/game/score";
+import { logToBeats, scoreBeats, turnLight, type ScoreTurn } from "@/game/score";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
 import type { RelationalEncounter, PlanetName, Polarity, Run } from "@/game/types";
@@ -38,7 +38,11 @@ function compare(
   prepare?.({ run, enc, playerPlanet });
   const opponentPlanet = enc.sequence[enc.turnIndex]!;
   const opponentAction = enc.opponentActions[enc.turnIndex]!;
-  const charts: ScoreCharts = { self: prince.chart, other: enc.opponentChart };
+  // `resolveTurn` clones the player's state, so `run.state` stays the pre-turn read.
+  const before = {
+    self: prince.chart, other: enc.opponentChart, selfState: run.state, roster: enc.roster,
+  };
+  const turn: ScoreTurn = { ...before, playerPlanet, opponentAction };
 
   const projection = computeProjectedEffects({
     playerChart: prince.chart,
@@ -57,23 +61,26 @@ function compare(
 
   for (const ruler of PLANETS) {
     expect(
-      scoreBeats(ruler, projection.beats, charts, opponentAction),
+      scoreBeats(ruler, projection.beats, turn),
       `${ruler} @ seed ${opponentSeed}/${playerValence}`,
-    ).toBe(scoreBeats(ruler, logToBeats(result.log), charts, opponentAction));
+    ).toBe(scoreBeats(ruler, logToBeats(result.log), turn));
   }
 
   // Stronger than the score alone: the two lists are the same beats, in the
   // same order, so no rule can key on something only one side produces.
   expect(projection.beats).toEqual(logToBeats(result.log));
 
-  // Non-vacuity: every turn lands a direct hit on their chart, which Jupiter's
-  // rule always admits — so the parity above is never 0 === 0 throughout.
-  expect(scoreBeats("Jupiter", projection.beats, charts, opponentAction)).toBeGreaterThan(0);
+  // Non-vacuity: every turn lands a direct hit on their chart, and Venus and
+  // Mars between them admit every hit there — so the parity above is never
+  // 0 === 0 throughout.
+  expect(
+    scoreBeats("Venus", projection.beats, turn) + scoreBeats("Mars", projection.beats, turn),
+  ).toBeGreaterThan(0);
 
   const ruler = encounterRuler(enc);
-  expect(result.log.lightGain).toBe(turnLight(result.log, ruler, charts));
+  expect(result.log.lightGain).toBe(turnLight(result.log, ruler, before));
   expect(result.run.light - run.light).toBe(result.log.lightGain);
-  return { projection, result, charts, playerPlanet, opponentPlanet, ruler };
+  return { projection, result, turn, playerPlanet, opponentPlanet, ruler };
 }
 
 const SEEDS = [11, 42, 99, 123];
@@ -92,7 +99,7 @@ describe("preview and outcome score the same beats", () => {
     // Park the opponent's actor one point under its ceiling: the blow combusts
     // it, preempting the reply, and the projected magnitude must be that one
     // point — not the planet's full swing.
-    const { projection, result } = compare(99, "Affliction", ({ enc }) => {
+    const { projection, result, turn } = compare(99, "Affliction", ({ enc }) => {
       const active = enc.sequence[enc.turnIndex]!;
       enc.opponentState[active].affliction =
         combustionCeiling(enc.opponentChart.planets[active]) - 1;
@@ -103,10 +110,14 @@ describe("preview and outcome score the same beats", () => {
     expect(result.log.opponentDelta).toBe(1);
     expect(projection.other[active]!.delta).toBe(1);
     expect(projection.beats).toContainEqual({ kind: "combust", side: "other", target: active });
+    // Saturn counts the planet that went dark at its full Resolve, not the remainder.
+    expect(scoreBeats("Saturn", projection.beats, turn)).toBe(
+      combustionCeiling(turn.other.planets[active]),
+    );
   });
 
-  it("a catcher combusted by the incoming blow pays its ceiling under Saturn", () => {
-    const { projection, result, charts, playerPlanet } = compare(11, "Testimony", ({ run, enc, playerPlanet }) => {
+  it("your own planet going dark generates nothing under Saturn", () => {
+    const { projection, result, turn, playerPlanet } = compare(11, "Testimony", ({ run, enc, playerPlanet }) => {
       // Your planet catches the reply one point under its ceiling and goes out.
       // Testify, so nothing on their side dies to preempt it.
       run.state[playerPlanet].affliction =
@@ -115,14 +126,27 @@ describe("preview and outcome score the same beats", () => {
     });
     expect(result.log.playerCombust).toBe(true);
     expect(projection.beats).toContainEqual({ kind: "combust", side: "self", target: playerPlanet });
-    // Saturn is the one rule that pays for it — and it pays the ceiling.
-    expect(
-      scoreBeats("Saturn", projection.beats, charts, result.log.opponentValence),
-    ).toBeGreaterThanOrEqual(
-      combustionCeiling(charts.self.planets[playerPlanet]),
-    );
-    expect(scoreBeats("Moon", projection.beats, charts, result.log.opponentValence)).toBe(
-      scoreBeats("Moon", logToBeats(result.log), charts, result.log.opponentValence),
+    // Only the Other's planets going dark count, and none did.
+    expect(scoreBeats("Saturn", projection.beats, turn)).toBe(0);
+  });
+
+  it("the Sun reads the Resolve left before the turn, in outcome as in preview", () => {
+    // Your acting planet starts one point ahead of every other lit planet, and
+    // the Other's Affliction drops it behind them. It had the most when it
+    // acted, so its hits on the Other still count double.
+    const { projection, result, turn, ruler } = compare(42, "Affliction", ({ run, enc, playerPlanet }) => {
+      enc.opponentChart.ascendantSign = "Leo";
+      enc.opponentActions[enc.turnIndex] = "Affliction";
+      const chart = createStubPrince({ seed: 7 }).chart;
+      for (const p of enc.roster) {
+        run.state[p].affliction =
+          combustionCeiling(chart.planets[p]) - (p === playerPlanet ? 25 : 24);
+      }
+    });
+    expect(ruler).toBe("Sun");
+    expect(result.log.playerDelta).toBeGreaterThan(1);
+    expect(result.log.lightGain).toBe(
+      2 * (scoreBeats("Venus", projection.beats, turn) + scoreBeats("Mars", projection.beats, turn)),
     );
   });
 });

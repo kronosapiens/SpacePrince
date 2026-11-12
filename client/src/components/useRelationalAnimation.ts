@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { aspectKey } from "@/components/Chart";
 import { playCombust, playStrike } from "@/audio/engine";
 import { encounterRuler } from "@/game/encounter";
-import { beatScore, type ScoreCharts, type ScoredBeat } from "@/game/score";
+import { beatScore, type ScoreTurn, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
 import type {
   Chart,
@@ -102,8 +102,9 @@ export interface RelationalAnimationApi {
     entry: TurnLogEntry;
     previousRun: Run;
     previousEncounter: RelationalEncounter;
-    /** The player's chart — the scorer needs both charts, since a ruler whose
-     *  rule reaches your side pays a combust its ceiling (`score.ts`). */
+    /** The player's run chart — the scorer reads it for the Resolve your
+     *  planets had left before the turn, which the Moon's and the Sun's rules
+     *  compare (`score.ts`). */
     playerChart: Chart;
     projectedDeltas?: { self: ProjectionDeltas; other: ProjectionDeltas } | null;
   }): void;
@@ -225,11 +226,19 @@ function runScheduler(args: {
   // Light ticks per beat under the encounter's ruler, so the running number
   // climbs by exactly what the turn awards and never snaps at the end. The
   // beats ticked below are the ones `logToBeats` walks — same fields, same
-  // order, which is the order of record — so they sum to `entry.lightGain`.
+  // order, which is the order of record — and they are scored beside the same
+  // pre-turn state the resolver read, so they sum to `entry.lightGain`.
   const ruler = encounterRuler(previousEncounter);
-  const charts: ScoreCharts = { self: playerChart, other: previousEncounter.opponentChart };
+  const turn: ScoreTurn = {
+    self: playerChart,
+    other: previousEncounter.opponentChart,
+    selfState: previousRun.state,
+    roster: previousEncounter.roster,
+    playerPlanet: entry.playerPlanet,
+    opponentAction: entry.opponentValence,
+  };
   const tick = (state: RelationalAnimationState, beat: ScoredBeat) => {
-    const gain = beatScore(ruler, beat, charts, entry.opponentValence);
+    const gain = beatScore(ruler, beat, turn);
     if (gain <= 0) return;
     state.runningLight += gain;
     state.lightFlashEpoch += 1;
@@ -305,7 +314,6 @@ function runScheduler(args: {
           target: actionPlanet,
           polarity: receivedPolarity,
           magnitude: actionDelta,
-          channel: "direct",
         });
         next.actionPulse = isSelf
           ? { ...next.actionPulse, player: actionPlanet }
@@ -389,7 +397,6 @@ function runScheduler(args: {
               target: step.target,
               polarity: step.polarity,
               magnitude: Math.abs(step.delta),
-              channel: "propagated",
             });
             // Bloom only on non-combust hits — a combusting planet gets the
             // ripple instead, not a heal/harm pulse.

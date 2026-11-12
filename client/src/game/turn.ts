@@ -102,11 +102,13 @@ export function resolveTurn(
     lightGain: 0,
   };
   // Scored after the log is built: the rule is keyed on the encounter's ruler
-  // and reads the whole turn as beats (`score.ts`), charts included for the
-  // ceilings a combust pays.
+  // and reads the whole turn as beats (`score.ts`), beside the player's side
+  // as it stood before the turn — `run.state`, not the clone resolved above.
   log.lightGain = turnLight(log, encounterRuler(enc), {
     self: playerChart,
     other: enc.opponentChart,
+    selfState: run.state,
+    roster: enc.roster,
   });
 
   // Draw the next turn's precommit — planet + verb. This is the relational encounter's only
