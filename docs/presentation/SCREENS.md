@@ -387,8 +387,8 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
   Playtesters still found the game confusing with the invite rings alone, so the step is named outright.
 - **The ruler, the opening, and the rule.**
   The encounter's ruler ([MECHANICS.md §11](../mechanics/MECHANICS.md#11-encounter--map--run-flow)), named in its own colour — the colour its node had on the map — tucked into the corner between the wheels just above their lower edge.
-  Beneath it hang one sentence in bone that opens the meeting, and under that one line stating how you gain Light here (*Gain Light from affliction on the Other's chart*), the rule in the ruler's colour and Light itself neutral.
-  The opening says what the Other seeks from this exchange, in the manner of the ruler's own natal sign in the Other's chart (not the rising sign that chose the ruler), and leaves the player's response unwritten; one sentence per ruler–sign placement lives in `client/src/copy/encounter-openings.ts`.
+  Beneath it hang one sentence in bone that opens the meeting, and under that one line stating how you gain Light here (*Gain Light from tension eased in the Other*), the rule in the ruler's colour and Light itself neutral.
+  The opening says what the Other seeks from this exchange and leaves the player's response unwritten; one sentence per ruler lives in `client/src/copy/encounter-openings.ts`, beside the rule lines.
   Its job is to make the rule beneath it emotionally legible: what the Other wants is what the rule rewards.
   The number's meaning changes per node, so the rule is stated for the whole encounter, in every state, rather than discovered, and the opening holds with it, unchanged as turns and acting planets change, from entry through resolution.
 

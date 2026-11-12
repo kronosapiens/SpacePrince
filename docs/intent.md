@@ -53,7 +53,7 @@ The client holds to a few qualities in service of that:
 
 - **Never rush.** Transitions and text have pacing, and silence is a design tool.
 - **Never flatten the mystery.** Even at full progression the chart should feel partially opaque, not because information is hidden but because symbolic meaning is inexhaustible.
-- **Never generate text.** Every line the player reads is authored; composing a surface from authored lines (the 720 house scenes, the 84 encounter openings) honors this.
+- **Never generate text.** Every line the player reads is authored; composing a surface from authored lines (the 720 house scenes, the seven encounter openings) honors this.
 - **Client honesty.** Anything derivable from public state is shown, and nothing determined is framed as a gamble ([SCREENS.md §1.1](presentation/SCREENS.md#11-client-honesty)).
 - **Failure is canonical.** Combusting out is acknowledgment, not punishment; the star is the same kind of mark either way.
 

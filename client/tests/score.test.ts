@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  RULER_RULES, logToBeats, scoreBeats, turnLight, type ScoreTurn, type ScoredBeat,
-} from "@/game/score";
+import { logToBeats, scoreBeats, turnLight, type ScoreTurn, type ScoredBeat } from "@/game/score";
 import { blankSideState, seededChart } from "@/game/chart";
 import { combustionCeiling } from "@/game/combust";
 import { PLANETS } from "@/game/data";
@@ -75,10 +73,6 @@ describe("RULER_RULES — each ruler counts what that planet values", () => {
   it("nothing on the player's chart counts under any ruler", () => {
     const own = BEATS.filter((b) => b.side === "self");
     for (const ruler of PLANETS) expect(scoreBeats(ruler, own, turn())).toBe(0);
-  });
-
-  it("every rule has a label completing \"Gain Light from …\"", () => {
-    for (const ruler of PLANETS) expect(RULER_RULES[ruler].label.length).toBeGreaterThan(0);
   });
 
   it("an empty turn scores nothing under any ruler", () => {

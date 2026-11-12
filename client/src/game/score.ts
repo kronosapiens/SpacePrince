@@ -34,8 +34,6 @@ export interface ScoringRule {
   /** Only your lit planet with the least (or most) Resolve left generates
    *  Light, and its hits count double. */
   actor?: "least" | "most";
-  /** Player-facing phrase completing "Gain Light from …". */
-  label: string;
 }
 
 /**
@@ -45,13 +43,13 @@ export interface ScoringRule {
  * Saturn counts the Other's planets going dark.
  */
 export const RULER_RULES: Record<PlanetName, ScoringRule> = {
-  Moon:    { polarity: "Either",     payout: "magnitude", actor: "least", label: "tension eased on the Other's chart" },
-  Mercury: { polarity: "Contrary",   payout: "magnitude",                 label: "effects contrary to the Other's action" },
-  Venus:   { polarity: "Testimony",  payout: "magnitude",                 label: "tension eased directly on both charts" },
-  Sun:     { polarity: "Either",     payout: "magnitude", actor: "most",  label: "effects in accord with the Other's action" },
-  Mars:    { polarity: "Affliction", payout: "magnitude",                 label: "tension created on the Other's chart" },
-  Jupiter: { polarity: "Accord",     payout: "magnitude",                 label: "direct effects on both charts" },
-  Saturn:  { polarity: "Affliction", payout: "ceiling",                   label: "planets going dark on both charts" },
+  Moon:    { polarity: "Either",     payout: "magnitude", actor: "least" },
+  Mercury: { polarity: "Contrary",   payout: "magnitude" },
+  Venus:   { polarity: "Testimony",  payout: "magnitude" },
+  Sun:     { polarity: "Either",     payout: "magnitude", actor: "most" },
+  Mars:    { polarity: "Affliction", payout: "magnitude" },
+  Jupiter: { polarity: "Accord",     payout: "magnitude" },
+  Saturn:  { polarity: "Affliction", payout: "ceiling" },
 };
 
 /** What the scorer reads beside the beats, all of it as it stood before the
