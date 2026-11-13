@@ -358,6 +358,7 @@ UI label: `Light`.
 Light sums integer magnitudes from the turn log, or Resolve ceilings, which are multiples of `12`.
 What gathers it is decided by the encounter's **ruler** (§11): each ruler admits a different set of beats (`RULER_RULES` in `client/src/game/score.ts`).
 Only effects on the Other's chart generate Light, direct and propagated alike.
+As a general rule, each condition should offer roughly the same potential to generate Light.
 
 | Ruler | Counts | Acting planet | Payout |
 |---|---|---|---|
@@ -403,50 +404,6 @@ Nothing else about the run is recorded: not how it ended, not which planets comb
 Only the Light, and the star it shapes.
 
 What Light is, and so what these conditions are held to, is defined in [intent.md](../intent.md#premise).
-
-### 12.1 Draft conditions
-
-The conditions above in the player's words, with what each Other seeks.
-The Flavor Text and Rule Text lines are the two the encounter screen shows under the wheels (`client/src/copy/encounter-openings.ts`).
-
-Tentative principles every condition holds to:
-- Light comes from effects on the Other's chart.
-- Every condition has roughly the same potential to generate Light.
-
-**Venus**
-- Rule Logic: Testimony on their chart.
-- Flavor Text: They are weary and want to be eased.
-- Rule Text: Gain Light from tension eased in the Other.
-
-**Mars**
-- Rule Logic: Affliction on their chart.
-- Flavor Text: They want their strength tested.
-- Rule Text: Gain Light from tension created in the Other.
-
-**Jupiter**
-- Rule Logic: Effects aligned with their own action.
-- Flavor Text: They want to be met as they are.
-- Rule Text: Gain Light from effects in accord with the Other.
-
-**Mercury**
-- Rule Logic: Effects opposite to their own action.
-- Flavor Text: They want an answer they could not give themselves.
-- Rule Text: Gain Light from effects contrary to the Other.
-
-**Moon**
-- Rule Logic: Acting with your planet with the least resolve, 2x.
-- Flavor Text: They want to see you at your most vulnerable.
-- Rule Text: Gain Light through your planet with the least Resolve, doubled.
-
-**Sun**
-- Rule Logic: Acting with your planet with the most resolve, 2x.
-- Flavor Text: They want to see you at your strongest.
-- Rule Text: Gain Light through your planet with the most Resolve, doubled.
-
-**Saturn**
-- Rule Logic: Affliction which combusts a planet, for that planet's full resolve.
-- Flavor Text: They want to be pressed past their limit.
-- Rule Text: Gain Light from planets going dark on the Other.
 
 ## 13. Interaction Chart Semantics
 
