@@ -36,14 +36,18 @@ export function newMapState(seed: number): MapState {
   };
 }
 
+/** The seed of the map every Prince's first run opens on (MAP.md §4). Found by
+ *  search, so it holds only for this generator: four relational encounters on
+ *  the central nodes every route passes, narrative encounters on the two pairs between. */
+export const FIRST_MAP_SEED = 127977;
+
 export function beginRun(
   chart: Chart,
   seed = randomSeed(),
   lifetimeRelationalEncounterCount = 0,
   devUnlockAll = false,
+  mapSeed = Math.floor(mulberry32(seed)() * 2 ** 31),
 ): Run {
-  const rng = mulberry32(seed);
-  const mapSeed = Math.floor(rng() * 2 ** 31);
   const roster = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
   const crossed = rollMapBoundary(
     chart, blankSideState(), roster,

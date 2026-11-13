@@ -78,6 +78,7 @@ Any information derivable from public state remains available to the player.
 For the onchain design, randomness is spent deliberately:
 
 - **Once per run** — `Run.seed`, set by a VRF request at run start; the first map derives from it, and the player's affliction starts at zero.
+  A Prince's first run opens on the fixed first map instead ([MAP.md §4](MAP.md#4-seeding)).
 - **Once per map rollover** — the next map's seed; from it derive node content and opening uncombust rolls (MECHANICS §11.3), shown on entry.
   Revival uses a separate seeded stream from node content; map openings add no affliction.
 - **At relational encounter arrival** — the minted Prince that supplies the other chart, and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with affliction capped at Resolve.

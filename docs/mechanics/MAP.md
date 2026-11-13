@@ -117,6 +117,11 @@ A map is unknowable before it exists; once created, topology and per-node encoun
 The one exception is a relational encounter's ruler, which also depends on the planets the player holds when the encounter starts ([MECHANICS.md §11.1](MECHANICS.md#111-planet-unlock-schedule)).
 The run as a whole is therefore never solvable in advance: each map's fate is fixed only when the previous map completes.
 
+The first map of a Prince's first run is the exception: every Prince opens on the same map, from a fixed seed (`FIRST_MAP_SEED` in `client/src/game/run.ts`).
+Its pattern is `[1, 1, 1, 2, 2, 1, 1]`, with relational encounters on the four central nodes after the root and narrative encounters on the four paired nodes (houses 3, 5, 10 and 7).
+Every route therefore holds exactly four relational encounters, ruled in order by the Moon, Mercury, Venus and the Moon, and the player leaves the map holding four planets ([MECHANICS.md §11.1](MECHANICS.md#111-planet-unlock-schedule)).
+The seed was found by searching for that layout and holds only for the client's generator; onchain, the contract stores the seed that gives the layout under its own.
+
 Whether the chart should additionally *bias* generation (e.g. per-layer probabilities) on top of the seed remains open — see §6.
 
 The client prototype stands in with local randomness for the VRF.

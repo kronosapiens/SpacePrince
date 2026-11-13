@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadPrince, savePrince } from "@/state/prince";
-import { beginRun, MAPS_PER_RUN } from "@/game/run";
+import { beginRun, FIRST_MAP_SEED, MAPS_PER_RUN } from "@/game/run";
 import { combustionCeiling } from "@/game/combust";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANET_GLYPH } from "@/svg/glyphs";
@@ -168,6 +168,7 @@ describe("entry screens", () => {
     expect(minted.position).toMatchObject({ lat: 40.71, lon: -74.01 });
     expect(minted.runs).toHaveLength(1);
     const first = minted.runs[0]!;
+    expect(first.map.seed).toBe(FIRST_MAP_SEED);
     expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numRelationalEncounters).state);
     expect(first.state.Moon.affliction).toBe(0);
     expect(first.map.boundary!.necessity).toEqual([]);
@@ -275,6 +276,7 @@ describe("entry screens", () => {
     expect(restarted.runs).toHaveLength(2);
     expect(restarted.runs[0]).toEqual(run);
     const fresh = restarted.runs[1]!;
+    expect(fresh.map.seed).not.toBe(FIRST_MAP_SEED);
     expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numRelationalEncounters).state);
     expect(fresh.state.Moon.affliction).toBe(0);
     expect(container.querySelector(".necessity-opening")).toBeNull();

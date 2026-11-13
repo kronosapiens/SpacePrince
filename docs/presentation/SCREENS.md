@@ -495,6 +495,7 @@ This lets dev tooling reproduce exact map states for screen-iteration work, and 
 A map is determined the moment it is created, except for the rulers of its relational encounters:
 
 - The **map seed** comes from a VRF request at map creation ([MAP.md §4](../mechanics/MAP.md#4-seeding)) — one call per map, never per node.
+  The first map of a Prince's first run uses a fixed seed instead, so every Prince opens on the same map.
 - The **topology** derives from the seed (per [MAP.md](../mechanics/MAP.md)).
 - **Encounter content** (relational encounter, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
 - A relational encounter's **ruler** is set when the encounter starts: the node's roll fixes an order of the seven planets, and the ruler is the first planet in that order the player holds ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).

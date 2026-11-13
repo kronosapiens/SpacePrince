@@ -287,6 +287,7 @@ The Moon is present from the first encounter; each subsequent planet unlocks at 
 
 The first 32 relational encounters are effectively a tutorial — the chart fills in at exponentially spaced intervals, and the player's mechanical and symbolic literacy grow alongside the chart.
 Saturn arrives last as the final teacher.
+A Prince's first run opens on a fixed first map with four relational encounters on every route, so the player leaves it holding the Moon, Mercury, Venus and the Sun ([MAP.md §4](MAP.md#4-seeding)).
 
 **Encounter length and the mirrored opponent.** Relational encounter length is the **map number**: 1 turn on map 1, 2 on map 2, up to 7 on map 7.
 Difficulty therefore ramps on two axes.

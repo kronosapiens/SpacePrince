@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { playEncounter, type PlayContext } from "@/eval/play";
-import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
+import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, FIRST_MAP_SEED, MAPS_PER_RUN } from "@/game/run";
 import { houseSign } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { relationalTurnRng, resolveTurn } from "@/game/turn";
@@ -62,6 +62,20 @@ describe("Run loop integration", () => {
       }
     }
     expect(newMapState(123).rolledNodes).toEqual(map.rolledNodes);
+  });
+
+  it("the first map puts four relational encounters on every route, ruled Moon, Mercury, Venus, Moon", () => {
+    const { graph, rolledNodes } = newMapState(FIRST_MAP_SEED);
+    expect(graph.pattern).toEqual([1, 1, 1, 2, 2, 1, 1]);
+    // Encounter n starts with n relational encounters completed; house scenes do not count.
+    expect(["2C", "3C", "6C", "7C"].map((id, completed) => {
+      const content = rolledNodes[id]!;
+      return content.kind === "relational" && seedRuler(content.opponentSeed, unlockedPlanets(completed));
+    })).toEqual(["Moon", "Mercury", "Venus", "Moon"]);
+    expect(["4L", "4R", "5L", "5R"].map((id) => {
+      const content = rolledNodes[id]!;
+      return content.kind === "narrative" && content.house;
+    })).toEqual([3, 5, 10, 7]);
   });
 
   it("gives every seed an unlocked ruler, which an unlock changes only to the newly unlocked planet", () => {
