@@ -65,7 +65,7 @@ export function spawnMap(opts: SpawnOpts = {}): Prince {
   const mapsCompleted = Math.floor(mulberry32(hashString(`${seed}_map`))() * MAPS_PER_RUN);
   const base = { ...beginRun(devPlayerChart(seed), seed, tier), mapsCompleted };
   // Park the player partway through a rolled map (never on the terminal).
-  const map = walkMap(seed, false, tier);
+  const map = walkMap(seed, false);
   const run: Run = {
     ...base,
     state: livedInState(seed, "self", devPlayerChart(seed), fielded),
@@ -138,9 +138,9 @@ export function spawnEnd(opts: SpawnOpts = {}): Prince {
   // walked with synthesized per-node outcomes (so the encounter count is real).
   const events = [];
   for (let i = 0; i < MAPS_PER_RUN - 1; i++) {
-    events.push({ kind: "map-completed" as const, map: walkMap(hashString(`${seed}_end_${i}`), true, tier) });
+    events.push({ kind: "map-completed" as const, map: walkMap(hashString(`${seed}_end_${i}`), true) });
   }
-  const finalMap = walkMap(hashString(`${seed}_end_${MAPS_PER_RUN - 1}`), true, tier);
+  const finalMap = walkMap(hashString(`${seed}_end_${MAPS_PER_RUN - 1}`), true);
   const light = [...events.map((e) => e.map), finalMap].reduce(
     (sum, m) => sum + Object.values(m.outcomes).reduce((total, o) => total + o.lightDelta, 0),
     0,
@@ -191,7 +191,7 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
     const pastSeed = hashString(`${seed}_history_${index}`);
     return {
       ...beginRun(devPlayerChart(seed), pastSeed, tier),
-      map: walkMap(pastSeed, true, tier),
+      map: walkMap(pastSeed, true),
       mapsCompleted: MAPS_PER_RUN,
       // Sample doublings to expose both faint and bright stars in the preview.
       light: Math.round(2 ** (rng() * 13) - 1),
@@ -246,8 +246,8 @@ function livedInLight(seed: number): number {
  *  End rainbow); otherwise stops partway so the player sits at a mid-map node.
  *  Visited non-root nodes get a synthesized outcome (drives the End counts +
  *  visited styling). */
-function walkMap(seed: number, toTerminal: boolean, tier: number): MapState {
-  const base = newMapState(seed, unlockedPlanets(tier));
+function walkMap(seed: number, toTerminal: boolean): MapState {
+  const base = newMapState(seed);
   const rolled = base.rolledNodes;
   const walkRng = mulberry32(hashString(`${seed}_walk`));
   const path: string[] = [base.currentNodeId];

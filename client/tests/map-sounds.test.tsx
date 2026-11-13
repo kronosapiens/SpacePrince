@@ -7,6 +7,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
 import { buildMapGraph, eligibleNext } from "@/game/map-gen";
 import { beginRun } from "@/game/run";
+import { unlockedPlanets } from "@/game/unlocks";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -53,7 +54,7 @@ function setup() {
   prince.runs = [run];
   savePrince(prince);
   const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
-  return { prince, map: run.map, next, node: `[data-guide="node-${next}"]` };
+  return { prince, map: run.map, unlocked: unlockedPlanets(prince.numRelationalEncounters), next, node: `[data-guide="node-${next}"]` };
 }
 const cues = () => vi.mocked(playUISound).mock.calls.map(([cue]) => cue);
 
@@ -98,11 +99,11 @@ describe("map feedback", () => {
   });
 
   it("previews a route on hover or focus, preserving focus when the pointer leaves", () => {
-    const { map } = setup();
+    const { map, unlocked } = setup();
     map.graph = buildMapGraph(42, { forced: [2, 1, 1, 1, 1] });
     const node = '[data-guide="node-2L"]';
     const onSelectNode = vi.fn();
-    act(() => root.render(<MapDiagram map={map} onSelectNode={onSelectNode} />));
+    act(() => root.render(<MapDiagram map={map} unlockedPlanets={unlocked} onSelectNode={onSelectNode} />));
     const control = get(node).closest('[role="button"]')!;
     const previewedRoute = () => container.querySelector('line[stroke-opacity="0.75"]');
     const ring = () => control.querySelector('.invite-ring')!;
@@ -129,15 +130,15 @@ describe("map feedback", () => {
   });
 
   it("leaves background clicks and passive thumbnails silent", () => {
-    const { map, node } = setup();
+    const { map, unlocked, node } = setup();
     const onSelectNode = vi.fn();
-    act(() => root.render(<MapDiagram map={map} onSelectNode={onSelectNode} />));
+    act(() => root.render(<MapDiagram map={map} unlockedPlanets={unlocked} onSelectNode={onSelectNode} />));
     click(node);
     expect(onSelectNode).toHaveBeenCalledOnce();
     expect(get(node).closest('[role="button"]')?.hasAttribute("aria-pressed")).toBe(false);
     click('[data-guide="map"]');
     expect(cues()).toEqual([]);
-    act(() => root.render(<MapDiagram map={map} />));
+    act(() => root.render(<MapDiagram map={map} unlockedPlanets={unlocked} />));
     click(node);
     expect(onSelectNode).toHaveBeenCalledOnce();
     expect(cues()).toEqual([]);

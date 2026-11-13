@@ -156,7 +156,8 @@ export interface MapGraph {
 }
 
 export type NodeContent =
-  | { kind: "relational"; opponentSeed: number }
+  /** `ruler` is the ruler the encounter started under, absent until the node is entered. */
+  | { kind: "relational"; opponentSeed: number; ruler?: PlanetName }
   | { kind: "narrative"; house: number };
 
 export interface NodeOutcome {

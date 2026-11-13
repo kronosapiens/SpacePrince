@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import { playEncounter, type PlayContext } from "@/eval/play";
 import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, MAPS_PER_RUN } from "@/game/run";
-import { chartRuler, houseSign, seededChart } from "@/game/chart";
+import { houseSign } from "@/game/chart";
 import { combustionCeiling, isCombusted } from "@/game/combust";
 import { relationalTurnRng, resolveTurn } from "@/game/turn";
 import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { hashString, mulberry32 } from "@/game/rng";
 import { unlockedPlanets } from "@/game/unlocks";
-import { rollNodeContent } from "@/game/map-content";
+import { nodeRuler, rollNodeContent, seedRuler } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANETS } from "@/game/data";
 import { getScenario, pickScenario } from "@/data/narrative-scenarios";
@@ -53,8 +53,7 @@ describe("Run loop integration", () => {
   });
 
   it("a new map pre-rolls content for every node except the root, deterministically", () => {
-    const relationalRulers = unlockedPlanets(0);
-    const map = newMapState(123, relationalRulers);
+    const map = newMapState(123);
     for (const node of map.graph.nodes) {
       if (node.id === ROOT_NODE_ID) {
         expect(map.rolledNodes[node.id]).toBeUndefined();
@@ -62,37 +61,48 @@ describe("Run loop integration", () => {
         expect(map.rolledNodes[node.id]).toBeDefined();
       }
     }
-    expect(newMapState(123, relationalRulers).rolledNodes).toEqual(map.rolledNodes);
+    expect(newMapState(123).rolledNodes).toEqual(map.rolledNodes);
   });
 
-  it("rejects relational charts whose rulers are not unlocked", () => {
+  it("gives every seed an unlocked ruler, which an unlock changes only to the newly unlocked planet", () => {
+    const ladder = [0, 1, 2, 4, 8, 16, 32].map((count) => unlockedPlanets(count));
+    for (let seed = 0; seed < 500; seed++) {
+      const rulers = ladder.map((unlocked) => seedRuler(seed, unlocked));
+      rulers.forEach((ruler, step) => {
+        expect(ladder[step]).toContain(ruler);
+        if (step > 0 && ruler !== rulers[step - 1]) expect(ruler).toBe(ladder[step]!.at(-1));
+      });
+    }
+  });
+
+  it("meets an Other whose ruler is the one the map showed for the node", () => {
     for (const count of [0, 1, 2, 4, 8, 16, 32]) {
-      const eligible = unlockedPlanets(count);
-      const map = newMapState(1_000 + count, eligible);
-      const relationalNodes = Object.values(map.rolledNodes).filter(
-        (content) => content.kind === "relational",
-      );
+      const prince = createStubPrince({ numRelationalEncounters: count });
+      const run = beginRun(prince.chart, 1_000 + count, count);
+      const relationalNodes = Object.entries(run.map.rolledNodes).filter(([, content]) => content.kind === "relational");
       expect(relationalNodes.length).toBeGreaterThan(0);
-      for (const content of relationalNodes) {
+      for (const [nodeId, content] of relationalNodes) {
         if (content.kind !== "relational") continue;
-        expect(eligible).toContain(
-          chartRuler(seededChart(content.opponentSeed, "Other")),
-        );
+        const entered = enterNode({ run, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: count });
+        expect(encounterRuler(entered.encounter as RelationalEncounter)).toBe(nodeRuler(content, unlockedPlanets(count)));
       }
     }
   });
 
-  it("rejection-samples direct encounter seeds against the current tier", () => {
-    const rejectedSeed = Array.from({ length: 20 }, (_, seed) => seed).find(
-      (seed) => chartRuler(seededChart(seed, "Other")) !== "Moon",
+  it("keeps the ruler a node started under after a later unlock", () => {
+    const atEntry = unlockedPlanets(0);
+    // A seed whose ruler differs between the planets unlocked at entry and all seven.
+    const opponentSeed = Array.from({ length: 20 }, (_, seed) => seed).find(
+      (seed) => seedRuler(seed, atEntry) !== seedRuler(seed, PLANETS),
     )!;
-    const encounter = beginRelationalEncounter({
-      run: beginRun(createStubPrince().chart, 42, 0),
-      opponentSeed: rejectedSeed,
-      lifetimeRelationalEncounterCount: 0,
-    });
-    expect(encounterRuler(encounter)).toBe("Moon");
-    expect(encounter.opponentChart.id).not.toBe(`chart_${rejectedSeed}`);
+    const prince = createStubPrince({ numRelationalEncounters: 0 });
+    const run = beginRun(prince.chart, 42, 0);
+    const nodeId = Object.keys(run.map.rolledNodes)[0]!;
+    run.map.rolledNodes[nodeId] = { kind: "relational", opponentSeed };
+    const entered = enterNode({ run, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: 0 });
+    const content = entered.map.rolledNodes[nodeId]!;
+    if (content.kind !== "relational") throw new Error("Expected relational");
+    expect(nodeRuler(content, PLANETS)).toBe(seedRuler(opponentSeed, atEntry));
   });
 
   it("eligibleNext returns 1-edge neighbors at layer ≥ current, never backward", () => {
@@ -222,7 +232,11 @@ describe("Shared run transitions", () => {
     const draws = Array.from({ length: 8 }, (_, seed) => enter(run, relationalId, seed));
     const encounters = draws.map((draw) => draw.encounter as RelationalEncounter);
     for (const draw of draws) {
-      expect(draw.map.rolledNodes).toEqual(run.map.rolledNodes);
+      // Entry leaves every node as rolled, except that the entered node records its ruler.
+      expect(draw.map.rolledNodes).toEqual({
+        ...run.map.rolledNodes,
+        [relationalId]: { ...run.map.rolledNodes[relationalId], ruler: encounterRuler(encounters[0]!) },
+      });
       expect(draw.map.graph).toEqual(run.map.graph);
       expect(draw.map.seed).toBe(run.map.seed);
       expect((draw.encounter as RelationalEncounter).opponentChart).toEqual(encounters[0]!.opponentChart);

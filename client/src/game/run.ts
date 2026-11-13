@@ -2,7 +2,7 @@ import { pickScenario } from "@/data/narrative-scenarios";
 import { blankGains, blankSideState, cloneSideState, houseSign, runChart } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./relational";
 import { isCombusted, newlyCombusted, uncombust } from "./combust";
-import { beginRelationalEncounter, beginNarrativeEncounter } from "./encounter";
+import { beginRelationalEncounter, beginNarrativeEncounter, encounterRuler } from "./encounter";
 import { applyNecessity } from "./necessity";
 import { rollNodeContent } from "./map-content";
 import { buildMapGraph, ROOT_NODE_ID, TERMINAL_NODE_ID } from "./map-gen";
@@ -13,10 +13,7 @@ import type { Chart, MapBoundary, MapState, NodeContent, PlanetName, Run, SideSt
 /** A run spans up to seven maps; the seventh's completion ends it (MECHANICS §11). */
 export const MAPS_PER_RUN = 7;
 
-export function newMapState(
-  seed: number,
-  relationalRulers: readonly PlanetName[] = unlockedPlanets(0),
-): MapState {
+export function newMapState(seed: number): MapState {
   const graph = buildMapGraph(seed);
   // Every node's content is fixed at map creation, seeded on (map seed, node
   // id). Onchain the map seed itself is a VRF draw at creation — a map is
@@ -26,10 +23,7 @@ export function newMapState(
   const rolledNodes: Record<string, NodeContent> = {};
   for (const node of graph.nodes) {
     if (node.id === ROOT_NODE_ID) continue;
-    rolledNodes[node.id] = rollNodeContent({
-      rng: mulberry32(hashString(`${seed}_${node.id}`)),
-      relationalRulers,
-    });
+    rolledNodes[node.id] = rollNodeContent({ rng: mulberry32(hashString(`${seed}_${node.id}`)) });
   }
   return {
     id: `map_${seed}`,
@@ -50,9 +44,9 @@ export function beginRun(
 ): Run {
   const rng = mulberry32(seed);
   const mapSeed = Math.floor(rng() * 2 ** 31);
-  const relationalRulers = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
+  const roster = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
   const crossed = rollMapBoundary(
-    chart, blankSideState(), relationalRulers,
+    chart, blankSideState(), roster,
     mulberry32(hashString(`${mapSeed}_boundary`)),
   );
   return {
@@ -61,7 +55,7 @@ export function beginRun(
     state: crossed.state,
     light: 0,
     gains: blankGains(),
-    map: { ...newMapState(mapSeed, relationalRulers), boundary: crossed.boundary },
+    map: { ...newMapState(mapSeed), boundary: crossed.boundary },
     mapsCompleted: 0,
     encounter: null,
     seenScenarioIds: [],
@@ -77,13 +71,14 @@ export interface EnterNodeInput {
   devUnlockAll?: boolean;
   /** Entry randomness for the narrative scene or relational opening and Necessity.
    *  Live entry samples this in the store; forecasts and tests inject a seed.
-   *  Omission retains deterministic evaluation. Map content is unchanged. */
+   *  Omission retains deterministic evaluation. Map content does not depend on it. */
   encounterIdSeed?: number;
 }
 
 /** Commit a node and initialize its encounter from entry randomness.
- *  The map's kind, house and Other stay fixed; narrative selection draws from
- *  the matching house/sign's unseen pool and joins the no-repeat history. */
+ *  The node's kind, house and Other do not depend on that randomness, and a
+ *  relational node records the ruler it starts under; narrative selection draws
+ *  from the matching house/sign's unseen pool and joins the no-repeat history. */
 export function enterNode(input: EnterNodeInput): Run {
   const { run, chart, nodeId, lifetimeRelationalEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const content = run.map.rolledNodes[nodeId];
@@ -106,7 +101,13 @@ export function enterNode(input: EnterNodeInput): Run {
       mulberry32(hashString(`${encounterIdSeed ?? run.id}_${run.map.seed}_${nodeId}_player_necessity`)),
     );
     const wiped = encounter.roster.every((planet) => isCombusted(playerChart.planets[planet], opening.state[planet]));
-    const next = { ...entered, state: opening.state, encounter: { ...encounter, selfNecessity: opening.necessity, resolved: wiped } };
+    const next = {
+      ...entered,
+      state: opening.state,
+      encounter: { ...encounter, selfNecessity: opening.necessity, resolved: wiped },
+      // The node keeps the ruler its encounter started under; a later unlock does not change it.
+      map: { ...entered.map, rolledNodes: { ...entered.map.rolledNodes, [nodeId]: { ...content, ruler: encounterRuler(encounter) } } },
+    };
     if (wiped) next.map = { ...next.map, outcomes: { ...next.map.outcomes, [nodeId]: {
       nodeId, kind: "relational", summary: `Encounter · ${encounter.opponentChart.name}`, lightDelta: 0,
       combusts: newlyCombusted(playerChart, entered.state, opening.state),
@@ -184,6 +185,6 @@ export function rolloverMap(
     runChart(chart, run), run.state, roster,
     mulberry32(hashString(`${seed}_boundary`)),
   );
-  const map: MapState = { ...newMapState(seed, roster), boundary: crossed.boundary };
+  const map: MapState = { ...newMapState(seed), boundary: crossed.boundary };
   return { ...run, map, state: crossed.state, mapsCompleted, encounter: null, events };
 }

@@ -95,11 +95,11 @@ describe("strategic policies", () => {
 
   it("ranks relational actions by each strategy's criteria", () => {
     // Every planet sits 6 short of combusting, against a testifying Venus. Venus
-    // afflicting keeps all seven lit (32 Light). Sun and Moon afflicting gain the
+    // afflicting keeps all seven lit (28 Light). Sun and Moon afflicting gain the
     // most (84) but combust a planet without ending the run; the Sun leaves more capacity.
     const r = beginRun(prince.chart, 1, prince.numRelationalEncounters);
     for (const p of PLANETS) r.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 6;
-    const encounter = beginRelationalEncounter({ run: r, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
+    const encounter = beginRelationalEncounter({ run: r, opponentSeed: 282, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     // Fix the tactical state independently of encounter-opening tuning.
     const otherAffliction = { Moon: 24, Mercury: 18, Venus: 24, Sun: 12, Mars: 12, Jupiter: 36, Saturn: 12 };
     for (const p of PLANETS) encounter.opponentState[p].affliction = otherAffliction[p];
@@ -116,7 +116,7 @@ describe("strategic policies", () => {
     const even = beginRun(prince.chart, 14, prince.numRelationalEncounters);
     const afflictions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
     for (const p of PLANETS) even.state[p].affliction = afflictions[p];
-    const evenEncounter = beginRelationalEncounter({ run: even, opponentSeed: 14, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
+    const evenEncounter = beginRelationalEncounter({ run: even, opponentSeed: 563, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     const evenOtherAffliction = { Moon: 18, Mercury: 6, Venus: 24, Sun: 12, Mars: 12, Jupiter: 6, Saturn: 24 };
     for (const p of PLANETS) evenEncounter.opponentState[p].affliction = evenOtherAffliction[p];
     expect([evenEncounter.sequence[0], evenEncounter.opponentActions[0]]).toEqual(["Sun", "Affliction"]);
@@ -156,7 +156,7 @@ describe("strategic policies", () => {
     };
     const ceiling = (p: PlanetName) => combustionCeiling(prince.chart.planets[p]);
     const at = (mapsCompleted: number, affliction: (p: PlanetName) => number): Run => {
-      const r = { ...beginRun(prince.chart, 13, prince.numRelationalEncounters), mapsCompleted };
+      const r = { ...beginRun(prince.chart, 133, prince.numRelationalEncounters), mapsCompleted };
       for (const p of PLANETS) r.state[p].affliction = affliction(p);
       return useMara(r);
     };

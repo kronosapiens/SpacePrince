@@ -438,7 +438,7 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 Two content types, distinguished by shape and fill.
 Both share the same outer disc footprint so the diagram reads as one network of nodes; the *content inside* the disc tells you what kind of beat it is.
 
-- **Relational node:** thin disc-ring outline plus an eight-pointed star inside, filled with the opponent's **chart ruler** color — the planet ruling the opponent's Ascendant sign.
+- **Relational node:** thin disc-ring outline plus an eight-pointed star inside, filled with the color of the encounter's **ruler** (§4.3).
   The star extends slightly past the disc rim.
   Reads as *"another chart waits here, anchored by [planet]."*
 - **Narrative node:** filled disc in the color of the house's fixed game ruler (§4.5).
@@ -446,7 +446,8 @@ Both share the same outer disc footprint so the diagram reads as one network of 
   The house Roman numeral appears at the node center.
 
 Each node's identifying planet supplies its color.
-Narrative nodes use the house's fixed game ruler (§4.5); relational nodes use the traditional ruler of the opponent's Ascendant sign, listed in the [sign matrix](../writing/PLANET_MATRIX.md#sign-matrix).
+Narrative nodes use the house's fixed game ruler (§4.5).
+Relational nodes use the encounter's ruler (§4.3): before the encounter starts, the ruler the node would have with the planets the player holds now; from then on, the ruler it started under.
 
 Each node also has one of four **temporal states** relative to the player's current position.
 Together with content type, the state determines what's rendered:
@@ -469,6 +470,7 @@ Together with content type, the state determines what's rendered:
 The whole map renders its content from the start.
 A map's fate is fixed the moment it is created (§4.3), so hiding rolled content behind a fog of war would misstate the player's actual knowledge — **the map visual reflects exactly what is knowable**.
 This is the client-honesty rule (§1.1) applied to the map.
+The one thing not fixed at creation is a relational encounter's ruler, and the map shows it as it stands: an unlock can change the color of a relational node ahead (§4.3).
 The tiers grade *attention*, not information: meaning concentrates near the player while the distance stays faint but readable.
 
 The progression from faint (distant) through translucent (eligible) to full saturation + halo (current), with the walked path solid behind the player, reads as the map becoming real as it is walked.
@@ -484,19 +486,22 @@ The finished run's map remains noninteractive, without invitations to travel.
 
 ### 4.2.1 Determinism
 
-A map's full visual state — topology, content per node, walk-path so far, and current position — is **deterministically derived from a single seed** and the walk.
+A map's full visual state — topology, content per node, walk-path so far, and current position — is **deterministically derived from a single seed** and the walk; the colors of relational nodes also depend on the planets the player holds (§4.3).
 Re-rendering the same seed always produces the same map and the same point along the walk.
 This lets dev tooling reproduce exact map states for screen-iteration work, and it is what would make a run state shareable by URL ([#32](https://github.com/kronosapiens/SpacePrince/issues/32)).
 
 ### 4.3 Node generation
 
-A map is fully determined the moment it is created:
+A map is determined the moment it is created, except for the rulers of its relational encounters:
 
 - The **map seed** comes from a VRF request at map creation ([MAP.md §4](../mechanics/MAP.md#4-seeding)) — one call per map, never per node.
 - The **topology** derives from the seed (per [MAP.md](../mechanics/MAP.md)).
-- **Encounter content** (relational opponent, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
+- **Encounter content** (relational encounter, or narrative house) is rolled for every node at creation, each from its own RNG stream seeded on `(map seed, node id)`, so rolls are path-independent.
+- A relational encounter's **ruler** is set when the encounter starts: the node's roll fixes an order of the seven planets, and the ruler is the first planet in that order the player holds ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+  Until then the map shows the ruler the node would have now, so an unlock can change a node ahead, and only ever to the newly unlocked planet.
+  Once set, the ruler does not change on a later unlock.
 
-Before a map exists, nothing about it is knowable; once it exists, everything is — and the map renders accordingly (§4.2).
+Before a map exists, nothing about it is knowable; once it exists, everything is except the rulers ahead, which the map shows as they stand (§4.2).
 An earlier draft rolled content lazily at the eligible frontier and hid distant nodes behind a fog of war.
 Both were dropped: under a per-map VRF seed the fog reflected no real uncertainty, and the map visual should reflect the actual knowledge available.
 
@@ -506,7 +511,7 @@ Both were dropped: under a per-map VRF seed the fog reflected no real uncertaint
   Refine in playtesting — earlier drafts ran a φ:1 (62/38) relational-heavy split, but rebalanced to give narrative beats equal footing in a run.
 - **House assignment** (for narrative nodes): **uniform random over the 12 houses**.
   A "no immediate repeat" rule and position-derived house assignment (upper layers = elevated houses, lower = grounded) are deferred until they earn their weight in playtesting.
-- **Relational opponent assignment:** intended, a real other-player Prince per §3.4; in the prototype, a seeded chart whose ruler belongs to the unlocked rotation ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
+- **Relational opponent assignment:** intended, a real other-player Prince per §3.4; in the prototype, a seeded chart whose Ascendant the encounter's ruler rules, found when the encounter starts ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)).
 
 ### 4.4 Mobile (deferred)
 

@@ -252,12 +252,12 @@ The game's progression is layered:
 
 Per encounter:
 
-- Every relational encounter has a **ruler** — the planet ruling the opponent chart's Ascendant (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
-  It is derived from the chart, never stored, and one planet drives three surfaces: the node's colour on the map, the relational theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
+- Every relational encounter has a **ruler**, chosen when the encounter starts from the planets the player holds (§11.1).
+  The Other is then a chart whose Ascendant that planet rules (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
+  One planet drives three surfaces: the node's colour on the map, the relational theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
   Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
 - Both charts receive **Necessity at relational entry** (§11.3): the player adds it to carried affliction, while the other begins with fresh state.
   Fortune can leave a planet at zero affliction, while every fielded planet on the other chart arrives lit.
-  Under the Moon's rule only resolution scores (§12), so an opening with no affliction to resolve can yield no Light.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
   The VRF request for turn N+1 happens at turn N's resolution — the encounter arrival request covers the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
@@ -293,7 +293,6 @@ Difficulty therefore ramps on two axes.
 The opponent's *roster* mirrors the player's unlock tier — Moon vs Moon at the first encounter, up to a full seven-vs-seven — so the challenge grows with the player's own chart rather than throwing a seven-planet opponent at a single-planet newcomer.
 Encounter *length* rides the run instead: one-turn encounters on the first map, full arcs on late maps.
 Necessity applies at every relational opening without a depth multiplier; the player's existing affliction carries forward.
-The length ramp is also a curriculum for the two-beat (§12): map 1 teaches resolving initial affliction, map 2 is the minimal build-then-cash cycle, and later maps open real sequencing.
 On a first run the unlock schedule and the map number rise roughly together, so the two ramps stay aligned; for a veteran at full roster, length reads purely as stakes.
 Both sides may send the same planet on more than one turn, so a one-planet player still plays every turn with the Moon alone.
 Only fielded planets conduct: propagation (§9) ripples through the roster's aspect web alone, so an unfielded planet takes nothing, passes nothing on, and scores nothing — the web the game resolves is the web the chart draws.
@@ -303,9 +302,11 @@ Each unlock happens **between encounters**, on the Map screen: surfacing from th
 
 A planet enters the **relational-encounter ruler rotation** when it unlocks.
 Before that threshold, no relational encounter may be ruled by it; narrative encounters keep their house-derived rulers independently.
-Each map samples its relational rulers from the unlock tier present when that map is created, so its revealed nodes remain fixed even if another planet unlocks during the map.
-The client prototype enforces this with deterministic rejection sampling: it generates Other charts until the Ascendant ruler belongs to that tier.
-Onchain, the Other is a minted Prince with an eligible ruler, picked at arrival; how the contract finds one remains unspecified.
+Each relational node's roll fixes an order of the seven planets, and the encounter's ruler is the first planet in that order the player holds when the encounter starts.
+Every held planet is therefore equally likely to rule, and the ruler does not change on a later unlock.
+Before the encounter starts the map shows the ruler the node would have now, so an unlock can change a node ahead, and only ever to the newly unlocked planet ([SCREENS.md §4.3](../presentation/SCREENS.md#43-node-generation)).
+The Other is then found to fit the ruler: the client prototype generates Other charts until one has an Ascendant that planet rules.
+Onchain, the Other is a minted Prince with that ruler, picked at arrival; how the contract finds one remains unspecified.
 
 The Prince NFT artifact reveals planets on the same schedule: an unrevealed planet renders as a **ghost** at hairline weight (per [STYLE.md](../presentation/STYLE.md)), present as potential but not yet awakened.
 See [NFT.md](../presentation/NFT.md).
@@ -392,7 +393,7 @@ The rule is stated on the encounter screen for the whole encounter, beneath a se
 Venus and Mars partition effects on the Other's chart by absolute polarity.
 Mercury and Jupiter partition them by polarity relative to the Other's announced action.
 The Moon and the Sun divide them by which of the Prince's planets acts.
-Within the unlocked rotation, rulership fixes relative frequencies: the luminaries rule one sign each, while the other planets rule two.
+Within the unlocked rotation every planet is equally likely to rule (§11.1).
 Before Mercury unlocks, every relational encounter is necessarily Moon-ruled.
 
 A run's remaining **Light** is its permanent output.

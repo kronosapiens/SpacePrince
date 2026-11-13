@@ -5,7 +5,6 @@ import { beginRun, enterNode, isOver, rolloverMap as rolloverMapFn } from "@/gam
 import { hashString, mulberry32, randomSeed } from "@/game/rng";
 import { loadDevSettings } from "./settings";
 import { rollNodeContent } from "@/game/map-content";
-import { unlockedPlanets } from "@/game/unlocks";
 import type { Chart, PlanetName, Polarity, Run } from "@/game/types";
 
 /**
@@ -45,7 +44,6 @@ export function useEnterNode() {
         rng: mulberry32(hashString(`${run.map.seed}_${nodeId}`)),
         forceNarrativeHouse: settings.forceNarrativeHouse,
         forceRelational: settings.forceRelational,
-        relationalRulers: unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll),
       });
       nextRun = { ...run, map: { ...run.map, rolledNodes: { ...run.map.rolledNodes, [nodeId]: content } } };
     }
@@ -85,8 +83,8 @@ export function useCommitTurn() {
   );
 }
 
-/** Roll over to a fresh map (terminal node reached). The fielded roster gates
- *  its relational rulers and feeds the boundary's uncombust rolls and necessity. */
+/** Roll over to a fresh map (terminal node reached). The fielded roster
+ *  feeds the boundary's uncombust rolls and necessity. */
 export function useRolloverMap() {
   const dispatch = usePrinceDispatch();
   return useCallback(

@@ -114,6 +114,7 @@ The canonical `[1, 2, 2, 1, 2, 1, 1]` pattern produces exactly 22 edges, matchin
 
 The map seed comes from a **VRF request at map creation** — one call per map, never per node.
 A map is unknowable before it exists; once created, topology and per-node encounter content derive deterministically from the seed (content is seeded per-node on `(map seed, node id)`, so rolls are path-independent).
+The one exception is a relational encounter's ruler, which also depends on the planets the player holds when the encounter starts ([MECHANICS.md §11.1](MECHANICS.md#111-planet-unlock-schedule)).
 The run as a whole is therefore never solvable in advance: each map's fate is fixed only when the previous map completes.
 
 Whether the chart should additionally *bias* generation (e.g. per-layer probabilities) on top of the seed remains open — see §6.
