@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { NODE_R } from "@/svg/map-style";
 import { GUIDE_COPY } from "@/copy/guide";
-import { chartRuler, seededChart } from "@/game/chart";
+import { nodeRuler } from "@/game/map-content";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { planetName, TermText } from "@/components/TermText";
 import { chartGlyphs, chartShape, planetAnchor, PLANET_REACH } from "@/components/chart-guide";
@@ -22,6 +22,7 @@ interface MapGuideProps {
   open: boolean;
   phase: MapGuidePhase;
   map: MapState;
+  unlockedPlanets: PlanetName[];
   examplePlanet: PlanetName;
   onOpen: () => void;
   onClose: () => void;
@@ -65,6 +66,7 @@ export function MapGuide({
   open,
   phase,
   map,
+  unlockedPlanets,
   examplePlanet,
   onOpen,
   onClose,
@@ -86,7 +88,7 @@ export function MapGuide({
       const relationalId = pickNode(map, eligible, "relational");
       const relational = relationalId ? map.rolledNodes[relationalId] : undefined;
       if (relationalId && relational?.kind === "relational") {
-        const ruler = chartRuler(seededChart(relational.opponentSeed, ""));
+        const ruler = nodeRuler(relational, unlockedPlanets);
         mapNotes.push({
           key: "encounter",
           anchor: nodeAnchor(relationalId),
@@ -128,7 +130,7 @@ export function MapGuide({
       });
     }
     return chartNotes;
-  }, [phase, map, examplePlanet]);
+  }, [phase, map, unlockedPlanets, examplePlanet]);
 
   const shapes = useMemo<GuideShapes>(() => {
     // The chart's outer ring sits at 96% of its box; the circle clears it.

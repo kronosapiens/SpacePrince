@@ -16,7 +16,8 @@ import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { HOUSES } from "@/data/houses";
-import { chartRuler, seededChart } from "@/game/chart";
+import { chartRuler } from "@/game/chart";
+import { nodeRuler } from "@/game/map-content";
 import type { MapState, PlanetName } from "@/game/types";
 
 /** Roman numerals for the current map. */
@@ -38,10 +39,16 @@ export function MapScreen() {
   }, [setGuideOpen]);
   useFirstGuide("map", !openingActive, openGuide);
 
+  const settings = loadDevSettings();
+  const playerUnlocked = useMemo(
+    () => (prince ? unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll) : []),
+    [prince, settings.unlockAll],
+  );
+
   const tintPlanet = useMemo<PlanetName | null>(() => {
     if (!run) return null;
-    return mapTintPlanet(run.map);
-  }, [run]);
+    return mapTintPlanet(run.map, playerUnlocked);
+  }, [run, playerUnlocked]);
 
   useEffect(() => {
     setActive(tintPlanet);
@@ -53,12 +60,6 @@ export function MapScreen() {
   useEffect(() => {
     if (princeRuler) setTheme(princeRuler, "map");
   }, [princeRuler]);
-
-  const settings = loadDevSettings();
-  const playerUnlocked = useMemo(
-    () => (prince ? unlockedPlanets(prince.numRelationalEncounters, settings.unlockAll) : []),
-    [prince, settings.unlockAll],
-  );
 
   const handleNodeSelect = useCallback(
     (nodeId: string) => {
@@ -90,6 +91,7 @@ export function MapScreen() {
         open={guideOpen}
         phase={guidePhase}
         map={run.map}
+        unlockedPlanets={playerUnlocked}
         examplePlanet={playerUnlocked[0] ?? "Moon"}
         onOpen={() => { if (!openingActive) openGuide(); }}
         onClose={() => setGuideOpen(false)}
@@ -100,7 +102,7 @@ export function MapScreen() {
       )}
       <div className="map-content anim-surface-in">
         <div className="map-diagram-wrap">
-          <MapDiagram map={run.map} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />
+          <MapDiagram map={run.map} unlockedPlanets={playerUnlocked} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
         <div className="map-index">
           <span className="map-index-v">{ROMAN[mapIndex]}</span>
@@ -117,14 +119,14 @@ const noop = () => {};
  *  current node's ruler (where the player is standing); fall back to the
  *  terminal node's ruler (the destination) so freshly-entered maps still
  *  carry a color. Returns null if neither has been rolled yet. */
-function mapTintPlanet(map: MapState): PlanetName | null {
-  return rulerOf(map, map.currentNodeId) ?? rulerOf(map, TERMINAL_NODE_ID);
+function mapTintPlanet(map: MapState, playerUnlocked: PlanetName[]): PlanetName | null {
+  return rulerOf(map, map.currentNodeId, playerUnlocked) ?? rulerOf(map, TERMINAL_NODE_ID, playerUnlocked);
 }
 
-function rulerOf(map: MapState, nodeId: string | undefined): PlanetName | null {
+function rulerOf(map: MapState, nodeId: string | undefined, playerUnlocked: PlanetName[]): PlanetName | null {
   if (!nodeId) return null;
   const content = map.rolledNodes[nodeId];
   if (!content) return null;
   if (content.kind === "narrative") return HOUSES[content.house - 1]!.ruler;
-  return chartRuler(seededChart(content.opponentSeed, ""));
+  return nodeRuler(content, playerUnlocked);
 }

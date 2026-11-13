@@ -82,7 +82,7 @@ describe("necessity", () => {
     const roster = unlockedPlanets(32);
     const run = beginRun(chart, 42, 32);
     const mapSeed = Math.floor(mulberry32(42)() * 2 ** 31);
-    expect(run.map.rolledNodes).toEqual(newMapState(mapSeed, roster).rolledNodes);
+    expect(run.map.rolledNodes).toEqual(newMapState(mapSeed).rolledNodes);
     expect(run.state).toEqual(blankSideState());
     const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "relational")!;
     const content = run.map.rolledNodes[nodeId]!;

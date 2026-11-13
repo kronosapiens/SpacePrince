@@ -16,6 +16,7 @@ import { seededChart } from "@/game/chart";
 import { PLANETS, PLANET_ROLE, SIGNS, UNLOCK_THRESHOLDS } from "@/game/data";
 import { beginRun } from "@/game/run";
 import type { PlanetName, Prince, SignName } from "@/game/types";
+import { unlockedPlanets } from "@/game/unlocks";
 import { ROUTES } from "@/routes";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
 import { NEUTRAL, PLANET_PRIMARY, PLANET_SECONDARY } from "@/svg/palette";
@@ -155,7 +156,7 @@ export default function GalleryScreen() {
             <figcaption>Prince artwork · all planets & draft achievement marks</figcaption>
           </figure>
           <figure>
-            <div className="gallery-map"><MapDiagram map={run.map} /></div>
+            <div className="gallery-map"><MapDiagram map={run.map} unlockedPlanets={unlockedPlanets(prince.numRelationalEncounters)} /></div>
             <figcaption>Map · houses, encounters & the Lot of Fortune</figcaption>
           </figure>
         </div>

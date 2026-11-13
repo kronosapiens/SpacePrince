@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties } from "react";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import { layoutNodes, eligibleNext, ROOT_NODE_ID } from "@/game/map-gen";
-import { chartRuler, seededChart } from "@/game/chart";
+import { nodeRuler } from "@/game/map-content";
 import { HOUSES } from "@/data/houses";
 import { HouseCoin, romanHouse } from "@/components/HouseCoin";
 import { NEUTRAL, PLANET_PRIMARY } from "@/svg/palette";
@@ -11,6 +11,8 @@ import type { MapState, PlanetName } from "@/game/types";
 
 interface MapDiagramProps {
   map: MapState;
+  /** The planets the Prince shown has unlocked; they set an unentered encounter's ruler. */
+  unlockedPlanets: PlanetName[];
   onSelectNode?: (nodeId: string) => void;
   style?: CSSProperties;
   /** When true (default), layer 1 sits at the bottom and the player walks upward. */
@@ -32,7 +34,7 @@ const TIER = {
   background: { opacity: 0.42, stroke: 1.3 }, // distant — content visible but faint
 } as const;
 
-export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
+export function MapDiagram({ map, unlockedPlanets, onSelectNode, style, bottomUp = true }: MapDiagramProps) {
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
   const indicatedNodeId = onSelectNode ? hoveredNodeId ?? focusedNodeId : null;
@@ -70,25 +72,11 @@ export function MapDiagram({ map, onSelectNode, style, bottomUp = true }: MapDia
   const w = maxX - minX;
   const h = maxY - minY;
 
-  // Relational nodes derive their color from the opponent's chart ruler — the
-  // planet that rules the opponent's Ascendant sign. Cached per node so we
-  // only build each opponent chart once per render pass.
-  const relationalRulerByNode = useMemo(() => {
-    const out: Record<string, PlanetName> = {};
-    for (const [id, content] of Object.entries(map.rolledNodes)) {
-      if (content.kind !== "relational") continue;
-      out[id] = chartRuler(seededChart(content.opponentSeed, ""));
-    }
-    return out;
-  }, [map.rolledNodes]);
-
   // Resolve ruler color for a node.
   const ruler = (id: string): PlanetName | null => {
     const c = map.rolledNodes[id];
     if (!c) return null;
-    if (c.kind === "narrative") return HOUSES[c.house - 1]!.ruler;
-    if (c.kind === "relational") return relationalRulerByNode[id] ?? null;
-    return null;
+    return c.kind === "narrative" ? HOUSES[c.house - 1]!.ruler : nodeRuler(c, unlockedPlanets);
   };
 
   const nodeColor = (id: string) => {

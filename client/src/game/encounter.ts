@@ -1,7 +1,7 @@
 import { blankSideState, chartRuler, seededChart } from "./chart";
 import { applyNecessity } from "./necessity";
 import { drawValence, getEffectiveStatsFromPlacement } from "./relational";
-import { eligibleOpponentSeed } from "./map-content";
+import { opponentSeedForRuler, seedRuler } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
@@ -13,10 +13,11 @@ import type {
   Run,
 } from "./types";
 
-/** The encounter's ruler — the planet ruling the opponent chart's Ascendant.
- *  Derived, never stored, and one planet drives three surfaces: the node's
- *  colour on the map, the relational theme, and the encounter's scoring rule
- *  (`score.ts` `RULER_RULES`). */
+/** The encounter's ruler — the planet ruling the opponent chart's Ascendant,
+ *  which is the ruler the node's seed gave for the planets unlocked at entry
+ *  (`seedRuler`). One planet drives three surfaces: the node's colour on the
+ *  map, the relational theme, and the encounter's scoring rule (`score.ts`
+ *  `RULER_RULES`). */
 export function encounterRuler(enc: RelationalEncounter): PlanetName {
   return chartRuler(enc.opponentChart);
 }
@@ -60,9 +61,9 @@ export function rollOpponentTurns(
 export function beginRelationalEncounter(input: BeginRelationalInput): RelationalEncounter {
   const { run, opponentSeed, lifetimeRelationalEncounterCount, devUnlockAll, encounterIdSeed } = input;
   const roster = unlockedPlanets(lifetimeRelationalEncounterCount, devUnlockAll);
-  // Maps normally store an already-eligible seed. Recheck here so direct dev
-  // encounters and old local maps obey the same ruler gate.
-  const acceptedSeed = eligibleOpponentSeed(opponentSeed, roster);
+  // The node's seed names the ruler among the planets unlocked now; the Other
+  // is then a chart whose Ascendant that planet rules.
+  const acceptedSeed = opponentSeedForRuler(opponentSeed, seedRuler(opponentSeed, roster));
   // Player-facing name: the self/other axis, never adversary (SCREENS.md).
   const opponentChart = seededChart(acceptedSeed, `Other ${acceptedSeed % 9999}`);
   // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
