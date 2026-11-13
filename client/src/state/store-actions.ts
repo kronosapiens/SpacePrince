@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useActiveRun, usePrince, usePrinceDispatch } from "./PrinceStore";
 import { resolveTurn, type TurnResult } from "@/game/turn";
-import { beginRun, enterNode, isOver, rolloverMap as rolloverMapFn } from "@/game/run";
+import { beginRun, enterNode, FIRST_MAP_SEED, isOver, rolloverMap as rolloverMapFn } from "@/game/run";
 import { hashString, mulberry32, randomSeed } from "@/game/rng";
 import { loadDevSettings } from "./settings";
 import { rollNodeContent } from "@/game/map-content";
@@ -22,7 +22,10 @@ export function useStartRun() {
   return useCallback(
     (seed: number = randomSeed()): Run => {
       if (!prince) throw new Error("A Prince is required to start a run");
-      const run = beginRun(prince.chart, seed, lifetimeRelationalEncounterCount, devUnlockAll);
+      const run = beginRun(
+        prince.chart, seed, lifetimeRelationalEncounterCount, devUnlockAll,
+        prince.runs.length === 0 ? FIRST_MAP_SEED : undefined,
+      );
       dispatch({ kind: "startRun", run });
       return run;
     },

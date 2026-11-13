@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { computeBirthChart } from "@/astronomy/compute";
 import { derivePlacements } from "@/game/chart";
 import { usePrinceDispatch } from "@/state/PrinceStore";
-import { beginRun } from "@/game/run";
+import { beginRun, FIRST_MAP_SEED } from "@/game/run";
 import { loadDevSettings } from "@/state/settings";
 import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, PLANETS } from "@/game/data";
@@ -124,7 +124,7 @@ export function useCasting(enabled: boolean) {
       chart: computed,
       numRelationalEncounters: 0,
       achievements: 0,
-      runs: [beginRun(computed, undefined, 0, loadDevSettings().unlockAll)],
+      runs: [beginRun(computed, undefined, 0, loadDevSettings().unlockAll, FIRST_MAP_SEED)],
     };
     dispatchPrince({ kind: "mint", prince });
     playUISound("commit");
