@@ -186,7 +186,7 @@ Activation propagates within each chart along that chart's own aspect lines; the
 The connection between them is conceptual (your planet faces theirs this turn), not visual.
 
 The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
-The per-motion durations live in `client/src/style/motion.css`.
+The per-motion durations live in `client/src/svg/timings.ts`.
 
 **Narrative.**
 During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.

@@ -10,7 +10,7 @@ import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { eligibleNext } from "@/game/map-gen";
 import { unlockedPlanets } from "@/game/unlocks";
-import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
+import { TIMINGS } from "@/svg/timings";
 import { playCombust, playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
@@ -24,6 +24,8 @@ vi.mock("@/components/InfoCardHost", () => ({
   },
 }));
 
+const openingTiming = TIMINGS.necessity;
+const perPlanet = openingTiming.accent + openingTiming.necessity + openingTiming.fortune + openingTiming.settle;
 let root: Root | null;
 let container: HTMLDivElement;
 beforeEach(() => {
@@ -123,7 +125,6 @@ describe("encounter advancement", () => {
     click(get(".relational"));
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
 
-    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
     advanceTime(perPlanet);
     expect(container.querySelector('[data-guide="chart-self"] .necessity-opening')).toBeNull();
     expect(container.querySelector('[data-guide="chart-other"] .necessity-opening')).not.toBeNull();

@@ -62,7 +62,6 @@ export function GameLayout() {
     necessity: run?.map.boundary?.necessity,
     uncombusts: run?.map.boundary?.uncombusts,
     enabled: !isTitle && !isCasting && !isEncounter && run?.map.currentNodeId === ROOT_NODE_ID,
-    kind: "map",
   });
   const context: GameLayoutContext = { casting, guideOpen, setGuideOpen, openingActive: opening.active };
 

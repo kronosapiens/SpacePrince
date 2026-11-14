@@ -5,7 +5,7 @@
 [intent.md](../intent.md) describes how the game should feel.
 This document defines what it is drawn with — the primitives, the stroke scale, the palette, the two faces, the motion grammar — so that two engineers and one illustrator working in different rooms produce a coherent object, and so the client and the onchain renderer draw the same one.
 It holds the vocabulary and its rules, not the tuned values.
-Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `prince-style.ts`, `palette.ts`, `viewbox.ts`, and `client/src/style/tokens.css` and `motion.css`.
+Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `prince-style.ts`, `palette.ts`, `viewbox.ts`, `timings.ts`, and `client/src/style/tokens.css` and `motion.css`.
 
 The guiding principle:
 
@@ -326,7 +326,8 @@ Animation is part of the symbolic vocabulary.
 ### One clock
 
 Every ambient pulse rides one shared breath (`--breath` in `client/src/style/motion.css`); there is never a second rhythm.
-The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath — and their durations and easings live in that file beside their keyframes, each with a line on what it is for.
+The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath — and their easings live in that file beside their keyframes, each with a line on what it is for.
+Durations that pace a turn, a Necessity opening and the mint live in `client/src/svg/timings.ts`, which writes the ones CSS needs; the rest stay beside their keyframes.
 
 ### The next click is always legible
 

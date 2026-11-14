@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { playUISound } from "@/audio/engine";
 
 /** Advance after the outcome has settled; a tap can skip the remaining pause. */
-export function useEncounterAdvance(ready: boolean, onAdvance: () => void, delayMs = 1800) {
+export function useEncounterAdvance(ready: boolean, onAdvance: () => void, delayMs: number) {
   const advanced = useRef(false);
   const callback = useRef(onAdvance);
   useEffect(() => { callback.current = onAdvance; }, [onAdvance]);

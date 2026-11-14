@@ -135,7 +135,7 @@
 /* ── Title ─────────────────────────────────────────────────────────────── */
 
 .title-content {
-  transition: opacity 420ms ease;
+  transition: opacity var(--m-title-fade) ease;
 }
 /* Only the adjacent content changes; the chart stays visible. */
 .title-content.is-leaving,
@@ -143,7 +143,7 @@
   opacity: 0;
 }
 .mint-framing {
-  transition: opacity 400ms ease;
+  transition: opacity var(--m-framing-fade) ease;
 }
 
 .title-wordmark {

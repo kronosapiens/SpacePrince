@@ -9,7 +9,7 @@ import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
 import { getEffectiveStats, getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
-import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
+import { TIMINGS } from "@/svg/timings";
 import { playUISound } from "@/audio/engine";
 import { NEUTRAL, VALENCE_COLOR } from "@/svg/palette";
 import type { NecessityEntry, PlanetName, Polarity } from "@/game/types";
@@ -18,6 +18,8 @@ import { createStubPrince } from "./fixtures";
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playStrike: vi.fn(), playCombust: vi.fn(), playUISound: vi.fn() }));
 
+const openingTiming = TIMINGS.necessity;
+const perPlanet = openingTiming.accent + openingTiming.necessity + openingTiming.fortune + openingTiming.settle;
 let root: Root;
 let container: HTMLDivElement;
 beforeEach(() => {
@@ -150,7 +152,6 @@ describe("encounter interactions", () => {
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
     click(moon);
     expect(container.querySelector(testimony)).toBeNull();
-    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
     act(() => vi.advanceTimersByTime(perPlanet));
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(1);
     expect(container.querySelector(`[data-guide="chart-${longer}"] .necessity-opening`)).not.toBeNull();
@@ -184,15 +185,14 @@ describe("encounter interactions", () => {
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
     click(moon);
     expect(container.querySelector(testimony)).toBeNull();
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    act(() => vi.advanceTimersByTime(openingTiming.accent));
     expect(container.querySelectorAll(".necessity-arc")).toHaveLength(2);
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity));
+    act(() => vi.advanceTimersByTime(openingTiming.necessity));
     expect(container.querySelector(".necessity-arc")).toBeNull();
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
     render();
     expect(container.querySelector(".necessity-arc")).toBeNull();
-    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
-    act(() => vi.advanceTimersByTime(7 * perPlanet - openingTiming.encounter.accent - openingTiming.encounter.necessity - 1));
+    act(() => vi.advanceTimersByTime(7 * perPlanet - openingTiming.accent - openingTiming.necessity - 1));
     click(moon);
     expect(container.querySelector(testimony)).toBeNull();
     expect(onCommitTurn).not.toHaveBeenCalled();
@@ -207,23 +207,23 @@ describe("encounter interactions", () => {
   it("shows the Other's raw draw, then the rolled amount once Fortune answers", () => {
     setup(false, { self: 1, other: 1 });
     const arc = '[data-guide="arc-other-moon"] .necessity-arc path';
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    act(() => vi.advanceTimersByTime(openingTiming.accent));
     const raw = get(arc).getAttribute("d");
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity));
+    act(() => vi.advanceTimersByTime(openingTiming.necessity));
     const rolled = get(arc).getAttribute("d");
     expect(rolled).not.toBe(raw);
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.fortune));
+    act(() => vi.advanceTimersByTime(openingTiming.fortune));
     expect(get(arc).getAttribute("d")).toBe(rolled);
   });
 
   it("shows an entry death when its sweep settles and only allows surviving planets to act", () => {
     const { run, prince, onCommitTurn } = setup(false, { self: 1, other: 2, combustSelf: "Moon", blocked: false });
     expect(get(moon).closest(".anim-combust")).toBeNull();
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
+    act(() => vi.advanceTimersByTime(openingTiming.accent));
     const arc = get('[data-guide="arc-self-moon"]');
     const trackEnd = arc.querySelector("path")!.getAttribute("d")!.split(" ").slice(-2);
     expect(arc.querySelector(".necessity-arc path")!.getAttribute("d")!.split(" ").slice(-2)).toEqual(trackEnd);
-    act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity + openingTiming.encounter.fortune));
+    act(() => vi.advanceTimersByTime(openingTiming.necessity + openingTiming.fortune));
     expect(get(moon).closest(".anim-combust")).not.toBeNull();
     expect(run.state.Moon.tension).toBe(getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve);
     click(moon);

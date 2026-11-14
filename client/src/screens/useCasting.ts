@@ -8,6 +8,7 @@ import { hashString } from "@/game/rng";
 import { TIME_BUCKET_MS, PLANETS } from "@/game/data";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { playUISound, setTheme } from "@/audio/engine";
+import { timings } from "@/svg/timings";
 import type { Chart as ChartType, Prince, SignName } from "@/game/types";
 
 type Stage = "framing" | "input" | "revealing" | "dimmed" | "introducing" | "settled";
@@ -20,11 +21,6 @@ interface FormState {
   lon: string;
   tz: string;
 }
-
-const REVEAL_INTERVAL_MS = 2500;
-const HELD_MOMENT_MS = 1500;
-const DIMMED_MS = 1500;
-const FRAMING_FADE_MS = 400;
 
 export function useCasting(enabled: boolean) {
   const { setActive } = useActivePlanet();
@@ -78,12 +74,13 @@ export function useCasting(enabled: boolean) {
   // Moon arrives through the same introduction card every later planet uses.
   useEffect(() => {
     if (!enabled) return;
+    const mint = timings().mint;
     if (stage === "dimmed") {
-      const timer = window.setTimeout(() => setStage("introducing"), DIMMED_MS);
+      const timer = window.setTimeout(() => setStage("introducing"), mint.dimmed);
       return () => window.clearTimeout(timer);
     }
     if (stage !== "revealing") return;
-    const delay = revealedCount >= PLANETS.length ? HELD_MOMENT_MS : REVEAL_INTERVAL_MS;
+    const delay = revealedCount >= PLANETS.length ? mint.heldMoment : mint.revealInterval;
     const timer = window.setTimeout(() => {
       if (revealedCount >= PLANETS.length) setStage("dimmed");
       else setRevealedCount((n) => n + 1);
@@ -156,7 +153,7 @@ export function useCasting(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled || !leavingFraming) return;
-    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : FRAMING_FADE_MS;
+    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : timings().mint.framingFade;
     const timer = window.setTimeout(() => {
       setStage("input");
       setLeavingFraming(false);

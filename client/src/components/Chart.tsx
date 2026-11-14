@@ -11,7 +11,7 @@ import {
   panelHeightFor,
   type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
-import { NECESSITY_ANIMATION_TIMINGS, type NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
+import type { NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
 import { PropagationLine } from "@/components/PropagationLine";
 import { useMobileLayout } from "@/components/useMobileLayout";
 import { SvgRotation } from "@/components/SvgRotation";
@@ -670,8 +670,7 @@ function PlanetGlyph({
         setFocused(false);
         if (interactive) onFocus?.(null);
       }}
-      style={{ cursor: interactive ? "pointer" : "default", color: c,
-        animationDuration: necessityAccent ? `${NECESSITY_ANIMATION_TIMINGS.map.accent}ms` : undefined }}
+      style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}
     >
       {handleClick && hitRadius != null && (

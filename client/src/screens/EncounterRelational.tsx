@@ -25,6 +25,7 @@ import { getAspects } from "@/game/aspects";
 import { directAmount, getEffectiveStats } from "@/game/relational";
 import { isCombusted } from "@/game/combust";
 import { NEUTRAL, PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
+import { timings } from "@/svg/timings";
 import type { PlanetStatsActions } from "@/components/PlanetStatsPanel";
 import {
   EMPTY_EFFECT_MAP,
@@ -89,7 +90,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     state: run.state,
     necessity: encounter.selfNecessity,
     enabled: openingEnabled,
-    kind: "encounter",
   });
   const otherOpening = useNecessityAnimation({
     id: openingId,
@@ -97,7 +97,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     state: encounter.opponentState,
     necessity: encounter.necessity,
     enabled: openingEnabled,
-    kind: "encounter",
   });
 
   const openingActive = selfOpening.active || otherOpening.active;
@@ -127,7 +126,8 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
         )
       : null;
   const settled = encounter.resolved && !animation && !openingActive;
-  const advance = useEncounterAdvance(settled, onClearEncounter, runEnded ? 2800 : 1800);
+  const leave = timings().leave;
+  const advance = useEncounterAdvance(settled, onClearEncounter, runEnded ? leave.runEnded : leave.encounter);
   const displayedRunLight = animation?.runningLight ?? run.light;
   const lightFlashEpoch = animation?.lightFlashEpoch ?? 0;
   // Tint each Light flash with the color of the planet resolving on that
