@@ -8,7 +8,7 @@ import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
 import { relationalTurnRng } from "@/game/turn";
-import type { RelationalEncounter, Run } from "@/game/types";
+import type { RelationalEncounter, Run, TurnLogEntry } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 
 function fixture(seed = 2) {
@@ -58,7 +58,7 @@ describe("relational planning", () => {
     expect(preferred(values, 0)).toEqual([values[0]]);
   });
 
-  it("enumerates only living fielded opponents with uniform planets and stat-weighted verbs", () => {
+  it("enumerates only lit fielded opponents, by the ruler's rule and the action of the newest logged turn", () => {
     const { run, encounter } = fixture();
     encounter.roster = ["Moon", "Mercury", "Venus"];
     for (const planet of encounter.roster) {
@@ -66,14 +66,30 @@ describe("relational planning", () => {
       encounter.opponentChart.planets[planet].buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
     }
     encounter.opponentChart.planets.Mercury.base = { affliction: 36, testimony: 12, resolve: 120, luck: 12 };
+    encounter.opponentState.Moon.tension = 0;
+    encounter.opponentState.Mercury.tension = 12;
     encounter.opponentState.Venus.tension = 120;
-    const draws = nextAnnouncements(run);
-    expect(draws.map(({ run: next, probability }) => {
+    const draws = () => nextAnnouncements(run).map(({ run: next, probability }) => {
       const enc = next.encounter as RelationalEncounter;
       return [enc.sequence[enc.turnIndex], enc.opponentActions[enc.turnIndex], probability];
-    })).toEqual([
+    });
+    // Mercury rules: an even pick, and a first move's action is drawn once.
+    encounter.opponentChart.ascendantSign = "Gemini";
+    expect(draws()).toEqual([
       ["Moon", "Affliction", 1 / 8], ["Moon", "Testimony", 3 / 8],
       ["Mercury", "Affliction", 3 / 8], ["Mercury", "Testimony", 1 / 8],
+    ]);
+    // After the player's Affliction, a planet testifies only by drawing it twice.
+    encounter.log = [{ playerValence: "Affliction" }, { playerValence: "Testimony" }] as TurnLogEntry[];
+    expect(draws()).toEqual([
+      ["Moon", "Affliction", 7 / 32], ["Moon", "Testimony", 9 / 32],
+      ["Mercury", "Affliction", 15 / 32], ["Mercury", "Testimony", 1 / 32],
+    ]);
+    // The Sun rules: the Moon has more remaining Resolve, so it is kept in three of the four pairs.
+    encounter.opponentChart.ascendantSign = "Leo";
+    expect(draws()).toEqual([
+      ["Moon", "Affliction", 3 / 16], ["Moon", "Testimony", 9 / 16],
+      ["Mercury", "Affliction", 3 / 16], ["Mercury", "Testimony", 1 / 16],
     ]);
   });
 

@@ -1,12 +1,14 @@
 import { runChart } from "@/game/chart";
 import { isCombusted, remainingResolve } from "@/game/combust";
+import { encounterRuler } from "@/game/encounter";
 import { fortuneChance, getEffectiveStats } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { NECESSITY_TENSION_TIERS } from "@/game/necessity";
+import { opponentMoveOdds } from "@/game/opponent-move";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { MAPS_PER_RUN } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
-import type { Chart, RelationalEncounter, MapState, PlanetName, Polarity, Run } from "@/game/types";
+import type { Chart, RelationalEncounter, MapState, PlanetName, Run } from "@/game/types";
 import { relationalActions, type RelationalAction, type PlayContext, type Policy } from "./play";
 
 export interface Value { alive: number; lit: number; capacity: number; light: number }
@@ -31,26 +33,22 @@ function measure(run: Run, chart: Chart, roster: PlanetName[]): Value {
   return { alive: lit > 0 ? 1 : 0, lit, capacity, light: run.light };
 }
 
-/** Every possible next announcement: uniform among lit Other planets, then
- * the game's stat-weighted verb. Replaces the resolver's placeholder draw. */
+/** Every possible next announcement with its exact chance under the ruler's
+ * rule (`opponentMoveOdds`): among lit Other planets, reading the Other's
+ * state as it stands and the action the player used in the newest logged
+ * turn. Replaces the resolver's placeholder draw. */
 export function nextAnnouncements(run: Run): { run: Run; probability: number }[] {
   const encounter = run.encounter as RelationalEncounter;
   if (encounter.resolved) return [];
-  const roster = encounter.roster.filter((p) => !isCombusted(encounter.opponentChart.planets[p], encounter.opponentState[p]));
-  return roster.flatMap((planet) => {
-    const stats = getEffectiveStats(encounter.opponentChart, planet);
-    const total = stats.affliction + stats.testimony;
-    const afflict = total > 0 ? stats.affliction / total : 1;
-    return (["Affliction", "Testimony"] as Polarity[]).map((verb) => {
-      const sequence = [...encounter.sequence];
-      const opponentActions = [...encounter.opponentActions];
-      sequence[encounter.turnIndex] = planet;
-      opponentActions[encounter.turnIndex] = verb;
-      return {
-        probability: (verb === "Affliction" ? afflict : 1 - afflict) / roster.length,
-        run: { ...run, encounter: { ...encounter, sequence, opponentActions } },
-      };
-    }).filter(({ probability }) => probability > 0);
+  const lit = encounter.roster.filter((p) => !isCombusted(encounter.opponentChart.planets[p], encounter.opponentState[p]));
+  return opponentMoveOdds(
+    encounter.opponentChart, encounter.opponentState, lit, encounterRuler(encounter), encounter.log[0]?.playerValence,
+  ).filter(({ probability }) => probability > 0).map(({ planet, action, probability }) => {
+    const sequence = [...encounter.sequence];
+    const opponentActions = [...encounter.opponentActions];
+    sequence[encounter.turnIndex] = planet;
+    opponentActions[encounter.turnIndex] = action;
+    return { probability, run: { ...run, encounter: { ...encounter, sequence, opponentActions } } };
   });
 }
 

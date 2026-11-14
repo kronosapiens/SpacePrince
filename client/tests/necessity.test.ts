@@ -95,7 +95,7 @@ describe("necessity", () => {
       expect(enc.opponentState).toEqual(opening.state);
       expect(enc.necessity).toEqual(opening.necessity);
       expect({ sequence: enc.sequence, opponentActions: enc.opponentActions })
-        .toEqual(rollOpponentTurns(enc.opponentChart, roster, mulberry32(encounterIdSeed), 1));
+        .toEqual(rollOpponentTurns(enc.opponentChart, opening.state, roster, mulberry32(encounterIdSeed), 1));
       expect(beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 32, encounterIdSeed })).toEqual(enc);
       expect(enc.selfNecessity).toBeUndefined(); // Direct dev encounters retain their manual Self state.
       const entered = enterNode({ run, chart, nodeId, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
