@@ -21,7 +21,7 @@ import {
   CHART_CENTER, CHART_VIEWBOX,
   ACTIVE_HALO_R, CORONA_INNER_R, INCOMING_RING_PITCH,
   INNER_RING_R, INTERACTION_RING_R, INVITE_HALO_R, OUTER_RING_R,
-  PLANET_R_ACTIVE, PLANET_R_REST,
+  PLANET_R_ACTIVE, PLANET_R_REST, MOBILE_PLANET_HIT_R, MOBILE_PLANET_HIT_GAP,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
@@ -467,6 +467,9 @@ export function Chart(props: ChartProps) {
             key={p.planet}
             tuning={tuning}
             point={p}
+            hitRadius={mobile ? Math.min(MOBILE_PLANET_HIT_R, ...points
+              .filter((other) => other !== p)
+              .map((other) => (Math.hypot(p.cx - other.cx, p.cy - other.cy) - MOBILE_PLANET_HIT_GAP) / 2)) : undefined}
             combusted={combusted}
             ghost={!unlocked}
             selected={isSelected}
@@ -533,21 +536,6 @@ export function Chart(props: ChartProps) {
           chart, the panel sits on top — it's the focused read. */}
       {!mobile && panel}
     </svg>
-    {mobile && handleClick && (
-      <div className="chart-planet-controls">
-        {PLANETS.filter(isUnlocked).map((planet) => (
-          <button key={planet} type="button"
-            aria-label={planet}
-            aria-pressed={selectedPlanet === planet}
-            disabled={interactionPlanets ? !interactionPlanets.has(planet) : planetCombusted(planet)}
-            style={{ "--planet-color": PLANET_PRIMARY[planet] } as CSSProperties}
-            onClick={(event) => { event.stopPropagation(); handleClick(planet); }}>
-            <span aria-hidden="true">{PLANET_GLYPH[planet]}</span>
-            {planet}
-          </button>
-        ))}
-      </div>
-    )}
     {mobile && panel}
     </>
   );
@@ -561,7 +549,7 @@ export function aspectKey(from: PlanetName, to: PlanetName): string {
 
 function PlanetGlyph({
   tuning,
-  point, combusted, ghost,
+  point, hitRadius, combusted, ghost,
   selected, active, hovered,
   onClick, onHover, onFocus, passive, eligible, invite, ringVerb,
   actionPulse, necessityAccent, combusting,
@@ -571,6 +559,7 @@ function PlanetGlyph({
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
+  hitRadius?: number;
   combusted: boolean;
   ghost: boolean;
   selected: boolean;
@@ -685,6 +674,9 @@ function PlanetGlyph({
         animationDuration: necessityAccent ? `${NECESSITY_ANIMATION_TIMINGS.map.accent}ms` : undefined }}
       className={outerClass}
     >
+      {handleClick && hitRadius != null && (
+        <circle className="planet-hit-area" r={hitRadius} fill="transparent" pointerEvents="all" aria-hidden="true" />
+      )}
       {active && tuning.showGlow && (
         <circle
           className="anim-active-halo"

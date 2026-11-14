@@ -2291,28 +2291,6 @@ body:has(.guide-overlay) .dev-keys { display: none; }
       max(var(--mobile-gap), env(safe-area-inset-left));
   }
   .chart-layout-chart { scroll-margin-top: calc(var(--mobile-header-height) + env(safe-area-inset-top)); }
-  .chart-planet-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
-    gap: 8px;
-    margin-top: var(--mobile-gap);
-  }
-  .chart-planet-controls button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    min-height: var(--mobile-touch-size);
-    color: var(--planet-color);
-    font-size: var(--mobile-planet-name-size);
-    border-bottom: 1px solid var(--smoke);
-  }
-  .chart-planet-controls button > span { font-size: var(--mobile-planet-glyph-size); }
-  .chart-planet-controls button[aria-pressed="true"] { border-color: currentColor; }
-  .chart-planet-controls button:disabled { opacity: 0.35; cursor: default; }
-  .chart-planet-controls button:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
-  body:has(.guide-overlay) .chart-planet-controls { display: none; }
-
   .ps-mobile { margin-top: var(--mobile-gap); height: auto; }
   .ps-mobile .ps-content { padding: var(--mobile-gap); }
   .ps-mobile .ps-head { gap: 12px; flex-wrap: wrap; }

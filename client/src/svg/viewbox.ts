@@ -31,6 +31,10 @@ export const TICK_OUTER_R = 453;
 export const PLANET_R_REST = 24;
 export const PLANET_R_ACTIVE = 36;
 export const PLANET_HALO_R = 100;
+// Mobile tap regions grow around the unchanged discs, capped at half the
+// nearest planet's distance so neighboring regions cannot overlap.
+export const MOBILE_PLANET_HIT_R = 60;
+export const MOBILE_PLANET_HIT_GAP = 2;
 
 // Concentric budget around a planet. Both of these are drawn on every visible
 // planet at once, so the ring is what sets the chart's spacing floor rather than
