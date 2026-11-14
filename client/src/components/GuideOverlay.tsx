@@ -9,6 +9,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import { useMobileLayout } from "@/components/useMobileLayout";
 import { createPortal } from "react-dom";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
@@ -376,6 +377,8 @@ export function GuideOverlay<P extends string>({
   onClose,
   onPhaseChange,
 }: GuideOverlayProps<P>): ReactElement {
+  const mobile = useMobileLayout();
+  const mobileCardRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const restoringFocus = useRef(false);
   const controlsRef = useRef<HTMLDivElement>(null);
@@ -419,6 +422,25 @@ export function GuideOverlay<P extends string>({
     [notes, litIds, shapes],
   );
   const { rects, viewport } = useGuideRects(open, phase, ids, revision);
+
+  // Bring the first explained target above the phone's fixed note card.
+  // Only phase changes scroll; reading or previewing a value must not jump.
+  const firstAnchor = notes[0]?.anchor.split("+")[0];
+  useEffect(() => {
+    if (!open || !mobile || !firstAnchor) return;
+    const frame = requestAnimationFrame(() => {
+      const target = document.querySelector(`[data-guide="${firstAnchor}"]`);
+      const card = mobileCardRef.current;
+      if (!target || !card) return;
+      const rect = target.getBoundingClientRect();
+      const top = (document.querySelector(".screen-settings-button")?.getBoundingClientRect().bottom ?? 56) + 16;
+      const bottom = card.getBoundingClientRect().top - 16;
+      const space = Math.max(0, bottom - top);
+      const desiredTop = top + Math.max(0, (space - rect.height) / 2);
+      window.scrollBy({ top: rect.top - desiredTop, behavior: "instant" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, mobile, phase, firstAnchor]);
 
   // Notes are as tall as their copy; positions come from the rendered size.
   // The bar sits over the screen top-left, so its box is measured too and
@@ -648,7 +670,7 @@ export function GuideOverlay<P extends string>({
           </button>
         </div>
 
-        <section className="guide-mobile-card" aria-live="polite">
+        <section className="guide-mobile-card" ref={mobileCardRef} aria-live="polite" onClick={mobile ? (event) => event.stopPropagation() : undefined}>
           <div className="guide-note-label">{phaseLabel[phase]}</div>
           {notes.map((note) => (
             <div key={note.key} className="guide-mobile-entry">

@@ -20,6 +20,8 @@ export interface PlanetStatsActions {
 
 interface PlanetStatsPanelProps {
   chart: Chart;
+  /** Normal document flow below the chart on narrow screens. */
+  mobile?: boolean;
   planet: PlanetName;
   /** Tension taken so far. The title line shows remaining Resolve
    *  rather than this directly, so it reads as the arc's bright span — the
@@ -74,6 +76,7 @@ export function panelHeightFor({ actions }: { actions: boolean }): number {
  *  on-chain SVG artifact, so HTML-in-SVG is fine here (see STYLE.md). */
 export function PlanetStatsPanel({
   chart,
+  mobile = false,
   planet,
   tension,
   cx,
@@ -111,7 +114,7 @@ export function PlanetStatsPanel({
   // +2 covers the card's 1px top+bottom border.
   useLayoutEffect(() => {
     const el = contentRef.current;
-    if (!el) return;
+    if (!el || mobile) return;
     const measure = () => setBoxH(el.offsetHeight + 2);
     measure();
     const ro = new ResizeObserver(measure);
@@ -128,11 +131,9 @@ export function PlanetStatsPanel({
   const EDGE_MARGIN = 10;
   const yTop = Math.min(cy - height / 2, CHART_CENTER + OUTER_RING_R - EDGE_MARGIN - boxH);
 
-  return (
-    <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
-      {/* Reading the card never dismisses inspection or commits an action. */}
+  const card = (
       <div
-        className="ps-card"
+        className={`ps-card${mobile ? " ps-mobile" : ""}`}
         data-guide="planet-panel"
         onClick={(e) => {
           e.stopPropagation();
@@ -279,6 +280,11 @@ export function PlanetStatsPanel({
           )}
         </div>
       </div>
+  );
+  if (mobile) return card;
+  return (
+    <foreignObject className={`ps-fo ${ready ? "is-ready" : ""}`} x={x0} y={yTop} width={W} height={boxH} style={{ height: `${boxH}px` }}>
+      {card}
     </foreignObject>
   );
 }

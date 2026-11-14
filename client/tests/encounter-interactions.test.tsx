@@ -94,6 +94,47 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
 }
 
 describe("encounter interactions", () => {
+  it("keeps the selected planet and shared actions when switching to the mobile layout", () => {
+    let mobile = false;
+    let resize = () => {};
+    vi.stubGlobal("matchMedia", () => ({
+      get matches() { return mobile; },
+      addEventListener: (_: string, listener: () => void) => { resize = listener; },
+      removeEventListener: () => {},
+    }));
+    const { onCommitTurn } = setup();
+    click(moon);
+    expect(get(testimony).closest("foreignObject")).not.toBeNull();
+    expect(container.querySelector(".planet-hit-area")).toBeNull();
+    act(() => { mobile = true; resize(); });
+    expect(get(testimony).closest("foreignObject")).toBeNull();
+    expect(get(testimony).closest(".ps-mobile")).not.toBeNull();
+    expect(get(moon).closest('[role="button"]')?.getAttribute("aria-pressed")).toBe("true");
+    click('.chart-layout-chart g[aria-label="Mars"] .planet-hit-area');
+    expect(get(".ps-mobile .ps-name").textContent).toContain("MARS");
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledTimes(1);
+    expect(onCommitTurn.mock.calls[0]?.slice(0, 2)).toEqual(["Mars", "Testimony"]);
+  });
+
+  it("enlarges mobile planet targets without overlapping their neighbors", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    setup();
+    const circles = Array.from(container.querySelectorAll(".chart-layout-chart .planet-hit-area"));
+    const targets = circles.map((circle) => {
+      const [x, y] = circle.parentElement!.getAttribute("transform")!.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+      return { x: x!, y: y!, radius: Number(circle.getAttribute("r")) };
+    });
+    expect(targets.length).toBeGreaterThan(1);
+    for (const target of targets) {
+      expect(target.radius).toBeGreaterThan(24);
+      for (const other of targets) {
+        if (other === target) continue;
+        expect(target.radius + other.radius).toBeLessThan(Math.hypot(target.x - other.x, target.y - other.y));
+      }
+    }
+  });
+
   it("opens with the ruler's sentence and states the ruler's rule beneath it", () => {
     const { encounter } = setup();
     const ruler = encounterRuler(encounter);

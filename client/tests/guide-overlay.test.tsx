@@ -61,6 +61,26 @@ function click(selector: string) {
 const phase = () => document.querySelector('[role="dialog"]')?.getAttribute("aria-label");
 
 describe("guide placement", () => {
+  it("scrolls mobile guide targets above the notes on each phase", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const scroll = vi.fn();
+    vi.stubGlobal("scrollBy", scroll);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      if (this.dataset.guide === "target") return new DOMRect(16, 900, 100, 44);
+      if (this.classList.contains("guide-mobile-card")) return new DOMRect(12, 400, 296, 120);
+      return new DOMRect();
+    });
+    mount();
+    act(() => vi.runOnlyPendingTimers());
+    expect(scroll).toHaveBeenCalledWith({ top: 694, behavior: "instant" });
+    scroll.mockClear();
+    click(".guide-step.is-primary");
+    act(() => vi.runOnlyPendingTimers());
+    expect(scroll).toHaveBeenCalledTimes(1);
+    click(".guide-mobile-card");
+    expect(phase()).toBe("Second");
+  });
+
   it("keeps planets clear only while their chart is highlighted", () => {
     vi.stubGlobal("innerWidth", 1600);
     vi.stubGlobal("innerHeight", 1200);

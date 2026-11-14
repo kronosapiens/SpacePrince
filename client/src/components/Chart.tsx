@@ -13,6 +13,7 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { NECESSITY_ANIMATION_TIMINGS, type NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
 import { PropagationLine } from "@/components/PropagationLine";
+import { useMobileLayout } from "@/components/useMobileLayout";
 import { SvgRotation } from "@/components/SvgRotation";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
@@ -20,7 +21,7 @@ import {
   CHART_CENTER, CHART_VIEWBOX,
   ACTIVE_HALO_R, CORONA_INNER_R, INCOMING_RING_PITCH,
   INNER_RING_R, INTERACTION_RING_R, INVITE_HALO_R, OUTER_RING_R,
-  PLANET_R_ACTIVE, PLANET_R_REST,
+  PLANET_R_ACTIVE, PLANET_R_REST, MOBILE_PLANET_HIT_R, MOBILE_PLANET_HIT_GAP,
   SIGN_LABEL_R, TICK_INNER_R, TICK_OUTER_R,
 } from "@/svg/viewbox";
 import { PLANET_GLYPH, SIGN_GLYPH } from "@/svg/glyphs";
@@ -242,6 +243,7 @@ export function Chart(props: ChartProps) {
     onToggleStudy,
   } = props;
 
+  const mobile = useMobileLayout();
   const pointerPlanet = useRef<PlanetName | null>(null);
   const focusPlanet = useRef<PlanetName | null>(null);
   const canPreview = !!onPlanetHover && !passive && !opening;
@@ -376,7 +378,25 @@ export function Chart(props: ChartProps) {
   // Sacred-geometry ground (static hexagram + vesica), shown by default.
   const substrate = showSubstrate ? renderSubstrate() : null;
 
+  const panel = !opening && statsPanelPlanet ? (
+    <PlanetStatsPanel
+      mobile={mobile}
+      chart={chart}
+      planet={statsPanelPlanet}
+      tension={state?.[statsPanelPlanet]?.tension ?? 0}
+      cx={panelPlacement.cx}
+      cy={panelPlacement.cy}
+      height={panelHeight}
+      actions={statsPanelActions}
+      effect={statsPanelEffect}
+      resolvePreview={projection?.deltas[statsPanelPlanet]?.resolve}
+      study={statsPanelStudy}
+      onToggleStudy={onToggleStudy}
+    />
+  ) : null;
+
   return (
+    <>
     <svg
       viewBox={CHART_VIEWBOX}
       overflow="visible"
@@ -447,6 +467,9 @@ export function Chart(props: ChartProps) {
             key={p.planet}
             tuning={tuning}
             point={p}
+            hitRadius={mobile ? Math.min(MOBILE_PLANET_HIT_R, ...points
+              .filter((other) => other !== p)
+              .map((other) => (Math.hypot(p.cx - other.cx, p.cy - other.cy) - MOBILE_PLANET_HIT_GAP) / 2)) : undefined}
             combusted={combusted}
             ghost={!unlocked}
             selected={isSelected}
@@ -511,22 +534,10 @@ export function Chart(props: ChartProps) {
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
           chart, the panel sits on top — it's the focused read. */}
-      {!opening && statsPanelPlanet && (
-        <PlanetStatsPanel
-          chart={chart}
-          planet={statsPanelPlanet}
-          tension={state?.[statsPanelPlanet]?.tension ?? 0}
-          cx={panelPlacement.cx}
-          cy={panelPlacement.cy}
-          height={panelHeight}
-          actions={statsPanelActions}
-          effect={statsPanelEffect}
-          resolvePreview={projection?.deltas[statsPanelPlanet]?.resolve}
-          study={statsPanelStudy}
-          onToggleStudy={onToggleStudy}
-        />
-      )}
+      {!mobile && panel}
     </svg>
+    {mobile && panel}
+    </>
   );
 }
 
@@ -538,7 +549,7 @@ export function aspectKey(from: PlanetName, to: PlanetName): string {
 
 function PlanetGlyph({
   tuning,
-  point, combusted, ghost,
+  point, hitRadius, combusted, ghost,
   selected, active, hovered,
   onClick, onHover, onFocus, passive, eligible, invite, ringVerb,
   actionPulse, necessityAccent, combusting,
@@ -548,6 +559,7 @@ function PlanetGlyph({
 }: {
   tuning: ChartTuning;
   point: PlanetPoint;
+  hitRadius?: number;
   combusted: boolean;
   ghost: boolean;
   selected: boolean;
@@ -662,6 +674,9 @@ function PlanetGlyph({
         animationDuration: necessityAccent ? `${NECESSITY_ANIMATION_TIMINGS.map.accent}ms` : undefined }}
       className={outerClass}
     >
+      {handleClick && hitRadius != null && (
+        <circle className="planet-hit-area" r={hitRadius} fill="transparent" pointerEvents="all" aria-hidden="true" />
+      )}
       {active && tuning.showGlow && (
         <circle
           className="anim-active-halo"
