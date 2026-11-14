@@ -37,9 +37,9 @@ export interface PlanetPlacement {
 }
 
 /** Per-planet mutable state. Combustion carries no flag — it is derived,
- *  `affliction >= ceiling` (combust.ts `isCombusted`; STATE.md). */
+ *  `tension >= Resolve` (combust.ts `isCombusted`; STATE.md). */
 export interface PlanetState {
-  affliction: number;
+  tension: number;
 }
 
 export interface Chart {
@@ -69,7 +69,7 @@ export interface PropagationEntry {
   delta: number;
   /** The polarity that landed on the target. Carries the heal/harm signal
    *  even when `delta` clamps to 0 (e.g. testimony to a planet already at
-   *  0 affliction); inferring from `delta` sign alone is unsafe. */
+   *  0 tension); inferring from `delta` sign alone is unsafe. */
   polarity: Polarity;
   note: string;
 }
@@ -210,7 +210,7 @@ export type RunEvent = { kind: "map-completed"; map: MapState };
 export interface Run {
   id: string;
   seed: number;
-  /** Per-planet affliction; persists across encounters and maps, resets only
+  /** Per-planet tension; persists across encounters and maps, resets only
    *  at run start. Combustion is derived from it, never stored. */
   state: SideState;
   /** Cumulative Light — this run's score, its permanent record. */

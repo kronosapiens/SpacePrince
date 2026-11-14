@@ -3,7 +3,7 @@ import { MAPS_PER_RUN } from "@/game/run";
 import type { Polarity } from "@/game/types";
 import type { Trial } from "./play";
 import type { Strategy } from "./policies";
-import { emptyRunPressure, type RunPressure, type RunRecord, type RunSummary } from "./runner";
+import { emptyRunTension, type RunTension, type RunRecord, type RunSummary } from "./runner";
 
 /** One line of `runs.jsonl`: replay regenerates the steps. */
 export type Row = Pick<RunRecord, "trial" | "summary">;
@@ -20,7 +20,7 @@ export interface StrategyStats {
   maps: { mean: number; median: number };
   light: { mean: number; median: number; p10: number; p90: number };
   /** Means per run, using actual Self effects rather than announced magnitudes. */
-  pressure: RunPressure;
+  tension: RunTension;
   progression: { unlocks: number; unlockRescues: number; finalLifetimeRelationalEncounterCount: number };
   /** Means per run. Encounters count once survived. */
   perRun: {
@@ -146,13 +146,13 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     return Object.entries(counts).map(([option, chosen]) => ({ option: `${scenario}/${option}`, chosen, of }));
   });
   const per = (of: (s: RunSummary) => number) => mean(ss.map(of));
-  const pressure = emptyRunPressure();
-  for (const key of Object.keys(pressure) as (keyof RunPressure)[]) {
+  const tension = emptyRunTension();
+  for (const key of Object.keys(tension) as (keyof RunTension)[]) {
     if (key === "relational") {
-      for (const source of Object.keys(pressure.relational) as (keyof RunPressure["relational"])[]) {
-        pressure.relational[source] = per((s) => s.pressure.relational[source]);
+      for (const source of Object.keys(tension.relational) as (keyof RunTension["relational"])[]) {
+        tension.relational[source] = per((s) => s.tension.relational[source]);
       }
-    } else pressure[key] = per((s) => s.pressure[key]);
+    } else tension[key] = per((s) => s.tension[key]);
   }
   return {
     strategy,
@@ -164,7 +164,7 @@ function strategyStats(strategy: Strategy, rows: Row[], charts: number[], draws:
     },
     maps: { mean: mean(maps), median: quantile(maps, 0.5) },
     light: { mean: mean(light), median: quantile(light, 0.5), p10: quantile(light, 0.1), p90: quantile(light, 0.9) },
-    pressure,
+    tension,
     progression: { unlocks: per((s) => s.unlocks.length), unlockRescues: per((s) => s.unlockRescues),
       finalLifetimeRelationalEncounterCount: per((s) => s.finalLifetimeRelationalEncounterCount) },
     perRun: {

@@ -3,7 +3,7 @@ import { runTrial } from "@/eval/runner";
 import type { Step, Trial } from "@/eval/play";
 import { POLICIES, type Strategy } from "@/eval/policies";
 import { runChart, seededChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { unlockedPlanets } from "@/game/unlocks";
 import type { PlanetName } from "@/game/types";
@@ -43,7 +43,7 @@ describe("seeded runner", () => {
           for (const p of unlockedPlanets(15)) {
             play.prince.chart.planets[p].base.luck = 0;
             play.prince.chart.planets[p].buffs.luck = 0;
-            run.state[p].affliction = combustionCeiling(play.prince.chart.planets[p]) - 12;
+            run.state[p].tension = getEffectiveStatsFromPlacement(play.prince.chart.planets[p]).resolve - 12;
           }
         }
         return nodeId;
@@ -55,7 +55,7 @@ describe("seeded runner", () => {
     expect(unlocked).toMatchObject({ kind: "unlock", planet: "Jupiter", lifetimeRelationalEncounterCount: 16, rescuedByUnlock: true, entryWipe: true });
     expect(next).toMatchObject({ kind: "enter", lifetimeRelationalEncounterCount: 16 });
     expect(unlocked!.light).toBe(entered!.light);
-    expect(unlocked!.affliction.Jupiter).toBe(0);
+    expect(unlocked!.tension.Jupiter).toBe(0);
   });
 
   it("can start the next fresh run at the previous run's final lifetime count", () => {
@@ -63,25 +63,25 @@ describe("seeded runner", () => {
     const next = runTrial(trial(1, 2), undefined, { startingLifetimeRelationalEncounterCount: start });
     expect(next.summary.startingLifetimeRelationalEncounterCount).toBe(start);
     expect(next.summary.finalLifetimeRelationalEncounterCount).toBe(start + next.steps.filter((s) => s.kind === "enter" && s.encounter === "relational").length);
-    expect(Object.values(next.steps[0]!.affliction)).toEqual(PLANETS.map(() => 0));
+    expect(Object.values(next.steps[0]!.tension)).toEqual(PLANETS.map(() => 0));
     expect(Object.values(next.steps[0]!.gains).flatMap(Object.values).every((gain) => gain === 0)).toBe(true);
   });
 
-  it("reconciles pressure with fielded capacity across relational, entries, gains, revivals and unlocks", () => {
+  it("reconciles tension with fielded capacity across relational, entries, gains, revivals and unlocks", () => {
     for (const record of [...batch, completion, progression]) {
-      const { pressure: p, startingLifetimeRelationalEncounterCount: start, finalLifetimeRelationalEncounterCount: end } = record.summary;
+      const { tension: t, startingLifetimeRelationalEncounterCount: start, finalLifetimeRelationalEncounterCount: end } = record.summary;
       const chart = seededChart(record.trial.chartSeed);
       const capacity = (step: Step, count: number) => unlockedPlanets(count).reduce((sum, planet) =>
-        sum + Math.max(0, combustionCeiling(runChart(chart, step).planets[planet]) - step.affliction[planet]), 0);
-      expect(p.capacityStart).toBe(capacity(record.steps[0]!, start));
-      expect(p.capacityEnd).toBe(capacity(record.steps.at(-1)!, end));
-      expect(p.capacityEnd - p.capacityStart).toBe(
-        p.relational.healing - p.relational.damage - p.entryDamage + p.narrativeHealing - p.narrativeDamage +
-        p.narrativeRevivalRecovery + p.boundaryRevivalRecovery + p.resolveGain + p.unlockCapacity,
+        sum + Math.max(0, getEffectiveStatsFromPlacement(runChart(chart, step).planets[planet]).resolve - step.tension[planet]), 0);
+      expect(t.capacityStart).toBe(capacity(record.steps[0]!, start));
+      expect(t.capacityEnd).toBe(capacity(record.steps.at(-1)!, end));
+      expect(t.capacityEnd - t.capacityStart).toBe(
+        t.relational.eased - t.relational.created - t.entryTension + t.narrativeEased - t.narrativeCreated +
+        t.narrativeRevivalRecovery + t.boundaryRevivalRecovery + t.resolveGain + t.unlockCapacity,
       );
     }
-    expect([...batch, completion, progression].some((record) => record.summary.pressure.resolveGain > 0)).toBe(true);
-    expect(progression.summary.pressure.unlockCapacity).toBeGreaterThan(0);
+    expect([...batch, completion, progression].some((record) => record.summary.tension.resolveGain > 0)).toBe(true);
+    expect(progression.summary.tension.unlockCapacity).toBeGreaterThan(0);
   });
 
   it("replays a trial exactly, whatever ran before it", () => {
@@ -121,21 +121,21 @@ describe("seeded runner", () => {
       return r.steps.filter((s, i) => {
         if (s.kind !== "turn") return false;
         const prev = r.steps[i - 1]!;
-        return prev.affliction[s.planet] >= combustionCeiling(runChart(chart, prev).planets[s.planet]);
+        return prev.tension[s.planet] >= getEffectiveStatsFromPlacement(runChart(chart, prev).planets[s.planet]).resolve;
       });
     });
     expect(sentDark).toEqual([]);
     // Entry snapshots, rather than map boundaries, now record Self's Necessity.
     for (const { steps: [first] } of batch) {
       expect(first?.kind === "boundary" && first.necessity).toEqual([]);
-      expect(PLANETS.every((p) => first!.affliction[p] === 0)).toBe(true);
+      expect(PLANETS.every((p) => first!.tension[p] === 0)).toBe(true);
     }
   });
 
   it("summarizes what the steps record", () => {
     for (const { trial, steps, summary } of batch) {
       const chart = seededChart(trial.chartSeed);
-      const dark = (s: Step, p: PlanetName) => s.affliction[p] >= combustionCeiling(runChart(chart, s).planets[p]);
+      const dark = (s: Step, p: PlanetName) => s.tension[p] >= getEffectiveStatsFromPlacement(runChart(chart, s).planets[p]).resolve;
       let combustions = 0, revivals = 0, light = 0;
       steps.forEach((s, i) => {
         const prev = steps[i - 1];
@@ -169,8 +169,8 @@ describe("seeded runner", () => {
     expect(steps.some((step) => step.kind === "turn" || step.kind === "narrative")).toBe(true);
     const chart = seededChart(record!.trial.chartSeed);
     const entryDeaths = steps.reduce((sum, step, i) => step.kind === "enter" && step.encounter === "relational" ? sum + PLANETS.filter((p) => {
-      const ceiling = combustionCeiling(runChart(chart, step).planets[p]);
-      return steps[i - 1]!.affliction[p] < ceiling && step.affliction[p] >= ceiling;
+      const resolve = getEffectiveStatsFromPlacement(runChart(chart, step).planets[p]).resolve;
+      return steps[i - 1]!.tension[p] < resolve && step.tension[p] >= resolve;
     }).length : sum, 0);
     const actionDeaths = steps.reduce((sum, step) => sum + (step.kind === "turn" || step.kind === "narrative" ? step.combusts.length : 0), 0);
     expect(entryDeaths).toBeGreaterThan(0);
@@ -187,7 +187,7 @@ describe("seeded runner", () => {
     const entry = lastEntry(record);
     const last = record.steps.at(-1)!;
     const chart = runChart(seededChart(record.trial.chartSeed), last);
-    expect(PLANETS.every((p) => last.affliction[p] >= combustionCeiling(chart.planets[p]))).toBe(true);
+    expect(PLANETS.every((p) => last.tension[p] >= getEffectiveStatsFromPlacement(chart.planets[p]).resolve)).toBe(true);
     expect(record.summary.endReason).toBe("combustion");
     // The summary alone names the encounter and the choice the run ended on.
     const entered = record.steps[entry]!;

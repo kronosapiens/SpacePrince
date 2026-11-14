@@ -25,7 +25,7 @@ export const TICK_INNER_R = 417;     // tick marks straddle the gap between ring
 export const TICK_OUTER_R = 453;
 
 // Planet glyph sizing (uniform global; cluster shape is what changes per stack).
-// The disc gave up 6 units when the affliction arc arrived — three concentric
+// The disc gave up 6 units when the Resolve arc arrived — three concentric
 // things now share the budget below, and the arc is unreadable pressed against
 // the disc rim.
 export const PLANET_R_REST = 24;
@@ -43,7 +43,7 @@ export const PLANET_HALO_R = 100;
 // buys the arc a third more circumference — but arcs are drawn on every planet
 // at once, so at that radius they touch in a 4-stack and it stops being clear
 // which arc belongs to which planet.
-export const AFFLICTION_ARC_R = 30;
+export const RESOLVE_ARC_R = 30;
 export const INTERACTION_RING_R = 36;
 // Halos bloom *past* the ring — the ring wants a soft falloff outside it, not a
 // hard bright edge as the outermost thing. So they key off the ring rather than
@@ -66,12 +66,12 @@ export const INCOMING_RING_PITCH = INTERACTION_RING_R / 6;
  *  descends into the same point as it dies. Degrees are math-convention
  *  (0 = 3 o'clock, increasing counterclockwise), matching `polar` in Chart.tsx
  *  and the wheel's own sense: signs advance counterclockwise from the ASC. */
-export const AFFLICTION_ARC_ANCHOR_DEG = 270;
+export const RESOLVE_ARC_ANCHOR_DEG = 270;
 
 /**
  * Stroke schedule, in chart viewBox units. Four rungs, four roles: LIGHT is
  * ground, MEDIUM is structure, HEAVY is a thing under attention, EXTRA_HEAVY is
- * the affliction arc.
+ * the Resolve arc.
  *
  * A whole unit apart rather than finer. The chart renders ~672px wide, so a
  * unit is about two thirds of a pixel and a half-unit step is invisible — the
@@ -86,7 +86,7 @@ export const AFFLICTION_ARC_ANCHOR_DEG = 270;
 export const STROKE_LIGHT = 1;
 export const STROKE_MEDIUM = 2;
 export const STROKE_HEAVY = 3;
-/** The projection diff on an affliction arc, alone. Named on the same axis as
+/** The projection diff on a Resolve arc, alone. Named on the same axis as
  *  the rungs below it — weight, not width — since they grade one property. It
  *  sits above HEAVY because a blow in flight outranks anything merely under
  *  attention, including the arc it is drawn on: the arc says what a planet can

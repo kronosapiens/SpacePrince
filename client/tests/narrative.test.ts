@@ -8,7 +8,8 @@ import {
 import { joyChoice, trade, L } from "@/data/narrative/shared";
 import { runChart } from "@/game/chart";
 import { beginNarrativeEncounter } from "@/game/encounter";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS, SIGNS } from "@/game/data";
 import { beginRun, isOver } from "@/game/run";
 import { describeOption, occupantLine } from "@/copy/narrative";
@@ -25,11 +26,11 @@ function setup(input: string | NarrativeScenario = INTERACTION_SCENE, numRelatio
   run.encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: scenario.scenarioId });
   const context = () => narrativeContext(prince, run, scenario.house);
   const option = (optionId: string) => scenario.options.find((o) => o.id === optionId)!;
-  const darken = (p: typeof PLANETS[number]) => { run.state[p].affliction = combustionCeiling(prince.chart.planets[p]); };
+  const darken = (p: typeof PLANETS[number]) => { run.state[p].tension = getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve; };
   return { prince, run, scenario, context, option, darken };
 }
 
-const A = (delta: number, target: "chosen" | "allUnlocked" = "chosen"): Outcome => ({ kind: "affliction", target, delta });
+const A = (delta: number, target: "chosen" | "allUnlocked" = "chosen"): Outcome => ({ kind: "tension", target, delta });
 const RESOLVE: Outcome = { kind: "gain", target: "chosen", stat: "resolve", amount: 12 };
 
 describe("single-decision narrative", () => {
@@ -43,7 +44,7 @@ describe("single-decision narrative", () => {
 
   it("requires the full price before healing and leaves failed purchases untouched", () => {
     const { run, context, option } = setup("home-libra-mara", 0);
-    run.state.Moon.affliction = 12;
+    run.state.Moon.tension = 12;
     run.light = 12;
     const before = structuredClone(run);
     expect(previewOption(run, context(), option("pass"), { chosen: "Moon" })).toEqual({ ok: false, reason: "Requires 24 Light; you have 12." });
@@ -52,15 +53,15 @@ describe("single-decision narrative", () => {
     const preview = previewOption(run, context(), option("pass"), { chosen: "Moon" });
     if (!preview.ok) throw new Error(preview.reason);
     expect(preview.success.light).toBe(0);
-    expect(preview.success.state.Moon.affliction).toBe(0);
-    expect(run.state.Moon.affliction).toBe(12);
+    expect(preview.success.state.Moon.tension).toBe(0);
+    expect(run.state.Moon.tension).toBe(12);
     expect(describeOption(context(), option("pass"), { chosen: "Moon" })).toBe("Testify 24 on Moon · Lose 24 Light");
   });
 
   it("keeps authored group recovery amounts independent of current resources", () => {
     const { run, context, option } = setup("home-pisces-flood");
-    run.state.Sun.affliction = 10;
-    run.state.Moon.affliction = 48;
+    run.state.Sun.tension = 10;
+    run.state.Moon.tension = 48;
     for (const light of [0, 5, 120]) {
       run.light = light;
       expect(describeOption(context(), option("loft"))).toBe("Testify 12 on each lit planet · Lose 48 Light");
@@ -69,7 +70,7 @@ describe("single-decision narrative", () => {
 
   it("does not sell healing to a clean or combusted target", () => {
     const { run, context, option, darken } = setup("home-libra-mara", 0);
-    run.state.Moon.affliction = 0;
+    run.state.Moon.tension = 0;
     expect(previewOption(run, context(), option("pass"), { chosen: "Moon" }).ok).toBe(false);
     darken("Moon");
     expect(previewOption(run, context(), option("pass"), { chosen: "Moon" }).ok).toBe(false);
@@ -94,10 +95,10 @@ describe("single-decision narrative", () => {
     expect(run.light).toBe(120);
   });
 
-  it.each([24, 48])("allows lethal affliction with %i capacity, caps it, and retains the reward", (capacity) => {
+  it.each([24, 48])("allows lethal tension with %i capacity, caps it, and retains the reward", (capacity) => {
     const { run, context, option, prince, scenario } = setup(INTERACTION_SCENE, 0);
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
-    run.state.Moon.affliction = ceiling - capacity;
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
+    run.state.Moon.tension = resolve - capacity;
     const before = structuredClone(run);
     const selection = { chosen: "Moon" as const };
     expect(availableSelections(run, context(), option("work"))).toEqual([selection]);
@@ -106,7 +107,7 @@ describe("single-decision narrative", () => {
     const next = resolveNarrative(run, prince, scenario, "work", selection)!;
     expect(next.state).toEqual(preview.success.state);
     expect(next.light).toBe(preview.success.light);
-    expect(next.state.Moon.affliction).toBe(ceiling);
+    expect(next.state.Moon.tension).toBe(resolve);
     expect(next.light).toBe(run.light + 48);
     expect(next.encounter?.resolved).toBe(true);
     expect(next.map.outcomes[run.map.currentNodeId]).toMatchObject({ lightDelta: 48, combusts: ["Moon"] });
@@ -115,18 +116,18 @@ describe("single-decision narrative", () => {
     expect(describeOption(context(), option("work"), selection)).toBe("Afflict 48 on Moon · Gain 48 Light");
   });
 
-  it("healthiest means greatest remaining combustion margin", () => {
+  it("mostRemainingResolve means the greatest remaining Resolve", () => {
     const { prince, run, context } = setup();
     prince.chart.planets.Moon.base.resolve = 24;
     prince.chart.planets.Moon.buffs.resolve = 0;
     prince.chart.planets.Saturn.base.resolve = 120;
     prince.chart.planets.Saturn.buffs.resolve = 0;
-    run.state.Saturn.affliction = 72;
+    run.state.Saturn.tension = 72;
     const ctx = { ...context(), unlocked: ["Moon", "Saturn"] as typeof PLANETS[number][] };
-    expect(resolveTargets("healthiest", ctx)).toEqual(["Saturn"]);
+    expect(resolveTargets("mostRemainingResolve", ctx)).toEqual(["Saturn"]);
   });
 
-  it("revives only a selected extinguished planet at half ceiling for the full price", () => {
+  it("revives only a selected extinguished planet at half Resolve for the full price", () => {
     const { run, prince, context, option, darken } = setup("home-libra-mara");
     darken("Venus");
     run.light = 168;
@@ -137,8 +138,8 @@ describe("single-decision narrative", () => {
     expect(previewOption(run, context(), option("revive")).ok).toBe(false);
     const paid = previewOption(run, context(), option("revive"), { chosen: "Venus" });
     expect(paid.ok && paid.success.light).toBe(0);
-    expect(paid.ok && paid.success.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus) / 2);
-    expect(run.state.Venus.affliction).toBe(combustionCeiling(prince.chart.planets.Venus));
+    expect(paid.ok && paid.success.state.Venus.tension).toBe(getEffectiveStatsFromPlacement(prince.chart.planets.Venus).resolve / 2);
+    expect(run.state.Venus.tension).toBe(getEffectiveStatsFromPlacement(prince.chart.planets.Venus).resolve);
   });
 
   it("adds the joy choice only while its planet is unlocked, lit, and below the threshold", () => {
@@ -151,14 +152,14 @@ describe("single-decision narrative", () => {
     expect(offered()).toEqual(["leave"]);
     expect(resolveNarrative(run, prince, scenario, "joy", { chosen: "Moon" })).toBeNull();
     prince.numRelationalEncounters = 1;
-    run.state.Mercury.affliction = 0;
+    run.state.Mercury.tension = 0;
     expect(offered()).toEqual(["leave", "joy"]);
     prince.chart.planets.Mercury.dignity = "Fall";
     expect(joyPresent(context())).toBe(true);
     run.gains.Mercury.resolve = 120;
-    run.state.Mercury.affliction = 95;
+    run.state.Mercury.tension = 95;
     expect(offered()).toEqual(["leave", "joy"]);
-    run.state.Mercury.affliction = 96;
+    run.state.Mercury.tension = 96;
     expect(offered()).toEqual(["leave"]);
     run.gains.Mercury.resolve = 0;
     darken("Mercury");
@@ -218,53 +219,53 @@ describe("accepted house-and-sign scenes", () => {
     prince.chart.ascendantSign = "Libra"; // house IV holds Capricorn
     for (const p of PLANETS) prince.chart.planets[p].sign = "Aries";
     Object.assign(prince.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
-    run.state.Moon.affliction = 36;
+    run.state.Moon.tension = 36;
     expect(occupantLine(context().occupants)).toBe("Saturn is in this house: the terms are better.");
     expect(describeOption(context(), offeredOptions(scenario, context()).find((o) => o.id === "salt")!)).toBe("+12 Resolve on a chosen planet");
     const next = resolveNarrative(run, prince, scenario, "cook", { chosen: "Moon" })!;
     expect(next.light).toBe(run.light);
-    expect(next.state.Moon.affliction).toBe(12);
+    expect(next.state.Moon.tension).toBe(12);
     Object.assign(prince.chart.planets.Moon, { sign: "Capricorn", dignity: "Detriment" });
     expect(occupantLine(context().occupants)).toBe("Moon and Saturn are in this house: the terms are unchanged.");
   });
 
   it("retains a stat reward when earlier harm combusts its recipient", () => {
     const { prince, run, scenario } = setup("home-leo-harvest", 0);
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
-    run.state.Moon.affliction = ceiling - 6;
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
+    run.state.Moon.tension = resolve - 6;
     const next = resolveNarrative(run, prince, scenario, "earnest", { chosen: "Moon" })!;
-    expect(next.state.Moon.affliction).toBe(ceiling);
+    expect(next.state.Moon.tension).toBe(resolve);
     expect(next.gains.Moon.affliction).toBe(12);
     expect(isOver(next, prince.chart, 0)).toBe(true);
     expect(run.gains.Moon.affliction).toBe(0);
   });
 
-  it("applies a later Resolve gain even when earlier harm reaches the old ceiling", () => {
+  it("applies a later Resolve gain even when earlier harm reaches the old Resolve", () => {
     const { prince, run, context } = setup("home-capricorn-salting");
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
     const salt = [A(12), RESOLVE];
-    run.state.Moon.affliction = ceiling - 6;
+    run.state.Moon.tension = resolve - 6;
     const applied = applyOutcomes(run, context(), salt, { chosen: "Moon" });
     if (!applied.ok) throw new Error(applied.reason);
-    expect(applied.run.state.Moon.affliction).toBe(ceiling);
+    expect(applied.run.state.Moon.tension).toBe(resolve);
     expect(applied.run.gains.Moon.resolve).toBe(12);
     expect(run.gains.Moon.resolve).toBe(0);
     const placement = runChart(prince.chart, applied.run).planets.Moon;
-    expect(combustionCeiling(placement)).toBe(ceiling + 12);
+    expect(getEffectiveStatsFromPlacement(placement).resolve).toBe(resolve + 12);
     expect(isCombusted(placement, applied.run.state.Moon)).toBe(false);
     const reversed = applyOutcomes(run, context(), [RESOLVE, A(12)], { chosen: "Moon" });
-    expect(reversed.ok && reversed.run.state.Moon.affliction).toBe(ceiling + 6);
+    expect(reversed.ok && reversed.run.state.Moon.tension).toBe(resolve + 6);
     expect(describeOption(context(), { id: "salt", text: "", result: { effects: salt } }, { chosen: "Moon" }))
       .toBe("Afflict 12 on Moon · +12 Resolve");
   });
 
   it("applies recovery after harm within the same choice", () => {
     const { prince, run, context } = setup("livelihood-taurus-good-bowl", 0);
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
-    run.state.Moon.affliction = ceiling - 6;
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
+    run.state.Moon.tension = resolve - 6;
     const applied = applyOutcomes(run, context(), [A(12), A(-36)], { chosen: "Moon" });
-    expect(applied.ok && applied.run.state.Moon.affliction).toBe(ceiling - 36);
-    expect(run.state.Moon.affliction).toBe(ceiling - 6);
+    expect(applied.ok && applied.run.state.Moon.tension).toBe(resolve - 36);
+    expect(run.state.Moon.tension).toBe(resolve - 6);
   });
 
   it("records the option's own text when it carries no result text", () => {

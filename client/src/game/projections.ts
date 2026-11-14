@@ -1,7 +1,7 @@
 import { PLANETS } from "./data";
 import { propagatedMagnitude } from "./aspects";
-import { getProjectedPair } from "./relational";
-import { combustionCeiling, isCombusted, wouldCombust } from "./combust";
+import { getEffectiveStatsFromPlacement, getProjectedPair } from "./relational";
+import { isCombusted, wouldCombust } from "./combust";
 import type { ScoredBeat } from "./score";
 import type {
   AspectConnection,
@@ -38,7 +38,7 @@ export interface ComputeProjectedEffectsInput {
 
 /** Per-planet projection: the polarity (so the arc can be colored even
  *  when the numeric delta clamps to zero — e.g. testimony on a planet
- *  already at 0 affliction) and the actual delta after clamping. */
+ *  already at 0 tension) and the actual delta after clamping. */
 export interface ProjectedEffect {
   delta: number;
   polarity: Polarity;
@@ -66,7 +66,7 @@ interface InProgress {
 
 /** Applies one blow and returns the magnitude that actually landed. Bounded on
  *  both sides, as the resolver's `applyEffect` is (MECHANICS §8, §10): testimony
- *  clamps at zero, affliction caps at the ceiling — so a finishing blow projects
+ *  clamps at zero, affliction caps at Resolve — so a finishing blow projects
  *  only the remainder, and a projected beat pays what the turn will award. */
 function applyMag(
   side: SideState,
@@ -79,13 +79,13 @@ function applyMag(
   // Callers guard combusted targets (they hold the placements this check needs).
   const state = side[target];
   if (!state || magnitude <= 0) return 0;
-  const ceiling = combustionCeiling(chart.planets[target]);
+  const resolve = getEffectiveStatsFromPlacement(chart.planets[target]).resolve;
   const existing = out[target];
-  const current = existing?.finalValue ?? state.affliction;
+  const current = existing?.finalValue ?? state.tension;
   const next =
     polarity === "Testimony"
       ? Math.max(0, current - magnitude)
-      : Math.min(ceiling, current + magnitude);
+      : Math.min(resolve, current + magnitude);
   out[target] = { finalValue: next, polarity };
   return Math.abs(next - current);
 }
@@ -102,10 +102,10 @@ function toEffects(
   for (const planet of PLANETS) {
     const entry = finalMap[planet];
     if (!entry) continue;
-    const delta = round2(entry.finalValue - side[planet].affliction);
+    const delta = round2(entry.finalValue - side[planet].tension);
     // Drop friction with zero delta as visual noise. Keep zero-delta
     // testimony so the player sees the heal-intent even when the planet
-    // is already at zero affliction (otherwise they'd wonder if their
+    // is already at zero tension (otherwise they'd wonder if their
     // mental model of propagation was wrong).
     if (delta === 0 && entry.polarity !== "Testimony") continue;
     out[planet] = { delta, polarity: entry.polarity };
@@ -137,7 +137,7 @@ export function computeProjectedEffects(
   const otherFinal: Partial<Record<PlanetName, InProgress>> = {};
   const beats: ScoredBeat[] = [];
 
-  // A hop that carries its target to the ceiling combusts it, and the combust
+  // A hop that carries its target to its Resolve combusts it, and the combust
   // beat follows its hit — the order `propagate` logs the pair in (`turn.ts`).
   const hopBeats = (
     side: "self" | "other",
@@ -148,7 +148,7 @@ export function computeProjectedEffects(
     magnitude: number,
   ) => {
     beats.push({ kind: "hit", side, target, polarity, magnitude });
-    if ((final[target]?.finalValue ?? 0) >= combustionCeiling(chart.planets[target])) {
+    if ((final[target]?.finalValue ?? 0) >= getEffectiveStatsFromPlacement(chart.planets[target]).resolve) {
       beats.push({ kind: "combust", side, target });
     }
   };

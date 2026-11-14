@@ -100,7 +100,7 @@ for (const scene of NARRATIVE_SCENARIOS) {
   for (const option of scene.options) menuLines.push(`| ${option.visibleIf === joyPresent ? "Joy: " : ""}${option.text} | ${option.cost ? `Pay ${option.cost} Light; ` : ""}${option.result.effects.map((effect) =>
     effect.kind === "light" ? `${effect.delta > 0 ? "+" : ""}${effect.delta} Light`
       : effect.kind === "gain" ? `+${displayStat(effect.stat, effect.amount)} ${STAT_LABEL[effect.stat]} on ${effect.target}`
-      : effect.kind === "affliction" ? `${effect.delta > 0 ? "+" : ""}${effect.delta} affliction on ${effect.target}`
+      : effect.kind === "tension" ? `${effect.delta > 0 ? "+" : ""}${effect.delta} tension on ${effect.target}`
       : `revive ${effect.target}`).join("; ") || "No effect"} |`);
   menuLines.push("");
 }

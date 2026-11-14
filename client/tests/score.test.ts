@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { logToBeats, scoreBeats, turnLight, type ScoreTurn, type ScoredBeat } from "@/game/score";
 import { blankSideState, seededChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import type { PlanetName, SideState, TurnLogEntry } from "@/game/types";
 
@@ -9,7 +9,7 @@ const self = seededChart(7, "Self");
 const other = seededChart(99, "Other");
 
 // By default the acting Moon is the only fielded planet, so it has both the
-// least and the most Resolve left and the Moon's and the Sun's rules both count.
+// least and the most remaining Resolve and the Moon's and the Sun's rules both count.
 const turn = (over: Partial<ScoreTurn> = {}): ScoreTurn => ({
   self,
   other,
@@ -37,26 +37,26 @@ const BEATS: ScoredBeat[] = [
   { kind: "combust", side: "self", target: "Saturn" },
 ];
 
-const otherMarsCeiling = combustionCeiling(other.planets.Mars);
+const otherMarsResolve = getEffectiveStatsFromPlacement(other.planets.Mars).resolve;
 
 describe("RULER_RULES — each ruler counts what that planet values", () => {
   const expected: Record<PlanetName, number> = {
     // Every hit on the Other's chart, doubled: the acting planet has the least
-    // Resolve left.
+    // remaining Resolve.
     Moon: 2 * (1 + 2),
     // Hits on the Other contrary to its announced Testimony.
     Mercury: 2,
     // Testimony hits on the Other.
     Venus: 1,
     // Every hit on the Other's chart, doubled: the acting planet has the most
-    // Resolve left.
+    // remaining Resolve.
     Sun: 2 * (1 + 2),
     // Affliction hits on the Other.
     Mars: 2,
     // Hits on the Other in accord with its announced Testimony.
     Jupiter: 1,
     // The Other's planet going dark, at its full Resolve.
-    Saturn: otherMarsCeiling,
+    Saturn: otherMarsResolve,
   };
 
   for (const ruler of PLANETS) {
@@ -81,17 +81,17 @@ describe("RULER_RULES — each ruler counts what that planet values", () => {
 
   it("Saturn counts combust markers at full Resolve, not hits", () => {
     expect(scoreBeats("Saturn", BEATS.filter((b) => b.kind === "hit"), turn())).toBe(0);
-    expect(otherMarsCeiling % 12).toBe(0);
+    expect(otherMarsResolve % 12).toBe(0);
   });
 });
 
-describe("the Moon and the Sun count the acting planet by the Resolve it has left", () => {
-  /** The player's side with each named planet left that much Resolve; the rest
-   *  are combusted. */
-  const stateWith = (left: Partial<Record<PlanetName, number>>): SideState => {
+describe("the Moon and the Sun count the acting planet by its remaining Resolve", () => {
+  /** The player's side with each named planet at that much remaining Resolve;
+   *  the rest are combusted. */
+  const stateWith = (remaining: Partial<Record<PlanetName, number>>): SideState => {
     const state = blankSideState();
     for (const p of PLANETS) {
-      state[p].affliction = combustionCeiling(self.planets[p]) - (left[p] ?? 0);
+      state[p].tension = getEffectiveStatsFromPlacement(self.planets[p]).resolve - (remaining[p] ?? 0);
     }
     return state;
   };
@@ -130,7 +130,7 @@ describe("the Moon and the Sun count the acting planet by the Resolve it has lef
   });
 
   it("a combusted planet is not compared", () => {
-    // The fielded Moon is combusted, with no Resolve left; Mercury is still the least.
+    // The fielded Moon is combusted, with no remaining Resolve; Mercury is still the least.
     expect(score("Moon", "Mercury", spread, ["Moon", "Mercury", "Venus", "Mars"])).toBe(doubled);
   });
 
@@ -178,7 +178,7 @@ describe("logToBeats — the order the UI replays", () => {
     // Their chart takes 5 Affliction direct + 2 propagated, against an announced
     // Testimony; Venus and the Moon combust on theirs. Your chart's 3 + 1
     // Testimony and the Sun's combust count for nothing. The acting Sun is the
-    // only fielded planet, so it has both the least and the most Resolve left.
+    // only fielded planet, so it has both the least and the most remaining Resolve.
     const light = (ruler: PlanetName) =>
       turnLight(entry, ruler, { self, other, selfState: blankSideState(), roster: ["Sun"] });
     expect(light("Moon")).toBe(14);
@@ -188,7 +188,7 @@ describe("logToBeats — the order the UI replays", () => {
     expect(light("Mars")).toBe(7);
     expect(light("Jupiter")).toBe(0);
     expect(light("Saturn")).toBe(
-      combustionCeiling(other.planets.Venus) + combustionCeiling(other.planets.Moon),
+      getEffectiveStatsFromPlacement(other.planets.Venus).resolve + getEffectiveStatsFromPlacement(other.planets.Moon).resolve,
     );
   });
 });

@@ -1,6 +1,7 @@
 import { runChart } from "@/game/chart";
 import { getScenario } from "@/data/narrative-scenarios";
-import { combustionCeiling, isCombusted, newlyCombusted } from "@/game/combust";
+import { isCombusted, newlyCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { narrativeContext, resolveNarrative, visibleOptions, type NarrativeScenario, type Option, type Selection } from "@/game/narrative";
 import { resolveTurn } from "@/game/turn";
@@ -42,58 +43,59 @@ export interface Policy {
 }
 
 /** The state a step leaves behind, so a record shows every change. */
-export function snapshot(run: Run): { light: number; affliction: Record<PlanetName, number>; gains: Run["gains"] } {
+export function snapshot(run: Run): { light: number; tension: Record<PlanetName, number>; gains: Run["gains"] } {
   return {
     light: run.light,
     gains: run.gains,
-    affliction: Object.fromEntries(PLANETS.map((p) => [p, run.state[p].affliction])) as Record<PlanetName, number>,
+    tension: Object.fromEntries(PLANETS.map((p) => [p, run.state[p].tension])) as Record<PlanetName, number>,
   };
 }
 export type Snapshot = ReturnType<typeof snapshot>;
 
 /** Actual effects received by Self, after clamping and aspect inversion. */
-export interface RelationalPressure {
-  damage: number; healing: number;
-  directAffliction: number; propagatedAffliction: number; invertedTestimonyDamage: number;
-  directTestimony: number; propagatedTestimony: number; invertedAfflictionHealing: number;
+export interface RelationalTension {
+  created: number; eased: number;
+  directAffliction: number; propagatedAffliction: number; invertedTestimonyCreated: number;
+  directTestimony: number; propagatedTestimony: number; invertedAfflictionEased: number;
 }
 
-export function emptyRelationalPressure(): RelationalPressure {
-  return { damage: 0, healing: 0, directAffliction: 0, propagatedAffliction: 0,
-    invertedTestimonyDamage: 0, directTestimony: 0, propagatedTestimony: 0, invertedAfflictionHealing: 0 };
+export function emptyRelationalTension(): RelationalTension {
+  return { created: 0, eased: 0, directAffliction: 0, propagatedAffliction: 0,
+    invertedTestimonyCreated: 0, directTestimony: 0, propagatedTestimony: 0, invertedAfflictionEased: 0 };
 }
 
-export function relationalPressure(log: TurnLogEntry): RelationalPressure {
-  const pressure = emptyRelationalPressure();
-  pressure[log.opponentValence === "Affliction" ? "directAffliction" : "directTestimony"] = log.playerDelta;
+export function relationalTension(log: TurnLogEntry): RelationalTension {
+  const tension = emptyRelationalTension();
+  tension[log.opponentValence === "Affliction" ? "directAffliction" : "directTestimony"] = log.playerDelta;
   for (const effect of log.propagation) {
     if (effect.side !== "self") continue;
     const key = log.opponentValence === "Affliction"
-      ? effect.polarity === "Affliction" ? "propagatedAffliction" : "invertedAfflictionHealing"
-      : effect.polarity === "Testimony" ? "propagatedTestimony" : "invertedTestimonyDamage";
+      ? effect.polarity === "Affliction" ? "propagatedAffliction" : "invertedAfflictionEased"
+      : effect.polarity === "Testimony" ? "propagatedTestimony" : "invertedTestimonyCreated";
     // The separate combustion marker has delta zero, so it cannot double-count a hit.
-    pressure[key] += Math.abs(effect.delta);
+    tension[key] += Math.abs(effect.delta);
   }
-  pressure.damage = pressure.directAffliction + pressure.propagatedAffliction + pressure.invertedTestimonyDamage;
-  pressure.healing = pressure.directTestimony + pressure.propagatedTestimony + pressure.invertedAfflictionHealing;
-  return pressure;
+  tension.created = tension.directAffliction + tension.propagatedAffliction + tension.invertedTestimonyCreated;
+  tension.eased = tension.directTestimony + tension.propagatedTestimony + tension.invertedAfflictionEased;
+  return tension;
 }
 
-export interface StatePressure { damage: number; healing: number; revivalRecovery: number; resolveGain: number }
+export interface StateTension { created: number; eased: number; revivalRecovery: number; resolveGain: number }
 
-/** Affliction changes and Resolve gains remain separate sources of capacity. */
-export function statePressure(chart: Chart, before: Snapshot, after: Snapshot, roster: readonly PlanetName[]): StatePressure {
+/** Tension changes and Resolve gains remain separate sources of capacity. */
+export function stateTension(chart: Chart, before: Snapshot, after: Snapshot, roster: readonly PlanetName[]): StateTension {
   const oldChart = runChart(chart, before), newChart = runChart(chart, after);
-  const pressure: StatePressure = { damage: 0, healing: 0, revivalRecovery: 0, resolveGain: 0 };
+  const tension: StateTension = { created: 0, eased: 0, revivalRecovery: 0, resolveGain: 0 };
   for (const planet of roster) {
-    const oldCeiling = combustionCeiling(oldChart.planets[planet]), newCeiling = combustionCeiling(newChart.planets[planet]);
-    const change = after.affliction[planet] - before.affliction[planet];
-    pressure.resolveGain += newCeiling - oldCeiling;
-    if (change > 0) pressure.damage += change;
-    else if (before.affliction[planet] >= oldCeiling && after.affliction[planet] < newCeiling) pressure.revivalRecovery -= change;
-    else pressure.healing -= change;
+    const oldResolve = getEffectiveStatsFromPlacement(oldChart.planets[planet]).resolve;
+    const newResolve = getEffectiveStatsFromPlacement(newChart.planets[planet]).resolve;
+    const change = after.tension[planet] - before.tension[planet];
+    tension.resolveGain += newResolve - oldResolve;
+    if (change > 0) tension.created += change;
+    else if (before.tension[planet] >= oldResolve && after.tension[planet] < newResolve) tension.revivalRecovery -= change;
+    else tension.eased -= change;
   }
-  return pressure;
+  return tension;
 }
 
 /** Every step carries the state it leaves, so replay shows each change. */
@@ -107,12 +109,12 @@ export type Step = ReturnType<typeof snapshot> & (
       kind: "turn"; planet: PlanetName; verb: Polarity; opponentPlanet: PlanetName; opponentVerb: Polarity;
       playerDelta: number; opponentDelta: number; lightGain: number;
       combusts: PlanetName[]; opponentCombusts: PlanetName[];
-      pressure: RelationalPressure;
+      tensionChange: RelationalTension;
     }
   | {
       kind: "narrative"; optionId: string; chosen: PlanetName | null; lightDelta: number;
       combusts: PlanetName[]; revivals: PlanetName[];
-      pressure: StatePressure;
+      tensionChange: StateTension;
     }
 );
 
@@ -152,7 +154,7 @@ export function playEncounter(play: PlayContext, run: Run, record?: (step: Step)
       lightDelta: next.light - run.light,
       combusts: roster.filter((p) => !combustedBefore(p) && combustedAfter(p)),
       revivals: roster.filter((p) => combustedBefore(p) && !combustedAfter(p)),
-      pressure: statePressure(chart, snapshot(run), snapshot(next), roster),
+      tensionChange: stateTension(chart, snapshot(run), snapshot(next), roster),
       ...snapshot(next),
     });
     return next;
@@ -173,7 +175,7 @@ export function playEncounter(play: PlayContext, run: Run, record?: (step: Step)
       lightGain: log.lightGain,
       combusts: newlyCombusted(runChart(chart, run), run.state, result.run.state),
       opponentCombusts: newlyCombusted(enc.opponentChart, enc.opponentState, result.encounter.opponentState),
-      pressure: relationalPressure(log),
+      tensionChange: relationalTension(log),
       ...snapshot(result.run),
     });
     run = result.run;

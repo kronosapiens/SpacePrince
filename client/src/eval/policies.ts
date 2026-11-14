@@ -1,6 +1,6 @@
 import { runChart } from "@/game/chart";
 import { getScenario } from "@/data/narrative-scenarios";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted, remainingResolve } from "@/game/combust";
 import { resolveNarrative } from "@/game/narrative";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { enterNode, isOver } from "@/game/run";
@@ -30,7 +30,7 @@ const NO_DRAW = () => 0;
 
 interface Measures { over: boolean; lit: number; capacity: number; light: number }
 
-/** Lit planets and remaining capacity to absorb affliction, across the fielded roster. */
+/** Lit planets and remaining capacity to absorb tension, across the fielded roster. */
 function measure(run: Run, prince: Prince): Measures {
   const { numRelationalEncounters } = prince;
   const chart = runChart(prince.chart, run);
@@ -38,7 +38,7 @@ function measure(run: Run, prince: Prince): Measures {
   return {
     over: isOver(run, chart, numRelationalEncounters),
     lit: roster.filter((p) => !isCombusted(chart.planets[p], run.state[p])).length,
-    capacity: roster.reduce((sum, p) => sum + Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction), 0),
+    capacity: roster.reduce((sum, p) => sum + Math.max(0, remainingResolve(chart.planets[p], run.state[p])), 0),
     light: run.light,
   };
 }

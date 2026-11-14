@@ -25,7 +25,7 @@ describe("house-specific narrative risk across all rising signs", () => {
       for (const outcome of outcomes) {
         expect(outcome.next.light, id).toBeLessThan(state.run.light);
         expect(outcome.after.lit, id).toContain("Moon");
-        expect(outcome.next.state.Moon.affliction, id).toBe(0);
+        expect(outcome.next.state.Moon.tension, id).toBe(0);
       }
     }
   });

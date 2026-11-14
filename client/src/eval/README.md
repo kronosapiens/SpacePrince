@@ -57,16 +57,16 @@ Even shared initial seeds and tie streams do not guarantee identical later draws
 Do not compare percentages from different cohorts as if they were a paired experiment.
 The sampled ephemeris charts are also a model of chart diversity, not an observed distribution of players' birth charts.
 
-## Measure pressure and choices, not only completion
+## Measure tension and choices, not only completion
 
 Capacity is the sum of remaining room before combustion across fielded planets, using their effective Resolve including gains.
-Track relational damage and healing separately, entry affliction, narrative effects, revival, Resolve gains, and capacity added by unlocks; reconcile them with the change in capacity.
+Track relational tension created and eased separately, entry tension, narrative effects, revival, Resolve gains, and capacity added by unlocks; reconcile them with the change in capacity.
 Relational measurements use actual logged effects after clamping and inversion, while narrative measurements use net changes per planet within a choice.
 
-The pressure audit showed that relational could restore more capacity than it consumed.
-Consequently, extra turns can supply healing, extra opening affliction can create more room for recovery, and doubling damage can change combustion and propagation.
+The tension audit showed that relational could restore more capacity than it consumed.
+Consequently, extra turns can supply easing, extra opening tension can create more room for recovery, and doubling the tension created can change combustion and propagation.
 Rerun the resolver under a candidate rule rather than scaling totals from old trajectories.
-More affliction on the Other also lowered preemption thresholds and could make survival easier; Self and Other tuning cannot be interpreted independently of initiative and healing.
+More tension on the Other also lowered preemption thresholds and could make survival easier; Self and Other tuning cannot be interpreted independently of initiative and easing.
 
 Report completion and failure maps, Light across all attempted runs, outcomes among completed runs, and encounter exposure.
 Separate planet losses at entry from losses during turns, full entry wipes, and final run failures after unlock handling.

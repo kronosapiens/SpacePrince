@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { playEncounter, type PlayContext } from "@/eval/play";
 import { beginRun, enterNode, isOver, newMapState, rolloverMap, shouldRolloverMap, FIRST_MAP_SEED, MAPS_PER_RUN } from "@/game/run";
 import { houseSign } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { relationalTurnRng, resolveTurn } from "@/game/turn";
 import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { hashString, mulberry32 } from "@/game/rng";
@@ -197,7 +198,7 @@ describe("Run loop integration", () => {
     expect(isOver(run, prince.chart, prince.numRelationalEncounters)).toBe(false);
     const dead = { ...run, state: { ...run.state } };
     for (const p of PLANETS) {
-      dead.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
+      dead.state[p] = { tension: getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve };
     }
     expect(isOver(dead, prince.chart, prince.numRelationalEncounters)).toBe(true);
   });
@@ -307,7 +308,7 @@ describe("Shared run transitions", () => {
       ...entered,
       state: Object.fromEntries(PLANETS.map((p) => [p, {
         ...entered.state[p],
-        affliction: combustionCeiling(prince.chart.planets[p]) - (p === "Moon" ? 1 : 0),
+        tension: getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve - (p === "Moon" ? 1 : 0),
       }])) as Run["state"],
       // This manually constructed starting state has no recorded opening sweep.
       encounter: { ...enc, selfNecessity: undefined, opponentActions: enc.opponentActions.map((a, i) => (i === 0 ? "Affliction" : a)) },
@@ -326,8 +327,8 @@ describe("Shared run transitions", () => {
     }
     const wounded = structuredClone(run);
     wounded.light = 123;
-    for (const p of PLANETS) wounded.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 1;
-    wounded.state.Sun.affliction++; // Already combusted before this encounter.
+    for (const p of PLANETS) wounded.state[p].tension = getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve - 1;
+    wounded.state.Sun.tension++; // Already combusted before this encounter.
     const before = structuredClone(wounded), nodeId = nodeOf("relational");
     const entered = enterNode({ run: wounded, chart, nodeId, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     expect(entered.encounter).toMatchObject({ kind: "relational", resolved: true, turnIndex: 0, log: [] });
@@ -357,7 +358,7 @@ describe("Shared run transitions", () => {
       chart.planets[planet].buffs.luck = 0;
     }
     const wounded = { ...beginRun(chart, 42, 2), mapsCompleted: 2 };
-    wounded.state.Moon.affliction = combustionCeiling(chart.planets.Moon) - 1;
+    wounded.state.Moon.tension = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve - 1;
     const nodeId = Object.keys(wounded.map.rolledNodes).find((id) => wounded.map.rolledNodes[id]!.kind === "relational")!;
     let current = enterNode({ run: wounded, chart, nodeId, lifetimeRelationalEncounterCount: 2 });
     const encounter = current.encounter as RelationalEncounter;
@@ -369,8 +370,8 @@ describe("Shared run transitions", () => {
     expect(encounter.resolved).toBe(false);
     expect(current.map.outcomes[nodeId]).toBeUndefined();
     // Fix later wounds and the incoming magnitude to exercise all three loss stages.
-    current.state.Venus.affliction = combustionCeiling(chart.planets.Venus) - 12;
-    current.state.Mercury.affliction = combustionCeiling(chart.planets.Mercury) - 24;
+    current.state.Venus.tension = getEffectiveStatsFromPlacement(chart.planets.Venus).resolve - 12;
+    current.state.Mercury.tension = getEffectiveStatsFromPlacement(chart.planets.Mercury).resolve - 24;
     encounter.sequence = ["Moon", "Moon", "Moon"];
     encounter.opponentActions = ["Affliction", "Affliction", "Affliction"];
     encounter.opponentChart.planets.Moon.base.affliction = 12;
@@ -388,7 +389,7 @@ describe("Shared run transitions", () => {
   it("rolls over only from the cleared terminal node, and full combustion ends the run first", () => {
     const atExit: Run = { ...run, map: { ...run.map, currentNodeId: TERMINAL_NODE_ID } };
     const spent: Run = { ...atExit, state: { ...atExit.state } };
-    for (const p of PLANETS) spent.state[p] = { affliction: combustionCeiling(prince.chart.planets[p]) };
+    for (const p of PLANETS) spent.state[p] = { tension: getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve };
     const rolls = (r: Run) => shouldRolloverMap(r, prince.chart, prince.numRelationalEncounters);
     expect(rolls(run)).toBe(false);
     expect(rolls(enter(run, TERMINAL_NODE_ID))).toBe(false);

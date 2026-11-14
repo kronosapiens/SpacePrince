@@ -24,7 +24,7 @@ export function PrinceArtwork({ prince, draft = false }: { prince: Prince; draft
           chart={prince.chart}
           unlockedPlanets={unlockedPlanets(prince.numRelationalEncounters)}
           passive
-          hideAffliction
+          hideResolveArc
         />
       </svg>
       <AchievementMarks achievements={prince.achievements} draft={draft} />

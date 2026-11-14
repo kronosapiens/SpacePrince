@@ -150,12 +150,12 @@ export function seededChart(seed = randomSeed(), name = "Prince"): Chart {
 }
 
 export function blankSideState() {
-  const out = {} as Record<PlanetName, { affliction: number; combusted: boolean }>;
-  for (const p of PLANETS) out[p] = { affliction: 0, combusted: false };
+  const out = {} as Record<PlanetName, { tension: number; combusted: boolean }>;
+  for (const p of PLANETS) out[p] = { tension: 0, combusted: false };
   return out;
 }
 
-export function cloneSideState<T extends Record<PlanetName, { affliction: number; combusted: boolean }>>(s: T): T {
+export function cloneSideState<T extends Record<PlanetName, { tension: number; combusted: boolean }>>(s: T): T {
   const out = {} as T;
   for (const p of PLANETS) {
     (out as any)[p] = { ...s[p] };

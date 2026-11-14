@@ -15,7 +15,7 @@ import type { Chart as ChartType, PlanetName, SignName } from "@/game/types";
 /**
  * The natal wheel, as the game draws it. This is a showcase copy of the client's
  * Chart (client/src/components/Chart.tsx) carrying only what a resting,
- * hover-only chart needs — no relational encounter state, so no affliction arc, badges,
+ * hover-only chart needs — no relational encounter state, so no Resolve arc, badges,
  * corona, or propagation. Styling values live in svg/chart-style.ts and mirror
  * the client's tokens, so the chart here and the chart in the game read as the
  * same object.

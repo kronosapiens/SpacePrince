@@ -61,12 +61,12 @@ export interface RelationalAnimationState {
   playerValence: Polarity;
   turnIndex: number;
   /** Light shown right now — starts at the pre-turn total and ticks up as
-   *  each planet's affliction resolves, in step with the resolution beats. */
+   *  each planet's tension resolves, in step with the resolution beats. */
   runningLight: number;
   /** Bumps once per Light increase; used as a React key so the flash
    *  behind the number re-triggers on every resolution. */
   lightFlashEpoch: number;
-  /** The planet whose affliction resolved on the latest beat — its color tints
+  /** The planet whose tension resolved on the latest beat — its color tints
    *  that beat's flash, so the number flashes through the wave's planets. */
   lightFlashPlanet: PlanetName | null;
   activePropagationKeys: FlagPair<string>;
@@ -202,7 +202,7 @@ function cloneAnimation(state: RelationalAnimationState): RelationalAnimationSta
 }
 
 function applyDelta(state: SideState, planet: PlanetName, delta: number) {
-  state[planet].affliction = Math.max(0, state[planet].affliction + delta);
+  state[planet].tension = Math.max(0, state[planet].tension + delta);
 }
 
 function runScheduler(args: {
@@ -298,7 +298,7 @@ function runScheduler(args: {
     const { base, side, actionPlanet, actionDelta, actionCombust, sign, steps } = args;
     const isSelf = side === "self";
     // The action planet receives the opposing valence: sign < 0 means the hit
-    // resolved affliction (testimony/heal), sign > 0 means it added (affliction/harm).
+    // resolved tension (testimony/heal), sign > 0 means it added (affliction/harm).
     const receivedPolarity: Polarity = sign < 0 ? "Testimony" : "Affliction";
 
     // Primary direct phase — apply delta, light action-glow, effect.
@@ -382,7 +382,7 @@ function runScheduler(args: {
           const next = cloneAnimation(state);
           const targetState = isSelf ? next.selfState : next.otherState;
           if (step.note === "Combusts") {
-            // The delta step already carried affliction to the ceiling, which
+            // The delta step already carried tension to its Resolve, which
             // *is* combustion (derived); this beat adds the ripple + sound.
             next.combustingPlanets = {
               ...next.combustingPlanets,

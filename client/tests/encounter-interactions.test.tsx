@@ -7,8 +7,7 @@ import { ENCOUNTER_OPENINGS, ENCOUNTER_RULES } from "@/copy/encounter-openings";
 import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
-import { getEffectiveStats } from "@/game/relational";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStats, getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
 import { playUISound } from "@/audio/engine";
@@ -68,18 +67,18 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
   const encounter = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
   encounter.sequence = ["Moon", "Mars"];
   encounter.opponentActions = ["Affliction", "Testimony"];
-  encounter.opponentState.Moon.affliction = 12;
+  encounter.opponentState.Moon.tension = 12;
   if (openingCounts) {
     const entries = (count: number): NecessityEntry[] => PLANETS.slice(0, count).map((planet) => openingCounts.blocked === undefined
       ? { planet, amount: 12, draw: 24, halved: true }
       : { planet, amount: openingCounts.blocked ? 0 : 12, draw: 12, blocked: openingCounts.blocked });
     encounter.selfNecessity = entries(openingCounts.self);
     encounter.necessity = entries(openingCounts.other);
-    for (const entry of encounter.selfNecessity) run.state[entry.planet].affliction = 30;
-    for (const entry of encounter.necessity) encounter.opponentState[entry.planet].affliction = 30;
+    for (const entry of encounter.selfNecessity) run.state[entry.planet].tension = 30;
+    for (const entry of encounter.necessity) encounter.opponentState[entry.planet].tension = 30;
     if (openingCounts.combustSelf) {
       const planet = openingCounts.combustSelf;
-      run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+      run.state[planet].tension = getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve;
     }
   }
   run.encounter = encounter;
@@ -185,7 +184,7 @@ describe("encounter interactions", () => {
     expect(arc.querySelector(".necessity-arc path")!.getAttribute("d")!.split(" ").slice(-2)).toEqual(trackEnd);
     act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity + openingTiming.encounter.fortune));
     expect(get(moon).closest(".anim-combust")).not.toBeNull();
-    expect(run.state.Moon.affliction).toBe(combustionCeiling(prince.chart.planets.Moon));
+    expect(run.state.Moon.tension).toBe(getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve);
     click(moon);
     expect(container.querySelector(testimony)).toBeNull();
     finishOpening();

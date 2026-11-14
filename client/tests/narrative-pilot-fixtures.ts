@@ -1,6 +1,6 @@
 import { getScenario, NARRATIVE_SCENARIOS } from "@/data/narrative-scenarios";
 import { derivePlacements } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS, SIGNS } from "@/game/data";
 import type { NarrativeScenario } from "@/game/narrative";
 import type { PlanetName, Prince, Run } from "@/game/types";
@@ -45,7 +45,7 @@ export function pilotState(scene: NarrativeScenario, sample: PilotState): { prin
   const prince = { ...BASE_PRINCE, chart, numRelationalEncounters: sample.tier };
   const run = stateFor(scene, prince, sample.condition, sample.light);
   if (sample.joy === false) for (const planet of ["Jupiter", "Saturn"] as const) {
-    run.state[planet].affliction = Math.min(96, combustionCeiling(chart.planets[planet]));
+    run.state[planet].tension = Math.min(96, getEffectiveStatsFromPlacement(chart.planets[planet]).resolve);
   }
   return { prince, run };
 }

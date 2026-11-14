@@ -75,7 +75,7 @@ export function beginRelationalEncounter(input: BeginRelationalInput): Relationa
   );
   // Separate stream for the necessity so its draws don't perturb the
   // turn-sequence rolls above.
-  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_affliction`));
+  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_tension`));
   const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng);
   return {
     kind: "relational",

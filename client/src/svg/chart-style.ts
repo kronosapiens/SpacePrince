@@ -6,7 +6,7 @@ import { STROKE_EXTRA_HEAVY, STROKE_HEAVY, STROKE_LIGHT, STROKE_MEDIUM } from "@
  * of JSX. Grouped by element; values are in chart viewBox units.
  * Elements that change on interaction carry rest/active (or rest/hover) pairs.
  * Every stroke is a rung of the four-step schedule in viewbox.ts — ground,
- * structure, under attention, the affliction arc — never a loose number.
+ * structure, under attention, the Resolve arc — never a loose number.
  *
  * Geometry lives in viewbox.ts, with one exception: the substrate's radii sit
  * here, beside the rest of that figure's knobs, because nothing else in the
@@ -85,7 +85,7 @@ export const CHART_STYLE = {
   /** Diagram — planet glyph disc + rim. Rim/ghost stroke scales with glyph
    *  radius: max(rimStrokeMin, glyphR * rimStrokeRatio); the symbol scales as
    *  glyphR * symbolRatio. The ratio rose well past its old 0.85 when the disc
-   *  shrank to make room for the affliction arc, so the symbol kept its size
+   *  shrank to make room for the Resolve arc, so the symbol kept its size
    *  while the circle under it gave up radius — what identifies a planet is its
    *  sign, not how big a disc it sits on. Tuned live against the arc and ring
    *  (`svg/tuning.ts`). */
@@ -116,7 +116,7 @@ export const CHART_STYLE = {
    *  the heavy rung, shared with the aspect line under attention.
    *  Rejected: separate invite and select rings at different radii — they were
    *  already mutually exclusive (selecting clears the invite on every planet),
-   *  so the second radius bought nothing and spent room the affliction arc
+   *  so the second radius bought nothing and spent room the Resolve arc
    *  needs. */
   interactionRing: { steady: 1, stroke: STROKE_HEAVY },
   /** Active — the corona on an acting planet: its verb, drawn as streamers.
@@ -145,14 +145,14 @@ export const CHART_STYLE = {
     radius: 54, rimGap: 27, rays: 8,
     stroke: STROKE_MEDIUM, opacity: 0.85, turn: "96s",
   },
-  /** Diagram — the affliction arc: a planet's Resolve at 1 point = 2°, drawn
+  /** Diagram — the Resolve arc: a planet's Resolve at 1 point = 2°, drawn
    *  as a partial arc inside the interaction ring. Kind, not weight, keeps the
    *  two apart — data is an arc, interaction is a complete circle — so the arc
    *  can stay quiet and still never read as tappable. `track` is the whole
-   *  ceiling (so arc length is proportional to Resolve, visible with no number);
+   *  Resolve (so arc length is proportional to it, visible with no number);
    *  `remaining` is what the planet can still absorb; `diff` is the projected
    *  change to that span. */
-  afflictionArc: {
+  resolveArc: {
     degreesPerPoint: 2,
     stroke: STROKE_HEAVY,
     trackOpacity: 0.3,
@@ -205,7 +205,7 @@ export const CHART_STYLE = {
   /** Radial-gradient glow ramps (core → mid → transparent edge). Halved from
    *  their first values in one pass, along with the screen tint in tokens.css —
    *  the ramps were competing with the marks drawn on top of them, the
-   *  affliction arc most of all. */
+   *  Resolve arc most of all. */
   glow: {
     colorField: { core: 0.16, mid: 0.04 },
     halo: { core: 0.35, mid: 0.09 },

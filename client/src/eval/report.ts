@@ -12,7 +12,7 @@ export interface ReportContext {
 
 const DEFINITIONS: Record<Strategy, string> = {
   random: "Uniform among legal choices: the next node, a planet and verb, or a narrative option and then its target.",
-  survival: "Most lit planets, then most capacity to absorb affliction, then most Light; " +
+  survival: "Most lit planets, then most capacity to absorb tension, then most Light; " +
     `routes by ${FORECAST_SAMPLES} sampled plays of each next encounter, then the shorter way to the map's exit.`,
   light: "Most Light among choices that keep the run going (any, if none do), then lit planets and capacity; " +
     `routes by ${FORECAST_SAMPLES} sampled plays of each next encounter, survival first.`,
@@ -103,25 +103,25 @@ export function renderReport(agg: Aggregates, ctx: ReportContext): string {
       ]),
     ),
     "",
-    "## Pressure on Self (means per run)",
+    "## Tension on Self (means per run)",
     "",
-    "Relational effects use actual applied damage and healing, including propagation and inversion, rather than the announced verb alone.",
+    "Relational effects use the tension actually created and eased, including propagation and inversion, rather than the announced verb alone.",
     "Entry wipes include those rescued by an unlock; entry deaths count planets, while wipes count encounters.",
     table(
-      ["Strategy", "Entry affliction", "Entry deaths", "Entry wipes", "Entry wipe rescues", "Relational damage", "Relational healing", "Inverted Testimony damage", "Inverted Affliction healing"],
-      ss.map(({ strategy, pressure: p }) => [strategy, two(p.entryDamage), two(p.entryDeaths), two(p.entryWipes), two(p.entryWipeRescues),
-        two(p.relational.damage), two(p.relational.healing), two(p.relational.invertedTestimonyDamage), two(p.relational.invertedAfflictionHealing)]),
+      ["Strategy", "Entry tension", "Entry deaths", "Entry wipes", "Entry wipe rescues", "Relational tension created", "Relational tension eased", "Tension created by inverted Testimony", "Tension eased by inverted Affliction"],
+      ss.map(({ strategy, tension: t }) => [strategy, two(t.entryTension), two(t.entryDeaths), two(t.entryWipes), two(t.entryWipeRescues),
+        two(t.relational.created), two(t.relational.eased), two(t.relational.invertedTestimonyCreated), two(t.relational.invertedAfflictionEased)]),
     ),
     "",
     "## Recovery and unlocks (means per run)",
     "",
-    "Narrative damage and healing are net changes per planet within each choice; revival recovery and Resolve gains are separate sources of capacity.",
-    "Final capacity equals starting capacity minus entry and relational/narrative damage, plus relational/narrative healing, revival recovery, Resolve gains, and capacity unlocked.",
+    "Narrative tension created and eased are net changes per planet within each choice; revival recovery and Resolve gains are separate sources of capacity.",
+    "Final capacity equals starting capacity minus entry tension and relational/narrative tension created, plus relational/narrative tension eased, revival recovery, Resolve gains, and capacity unlocked.",
     table(
-      ["Strategy", "Narrative damage", "Narrative healing", "Revival recovery", "Resolve gains", "Unlocked capacity", "Unlocks", "Unlock rescues", "Starting capacity", "Final capacity"],
-      ss.map(({ strategy, pressure: p, progression: u }) => [strategy, two(p.narrativeDamage), two(p.narrativeHealing),
-        two(p.boundaryRevivalRecovery + p.narrativeRevivalRecovery), two(p.resolveGain), two(p.unlockCapacity),
-        two(u.unlocks), two(u.unlockRescues), two(p.capacityStart), two(p.capacityEnd)]),
+      ["Strategy", "Narrative tension created", "Narrative tension eased", "Revival recovery", "Resolve gains", "Unlocked capacity", "Unlocks", "Unlock rescues", "Starting capacity", "Final capacity"],
+      ss.map(({ strategy, tension: t, progression: u }) => [strategy, two(t.narrativeCreated), two(t.narrativeEased),
+        two(t.boundaryRevivalRecovery + t.narrativeRevivalRecovery), two(t.resolveGain), two(t.unlockCapacity),
+        two(u.unlocks), two(u.unlockRescues), two(t.capacityStart), two(t.capacityEnd)]),
     ),
     "",
     "## Encounters survived per completed run",

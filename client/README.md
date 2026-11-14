@@ -45,9 +45,9 @@ client/src/
 
 ### One store: the Prince owns its runs
 
-There is one reducer at the app root, `princeReducer`, provided by `PrinceStoreProvider` (`state/PrinceStore.tsx`) and persisted under one `localStorage` key, `sp:prince:v6` (`state/prince.ts`).
+There is one reducer at the app root, `princeReducer`, provided by `PrinceStoreProvider` (`state/PrinceStore.tsx`) and persisted under one `localStorage` key, `sp:prince:v7` (`state/prince.ts`).
 The `Prince` holds identity, chart, lifetime relational encounter count, the achievement bitmap, and every run it has played; the active run is the tail of `runs` if and only if it is not over (`docs/mechanics/STATE.md`).
-Keys from earlier prototype shapes (`sp:profile:v1`, `sp:run:v1`, `sp:prince:v1` through `v5`) are cleared on load; there is no migration, so a schema change wipes stored state until the game ships for real users.
+Keys from earlier prototype shapes (`sp:profile:v1`, `sp:run:v1`, `sp:prince:v1` through `v6`) are cleared on load; there is no migration, so a schema change wipes stored state until the game ships for real users.
 
 Reducer actions: `mint`, `clear`, `setRelationalEncounters`, `incrementRelationalEncounters`, `startRun`, `commitRun`.
 Run mutations land on the tail run through `commitRun`.
@@ -110,7 +110,7 @@ Key modules:
 - `relational.ts`: stats, the valence draw, direct exchange, the fortune roll (shared by resolution and projection)
 - `projections.ts`: preview deltas and projected Light, over the same beats the scorer reads
 - `score.ts`: Light by the encounter's ruler (`RULER_RULES`)
-- `combust.ts`: ceilings, combustion, uncombust
+- `combust.ts`: remaining Resolve, combustion, uncombust
 - `necessity.ts`: relational-entry Necessity with Fortune blocking
 - `encounter.ts`: `beginRelationalEncounter`, `beginNarrativeEncounter`, `encounterRuler`
 - `narrative.ts`: scene context, targets, occupant terms (`withOccupants`), preview and resolve
@@ -183,7 +183,7 @@ Clearing a relational encounter advances lifetime progress before checking for f
 Programmatic callers can pass a run's final lifetime count into the next `runTrial` call.
 
 Outputs include configuration, source revision and working-tree patch, run summaries, and paired comparisons with intervals resampled by chart.
-The report separates relational damage and healing, relational-entry affliction and losses, and unlocks.
+The report separates relational tension created and eased, relational-entry tension and losses, and unlocks.
 These fixed policies provide comparisons, not calibrated human win rates.
 Regenerate a full record with the replay ID from the report, supplying the same starting count when used:
 

@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { RunStars } from "@/components/RunStars";
 import { beginRun, MAPS_PER_RUN } from "@/game/run";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import type { Prince } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 import { SPANDREL, STAR_RECTANGLES } from "@/svg/prince-style";
@@ -60,7 +60,7 @@ describe("run stars", () => {
   it("shows every finished run, including early combustion and zero Light, with brightness ordered by Light", () => {
     const prince = createStubPrince();
     const earlyRun = beginRun(prince.chart, 1);
-    earlyRun.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
+    earlyRun.state.Moon.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
     const completed = [64, 512, 4096].map((light, index) => ({
       ...beginRun(prince.chart, index + 2), light, mapsCompleted: MAPS_PER_RUN,
     }));

@@ -78,7 +78,7 @@ export function GameLayout() {
         invite={isTitle}
         disabled={opening.active || (!isTitle && (guideOpen || isEncounter))}
         activePlanet={isCasting ? casting.currentRevealing : null}
-        hideAffliction={isTitle || isCasting}
+        hideResolveArc={isTitle || isCasting}
         onReroll={isTitle && !prince ? reroll : undefined}
       >
         {isCasting && <PlanetBands on={casting.bandsOn} current={casting.bandsCurrent} />}

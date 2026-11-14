@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEve
 import { PLANETS, SIGNS } from "@/game/data";
 import { getAspects } from "@/game/aspects";
 import { houseSign } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { HOUSES } from "@/data/houses";
 import {
   PlanetStatsPanel,
@@ -15,7 +16,7 @@ import { PropagationLine } from "@/components/PropagationLine";
 import { SvgRotation } from "@/components/SvgRotation";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
-  AFFLICTION_ARC_ANCHOR_DEG, AFFLICTION_ARC_R,
+  RESOLVE_ARC_ANCHOR_DEG, RESOLVE_ARC_R,
   CHART_CENTER, CHART_VIEWBOX,
   ACTIVE_HALO_R, CORONA_INNER_R, INCOMING_RING_PITCH,
   INNER_RING_R, INTERACTION_RING_R, INVITE_HALO_R, OUTER_RING_R,
@@ -102,14 +103,14 @@ interface PlanetPoint {
 }
 
 interface PlanetStatus {
-  affliction?: number;
+  tension?: number;
 }
 
 export interface ProjectionChip {
   delta: number;
   polarity: Polarity;
-  /** Narrative Resolve changes carry the resolver's final ceiling and affliction. */
-  resolve?: { ceiling: number; affliction: number };
+  /** Narrative Resolve changes carry the resolver's final Resolve and tension. */
+  resolve?: { resolve: number; tension: number };
 }
 
 export interface ProjectionChips {
@@ -140,10 +141,10 @@ export interface ChartProps {
   showSubstrate?: boolean;
   /** Subtle aspect-graph: hairline at rest. */
   showAspects?: boolean;
-  /** Hide the affliction arc. For charts shown for their form rather than
+  /** Hide the Resolve arc. For charts shown for their form rather than
    *  their state (such as the Title's sample charts); gameplay screens don't
    *  set it. */
-  hideAffliction?: boolean;
+  hideResolveArc?: boolean;
   scale?: number;
   side?: "self" | "other";
   onPlanetClick?: (p: PlanetName) => void;
@@ -215,7 +216,7 @@ export function Chart(props: ChartProps) {
     showColorField = true,
     showSubstrate = true,
     showAspects = true,
-    hideAffliction = false,
+    hideResolveArc = false,
     side,
     onPlanetClick,
     onPlanetHover,
@@ -272,11 +273,11 @@ export function Chart(props: ChartProps) {
   // allActive overrides unlock-gating: every planet renders in full state.
   const isUnlocked = (p: PlanetName) =>
     allActive || (unlockedPlanets ? unlockedPlanets.includes(p) : true);
-  // Combustion is derived from affliction against the placement's ceiling
+  // Combustion is derived from tension against the placement's Resolve
   // (combust.ts) — no flag arrives in `state`.
   const planetCombusted = (p: PlanetName) => {
-    const affliction = state?.[p]?.affliction;
-    return affliction != null && isCombusted(chart.planets[p], { affliction });
+    const tension = state?.[p]?.tension;
+    return tension != null && isCombusted(chart.planets[p], { tension });
   };
 
   // Color-field blooms — one radial gradient per visible non-combust planet.
@@ -480,7 +481,7 @@ export function Chart(props: ChartProps) {
           neighbour's bloom must not sit on top of it. A combusted planet has
           nothing left to absorb, so it drops the arc entirely rather than
           showing a spent track. */}
-      {!hideAffliction && points.map((p) => {
+      {!hideResolveArc && points.map((p) => {
         if (!isUnlocked(p.planet)) return null;
         const projected = opening ? undefined : projection?.deltas[p.planet];
         if (planetCombusted(p.planet) && !(projected?.polarity === "Testimony" && projected.delta > 0)) return null;
@@ -489,7 +490,7 @@ export function Chart(props: ChartProps) {
             key={p.planet}
             point={p}
             placement={chart.planets[p.planet]}
-            affliction={state?.[p.planet]?.affliction ?? 0}
+            tension={state?.[p.planet]?.tension ?? 0}
             projection={opening ? undefined : projection?.deltas[p.planet]}
             openingPhase={opening?.phase}
             necessity={opening?.entries.find((entry) => entry.planet === p.planet)}
@@ -514,7 +515,7 @@ export function Chart(props: ChartProps) {
         <PlanetStatsPanel
           chart={chart}
           planet={statsPanelPlanet}
-          affliction={state?.[statsPanelPlanet]?.affliction ?? 0}
+          tension={state?.[statsPanelPlanet]?.tension ?? 0}
           cx={panelPlacement.cx}
           cy={panelPlacement.cy}
           height={panelHeight}
@@ -615,7 +616,7 @@ function PlanetGlyph({
   const ringShown = active || selected || ((invite || focused) && interactive);
   const ringSteady = active || selected || hovered || focused;
   // Neutral at rest, the verb once one is determined — the same grammar as the
-  // affliction arc inside it. The ring used to restate the planet's own colour,
+  // Resolve arc inside it. The ring used to restate the planet's own colour,
   // which the disc, the glyph and the halo already carry three times over, so
   // the hue was decoration; spending it on the verb is what lets a precommit
   // read at its source rather than only through its consequences on the other
@@ -755,50 +756,50 @@ function PlanetGlyph({
 }
 
 /**
- * Affliction arc — the planet's Resolve drawn at 1 point of affliction = 2°.
- * Ceilings are multiples of 12 (combust.ts).
+ * Resolve arc — the planet's Resolve drawn at 1 point of tension = 2°.
+ * Resolve is a multiple of 12 (combust.ts).
  * The mapping is absolute rather than normalized:
  * arc length is proportional to Resolve, so a resting chart shows which planets are sturdy
  * without a number, and one incoming magnitude draws the same sweep on every
  * planet — the player learns what 48 looks like once and can then scan seven
  * gaps against it.
  *
- * The ceiling end is pinned at 6 o'clock and affliction accumulates toward it,
+ * The Resolve end is pinned at 6 o'clock and tension accumulates toward it,
  * so the bright span — what the planet can still absorb — shortens by its free
  * end descending into the anchor, and combustion is that span closing. Every
  * planet dies at the same point on the dial.
  *
- * Rejected: normalized (every ceiling sweeping a full 360°). It reads as a
+ * Rejected: normalized (every planet's Resolve sweeping a full 360°). It reads as a
  * fraction, which needs a complete-circle track to read against — and complete
  * circles are the interaction ring's signal. It also flattens the resting
  * chart, since every undamaged planet would look identical.
  */
 function PlanetArc({
-  point, placement, affliction, projection, guideId, openingPhase, necessity,
+  point, placement, tension, projection, guideId, openingPhase, necessity,
 }: {
   point: PlanetPoint;
   placement: PlanetPlacement;
-  affliction: number;
+  tension: number;
   projection?: ProjectionChip;
   openingPhase?: NecessityAnimationPresentation["phase"];
   necessity?: NecessityEntry;
   guideId?: string;
 }) {
-  const ceiling = combustionCeiling(placement);
-  if (ceiling <= 0) return null;
-  const r = AFFLICTION_ARC_R;
-  const stroke = CHART_STYLE.afflictionArc.stroke;
-  const degreesPerPoint = CHART_STYLE.afflictionArc.degreesPerPoint;
+  const resolve = getEffectiveStatsFromPlacement(placement).resolve;
+  if (resolve <= 0) return null;
+  const r = RESOLVE_ARC_R;
+  const stroke = CHART_STYLE.resolveArc.stroke;
+  const degreesPerPoint = CHART_STYLE.resolveArc.degreesPerPoint;
   // Remaining Resolve sets the angular distance back from the combustion anchor.
   const at = (a: number) =>
-    AFFLICTION_ARC_ANCHOR_DEG - (ceiling - a) * degreesPerPoint;
-  const spent = clamp(affliction, 0, ceiling);
+    RESOLVE_ARC_ANCHOR_DEG - (resolve - a) * degreesPerPoint;
+  const spent = clamp(tension, 0, resolve);
 
   // The projected span runs between the current boundary and where the blow
   // would put it — one segment either way, since testimony just moves it back.
   //
   // A blow that closes the span turns ember instead of amber. Length cannot
-  // carry this: the span clamps at the ceiling, so a planet that dies shows a
+  // carry this: the span clamps at Resolve, so a planet that dies shows a
   // *shorter* mark than one that survives, and "more amber is worse" reads
   // exactly backwards. Colour makes it categorical — which of these dies —
   // rather than a comparison of two lengths. The predicate is `wouldCombust`
@@ -813,19 +814,19 @@ function PlanetArc({
     const amount = openingPhase === "necessity" ? draw
       : openingPhase === "fortune" && necessity.draw !== undefined
         ? afterFortune : necessity.amount;
-    const to = clamp(from + amount, from, ceiling);
-    if (to > from) diff = { from, to, color: to >= ceiling ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
+    const to = clamp(from + amount, from, resolve);
+    if (to > from) diff = { from, to, color: to >= resolve ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
   } else if (projection) {
     const harm = projection.polarity !== "Testimony";
     const signed = harm ? Math.abs(projection.delta) : -Math.abs(projection.delta);
-    const finalCeiling = projection.resolve?.ceiling ?? ceiling;
-    const finalAffliction = projection.resolve?.affliction ?? clamp(spent + signed, 0, ceiling);
-    // Express the final remaining capacity against the current ceiling so
-    // the same arc can show both affliction and Resolve changing together.
-    const projected = ceiling - Math.max(0, finalCeiling - finalAffliction);
+    const finalResolve = projection.resolve?.resolve ?? resolve;
+    const finalTension = projection.resolve?.tension ?? clamp(spent + signed, 0, resolve);
+    // Express the final remaining Resolve against the current Resolve so
+    // the same arc can show both tension and Resolve changing together.
+    const projected = resolve - Math.max(0, finalResolve - finalTension);
     if (projected !== spent) {
       const losingCapacity = projected > spent;
-      const fatal = losingCapacity && finalAffliction >= finalCeiling;
+      const fatal = losingCapacity && finalTension >= finalResolve;
       diff = {
         from: Math.min(spent, projected),
         to: Math.max(spent, projected),
@@ -838,13 +839,13 @@ function PlanetArc({
 
   return (
     <g data-guide={guideId} transform={`translate(${point.cx}, ${point.cy})`} style={{ pointerEvents: "none" }}>
-      {/* The whole ceiling, faint. What shows through is the affliction already
-          spent, and the full extent is the planet's Resolve. */}
-      <ArcStroke r={r} from={at(ceiling - Math.max(ceiling, projection?.resolve?.ceiling ?? ceiling))} to={at(ceiling)}
-        stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.trackOpacity} width={stroke} />
-      {spent < ceiling && (
-        <ArcStroke r={r} from={at(spent)} to={at(ceiling)}
-          stroke={NEUTRAL.bone} opacity={CHART_STYLE.afflictionArc.remainingOpacity} width={stroke} />
+      {/* The whole Resolve, faint. What shows through is the tension already
+          taken. */}
+      <ArcStroke r={r} from={at(resolve - Math.max(resolve, projection?.resolve?.resolve ?? resolve))} to={at(resolve)}
+        stroke={NEUTRAL.bone} opacity={CHART_STYLE.resolveArc.trackOpacity} width={stroke} />
+      {spent < resolve && (
+        <ArcStroke r={r} from={at(spent)} to={at(resolve)}
+          stroke={NEUTRAL.bone} opacity={CHART_STYLE.resolveArc.remainingOpacity} width={stroke} />
       )}
       {diff && (
         // `color` feeds the class's currentColor drop-shadow, so the glow
@@ -854,12 +855,12 @@ function PlanetArc({
           className={`arc-diff ${openingPhase ? `necessity-arc necessity-${openingPhase}` : ""}`}
           style={{
             color: diff.color,
-            "--arc-diff-glow": `${CHART_STYLE.afflictionArc.diffGlow}px`,
+            "--arc-diff-glow": `${CHART_STYLE.resolveArc.diffGlow}px`,
           } as CSSProperties}
         >
           <ArcStroke r={r} from={at(diff.from)} to={at(diff.to)}
-            stroke={diff.color} opacity={CHART_STYLE.afflictionArc.diffOpacity}
-            width={CHART_STYLE.afflictionArc.diffStroke} />
+            stroke={diff.color} opacity={CHART_STYLE.resolveArc.diffOpacity}
+            width={CHART_STYLE.resolveArc.diffStroke} />
         </g>
       )}
     </g>
@@ -901,7 +902,7 @@ function ArcStroke({
  *
  * Radial line segments are the one primitive still free around a planet: the
  * filled circle is the disc, a complete circle is the interaction ring, a partial
- * arc is affliction, a gradient bloom is identity, and an expanding circle is
+ * arc is Resolve, a gradient bloom is identity, and an expanding circle is
  * combustion. Rays terminate in empty space, so they can't be read as aspect
  * lines, which always span planet to planet.
  */

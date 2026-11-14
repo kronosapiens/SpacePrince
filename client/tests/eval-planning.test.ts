@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { relationalActions, type PlayContext } from "@/eval/play";
 import { entryLeafValue, evaluateRelational, nextAnnouncements, preferred, type Candidate } from "@/eval/planning";
 import { POLICIES, survivalPolicy } from "@/eval/policies";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRelationalEncounter } from "@/game/encounter";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
@@ -30,7 +30,7 @@ function leaf(capacity: number, luck = 60) {
   encounter.roster = ["Moon"];
   play.prince.chart.planets.Moon.base = { affliction: 12, testimony: 12, resolve: 120, luck };
   play.prince.chart.planets.Moon.buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
-  run.state.Moon.affliction = 120 - capacity;
+  run.state.Moon.tension = 120 - capacity;
   run.light = 37;
   return result;
 }
@@ -66,7 +66,7 @@ describe("relational planning", () => {
       encounter.opponentChart.planets[planet].buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
     }
     encounter.opponentChart.planets.Mercury.base = { affliction: 36, testimony: 12, resolve: 120, luck: 12 };
-    encounter.opponentState.Venus.affliction = 120;
+    encounter.opponentState.Venus.tension = 120;
     const draws = nextAnnouncements(run);
     expect(draws.map(({ run: next, probability }) => {
       const enc = next.encounter as RelationalEncounter;
@@ -110,10 +110,10 @@ describe("relational planning", () => {
       placement.base = { affliction: 12, testimony: 12, resolve: 120, luck: 60 };
       placement.buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
     }
-    run.state.Moon.affliction = 12;
-    encounter.opponentState.Moon.affliction = 12;
+    run.state.Moon.tension = 12;
+    encounter.opponentState.Moon.tension = 12;
     const actions = [{ planet: "Moon" as const, verb: "Testimony" as const }];
-    // The Moon rules, and the lone fielded Moon has the least Resolve left, so
+    // The Moon rules, and the lone fielded Moon has the least remaining Resolve, so
     // its 12 Testimony on the Other counts double: 24 Light. The Other's
     // Testimony clears our 12. Next turn it equally afflicts 12 or testifies
     // to nothing: expected capacity is 114. Either way the best reply afflicts
@@ -152,8 +152,8 @@ describe("next-entry expectation", () => {
     run.gains.Moon.luck = 60;
     chart.planets.Mercury.base = { affliction: 12, testimony: 12, resolve: 120, luck: 60 };
     chart.planets.Mercury.buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
-    run.state.Mercury.affliction = 108;
-    run.state.Venus.affliction = combustionCeiling(chart.planets.Venus);
+    run.state.Mercury.tension = 108;
+    run.state.Venus.tension = getEffectiveStatsFromPlacement(chart.planets.Venus).resolve;
     const before = structuredClone(run);
     // Each of two lit planets survives with probability 1/2 and capacity 12.
     expect(entryLeafValue(run, chart)).toEqual({ alive: 0.75, lit: 1, capacity: 12, light: 37 });
@@ -172,7 +172,7 @@ describe("next-entry expectation", () => {
     run.map.currentNodeId = TERMINAL_NODE_ID;
     expect(entryLeafValue(run, play.prince.chart)).toEqual(unchanged);
     run.mapsCompleted = 0;
-    run.state.Moon.affliction = 120;
+    run.state.Moon.tension = 120;
     expect(entryLeafValue(run, play.prince.chart)).toEqual({ alive: 0, lit: 0, capacity: 0, light: 37 });
   });
 });

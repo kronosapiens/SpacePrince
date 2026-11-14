@@ -56,14 +56,14 @@ export const ASPECT_HEAD_COLOR = {
 
 /** Action valence colors — afflict (amber) / testify (violet). Kept off the
  *  aspect red/green. Shared by the action buttons, the opponent's precommitted-
- *  verb label, the affliction arc's projection, and the two verbs named in
+ *  verb label, the Resolve arc's projection, and the two verbs named in
  *  prose (TermText). */
 export const VALENCE_COLOR = {
   Affliction: "#E8913A",
   Testimony: "#9D86D9",
 } as const;
 
-/** Rejected: a brightened pair for the projection diff on an affliction arc,
+/** Rejected: a brightened pair for the projection diff on a Resolve arc,
  *  by analogy with `ASPECT_HEAD_COLOR` above. It reads backwards there. The
  *  aspect head is brightened against a *dim* static web, but the diff abuts the
  *  bone remaining span, which is the brightest mark on the wheel — so lifting
@@ -77,7 +77,7 @@ export const VALENCE_COLOR = {
  *  flight), the luminant aspect red (edge language), and Mars vermillion
  *  (identity), which weight and kind separate it from besides.
  *
- *  Luminance is the constraint, not saturation. The mark rides the affliction
+ *  Luminance is the constraint, not saturation. The mark rides the Resolve
  *  arc, whose whole vocabulary is bright = still yours, dark = already spent —
  *  so a dark ember (this was #B03636) reads as *more spent*, receding into the
  *  track exactly where it should alarm. It has to sit in the same value band as

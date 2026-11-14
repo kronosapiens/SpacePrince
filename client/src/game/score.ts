@@ -1,4 +1,5 @@
-import { combustionCeiling, isCombusted } from "./combust";
+import { isCombusted, remainingResolve } from "./combust";
+import { getEffectiveStatsFromPlacement } from "./relational";
 import type { Chart, PlanetName, Polarity, SideState, TurnLogEntry } from "./types";
 
 /**
@@ -28,10 +29,10 @@ export type PolarityCondition = Polarity | "Either" | "Contrary" | "Accord";
 
 export interface ScoringRule {
   polarity: PolarityCondition;
-  /** `magnitude` counts hits at what applied; `ceiling` counts combust markers
+  /** `magnitude` counts hits at what applied; `resolve` counts combust markers
    *  at the planet's full Resolve. */
-  payout: "magnitude" | "ceiling";
-  /** Only your lit planet with the least (or most) Resolve left generates
+  payout: "magnitude" | "resolve";
+  /** Only your lit planet with the least (or most) remaining Resolve generates
    *  Light, and its hits count double. */
   actor?: "least" | "most";
 }
@@ -49,16 +50,16 @@ export const RULER_RULES: Record<PlanetName, ScoringRule> = {
   Sun:     { polarity: "Either",     payout: "magnitude", actor: "most" },
   Mars:    { polarity: "Affliction", payout: "magnitude" },
   Jupiter: { polarity: "Accord",     payout: "magnitude" },
-  Saturn:  { polarity: "Affliction", payout: "ceiling" },
+  Saturn:  { polarity: "Affliction", payout: "resolve" },
 };
 
 /** What the scorer reads beside the beats, all of it as it stood before the
  *  turn resolved. */
 export interface ScoreTurn {
-  /** The player's run chart, for the Resolve ceilings of their planets. */
+  /** The player's run chart, for the Resolve of their planets. */
   self: Chart;
   other: Chart;
-  /** The player's affliction before the turn. */
+  /** The player's tension before the turn. */
   selfState: SideState;
   /** The fielded planets; only the lit ones are compared for least and most. */
   roster: PlanetName[];
@@ -77,8 +78,8 @@ export function beatScore(ruler: PlanetName, beat: ScoredBeat, turn: ScoreTurn):
   const rule = RULER_RULES[ruler];
   const beatPolarity = beat.kind === "combust" ? "Affliction" : beat.polarity;
   if (!polarityMatches(rule.polarity, beatPolarity, turn.opponentAction)) return 0;
-  if (rule.payout === "ceiling") {
-    return beat.kind === "combust" ? combustionCeiling(turn.other.planets[beat.target]) : 0;
+  if (rule.payout === "resolve") {
+    return beat.kind === "combust" ? getEffectiveStatsFromPlacement(turn.other.planets[beat.target]).resolve : 0;
   }
   if (beat.kind !== "hit") return 0;
   if (!rule.actor) return beat.magnitude;
@@ -96,14 +97,13 @@ function polarityMatches(
   return beatPolarity === condition;
 }
 
-/** Whether the acting planet has the least (or most) Resolve left of the
+/** Whether the acting planet has the least (or most) remaining Resolve of the
  *  player's lit planets. Planets tied for it all match. */
 function actorMatches(actor: "least" | "most", turn: ScoreTurn): boolean {
-  const left = (p: PlanetName) =>
-    combustionCeiling(turn.self.planets[p]) - turn.selfState[p].affliction;
+  const remaining = (p: PlanetName) => remainingResolve(turn.self.planets[p], turn.selfState[p]);
   const lit = turn.roster.filter((p) => !isCombusted(turn.self.planets[p], turn.selfState[p]));
-  const bound = (actor === "least" ? Math.min : Math.max)(...lit.map(left));
-  return left(turn.playerPlanet) === bound;
+  const bound = (actor === "least" ? Math.min : Math.max)(...lit.map(remaining));
+  return remaining(turn.playerPlanet) === bound;
 }
 
 export function scoreBeats(ruler: PlanetName, beats: ScoredBeat[], turn: ScoreTurn): number {

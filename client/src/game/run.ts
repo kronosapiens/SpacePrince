@@ -130,7 +130,7 @@ export function enterNode(input: EnterNodeInput): Run {
 /** Whether a run has ended — derived, never stored (STATE.md). A run is over
  *  when the seventh map is finished (completion) or every planet the player has
  *  *fielded* (its unlock tier) is combust (full combustion). Needs the chart
- *  because combustion is itself derived — affliction against each ceiling,
+ *  because combustion is itself derived — tension against each planet's Resolve,
  *  which the run's gains raise. */
 export function isOver(run: Run, chart: Chart, numRelationalEncounters: number): boolean {
   if (run.mapsCompleted >= MAPS_PER_RUN) return true;

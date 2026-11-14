@@ -44,7 +44,7 @@ export const CHART_STYLE = {
   /** Diagram — planet glyph disc + rim. Rim stroke scales with glyph radius:
    *  max(rimStrokeMin, glyphR * rimStrokeRatio); the symbol scales as
    *  glyphR * symbolRatio. The ratio rose past its old 0.85 when the disc shrank
-   *  to make room for the client's affliction arc — the symbol kept its size
+   *  to make room for the client's Resolve arc — the symbol kept its size
    *  while the circle under it gave up radius. */
   planet: {
     discOpacity: 0.92,

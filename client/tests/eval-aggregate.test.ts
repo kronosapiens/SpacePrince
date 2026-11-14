@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { aggregate, type Row } from "@/eval/aggregate";
 import { batchTrials } from "@/eval/batch";
 import type { Strategy } from "@/eval/policies";
-import { emptyRunPressure, type RunSummary } from "@/eval/runner";
+import { emptyRunTension, type RunSummary } from "@/eval/runner";
 import { renderReport } from "@/eval/report";
 
 /** A run that completed `maps` maps (seven is completion) with `light` Light. */
 function row(strategy: Strategy, chartSeed: number, gameSeed: number, maps: number, light: number, more: Partial<RunSummary> = {}): Row {
   const summary: RunSummary = {
-    startingLifetimeRelationalEncounterCount: 32, finalLifetimeRelationalEncounterCount: 32, unlocks: [], unlockRescues: 0, pressure: emptyRunPressure(),
+    startingLifetimeRelationalEncounterCount: 32, finalLifetimeRelationalEncounterCount: 32, unlocks: [], unlockRescues: 0, tension: emptyRunTension(),
     endReason: maps === 7 ? "completion" : "combustion", mapsCompleted: maps, terminalMap: Math.min(maps + 1, 7),
     terminalNodeId: "5C", terminalKind: "relational", terminalScenarioId: null, terminalRuler: "Moon",
     lastPlanet: "Moon", lastVerb: "Affliction", lastOptionId: null,
@@ -43,32 +43,32 @@ const rows = [
 ];
 
 describe("balance aggregation", () => {
-  it("reports actual pressure and unlock recovery with the run denominator", () => {
-    const pressure = emptyRunPressure();
-    pressure.entryDamage = 12;
-    pressure.entryDeaths = 1;
-    pressure.entryWipes = 1;
-    pressure.entryWipeRescues = 1;
-    pressure.relational = { damage: 48, healing: 24, directAffliction: 24, propagatedAffliction: 12,
-      invertedTestimonyDamage: 12, directTestimony: 12, propagatedTestimony: 6, invertedAfflictionHealing: 6 };
-    pressure.resolveGain = 12;
-    pressure.unlockCapacity = 72;
-    pressure.capacityStart = 100;
-    pressure.capacityEnd = 148;
+  it("reports actual tension and unlock recovery with the run denominator", () => {
+    const tension = emptyRunTension();
+    tension.entryTension = 12;
+    tension.entryDeaths = 1;
+    tension.entryWipes = 1;
+    tension.entryWipeRescues = 1;
+    tension.relational = { created: 48, eased: 24, directAffliction: 24, propagatedAffliction: 12,
+      invertedTestimonyCreated: 12, directTestimony: 12, propagatedTestimony: 6, invertedAfflictionEased: 6 };
+    tension.resolveGain = 12;
+    tension.unlockCapacity = 72;
+    tension.capacityStart = 100;
+    tension.capacityEnd = 148;
     const agg = aggregate([
-      row("random", 1, 1, 7, 0, { pressure, startingLifetimeRelationalEncounterCount: 0, finalLifetimeRelationalEncounterCount: 32, unlocks: ["Mercury"], unlockRescues: 1 }),
+      row("random", 1, 1, 7, 0, { tension, startingLifetimeRelationalEncounterCount: 0, finalLifetimeRelationalEncounterCount: 32, unlocks: ["Mercury"], unlockRescues: 1 }),
       row("random", 1, 2, 1, 0),
     ], 1);
     const actual = agg.strategies[0]!;
-    expect(actual.pressure).toMatchObject({ entryDamage: 6, entryDeaths: .5, entryWipes: .5, entryWipeRescues: .5,
+    expect(actual.tension).toMatchObject({ entryTension: 6, entryDeaths: .5, entryWipes: .5, entryWipeRescues: .5,
       resolveGain: 6, unlockCapacity: 36, capacityStart: 50, capacityEnd: 74,
-      relational: { damage: 24, healing: 12, invertedTestimonyDamage: 6, invertedAfflictionHealing: 3 } });
+      relational: { created: 24, eased: 12, invertedTestimonyCreated: 6, invertedAfflictionEased: 3 } });
     expect(actual.progression).toEqual({ unlocks: .5, unlockRescues: .5, finalLifetimeRelationalEncounterCount: 32 });
     const report = renderReport(agg, { revision: "fixture", dirty: false,
       options: { seed: 1, charts: 1, runs: 2, strategies: ["random"], strategySeed: 0, startingLifetimeRelationalEncounterCount: 0 } });
     expect(report).toContain("starts independently at 0 lifetime relational encounters");
     expect(report).toContain("--replay <id> --starting-encounters 0");
-    expect(report).toContain("Inverted Testimony damage");
+    expect(report).toContain("Tension created by inverted Testimony");
     expect(report).toContain("Unlock rescues");
   });
 

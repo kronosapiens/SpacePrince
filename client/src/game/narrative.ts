@@ -1,13 +1,14 @@
 import { HOUSES } from "@/data/houses";
 import { cloneSideState, houseSign, runChart } from "./chart";
-import { combustionCeiling, isCombusted, newlyCombusted, uncombust } from "./combust";
+import { isCombusted, newlyCombusted, remainingResolve, uncombust } from "./combust";
+import { getEffectiveStatsFromPlacement } from "./relational";
 import { unlockedPlanets } from "./unlocks";
 import type { Dignity, PlanetName, PlanetPlacement, PlanetStats, Prince, Run, SignName } from "./types";
 
 export type Selection = { chosen?: PlanetName };
-export type Target = "chosen" | "allUnlocked" | "mostAfflicted" | "healthiest" | "joy" | "ruler";
+export type Target = "chosen" | "allUnlocked" | "mostTension" | "mostRemainingResolve" | "joy" | "ruler";
 export type Outcome =
-  | { kind: "affliction"; target: Target; delta: number }
+  | { kind: "tension"; target: Target; delta: number }
   /** A stat raised for the rest of the run (`Run.gains`), in raw stat units. */
   | { kind: "gain"; target: Target; stat: keyof PlanetStats; amount: number }
   | { kind: "uncombust"; target: Target }
@@ -44,7 +45,7 @@ export interface NarrativeContext {
   rulerPlanet: PlanetName;
   unlocked: PlanetName[];
   perPlanetState: Run["state"];
-  /** The run's chart (`runChart`), so ceilings include the run's gains. */
+  /** The run's chart (`runChart`), so Resolve includes the run's gains. */
   placements: Prince["chart"]["planets"];
   /** Unlocked planets whose natal sign is the house's sign, lit or not. */
   occupants: Occupant[];
@@ -67,23 +68,23 @@ const combusted = (ctx: NarrativeContext, p: PlanetName) =>
 
 export const joyPresent = (ctx: NarrativeContext): boolean =>
   !!ctx.joyPlanet && ctx.unlocked.includes(ctx.joyPlanet) &&
-  !combusted(ctx, ctx.joyPlanet) && ctx.perPlanetState[ctx.joyPlanet].affliction < 96;
+  !combusted(ctx, ctx.joyPlanet) && ctx.perPlanetState[ctx.joyPlanet].tension < 96;
 export const anyCombusted = (ctx: NarrativeContext): boolean =>
   ctx.unlocked.some((p) => combusted(ctx, p));
 
 /** All roles bind against the state before the choice, never a partially applied result. */
 export function resolveTargets(target: Target, ctx: NarrativeContext, selection: Selection = {}): PlanetName[] {
   const lit = ctx.unlocked.filter((p) => !combusted(ctx, p));
-  const affliction = (p: PlanetName) => ctx.perPlanetState[p].affliction;
-  const margin = (p: PlanetName) => combustionCeiling(ctx.placements[p]) - affliction(p);
+  const tension = (p: PlanetName) => ctx.perPlanetState[p].tension;
+  const remaining = (p: PlanetName) => remainingResolve(ctx.placements[p], ctx.perPlanetState[p]);
   switch (target) {
     case "chosen": {
       const p = selection[target];
       return p && ctx.unlocked.includes(p) ? [p] : [];
     }
     case "allUnlocked": return lit;
-    case "mostAfflicted": return lit.length ? [lit.reduce((a, b) => affliction(b) > affliction(a) ? b : a)] : [];
-    case "healthiest": return lit.length ? [lit.reduce((a, b) => margin(b) > margin(a) ? b : a)] : [];
+    case "mostTension": return lit.length ? [lit.reduce((a, b) => tension(b) > tension(a) ? b : a)] : [];
+    case "mostRemainingResolve": return lit.length ? [lit.reduce((a, b) => remaining(b) > remaining(a) ? b : a)] : [];
     case "joy": return ctx.joyPlanet && lit.includes(ctx.joyPlanet) ? [ctx.joyPlanet] : [];
     case "ruler": return lit.includes(ctx.rulerPlanet) ? [ctx.rulerPlanet] : [];
   }
@@ -97,7 +98,7 @@ export type AppliedOutcome = { ok: true; run: Run } | { ok: false; reason: strin
 const invalid = (reason: string): AppliedOutcome => ({ ok: false, reason });
 
 /** Atomic application: a missing target or unpaid cost discards every effect.
- *  Effects apply in order, each against the ceilings the earlier ones left.
+ *  Effects apply in order, each against the Resolve the earlier ones left.
  *  Planets lit before the choice remain eligible for its remaining effects. */
 export function applyOutcomes(
   run: Run, ctx: NarrativeContext, outcomes: Outcome[], selection: Selection = {}, cost = 0,
@@ -123,11 +124,11 @@ export function applyOutcomes(
       } else if (effect.kind === "gain") {
         gains[p] = { ...gains[p], [effect.stat]: gains[p][effect.stat] + effect.amount };
       } else {
-        ps.affliction = Math.max(0, Math.min(combustionCeiling(placement), ps.affliction + effect.delta));
+        ps.tension = Math.max(0, Math.min(getEffectiveStatsFromPlacement(placement).resolve, ps.tension + effect.delta));
       }
     }
   }
-  if (cost > 0 && outcomes.some((e) => e.kind === "affliction" && e.delta < 0) && light <= run.light - cost && ctx.unlocked.every((p) => state[p].affliction === run.state[p].affliction)) {
+  if (cost > 0 && outcomes.some((e) => e.kind === "tension" && e.delta < 0) && light <= run.light - cost && ctx.unlocked.every((p) => state[p].tension === run.state[p].tension)) {
     return invalid("There is nothing to restore.");
   }
   return { ok: true, run: { ...run, state, gains, light } };
@@ -156,7 +157,7 @@ export function occupantLean(occupants: readonly Occupant[]): number {
 }
 
 /** The occupants' net dignity moves an existing cost by one step: a Light
- *  price (24), else affliction taken (12), else an ordinary Light loss (24).
+ *  price (24), else tension taken (12), else an ordinary Light loss (24).
  *  Costs stop at zero; gifts and neutral occupants leave terms unchanged. */
 export function withOccupants(option: Option, occupants: readonly Occupant[]): Option {
   const lean = occupantLean(occupants);
@@ -166,11 +167,11 @@ export function withOccupants(option: Option, occupants: readonly Occupant[]): O
   if (cost) {
     cost = Math.max(0, cost - lean * 24);
   } else {
-    const taken = effects.findIndex((e) => e.kind === "affliction" && e.delta > 0);
+    const taken = effects.findIndex((e) => e.kind === "tension" && e.delta > 0);
     const side = taken >= 0 ? taken : effects.findIndex((e) => e.kind === "light" && e.delta < 0);
     effects = effects.map((e, i) =>
       i !== side ? e
-      : e.kind === "affliction" ? { ...e, delta: Math.max(0, e.delta - lean * 12) }
+      : e.kind === "tension" ? { ...e, delta: Math.max(0, e.delta - lean * 12) }
       : e.kind === "light" ? { ...e, delta: Math.min(0, e.delta + lean * 24) }
       : e);
   }

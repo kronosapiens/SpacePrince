@@ -12,7 +12,8 @@ import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
 import { describeOptionParts, occupantLine } from "@/copy/narrative";
-import { combustionCeiling, newlyCombusted } from "@/game/combust";
+import { newlyCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { runChart } from "@/game/chart";
 import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
@@ -71,7 +72,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     setTheme(rulerPlanet, "narrative");
   }, [rulerPlanet]);
 
-  // The run's chart: the wheel, its stats and ceilings read the run's gains.
+  // The run's chart: the wheel, its stats and Resolve read the run's gains.
   const chart = useMemo(() => runChart(prince.chart, run), [prince.chart, run.gains]);
   const ctx = useMemo(
     () => narrativeContext(prince, run, encounter.house, devUnlockAll),
@@ -117,8 +118,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     ? selectedRow!.assignments.flatMap((s) => s.chosen ? [s.chosen] : [])
     : ctx.unlocked);
   const targetEffect = indicatedOption?.result.effects.find((e) =>
-    "target" in e && e.target === "chosen" && !(e.kind === "affliction" && e.delta === 0));
-  const verb: Polarity = targetEffect?.kind === "affliction" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
+    "target" in e && e.target === "chosen" && !(e.kind === "tension" && e.delta === 0));
+  const verb: Polarity = targetEffect?.kind === "tension" && targetEffect.delta > 0 ? "Affliction" : "Testimony";
   const choosePlanet = (planet: PlanetName) => {
     if (resolved || committedRef.current || !eligiblePlanets.has(planet)) return;
     if (targeting) {
@@ -150,10 +151,10 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   if (!resolved && preview?.ok) {
     const afterChart = runChart(prince.chart, preview.success);
     for (const p of ctx.unlocked) {
-      const affliction = preview.success.state[p].affliction;
-      const delta = affliction - run.state[p].affliction;
-      const ceiling = combustionCeiling(afterChart.planets[p]);
-      const resolve = ceiling !== combustionCeiling(chart.planets[p]) ? { ceiling, affliction } : undefined;
+      const tension = preview.success.state[p].tension;
+      const delta = tension - run.state[p].tension;
+      const afterResolve = getEffectiveStatsFromPlacement(afterChart.planets[p]).resolve;
+      const resolve = afterResolve !== getEffectiveStatsFromPlacement(chart.planets[p]).resolve ? { resolve: afterResolve, tension } : undefined;
       if (delta || resolve) projection.deltas[p] = { delta: Math.abs(delta), polarity: delta > 0 ? "Affliction" : "Testimony", resolve };
     }
   }
@@ -174,8 +175,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     for (const p of PLANETS) {
       const before = run.state[p];
       const after = nextRun.state[p];
-      if (after.affliction < before.affliction) effect.set(p, "Testimony");
-      else if (after.affliction > before.affliction) effect.set(p, "Affliction");
+      if (after.tension < before.tension) effect.set(p, "Testimony");
+      else if (after.tension > before.tension) effect.set(p, "Affliction");
     }
     setFlash({
       epoch: 1,
@@ -200,8 +201,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   };
 
   const planetDelta = inspectedPlanet && preview?.ok
-    ? preview.success.state[inspectedPlanet].affliction - run.state[inspectedPlanet].affliction : 0;
-  const planetEffect = !resolved && preview?.ok && inspectedPlanet && (targetEffect?.kind === "affliction" || planetDelta)
+    ? preview.success.state[inspectedPlanet].tension - run.state[inspectedPlanet].tension : 0;
+  const planetEffect = !resolved && preview?.ok && inspectedPlanet && (targetEffect?.kind === "tension" || planetDelta)
     ? { verb: planetDelta > 0 ? "Affliction" as const : "Testimony" as const, value: Math.abs(planetDelta) }
     : undefined;
 
@@ -233,7 +234,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       inviteInteraction: !resolved && targeting,
       incoming: !resolved && targetEffect ? {
         verb,
-        amount: targetEffect.kind === "affliction" ? Math.abs(targetEffect.delta) : undefined,
+        amount: targetEffect.kind === "tension" ? Math.abs(targetEffect.delta) : undefined,
       } : null,
       projection,
       statsPanelPlanet: resolved ? null : inspectedPlanet,

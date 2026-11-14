@@ -60,7 +60,7 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
   const { run, prince, encounter, onCommitTurn, onClearEncounter, devUnlockAll } = props;
   const devAnimationControls = props.devAnimationControls ?? false;
   const { setActive } = useActivePlanet();
-  // The run's chart: every stat, ceiling, preview and score here reads its gains.
+  // The run's chart: every stat, Resolve, preview and score here reads its gains.
   const playerChart = useMemo(() => runChart(prince.chart, run), [prince.chart, run.gains]);
 
   const [selected, setSelected] = useState<PlanetName | null>(null);
@@ -361,7 +361,7 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
   // Dev console: fire any gesture on demand. Resolves a real turn (so deltas and
   // propagation match the charts) but as a fresh single-turn snapshot, then
   // overrides the combust flag the scheduler reads — so a combust flare is
-  // viewable on turn 0 without grinding affliction. Non-committal: nothing is
+  // viewable on turn 0 without grinding tension. Non-committal: nothing is
   // dispatched, so it replays from the same baseline every time.
   const fireDevAnimation = useCallback(
     (cfg: {

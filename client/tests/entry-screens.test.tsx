@@ -4,7 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginRun, FIRST_MAP_SEED, MAPS_PER_RUN } from "@/game/run";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import { PLANETS } from "@/game/data";
@@ -40,7 +40,7 @@ afterEach(() => {
 function mount(screen: "title" | "map") {
   const prince = createStubPrince();
   const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
-  run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon);
+  run.state.Moon.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
   prince.runs = [run];
   savePrince(prince);
   act(() => root.render(<GameTest path={screen === "title" ? "/" : "/play"} />));
@@ -79,7 +79,7 @@ describe("entry screens", () => {
   it("finishes map revival before allowing travel and study", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
-    run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) / 2;
+    run.state.Moon.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve / 2;
     run.map.boundary = { uncombusts: [{ planet: "Moon", chance: 0.5, success: true }], necessity: [] };
     prince.runs = [run];
     savePrince(prince);
@@ -170,7 +170,7 @@ describe("entry screens", () => {
     const first = minted.runs[0]!;
     expect(first.map.seed).toBe(FIRST_MAP_SEED);
     expect(first.state).toEqual(beginRun(minted.chart, first.seed, minted.numRelationalEncounters).state);
-    expect(first.state.Moon.affliction).toBe(0);
+    expect(first.state.Moon.tension).toBe(0);
     expect(first.map.boundary!.necessity).toEqual([]);
     expect(container.querySelector(".map-boundary")).toBeNull();
     expect(container.querySelector(".map-screen .chart-svg .necessity-opening")).toBeNull();
@@ -215,7 +215,7 @@ describe("entry screens", () => {
     act(() => vi.advanceTimersByTime(6000));
     expect(element(".title .chart-svg").getAttribute("aria-label")).toBe("Stub natal chart");
     click(element('[role="button"][aria-label="Moon"]'));
-    expect(element(".ps-ratio").textContent).toBe(`Resolve0/${combustionCeiling(prince.chart.planets.Moon)}`);
+    expect(element(".ps-ratio").textContent).toBe(`Resolve0/${getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve}`);
     expect(loadPrince()).toEqual(prince);
   });
 
@@ -247,7 +247,7 @@ describe("entry screens", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
     for (const planet of PLANETS) {
-      run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+      run.state[planet].tension = getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve;
     }
     run.light = 96;
     const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
@@ -266,7 +266,7 @@ describe("entry screens", () => {
     expect(loadPrince()).toEqual(prince);
     finishOpening();
     click(element('[role="button"][aria-label="Moon"]'));
-    expect(element(".ps-ratio").textContent).toBe(`Resolve0/${combustionCeiling(prince.chart.planets.Moon)}`);
+    expect(element(".ps-ratio").textContent).toBe(`Resolve0/${getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve}`);
 
     vi.mocked(playUISound).mockClear();
     click(element(".begin-btn"));
@@ -278,7 +278,7 @@ describe("entry screens", () => {
     const fresh = restarted.runs[1]!;
     expect(fresh.map.seed).not.toBe(FIRST_MAP_SEED);
     expect(fresh.state).toEqual(beginRun(prince.chart, fresh.seed, prince.numRelationalEncounters).state);
-    expect(fresh.state.Moon.affliction).toBe(0);
+    expect(fresh.state.Moon.tension).toBe(0);
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
     finishOpening();
