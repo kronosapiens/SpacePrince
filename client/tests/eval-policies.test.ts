@@ -4,7 +4,7 @@ import { relationalActions, narrativeOptions, snapshot, type Policy, type PlayCo
 import { forecast, lightPolicy, survivalPolicy } from "@/eval/policies";
 import { A, L, scene as defineScene, trade } from "@/data/narrative/shared";
 import { getScenario, SCENARIOS_BY_HOUSE } from "@/data/narrative-scenarios";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { eligibleNext } from "@/game/map-gen";
@@ -74,7 +74,7 @@ describe("strategic policies", () => {
     vi.spyOn(catalogue, "getScenario").mockReturnValue(scenario);
     const scene = (state: (r: Run) => void): Run => {
       const r = beginRun(chooser.chart, 1, chooser.numRelationalEncounters);
-      for (const p of PLANETS) r.state[p].affliction = 0;
+      for (const p of PLANETS) r.state[p].tension = 0;
       state(r);
       return { ...r, encounter: beginNarrativeEncounter({ run: r, house: scenario.house, scenarioId: scenario.scenarioId }) };
     };
@@ -87,8 +87,8 @@ describe("strategic policies", () => {
 
     // Saturn is the last lit planet, and finishing would combust it exactly.
     const lastLight = scene((r) => {
-      for (const p of PLANETS) r.state[p].affliction = combustionCeiling(chooser.chart.planets[p]);
-      r.state.Saturn.affliction -= 48;
+      for (const p of PLANETS) r.state[p].tension = getEffectiveStatsFromPlacement(chooser.chart.planets[p]).resolve;
+      r.state.Saturn.tension -= 48;
     });
     expect(choose(lightPolicy, lastLight)).toEqual({ optionId: "rough", selection: { chosen: "Saturn" } });
   });
@@ -98,11 +98,11 @@ describe("strategic policies", () => {
     // afflicting keeps all seven lit (28 Light). Sun and Moon afflicting gain the
     // most (84) but combust a planet without ending the run; the Sun leaves more capacity.
     const r = beginRun(prince.chart, 1, prince.numRelationalEncounters);
-    for (const p of PLANETS) r.state[p].affliction = combustionCeiling(prince.chart.planets[p]) - 6;
+    for (const p of PLANETS) r.state[p].tension = getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve - 6;
     const encounter = beginRelationalEncounter({ run: r, opponentSeed: 282, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
     // Fix the tactical state independently of encounter-opening tuning.
-    const otherAffliction = { Moon: 24, Mercury: 18, Venus: 24, Sun: 12, Mars: 12, Jupiter: 36, Saturn: 12 };
-    for (const p of PLANETS) encounter.opponentState[p].affliction = otherAffliction[p];
+    const otherTension = { Moon: 24, Mercury: 18, Venus: 24, Sun: 12, Mars: 12, Jupiter: 36, Saturn: 12 };
+    for (const p of PLANETS) encounter.opponentState[p].tension = otherTension[p];
     encounter.sequence = ["Venus"];
     encounter.opponentActions = ["Testimony"];
     const turn: Run = { ...r, encounter };
@@ -114,11 +114,11 @@ describe("strategic policies", () => {
     // Light: Mars keeps all seven lit, Saturn leaves more capacity but loses a
     // planet. Light ranks lit planets before capacity.
     const even = beginRun(prince.chart, 14, prince.numRelationalEncounters);
-    const afflictions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
-    for (const p of PLANETS) even.state[p].affliction = afflictions[p];
+    const tensions = { Moon: 24, Mercury: 42, Venus: 36, Sun: 42, Mars: 18, Jupiter: 42, Saturn: 90 };
+    for (const p of PLANETS) even.state[p].tension = tensions[p];
     const evenEncounter = beginRelationalEncounter({ run: even, opponentSeed: 563, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
-    const evenOtherAffliction = { Moon: 18, Mercury: 6, Venus: 24, Sun: 12, Mars: 12, Jupiter: 6, Saturn: 24 };
-    for (const p of PLANETS) evenEncounter.opponentState[p].affliction = evenOtherAffliction[p];
+    const evenOtherTension = { Moon: 18, Mercury: 6, Venus: 24, Sun: 12, Mars: 12, Jupiter: 6, Saturn: 24 };
+    for (const p of PLANETS) evenEncounter.opponentState[p].tension = evenOtherTension[p];
     expect([evenEncounter.sequence[0], evenEncounter.opponentActions[0]]).toEqual(["Sun", "Affliction"]);
     const evenTurn: Run = { ...even, encounter: evenEncounter };
     expect(lightPolicy.relational(context(prince, lightPolicy), evenTurn, relationalActions(evenTurn, prince.chart, evenEncounter)))
@@ -131,7 +131,7 @@ describe("strategic policies", () => {
     for (const p of PLANETS) chooser.chart.planets[p].sign = "Aries";
     Object.assign(chooser.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
     const r = beginRun(chooser.chart, 1, chooser.numRelationalEncounters);
-    for (const p of PLANETS) r.state[p].affliction = combustionCeiling(chooser.chart.planets[p]);
+    for (const p of PLANETS) r.state[p].tension = getEffectiveStatsFromPlacement(chooser.chart.planets[p]).resolve;
     r.gains.Moon.resolve = 12;
     const relational = beginRelationalEncounter({ run: r, opponentSeed: 5, lifetimeRelationalEncounterCount: chooser.numRelationalEncounters });
     expect(relationalActions(r, chooser.chart, relational).map(a => a.planet)).toEqual(["Moon", "Moon"]);
@@ -154,26 +154,26 @@ describe("strategic policies", () => {
       }
       return r;
     };
-    const ceiling = (p: PlanetName) => combustionCeiling(prince.chart.planets[p]);
-    const at = (mapsCompleted: number, affliction: (p: PlanetName) => number): Run => {
+    const resolve = (p: PlanetName) => getEffectiveStatsFromPlacement(prince.chart.planets[p]).resolve;
+    const at = (mapsCompleted: number, tension: (p: PlanetName) => number): Run => {
       const r = { ...beginRun(prince.chart, 133, prince.numRelationalEncounters), mapsCompleted };
-      for (const p of PLANETS) r.state[p].affliction = affliction(p);
+      for (const p of PLANETS) r.state[p].tension = tension(p);
       return useMara(r);
     };
-    const healthy = at(0, () => 0);
-    const ids = eligibleNext(healthy.map.graph, healthy.map.currentNodeId, healthy.map.visitedNodeIds);
-    expect(ids.map((id) => healthy.map.rolledNodes[id]!.kind)).toEqual(["relational", "relational", "narrative"]);
+    const clean = at(0, () => 0);
+    const ids = eligibleNext(clean.map.graph, clean.map.currentNodeId, clean.map.visitedNodeIds);
+    expect(ids.map((id) => clean.map.rolledNodes[id]!.kind)).toEqual(["relational", "relational", "narrative"]);
     const route = (policy: Policy, r: Run) => policy.route(context(prince, policy), r, ids);
 
     // Only the Moon is lit, one point from combusting: the three-turn relational encounters
     // usually end the run, the scene never does.
-    const spent = at(2, (p) => ceiling(p) - (p === "Moon" ? 1 : 0));
+    const spent = at(2, (p) => resolve(p) - (p === "Moon" ? 1 : 0));
     expect(route(survivalPolicy, spent)).toBe("3C");
     expect(route(lightPolicy, spent)).toBe("3C");
-    // From full health every candidate is survived; the scene offers recovery
+    // With no tension every candidate is survived; the scene offers recovery
     // for survival and Light for accepting a burden.
-    expect(route(survivalPolicy, healthy)).toBe("3C");
-    expect(route(lightPolicy, healthy)).toBe("3C");
+    expect(route(survivalPolicy, clean)).toBe("3C");
+    expect(route(lightPolicy, clean)).toBe("3C");
 
     // Two scenes forecast alike; survival takes the one nearer the map's exit.
     const tied = useMara(beginRun(prince.chart, 61, prince.numRelationalEncounters));

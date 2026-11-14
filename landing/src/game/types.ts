@@ -36,7 +36,7 @@ export interface PlanetPlacement {
 }
 
 export interface PlanetState {
-  affliction: number;
+  tension: number;
   combusted: boolean;
 }
 
@@ -63,7 +63,7 @@ export interface PropagationEntry {
   delta: number;
   /** The polarity that landed on the target. Carries the heal/harm signal
    *  even when `delta` clamps to 0 (e.g. testimony to a planet already at
-   *  0 affliction); inferring from `delta` sign alone is unsafe. */
+   *  0 tension); inferring from `delta` sign alone is unsafe. */
   polarity: Polarity;
   note: string;
 }

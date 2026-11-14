@@ -3,7 +3,7 @@ import * as catalogue from "@/data/narrative-scenarios";
 import { A, G, scene, trade } from "@/data/narrative/shared";
 import { playEncounter, snapshot, type PlayContext, type Policy, type Step } from "@/eval/play";
 import { runChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { relationalTurnRng } from "@/game/turn";
@@ -20,10 +20,10 @@ const context = (prince: Prince): PlayContext => ({ prince, policy,
   trial: { chartSeed: 7, gameSeed: 2, strategy: "random", strategySeed: 0 }, rng: () => .5, turnRng: relationalTurnRng });
 const capacity = (prince: Prince, run: Run, roster = PLANETS) => {
   const chart = runChart(prince.chart, run);
-  return roster.reduce((sum, p) => sum + Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction), 0);
+  return roster.reduce((sum, p) => sum + Math.max(0, getEffectiveStatsFromPlacement(chart.planets[p]).resolve - run.state[p].tension), 0);
 };
 
-describe("evaluation pressure ledger", () => {
+describe("evaluation tension ledger", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it.each(["Affliction", "Testimony"] as const)("counts actual direct, propagated and inverted effects of %s", (verb) => {
@@ -41,38 +41,38 @@ describe("evaluation pressure ledger", () => {
     encounter.opponentChart.planets.Moon.base.testimony = 36;
     encounter.opponentChart.planets.Moon.buffs.affliction = 0;
     encounter.opponentChart.planets.Moon.buffs.testimony = 0;
-    for (const p of PLANETS) encounter.opponentState[p].affliction = 0;
+    for (const p of PLANETS) encounter.opponentState[p].tension = 0;
     run.encounter = encounter;
     if (verb === "Testimony") {
-      run.state.Moon.affliction = 12;
-      run.state.Mercury.affliction = 12;
-      run.state.Venus.affliction = combustionCeiling(prince.chart.planets.Venus) - 6;
-    } else run.state.Venus.affliction = 24;
+      run.state.Moon.tension = 12;
+      run.state.Mercury.tension = 12;
+      run.state.Venus.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Venus).resolve - 6;
+    } else run.state.Venus.tension = 24;
     const before = structuredClone(run), steps: Step[] = [];
     const next = playEncounter(context(prince), run, (step) => steps.push(step));
     expect(run).toEqual(before);
     expect(next).toEqual(playEncounter(context(prince), run));
     const step = steps[0]!;
     if (step.kind !== "turn") throw new Error("Expected a turn");
-    expect(step.pressure).toEqual(verb === "Affliction"
-      ? { damage: 42, healing: 18, directAffliction: 36, propagatedAffliction: 6, invertedTestimonyDamage: 0,
-        directTestimony: 0, propagatedTestimony: 0, invertedAfflictionHealing: 18 }
-      : { damage: 6, healing: 18, directAffliction: 0, propagatedAffliction: 0, invertedTestimonyDamage: 6,
-        directTestimony: 12, propagatedTestimony: 6, invertedAfflictionHealing: 0 });
+    expect(step.tensionChange).toEqual(verb === "Affliction"
+      ? { created: 42, eased: 18, directAffliction: 36, propagatedAffliction: 6, invertedTestimonyCreated: 0,
+        directTestimony: 0, propagatedTestimony: 0, invertedAfflictionEased: 18 }
+      : { created: 6, eased: 18, directAffliction: 0, propagatedAffliction: 0, invertedTestimonyCreated: 6,
+        directTestimony: 12, propagatedTestimony: 6, invertedAfflictionEased: 0 });
     expect(capacity(prince, next, encounter.roster) - capacity(prince, run, encounter.roster))
-      .toBe(step.pressure.healing - step.pressure.damage);
+      .toBe(step.tensionChange.eased - step.tensionChange.created);
     if (verb === "Testimony") expect(step.combusts).toEqual(["Venus"]);
   });
 
-  it.each([{ revived: false, recovery: "ordinary healing" }, { revived: true, recovery: "revival recovery" }])("separates Resolve gains from $recovery", ({ revived }) => {
+  it.each([{ revived: false, recovery: "ordinary easing" }, { revived: true, recovery: "revival recovery" }])("separates Resolve gains from $recovery", ({ revived }) => {
     const prince = createStubPrince();
     prince.chart.ascendantSign = "Aries";
     for (const p of PLANETS) prince.chart.planets[p].sign = "Taurus";
     const run = beginRun(prince.chart, 2, prince.numRelationalEncounters);
     run.gains.Venus.resolve = 24;
-    const ceiling = combustionCeiling(runChart(prince.chart, run).planets.Venus);
-    run.state.Venus.affliction = revived ? ceiling : 12;
-    const scenario = scene("fixture-pressure", 1, "Aries", "Recover.", [trade("restore", "Recover.", [
+    const resolve = getEffectiveStatsFromPlacement(runChart(prince.chart, run).planets.Venus).resolve;
+    run.state.Venus.tension = revived ? resolve : 12;
+    const scenario = scene("fixture-tension", 1, "Aries", "Recover.", [trade("restore", "Recover.", [
       ...(revived ? [{ kind: "uncombust" as const, target: "chosen" as const }] : [A("chosen", -12)]),
       G("chosen", "resolve", 12),
     ])]);
@@ -82,9 +82,9 @@ describe("evaluation pressure ledger", () => {
     const next = playEncounter(context(prince), run, (step) => steps.push(step));
     const step = steps[0]!;
     if (step.kind !== "narrative") throw new Error("Expected a narrative choice");
-    expect(step.pressure).toEqual({ damage: 0, healing: revived ? 0 : 12, revivalRecovery: revived ? ceiling / 2 : 0, resolveGain: 12 });
+    expect(step.tensionChange).toEqual({ created: 0, eased: revived ? 0 : 12, revivalRecovery: revived ? resolve / 2 : 0, resolveGain: 12 });
     expect(step.revivals).toEqual(revived ? ["Venus"] : []);
-    expect(capacity(prince, next) - capacity(prince, run)).toBe(step.pressure.healing + step.pressure.revivalRecovery + step.pressure.resolveGain);
+    expect(capacity(prince, next) - capacity(prince, run)).toBe(step.tensionChange.eased + step.tensionChange.revivalRecovery + step.tensionChange.resolveGain);
     expect(snapshot(run)).toEqual(before);
   });
 });

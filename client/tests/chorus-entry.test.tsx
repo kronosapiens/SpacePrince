@@ -7,7 +7,7 @@ import { beginRun, enterNode, isOver } from "@/game/run";
 import { getScenario } from "@/data/narrative-scenarios";
 import { PILOT_SCENES, pilotState } from "./narrative-pilot-fixtures";
 import { eligibleNext } from "@/game/map-gen";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { randomSeed } from "@/game/rng";
 import { loadPrince, savePrince } from "@/state/prince";
 import { saveDevSettings } from "@/state/settings";
@@ -185,7 +185,7 @@ describe("chorus entry", () => {
   it("keeps a roster wiped on entry behind the chorus, then plays and advances", () => {
     const prince = createStubPrince({ numRelationalEncounters: 0 });
     const { run, nodeId } = setup("relational", prince);
-    run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) - 1;
+    run.state.Moon.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve - 1;
     // Find a deterministic ordinary entry where Necessity combusts the last planet.
     for (let seed = 0; seed < 100; seed++) {
       if (enterNode({ run, chart: prince.chart, nodeId, lifetimeRelationalEncounterCount: 0, encounterIdSeed: seed }).encounter!.resolved) {

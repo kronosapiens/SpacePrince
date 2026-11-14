@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { beginRun, rollMapBoundary, rolloverMap } from "@/game/run";
 import { blankSideState } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { unlockedPlanets } from "@/game/unlocks";
 import { createStubPrince } from "./fixtures";
 
@@ -9,7 +10,7 @@ describe("map boundary", () => {
   const prince = createStubPrince({ seed: 21 });
   const roster = unlockedPlanets(32); // all seven fielded
 
-  it("starts every unlock tier with zero affliction and no map Necessity", () => {
+  it("starts every unlock tier with zero tension and no map Necessity", () => {
     for (const tier of [0, 1, 32]) {
       const run = beginRun(prince.chart, 7, tier);
       expect(run.map.boundary).toEqual({ uncombusts: [], necessity: [] });
@@ -20,31 +21,31 @@ describe("map boundary", () => {
 
   it("uncombust roll: success revives at half Resolve without additional damage", () => {
     const state = blankSideState();
-    const ceiling = combustionCeiling(prince.chart.planets.Mars);
-    state.Mars = { affliction: ceiling }; // at the ceiling = combusted (derived)
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Mars).resolve;
+    state.Mars = { tension: resolve }; // at Resolve = combusted (derived)
     const crossed = rollMapBoundary(prince.chart, state, roster, () => 0);
     expect(isCombusted(prince.chart.planets.Mars, crossed.state.Mars)).toBe(false);
-    expect(crossed.state.Mars.affliction).toBe(ceiling / 2);
+    expect(crossed.state.Mars.tension).toBe(resolve / 2);
     expect(crossed.boundary.uncombusts).toHaveLength(1);
     expect(crossed.boundary.uncombusts[0]).toMatchObject({ planet: "Mars", success: true });
     expect(crossed.boundary.necessity).toEqual([]);
-    expect(state.Mars.affliction).toBe(ceiling);
+    expect(state.Mars.tension).toBe(resolve);
   });
 
-  it("uncombust roll: failure leaves the planet combusted at its ceiling", () => {
+  it("uncombust roll: failure leaves the planet combusted at its Resolve", () => {
     const state = blankSideState();
-    const ceiling = combustionCeiling(prince.chart.planets.Mars);
-    state.Mars = { affliction: ceiling };
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Mars).resolve;
+    state.Mars = { tension: resolve };
     const crossed = rollMapBoundary(prince.chart, state, roster, () => 0.999);
     expect(isCombusted(prince.chart.planets.Mars, crossed.state.Mars)).toBe(true);
-    expect(crossed.state.Mars.affliction).toBe(ceiling);
+    expect(crossed.state.Mars.tension).toBe(resolve);
     expect(crossed.boundary.uncombusts[0]).toMatchObject({ planet: "Mars", success: false });
   });
 
   it("leaves lit and unfielded planets unchanged without consuming rolls or mutating state", () => {
     const state = blankSideState();
-    state.Moon.affliction = 24;
-    state.Mars.affliction = combustionCeiling(prince.chart.planets.Mars);
+    state.Moon.tension = 24;
+    state.Mars.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Mars).resolve;
     const rng = vi.fn(() => 0);
     const crossed = rollMapBoundary(prince.chart, state, ["Moon"], rng);
     expect(crossed.state).toEqual(state);
@@ -63,15 +64,15 @@ describe("map boundary", () => {
   });
 
   it("rolloverMap crosses the boundary, records it on the new map, and replays deterministically", () => {
-    const ceiling = combustionCeiling(prince.chart.planets.Moon) + 24;
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve + 24;
     let run = beginRun(prince.chart, 11);
     run.gains.Moon.resolve = 24;
     run.gains.Moon.luck = 120;
-    run = { ...run, state: { ...run.state, Moon: { affliction: ceiling } } };
+    run = { ...run, state: { ...run.state, Moon: { tension: resolve } } };
     const next = rolloverMap(run, prince.chart, roster, 555);
     expect(next.map.boundary).toBeDefined();
     expect(next.map.boundary!.uncombusts).toHaveLength(1);
-    expect(next.state.Moon.affliction).toBe(ceiling / 2);
+    expect(next.state.Moon.tension).toBe(resolve / 2);
     expect(next.map.boundary!.necessity).toEqual([]);
     // Same map seed → same crossing: the boundary is f(seed), like node content.
     const replay = rolloverMap(run, prince.chart, roster, 555);

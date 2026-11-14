@@ -6,7 +6,7 @@ export const ACHIEVEMENTS = [
   { id: 5, category: "Milestones", condition: "Complete the first seven-map run." },
   { id: 6, category: "Mastery", condition: "Complete a run without any of your planets combusting." },
   { id: 8, category: "Mastery", condition: "Complete a map in which you acted with each of the seven planets." },
-  { id: 9, category: "Mastery", condition: "With one Testify action, reduce affliction on its direct target and combust another Other planet through a hard aspect." },
+  { id: 9, category: "Mastery", condition: "With one Testify action, reduce tension on its direct target and combust another Other planet through a hard aspect." },
   { id: 11, category: "Exploration", condition: "Visit all twelve houses across the Prince’s lifetime." },
   { id: 12, category: "Exploration", condition: "Earn Light under each of the seven encounter rulers across runs." },
   { id: 14, category: "Exploration", condition: "Resolve the same house scene on separate visits: once with its joy-planet combusted, and once by taking an option enabled by that planet’s presence." },

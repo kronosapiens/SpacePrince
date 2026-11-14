@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { playNecessityNote } from "@/audio/engine";
 import { chartRuler, cloneSideState } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import type { Chart, MapBoundary, NecessityEntry, PlanetName, SideState } from "@/game/types";
 
@@ -71,9 +71,9 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
       return;
     }
     const beforeNecessity = cloneSideState(state);
-    for (const entry of necessity) beforeNecessity[entry.planet].affliction -= entry.amount;
+    for (const entry of necessity) beforeNecessity[entry.planet].tension -= entry.amount;
     const progress = cloneSideState(beforeNecessity);
-    for (const planet of revived) progress[planet].affliction = combustionCeiling(chart.planets[planet]);
+    for (const planet of revived) progress[planet].tension = getEffectiveStatsFromPlacement(chart.planets[planet]).resolve;
     let elapsed = 0;
     const timing = NECESSITY_ANIMATION_TIMINGS[kind];
     const noteDuration = (timing.accent + timing.necessity + timing.fortune + timing.settle) / 1000;
@@ -92,7 +92,7 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
     for (const planet of revived) {
       show({ phase: "revival", entries: [], revived: [planet] });
       elapsed += NECESSITY_ANIMATION_TIMINGS.revival;
-      progress[planet].affliction = beforeNecessity[planet].affliction;
+      progress[planet].tension = beforeNecessity[planet].tension;
     }
     for (const entry of ordered) {
       const opening = { entries: [entry] };
@@ -102,7 +102,7 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
       elapsed += timing.necessity;
       show({ ...opening, phase: "fortune" });
       elapsed += timing.fortune;
-      progress[entry.planet].affliction = state[entry.planet].affliction;
+      progress[entry.planet].tension = state[entry.planet].tension;
       show({ ...opening, phase: "settle" });
       elapsed += timing.settle;
     }

@@ -4,7 +4,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { getScenario } from "@/data/narrative-scenarios";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { resolveNarrative } from "@/game/narrative";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { createStubPrince } from "./fixtures";
 
 describe("Prince storage", () => {
@@ -39,7 +39,7 @@ describe("Prince storage", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     const scenario = getScenario("home-libra-mara");
-    run.state.Moon.affliction = 0;
+    run.state.Moon.tension = 0;
     run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: scenario.scenarioId });
     prince.runs = [run];
     savePrince(prince);
@@ -57,7 +57,7 @@ describe("Prince storage", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     run.light = 72;
-    run.state.Moon.affliction = 24;
+    run.state.Moon.tension = 24;
     run.encounter = beginRelationalEncounter({
       run, opponentSeed: 8, lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
     });
@@ -68,7 +68,7 @@ describe("Prince storage", () => {
     const raw = JSON.stringify(prince, (key, value) =>
       key === "base" || key === "buffs" ? { luck: value.luck } : value,
     );
-    localStorage.setItem("sp:prince:v6", raw);
+    localStorage.setItem("sp:prince:v7", raw);
 
     const restored = loadPrince()!;
     expect(restored).toEqual(prince);
@@ -76,26 +76,26 @@ describe("Prince storage", () => {
     expect(loadPrince()).toEqual(prince);
   });
 
-  it("caps saved affliction at the current Resolve on both charts", () => {
+  it("caps saved tension at the current Resolve on both charts", () => {
     const prince = createStubPrince();
     const run = beginRun(prince.chart, 7, prince.numRelationalEncounters);
     run.light = 72;
     const encounter = beginRelationalEncounter({
       run, opponentSeed: 8, lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
     });
-    run.state.Moon.affliction = 180;
-    encounter.opponentState.Moon.affliction = 180;
+    run.state.Moon.tension = 180;
+    encounter.opponentState.Moon.tension = 180;
     run.encounter = encounter;
     prince.runs = [run];
     savePrince(prince);
 
     const restored = loadPrince()!;
     const savedRun = restored.runs[0]!;
-    expect(savedRun.state.Moon.affliction).toBe(combustionCeiling(restored.chart.planets.Moon));
+    expect(savedRun.state.Moon.tension).toBe(getEffectiveStatsFromPlacement(restored.chart.planets.Moon).resolve);
     const savedEncounter = savedRun.encounter;
     if (savedEncounter?.kind !== "relational") throw new Error("Expected a saved relational encounter");
-    expect(savedEncounter.opponentState.Moon.affliction)
-      .toBe(combustionCeiling(savedEncounter.opponentChart.planets.Moon));
+    expect(savedEncounter.opponentState.Moon.tension)
+      .toBe(getEffectiveStatsFromPlacement(savedEncounter.opponentChart.planets.Moon).resolve);
     expect(savedRun.light).toBe(72);
   });
 
@@ -107,7 +107,7 @@ describe("Prince storage", () => {
 
     savePrince(prince);
 
-    const raw = localStorage.getItem("sp:prince:v6");
+    const raw = localStorage.getItem("sp:prince:v7");
     expect(raw).toContain('"light":36');
     expect(raw).toContain('"light":72');
     expect(raw).not.toContain('"distance"');

@@ -1,6 +1,6 @@
 import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./relational";
 import { getAspects, propagatedMagnitude } from "./aspects";
-import { combustionCeiling, isCombusted, newlyCombusted } from "./combust";
+import { isCombusted, newlyCombusted } from "./combust";
 import { cloneSideState, runChart } from "./chart";
 import { encounterRuler } from "./encounter";
 import { turnLight } from "./score";
@@ -37,7 +37,7 @@ export function relationalTurnRng(run: Run, encounter: RelationalEncounter): () 
 }
 
 /**
- * Resolves a single relational turn. Operates on RUN-LEVEL player state — affliction
+ * Resolves a single relational turn. Operates on RUN-LEVEL player state — tension
  * and combustion persist across encounters and maps within a run, and the
  * player's chart carries the run's stat gains.
  */
@@ -207,7 +207,7 @@ function resolveAction(
   const wasCombusted = isCombusted(placement, side[active]);
   const delta = wasCombusted
     ? 0
-    : applyEffect(side[active], valence, amount, combustionCeiling(placement));
+    : applyEffect(side[active], valence, amount, getEffectiveStatsFromPlacement(placement).resolve);
   // Combustion is resolved before propagation: a planet destroyed by the blow
   // can't conduct it onward, so `propagate`'s combusted guard short-circuits.
   const combust = !wasCombusted && isCombusted(placement, side[active]);
@@ -215,21 +215,21 @@ function resolveAction(
   return { amount, delta, combust, propagation };
 }
 
-/** Affliction is bounded on both sides (MECHANICS §8, §10): testimony clamps
- *  at zero, affliction caps at the ceiling. Returns the amount that actually
+/** Tension is bounded on both sides (MECHANICS §8, §10): testimony clamps
+ *  at zero, affliction caps at Resolve. Returns the amount that actually
  *  applied — a finishing blow reports only what it took to reach the line.
- *  Callers guard combusted targets; the ceiling check here is the backstop
- *  (a combusted planet holds the ceiling and takes nothing, §10). */
-function applyEffect(state: PlanetState, polarity: Polarity, raw: number, ceiling: number): number {
-  if (raw <= 0 || state.affliction >= ceiling) return 0;
+ *  Callers guard combusted targets; the Resolve check here is the backstop
+ *  (a combusted planet holds at its Resolve and takes nothing, §10). */
+function applyEffect(state: PlanetState, polarity: Polarity, raw: number, resolve: number): number {
+  if (raw <= 0 || state.tension >= resolve) return 0;
   if (polarity === "Testimony") {
-    const before = state.affliction;
-    state.affliction = Math.max(0, state.affliction - raw);
-    return before - state.affliction;
+    const before = state.tension;
+    state.tension = Math.max(0, state.tension - raw);
+    return before - state.tension;
   }
-  const before = state.affliction;
-  state.affliction = Math.min(ceiling, state.affliction + raw);
-  return state.affliction - before;
+  const before = state.tension;
+  state.tension = Math.min(resolve, state.tension + raw);
+  return state.tension - before;
 }
 
 function propagate(
@@ -260,8 +260,8 @@ function propagate(
     const effPolarity: Polarity = inverted
       ? polarity === "Testimony" ? "Affliction" : "Testimony"
       : polarity;
-    const delta = applyEffect(target, effPolarity, magnitude, combustionCeiling(targetPlacement));
-    // The target was live before the ripple, so at-ceiling now means it just went.
+    const delta = applyEffect(target, effPolarity, magnitude, getEffectiveStatsFromPlacement(targetPlacement).resolve);
+    // The target was live before the ripple, so at its Resolve now means it just went.
     const combust = isCombusted(targetPlacement, target);
     out.push({
       side: sideTag,

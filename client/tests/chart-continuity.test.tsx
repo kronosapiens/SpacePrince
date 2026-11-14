@@ -4,13 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getScenario, NARRATIVE_SCENARIOS } from "@/data/narrative-scenarios";
 import { Chart } from "@/components/Chart";
 import { PLANETS } from "@/game/data";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { eligibleNext } from "@/game/map-gen";
 import { beginRun } from "@/game/run";
 import { loadPrince, savePrince } from "@/state/prince";
 import { createStubPrince } from "./fixtures";
 import { GameTest } from "./game-layout";
-import { AFFLICTION_ARC_R } from "@/svg/viewbox";
+import { RESOLVE_ARC_R } from "@/svg/viewbox";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
@@ -124,13 +124,13 @@ describe("shared player chart", () => {
     click('[data-guide="option-2"]');
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     const target = PLANETS.find((planet) =>
-      combustionCeiling(prince.chart.planets[planet]) - afterRelational.runs[0]!.state[planet].affliction >= 24)!;
+      getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve - afterRelational.runs[0]!.state[planet].tension >= 24)!;
     expect(target).toBeDefined();
-    const startingAffliction = afterRelational.runs[0]!.state[target].affliction;
+    const startingTension = afterRelational.runs[0]!.state[target].tension;
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
     const afterNarrative = loadPrince()!.runs[0]!;
     expect(afterNarrative.encounter?.resolved).toBe(true);
-    expect(afterNarrative.state[target].affliction).toBe(startingAffliction + 24);
+    expect(afterNarrative.state[target].tension).toBe(startingTension + 24);
     expect(afterNarrative.light).toBe(afterRelational.runs[0]!.light + 96);
     expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
@@ -142,8 +142,8 @@ describe("shared player chart", () => {
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     expect(loadPrince()!.numRelationalEncounters).toBe(prince.numRelationalEncounters + 1);
     click(`[data-guide="planet-self-${target.toLowerCase()}"]`);
-    const ceiling = combustionCeiling(prince.chart.planets[target]);
-    expect(element(".ps-ratio").textContent).toBe(`Resolve${ceiling - startingAffliction - 24}/${ceiling}`);
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets[target]).resolve;
+    expect(element(".ps-ratio").textContent).toBe(`Resolve${resolve - startingTension - 24}/${resolve}`);
     expect(container.querySelector(".ps-actions")).toBeNull();
   });
 
@@ -163,7 +163,7 @@ describe("shared player chart", () => {
   });
 });
 
-describe("affliction arcs", () => {
+describe("Resolve arcs", () => {
   it("uses two degrees per point for capacity, remaining Resolve, and projections", () => {
     const chart = createStubPrince().chart;
     chart.planets.Moon.base.resolve = 180;
@@ -178,7 +178,7 @@ describe("affliction arcs", () => {
     expect(element(arc).querySelector("path")).toBeNull();
 
     act(() => root.render(<Chart chart={chart} side="self"
-      state={{ Moon: { affliction: 90 } }}
+      state={{ Moon: { tension: 90 } }}
       projection={{ deltas: { Moon: { delta: 45, polarity: "Affliction" } } }} />));
 
     // 90 remaining points sweep a semicircle from noon to the combustion anchor.
@@ -186,15 +186,15 @@ describe("affliction arcs", () => {
       .match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi)!.map(Number);
     const remaining = coordinates(`${arc} > path`);
     expect(remaining[0]).toBeCloseTo(0);
-    expect(remaining[1]).toBeCloseTo(-AFFLICTION_ARC_R);
+    expect(remaining[1]).toBeCloseTo(-RESOLVE_ARC_R);
     expect(remaining[7]).toBeCloseTo(0);
-    expect(remaining[8]).toBeCloseTo(AFFLICTION_ARC_R);
+    expect(remaining[8]).toBeCloseTo(RESOLVE_ARC_R);
 
     // A 45-point preview covers the first quarter-circle of that remaining span.
     const projected = coordinates(`${arc} .arc-diff path`);
     expect(projected[0]).toBeCloseTo(0);
-    expect(projected[1]).toBeCloseTo(-AFFLICTION_ARC_R);
-    expect(projected[7]).toBeCloseTo(-AFFLICTION_ARC_R);
+    expect(projected[1]).toBeCloseTo(-RESOLVE_ARC_R);
+    expect(projected[7]).toBeCloseTo(-RESOLVE_ARC_R);
     expect(projected[8]).toBeCloseTo(0);
   });
 });

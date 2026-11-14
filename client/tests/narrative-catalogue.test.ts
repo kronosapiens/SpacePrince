@@ -62,9 +62,9 @@ describe("narrative catalogue", () => {
         expect(option.cost ?? 0, label).toBeGreaterThanOrEqual(0);
         expect((option.cost ?? 0) % 12, label).toBe(0);
         for (const effect of option.result.effects) {
-          expect(["affliction", "light", "gain", "uncombust"], label).toContain(effect.kind);
+          expect(["tension", "light", "gain", "uncombust"], label).toContain(effect.kind);
           if ("target" in effect) {
-            expect(["chosen", "allUnlocked", "mostAfflicted", "healthiest", "joy", "ruler"], label).toContain(effect.target);
+            expect(["chosen", "allUnlocked", "mostTension", "mostRemainingResolve", "joy", "ruler"], label).toContain(effect.target);
             if (effect.target === "joy") expect(option.visibleIf, label).toBe(joyPresent);
           }
           if ("delta" in effect) {

@@ -1,5 +1,6 @@
 import { blankGains, houseSign, seededChart } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRun, newMapState, MAPS_PER_RUN } from "@/game/run";
 import { beginRelationalEncounter, beginNarrativeEncounter, rollOpponentTurns } from "@/game/encounter";
 import { eligibleNext, ROOT_NODE_ID, TERMINAL_NODE_ID } from "@/game/map-gen";
@@ -26,7 +27,7 @@ import type {
  * preview: "Regenerate" is just a fresh real game re-rolled at the same screen.
  *
  * Spawns are deliberately *lived-in*, not pristine: each re-roll randomizes
- * affliction/combustion on the boards, the relational turn, the map position, and
+ * tension/combustion on the boards, the relational turn, the map position, and
  * the house — so re-rolling actually surfaces different game states. Everything
  * is derived from one `randomSeed()` per spawn, so a given run still replays
  * the same. Minting wipes the current local game, which is the intent here.
@@ -91,9 +92,9 @@ export function spawnRelational(opts: SpawnOpts = {}): Prince {
   const opponentState = livedInState(seed, "opp", fresh.opponentChart, roster);
   const acting = fresh.sequence[turnIndex];
   if (acting) {
-    // Clamp under the ceiling — at the ceiling it would read as combusted.
-    const ceiling = combustionCeiling(fresh.opponentChart.planets[acting]);
-    opponentState[acting] = { affliction: Math.min(opponentState[acting].affliction, ceiling - 1) };
+    // Clamp under its Resolve — at its Resolve it would read as combusted.
+    const resolve = getEffectiveStatsFromPlacement(fresh.opponentChart.planets[acting]).resolve;
+    opponentState[acting] = { tension: Math.min(opponentState[acting].tension, resolve - 1) };
   }
   const encounter: RelationalEncounter = { ...fresh, turnIndex, opponentState, necessity: undefined };
   const run: Run = {
@@ -207,9 +208,9 @@ function devPrince(seed: number, tier = DEFAULT_TIER, run: Run): Prince {
   };
 }
 
-/** Deterministic lived-in per-planet state: varied affliction, occasional
- *  combustion. Afflictions are ceiling-relative (affliction caps at the
- *  ceiling, MECHANICS §10; combusted planets hold it). If `keepAlive` is given,
+/** Deterministic lived-in per-planet state: varied tension, occasional
+ *  combustion. Tension is relative to Resolve (tension caps at
+ *  Resolve, MECHANICS §10; combusted planets hold it). If `keepAlive` is given,
  *  guarantees at least one of those planets survives — so a spawned run isn't
  *  already over (every fielded planet dead). */
 function livedInState(
@@ -221,17 +222,17 @@ function livedInState(
   const rng = mulberry32(hashString(`${seed}_${tag}_state`));
   const out = {} as SideState;
   for (const p of PLANETS) {
-    const ceiling = combustionCeiling(chart.planets[p]);
+    const resolve = getEffectiveStatsFromPlacement(chart.planets[p]).resolve;
     const r = rng();
-    if (r < 0.5) out[p] = { affliction: 0 };
-    else if (r < 0.8) out[p] = { affliction: Math.round(ceiling * rng() * 0.4) };
-    else if (r < 0.92) out[p] = { affliction: Math.round(ceiling * (0.4 + rng() * 0.55)) };
-    else out[p] = { affliction: ceiling }; // at the ceiling = combusted (derived)
+    if (r < 0.5) out[p] = { tension: 0 };
+    else if (r < 0.8) out[p] = { tension: Math.round(resolve * rng() * 0.4) };
+    else if (r < 0.92) out[p] = { tension: Math.round(resolve * (0.4 + rng() * 0.55)) };
+    else out[p] = { tension: resolve }; // at its Resolve = combusted (derived)
   }
   if (keepAlive?.length && keepAlive.every((p) => isCombusted(chart.planets[p], out[p]))) {
     const revived = keepAlive[0]!;
-    const ceiling = combustionCeiling(chart.planets[revived]);
-    out[revived] = { affliction: Math.round(ceiling * rng() * 0.3) };
+    const resolve = getEffectiveStatsFromPlacement(chart.planets[revived]).resolve;
+    out[revived] = { tension: Math.round(resolve * rng() * 0.3) };
   }
   return out;
 }

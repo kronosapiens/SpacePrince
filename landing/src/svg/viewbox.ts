@@ -1,5 +1,5 @@
 // The viewport fits the outer ring. Mirrors client/src/svg/viewbox.ts,
-// trimmed to what the landing chart draws (no affliction arc, no corona).
+// trimmed to what the landing chart draws (no Resolve arc, no corona).
 
 export const CHART_CENTER = 500;
 
@@ -23,7 +23,7 @@ export const TICK_INNER_R = 417;     // tick marks straddle the gap between ring
 export const TICK_OUTER_R = 453;
 
 // Planet glyph sizing (uniform global; cluster shape is what changes per stack).
-// The disc gave up 6 units when the affliction arc arrived in the client — the
+// The disc gave up 6 units when the Resolve arc arrived in the client — the
 // landing has no arc, but the disc keeps the client's size so a chart here and a
 // chart in the game read as the same object.
 export const PLANET_R_REST = 24;
@@ -38,7 +38,7 @@ export const INVITE_HALO_R = INTERACTION_RING_R * 1.5;
 /**
  * Stroke schedule, in chart viewBox units. Three rungs, three roles: LIGHT is
  * ground, MEDIUM is structure, HEAVY is a thing under attention. (The client
- * carries a fourth, EXTRA_HEAVY, for the affliction arc, which the landing
+ * carries a fourth, EXTRA_HEAVY, for the Resolve arc, which the landing
  * doesn't draw.)
  *
  * A whole unit apart rather than finer: the chart renders ~672px wide, so a

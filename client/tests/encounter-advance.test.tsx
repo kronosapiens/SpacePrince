@@ -6,7 +6,7 @@ import { useInfoCards } from "@/state/InfoCardContext";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun, enterNode, isOver } from "@/game/run";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { eligibleNext } from "@/game/map-gen";
 import { unlockedPlanets } from "@/game/unlocks";
@@ -65,9 +65,9 @@ function entryWipe(count: number) {
   prince.chart.planets.Moon.buffs.luck = 0;
   let run = beginRun(prince.chart, 42, count);
   for (const planet of unlockedPlanets(count)) {
-    run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
+    run.state[planet].tension = getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve;
   }
-  run.state.Moon.affliction -= 6;
+  run.state.Moon.tension -= 6;
   run.light = 96;
   const nodeId = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
   run.map.rolledNodes[nodeId] = { kind: "relational", opponentSeed: 99 };
@@ -146,7 +146,7 @@ describe("encounter advancement", () => {
     expect(after.numRelationalEncounters).toBe(32);
     expect(after.runs[0]!.encounter).toBeNull();
     expect(after.runs[0]!.light).toBe(96);
-    expect(after.runs[0]!.state.Saturn.affliction).toBe(0);
+    expect(after.runs[0]!.state.Saturn.tension).toBe(0);
     expect(isOver(after.runs[0]!, after.chart, after.numRelationalEncounters)).toBe(false);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(get("[data-intro]").textContent).toBe("Saturn");
@@ -254,8 +254,8 @@ describe("encounter advancement", () => {
 
   it("finishes run-ending combustion playback before returning to the map", () => {
     const { prince, run, encounter } = relational();
-    for (const planet of PLANETS) run.state[planet].affliction = combustionCeiling(prince.chart.planets[planet]);
-    run.state.Moon.affliction -= 12;
+    for (const planet of PLANETS) run.state[planet].tension = getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve;
+    run.state.Moon.tension -= 12;
     encounter.opponentActions = ["Affliction"];
     mount(prince);
     commit("Testify");

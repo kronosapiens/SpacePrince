@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { applyNecessity } from "@/game/necessity";
 import { blankSideState, derivePlacements, runChart, seededChart } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
-import { fortuneChance, getEffectiveStats } from "@/game/relational";
+import { isCombusted } from "@/game/combust";
+import { fortuneChance, getEffectiveStats, getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRelationalEncounter, rollOpponentTurns } from "@/game/encounter";
 import { beginRun, enterNode, newMapState } from "@/game/run";
 import { hashString, mulberry32 } from "@/game/rng";
@@ -22,7 +22,7 @@ describe("necessity", () => {
         const result = applyNecessity(chart, blankSideState(), ["Sun"], rng);
         const draw = [12, 24, 36][tier]!;
         const amount = fortunate ? 0 : draw;
-        expect(result.state.Sun.affliction).toBe(amount);
+        expect(result.state.Sun.tension).toBe(amount);
         expect(result.necessity).toEqual([{ planet: "Sun", amount, blocked: fortunate, draw }]);
         expect(rng).toHaveBeenCalledTimes(2);
       }
@@ -30,21 +30,21 @@ describe("necessity", () => {
   });
 
   it("can combust wounded planets, caps at Resolve, and does not mutate the input", () => {
-    const ceiling = combustionCeiling(chart.planets.Moon);
-    for (const initial of [12, ceiling - 2, ceiling - 1, ceiling - 0.5]) {
+    const resolve = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve;
+    for (const initial of [12, resolve - 2, resolve - 1, resolve - 0.5]) {
       const state = blankSideState();
-      state.Moon.affliction = initial;
+      state.Moon.tension = initial;
       const result = applyNecessity(chart, state, ["Moon"], () => 0.999);
-      const expected = Math.min(initial + 36, ceiling);
-      expect(result.state.Moon.affliction).toBe(expected);
-      expect(state.Moon.affliction).toBe(initial);
+      const expected = Math.min(initial + 36, resolve);
+      expect(result.state.Moon.tension).toBe(expected);
+      expect(state.Moon.tension).toBe(initial);
       expect(result.necessity).toEqual([{ planet: "Moon", amount: expected - initial, blocked: false, draw: 36 }]);
     }
   });
 
   it("blocks the complete draw on a wounded planet and retains its zero-amount record", () => {
     const state = blankSideState();
-    state.Moon.affliction = combustionCeiling(chart.planets.Moon) - 2;
+    state.Moon.tension = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve - 2;
     const rng = vi.fn().mockReturnValueOnce(0.999).mockReturnValueOnce(0);
     const result = applyNecessity(chart, state, ["Moon"], rng);
     expect(result.state.Moon).toEqual(state.Moon);
@@ -55,13 +55,13 @@ describe("necessity", () => {
 
   it("skips combusted and unfielded planets without consuming their rolls", () => {
     const state = blankSideState();
-    state.Mars.affliction = combustionCeiling(chart.planets.Mars);
+    state.Mars.tension = getEffectiveStatsFromPlacement(chart.planets.Mars).resolve;
     const rng = vi.fn(() => 0);
     const result = applyNecessity(chart, state, ["Mars", "Moon"], rng);
     expect(rng).toHaveBeenCalledTimes(2);
     expect(result.necessity).toEqual([{ planet: "Moon", amount: 0, blocked: true, draw: 12 }]);
     for (const planet of PLANETS) {
-      expect(result.state[planet].affliction).toBe(state[planet].affliction);
+      expect(result.state[planet].tension).toBe(state[planet].tension);
     }
   });
 
@@ -71,8 +71,8 @@ describe("necessity", () => {
       const fresh: Chart = { id: "fresh", name: "fresh", isDiurnal, ...derivePlacements({ longitudes, ascendantLongitude: 0, isDiurnal }) };
       const result = applyNecessity(fresh, blankSideState(), PLANETS, () => 0.999);
       for (const planet of PLANETS) {
-        expect(combustionCeiling(fresh.planets[planet])).toBeGreaterThanOrEqual(48);
-        expect(result.state[planet].affliction).toBe(36);
+        expect(getEffectiveStatsFromPlacement(fresh.planets[planet]).resolve).toBeGreaterThanOrEqual(48);
+        expect(result.state[planet].tension).toBe(36);
         expect(isCombusted(fresh.planets[planet], result.state[planet])).toBe(false);
       }
     }
@@ -91,7 +91,7 @@ describe("necessity", () => {
     for (const encounterIdSeed of [13, 99]) {
       const enc = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
       const opening = applyNecessity(enc.opponentChart, blankSideState(), roster,
-        mulberry32(hashString(`${encounterIdSeed}_affliction`)));
+        mulberry32(hashString(`${encounterIdSeed}_tension`)));
       expect(enc.opponentState).toEqual(opening.state);
       expect(enc.necessity).toEqual(opening.necessity);
       expect({ sequence: enc.sequence, opponentActions: enc.opponentActions })
@@ -119,9 +119,9 @@ describe("necessity", () => {
     const run = beginRun(chart, 42, lifetimeRelationalEncounterCount);
     run.gains.Moon.resolve = 24;
     run.gains.Moon.luck = 120;
-    run.state.Moon.affliction = combustionCeiling(chart.planets.Moon) + 6;
-    run.state.Sun.affliction = combustionCeiling(chart.planets.Sun);
-    run.state.Mercury.affliction = 12;
+    run.state.Moon.tension = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve + 6;
+    run.state.Sun.tension = getEffectiveStatsFromPlacement(chart.planets.Sun).resolve;
+    run.state.Mercury.tension = 12;
     const before = structuredClone(run);
     const nodeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "relational")!;
     const entered = enterNode({ run, chart, nodeId, lifetimeRelationalEncounterCount });
@@ -130,7 +130,7 @@ describe("necessity", () => {
       mulberry32(hashString(`${run.id}_${run.map.seed}_${nodeId}_player_necessity`)));
     expect(entered.state).toEqual(opening.state);
     expect(encounter.selfNecessity).toEqual(opening.necessity);
-    expect(entered.state.Moon.affliction).toBe(run.state.Moon.affliction);
+    expect(entered.state.Moon.tension).toBe(run.state.Moon.tension);
     expect(encounter.selfNecessity!.find((entry) => entry.planet === "Moon")).toMatchObject({ amount: 0, blocked: true });
     expect(entered.state.Sun).toEqual(run.state.Sun);
     for (const planet of PLANETS.filter((p) => !encounter.roster.includes(p))) expect(entered.state[planet]).toEqual(run.state[planet]);

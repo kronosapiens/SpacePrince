@@ -21,10 +21,10 @@ export interface PlanetStatsActions {
 interface PlanetStatsPanelProps {
   chart: Chart;
   planet: PlanetName;
-  /** Affliction taken so far. The title line shows what's left of Resolve
+  /** Tension taken so far. The title line shows remaining Resolve
    *  rather than this directly, so it reads as the arc's bright span — the
    *  chart carries that geometrically and nothing else states it as a number. */
-  affliction: number;
+  tension: number;
   /** Panel center, in chart viewBox units. */
   cx: number;
   cy: number;
@@ -36,7 +36,7 @@ interface PlanetStatsPanelProps {
   /** Actual narrative effect, computed by the encounter's resolver. */
   effect?: { verb: Polarity; value: number };
   /** Final values for a pending narrative Resolve change. */
-  resolvePreview?: { ceiling: number; affliction: number };
+  resolvePreview?: { resolve: number; tension: number };
   /** Study mode on — the card drops open to the gloss + stat table. */
   study?: boolean;
   /** When provided, the panel shows the study "i" toggle. */
@@ -75,7 +75,7 @@ export function panelHeightFor({ actions }: { actions: boolean }): number {
 export function PlanetStatsPanel({
   chart,
   planet,
-  affliction,
+  tension,
   cx,
   cy,
   height,
@@ -140,10 +140,10 @@ export function PlanetStatsPanel({
       >
         <div className="ps-content" ref={contentRef}>
           <div className={`ps-title ${study ? "is-open" : ""}`}>
-            {/* Name and remaining-of-Resolve share the line. The panel is where
+            {/* Name and remaining Resolve share the line. The panel is where
                 numbers live, so this is the one place the arc's quantity is
                 stated outright, next to the Testify/Afflict figures below.
-                Remaining, not affliction taken: the arc's bright span is what
+                Remaining Resolve, not tension taken: the arc's bright span is what
                 the planet can still absorb, so the number has to count the same
                 way or it captions the dark half of the mark. Floored like the
                 arc's own clamp, so the two can't disagree. */}
@@ -167,8 +167,8 @@ export function PlanetStatsPanel({
               </span>
               <span className="ps-ratio">
                 <span className="ps-ratio-label">Resolve</span>
-                {Math.max(0, table.resolve - affliction)}/{table.resolve}
-                {resolvePreview && <span className="ps-ratio-preview">→ {Math.max(0, resolvePreview.ceiling - resolvePreview.affliction)}/{resolvePreview.ceiling}</span>}
+                {Math.max(0, table.resolve - tension)}/{table.resolve}
+                {resolvePreview && <span className="ps-ratio-preview">→ {Math.max(0, resolvePreview.resolve - resolvePreview.tension)}/{resolvePreview.resolve}</span>}
               </span>
             </div>
           </div>

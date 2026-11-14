@@ -3,7 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { useNecessityAnimation, NECESSITY_ANIMATION_TIMINGS as timing } from "@/components/useNecessityAnimation";
 import { blankSideState, chartRuler, seededChart } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 
 const audio = vi.hoisted(() => ({ play: vi.fn(), cancel: vi.fn() }));
@@ -19,7 +19,7 @@ function render(input: Input) { act(() => root.render(<Probe {...input} />)); }
 function advance(ms: number) { act(() => vi.advanceTimersByTime(ms)); }
 function input(): Input {
   const state = blankSideState();
-  state.Moon.affliction = 30;
+  state.Moon.tension = 30;
   return { id: "map-1", chart, state, necessity: [{ planet: "Moon", amount: 6, halved: true, draw: 12 }], enabled: true, kind: "map" };
 }
 beforeEach(() => {
@@ -42,15 +42,15 @@ it("shows revival, necessity, Fortune, then committed state without mutation", (
   render(props);
   expect(result.opening?.phase).toBe("revival");
   expect(result.opening?.revived).toEqual(["Moon"]);
-  expect(result.state.Moon.affliction).toBe(combustionCeiling(chart.planets.Moon));
+  expect(result.state.Moon.tension).toBe(getEffectiveStatsFromPlacement(chart.planets.Moon).resolve);
   advance(timing.revival);
   expect(result.opening?.phase).toBe("accent");
   advance(timing.map.accent);
   expect(result.opening?.phase).toBe("necessity");
-  expect(result.state.Moon.affliction).toBe(24);
+  expect(result.state.Moon.tension).toBe(24);
   advance(timing.map.necessity);
   expect(result.opening?.phase).toBe("fortune");
-  expect(result.state.Moon.affliction).toBe(24);
+  expect(result.state.Moon.tension).toBe(24);
   expect(result.opening?.entries).toEqual(props.necessity);
   advance(timing.map.fortune);
   expect(result.opening?.phase).toBe("settle");
@@ -58,7 +58,7 @@ it("shows revival, necessity, Fortune, then committed state without mutation", (
   advance(timing.map.settle);
   expect(result.active).toBe(false);
   expect(result.opening).toBeUndefined();
-  expect(props.state.Moon.affliction).toBe(30);
+  expect(props.state.Moon.tension).toBe(30);
 });
 it("uses encounter timings and does not restart on ordinary rerenders", () => {
   const props = { ...input(), kind: "encounter" as const };
@@ -79,12 +79,12 @@ it("preserves missing raw draws in old records", () => {
   advance(timing.map.accent + timing.map.necessity);
   expect(result.opening?.phase).toBe("fortune");
   expect(result.opening?.entries[0]?.draw).toBeUndefined();
-  expect(result.state.Moon.affliction).toBe(24);
+  expect(result.state.Moon.tension).toBe(24);
 });
 it("plays all seven planets in Macrobian order with progressive immutable state", () => {
   const props = input();
   props.necessity = [...PLANETS].reverse().map((planet) => ({ planet, amount: 12, draw: 24, halved: true }));
-  for (const planet of PLANETS) props.state[planet].affliction = 30;
+  for (const planet of PLANETS) props.state[planet].tension = 30;
   const original = structuredClone(props);
   render(props);
   const firstSnapshot = result.state;
@@ -97,35 +97,35 @@ it("plays all seven planets in Macrobian order with progressive immutable state"
     expect(result.opening?.entries).toEqual([props.necessity.find((entry) => entry.planet === planet)]);
     expect(result.opening?.revived).toBeUndefined();
     for (const [otherIndex, other] of PLANETS.entries()) {
-      expect(result.state[other].affliction).toBe(otherIndex < index ? 30 : 18);
+      expect(result.state[other].tension).toBe(otherIndex < index ? 30 : 18);
     }
     advance(timing.map.necessity - 1);
     expect(result.opening?.phase).toBe("necessity");
     advance(1);
     expect(result.opening?.phase).toBe("fortune");
-    expect(result.state[planet].affliction).toBe(18);
+    expect(result.state[planet].tension).toBe(18);
     advance(timing.map.fortune);
     expect(result.opening?.phase).toBe("settle");
     for (const [otherIndex, other] of PLANETS.entries()) {
-      expect(result.state[other].affliction).toBe(otherIndex <= index ? 30 : 18);
+      expect(result.state[other].tension).toBe(otherIndex <= index ? 30 : 18);
     }
     advance(timing.map.settle);
   }
   expect(result.active).toBe(false);
   expect(result.state).toEqual(props.state);
-  expect(PLANETS.map((planet) => firstSnapshot[planet].affliction)).toEqual(Array(7).fill(18));
+  expect(PLANETS.map((planet) => firstSnapshot[planet].tension)).toEqual(Array(7).fill(18));
   expect(props).toEqual(original);
   expect(audio.play.mock.calls.map((call) => call[1])).toEqual(PLANETS);
 });
 it("plays only recorded planets for a noncontiguous roster using encounter timings", () => {
   const props = { ...input(), kind: "encounter" as const };
   props.necessity = ["Saturn", "Venus", "Moon"].map((planet) => ({ planet: planet as "Saturn" | "Venus" | "Moon", amount: 12, halved: false }));
-  for (const entry of props.necessity) props.state[entry.planet].affliction = 24;
-  props.state.Mars.affliction = 9;
+  for (const entry of props.necessity) props.state[entry.planet].tension = 24;
+  props.state.Mars.tension = 9;
   render(props);
   for (const planet of ["Moon", "Venus", "Saturn"]) {
     expect(result.opening?.entries.map((entry) => entry.planet)).toEqual([planet]);
-    expect(result.state.Mars.affliction).toBe(9);
+    expect(result.state.Mars.tension).toBe(9);
     advance(timing.encounter.accent + timing.encounter.necessity);
     expect(result.opening?.phase).toBe("fortune");
     advance(timing.encounter.fortune);
@@ -136,7 +136,7 @@ it("plays only recorded planets for a noncontiguous roster using encounter timin
 });
 it("finishes successful revivals in order before necessity and retains each restoration", () => {
   const props = input();
-  props.state.Saturn.affliction = 20;
+  props.state.Saturn.tension = 20;
   props.uncombusts = [
     { planet: "Saturn", chance: 0.5, success: true },
     { planet: "Venus", chance: 0.5, success: false },
@@ -144,25 +144,25 @@ it("finishes successful revivals in order before necessity and retains each rest
   ];
   render(props);
   expect(result.opening).toMatchObject({ phase: "revival", entries: [], revived: ["Moon"] });
-  expect(result.state.Saturn.affliction).toBe(combustionCeiling(chart.planets.Saturn));
+  expect(result.state.Saturn.tension).toBe(getEffectiveStatsFromPlacement(chart.planets.Saturn).resolve);
   advance(timing.revival);
   expect(result.opening).toMatchObject({ phase: "revival", entries: [], revived: ["Saturn"] });
-  expect(result.state.Moon.affliction).toBe(24);
-  expect(result.state.Saturn.affliction).toBe(combustionCeiling(chart.planets.Saturn));
+  expect(result.state.Moon.tension).toBe(24);
+  expect(result.state.Saturn.tension).toBe(getEffectiveStatsFromPlacement(chart.planets.Saturn).resolve);
   advance(timing.revival);
   expect(result.opening?.phase).toBe("accent");
   expect(result.opening?.revived).toBeUndefined();
-  expect(result.state.Saturn.affliction).toBe(20);
-  expect(result.state.Moon.affliction).toBe(24);
+  expect(result.state.Saturn.tension).toBe(20);
+  expect(result.state.Moon.tension).toBe(24);
 });
 it("finishes a revival-only map opening without a necessity sweep", () => {
   const props = input();
   props.necessity = [];
-  props.state.Moon.affliction = combustionCeiling(chart.planets.Moon) / 2;
+  props.state.Moon.tension = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve / 2;
   props.uncombusts = [{ planet: "Moon", chance: 0.5, success: true }];
   render(props);
   expect(result.opening).toMatchObject({ phase: "revival", entries: [], revived: ["Moon"] });
-  expect(result.state.Moon.affliction).toBe(combustionCeiling(chart.planets.Moon));
+  expect(result.state.Moon.tension).toBe(getEffectiveStatsFromPlacement(chart.planets.Moon).resolve);
   advance(timing.revival);
   expect(result.active).toBe(false);
   expect(result.state).toEqual(props.state);
@@ -172,7 +172,7 @@ it("finishes a revival-only map opening without a necessity sweep", () => {
 it.each(["click", "Enter", "Escape"])("continues through %s and finishes without replaying on rerender", (gesture) => {
   const props = input();
   props.necessity!.push({ planet: "Saturn", amount: 12, halved: false });
-  props.state.Saturn.affliction = 24;
+  props.state.Saturn.tension = 24;
   const button = document.createElement("button");
   const action = vi.fn();
   const eventType = gesture === "click" ? "click" : "keydown";
@@ -180,8 +180,8 @@ it.each(["click", "Enter", "Escape"])("continues through %s and finishes without
   document.body.append(button);
   render(props);
   advance(timing.map.accent + timing.map.necessity + timing.map.fortune + timing.map.settle);
-  expect(result.state.Moon.affliction).toBe(30);
-  expect(result.state.Saturn.affliction).toBe(12);
+  expect(result.state.Moon.tension).toBe(30);
+  expect(result.state.Saturn.tension).toBe(12);
   const event = () => gesture === "click"
     ? new MouseEvent("click", { bubbles: true, cancelable: true })
     : new KeyboardEvent("keydown", { key: gesture, bubbles: true, cancelable: true });
@@ -189,7 +189,7 @@ it.each(["click", "Enter", "Escape"])("continues through %s and finishes without
   const gestureEvent = event();
   act(() => { button.dispatchEvent(gestureEvent); });
   expect(result.active).toBe(true);
-  expect(result.state.Saturn.affliction).toBe(12);
+  expect(result.state.Saturn.tension).toBe(12);
   expect(audio.cancel).not.toHaveBeenCalled();
   expect(gestureEvent.defaultPrevented).toBe(false);
   expect(action).toHaveBeenCalledOnce();

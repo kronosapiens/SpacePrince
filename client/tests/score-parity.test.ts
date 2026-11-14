@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
 import { beginRelationalEncounter, encounterRuler } from "@/game/encounter";
 import { getAspects } from "@/game/aspects";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { computeProjectedEffects } from "@/game/projections";
 import { PLANETS } from "@/game/data";
 import { logToBeats, scoreBeats, turnLight, type ScoreTurn } from "@/game/score";
@@ -19,7 +19,7 @@ function setup(opponentSeed: number) {
     lifetimeRelationalEncounterCount: prince.numRelationalEncounters,
   });
   // Give Testimony something to resolve even when opening Fortune blocks the draw.
-  enc.opponentState[enc.sequence[0]!].affliction = 12;
+  enc.opponentState[enc.sequence[0]!].tension = 12;
   const run: Run = { ...base, encounter: enc };
   return { prince, run, enc };
 }
@@ -96,13 +96,13 @@ describe("preview and outcome score the same beats", () => {
   }
 
   it("a fatal blow pays only the remainder, in preview as in outcome", () => {
-    // Park the opponent's actor one point under its ceiling: the blow combusts
+    // Park the opponent's actor one point under its Resolve: the blow combusts
     // it, preempting the reply, and the projected magnitude must be that one
     // point — not the planet's full swing.
     const { projection, result, turn } = compare(99, "Affliction", ({ enc }) => {
       const active = enc.sequence[enc.turnIndex]!;
-      enc.opponentState[active].affliction =
-        combustionCeiling(enc.opponentChart.planets[active]) - 1;
+      enc.opponentState[active].tension =
+        getEffectiveStatsFromPlacement(enc.opponentChart.planets[active]).resolve - 1;
       enc.opponentActions[enc.turnIndex] = "Affliction";
     });
     const active = result.log.opponentPlanet;
@@ -112,16 +112,16 @@ describe("preview and outcome score the same beats", () => {
     expect(projection.beats).toContainEqual({ kind: "combust", side: "other", target: active });
     // Saturn counts the planet that went dark at its full Resolve, not the remainder.
     expect(scoreBeats("Saturn", projection.beats, turn)).toBe(
-      combustionCeiling(turn.other.planets[active]),
+      getEffectiveStatsFromPlacement(turn.other.planets[active]).resolve,
     );
   });
 
   it("your own planet going dark generates nothing under Saturn", () => {
     const { projection, result, turn, playerPlanet } = compare(11, "Testimony", ({ run, enc, playerPlanet }) => {
-      // Your planet catches the reply one point under its ceiling and goes out.
+      // Your planet catches the reply one point under its Resolve and goes out.
       // Testify, so nothing on their side dies to preempt it.
-      run.state[playerPlanet].affliction =
-        combustionCeiling(createStubPrince({ seed: 7 }).chart.planets[playerPlanet]) - 1;
+      run.state[playerPlanet].tension =
+        getEffectiveStatsFromPlacement(createStubPrince({ seed: 7 }).chart.planets[playerPlanet]).resolve - 1;
       enc.opponentActions[enc.turnIndex] = "Affliction";
     });
     expect(result.log.playerCombust).toBe(true);
@@ -130,7 +130,7 @@ describe("preview and outcome score the same beats", () => {
     expect(scoreBeats("Saturn", projection.beats, turn)).toBe(0);
   });
 
-  it("the Sun reads the Resolve left before the turn, in outcome as in preview", () => {
+  it("the Sun reads the remaining Resolve before the turn, in outcome as in preview", () => {
     // Your acting planet starts one point ahead of every other lit planet, and
     // the Other's Affliction drops it behind them. It had the most when it
     // acted, so its hits on the Other still count double.
@@ -139,8 +139,8 @@ describe("preview and outcome score the same beats", () => {
       enc.opponentActions[enc.turnIndex] = "Affliction";
       const chart = createStubPrince({ seed: 7 }).chart;
       for (const p of enc.roster) {
-        run.state[p].affliction =
-          combustionCeiling(chart.planets[p]) - (p === playerPlanet ? 25 : 24);
+        run.state[p].tension =
+          getEffectiveStatsFromPlacement(chart.planets[p]).resolve - (p === playerPlanet ? 25 : 24);
       }
     });
     expect(ruler).toBe("Sun");

@@ -1,8 +1,8 @@
 import { runChart } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted, remainingResolve } from "@/game/combust";
 import { fortuneChance, getEffectiveStats } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { NECESSITY_AFFLICTION_TIERS } from "@/game/necessity";
+import { NECESSITY_TENSION_TIERS } from "@/game/necessity";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { MAPS_PER_RUN } from "@/game/run";
 import { resolveTurn } from "@/game/turn";
@@ -24,7 +24,7 @@ const EPSILON = 1e-9;
 function measure(run: Run, chart: Chart, roster: PlanetName[]): Value {
   let lit = 0, capacity = 0;
   for (const planet of roster) {
-    const remaining = Math.max(0, combustionCeiling(chart.planets[planet]) - run.state[planet].affliction);
+    const remaining = Math.max(0, remainingResolve(chart.planets[planet], run.state[planet]));
     if (remaining > 0) lit++;
     capacity += remaining;
   }
@@ -83,13 +83,13 @@ export function entryLeafValue(run: Run, chart: Chart): Value {
 
   let allLost = 1, lit = 0, capacity = 0;
   for (const planet of encounter.roster) {
-    const remaining = Math.max(0, combustionCeiling(effective.planets[planet]) - run.state[planet].affliction);
+    const remaining = Math.max(0, remainingResolve(effective.planets[planet], run.state[planet]));
     if (remaining === 0) continue;
     const fortune = fortuneChance(getEffectiveStats(effective, planet).luck);
     let survives = fortune;
     capacity += fortune * remaining;
-    for (const draw of NECESSITY_AFFLICTION_TIERS) {
-      const probability = (1 - fortune) / NECESSITY_AFFLICTION_TIERS.length;
+    for (const draw of NECESSITY_TENSION_TIERS) {
+      const probability = (1 - fortune) / NECESSITY_TENSION_TIERS.length;
       const after = Math.max(0, remaining - draw);
       if (after > 0) survives += probability;
       capacity += probability * after;

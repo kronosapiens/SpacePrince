@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { blankGains, runChart } from "@/game/chart";
-import { deriveStatTable, fortuneChance, getEffectiveStats } from "@/game/relational";
-import { combustionCeiling } from "@/game/combust";
+import { deriveStatTable, fortuneChance, getEffectiveStats, getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { resolveNarrative } from "@/game/narrative";
 import { mulberry32 } from "@/game/rng";
@@ -20,11 +19,11 @@ const gain = (run: Run, planet: PlanetName, stat: keyof PlanetStats, amount: num
 describe("run gains", () => {
   beforeEach(() => localStorage.clear());
 
-  it("raise effective stats, the ceiling, and the stat table once, leaving the natal chart alone", () => {
+  it("raise effective stats, Resolve, and the stat table once, leaving the natal chart alone", () => {
     const run = gain(gain(beginRun(prince.chart, 1), "Mars", "resolve", 12), "Mars", "luck", 12);
     const chart = runChart(prince.chart, run);
     expect(runChart(chart, run)).toEqual(chart);
-    expect(combustionCeiling(chart.planets.Mars)).toBe(combustionCeiling(prince.chart.planets.Mars) + 12);
+    expect(getEffectiveStatsFromPlacement(chart.planets.Mars).resolve).toBe(getEffectiveStatsFromPlacement(prince.chart.planets.Mars).resolve + 12);
     expect(getEffectiveStats(chart, "Mars").luck).toBe(getEffectiveStats(prince.chart, "Mars").luck + 12);
     expect(prince.chart.planets.Mars.gains).toBeUndefined();
     const table = deriveStatTable(chart.planets.Mars);
@@ -50,11 +49,11 @@ describe("run gains", () => {
     expect(beginRun(prince.chart, 4, 64).gains).toEqual(blankGains());
   });
 
-  it("preserve gained ceilings when reloading", () => {
+  it("preserve gained Resolve when reloading", () => {
     const run = gain(beginRun(prince.chart, 5), "Moon", "resolve", 12);
-    run.state.Moon.affliction = combustionCeiling(prince.chart.planets.Moon) + 6;
+    run.state.Moon.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve + 6;
     savePrince({ ...prince, runs: [run] });
-    expect(loadPrince()!.runs[0]!.state.Moon.affliction).toBe(run.state.Moon.affliction);
+    expect(loadPrince()!.runs[0]!.state.Moon.tension).toBe(run.state.Moon.tension);
 
   });
 
@@ -63,17 +62,17 @@ describe("run gains", () => {
     const encounter = beginRelationalEncounter({ run: base, opponentSeed: 5, lifetimeRelationalEncounterCount: 64 });
     encounter.opponentActions[0] = "Affliction";
     const incoming = getEffectiveStats(encounter.opponentChart, encounter.sequence[0]!).affliction;
-    const affliction = Math.max(0, combustionCeiling(prince.chart.planets.Sun) - incoming);
-    const run: Run = { ...base, encounter, state: { ...base.state, Sun: { affliction } } };
+    const tension = Math.max(0, getEffectiveStatsFromPlacement(prince.chart.planets.Sun).resolve - incoming);
+    const run: Run = { ...base, encounter, state: { ...base.state, Sun: { tension } } };
     expect(resolveTurn(run, prince.chart, "Sun", "Testimony", () => 0)!.log.playerCombust).toBe(true);
     const gained = resolveTurn(gain(run, "Sun", "resolve", incoming), prince.chart, "Sun", "Testimony", () => 0)!;
     expect(gained.log.playerCombust).toBe(false);
-    expect(gained.run.state.Sun.affliction).toBe(affliction + incoming);
+    expect(gained.run.state.Sun.tension).toBe(tension + incoming);
   });
 
   it("feed the map boundary's Fortune and decide when the run is over", () => {
     const run = beginRun(prince.chart, 6, 0);
-    run.state.Moon = { affliction: combustionCeiling(prince.chart.planets.Moon) };
+    run.state.Moon = { tension: getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve };
     const roll = (r: Run) => rolloverMap(r, prince.chart, ["Moon"], 11).map.boundary!.uncombusts[0]!.chance;
     const luck = getEffectiveStats(prince.chart, "Moon").luck;
     expect(roll(run)).toBe(fortuneChance(luck));

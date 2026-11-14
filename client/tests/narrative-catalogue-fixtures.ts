@@ -1,5 +1,6 @@
 import { blankGains, blankSideState, derivePlacements, getDignity, runChart } from "@/game/chart";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS, SIGNS } from "@/game/data";
 import { beginNarrativeEncounter } from "@/game/encounter";
 import { narrativeContext, previewOption, resolveNarrative, visibleOptions, type NarrativeScenario } from "@/game/narrative";
@@ -49,11 +50,11 @@ export function stateFor(scene: NarrativeScenario, prince: Prince, condition: Co
   const chart = runChart(prince.chart, run);
   const roster = unlockedPlanets(prince.numRelationalEncounters);
   for (const [i, p] of roster.entries()) {
-    const ceiling = combustionCeiling(chart.planets[p]);
-    run.state[p].affliction = condition === "clean" ? 0
-      : condition === "near combustion" ? ceiling - 1
-      : condition === "one lit" && i > 0 ? ceiling
-      : Math.min(ceiling - 12, 6 + i * 6);
+    const resolve = getEffectiveStatsFromPlacement(chart.planets[p]).resolve;
+    run.state[p].tension = condition === "clean" ? 0
+      : condition === "near combustion" ? resolve - 1
+      : condition === "one lit" && i > 0 ? resolve
+      : Math.min(resolve - 12, 6 + i * 6);
   }
   run.encounter = beginNarrativeEncounter({ run, house: scene.house, scenarioId: scene.scenarioId });
   return run;
@@ -68,7 +69,7 @@ export function narrativeMeasures(prince: Prince, run: Run) {
   const chart = runChart(prince.chart, run);
   const roster = unlockedPlanets(prince.numRelationalEncounters);
   const remaining = Object.fromEntries(roster.map((p) =>
-    [p, Math.max(0, combustionCeiling(chart.planets[p]) - run.state[p].affliction)])) as Partial<Record<PlanetName, number>>;
+    [p, Math.max(0, getEffectiveStatsFromPlacement(chart.planets[p]).resolve - run.state[p].tension)])) as Partial<Record<PlanetName, number>>;
   return {
     light: run.light,
     capacity: Object.values(remaining).reduce((sum, amount) => sum + amount, 0),

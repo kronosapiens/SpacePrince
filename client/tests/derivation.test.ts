@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveStatTable, fortuneChance } from "@/game/relational";
-import { combustionCeiling } from "@/game/combust";
+import { deriveStatTable, fortuneChance, getEffectiveStatsFromPlacement } from "@/game/relational";
 import { seededChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";
 import type { PlanetStats } from "@/game/types";
@@ -44,7 +43,7 @@ describe("deriveStatTable", () => {
       for (const planet of PLANETS) {
         const placement = chart.planets[planet];
         const table = deriveStatTable(placement);
-        expect(table.resolve).toBe(combustionCeiling(placement));
+        expect(table.resolve).toBe(getEffectiveStatsFromPlacement(placement).resolve);
         // Fortune is the same roll as fortuneChance, stated in sixtieths.
         expect(table.fortune / 60).toBeCloseTo(
           fortuneChance(placement.base.luck + placement.buffs.luck),

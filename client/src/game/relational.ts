@@ -6,7 +6,6 @@ import type {
   Polarity,
 } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
-import { combustionCeiling } from "./combust";
 
 /** Stat-weighted action draw — `P(afflict) = affliction / (affliction + testimony)`.
  *  Used to precommit the opponent's verb each turn (the player chooses theirs).
@@ -79,7 +78,7 @@ export interface StatTable {
   rows: StatRow[];
   /** Operational read-outs for the closed modal — the same numbers, and the
    *  same units, as the matching row totals. */
-  resolve: number; // combustion ceiling
+  resolve: number; // the planet's Resolve
   fortune: number; // the fortune roll, in sixtieths
   afflict: number;
   testify: number;
@@ -107,7 +106,7 @@ export function deriveStatTable(p: PlanetPlacement): StatTable {
   const eff = getEffectiveStatsFromPlacement(p);
   return {
     rows,
-    resolve: combustionCeiling(p),
+    resolve: eff.resolve,
     fortune: fortuneSixtieths(eff.luck),
     afflict: eff.affliction,
     testify: eff.testimony,

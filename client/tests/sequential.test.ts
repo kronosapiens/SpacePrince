@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { beginRun } from "@/game/run";
 import { beginRelationalEncounter } from "@/game/encounter";
-import { combustionCeiling, isCombusted } from "@/game/combust";
+import { isCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { resolveTurn } from "@/game/turn";
 import { createStubPrince } from "./fixtures";
 import type { RelationalEncounter, Run } from "@/game/types";
@@ -23,10 +24,10 @@ describe("sequential resolution — preemption", () => {
     const { prince, run } = setup();
     const enc = run.encounter as RelationalEncounter;
     const active = enc.sequence[enc.turnIndex]!;
-    // Park the opponent's acting planet one point under its ceiling — any
-    // afflicting hit combusts it (affliction caps at the ceiling, §10).
-    enc.opponentState[active].affliction =
-      combustionCeiling(enc.opponentChart.planets[active]) - 1;
+    // Park the opponent's acting planet one point under its Resolve — any
+    // afflicting hit combusts it (tension caps at Resolve, §10).
+    enc.opponentState[active].tension =
+      getEffectiveStatsFromPlacement(enc.opponentChart.planets[active]).resolve - 1;
     enc.opponentActions[enc.turnIndex] = "Affliction";
 
     // Resolution is deterministic (§7) — rng only feeds the next-turn draw.
@@ -44,7 +45,7 @@ describe("sequential resolution — preemption", () => {
     const enc = run.encounter as RelationalEncounter;
     const active = "Saturn";
     enc.sequence[enc.turnIndex] = active;
-    enc.opponentState[active].affliction = 0;
+    enc.opponentState[active].tension = 0;
     enc.opponentActions[enc.turnIndex] = "Affliction";
 
     // A clean Saturn can withstand this Mars's affliction.
@@ -55,15 +56,15 @@ describe("sequential resolution — preemption", () => {
     expect(result.log.playerDelta).toBeGreaterThan(0);
   });
 
-  it("affliction caps at the ceiling — the finishing blow applies only the remainder", () => {
+  it("tension caps at Resolve — the finishing blow applies only the remainder", () => {
     const { prince, run } = setup();
     const enc = run.encounter as RelationalEncounter;
     const active = enc.sequence[enc.turnIndex]!;
-    const ceiling = combustionCeiling(enc.opponentChart.planets[active]);
-    enc.opponentState[active].affliction = ceiling - 1;
+    const resolve = getEffectiveStatsFromPlacement(enc.opponentChart.planets[active]).resolve;
+    enc.opponentState[active].tension = resolve - 1;
 
     const result = resolveTurn(run, prince.chart, "Mars", "Affliction", () => 0)!;
-    expect(result.encounter.opponentState[active].affliction).toBe(ceiling);
+    expect(result.encounter.opponentState[active].tension).toBe(resolve);
     expect(
       isCombusted(enc.opponentChart.planets[active], result.encounter.opponentState[active]),
     ).toBe(true);

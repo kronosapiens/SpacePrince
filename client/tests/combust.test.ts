@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { combustionCeiling, isCombusted, newlyCombusted, uncombust, wouldCombust } from "@/game/combust";
+import { isCombusted, newlyCombusted, uncombust, wouldCombust } from "@/game/combust";
 import { derivePlacements, seededChart } from "@/game/chart";
 import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import type { PlanetPlacement, PlanetState } from "@/game/types";
@@ -17,35 +17,35 @@ function placement(resolve: number): PlanetPlacement {
   };
 }
 
-function state(affliction: number): PlanetState {
-  return { affliction };
+function state(tension: number): PlanetState {
+  return { tension };
 }
 
-describe("combustionCeiling", () => {
+describe("a planet's Resolve", () => {
   it("is base Resolve plus placement bonuses", () => {
     const planet = placement(48);
     planet.buffs.resolve = 12;
-    expect(combustionCeiling(planet)).toBe(60);
-    expect(combustionCeiling(placement(24))).toBe(24);
+    expect(getEffectiveStatsFromPlacement(planet).resolve).toBe(60);
+    expect(getEffectiveStatsFromPlacement(placement(24)).resolve).toBe(24);
   });
 });
 
 describe("isCombusted", () => {
-  // Combustion is derived, never stored (STATE.md): affliction caps at the
-  // ceiling, so at-the-ceiling *is* combusted.
-  it("false at zero and below the ceiling — a recoverable margin", () => {
+  // Combustion is derived, never stored (STATE.md): tension caps at
+  // Resolve, so at Resolve *is* combusted.
+  it("false at zero and below Resolve — remaining Resolve to recover", () => {
     expect(isCombusted(placement(48), state(0))).toBe(false);
     expect(isCombusted(placement(48), state(47))).toBe(false);
   });
 
-  it("true the moment affliction reaches the ceiling", () => {
+  it("true the moment tension reaches Resolve", () => {
     expect(isCombusted(placement(48), state(48))).toBe(true);
     expect(isCombusted(placement(48), state(60))).toBe(true);
   });
 });
 
 describe("wouldCombust", () => {
-  it("true when the blow reaches the ceiling, false while margin remains", () => {
+  it("true when the blow reaches Resolve, false while remaining Resolve stays above zero", () => {
     expect(wouldCombust(placement(60), state(12), 48)).toBe(true);  // 12+48 = 60
     expect(wouldCombust(placement(60), state(11), 48)).toBe(false); // 11+48 = 59
   });
@@ -68,7 +68,7 @@ describe("wouldCombust", () => {
 });
 
 describe("newlyCombusted", () => {
-  it("reports only planets that crossed the ceiling between the two states", () => {
+  it("reports only planets that reached their Resolve between the two states", () => {
     const chart = seededChart(42);
     const before = {} as Record<string, PlanetState>;
     const after = {} as Record<string, PlanetState>;
@@ -76,21 +76,21 @@ describe("newlyCombusted", () => {
       before[p] = state(0);
       after[p] = state(0);
     }
-    const sunCeiling = combustionCeiling(chart.planets.Sun);
-    const moonCeiling = combustionCeiling(chart.planets.Moon);
-    after.Sun = state(sunCeiling);                       // crossed
-    before.Moon = state(moonCeiling);
-    after.Moon = state(moonCeiling);                     // already out
-    after.Mars = state(combustionCeiling(chart.planets.Mars) - 1); // wounded, live
+    const sunResolve = getEffectiveStatsFromPlacement(chart.planets.Sun).resolve;
+    const moonResolve = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve;
+    after.Sun = state(sunResolve);                       // crossed
+    before.Moon = state(moonResolve);
+    after.Moon = state(moonResolve);                     // already out
+    after.Mars = state(getEffectiveStatsFromPlacement(chart.planets.Mars).resolve - 1); // wounded, live
     expect(newlyCombusted(chart, before as never, after as never)).toEqual(["Sun"]);
   });
 });
 
 describe("uncombust", () => {
-  it("returns the planet at half its ceiling — back, but scarred (§10)", () => {
+  it("returns the planet at half its Resolve — back, but scarred (§10)", () => {
     const s = state(48);
     uncombust(placement(48), s);
     expect(isCombusted(placement(48), s)).toBe(false);
-    expect(s.affliction).toBe(24);
+    expect(s.tension).toBe(24);
   });
 });

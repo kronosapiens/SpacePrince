@@ -1,5 +1,6 @@
 import { runChart, seededChart } from "@/game/chart";
-import { combustionCeiling, newlyCombusted } from "@/game/combust";
+import { newlyCombusted } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { UNLOCK_THRESHOLDS } from "@/game/data";
 import { encounterRuler } from "@/game/encounter";
 import { eligibleNext } from "@/game/map-gen";
@@ -9,7 +10,7 @@ import { relationalTurnRng } from "@/game/turn";
 import { thresholdCrossedBy, unlockedPlanets } from "@/game/unlocks";
 import { princeReducer } from "@/state/prince-reducer";
 import type { Chart, RelationalEncounter, NarrativeEncounter, PlanetName, Polarity, Run } from "@/game/types";
-import { emptyRelationalPressure, playEncounter, snapshot, statePressure, type RelationalPressure, type PlayContext, type Policy, type Snapshot, type Step, type Trial } from "./play";
+import { emptyRelationalTension, playEncounter, snapshot, stateTension, type RelationalTension, type PlayContext, type Policy, type Snapshot, type Step, type Trial } from "./play";
 import { POLICIES } from "./policies";
 
 export interface RunSummary {
@@ -17,7 +18,7 @@ export interface RunSummary {
   finalLifetimeRelationalEncounterCount: number;
   unlocks: PlanetName[];
   unlockRescues: number;
-  pressure: RunPressure;
+  tension: RunTension;
   endReason: "completion" | "combustion";
   mapsCompleted: number;
   /** Where the run ended: the last encounter entered, and the last choice made in it. */
@@ -45,18 +46,18 @@ export interface RunSummary {
   narrativeOptions: Record<string, number>;
 }
 
-/** Capacity ledger for the fielded Self roster, in actual affliction points. */
-export interface RunPressure {
-  relational: RelationalPressure;
-  entryDamage: number; entryDeaths: number; entryWipes: number; entryWipeRescues: number;
-  narrativeDamage: number; narrativeHealing: number; narrativeRevivalRecovery: number; resolveGain: number;
+/** Capacity ledger for the fielded Self roster, in actual tension points. */
+export interface RunTension {
+  relational: RelationalTension;
+  entryTension: number; entryDeaths: number; entryWipes: number; entryWipeRescues: number;
+  narrativeCreated: number; narrativeEased: number; narrativeRevivalRecovery: number; resolveGain: number;
   boundaryRevivalRecovery: number; unlockCapacity: number;
   capacityStart: number; capacityEnd: number;
 }
 
-export function emptyRunPressure(): RunPressure {
-  return { relational: emptyRelationalPressure(), entryDamage: 0, entryDeaths: 0, entryWipes: 0, entryWipeRescues: 0,
-    narrativeDamage: 0, narrativeHealing: 0, narrativeRevivalRecovery: 0, resolveGain: 0,
+export function emptyRunTension(): RunTension {
+  return { relational: emptyRelationalTension(), entryTension: 0, entryDeaths: 0, entryWipes: 0, entryWipeRescues: 0,
+    narrativeCreated: 0, narrativeEased: 0, narrativeRevivalRecovery: 0, resolveGain: 0,
     boundaryRevivalRecovery: 0, unlockCapacity: 0, capacityStart: 0, capacityEnd: 0 };
 }
 
@@ -140,7 +141,7 @@ export function runTrial(trial: Trial, policy: Policy = POLICIES[trial.strategy]
 function capacity(chart: Chart, point: Snapshot, lifetimeRelationalEncounterCount: number): number {
   const placements = runChart(chart, point).planets;
   return unlockedPlanets(lifetimeRelationalEncounterCount).reduce((sum, p) =>
-    sum + Math.max(0, combustionCeiling(placements[p]) - point.affliction[p]), 0);
+    sum + Math.max(0, getEffectiveStatsFromPlacement(placements[p]).resolve - point.tension[p]), 0);
 }
 
 function boundaryStep(run: Run): Step {
@@ -169,14 +170,14 @@ function summarize(steps: Step[], run: Run, chart: Chart, startingLifetimeRelati
   let choice: Extract<Step, { kind: "turn" | "narrative" }> | undefined;
   let relationalEncounters = 0, narrativeEncounters = 0, relationalTurns = 0;
   let combustions = 0, boundaryRevivals = 0, narrativeRevivals = 0;
-  const pressure = emptyRunPressure(), unlocks: PlanetName[] = [];
+  const tension = emptyRunTension(), unlocks: PlanetName[] = [];
   let unlockRescues = 0, lifetimeRelationalEncounterCount = startingLifetimeRelationalEncounterCount;
-  pressure.capacityStart = capacity(chart, steps[0]!, startingLifetimeRelationalEncounterCount);
-  pressure.capacityEnd = capacity(chart, snapshot(run), finalLifetimeRelationalEncounterCount);
+  tension.capacityStart = capacity(chart, steps[0]!, startingLifetimeRelationalEncounterCount);
+  tension.capacityEnd = capacity(chart, snapshot(run), finalLifetimeRelationalEncounterCount);
   for (const [index, step] of steps.entries()) {
     if (step.kind === "boundary") {
       boundaryRevivals += step.uncombusts.filter((u) => u.success).length;
-      if (index > 0) pressure.boundaryRevivalRecovery += statePressure(chart, steps[index - 1]!, step, unlockedPlanets(lifetimeRelationalEncounterCount)).revivalRecovery;
+      if (index > 0) tension.boundaryRevivalRecovery += stateTension(chart, steps[index - 1]!, step, unlockedPlanets(lifetimeRelationalEncounterCount)).revivalRecovery;
     } else if (step.kind === "enter") {
       entry = step;
       choice = undefined;
@@ -184,9 +185,9 @@ function summarize(steps: Step[], run: Run, chart: Chart, startingLifetimeRelati
       if (step.encounter === "relational") {
         relationalEncounters++;
         combustions += step.combusts.length;
-        pressure.entryDamage += step.necessity.reduce((sum, n) => sum + n.amount, 0);
-        pressure.entryDeaths += step.combusts.length;
-        pressure.entryWipes += +step.wipe;
+        tension.entryTension += step.necessity.reduce((sum, n) => sum + n.amount, 0);
+        tension.entryDeaths += step.combusts.length;
+        tension.entryWipes += +step.wipe;
       }
       else narrativeEncounters++;
     } else if (step.kind === "turn") {
@@ -194,23 +195,23 @@ function summarize(steps: Step[], run: Run, chart: Chart, startingLifetimeRelati
       relationalTurns++;
       verbs[step.verb]++;
       combustions += step.combusts.length;
-      for (const key of Object.keys(pressure.relational) as (keyof RelationalPressure)[]) pressure.relational[key] += step.pressure[key];
+      for (const key of Object.keys(tension.relational) as (keyof RelationalTension)[]) tension.relational[key] += step.tensionChange[key];
     } else if (step.kind === "narrative") {
       choice = step;
       combustions += step.combusts.length;
       narrativeRevivals += step.revivals.length;
       const key = `${entry?.encounter === "narrative" ? entry.scenarioId : ""}/${step.optionId}`;
       narrativeOptions[key] = (narrativeOptions[key] ?? 0) + 1;
-      pressure.narrativeDamage += step.pressure.damage;
-      pressure.narrativeHealing += step.pressure.healing;
-      pressure.narrativeRevivalRecovery += step.pressure.revivalRecovery;
-      pressure.resolveGain += step.pressure.resolveGain;
+      tension.narrativeCreated += step.tensionChange.created;
+      tension.narrativeEased += step.tensionChange.eased;
+      tension.narrativeRevivalRecovery += step.tensionChange.revivalRecovery;
+      tension.resolveGain += step.tensionChange.resolveGain;
     } else {
       lifetimeRelationalEncounterCount = step.lifetimeRelationalEncounterCount;
       unlocks.push(step.planet);
       unlockRescues += +step.rescuedByUnlock;
-      pressure.unlockCapacity += step.capacity;
-      pressure.entryWipeRescues += +(step.entryWipe && step.rescuedByUnlock);
+      tension.unlockCapacity += step.capacity;
+      tension.entryWipeRescues += +(step.entryWipe && step.rescuedByUnlock);
     }
   }
   // A relational may end at entry, before any choice.
@@ -218,7 +219,7 @@ function summarize(steps: Step[], run: Run, chart: Chart, startingLifetimeRelati
   const endReason = run.mapsCompleted >= MAPS_PER_RUN ? "completion" : "combustion";
   const fatal = (kind: "relational" | "narrative") => (endReason === "combustion" && last.encounter === kind ? 1 : 0);
   return {
-    startingLifetimeRelationalEncounterCount, finalLifetimeRelationalEncounterCount, unlocks, unlockRescues, pressure,
+    startingLifetimeRelationalEncounterCount, finalLifetimeRelationalEncounterCount, unlocks, unlockRescues, tension,
     endReason,
     mapsCompleted: run.mapsCompleted,
     terminalMap: last.map,

@@ -3,7 +3,7 @@ import { computeProjectedEffects, type ComputeProjectedEffectsInput } from "@/ga
 import { getAspects } from "@/game/aspects";
 import { PLANETS } from "@/game/data";
 import { seededChart, blankSideState } from "@/game/chart";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { beginRun } from "@/game/run";
 import { beginRelationalEncounter } from "@/game/encounter";
 import { resolveTurn } from "@/game/turn";
@@ -15,8 +15,8 @@ describe("propagation projections", () => {
     const chart = seededChart(42);
     const opp = seededChart(99);
     const playerState = blankSideState();
-    // At the ceiling = combusted (derived, STATE.md).
-    playerState.Sun.affliction = combustionCeiling(chart.planets.Sun);
+    // At Resolve = combusted (derived, STATE.md).
+    playerState.Sun.tension = getEffectiveStatsFromPlacement(chart.planets.Sun).resolve;
     const projected = computeProjectedEffects({
       playerChart: chart,
       opponentChart: opp,
@@ -41,7 +41,7 @@ describe("propagation projections", () => {
     // has nowhere to land: only Mars itself may project.
     const playerState = blankSideState();
     for (const p of Object.keys(playerState) as Array<keyof typeof playerState>) {
-      if (p !== "Mars") playerState[p].affliction = combustionCeiling(chart.planets[p]);
+      if (p !== "Mars") playerState[p].tension = getEffectiveStatsFromPlacement(chart.planets[p]).resolve;
     }
     const projected = computeProjectedEffects({
       playerChart: chart,
@@ -66,8 +66,8 @@ describe("propagation projections", () => {
     const chart = seededChart(42);
     const opp = seededChart(99);
     const opponentState = blankSideState();
-    // One point of margin: any afflict combusts the actor on landing.
-    opponentState.Moon.affliction = combustionCeiling(opp.planets.Moon) - 1;
+    // One point of remaining Resolve: any afflict combusts the actor on landing.
+    opponentState.Moon.tension = getEffectiveStatsFromPlacement(opp.planets.Moon).resolve - 1;
     const base: ComputeProjectedEffectsInput = {
       playerChart: chart,
       opponentChart: opp,
@@ -111,9 +111,9 @@ describe("propagation projections", () => {
     // Untouched, the blow ripples past the catcher into its web.
     const rippling = computeProjectedEffects(base);
     expect(Object.keys(rippling.self).length).toBeGreaterThan(1);
-    // At one point of margin the catcher combusts on landing and conducts nothing.
+    // At one point of remaining Resolve the catcher combusts on landing and conducts nothing.
     const playerState = blankSideState();
-    playerState[catcher].affliction = combustionCeiling(chart.planets[catcher]) - 1;
+    playerState[catcher].tension = getEffectiveStatsFromPlacement(chart.planets[catcher]).resolve - 1;
     const combusting = computeProjectedEffects({ ...base, playerState });
     expect(Object.keys(combusting.self)).toEqual([catcher]);
   });
@@ -134,7 +134,7 @@ describe("propagation — only the fielded roster conducts", () => {
       playerValence: "Testimony",
       opponentValence: "Affliction",
       playerState: blankSideState(),
-      opponentState: { ...blankSideState(), Moon: { affliction: 12 } },
+      opponentState: { ...blankSideState(), Moon: { tension: 12 } },
       playerAspects: getAspects(chart),
       opponentAspects: getAspects(opp),
       roster: ["Moon"],
@@ -143,7 +143,7 @@ describe("propagation — only the fielded roster conducts", () => {
     expect(Object.keys(projected.other)).toEqual(["Moon"]);
   });
 
-  it("the resolver logs no hop into a ghost and leaves its affliction alone", () => {
+  it("the resolver logs no hop into a ghost and leaves its tension alone", () => {
     const prince = createStubPrince({ seed: 7 });
     const run = beginRun(prince.chart, 42);
     const full = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 64 });
@@ -165,8 +165,8 @@ describe("propagation — only the fielded roster conducts", () => {
     const soloEnc = solo.encounter as RelationalEncounter;
     for (const p of PLANETS) {
       if (p === planet) continue;
-      expect(contained.run.state[p].affliction).toBe(run.state[p].affliction);
-      expect(contained.encounter.opponentState[p].affliction).toBe(soloEnc.opponentState[p].affliction);
+      expect(contained.run.state[p].tension).toBe(run.state[p].tension);
+      expect(contained.encounter.opponentState[p].tension).toBe(soloEnc.opponentState[p].tension);
     }
   });
 });

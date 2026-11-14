@@ -6,7 +6,7 @@ import { EncounterNarrativeScreen } from "@/screens/EncounterNarrative";
 import { beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun } from "@/game/run";
 import { PLANETS } from "@/game/data";
-import { combustionCeiling } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { getScenario } from "@/data/narrative-scenarios";
 import { INTERACTION_SCENE } from "./narrative-fixture";
 import { createStubPrince } from "./fixtures";
@@ -48,10 +48,10 @@ afterEach(() => {
 function mount(id: string, prince = createStubPrince(), light = 120) {
   const scenario = getScenario(id);
   const run = { ...beginRun(prince.chart, 42, prince.numRelationalEncounters), light };
-  run.state.Moon.affliction = 10;
-  run.state.Sun.affliction = 10;
-  run.state.Mars.affliction = 24;
-  run.state.Venus.affliction = combustionCeiling(prince.chart.planets.Venus);
+  run.state.Moon.tension = 10;
+  run.state.Sun.tension = 10;
+  run.state.Mars.tension = 24;
+  run.state.Venus.tension = getEffectiveStatsFromPlacement(prince.chart.planets.Venus).resolve;
   const encounter = beginNarrativeEncounter({ run, house: scenario.house, scenarioId: id });
   run.encounter = encounter;
   const onCommit = vi.fn();
@@ -105,7 +105,7 @@ describe("narrative chart interaction", () => {
     expect(onCommit).not.toHaveBeenCalled();
     focus('[data-guide="planet-self-venus"]');
     expect(document.querySelector('[data-guide="arc-self-venus"] .arc-diff')).not.toBeNull();
-    expect(element(".ps-effect").textContent).toBe(`Testify ${run.state.Venus.affliction / 2}`);
+    expect(element(".ps-effect").textContent).toBe(`Testify ${run.state.Venus.tension / 2}`);
     expect(document.querySelector(".ps-action")).toBeNull();
     expect(onCommit).not.toHaveBeenCalled();
     act(() => {
@@ -117,7 +117,7 @@ describe("narrative chart interaction", () => {
     expect(vi.mocked(playUISound).mock.calls.filter(([cue]) => cue === "commit")).toHaveLength(1);
     const next = onCommit.mock.calls[0]![0];
     expect(next.light).toBe(36);
-    expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction / 2);
+    expect(next.state.Venus.tension).toBe(run.state.Venus.tension / 2);
     render(next);
     expect([...document.querySelectorAll(".option")].map((option) => option.textContent)).toEqual(options);
     expect(element(".option.is-selected").getAttribute("data-guide")).toBe("option-4");
@@ -138,8 +138,8 @@ describe("narrative chart interaction", () => {
     expect(onCommit).not.toHaveBeenCalled();
     click('[data-guide="planet-self-moon"]');
     const next = onCommit.mock.calls[0]![0];
-    expect(next.state.Mars.affliction).toBe(24);
-    expect(next.state.Moon.affliction).toBe(0);
+    expect(next.state.Mars.tension).toBe(24);
+    expect(next.state.Moon.tension).toBe(0);
   });
 
   it("keeps group healing at its authored amount while previewing and applying individual recovery", () => {
@@ -155,10 +155,10 @@ describe("narrative chart interaction", () => {
     expect(onCommit).not.toHaveBeenCalled();
     click('[data-guide="option-5"]');
     const next = onCommit.mock.calls[0]![0];
-    expect(next.state.Sun.affliction).toBe(0);
-    expect(next.state.Moon.affliction).toBe(0);
-    expect(next.state.Mars.affliction).toBe(0);
-    expect(next.state.Venus.affliction).toBe(run.state.Venus.affliction);
+    expect(next.state.Sun.tension).toBe(0);
+    expect(next.state.Moon.tension).toBe(0);
+    expect(next.state.Mars.tension).toBe(0);
+    expect(next.state.Venus.tension).toBe(run.state.Venus.tension);
     expect(next.light).toBe(96);
   });
 
@@ -174,7 +174,7 @@ describe("narrative chart interaction", () => {
     expect(element(".ps-effect").textContent).toBe("Testify 10");
     hoverOption(1);
     choose("mars");
-    expect(onCommit.mock.calls[0]![0].state.Mars.affliction).toBe(0);
+    expect(onCommit.mock.calls[0]![0].state.Mars.tension).toBe(0);
     expect(onCommit.mock.calls[0]![0].light).toBe(120);
   });
 
@@ -286,20 +286,20 @@ describe("narrative Resolve previews", () => {
     for (const planet of PLANETS) prince.chart.planets[planet].sign = "Aries";
     if (free) Object.assign(prince.chart.planets.Saturn, { sign: "Capricorn", dignity: "Domicile" });
     const { run, onCommit, render } = mount("home-capricorn-salting", prince);
-    const ceiling = combustionCeiling(prince.chart.planets.Moon);
-    const remaining = ceiling - run.state.Moon.affliction;
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
+    const remaining = resolve - run.state.Moon.tension;
     const arc = () => element('[data-guide="arc-self-moon"]');
     const trackBefore = arc().firstElementChild!.getAttribute("d");
     click('[data-guide="option-2"]');
     focus('[data-guide="planet-self-moon"]');
-    expect(element(".ps-ratio").textContent).toBe(`Resolve${remaining}/${ceiling}→ ${remaining + (free ? 12 : 0)}/${ceiling + 12}`);
+    expect(element(".ps-ratio").textContent).toBe(`Resolve${remaining}/${resolve}→ ${remaining + (free ? 12 : 0)}/${resolve + 12}`);
     expect(arc().firstElementChild!.getAttribute("d")).not.toBe(trackBefore);
     expect(arc().querySelector(".arc-diff") !== null).toBe(free);
     expect(run.gains.Moon.resolve).toBe(0);
     choose("moon");
     const next = onCommit.mock.calls[0]![0];
     expect(next.gains.Moon.resolve).toBe(12);
-    expect(next.state.Moon.affliction).toBe(run.state.Moon.affliction + (free ? 0 : 12));
+    expect(next.state.Moon.tension).toBe(run.state.Moon.tension + (free ? 0 : 12));
     render(next);
     expect(arc().querySelector(".arc-diff")).toBeNull();
   });

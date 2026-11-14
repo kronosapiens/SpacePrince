@@ -17,7 +17,8 @@
 import { writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { cloneSideState, seededChart } from "@/game/chart";
-import { combustionCeiling, isCombusted, uncombust } from "@/game/combust";
+import { isCombusted, uncombust } from "@/game/combust";
+import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS, UNLOCK_THRESHOLDS } from "@/game/data";
 import { beginRelationalEncounter } from "@/game/encounter";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
@@ -61,14 +62,14 @@ const VERBS: Polarity[] = ["Affliction", "Testimony"];
 /** Baseline-only observer: snapshots at each map opening, and per-relational tallies. */
 interface Watch {
   mapOpened(run: Run): void;
-  relational(map: number, light: number, afflictionTaken: number): void;
+  relational(map: number, light: number, tensionTaken: number): void;
 }
 
-const fieldedAffliction = (run: Run) => ROSTER.reduce((s, p) => s + run.state[p].affliction, 0);
+const fieldedTension = (run: Run) => ROSTER.reduce((s, p) => s + run.state[p].tension, 0);
 
 /**
  * Greedy policy: the lit planet and verb that gather the most Light this turn,
- * ties broken by the least affliction left on the player's fielded planets,
+ * ties broken by the least tension left on the player's fielded planets,
  * then by roster and verb order. Each candidate runs the real resolver with a
  * throwaway rng — the rng only draws the next precommit, never this outcome.
  */
@@ -79,7 +80,7 @@ function chooseAction(run: Run, chart: Chart): { planet: PlanetName; verb: Polar
     for (const verb of VERBS) {
       const result = resolveTurn(run, chart, planet, verb, () => 0)!;
       const light = result.log.lightGain;
-      const load = fieldedAffliction(result.run);
+      const load = fieldedTension(result.run);
       if (!best || light > best.light || (light === best.light && load < best.load)) {
         best = { planet, verb, light, load };
       }
@@ -104,7 +105,7 @@ function playRelational(run: Run, chart: Chart, opponentSeed: number, watch?: Wa
     const rng = mulberry32((r.seed ^ enc.turnIndex ^ hashString(enc.id)) >>> 0);
     r = resolveTurn(r, chart, planet, verb, rng)!.run;
   }
-  watch?.relational(map, r.light - run.light, fieldedAffliction(r) - fieldedAffliction(run));
+  watch?.relational(map, r.light - run.light, fieldedTension(r) - fieldedTension(run));
   return { ...r, encounter: null };
 }
 
@@ -159,7 +160,7 @@ const PRICE: Record<Treatment, number | null> = {
 };
 
 /** +12 to a stat for the rest of the run: placement buffs feed both the
- *  effective stats and the combustion ceiling. */
+ *  effective stats and the planet's Resolve. */
 function buffed(chart: Chart, planet: PlanetName, stat: keyof PlanetStats): Chart {
   const next = structuredClone(chart);
   next.planets[planet].buffs[stat] += 12;
@@ -167,7 +168,7 @@ function buffed(chart: Chart, planet: PlanetName, stat: keyof PlanetStats): Char
 }
 
 /** Applies a treatment at a map opening; null when it is ineligible. `moved`
- *  is the affliction actually removed or added. */
+ *  is the tension actually removed or added. */
 function treat(
   treatment: Treatment,
   run: Run,
@@ -181,20 +182,20 @@ function treat(
   switch (treatment) {
     case "recover24": {
       if (!lit) return null;
-      const moved = Math.min(24, ps.affliction);
-      ps.affliction -= moved;
+      const moved = Math.min(24, ps.tension);
+      ps.tension -= moved;
       return { run: { ...run, state }, chart, moved };
     }
     case "afflict24":
-      // Landing exactly on the ceiling combusts; past it does not fit.
-      if (ps.affliction + 24 > combustionCeiling(placement)) return null;
-      ps.affliction += 24;
+      // Landing exactly on Resolve combusts; past it does not fit.
+      if (ps.tension + 24 > getEffectiveStatsFromPlacement(placement).resolve) return null;
+      ps.tension += 24;
       return { run: { ...run, state }, chart, moved: 24 };
     case "revive":
       if (lit) return null;
       uncombust(placement, ps);
       return { run: { ...run, state }, chart, moved: 0 };
-    // Raising a combusted planet's ceiling would silently revive it.
+    // Raising a combusted planet's Resolve would silently revive it.
     case "resolve12":
       return lit ? { run, chart: buffed(chart, planet, "resolve"), moved: 0 } : null;
     case "testify12":
@@ -213,7 +214,7 @@ interface MapTally {
   litAtOpen: number;
   relationalEncounters: number;
   light: number;
-  afflictionTaken: number;
+  tensionTaken: number;
 }
 
 interface Obs {
@@ -226,7 +227,7 @@ interface Obs {
 }
 
 const mapTallies: MapTally[] = Array.from({ length: MAPS_PER_RUN }, () => ({
-  reached: 0, litAtOpen: 0, relationalEncounters: 0, light: 0, afflictionTaken: 0,
+  reached: 0, litAtOpen: 0, relationalEncounters: 0, light: 0, tensionTaken: 0,
 }));
 const finalLights: number[] = [];
 const earlyEnds: number[] = Array(MAPS_PER_RUN).fill(0); // by map the run ended on
@@ -245,11 +246,11 @@ for (let i = 0; i < CHARTS; i++) {
       tally.reached++;
       tally.litAtOpen += ROSTER.filter((p) => !isCombusted(chart.planets[p], run.state[p])).length;
     },
-    relational(map, light, afflictionTaken) {
+    relational(map, light, tensionTaken) {
       const tally = mapTallies[map - 1]!;
       tally.relationalEncounters++;
       tally.light += light;
-      tally.afflictionTaken += afflictionTaken;
+      tally.tensionTaken += tensionTaken;
     },
   });
   finalLights.push(baseline.light);
@@ -334,7 +335,7 @@ const baselineRows = mapTallies.map((t, m) => ({
   litAtOpen: t.litAtOpen / t.reached,
   relationalEncounters: t.relationalEncounters / t.reached,
   lightPerRelationalEncounter: t.light / t.relationalEncounters,
-  afflictionPerRelationalEncounter: t.afflictionTaken / t.relationalEncounters,
+  tensionPerRelationalEncounter: t.tensionTaken / t.relationalEncounters,
   lightPerMap: t.light / t.reached,
 }));
 
@@ -368,18 +369,18 @@ const out: string[] = [];
 out.push(
   `Space Prince economy simulation — roster ${ROSTER.length} (${ROSTER.join(", ")}), ` +
     `${CHARTS} charts, treatments at maps ${TREAT_MAPS.join(",")}, seed ${BASE_SEED}`,
-  `Policy: greedy max Light per turn (ties: least own affliction, then roster/verb order); ` +
+  `Policy: greedy max Light per turn (ties: least own tension, then roster/verb order); ` +
     `uniform random path; narrative nodes walked away from.`,
   `Runtime: ${elapsed.toFixed(1)}s (${(elapsed / CHARTS).toFixed(2)}s per chart, ` +
     `${observations.length} treated runs)`,
   "",
-  "Baseline by map (Light and affliction per relational encounter; affliction is the net rise on the player's",
+  "Baseline by map (Light and tension per relational encounter; tension is the net rise on the player's",
   "fielded planets across the relational encounter, excluding map-opening Necessity)",
   table(
-    ["map", "reached", "lit at open", "relational encounters", "Light/relational encounter", "affliction/relational encounter", "Light/map"],
+    ["map", "reached", "lit at open", "relational encounters", "Light/relational encounter", "tension/relational encounter", "Light/map"],
     baselineRows.map((r) => [
       String(r.map), pct(r.reached), fmt(r.litAtOpen, 2), fmt(r.relationalEncounters, 2),
-      fmt(r.lightPerRelationalEncounter), fmt(r.afflictionPerRelationalEncounter), fmt(r.lightPerMap),
+      fmt(r.lightPerRelationalEncounter), fmt(r.tensionPerRelationalEncounter), fmt(r.lightPerMap),
     ]),
   ),
   "",
@@ -391,7 +392,7 @@ out.push(
       : ""),
   "",
   "Treatments: change in final Light per application (SE clustered by chart).",
-  "Eligible = share of chart × planet slots where it applied; Light/pt = per affliction point moved.",
+  "Eligible = share of chart × planet slots where it applied; Light/pt = per tension point moved.",
   table(
     ["treatment", "price", "map", "eligible", "n", "ΔLight", "SE", "Light/pt", "SE", "pts moved"],
     treatmentRows.map((r) => [

@@ -14,7 +14,7 @@ const lightParts = (delta: number): EffectTextPart[] => [
 ];
 const plainText = (parts: EffectTextPart[]) => parts.map((part) => part.text).join("");
 
-function afflictionParts(delta: number, target: string): EffectTextPart[] {
+function tensionParts(delta: number, target: string): EffectTextPart[] {
   return [
     { text: `${delta < 0 ? "Testify" : "Afflict"} ${Math.abs(delta)}`, kind: valence(delta) },
     { text: ` on ${target}` },
@@ -33,8 +33,8 @@ function targetName(target: Target, ctx: NarrativeContext, selection: Selection)
     case "joy": return ctx.joyPlanet ?? "the house's joy";
     case "ruler": return ctx.rulerPlanet;
     case "allUnlocked": return "each lit planet";
-    case "mostAfflicted": return "the most afflicted lit planet";
-    case "healthiest": return "the lit planet with the most Resolve remaining";
+    case "mostTension": return "the lit planet with the most tension";
+    case "mostRemainingResolve": return "the lit planet with the most remaining Resolve";
   }
 }
 
@@ -42,16 +42,16 @@ type PlanetOutcome = Exclude<Outcome, { kind: "light" }>;
 
 function planetParts(effect: PlanetOutcome, name: string, named: boolean): EffectTextPart[] {
   if (effect.kind === "uncombust") return [{ text: `call back ${name} at half Resolve` }];
-  if (effect.kind === "affliction") return afflictionParts(effect.delta, name);
+  if (effect.kind === "tension") return tensionParts(effect.delta, name);
   // A gain on the planet the previous effect named reads as the same planet.
   return [{ text: `+${displayStat(effect.stat, effect.amount)} ${STAT_LABEL[effect.stat]}${named ? "" : ` on ${name}`}` }];
 }
 
 /** Authored amounts stay fixed; the chart preview shows actual changes. A
- *  zero affliction (an occupant's dignity can bring it there) goes unmentioned. */
+ *  zero tension effect (an occupant's dignity can bring it there) goes unmentioned. */
 export function describeOptionParts(ctx: NarrativeContext, option: Option, selection: Selection = {}): EffectTextPart[] {
   const planetEffects = option.result.effects.filter((e): e is PlanetOutcome =>
-    e.kind !== "light" && !(e.kind === "affliction" && e.delta === 0));
+    e.kind !== "light" && !(e.kind === "tension" && e.delta === 0));
   return joinEffects([
     ...planetEffects.map((e, i) =>
       planetParts(e, targetName(e.target, ctx, selection), planetEffects[i - 1]?.target === e.target)),
