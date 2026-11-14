@@ -483,7 +483,7 @@ export function Chart(props: ChartProps) {
             invite={inviteInteraction && !opening && !selectedPlanet}
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
-            necessityAccent={opening?.phase === "accent" && opening.entries.some((entry) => entry.planet === p.planet)}
+            necessityAccent={opening?.entries.some((entry) => entry.planet === p.planet)}
             combusting={isCombusting}
             effectPolarity={effectPolarity}
             animationEpoch={animationEpoch}
@@ -819,13 +819,10 @@ function PlanetArc({
   // rather than a comparison of two lengths. The predicate is `wouldCombust`
   // itself, not a second reading of the same arithmetic.
   let diff: { from: number; to: number; color: string } | null = null;
-  if (necessity && openingPhase && openingPhase !== "revival" && openingPhase !== "accent") {
+  if (necessity) {
     // Before settlement the base arc still holds its pre-necessity state.
-    // The necessity phase shows the raw draw (old records lack it; their amount
-    // is all we can show); from the Fortune phase on, the amount added.
     const from = openingPhase === "settle" ? Math.max(0, spent - necessity.amount) : spent;
-    const amount = openingPhase === "necessity" ? necessity.draw ?? necessity.amount : necessity.amount;
-    const to = clamp(from + amount, from, resolve);
+    const to = clamp(from + necessity.amount, from, resolve);
     if (to > from) diff = { from, to, color: to >= resolve ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
   } else if (projection) {
     const harm = projection.polarity !== "Testimony";

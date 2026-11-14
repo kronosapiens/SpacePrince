@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadPrince, savePrince } from "@/state/prince";
 import { beginRun, FIRST_MAP_SEED, MAPS_PER_RUN } from "@/game/run";
+import { beginRelationalEncounter } from "@/game/encounter";
 import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANET_GLYPH } from "@/svg/glyphs";
@@ -11,6 +12,7 @@ import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
 import { PRIMER_FRAMING } from "@/copy/primer";
 import { playUISound, setTheme } from "@/audio/engine";
+import { TIMINGS } from "@/svg/timings";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
@@ -109,16 +111,42 @@ describe("entry screens", () => {
     expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
   });
 
+  it("holds travel until a planet introduction earned on the way opens, a moment after the map", () => {
+    const prince = createStubPrince({ numRelationalEncounters: 0 });
+    const run = beginRun(prince.chart, 42, 0);
+    run.encounter = { ...beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 0 }), resolved: true, turnIndex: 1 };
+    // Past the first map, so no first-visit guide opens.
+    run.mapsCompleted = 1;
+    prince.runs = [run];
+    savePrince(prince);
+    act(() => root.render(<GameTest path="/play" />));
+    click(document.querySelector(".chorus-continue")!);
+    act(() => vi.advanceTimersByTime(TIMINGS.leave.encounter));
+    expect(loadPrince()!.runs[0]!.encounter).toBeNull();
+    const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
+    const node = `[data-guide="node-${next}"]`;
+    expect(element(node).closest('[role="button"]')).toBeNull();
+    click(element(node));
+    expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(run.map.currentNodeId);
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.card - 1));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-label")).toBe("Mercury unlocked");
+    click(document.querySelector(".info-card-close")!);
+    click(element(node));
+    expect(loadPrince()!.runs[0]!.map.currentNodeId).toBe(next);
+  });
+
   it("keeps one chart through a live casting preview, the ceremony, and entry to Map", () => {
     act(() => root.render(<GameTest />));
     const chart = element(".chart-svg");
     const samplePositions = planetPositions();
     click(element(".begin-btn"));
-    act(() => vi.advanceTimersByTime(420));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.titleFade));
     expect(element(".chart-svg")).toBe(chart);
     expect(planetPositions()).toEqual(samplePositions);
     click(element(".begin-btn"));
-    act(() => vi.advanceTimersByTime(400));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.framingFade));
 
     expect((element('[type="date"]') as HTMLInputElement).value).toBe("2000-01-01");
     expect((element('[type="time"]') as HTMLInputElement).value).toBe("00:00");
@@ -143,15 +171,17 @@ describe("entry screens", () => {
     click(element(".mint-submit"));
     expect(planetPositions()).toEqual(previewPositions);
     for (let i = 0; i < 7; i++) {
-      act(() => vi.advanceTimersByTime(2500));
+      act(() => vi.advanceTimersByTime(TIMINGS.mint.revealInterval));
       expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(i + 1);
       expect(element(".chart-svg")).toBe(chart);
     }
-    act(() => vi.advanceTimersByTime(1500));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.revealInterval - 1));
+    expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(7);
+    act(() => vi.advanceTimersByTime(1));
     expect(container.querySelectorAll('[data-guide^="planet-self-"]')).toHaveLength(0);
     expect(container.querySelector(".planet-band.is-on")).toBeNull();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    act(() => vi.advanceTimersByTime(1500));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.dimmed));
     expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-label")).toBe("Moon unlocked");
     expect(container.querySelector(".begin-btn")).toBeNull();
     click(document.querySelector(".info-card-close")!);
@@ -175,7 +205,9 @@ describe("entry screens", () => {
     expect(container.querySelector(".map-boundary")).toBeNull();
     expect(container.querySelector(".map-screen .chart-svg .necessity-opening")).toBeNull();
     expect(container.querySelector(".necessity-title")).toBeNull();
-    // A new Prince's first map opens its guide by itself.
+    // A new Prince's first map opens its guide by itself, a moment after arriving.
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.guide));
     expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-label")).toBe("Read the map");
     click(document.querySelector(".guide-close")!);
     expect(document.querySelector('[role="dialog"]')).toBeNull();
@@ -189,7 +221,7 @@ describe("entry screens", () => {
     const chart = element(".chart-svg");
     click(element('[role="button"][aria-label="Moon"]'));
     click(element(".begin-btn"));
-    act(() => vi.advanceTimersByTime(420));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.titleFade));
     expect(element(".map-screen .chart-svg")).toBe(chart);
     finishOpening();
     expect(element(".ps-name").textContent).toContain("MOON");

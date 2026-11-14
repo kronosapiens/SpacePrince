@@ -615,7 +615,9 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
                 <span style={{ color: NEUTRAL.gold }}>Necessity</span> settles
               </p>
             ) : !settled && displayOpponentTurn && displayOpponentAction && (
-              <p className="relational-announce-line" data-guide="opponent-move">
+              // Keyed by turn, so each turn's move fades in rather than replacing
+              // the last in the frame its playback ends.
+              <p key={displayTurnIndex} className="relational-announce-line anim-announce-in" data-guide="opponent-move">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
                   {displayOpponentTurn}
                 </span>{" "}

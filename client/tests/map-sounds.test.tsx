@@ -8,6 +8,7 @@ import { playUISound } from "@/audio/engine";
 import { buildMapGraph, eligibleNext } from "@/game/map-gen";
 import { beginRun } from "@/game/run";
 import { unlockedPlanets } from "@/game/unlocks";
+import { TIMINGS } from "@/svg/timings";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -93,6 +94,7 @@ describe("map feedback", () => {
     prince.runs = [run];
     savePrince(prince);
     act(() => root.render(<GameTest path="/play" />));
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.guide));
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(container.querySelector('.screen-help-button')).not.toBeNull();
     expect(loadPrince()!.numRelationalEncounters).toBe(0);

@@ -346,7 +346,7 @@ Mobile adaptation is deferred; it does not require extra desktop confirmation.
 
 In a relational turn the two charts resolve **sequentially** ([MECHANICS.md §6](../mechanics/MECHANICS.md#6-direct-resolution)): when the player commits, the opponent's chart lights up first — the player's action landing on it and propagating through its web — then, after a short pause, the player's chart resolves the opponent's reply.
 Watching the opponent before yourself keeps the two readable and lets a phase-1 combust visibly preempt the response.
-The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+A turn's playback runs a little over two seconds with no propagation and half a second more for each propagation step, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
 
 **Aspect propagation is the visual climax of each turn.**
 When an effect travels along an aspect line, the player should *see* it travel; when a hard aspect inverts it, the colour that arrives is the other valence.

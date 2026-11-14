@@ -7,7 +7,7 @@ import { timings } from "@/svg/timings";
 import type { Chart, MapBoundary, NecessityEntry, PlanetName, SideState } from "@/game/types";
 
 export interface NecessityAnimationPresentation {
-  phase: "accent" | "revival" | "necessity" | "fortune" | "settle";
+  phase: "revival" | "reveal" | "settle";
   entries: NecessityEntry[];
   revived?: PlanetName[];
 }
@@ -70,11 +70,11 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
     for (const planet of revived) progress[planet].tension = getEffectiveStatsFromPlacement(chart.planets[planet]).resolve;
     let elapsed = 0;
     const timing = timings().necessity;
-    const noteDuration = (timing.accent + timing.necessity + timing.fortune + timing.settle) / 1000;
+    const noteDuration = (timing.reveal + timing.settle) / 1000;
     const show = (opening: NecessityAnimationPresentation) => {
       const snapshot = { id, state: cloneSideState(progress), opening };
       const present = () => {
-        if (opening.phase === "accent") {
+        if (opening.phase === "reveal") {
           cancelNote.current?.();
           cancelNote.current = playNecessityNote(chartRuler(chart), opening.entries[0]!.planet, noteDuration);
         }
@@ -90,12 +90,8 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
     }
     for (const entry of ordered) {
       const opening = { entries: [entry] };
-      show({ ...opening, phase: "accent" });
-      elapsed += timing.accent;
-      show({ ...opening, phase: "necessity" });
-      elapsed += timing.necessity;
-      show({ ...opening, phase: "fortune" });
-      elapsed += timing.fortune;
+      show({ ...opening, phase: "reveal" });
+      elapsed += timing.reveal;
       progress[entry.planet].tension = state[entry.planet].tension;
       show({ ...opening, phase: "settle" });
       elapsed += timing.settle;

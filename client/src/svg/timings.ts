@@ -2,8 +2,9 @@ import { getTuning } from "@/svg/tuning";
 
 /**
  * Pacing: how long each beat holds, in milliseconds. A turn's playback, the
- * Necessity opening, the pause before the map returns, and the mint and title
- * fades. JS schedules read `timings()`; the CSS animations that must keep step
+ * Necessity opening, the pause before the map returns, the mint and title
+ * fades, and the wait before a guide or card covers a newly arrived screen.
+ * JS schedules read `timings()`; the CSS animations that must keep step
  * with them read the custom properties `applyTimings` writes on :root.
  *
  * Not here: hover and colour transitions, the breath, orbits and other ambient
@@ -11,36 +12,38 @@ import { getTuning } from "@/svg/tuning";
  */
 export const TIMINGS = {
   turn: {
-    primaryDelay: 200,
-    primaryEffectClear: 360,
-    primaryGlowClear: 600,
-    propagationStart: 800,
-    propagationStep: 520,
-    propagationApplyOffset: 230,
+    primaryDelay: 250,
+    primaryEffectClear: 500,
+    primaryGlowClear: 500,
+    propagationStart: 750,
+    propagationStep: 500,
+    propagationApplyOffset: 250,
     /** At least `propagationTravel`, so the pulse reaches the target before
      *  its line is cleared. */
     propagationClearOffset: 500,
     /** The JS schedule and both CSS ripples. */
     combustRippleDuration: 1000,
-    endOffset: 360,
+    endOffset: 500,
     /** Pause between the opponent's resolution phase and the player's, so the
      *  two charts read sequentially rather than simultaneously. */
-    interPhasePause: 240,
-    propagationTravel: 460,
-    effectBloom: 460,
-    lightFlash: 520,
-    lightPop: 420,
-    actionGlow: 600,
-    combust: 1800,
+    interPhasePause: 250,
+    propagationTravel: 500,
+    effectBloom: 500,
+    lightFlash: 500,
+    lightPop: 500,
+    actionGlow: 500,
+    combust: 2000,
+    /** The line naming the Other's move fades in each time it shows a new turn's move. */
+    announceFade: 250,
   },
+  /** Each planet's beat comes in two halves: the tension it takes appears on
+   *  its arc (`reveal`), then lands on the chart as the segment fades
+   *  (`settle`). The planet's accent and note span the whole beat. */
   necessity: {
-    accent: 250,
-    necessity: 350,
-    fortune: 250,
-    settle: 150,
+    reveal: 250,
+    settle: 250,
     /** The hold for each returning planet. */
     revival: 500,
-    arcReveal: 180,
     revivalReveal: 250,
   },
   /** The pause before the map returns. */
@@ -51,10 +54,16 @@ export const TIMINGS = {
   },
   mint: {
     revealInterval: 2500,
-    heldMoment: 1500,
-    dimmed: 1500,
-    framingFade: 400,
-    titleFade: 420,
+    dimmed: 2000,
+    framingFade: 500,
+    titleFade: 500,
+  },
+  /** How long a screen is seen bare, once ready, before something covers it. */
+  arrival: {
+    /** A first-visit guide. */
+    guide: 1000,
+    /** A queued card over the map, such as a planet's introduction. */
+    card: 1000,
   },
 } as const;
 
@@ -75,6 +84,7 @@ export function timings(): Timings {
     necessity: scaled(TIMINGS.necessity, all * tuning.necessityDurationScale),
     leave: scaled(TIMINGS.leave, all),
     mint: scaled(TIMINGS.mint, all),
+    arrival: scaled(TIMINGS.arrival, all),
   };
 }
 
@@ -89,8 +99,9 @@ export function applyTimings(): void {
     "--m-light-pop": turn.lightPop,
     "--m-planet-active": turn.actionGlow,
     "--m-combust": turn.combust,
-    "--m-necessity-accent": necessity.accent,
-    "--m-necessity-arc": necessity.arcReveal,
+    "--m-announce-fade": turn.announceFade,
+    "--m-necessity-accent": necessity.reveal + necessity.settle,
+    "--m-necessity-arc": necessity.reveal,
     "--m-necessity-revival": necessity.revivalReveal,
     "--m-necessity-settle": necessity.settle,
     "--m-framing-fade": mint.framingFade,

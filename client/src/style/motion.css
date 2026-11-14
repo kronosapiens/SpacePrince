@@ -305,6 +305,7 @@
   .wordmark-glow circle,
   .planet-corona,
   .anim-surface-in,
+  .anim-announce-in,
   .chart-layout .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
@@ -326,6 +327,8 @@
 /* Adjacent content enters while the chart remains visible. */
 @keyframes surface-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .anim-surface-in { animation: surface-fade-in 500ms var(--ease-out); }
+/* The Other's move arrives rather than swapping in the frame its turn begins. */
+.anim-announce-in { animation: surface-fade-in var(--m-announce-fade) var(--ease-out) both; }
 
 /* Necessity is a single opening, never a repeating pulse. */
 @keyframes necessity-accent {

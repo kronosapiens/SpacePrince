@@ -15,6 +15,6 @@ describe("timings", () => {
     expect(necessity).toEqual(
       Object.fromEntries(Object.entries(TIMINGS.necessity).map(([key, ms]) => [key, ms * 2])),
     );
-    expect(rest).toEqual({ turn: TIMINGS.turn, leave: TIMINGS.leave, mint: TIMINGS.mint });
+    expect(rest).toEqual({ turn: TIMINGS.turn, leave: TIMINGS.leave, mint: TIMINGS.mint, arrival: TIMINGS.arrival });
   });
 });

@@ -80,11 +80,10 @@ export function useCasting(enabled: boolean) {
       return () => window.clearTimeout(timer);
     }
     if (stage !== "revealing") return;
-    const delay = revealedCount >= PLANETS.length ? mint.heldMoment : mint.revealInterval;
     const timer = window.setTimeout(() => {
       if (revealedCount >= PLANETS.length) setStage("dimmed");
       else setRevealedCount((n) => n + 1);
-    }, delay);
+    }, mint.revealInterval);
     return () => window.clearTimeout(timer);
   }, [enabled, stage, revealedCount]);
 
