@@ -10,7 +10,7 @@ import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { PLANETS } from "@/game/data";
 import { eligibleNext } from "@/game/map-gen";
 import { unlockedPlanets } from "@/game/unlocks";
-import { NECESSITY_ANIMATION_TIMINGS as openingTiming } from "@/components/useNecessityAnimation";
+import { TIMINGS } from "@/svg/timings";
 import { playCombust, playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
@@ -24,6 +24,8 @@ vi.mock("@/components/InfoCardHost", () => ({
   },
 }));
 
+const openingTiming = TIMINGS.necessity;
+const perPlanet = openingTiming.reveal + openingTiming.settle;
 let root: Root | null;
 let container: HTMLDivElement;
 beforeEach(() => {
@@ -123,7 +125,6 @@ describe("encounter advancement", () => {
     click(get(".relational"));
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
 
-    const perPlanet = Object.values(openingTiming.encounter).reduce((a, b) => a + b, 0);
     advanceTime(perPlanet);
     expect(container.querySelector('[data-guide="chart-self"] .necessity-opening')).toBeNull();
     expect(container.querySelector('[data-guide="chart-other"] .necessity-opening')).not.toBeNull();
@@ -149,6 +150,7 @@ describe("encounter advancement", () => {
     expect(after.runs[0]!.state.Saturn.tension).toBe(0);
     expect(isOver(after.runs[0]!, after.chart, after.numRelationalEncounters)).toBe(false);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
+    advanceTime(TIMINGS.arrival.card);
     expect(get("[data-intro]").textContent).toBe("Saturn");
     advanceTime(5000);
     expect(loadPrince()!.numRelationalEncounters).toBe(32);
@@ -176,6 +178,24 @@ describe("encounter advancement", () => {
     expect(container.querySelector("[data-intro]")).toBeNull();
     advanceTime(5000);
     expect(loadPrince()!.numRelationalEncounters).toBe(65);
+  });
+
+  it("opens a first encounter's guide a moment after its opening finishes, never during it", () => {
+    const { prince, run, encounter } = relational(2);
+    run.mapsCompleted = 0;
+    mount(prince, false);
+    const guide = () => document.querySelector('[role="dialog"]');
+    const opening = Math.max(encounter.necessity?.length ?? 0, encounter.selfNecessity?.length ?? 0) * perPlanet;
+    expect(opening).toBeGreaterThan(TIMINGS.arrival.guide);
+    advanceTime(opening - 1);
+    expect(container.querySelector(".necessity-opening")).not.toBeNull();
+    expect(guide()).toBeNull();
+    advanceTime(1);
+    expect(container.querySelector(".necessity-opening")).toBeNull();
+    advanceTime(TIMINGS.arrival.guide - 1);
+    expect(guide()).toBeNull();
+    advanceTime(1);
+    expect(guide()!.getAttribute("aria-label")).toBe("Read the encounter");
   });
 
   it("sounds selection and commitment separately, and leaves repeated selection silent", () => {
@@ -234,6 +254,7 @@ describe("encounter advancement", () => {
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
+    advanceTime(TIMINGS.arrival.card);
     expect(get("[data-intro]").textContent).toBe("Mercury");
     expect(loadPrince()!.numRelationalEncounters).toBe(1);
   });

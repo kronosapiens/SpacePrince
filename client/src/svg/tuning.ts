@@ -18,7 +18,8 @@ import { useSyncExternalStore } from "react";
  * how you can tell at the call site that a number is decided. Put one back the
  * moment it is in question again; that costs a field, a default and a row.
  *
- * What is left is the breath period, which may still speed up.
+ * What is left is the breath period, which may still speed up, and three
+ * multipliers on the pacing durations in `timings.ts`.
  *
  * CSS knobs use the stylesheet values as defaults and the console overrides
  * them as inline custom properties on :root (see `CSS_KNOBS`).
@@ -31,6 +32,12 @@ export interface ChartTuning {
    *  Scaffolding. */
   showGlow: boolean;
   showHouseHighlight: boolean;
+  /** Multiplies every duration in `timings.ts`; 2 is twice as long. */
+  durationScale: number;
+  /** Multiplies a turn's playback, on top of `durationScale`. */
+  turnDurationScale: number;
+  /** Multiplies the Necessity opening, on top of `durationScale`. */
+  necessityDurationScale: number;
 }
 
 /** The keys the slider list can drive — every knob whose value is a number. */
@@ -41,6 +48,9 @@ type NumericKey = {
 export const TUNING_DEFAULTS: ChartTuning = {
   showGlow: true,
   showHouseHighlight: true,
+  durationScale: 1,
+  turnDurationScale: 1,
+  necessityDurationScale: 1,
 };
 
 /** Slider ranges for the console. Bounds are generous rather than safe — the
@@ -52,7 +62,11 @@ export const TUNING_KNOBS: ReadonlyArray<{
   min: number;
   max: number;
   step: number;
-}> = [];
+}> = [
+  { key: "durationScale", label: "All durations ×", min: 0.25, max: 3, step: 0.05 },
+  { key: "turnDurationScale", label: "Turn durations ×", min: 0.25, max: 3, step: 0.05 },
+  { key: "necessityDurationScale", label: "Necessity durations ×", min: 0.25, max: 3, step: 0.05 },
+];
 
 /** The CSS custom properties the console can override. `suffix` is
  *  what CSS needs appended to the raw number (a duration needs its unit). */

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CityPicker } from "@/components/CityPicker";
 import { loadPrince, savePrince } from "@/state/prince";
 import { playUISound } from "@/audio/engine";
+import { TIMINGS } from "@/svg/timings";
 import { createStubPrince } from "./fixtures";
 
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
@@ -95,7 +96,7 @@ describe("navigation feedback", () => {
     render("/play");
     click(".begin-btn");
     click(".begin-btn");
-    act(() => vi.advanceTimersByTime(400));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.framingFade));
     type('[type="date"]', "");
     click(".mint-submit");
     expect(cues()).toEqual(["select"]);
@@ -107,9 +108,8 @@ describe("navigation feedback", () => {
     expect(cues()).toEqual(["select", "select"]);
     click(".mint-submit");
     expect(cues()).toEqual(["select", "select", "commit"]);
-    for (let i = 0; i < 7; i++) act(() => vi.advanceTimersByTime(2500));
-    act(() => vi.advanceTimersByTime(1500));
-    act(() => vi.advanceTimersByTime(1500));
+    for (let i = 0; i < 8; i++) act(() => vi.advanceTimersByTime(TIMINGS.mint.revealInterval));
+    act(() => vi.advanceTimersByTime(TIMINGS.mint.dimmed));
     act(() => document.querySelector(".info-card-close")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     click(".begin-btn");
     expect(cues()).toEqual(["select", "select", "commit", "dismiss", "commit"]);

@@ -5,7 +5,7 @@
 [intent.md](../intent.md) describes how the game should feel.
 This document defines what it is drawn with — the primitives, the stroke scale, the palette, the two faces, the motion grammar — so that two engineers and one illustrator working in different rooms produce a coherent object, and so the client and the onchain renderer draw the same one.
 It holds the vocabulary and its rules, not the tuned values.
-Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `prince-style.ts`, `palette.ts`, `viewbox.ts`, and `client/src/style/tokens.css` and `motion.css`.
+Sizes, radii, opacities and durations are decided by looking, and each lives beside the code that uses it: `client/src/svg/chart-style.ts`, `prince-style.ts`, `palette.ts`, `viewbox.ts`, `timings.ts`, and `client/src/style/tokens.css` and `motion.css`.
 
 The guiding principle:
 
@@ -326,7 +326,8 @@ Animation is part of the symbolic vocabulary.
 ### One clock
 
 Every ambient pulse rides one shared breath (`--breath` in `client/src/style/motion.css`); there is never a second rhythm.
-The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath — and their durations and easings live in that file beside their keyframes, each with a line on what it is for.
+The named motions — the encounter opening, propagation along an aspect, combustion, the tint shift, the invite breath — and their easings live in that file beside their keyframes, each with a line on what it is for.
+Durations that pace a turn, a Necessity opening and the mint live in `client/src/svg/timings.ts`, which writes the ones CSS needs; the rest stay beside their keyframes.
 
 ### The next click is always legible
 
@@ -345,7 +346,7 @@ Mobile adaptation is deferred; it does not require extra desktop confirmation.
 
 In a relational turn the two charts resolve **sequentially** ([MECHANICS.md §6](../mechanics/MECHANICS.md#6-direct-resolution)): when the player commits, the opponent's chart lights up first — the player's action landing on it and propagating through its web — then, after a short pause, the player's chart resolves the opponent's reply.
 Watching the opponent before yourself keeps the two readable and lets a phase-1 combust visibly preempt the response.
-The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+A turn's playback runs a little over two seconds with no propagation and half a second more for each propagation step, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
 
 **Aspect propagation is the visual climax of each turn.**
 When an effect travels along an aspect line, the player should *see* it travel; when a hard aspect inverts it, the colour that arrives is the other valence.

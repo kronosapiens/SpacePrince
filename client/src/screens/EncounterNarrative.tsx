@@ -4,6 +4,7 @@ import type { ProjectionChips } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { NarrativeGuide } from "@/components/NarrativeGuide";
 import { PLANET_PRIMARY, VALENCE_COLOR } from "@/svg/palette";
+import { timings } from "@/svg/timings";
 import { PLANETS } from "@/game/data";
 import { HouseCoin } from "@/components/HouseCoin";
 import { HOUSE_COIN_GLOW } from "@/svg/map-style";
@@ -209,8 +210,9 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
   // `over` is derived (STATE.md): the run ended if every fielded planet combust.
   const runEnded = isOver(run, chart, prince.numRelationalEncounters);
 
+  const leave = timings().leave;
   const advance = useEncounterAdvance(
-    resolved, onClearEncounter, runEnded ? 2800 : flash?.combusting.size ? 2400 : 1800,
+    resolved, onClearEncounter, runEnded ? leave.runEnded : flash?.combusting.size ? leave.houseCombust : leave.encounter,
   );
 
   const chartRef = usePlayerChart({

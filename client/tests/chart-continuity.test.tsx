@@ -11,6 +11,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { createStubPrince } from "./fixtures";
 import { GameTest } from "./game-layout";
 import { RESOLVE_ARC_R } from "@/svg/viewbox";
+import { TIMINGS } from "@/svg/timings";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
@@ -48,8 +49,10 @@ function element(selector: string) {
 function click(selector: string) {
   act(() => element(selector).dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
-/** A first encounter of each kind opens its guide by itself; close it to play. */
+/** A first encounter of each kind opens its guide by itself a moment after
+ *  arriving; close it to play. */
 function closeFirstGuide(label: string) {
+  act(() => vi.advanceTimersByTime(TIMINGS.arrival.guide));
   expect(document.querySelector('[role="dialog"]')?.getAttribute("aria-label")).toBe(label);
   act(() => document.querySelector(".guide-close")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
   expect(document.querySelector('[role="dialog"]')).toBeNull();

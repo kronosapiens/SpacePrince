@@ -8,8 +8,7 @@ import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { BeginButton } from "@/components/BeginButton";
 import { WordmarkGlow } from "@/components/WordmarkGlow";
-
-const TITLE_FADE_MS = 420; // matches the .title-content opacity transition (layout.css)
+import { timings } from "@/svg/timings";
 
 export function TitleScreen() {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ export function TitleScreen() {
 
   useEffect(() => {
     if (!leaving) return;
-    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : TITLE_FADE_MS;
+    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : timings().mint.titleFade;
     const timer = window.setTimeout(() => navigate(ROUTES.play), delay);
     return () => window.clearTimeout(timer);
   }, [leaving, navigate]);

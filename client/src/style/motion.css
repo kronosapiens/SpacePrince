@@ -1,8 +1,7 @@
 /* Named motions per STYLE.md §7 / VIBES.md */
 
 /* Combustion — a planet dies. Flares hot, then collapses to desaturated ash.
-   The opening flare gives the irreversible beat real weight; total length stays
-   at 1000ms to match `combustRippleDuration` in useRelationalAnimation.ts. */
+   The opening flare gives the irreversible beat real weight. */
 @keyframes combust {
   0%   { filter: saturate(1.5) brightness(1.7); opacity: 1; }
   12%  { filter: saturate(1.6) brightness(2);   opacity: 1; }
@@ -110,7 +109,7 @@
   100% { stroke-dashoffset: -100; opacity: 0.85; }
 }
 .anim-prop-travel {
-  animation: prop-travel 460ms var(--ease-out) forwards;
+  animation: prop-travel var(--m-prop-travel) var(--ease-out) forwards;
 }
 
 /* Relational per-planet feedback — ported from client_v1. */
@@ -158,11 +157,11 @@
 }
 
 .anim-action-glow    { animation: action-glow-pulse var(--m-planet-active) var(--ease-out) both; }
-.anim-effect-bloom     { animation: effect-bloom 460ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
-.anim-combust-ripple { animation: combust-ripple 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
-.anim-combust-ripple-2 { animation: combust-ripple-2 1000ms var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
-.anim-light-flash { animation: light-flash 520ms var(--ease-out) both; }
-.anim-light-pop   { animation: light-pop 420ms var(--ease-out) both; }
+.anim-effect-bloom     { animation: effect-bloom var(--m-effect-bloom) var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-combust-ripple { animation: combust-ripple var(--m-combust-ripple) var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-combust-ripple-2 { animation: combust-ripple-2 var(--m-combust-ripple) var(--ease-out) both; transform-origin: center; transform-box: fill-box; }
+.anim-light-flash { animation: light-flash var(--m-light-flash) var(--ease-out) both; }
+.anim-light-pop   { animation: light-pop var(--m-light-pop) var(--ease-out) both; }
 .anim-map-current-halo {
   animation: map-current-halo-breath 4s ease-in-out infinite;
   transform-origin: center;
@@ -306,6 +305,7 @@
   .wordmark-glow circle,
   .planet-corona,
   .anim-surface-in,
+  .anim-announce-in,
   .chart-layout .anim-surface-in { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
@@ -314,6 +314,8 @@
   :root { animation: none; --breath: 0.375; }
   /* Show the propagation line solid (no travel) rather than frozen mid-sweep. */
   .anim-prop-travel { animation: none; stroke-dasharray: none; }
+  /* Land a combusted planet on its ash frame at once. */
+  .anim-combust { animation-duration: 1ms; }
   .chart-layout .title-content,
   .chart-layout .mint-framing { transition: none; }
 }
@@ -325,18 +327,20 @@
 /* Adjacent content enters while the chart remains visible. */
 @keyframes surface-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .anim-surface-in { animation: surface-fade-in 500ms var(--ease-out); }
+/* The Other's move arrives rather than swapping in the frame its turn begins. */
+.anim-announce-in { animation: surface-fade-in var(--m-announce-fade) var(--ease-out) both; }
 
 /* Necessity is a single opening, never a repeating pulse. */
 @keyframes necessity-accent {
   0%, 100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
   45% { filter: brightness(1.5) drop-shadow(0 0 8px currentColor); }
 }
-.necessity-accent { animation: necessity-accent var(--ease-out) both; }
+.necessity-accent { animation: necessity-accent var(--m-necessity-accent) var(--ease-out) both; }
 @keyframes necessity-reveal { from { opacity: 0.3; } to { opacity: 1; } }
 @keyframes necessity-settle { from { opacity: 1; } to { opacity: 0; } }
-.necessity-arc { animation: necessity-reveal 180ms var(--ease-out) both; }
-.necessity-revival { animation: necessity-reveal 250ms var(--ease-out) both; }
-.necessity-settle { animation: necessity-settle 150ms var(--ease-out) both; }
+.necessity-arc { animation: necessity-reveal var(--m-necessity-arc) var(--ease-out) both; }
+.necessity-revival { animation: necessity-reveal var(--m-necessity-revival) var(--ease-out) both; }
+.necessity-settle { animation: necessity-settle var(--m-necessity-settle) var(--ease-out) both; }
 @media (prefers-reduced-motion: reduce) {
   .necessity-accent, .necessity-arc, .necessity-revival, .necessity-settle { animation: none; }
 }

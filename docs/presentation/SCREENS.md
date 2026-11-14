@@ -185,8 +185,8 @@ The two charts resolve in sequence, the order the rules resolve them ([MECHANICS
 Activation propagates within each chart along that chart's own aspect lines; there is no line drawn between the two charts.
 The connection between them is conceptual (your planet faces theirs this turn), not visual.
 
-The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
-The per-motion durations live in `client/src/style/motion.css`.
+A turn's playback runs a little over two seconds with no propagation and half a second more for each propagation step, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+The per-motion durations live in `client/src/svg/timings.ts`.
 
 **Narrative.**
 During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.
@@ -284,7 +284,7 @@ With study **off**, the panel shows only **operational numbers** — what matter
   It is the planet's base Resolve plus placement bonuses, shown directly.
 - **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings or blocking its entire necessity draw, and for the Other's planets the odds that each of three necessity rolls adds nothing.
   Necessity applies independently to both charts at each relational encounter opening: the player's planets draw 12, 24, or 36 before Fortune, and the Other's start from half their Resolve.
-  Each sweep shows the raw draw, then removes what Fortune relieves before settling the resulting state.
+  Each sweep gives every fielded planet one beat: the tension it takes appears on its arc, then settles into the resulting state.
   Wounded planets can combust at entry; fresh planets survive every draw.
   Both charts show their opening sweep before the first action becomes available.
   If the player's entire roster combusts during the opening, both sweeps finish before the encounter advances without an action.
@@ -333,13 +333,14 @@ A card opens in three contexts:
   Passage and dismissal state live only in the UI.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
+The card opens a moment after the map appears, and travel waits until it has.
 The Moon has no threshold to cross; its card presents at the end of the mint reveal instead (§5.2).
 The introduction celebrates the **position, not a person**: no voice line, because planets stay ambient ([intent.md](../intent.md), Audience).
 
 **Screen-help cards** — the corner "?" on each gameplay surface — run three beats: one sentence of purpose carrying the screen's stakes (the test: it survives with the title deleted); two-three sentences of goals and affordances in one breath; a slightly longer close holding only the concepts that change decisions.
 Previews teach the numbers (§1.1); the card holds the frame the numbers sit in.
 Copy lives in `client/src/copy/help.ts` and follows the §1.2 register and casing.
-Each screen's **guide** (`client/src/copy/guide.ts`) opens by itself the first time a Prince meets that screen and waits for its `?` after that; it points at the controls in turn and permits previews but no commitment.
+Each screen's **guide** (`client/src/copy/guide.ts`) opens by itself the first time a Prince meets that screen, a moment after the screen is seen bare, and waits for its `?` after that; it points at the controls in turn and permits previews but no commitment.
 
 ### 3.7 Chrome
 
@@ -567,7 +568,7 @@ After confirmation, the chart is computed (onchain per [CHART.md](../mechanics/C
 
 > Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn
 
-Each planet appears at its computed sign placement, in its glyph and color, with a caption naming the placement and a row of glyph pips marking progress; the pacing lives in `client/src/screens/useCasting.ts`.
+Each planet appears at its computed sign placement, in its glyph and color, with a caption naming the placement and a row of glyph pips marking progress; the pacing lives in `client/src/svg/timings.ts`.
 The ceremony is intentionally long enough to mask an onchain confirmation and to give the act its weight.
 After all seven planets have appeared, the chart sits whole for a brief held moment.
 
