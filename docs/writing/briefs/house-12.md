@@ -3,7 +3,7 @@
 [House XII](../HOUSE_MATRIX.md#xii--the-hidden) concerns lives outside ordinary access, including chosen solitude as well as imposed confinement.
 [Sign references](../../research/SIGN_NOTES.md) make those lives particular; [Saturn in XII](../HOUSE_PLANET_MATRIX.md#saturn-xii--the-hidden) adds a workable limit or method within the circumstances.
 No visit cures an exile or creates a later obligation; participation and its costs end in the scene.
-A revealed confinement can require Light or affliction to bear, alongside scenes of wanted solitude and relief.
+A revealed confinement can require Light or tension to bear, alongside scenes of wanted solitude and relief.
 Larger paid returns and deeper quiet recovery accompany the more frequent burdens.
 
 ## Aries

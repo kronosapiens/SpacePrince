@@ -37,7 +37,7 @@ Chart {
 Run {
   seed:          felt252,        -- one VRF request at run start; seeds all previewable map structure + gives between-run variety
   light:         u64,            -- cumulative Light; the run's permanent record (one star). Stays in storage — the onchain SVG reads it
-  state:         u64,            -- per-planet run state: 7 × u9 affliction = 63 bits; combustion is derived, not stored (MECHANICS §10)
+  state:         u64,            -- per-planet run state: 7 × u9 tension = 63 bits; combustion is derived, not stored (MECHANICS §10)
   gains:         u128,           -- per-planet stat gains from narrative choices, lasting the run: 7 planets × 4 stats × u4 count of +12 steps = 112 bits; zero at run start (ENCOUNTERS §2)
   map:           Map,            -- the current map only; past maps are emitted as events, not stored
   mapsCompleted: u3,             -- maps finished this run, 0..7; the run ends at 7 (completion, MECHANICS §11)
@@ -77,14 +77,14 @@ Any information derivable from public state remains available to the player.
 
 For the onchain design, randomness is spent deliberately:
 
-- **Once per run** — `Run.seed`, set by a VRF request at run start; the first map derives from it, and the player's affliction starts at zero.
+- **Once per run** — `Run.seed`, set by a VRF request at run start; the first map derives from it, and the player's tension starts at zero.
   A Prince's first run opens on the fixed first map instead ([MAP.md §4](MAP.md#4-seeding)).
 - **Once per map rollover** — the next map's seed; from it derive node content and opening uncombust rolls (MECHANICS §11.3), shown on entry.
-  Revival uses a separate seeded stream from node content; map openings add no affliction.
-- **At relational encounter arrival** — the minted Prince that supplies the other chart, and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with affliction capped at Resolve.
+  Revival uses a separate seeded stream from node content; map openings add no tension.
+- **At relational encounter arrival** — the minted Prince that supplies the other chart, and independent Necessity rolls for both charts, each drawing uniformly from 12/24/36 before Fortune, with tension capped at Resolve.
   A successful Fortune roll blocks that planet's entire draw.
-  The player carries existing affliction; the other starts with fresh state.
-  Carried affliction can cause combustion at entry; fresh planets survive every draw.
+  The player carries existing tension; the other starts with fresh state.
+  Carried tension can cause combustion at entry; fresh planets survive every draw.
   In the prototype, each chart's Necessity uses a separate seeded stream from the other's and from the other chart's turn sequence.
 - **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
   A relational encounter's last turn has no next precommit, so it needs no VRF request.
@@ -107,7 +107,7 @@ Three tiers, separated by who needs to read the data.
 - The star-field derives from completed runs: Prince identity and original run index seed position, while final `light` determines radius and opacity ([NFT.md](../presentation/NFT.md), "The Star-Field").
   All earlier runs are finished; the tail contributes only after it ends.
   No separate star array or stored coordinates are needed.
-- A planet is **combusted** when `affliction >= ceiling` (MECHANICS §10): affliction caps at the ceiling and combustion triggers there, so the affliction lane carries the flag for free.
+- A planet is **combusted** when `tension >= Resolve` (MECHANICS §10): tension caps at Resolve and combustion triggers there, so the tension lane carries the flag for free.
   Rejected: a stored per-planet combust bit — it widened `state` lanes to 10 bits (u128) to duplicate what the cap already encodes.
 - A run is **over** when `mapsCompleted == 7` or all seven planets have combusted — a pure function of stored fields, so no status flag is stored.
   At most one run is not-over: the active one, always at the tail of `runs`.

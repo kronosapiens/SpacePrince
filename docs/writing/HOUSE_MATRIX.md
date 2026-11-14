@@ -86,7 +86,7 @@ The First contains the Ascendant and is the origin of these relationships, rathe
 | [XII](#xii--the-hidden) | The Hidden | Cadent | Aversion | Saturn | Jupiter | What remains of a life that others cannot see? |
 
 Mars and Saturn containing a smaller burden in their joy houses is the game's adaptation, not a claim that all traditions interpret joy this way.
-Use the existing [conditioning rules](../mechanics/ENCOUNTERS.md#4-chart-conditioning), including their unlock, affliction, and dignity requirements.
+Use the existing [conditioning rules](../mechanics/ENCOUNTERS.md#4-chart-conditioning), including their unlock, tension, and dignity requirements.
 
 ## I — Self
 

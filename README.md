@@ -12,7 +12,7 @@ Play is a journey of encounters.
 When two charts meet, each turn the player chooses which planet to send and whether it afflicts or testifies; the effect lands on the other chart and travels along that chart's own aspects.
 Every such encounter has a ruler, the planet ruling the other chart's rising sign, and the ruler decides what generates **Light**.
 In the houses of the player's own chart, each scene asks for one choice about the chart they carry onward.
-Affliction accumulates, planets combust and return, and runs end.
+Tension accumulates, planets combust and return, and runs end.
 Over a lifetime of encounters the chart fills in, one planet at a time, and every run leaves one star in the Prince's sky, shaped by the Light it carried out.
 
 ---
