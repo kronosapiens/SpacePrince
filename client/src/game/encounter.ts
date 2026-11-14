@@ -1,5 +1,5 @@
-import { blankSideState, chartRuler, seededChart } from "./chart";
-import { applyNecessity } from "./necessity";
+import { chartRuler, seededChart } from "./chart";
+import { applyOtherNecessity } from "./necessity";
 import { drawValence, getEffectiveStatsFromPlacement } from "./relational";
 import { opponentSeedForRuler, seedRuler } from "./map-content";
 import { pickWeighted, mulberry32, hashString } from "./rng";
@@ -73,10 +73,10 @@ export function beginRelationalEncounter(input: BeginRelationalInput): Relationa
   const { sequence, opponentActions } = rollOpponentTurns(
     opponentChart, roster, rng, relationalTurnCount(run.mapsCompleted),
   );
-  // Separate stream for the necessity so its draws don't perturb the
+  // Separate stream for the necessity so its rolls don't perturb the
   // turn-sequence rolls above.
   const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_tension`));
-  const opening = applyNecessity(opponentChart, blankSideState(), roster, stateRng);
+  const opening = applyOtherNecessity(opponentChart, roster, stateRng);
   return {
     kind: "relational",
     // The ID feeds turn RNG; retain its original salt to preserve seeded outcomes.

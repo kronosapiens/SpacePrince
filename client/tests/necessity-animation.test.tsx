@@ -20,7 +20,7 @@ function advance(ms: number) { act(() => vi.advanceTimersByTime(ms)); }
 function input(): Input {
   const state = blankSideState();
   state.Moon.tension = 30;
-  return { id: "map-1", chart, state, necessity: [{ planet: "Moon", amount: 6, halved: true, draw: 12 }], enabled: true, kind: "map" };
+  return { id: "map-1", chart, state, necessity: [{ planet: "Moon", amount: 6, draw: 12 }], enabled: true, kind: "map" };
 }
 beforeEach(() => {
   vi.useFakeTimers();
@@ -83,7 +83,7 @@ it("preserves missing raw draws in old records", () => {
 });
 it("plays all seven planets in Macrobian order with progressive immutable state", () => {
   const props = input();
-  props.necessity = [...PLANETS].reverse().map((planet) => ({ planet, amount: 12, draw: 24, halved: true }));
+  props.necessity = [...PLANETS].reverse().map((planet) => ({ planet, amount: 12, draw: 24 }));
   for (const planet of PLANETS) props.state[planet].tension = 30;
   const original = structuredClone(props);
   render(props);
@@ -119,7 +119,7 @@ it("plays all seven planets in Macrobian order with progressive immutable state"
 });
 it("plays only recorded planets for a noncontiguous roster using encounter timings", () => {
   const props = { ...input(), kind: "encounter" as const };
-  props.necessity = ["Saturn", "Venus", "Moon"].map((planet) => ({ planet: planet as "Saturn" | "Venus" | "Moon", amount: 12, halved: false }));
+  props.necessity = ["Saturn", "Venus", "Moon"].map((planet) => ({ planet: planet as "Saturn" | "Venus" | "Moon", amount: 12 }));
   for (const entry of props.necessity) props.state[entry.planet].tension = 24;
   props.state.Mars.tension = 9;
   render(props);
@@ -171,7 +171,7 @@ it("finishes a revival-only map opening without a necessity sweep", () => {
 });
 it.each(["click", "Enter", "Escape"])("continues through %s and finishes without replaying on rerender", (gesture) => {
   const props = input();
-  props.necessity!.push({ planet: "Saturn", amount: 12, halved: false });
+  props.necessity!.push({ planet: "Saturn", amount: 12 });
   props.state.Saturn.tension = 24;
   const button = document.createElement("button");
   const action = vi.fn();

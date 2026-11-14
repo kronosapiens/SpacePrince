@@ -174,9 +174,8 @@ export interface NecessityEntry {
   amount: number;
   /** Fortune blocked the draw; zero-amount entries still record lit planets. */
   blocked?: boolean;
-  /** Legacy openings only: replay their stored half-draws unchanged. */
-  halved?: boolean;
-  /** Original tier, before Fortune and the combustion cap; absent in old saves. */
+  /** Tension arriving before Fortune: Self's tier before the combustion cap,
+   *  or half of the Other's Resolve; absent in old saves. */
   draw?: number;
 }
 

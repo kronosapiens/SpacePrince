@@ -807,13 +807,10 @@ function PlanetArc({
   let diff: { from: number; to: number; color: string } | null = null;
   if (necessity && openingPhase && openingPhase !== "revival" && openingPhase !== "accent") {
     // Before settlement the base arc still holds its pre-necessity state.
-    // Old records lack the raw draw; their actual amount is all we can show.
+    // The necessity phase shows the raw draw (old records lack it; their amount
+    // is all we can show); from the Fortune phase on, the amount added.
     const from = openingPhase === "settle" ? Math.max(0, spent - necessity.amount) : spent;
-    const draw = necessity.draw ?? necessity.amount;
-    const afterFortune = necessity.blocked ? 0 : draw / (necessity.halved ? 2 : 1);
-    const amount = openingPhase === "necessity" ? draw
-      : openingPhase === "fortune" && necessity.draw !== undefined
-        ? afterFortune : necessity.amount;
+    const amount = openingPhase === "necessity" ? necessity.draw ?? necessity.amount : necessity.amount;
     const to = clamp(from + amount, from, resolve);
     if (to > from) diff = { from, to, color: to >= resolve ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
   } else if (projection) {

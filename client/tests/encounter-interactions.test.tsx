@@ -70,7 +70,7 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
   encounter.opponentState.Moon.tension = 12;
   if (openingCounts) {
     const entries = (count: number): NecessityEntry[] => PLANETS.slice(0, count).map((planet) => openingCounts.blocked === undefined
-      ? { planet, amount: 12, draw: 24, halved: true }
+      ? { planet, amount: 12, draw: 24 }
       : { planet, amount: openingCounts.blocked ? 0 : 12, draw: 12, blocked: openingCounts.blocked });
     encounter.selfNecessity = entries(openingCounts.self);
     encounter.necessity = entries(openingCounts.other);
@@ -163,16 +163,16 @@ describe("encounter interactions", () => {
     expect(onCommitTurn).toHaveBeenCalledOnce();
   });
 
-  it("still shows half the raw arc for a saved halved Fortune result", () => {
+  it("shows the Other's raw draw, then the rolled amount once Fortune answers", () => {
     setup(false, { self: 1, other: 1 });
-    const arc = '[data-guide="arc-self-moon"] .necessity-arc path';
+    const arc = '[data-guide="arc-other-moon"] .necessity-arc path';
     act(() => vi.advanceTimersByTime(openingTiming.encounter.accent));
     const raw = get(arc).getAttribute("d");
     act(() => vi.advanceTimersByTime(openingTiming.encounter.necessity));
-    const half = get(arc).getAttribute("d");
-    expect(half).not.toBe(raw);
+    const rolled = get(arc).getAttribute("d");
+    expect(rolled).not.toBe(raw);
     act(() => vi.advanceTimersByTime(openingTiming.encounter.fortune));
-    expect(get(arc).getAttribute("d")).toBe(half);
+    expect(get(arc).getAttribute("d")).toBe(rolled);
   });
 
   it("shows an entry death when its sweep settles and only allows surviving planets to act", () => {

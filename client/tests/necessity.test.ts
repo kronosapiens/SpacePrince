@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyNecessity } from "@/game/necessity";
+import { applyNecessity, applyOtherNecessity } from "@/game/necessity";
 import { blankSideState, derivePlacements, runChart, seededChart } from "@/game/chart";
 import { isCombusted } from "@/game/combust";
 import { fortuneChance, getEffectiveStats, getEffectiveStatsFromPlacement } from "@/game/relational";
@@ -90,7 +90,7 @@ describe("necessity", () => {
     const selfOpenings = [];
     for (const encounterIdSeed of [13, 99]) {
       const enc = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: 32, encounterIdSeed });
-      const opening = applyNecessity(enc.opponentChart, blankSideState(), roster,
+      const opening = applyOtherNecessity(enc.opponentChart, roster,
         mulberry32(hashString(`${encounterIdSeed}_tension`)));
       expect(enc.opponentState).toEqual(opening.state);
       expect(enc.necessity).toEqual(opening.necessity);
@@ -139,5 +139,31 @@ describe("necessity", () => {
     const narrativeId = Object.keys(run.map.rolledNodes).find((id) => run.map.rolledNodes[id]!.kind === "narrative")!;
     expect(enterNode({ run, chart, nodeId: narrativeId, lifetimeRelationalEncounterCount }).state).toEqual(before.state);
     expect(run).toEqual(before);
+  });
+});
+
+describe("the Other's necessity", () => {
+  const resolve = (planet: PlanetName) => getEffectiveStats(chart, planet).resolve;
+
+  it.each([[3, 0.999], [0, 0]])("adds %i sixths of Resolve to each fielded planet, and nothing to the rest, when every roll is %d", (sixths, roll) => {
+    const roster: PlanetName[] = ["Moon", "Mars", "Saturn"];
+    const rng = vi.fn(() => roll);
+    const result = applyOtherNecessity(chart, roster, rng);
+    expect(rng).toHaveBeenCalledTimes(3 * roster.length);
+    expect(result.necessity).toEqual(roster.map((planet) =>
+      ({ planet, amount: sixths * resolve(planet) / 6, draw: resolve(planet) / 2 })));
+    for (const planet of PLANETS) {
+      expect(result.state[planet].tension).toBe(roster.includes(planet) ? sixths * resolve(planet) / 6 : 0);
+      expect(isCombusted(chart.planets[planet], result.state[planet])).toBe(false);
+    }
+  });
+
+  it("adds a sixth of Resolve per missed roll, and a roll equal to the chance misses", () => {
+    const chance = (planet: PlanetName) => fortuneChance(getEffectiveStats(chart, planet).luck);
+    const rng = vi.fn();
+    for (const roll of [0.999, 0, chance("Sun"), 0, chance("Moon") - 0.001, 0.999]) rng.mockReturnValueOnce(roll);
+    const result = applyOtherNecessity(chart, ["Sun", "Moon"], rng);
+    expect(result.state.Sun.tension).toBe(resolve("Sun") / 3);
+    expect(result.state.Moon.tension).toBe(resolve("Moon") / 6);
   });
 });
