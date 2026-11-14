@@ -10,6 +10,7 @@
   --gold: #C9A96A;
   --gold-hi: #FFD24A;
   --testimony: #9D86D9; /* resolution/heal valence — mirrors VALENCE_COLOR.Testimony */
+  --affliction: #E8913A; /* affliction valence — mirrors VALENCE_COLOR.Affliction */
 
   /* Planetary primaries (saturated v2) */
   --sun: #FFD24A;
