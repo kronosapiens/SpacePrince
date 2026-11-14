@@ -7,7 +7,7 @@
  *  names what to click, and the screen shows its own numbers. Pair the
  *  game's terms with their descriptive words at first mention, once per
  *  screen's full tutorial: Afflict presses and creates tension, Testify
- *  eases it, Resolve is what a planet has left, and a combusted planet
+ *  eases it, Resolve is the tension a planet can take, and a combusted planet
  *  goes dark until it returns (SCREENS.md §1.2).
  *  Casing per SCREENS.md §1.2: named quantities capped
  *  (Resolve, Fortune, Light, Afflict, Testify — TermText accents these,

@@ -67,8 +67,8 @@ The underlying stats are **affliction, testimony, Resolve, and luck**.
 
 **One descriptive word per term.**
 Each game term is paired with one plain word, and never two: **press** for Afflict, **ease** for Testify, and **tension** for Resolve used up.
-Resolve is what a planet has left; its maximum is its ceiling.
-Affliction names what a planet sends when it Afflicts; as an amount that builds up on a planet it is internal accounting (`MECHANICS.md` §10) and does not reach player prose.
+Resolve is the total tension a planet can take; what it has left is its remaining Resolve.
+Affliction is how much tension a planet creates, and testimony how much it eases; neither names an amount that builds up on a planet.
 The screen guides (`client/src/copy/guide.ts`) and help (`client/src/copy/help.ts`) teach in these words too; damage, heal, and health are not used.
 
 **Casing.**
@@ -190,20 +190,20 @@ The per-motion durations live in `client/src/style/motion.css`.
 
 **Narrative.**
 During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.
-On **resolution**, affected planets receive plain state-change flashes (testimony or affliction gained, combust applied).
+On **resolution**, affected planets receive plain state-change flashes (tension eased or created, combust applied).
 No propagation through aspect lines — propagation is specific to relational encounters.
 The heading does not animate during resolution; it remains the steady framing presence.
 
-### 3.5.1 The affliction arc
+### 3.5.1 The Resolve arc
 
-Affliction is drawn as an arc around each planet, at **1 point = 2°**.
-Ceilings are multiples of 12 ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)).
+Resolve is drawn as an arc around each planet, at **1 point = 2°**.
+Resolve is a multiple of 12 ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)).
 A full circle represents 180 Resolve, the provisional per-planet maximum for future run upgrades.
 
-- The **faint track** is the planet's whole ceiling.
+- The **faint track** is the planet's Resolve.
   Its length is proportional to Resolve, so a resting chart shows which planets are sturdy without a number.
-- The **bright span** is what the planet can still absorb.
-- The **combustion end is pinned at 6 o'clock**, and affliction accumulates toward it, so the bright span shortens by its free end descending into the anchor and every planet dies at the same point on the dial.
+- The **bright span** is the planet's remaining Resolve, what it can still absorb.
+- The **combustion end is pinned at 6 o'clock**, and tension accumulates toward it, so the bright span shortens by its free end descending into the anchor and every planet dies at the same point on the dial.
 - The **projected span** is the change the declared blow would make to the boundary — amber for harm, violet for heal, ember when it would close the span ([STYLE.md §5](STYLE.md#5-color-rules)).
 - A **combusted planet drops the arc.**
   All that is left of it is the spent track, which gauges a capacity the planet no longer has; the dimmed disc and glyph already say it is out.
@@ -214,7 +214,7 @@ It also flattens the resting chart, since every undamaged planet would look iden
 
 **The projected span is focused only.**
 It appears on the planet under consideration — hovered, focused, or inspected — and nowhere else.
-A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at the ceiling — so combustion reads as geometry rather than as a warned number, and the read is categorical (this one dies) rather than a comparison of lengths.
+A planet that cannot survive has its **whole remaining span** go ember, because the span clamps at Resolve — so combustion reads as geometry rather than as a warned number, and the read is categorical (this one dies) rather than a comparison of lengths.
 
 Rejected: the precommit's bite drawn on every live candidate at rest.
 The magnitude does not depend on which planet catches it, so the resting menu and the focused preview were the same mark answering different questions — *what each planet would absorb*, against *what happens if I send this one* — and focusing read as six threats disappearing rather than as the question narrowing.
@@ -279,7 +279,7 @@ A player who never touches it sees the plain panel; the annotations exist only w
 
 With study **off**, the panel shows only **operational numbers** — what matters this turn:
 
-- **Resolve** — the combustion ceiling ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)): how much affliction the planet endures before it gives out.
+- **Resolve** — the total tension a planet can take ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)): how much tension the planet endures before it gives out.
   Now that combustion is deterministic, this is literally its HP.
   It is the planet's base Resolve plus placement bonuses, shown directly.
 - **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings or blocking its entire necessity draw.
@@ -288,7 +288,7 @@ With study **off**, the panel shows only **operational numbers** — what matter
   Wounded planets can combust at entry; fresh planets survive every draw.
   Both charts show their opening sweep before the first action becomes available.
   If the player's entire roster combusts during the opening, both sweeps finish before the encounter advances without an action.
-  Map openings show revival only; a new run begins with zero affliction.
+  Map openings show revival only; a new run begins with zero tension.
   These rolls settle before play; action resolution remains deterministic.
 - **Afflict / Testify** — the planet's affliction and testimony amounts, carried by the two action buttons.
 
@@ -397,7 +397,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
 - Section titles ("ENCOUNTER", "MAP") on the screens themselves — the player knows where they are.
 - The wordmark "SPACE PRINCE" inside the encounter — it lives on the title screen.
 - HP bars, "+N attack" registers, blockbuster game-UI flourishes.
-  The affliction arc is not one of these, and the distinction is the point: an HP bar fills against an invented maximum, while the arc's track is a real ceiling the game already has ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)).
+  The Resolve arc is not one of these, and the distinction is the point: an HP bar fills against an invented maximum, while the arc's track is a real ceiling the game already has ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)).
   Light, which has no ceiling to fill against, is a numeral rather than any kind of bar.
 - Always-visible logs of past turns (those are dev-only).
 - Run-management affordances inside an active run.
@@ -412,7 +412,7 @@ The durations live in `client/src/style/motion.css`.
 ### 3.9 Open questions
 
 - How a **zero-effect ripple** should read.
-  On an afflict turn a hard aspect inverts to testimony, and a target already at zero affliction has nothing to heal — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence.
+  On an afflict turn a hard aspect inverts to testimony, and a target already at zero tension has nothing to ease — so the arc draws nothing at all, and the player sees a lit aspect line with no consequence.
   The retired projection badge covered this by showing a violet zero.
 - Accessibility (color-channel parallel signal) — [STYLE.md §14](STYLE.md#14-open-questions).
 - What the encounter says about itself before, during, and after — the reading layer proposed in [#26](https://github.com/kronosapiens/SpacePrince/issues/26), now selected work under [#35](https://github.com/kronosapiens/SpacePrince/issues/35).
@@ -427,7 +427,7 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 ### 4.1 Layout
 
 - **The diagram** sits beside the player's chart, with the breathing room [STYLE.md §10](STYLE.md#10-the-maps-visual-treatment) asks for, and a Roman numeral naming which map of the run this is.
-- **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, affliction on the arc (§3.5.1).
+- **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, tension on the arc (§3.5.1).
   The "chart is always present" principle made literal on this surface.
   At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-relational-openings-and-revival-at-map-openings)).
 - **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative relational encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
@@ -637,7 +637,7 @@ The point is to look at the web, not to act on it.
 
 ### 7.3 What's shown
 
-The chart at full size, in its current state — combusts grayed, afflictions visible per the chart-rendering rules in [STYLE.md §11](STYLE.md#11-the-charts-visual-treatment); the title hides affliction, since nothing is at stake there.
+The chart at full size, in its current state — combusts grayed, tension visible per the chart-rendering rules in [STYLE.md §11](STYLE.md#11-the-charts-visual-treatment); the title hides tension, since nothing is at stake there.
 
 ### 7.4 Earned layers (deferred)
 

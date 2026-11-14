@@ -116,13 +116,13 @@ They do not travel: the run map and the encounter seam render at their own unit 
 | Light       | `1u`   | ground             | Substrate, aspect web at rest, chart inner ring, planet rim.                |
 | Medium      | `2u`   | structure          | Chart outer ring, sign ticks, combust shockwave.                             |
 | Heavy       | `3u`   | under attention    | Interaction ring, active aspect line, propagation pulse, combust ripple.     |
-| Extra heavy | `4u`   | the affliction arc | The arc alone.                                                              |
+| Extra heavy | `4u`   | the Resolve arc | The arc alone.                                                              |
 
 Four rungs, a unit apart, which at the chart's render size is about 0.67px per step.
 Half-unit steps were tried and draw distinctions the surface cannot express.
 
 Extra heavy has exactly one client on purpose.
-The affliction arc carries more than any other single mark on the chart — a planet's whole ceiling, what it can still absorb, and what the declared blow will take from it — so it outranks even the marks that are merely under attention.
+The Resolve arc carries more than any other single mark on the chart — a planet's Resolve, what it can still absorb, and what the declared blow will take from it — so it outranks even the marks that are merely under attention.
 A rung with one client is how the previous scale rotted, so if this one stays alone indefinitely it is worth folding back into Heavy rather than keeping a gradation nothing uses.
 
 Mixing weights inside a single drawn element is forbidden.
@@ -220,7 +220,7 @@ Three orthogonal signals share the chart and must read apart:
   The whole web renders at one opacity; **stroke weight, not opacity, carries the rest→active distinction** — a line steps from Light at rest to Heavy when hovered, selected, or propagating (§3), the same weight the propagation pulse rides.
   The tension red is kept luminant rather than deep-saturated on purpose: a dark, saturated red artifacts badly under social-media video chroma subsampling, where a light red survives.
   The propagation pulse brightens that same line briefly (§7); it does not crossfade or travel planet hues.
-- **Effect polarity (heal/harm)** — afflict/testify, the projected span on the affliction arc, and the interaction ring use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
+- **Effect polarity (heal/harm)** — afflict/testify, the projected span on the Resolve arc, and the interaction ring use **amber** (`#E8913A`, harm) and **violet** (`#9D86D9`, heal), kept deliberately off the aspect red/green so the two channels never collide.
   The ring is **mist** until a verb is determined for its planet — the opponent's precommit, or the player's action preview — and takes the verb's colour then, the same grammar as the arc inside it.
   Mist rather than bone because the arc is bone, and a bone ring just outside a bone arc reads as one double ring on an undamaged planet.
   Mist separates them and puts the two neutrals where the scale already defines them: bone is state, mist is affordance.
@@ -233,7 +233,7 @@ Three orthogonal signals share the chart and must read apart:
   **Afflict flares:** fewer rays, reaching well past the halo, alternate ones falling short so the outline breaks up.
   **Testify gathers:** more rays, all equal, hugging the rim.
   The two sit one stroke rung apart, so the weight difference survives while both stay present; the counts, reach and caps live in `chart-style.ts`.
-  Radial segments were the one primitive still free around a planet — the filled circle is the disc, a complete circle is the interaction ring, a partial arc is affliction, a gradient bloom is identity, an expanding circle is combustion.
+  Radial segments were the one primitive still free around a planet — the filled circle is the disc, a complete circle is the interaction ring, a partial arc is Resolve, a gradient bloom is identity, an expanding circle is combustion.
   They cannot be misread as aspect lines, which always span planet to planet; a streamer terminates in empty space.
   Unlike the arc and the ring the corona is exempt from the cluster radius budget, because only one planet per chart is ever acting — it may overlap a neighbour, since there is only ever one.
 
@@ -262,11 +262,11 @@ Three orthogonal signals share the chart and must read apart:
 - **Combust warning** — combustion is on the table for this planet this turn.
   A dedicated **luminant ember red** (`#FF5C33`, `COMBUST_WARNING` in `client/src/svg/palette.ts`): its own channel, kept off the valence amber (harm in flight), the luminant aspect red (edge language), the gold chrome (structure and invitation), and Mars vermillion (identity), which weight and kind separate it from besides.
   Luminance is the constraint here, not saturation — the opposite of the aspect red, where thin-line artifacting is what governs.
-  The mark rides the affliction arc, whose whole vocabulary is *bright = still yours, dark = already spent*, so a dark ember (this was `#B03636`) reads as more spent and recedes into the track exactly where it should alarm.
+  The mark rides the Resolve arc, whose whole vocabulary is *bright = still yours, dark = already spent*, so a dark ember (this was `#B03636`) reads as more spent and recedes into the track exactly where it should alarm.
   It has to sit in the same value band as the amber and violet it escalates from (L\* ~60–68), never below them.
-  The treatment lives on the affliction arc: when the projected blow would close a planet's remaining span, that span renders ember instead of the valence amber.
+  The treatment lives on the Resolve arc: when the projected blow would close a planet's remaining span, that span renders ember instead of the valence amber.
   A doomed planet therefore shows no bone at all — the ember covers everything it had left — where a survivor keeps bone with an amber bite at the end.
-  Colour carries this rather than length, because length cannot: the projected span clamps at the ceiling, so a planet that dies draws a *shorter* mark than one that survives, and "more amber is worse" reads backwards.
+  Colour carries this rather than length, because length cannot: the projected span clamps at Resolve, so a planet that dies draws a *shorter* mark than one that survives, and "more amber is worse" reads backwards.
   Ember makes the read categorical — which of these dies — instead of a comparison of two lengths at seven different clock positions.
 
 Rejected: coloring the lines by the two connected planets' own hues (primary for trine, secondary for square, a band traveling along the line).
@@ -476,7 +476,7 @@ The natal chart is the game's central drawing — the visual ground, not a menu.
 - Aspect lines are drawn between planet glyph edges, never planet centers.
   This keeps the central area clear.
   They are visible at rest at Light weight — the player sees their internal web — and during an encounter each chart's own web lights as effects propagate through it.
-- Combusted planets dim; affliction reads on the arc ([SCREENS.md §3.5.1](SCREENS.md#351-the-affliction-arc)), never as a number beside the glyph.
+- Combusted planets dim; tension reads on the arc ([SCREENS.md §3.5.1](SCREENS.md#351-the-resolve-arc)), never as a number beside the glyph.
 - The ascendant is marked by a single radial line from inner ring to outer ring at the rising sign's leading edge.
   Light weight.
 - The chart has no "front" — it does not rotate to put any sign at the top.

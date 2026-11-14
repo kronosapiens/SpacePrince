@@ -24,23 +24,23 @@ The outcome, target, and predicate tables in §2, §3, and §4.3 describe curren
 
 ## 1. The Complementary Loop
 
-Narrative choices gather or spend Light, add or relieve affliction, or revive a planet.
+Narrative choices gather or spend Light, add or relieve tension, or revive a planet.
 Relational encounters remain the primary scoring engine.
 
 ### 1.1 Shared resources
 
 - **Light:** the run's banked score and spendable currency.
-- **Affliction:** the burden on each planet, capped at its combustion ceiling.
+- **Tension:** the burden on each planet, capped at its Resolve.
 - **Lit planets:** the remaining choices the player can bring to subsequent encounters.
 
 Chart condition cannot be reduced to one health total.
-The location of affliction matters: restoring Mercury or preserving Saturn changes what the player can do under the next ruler.
+The location of tension matters: restoring Mercury or preserving Saturn changes what the player can do under the next ruler.
 
 ### 1.2 Choice families
 
-- **Press:** choose which planet absorbs an immediate affliction cost to gather Light.
+- **Press:** choose which planet absorbs an immediate tension cost to gather Light.
 - **Tend:** selected or distributed recovery, as a gift or in exchange for a cost.
-- **Revive:** spend Light to return a selected combusted planet at half its ceiling.
+- **Revive:** spend Light to return a selected combusted planet at half its Resolve.
 - **Stat gains:** raise a selected planet's Resolve, Afflict, or Fortune for the rest of the run, as a gift or in exchange for a cost.
 
 A scene uses the families its situation supports.
@@ -54,8 +54,8 @@ The same outcomes support several structures for a decision:
 | Structure | Example offers | Research |
 |---|---|---|
 | Choose a benefit | Recover 24 on one planet, gain 12 Resolve on one planet, or gather 48 Light | [The Library](../research/STS.md#the-library), [Big Fish](../research/STS.md#big-fish) |
-| Choose commitment size | Gather 12 Light freely, take 12 affliction for 60 Light, or take 24 affliction for 96 Light | [Sensory Stone](../research/STS.md#sensory-stone) |
-| Choose payment | Gain 12 Afflict on a chosen planet by paying 36 Light or taking 12 affliction on that planet | [Vampires](../research/STS.md#vampires) |
+| Choose commitment size | Gather 12 Light freely, take 12 tension for 60 Light, or take 24 tension for 96 Light | [Sensory Stone](../research/STS.md#sensory-stone) |
+| Choose payment | Gain 12 Afflict on a chosen planet by paying 36 Light or taking 12 tension on that planet | [Vampires](../research/STS.md#vampires) |
 | Concentrate or spread | Recover 36 on one planet or 12 on each lit planet | [Ancient Writing](../research/STS.md#ancient-writing), which contrasts a focused change with a broad improvement |
 
 These are provisional examples using the existing outcomes and a single decision.
@@ -63,17 +63,17 @@ Vary their amounts and combinations to fit the scene; they imply no fixed surplu
 A modest free option can make a commitment menu useful to a badly afflicted chart, while a larger reward gives healthier charts a reason to participate further.
 Alternate payments are separate options for the same benefit, so the player can preserve whichever resource matters more now.
 
-Compare recovery with Resolve using remaining capacity: gaining Resolve also gives immediate room for affliction.
-With a ceiling of 60 and 24 affliction, recovering 24 leaves 60 capacity; gaining 12 Resolve leaves 48.
-For group effects, count the lit recipients and actual recovery after clamping to each planet's affliction.
+Compare recovery with a Resolve gain by the remaining Resolve each leaves: gaining Resolve also gives immediate room for tension.
+With 60 Resolve and 24 tension, recovering 24 leaves 60 remaining Resolve; gaining 12 Resolve leaves 48.
+For group effects, count the lit recipients and actual recovery after clamping to each planet's tension.
 The value of spreading an effect changes with unlocks and the distribution of damage.
-For a positive affliction cost targeting `allUnlocked`, dignity adjusts the per-planet amount, so the total adjustment scales with the number of lit recipients.
-Apply occupant terms before comparing offers: favorable dignity makes the example's middle commitment free, while unfavorable dignity raises its affliction cost to 24.
+For a positive tension cost targeting `allUnlocked`, dignity adjusts the per-planet amount, so the total adjustment scales with the number of lit recipients.
+Apply occupant terms before comparing offers: favorable dignity makes the example's middle commitment free, while unfavorable dignity raises its tension cost to 24.
 An option can become preferable on a particular chart without making it preferable throughout the catalogue.
 
 ### 1.3 Run context
 
-Affliction can end a run early, but its value also depends on the upcoming rulers and the player's available planets.
+Tension can end a run early, but its value also depends on the upcoming rulers and the player's available planets.
 A scene should support a different preferred choice on a different chart or route.
 The test is whether the player can explain who needs recovery, who can carry a cost, or why the Light matters now.
 
@@ -90,10 +90,10 @@ Debts, vows with later consequences, Omen, Lore, and other persistent effects ar
 
 | Outcome | Meaning |
 |---|---|
-| `affliction { target, delta }` | Positive adds affliction up to Resolve; negative heals, clamped at zero. |
-| `uncombust { target }` | Return a combusted planet at half its ceiling, through the shared uncombust rule. |
+| `tension { target, delta }` | Positive adds tension up to Resolve; negative eases it, clamped at zero. |
+| `uncombust { target }` | Return a combusted planet at half its Resolve, through the shared uncombust rule. |
 | `light { delta }` | Gather Light or incur an ordinary loss, clamped at zero. |
-| `gain { target, stat, amount }` | Raise a lit planet's stat for the rest of the run; a Resolve gain raises its combustion ceiling. |
+| `gain { target, stat, amount }` | Raise a lit planet's stat for the rest of the run; a Resolve gain adds the same amount of remaining Resolve. |
 
 An option's separate `cost` is a **purchase**, paid in full before its result.
 Insufficient Light makes the entire option unavailable; incoming rewards cannot finance its price.
@@ -102,7 +102,7 @@ Paid healing requires some actual recovery; clean planets cannot consume Light f
 
 All outcomes are atomic.
 An invalid target or unaffordable Light purchase rejects the whole choice, including any reward.
-Positive affliction can exceed the target's remaining capacity; it caps at Resolve and combusts the planet without reducing the choice's reward.
+Positive tension can exceed the target's remaining Resolve; it caps at Resolve and combusts the planet without reducing the choice's reward.
 
 ### 2.1 Exchange value
 
@@ -110,11 +110,11 @@ Light is both a spendable currency and the common reference for valuing encounte
 The [economy table](../../client/src/data/economy.ts) holds the going rates (§6).
 They approximate each change's simulated effect on final run Light; full balance is deferred.
 An offer can exchange burdens and benefits directly without Light changing hands.
-For example, a Prince could take affliction for a run-long stat increase, or combine a smaller Light payment with an affliction cost.
+For example, a Prince could take tension for a run-long stat increase, or combine a smaller Light payment with a tension cost.
 The offer identifies which planet bears each burden and receives each benefit.
 
-Value taking affliction separately from the price of removing it; the two need not form a reversible exchange.
-In simulation, a point of affliction taken cost more final Light than a point removed gained, so taking affliction pays more per point than recovery costs.
+Value taking tension separately from the price of removing it; the two need not form a reversible exchange.
+In simulation, a point of tension taken cost more final Light than a point removed gained, so taking tension pays more per point than recovery costs.
 Value a direct trade at the going rates of its parts.
 
 Several linked costs and benefits form one choice and resolve together, with their full effects visible before commitment.
@@ -123,7 +123,7 @@ They do not require intermediate Light transactions or additional decisions.
 ## 3. Targeting
 
 Only unlocked planets may be selected or affected.
-Ordinary affliction effects require lit planets; revival requires a combusted planet.
+Ordinary tension effects require lit planets; revival requires a combusted planet.
 
 | Target | Meaning |
 |---|---|
@@ -131,8 +131,8 @@ Ordinary affliction effects require lit planets; revival requires a combusted pl
 | `allUnlocked` | All currently lit unlocked planets. |
 | `joy` | The house's joy, only if lit and unlocked. |
 | `ruler` | The house's fixed game ruler, only if lit and unlocked. |
-| `mostAfflicted` | The lit unlocked planet with greatest affliction. |
-| `healthiest` | The lit unlocked planet with greatest remaining combustion margin. |
+| `mostTension` | The lit unlocked planet with greatest tension. |
+| `mostRemainingResolve` | The lit unlocked planet with greatest remaining Resolve. |
 
 Target roles bind against the state before the choice.
 `ruler` binds the fixed `HOUSES[].ruler`, not the traditional ruler of the house's natal sign.
@@ -158,7 +158,7 @@ The shared economy and encounter limits constrain all offers.
 ### 4.1 Planetary joys
 
 A house's fixed joy assignment identifies the planet to inspect, wherever it resides in the natal chart.
-That planet's current unlock status, affliction, and combustion determine whether its choice is available.
+That planet's current unlock status, tension, and combustion determine whether its choice is available.
 This gives players opportunities they can preserve, lose, and restore through their decisions during a run.
 
 Every scene in the seven houses with a joy authors one joy choice, added to the scene's other choices rather than replacing one.
@@ -166,7 +166,7 @@ It offers better terms than the scene's trades, or an exchange they lack, in tha
 The joy can change the action, benefit, or recipients: Jupiter might organize shared recovery where the ordinary offers provide individual support.
 The [FTL research station example](../research/FTL.md#engi-research-station) illustrates a capability changing how a problem can be approached; Space Prince expresses that through immediate, determined effects.
 
-A joy is present when it is unlocked, lit, and below 96 affliction.
+A joy is present when it is unlocked, lit, and below 96 tension.
 At or above that threshold, or when combusted, its choice disappears.
 This threshold remains provisional.
 
@@ -176,7 +176,7 @@ Occupants are the unlocked planets whose natal sign is the house's sign, whateve
 They are not written into scenes.
 Their net dignity changes existing costs by one step.
 Each occupant counts +1 in domicile or exaltation and −1 in detriment or fall; only the sign of the total applies.
-A favorable total lowers the cost and an unfavorable total raises it: 24 Light for a purchase, otherwise 12 affliction taken, otherwise 24 Light for an ordinary loss, each stopping at zero.
+A favorable total lowers the cost and an unfavorable total raises it: 24 Light for a purchase, otherwise 12 tension taken, otherwise 24 Light for an ordinary loss, each stopping at zero.
 Neutral occupants and cancelling dignities leave the terms unchanged.
 Occupants do not enlarge exchanges, and a gift with no cost remains a gift.
 
@@ -193,7 +193,7 @@ These are the current client predicates.
 
 | Predicate | True when |
 |---|---|
-| `joyPresent` | The joy is unlocked, lit, and below the affliction threshold. |
+| `joyPresent` | The joy is unlocked, lit, and below the tension threshold. |
 | `anyCombusted` | At least one unlocked planet is combusted. |
 
 Visibility is distinct from affordability.
@@ -225,13 +225,13 @@ They apply to every rising sign, while encounter history and routing determine w
 Frequencies and amounts remain open to playtesting.
 The going rates (§6) are provisional references, not a requirement that every choice have the same nominal advantage.
 Gifts, trades, and choices among benefits can coexist within a house–sign pool.
-Some scenes require a loss of carried Light, useful remaining capacity, or an available planet even after the player chooses a preferred option.
+Some scenes require a loss of carried Light, useful remaining Resolve, or an available planet even after the player chooses a preferred option.
 Review the whole menu: an empty exit, a free benefit, or a Light loss clamped at zero can all remove that risk.
-Recovery or Resolve can offset nominal affliction, so compare complete outcomes rather than authored payments alone.
+Recovery or Resolve can offset nominal tension, so compare complete outcomes rather than authored payments alone.
 Joy and favorable occupants can legitimately provide a harmless way through; report that exception when comparing pools.
 Make costs follow the situation already entered, revising an optional offer if simply removing its refusal would make no sense.
 
-Compare the opportunities across each house–sign pool and representative run states, including early unlock tiers, affliction, remaining maps, and available Light.
+Compare the opportunities across each house–sign pool and representative run states, including early unlock tiers, tension, remaining maps, and available Light.
 Account for encounter frequency, payment methods, benefit types, target restrictions, and occupant and joy effects.
 No fixed per-choice surplus or symmetry of signs establishes balance by itself.
 
@@ -262,7 +262,7 @@ The writing method itself — voice, length, briefs, and review through comparis
    Check payment and target validity across representative charts and run states.
 3. **Review the integrated encounter.**
    Check that the displayed choices form a coherent scene and that prose, previews, costs, and immediate consequences agree.
-   A fictional burden alone does not justify affliction, and a desired reward does not justify inventing a transaction that weakens the scene.
+   A fictional burden alone does not justify tension, and a desired reward does not justify inventing a transaction that weakens the scene.
    If economic composition changes an action or situation, return that change to narrative review.
    Playtesting evaluates the player's experience separately from source fidelity and editorial quality.
 
@@ -273,7 +273,7 @@ Label supported resolver effects separately from proposed effects, and keep unap
 To refine a reference attribute's contribution, compare alternative interpretations while holding the selected chart and other authoring choices steady.
 For example, VI is always cadent and averse; compare how different VI scenes express those attributes rather than treating them as chart variations.
 When comparing charts, use valid placements and name which linked references change: holding a planet in a house while changing the house's sign also changes the planet's sign and may change its dignity.
-Changing affliction can change joy availability while leaving the natal references intact.
+Changing tension can change joy availability while leaving the natal references intact.
 If a proposed influence adds no useful distinction, simplify its use and update the relevant guidance rather than adding a token sentence or bonus.
 Keep unresolved writing questions separate from economic or implementation questions so each can be revisited on its own evidence.
 
@@ -317,16 +317,16 @@ The [economy table](../../client/src/data/economy.ts) holds the going rates:
 
 | Exchange | Going rate |
 |---|---|
-| Recover 24 affliction | 48 Light |
-| Take 24 affliction | Pays 72 Light |
+| Recover 24 tension | 48 Light |
+| Take 24 tension | Pays 72 Light |
 | +12 Resolve | 60 Light |
 | +12 Afflict | 36 Light |
 | +6 Fortune | 36 Light |
 | Revive | 180 Light |
 
 Testify gains are not offered; their simulated value was near zero.
-For valuing trades, count recovery at 2 Light per point and affliction taken at 3.
-Revival returns a planet at half its own ceiling, so its flat price favors planets with high Resolve.
+For valuing trades, count recovery at 2 Light per point and tension taken at 3.
+Revival returns a planet at half its own Resolve, so its flat price favors planets with high Resolve.
 
 ## 7. House Briefs
 
@@ -360,15 +360,15 @@ The narrative screen ([SCREENS.md §3.2](../presentation/SCREENS.md#32-narrative
 - **Light:** the run's total, pulsing when it moves.
 
 Mechanics belong in the aside, not in the scene's prose.
-Planet previews and read-only effect amounts show the actual changes from the shared resolver, including recovery clamped to current affliction.
-When Resolve changes, the arc compares current and final remaining capacity, its track shows the gained ceiling, and the stat panel names the current and projected values.
+Planet previews and read-only effect amounts show the actual changes from the shared resolver, including recovery clamped to current tension.
+When Resolve changes, the arc compares current and final remaining Resolve, its track shows the gained Resolve, and the stat panel names the current and projected values.
 Player-facing text uses encounter, self, and other; named Light and Resolve follow the shared copy register.
 
 ## 10. Validation
 
 Every authored scene must remain playable across all unlock tiers and representative clean, afflicted, and partially combusted charts.
 Preview and commit must agree for every valid target.
-Tests cover full payment, ordinary losses, invalid targets, combustion margins, revival, stat gains, occupant terms, repeated resolution, and save resets.
+Tests cover full payment, ordinary losses, invalid targets, the cap at Resolve, revival, stat gains, occupant terms, repeated resolution, and save resets.
 The [catalogue tests](../../client/tests/narrative-catalogue.test.ts) check exact coverage, unique IDs and openings, matching-sign selection without repeats until exhaustion, and amounts on the 12-lattice.
 They check zero-Light playability through every unlock tier, with empty, favorable, and adverse occupancy across four chart conditions: 60,480 scene states.
 They also compare preview and commit for every eligible selection across five representative states, including run-long gains, and check joy visibility, revival, and the five-choice limit.

@@ -55,7 +55,7 @@ The matrices supply writing possibilities; the authoring spec determines which e
 ## 2. Outcome Vocabulary
 
 Narrative encounters operate on the same resources as relational encounters.
-Light, affliction, revival, and stat gains are defined with payment and target rules in [ENCOUNTERS.md §2–3](ENCOUNTERS.md#2-outcomes-and-payment).
+Light, tension, revival, and stat gains are defined with payment and target rules in [ENCOUNTERS.md §2–3](ENCOUNTERS.md#2-outcomes-and-payment).
 That document also records [implementation status](ENCOUNTERS.md#implementation-status) and [deferred decisions](ENCOUNTERS.md#11-deferred-decisions).
 
 ---
@@ -153,11 +153,11 @@ The treatment of each dignity and limits on bonuses live in [ENCOUNTERS.md §4.2
 
 ### 3.3 Current run state
 
-Read unlocks, affliction, derived combustion, and Light from the current run.
+Read unlocks, tension, derived combustion, and Light from the current run.
 These determine valid targets, affordability, and which approaches are currently usable.
 
 Joy availability is derived by taking the house's fixed joy assignment and inspecting that planet's condition wherever it resides.
-Unlock status, affliction, and combustion can open or close its additional approaches, giving players opportunities they can preserve, lose, and restore.
+Unlock status, tension, and combustion can open or close its additional approaches, giving players opportunities they can preserve, lose, and restore.
 Natal occupancy is not required.
 The current threshold and related predicates live in [ENCOUNTERS.md §4.1–4.3](ENCOUNTERS.md#4-chart-conditioning).
 
