@@ -94,6 +94,28 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
 }
 
 describe("encounter interactions", () => {
+  it("keeps the selected planet and shared actions when switching to the mobile layout", () => {
+    let mobile = false;
+    let resize = () => {};
+    vi.stubGlobal("matchMedia", () => ({
+      get matches() { return mobile; },
+      addEventListener: (_: string, listener: () => void) => { resize = listener; },
+      removeEventListener: () => {},
+    }));
+    const { onCommitTurn } = setup();
+    click(moon);
+    expect(get(testimony).closest("foreignObject")).not.toBeNull();
+    act(() => { mobile = true; resize(); });
+    expect(get(testimony).closest("foreignObject")).toBeNull();
+    expect(get(testimony).closest(".ps-mobile")).not.toBeNull();
+    expect(get('.chart-layout-chart .chart-planet-controls button[aria-label="Moon"]').getAttribute("aria-pressed")).toBe("true");
+    click('.chart-layout-chart .chart-planet-controls button[aria-label="Mars"]');
+    expect(get(".ps-mobile .ps-name").textContent).toContain("MARS");
+    click(testimony);
+    expect(onCommitTurn).toHaveBeenCalledTimes(1);
+    expect(onCommitTurn.mock.calls[0]?.slice(0, 2)).toEqual(["Mars", "Testimony"]);
+  });
+
   it("opens with the ruler's sentence and states the ruler's rule beneath it", () => {
     const { encounter } = setup();
     const ruler = encounterRuler(encounter);

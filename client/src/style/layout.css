@@ -88,7 +88,6 @@
   .chart-layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto;
-    padding: 64px 16px 32px;
     gap: 28px;
     align-content: start;
   }
@@ -974,24 +973,8 @@
 }
 
 @media (max-width: 899px) {
-  .relational-content {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 480px;
-    margin-top: 72px;
-    margin-bottom: 72px;
-  }
-  .relational-side { grid-column: 1; max-width: none; }
-  .relational-topbar { display: block; }
   .relational-bands { width: 8px; }
-  .relational-readouts { justify-content: space-between; gap: 4px 18px; }
   .relational-foot { gap: 4px; }
-  .relational-announce {
-    position: absolute;
-    bottom: calc(100% + 28px);
-    left: 0;
-    right: 0;
-    font-size: 23px;
-  }
   .relational-light,
   .relational-ruler { gap: 6px; }
   .relational-turns-v,
@@ -1650,10 +1633,10 @@
   .guide-mobile-card {
     display: block;
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 56px;
-    max-height: 31vh;
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    max-height: 31dvh;
     overflow-y: auto;
     padding: 15px 18px;
     border-top: 1px solid var(--gold);
@@ -1685,7 +1668,7 @@
      edge, under the note card. */
   .guide-bar {
     top: auto;
-    bottom: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
   }
@@ -2297,4 +2280,117 @@ body:has(.guide-overlay) .dev-keys { display: none; }
 .chart-layout:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .chorus-modal .info-card-stage { animation: none; }
+}
+
+/* The chart, panel and callbacks are shared; only their placement changes. */
+@media (max-width: 899px) {
+  .chart-layout {
+    padding: calc(var(--mobile-header-height) + env(safe-area-inset-top))
+      max(var(--mobile-gap), env(safe-area-inset-right))
+      calc(32px + env(safe-area-inset-bottom))
+      max(var(--mobile-gap), env(safe-area-inset-left));
+  }
+  .chart-layout-chart { scroll-margin-top: calc(var(--mobile-header-height) + env(safe-area-inset-top)); }
+  .chart-planet-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+    gap: 8px;
+    margin-top: var(--mobile-gap);
+  }
+  .chart-planet-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    min-height: var(--mobile-touch-size);
+    color: var(--planet-color);
+    font-size: var(--mobile-planet-name-size);
+    border-bottom: 1px solid var(--smoke);
+  }
+  .chart-planet-controls button > span { font-size: var(--mobile-planet-glyph-size); }
+  .chart-planet-controls button[aria-pressed="true"] { border-color: currentColor; }
+  .chart-planet-controls button:disabled { opacity: 0.35; cursor: default; }
+  .chart-planet-controls button:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+  body:has(.guide-overlay) .chart-planet-controls { display: none; }
+
+  .ps-mobile { margin-top: var(--mobile-gap); height: auto; }
+  .ps-mobile .ps-content { padding: var(--mobile-gap); }
+  .ps-mobile .ps-head { gap: 12px; flex-wrap: wrap; }
+  .ps-mobile .ps-title { font-size: var(--mobile-panel-title-size); }
+  .ps-mobile :is(.ps-ratio, .ps-gloss, .ps-blurb, .ps-effect) { font-size: var(--mobile-panel-text-size); }
+  .ps-mobile .ps-epithet { font-size: var(--mobile-panel-small-size); }
+  .ps-mobile .ps-actions { gap: 12px; margin-top: var(--mobile-gap); }
+  .ps-mobile .ps-action {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--mobile-touch-size);
+    font-size: var(--mobile-panel-title-size);
+    transform: none;
+  }
+  .ps-mobile .ps-study-toggle { min-height: var(--mobile-touch-size); }
+  .ps-mobile .ps-table { table-layout: auto; }
+  .ps-mobile .ps-table col { width: auto; }
+  .ps-mobile .ps-table :is(th, td) { padding-inline: 3px; }
+  .ps-mobile .ps-table thead th { font-size: 10px; letter-spacing: 0; }
+  .ps-mobile .ps-table tbody td { font-size: var(--mobile-panel-small-size); }
+  .ps-mobile .ps-table tbody td.ps-rowlabel { font-size: var(--mobile-panel-small-size); }
+
+  .chart-layout.relational { grid-template-rows: repeat(4, auto); }
+  .relational .chart-layout-chart { grid-row: 3; }
+  .chart-layout > .relational-content { display: contents; }
+  .relational-topbar, .relational-foot, .relational-side {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 480px;
+    justify-self: center;
+    grid-column: 1;
+  }
+  .relational-topbar { grid-row: 1; display: flex; }
+  .relational-readouts { width: 100%; justify-content: space-around; }
+  .relational-announce { position: static; font-size: 23px; }
+  .relational-foot { grid-row: 2; }
+  .relational-side { grid-row: 4; }
+  .chart-layout-label, .relational-side > .relational-side-label {
+    position: static;
+    margin-bottom: var(--chart-label-gap);
+  }
+
+  .screen-help-button, .screen-settings-button {
+    top: calc(12px + env(safe-area-inset-top));
+    width: var(--mobile-touch-size);
+    height: var(--mobile-touch-size);
+  }
+  .screen-help-button { left: max(12px, env(safe-area-inset-left)); }
+  .screen-settings-button { right: max(12px, env(safe-area-inset-right)); }
+  .instruction {
+    top: calc(12px + env(safe-area-inset-top));
+    left: calc(64px + env(safe-area-inset-left));
+    right: calc(64px + env(safe-area-inset-right));
+    min-height: var(--mobile-touch-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
+    font-size: 11px;
+  }
+  .settings-dropdown {
+    top: calc(64px + env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    max-height: calc(100dvh - 80px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .info-card-overlay {
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .info-card-overlay .info-card-stage {
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+  }
+  .info-card-close, .info-card-help, .city-compass {
+    width: var(--mobile-touch-size);
+    height: var(--mobile-touch-size);
+  }
+  .info-card-help { right: 64px; }
+  .city-row { min-height: var(--mobile-touch-size); }
+  .guide-bar button { min-width: var(--mobile-touch-size); min-height: var(--mobile-touch-size); }
 }

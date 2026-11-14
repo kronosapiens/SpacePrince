@@ -91,6 +91,23 @@ const leaveOption = (index: number) => act(() => {
 });
 
 describe("narrative chart interaction", () => {
+  it("offers eligible mobile targets and commits revival through the shared handler", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const scroll = vi.fn();
+    HTMLElement.prototype.scrollIntoView = scroll;
+    const { onCommit } = mount(INTERACTION_SCENE.scenarioId, createStubPrince(), 216);
+    click('[data-guide="option-4"]');
+    expect(scroll).toHaveBeenCalledTimes(1);
+    const moonButton = element('.chart-planet-controls button[aria-label="Moon"]') as HTMLButtonElement;
+    const venusButton = element('.chart-planet-controls button[aria-label="Venus"]') as HTMLButtonElement;
+    expect(moonButton.disabled).toBe(true);
+    expect(venusButton.disabled).toBe(false);
+    click('.chart-planet-controls button[aria-label="Venus"]');
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(onCommit.mock.calls[0]![0].light).toBe(36);
+    delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+  });
+
   it("previews revival by focus and commits once on target activation", () => {
     const { run, onCommit, render } = mount(INTERACTION_SCENE.scenarioId, createStubPrince(), 216);
     const options = [...document.querySelectorAll(".option")].map((option) => option.textContent);

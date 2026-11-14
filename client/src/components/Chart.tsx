@@ -13,6 +13,7 @@ import {
 } from "@/components/PlanetStatsPanel";
 import { NECESSITY_ANIMATION_TIMINGS, type NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
 import { PropagationLine } from "@/components/PropagationLine";
+import { useMobileLayout } from "@/components/useMobileLayout";
 import { SvgRotation } from "@/components/SvgRotation";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 import {
@@ -242,6 +243,7 @@ export function Chart(props: ChartProps) {
     onToggleStudy,
   } = props;
 
+  const mobile = useMobileLayout();
   const pointerPlanet = useRef<PlanetName | null>(null);
   const focusPlanet = useRef<PlanetName | null>(null);
   const canPreview = !!onPlanetHover && !passive && !opening;
@@ -376,7 +378,25 @@ export function Chart(props: ChartProps) {
   // Sacred-geometry ground (static hexagram + vesica), shown by default.
   const substrate = showSubstrate ? renderSubstrate() : null;
 
+  const panel = !opening && statsPanelPlanet ? (
+    <PlanetStatsPanel
+      mobile={mobile}
+      chart={chart}
+      planet={statsPanelPlanet}
+      tension={state?.[statsPanelPlanet]?.tension ?? 0}
+      cx={panelPlacement.cx}
+      cy={panelPlacement.cy}
+      height={panelHeight}
+      actions={statsPanelActions}
+      effect={statsPanelEffect}
+      resolvePreview={projection?.deltas[statsPanelPlanet]?.resolve}
+      study={statsPanelStudy}
+      onToggleStudy={onToggleStudy}
+    />
+  ) : null;
+
   return (
+    <>
     <svg
       viewBox={CHART_VIEWBOX}
       overflow="visible"
@@ -511,22 +531,25 @@ export function Chart(props: ChartProps) {
 
       {/* Stats panel last = highest z. When it clashes with a planet in a busy
           chart, the panel sits on top — it's the focused read. */}
-      {!opening && statsPanelPlanet && (
-        <PlanetStatsPanel
-          chart={chart}
-          planet={statsPanelPlanet}
-          tension={state?.[statsPanelPlanet]?.tension ?? 0}
-          cx={panelPlacement.cx}
-          cy={panelPlacement.cy}
-          height={panelHeight}
-          actions={statsPanelActions}
-          effect={statsPanelEffect}
-          resolvePreview={projection?.deltas[statsPanelPlanet]?.resolve}
-          study={statsPanelStudy}
-          onToggleStudy={onToggleStudy}
-        />
-      )}
+      {!mobile && panel}
     </svg>
+    {mobile && handleClick && (
+      <div className="chart-planet-controls">
+        {PLANETS.filter(isUnlocked).map((planet) => (
+          <button key={planet} type="button"
+            aria-label={planet}
+            aria-pressed={selectedPlanet === planet}
+            disabled={interactionPlanets ? !interactionPlanets.has(planet) : planetCombusted(planet)}
+            style={{ "--planet-color": PLANET_PRIMARY[planet] } as CSSProperties}
+            onClick={(event) => { event.stopPropagation(); handleClick(planet); }}>
+            <span aria-hidden="true">{PLANET_GLYPH[planet]}</span>
+            {planet}
+          </button>
+        ))}
+      </div>
+    )}
+    {mobile && panel}
+    </>
   );
 }
 
