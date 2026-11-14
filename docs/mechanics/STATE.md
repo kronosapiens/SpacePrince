@@ -81,13 +81,15 @@ For the onchain design, randomness is spent deliberately:
   A Prince's first run opens on the fixed first map instead ([MAP.md §4](MAP.md#4-seeding)).
 - **Once per map rollover** — the next map's seed; from it derive node content and opening uncombust rolls (MECHANICS §11.3), shown on entry.
   Revival uses a separate seeded stream from node content; map openings add no tension.
-- **At relational encounter arrival** — the minted Prince that supplies the other chart, and independent Necessity rolls for both charts (MECHANICS §11.3).
+- **At relational encounter arrival** — the minted Prince that supplies the other chart, independent Necessity rolls for both charts (MECHANICS §11.3), and the opponent's first precommit, drawn after its Necessity.
   Each of the player's planets draws uniformly from 12/24/36, a successful Fortune roll blocks that planet's entire draw, and tension is capped at Resolve.
   Each of the Other's planets rolls Fortune three times, and each miss adds a sixth of its Resolve.
   The player carries existing tension; the other starts with fresh state.
   Carried tension can cause combustion at entry; the Other's planets always arrive lit.
   In the prototype, each chart's Necessity uses a separate seeded stream from the other's and from the other chart's turn sequence.
 - **At turn resolution** — the opponent's *next* precommit (planet + verb), revealed behind the resolution animation.
+  The ruler draws the move twice and keeps one (MECHANICS §11.4).
+  It reads the other chart's stored placements and state and the action in the transaction being resolved, so it stores nothing.
   A relational encounter's last turn has no next precommit, so it needs no VRF request.
 
 Everything else is **pseudorandom**: a deterministic function of committed state that the client computes to render and the contract re-derives to bind, storing nothing.

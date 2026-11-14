@@ -169,7 +169,7 @@ export function remirrorRelational(enc: RelationalEncounter, tier: number, seed:
   const roster = unlockedPlanets(tier);
   const rng = mulberry32(hashString(`${seed}_remirror_${tier}`));
   const { sequence, opponentActions } = rollOpponentTurns(
-    enc.opponentChart, roster, rng, enc.sequence.length,
+    enc.opponentChart, enc.opponentState, roster, rng, enc.sequence.length,
   );
   return {
     ...enc,

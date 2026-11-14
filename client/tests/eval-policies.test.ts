@@ -170,10 +170,11 @@ describe("strategic policies", () => {
     const spent = at(2, (p) => resolve(p) - (p === "Moon" ? 1 : 0));
     expect(route(survivalPolicy, spent)).toBe("3C");
     expect(route(lightPolicy, spent)).toBe("3C");
-    // With no tension every candidate is survived; the scene offers recovery
-    // for survival and Light for accepting a burden.
+    // With no tension every candidate is survived. The scene offers recovery
+    // for survival; its Light for accepting a burden (768 over the samples)
+    // falls short of the Venus-ruled encounter at 2L (810).
     expect(route(survivalPolicy, clean)).toBe("3C");
-    expect(route(lightPolicy, clean)).toBe("3C");
+    expect(route(lightPolicy, clean)).toBe("2L");
 
     // Two scenes forecast alike; survival takes the one nearer the map's exit.
     const tied = useMara(beginRun(prince.chart, 61, prince.numRelationalEncounters));

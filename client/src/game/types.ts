@@ -108,9 +108,12 @@ export interface RelationalEncounter {
    *  unlock tier (MECHANICS §11.1). The opponent's chart still holds all seven
    *  placements; only these are sent and rendered solid. */
   roster: PlanetName[];
-  sequence: PlanetName[]; // opponent's planet per turn; length is always 3
+  /** Opponent's planet per turn; the length is the encounter's turn count
+   *  (`relationalTurnCount`). Entries past the current turn are redrawn as
+   *  each turn resolves. */
+  sequence: PlanetName[];
   /** Opponent's precommitted action per turn, parallel to `sequence`. Drawn
-   *  stat-weighted (P(afflict) = affliction / (affliction + testimony)) and locked at
+   *  with the planet by the ruler's rule (`drawOpponentMove`) and locked at
    *  turn start, so the player always chooses with full information. */
   opponentActions: Polarity[];
   turnIndex: number;

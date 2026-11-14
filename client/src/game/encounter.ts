@@ -1,8 +1,8 @@
 import { chartRuler, seededChart } from "./chart";
 import { applyOtherNecessity } from "./necessity";
-import { drawValence, getEffectiveStatsFromPlacement } from "./relational";
+import { drawOpponentMove } from "./opponent-move";
 import { opponentSeedForRuler, seedRuler } from "./map-content";
-import { pickWeighted, mulberry32, hashString } from "./rng";
+import { mulberry32, hashString } from "./rng";
 import { unlockedPlanets } from "./unlocks";
 import type {
   Chart,
@@ -11,6 +11,7 @@ import type {
   PlanetName,
   Polarity,
   Run,
+  SideState,
 } from "./types";
 
 /** The encounter's ruler — the planet ruling the opponent chart's Ascendant,
@@ -37,23 +38,25 @@ export interface BeginRelationalInput {
   encounterIdSeed?: number;
 }
 
-/** Roll the opponent's turns from a roster: a stat-weighted planet per
- *  turn and its precommitted verb. Shared by encounter start and dev
- *  re-mirroring (when the unlock tier changes, the opponent re-fields to match). */
+/** Roll the opponent's turns from a roster: one move per turn, each drawn by
+ *  its ruler's rule (`drawOpponentMove`) from `opponentState` as it stands.
+ *  Resolving a turn redraws the next, so only the current turn's move is ever
+ *  played. Shared by encounter start and dev re-mirroring (when the unlock
+ *  tier changes, the opponent re-fields to match). */
 export function rollOpponentTurns(
   opponentChart: Chart,
+  opponentState: SideState,
   roster: PlanetName[],
   rng: () => number,
   turns: number,
 ): { sequence: PlanetName[]; opponentActions: Polarity[] } {
+  const ruler = chartRuler(opponentChart);
   const sequence: PlanetName[] = [];
   const opponentActions: Polarity[] = [];
   for (let i = 0; i < turns; i++) {
-    const planet = pickWeighted(roster, rng);
+    const { planet, action } = drawOpponentMove(opponentChart, opponentState, roster, ruler, rng);
     sequence.push(planet);
-    opponentActions.push(
-      drawValence(getEffectiveStatsFromPlacement(opponentChart.planets[planet]), rng),
-    );
+    opponentActions.push(action);
   }
   return { sequence, opponentActions };
 }
@@ -66,17 +69,18 @@ export function beginRelationalEncounter(input: BeginRelationalInput): Relationa
   const acceptedSeed = opponentSeedForRuler(opponentSeed, seedRuler(opponentSeed, roster));
   // Player-facing name: the self/other axis, never adversary (SCREENS.md).
   const opponentChart = seededChart(acceptedSeed, `Other ${acceptedSeed % 9999}`);
+  // Separate stream for the necessity so its rolls don't perturb the
+  // turn-sequence rolls below. It lands first: the opening move reads the
+  // tension the opponent arrives with.
+  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_tension`));
+  const opening = applyOtherNecessity(opponentChart, roster, stateRng);
   // Mirrored matchup (MECHANICS §11.1): the opponent fields exactly the planets
   // the player has unlocked — Moon v Moon, then 2v2, up to 7v7. Turn count is
   // the map number, so a single planet may simply be sent on repeat turns.
   const rng = mulberry32(encounterIdSeed ?? acceptedSeed);
   const { sequence, opponentActions } = rollOpponentTurns(
-    opponentChart, roster, rng, relationalTurnCount(run.mapsCompleted),
+    opponentChart, opening.state, roster, rng, relationalTurnCount(run.mapsCompleted),
   );
-  // Separate stream for the necessity so its rolls don't perturb the
-  // turn-sequence rolls above.
-  const stateRng = mulberry32(hashString(`${encounterIdSeed ?? acceptedSeed}_tension`));
-  const opening = applyOtherNecessity(opponentChart, roster, stateRng);
   return {
     kind: "relational",
     // The ID feeds turn RNG; retain its original salt to preserve seeded outcomes.

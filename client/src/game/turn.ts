@@ -1,10 +1,11 @@
-import { directAmount, drawValence, getEffectiveStatsFromPlacement } from "./relational";
+import { directAmount, getEffectiveStatsFromPlacement } from "./relational";
 import { getAspects, propagatedMagnitude } from "./aspects";
 import { isCombusted, newlyCombusted } from "./combust";
 import { cloneSideState, runChart } from "./chart";
 import { encounterRuler } from "./encounter";
+import { drawOpponentMove } from "./opponent-move";
 import { turnLight } from "./score";
-import { hashString, mulberry32, pickWeighted } from "./rng";
+import { hashString, mulberry32 } from "./rng";
 import type {
   Chart,
   RelationalEncounter,
@@ -131,17 +132,15 @@ export function resolveTurn(
   const newSequence = [...enc.sequence];
   const newOpponentActions = [...enc.opponentActions];
   if (!encounterEnded) {
+    // An encounter still running has a lit opponent planet to pick.
     const selectable = enc.roster.filter(
       (p) => !isCombusted(enc.opponentChart.planets[p], opponentStateMap[p]),
     );
-    if (selectable.length > 0) {
-      const nextOpponent = pickWeighted(selectable, rng);
-      newSequence[nextTurnIndex] = nextOpponent;
-      newOpponentActions[nextTurnIndex] = drawValence(
-        getEffectiveStatsFromPlacement(enc.opponentChart.planets[nextOpponent]),
-        rng,
-      );
-    }
+    const next = drawOpponentMove(
+      enc.opponentChart, opponentStateMap, selectable, encounterRuler(enc), rng, playerValence,
+    );
+    newSequence[nextTurnIndex] = next.planet;
+    newOpponentActions[nextTurnIndex] = next.action;
   }
 
   const updatedEnc: RelationalEncounter = {

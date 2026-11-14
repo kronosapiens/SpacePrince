@@ -116,6 +116,7 @@ Action is set per side:
   Selecting a planet fans out the two actions; the player picks one.
 - **Opponent side:** randomly drawn and precommitted.
   The verb is a stat-weighted random draw — `P(afflict) = affliction / (affliction + testimony)`, `P(testify) = 1 - P(afflict)`.
+  Under Jupiter and Mercury it is drawn twice (§11.4).
   It is locked at turn start and surfaced to the player — alongside the already-revealed opponent planet — before the player chooses, so the player always acts with full information.
 
 ## 6. Direct Resolution
@@ -154,8 +155,9 @@ Fresh randomness enters only where the game is already pausing to reveal somethi
 - **Map creation.** The map seed comes from a VRF request; from it derive node content ([MAP.md](MAP.md)) and opening uncombust rolls (§11.3).
   These are settled and displayed before the first node is entered.
 - **Relational encounter arrival.** Both charts receive necessity before the first action (§11.3).
-  In the prototype, each chart's opening tension uses a separate seeded stream from the other's and from the turn sequence, so necessity draws do not change the announced actions.
-- **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5).
+  In the prototype, each chart's opening tension uses a separate seeded stream from the other's and from the turn sequence.
+  The Other's first move is drawn after its necessity, because some rulers read its remaining Resolve (§11.4).
+- **Turn boundaries.** The transaction that resolves turn N also draws the opponent's next precommit — planet and verb (§5, §11.4).
   By the time the resolution animation finishes, the next move has landed.
   Randomness in relational encounters is not knowing what comes next — never not knowing what your committed action will do.
 
@@ -259,9 +261,9 @@ Per encounter:
   Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
 - Both charts receive **Necessity at relational entry** (§11.3): the player adds a draw to carried tension, while the Other begins with fresh state and arrives carrying up to half its Resolve as tension.
   Fortune can leave a planet with no added tension, and every fielded planet on the Other's chart arrives lit.
-- Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1).
+- Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1), at odds the ruler sets (§11.4).
   The VRF request for turn N+1 happens at turn N's resolution — the encounter arrival request covers the first — so the reveal rides a transaction already in flight (§7).
-- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5).
+- The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5, §11.4).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
 - Once the outcome settles, the encounter advances to the map by itself after a short pause, longer when the run has ended; a tap skips the pause (`useEncounterAdvance`).
 
@@ -357,6 +359,33 @@ The map seed determines revival in a separate stream from node content; results 
 At relational arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
 Encounter length still increases with map number, while repeated necessity adds to the player's carried tension and revival provides a way back from combustion.
 The balancing study that arrived at the player's rules is summarised on [PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560).
+
+### 11.4 The Other's move
+
+The ruler changes the odds of the Other's move, and a draw still decides it.
+Under every ruler the move is drawn twice, and the ruler says which of the two it keeps.
+
+| Ruler | Drawn twice | Kept |
+|---|---|---|
+| Venus | Planet | More Testimony |
+| Mars | Planet | More Affliction |
+| Jupiter | Action | The action the player last used |
+| Mercury | Action | The action the player last used |
+| Moon | Planet | Less remaining Resolve |
+| Sun | Planet | More remaining Resolve |
+| Saturn | Planet | Less remaining Resolve |
+
+Where the planet is drawn twice, two of the Other's lit fielded planets are picked at random, and the action is then one stat-weighted draw for the planet kept (§5).
+The same planet may be picked twice, so every lit planet can still act, and a tie keeps the first picked.
+With seven lit planets and no ties, the most favoured acts 13 times in 49 and the least favoured once, against 7 in 49 for each on an even draw.
+
+Where the action is drawn twice, the planet is one even pick and its action is drawn twice by its stats (§5).
+The action the player last used is announced if either draw gives it.
+An encounter's first move has no last action, so it is a single draw.
+A planet that would give that action half the time gives it three times in four.
+
+Remaining Resolve is read as the Other's chart stands when the move is drawn: after its Necessity for the first move (§11.3), and after the turn's resolution for each later one.
+The rule reads the two charts as they stand and the action just resolved, and never tries moves out, so it needs no further VRF request and stores nothing ([STATE.md](STATE.md), "Randomness").
 
 ## 12. Scoring (Light)
 

@@ -7,13 +7,18 @@ import type {
 } from "./types";
 import { ELEMENT_BUFFS, MODALITY_BUFFS } from "./data";
 
-/** Stat-weighted action draw — `P(afflict) = affliction / (affliction + testimony)`.
- *  Used to precommit the opponent's verb each turn (the player chooses theirs).
- *  No planet has a zero in either stat, so no draw is fully deterministic. */
-export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
+/** The chance one stat-weighted action draw gives Affliction —
+ *  `affliction / (affliction + testimony)`. No planet has a zero in either
+ *  stat, so no draw is fully deterministic. */
+export function afflictionChance(stats: PlanetStats): number {
   const total = stats.affliction + stats.testimony;
-  if (total <= 0) return "Affliction";
-  return rng() < stats.affliction / total ? "Affliction" : "Testimony";
+  return total > 0 ? stats.affliction / total : 1;
+}
+
+/** One stat-weighted action draw. The opponent's precommitted action each turn
+ *  comes from one or two of these (`opponent-move.ts`); the player chooses theirs. */
+export function drawValence(stats: PlanetStats, rng: () => number): Polarity {
+  return rng() < afflictionChance(stats) ? "Affliction" : "Testimony";
 }
 
 /** The fortune roll (MECHANICS.md §7) — `luck / 120`, i.e. `(luck/2)` sixtieths
