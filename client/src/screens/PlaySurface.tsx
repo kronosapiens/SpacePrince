@@ -40,8 +40,10 @@ function EncounterOpening({ encounter }: { encounter: EncounterState }) {
   useEffect(() => {
     if (passage) return;
     const frame = requestAnimationFrame(() => {
-      if (!document.querySelector('[role="dialog"]')) {
-        document.querySelector<HTMLElement>(".chart-layout")?.focus({ preventScroll: true });
+      const layout = document.querySelector<HTMLElement>(".chart-layout");
+      // A resolved encounter's Continue may already hold focus.
+      if (!document.querySelector('[role="dialog"]') && !layout?.contains(document.activeElement)) {
+        layout?.focus({ preventScroll: true });
       }
     });
     return () => cancelAnimationFrame(frame);

@@ -2,7 +2,7 @@ import { getTuning } from "@/svg/tuning";
 
 /**
  * Pacing: how long each beat holds, in milliseconds. A turn's playback, the
- * Necessity opening, the pause before the map returns, the mint and title
+ * Necessity opening, the wait before a house's Continue, the mint and title
  * fades, and the wait before a guide or card covers a newly arrived screen.
  * JS schedules read `timings()`; the CSS animations that must keep step
  * with them read the custom properties `applyTimings` writes on :root.
@@ -46,11 +46,11 @@ export const TIMINGS = {
     revival: 500,
     revivalReveal: 250,
   },
-  /** The pause before the map returns. */
-  leave: {
-    encounter: 1800,
-    houseCombust: 2400,
-    runEnded: 2800,
+  /** After a house choice, the wait before Continue shows, so the choice lands first. */
+  house: {
+    choice: 500,
+    /** The combust ripple's length. */
+    combust: 1000,
   },
   mint: {
     revealInterval: 2500,
@@ -82,7 +82,7 @@ export function timings(): Timings {
   return {
     turn: scaled(TIMINGS.turn, all * tuning.turnDurationScale),
     necessity: scaled(TIMINGS.necessity, all * tuning.necessityDurationScale),
-    leave: scaled(TIMINGS.leave, all),
+    house: scaled(TIMINGS.house, all),
     mint: scaled(TIMINGS.mint, all),
     arrival: scaled(TIMINGS.arrival, all),
   };

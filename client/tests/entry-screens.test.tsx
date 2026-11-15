@@ -121,7 +121,7 @@ describe("entry screens", () => {
     savePrince(prince);
     act(() => root.render(<GameTest path="/play" />));
     click(document.querySelector(".chorus-continue")!);
-    act(() => vi.advanceTimersByTime(TIMINGS.leave.encounter));
+    click(element(".relational-continue"));
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     const next = eligibleNext(run.map.graph, run.map.currentNodeId, run.map.visitedNodeIds)[0]!;
     const node = `[data-guide="node-${next}"]`;

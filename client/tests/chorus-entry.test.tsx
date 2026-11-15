@@ -11,6 +11,7 @@ import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { randomSeed } from "@/game/rng";
 import { loadPrince, savePrince } from "@/state/prince";
 import { saveDevSettings } from "@/state/settings";
+import { TIMINGS } from "@/svg/timings";
 import { CHORUS, chorusRuler } from "@/copy/chorus";
 import { playNecessityNote, setTheme } from "@/audio/engine";
 import type { Prince } from "@/game/types";
@@ -203,7 +204,7 @@ describe("chorus entry", () => {
     click(".chorus-continue");
     expect(document.querySelector(".necessity-opening")).not.toBeNull();
     act(() => vi.runOnlyPendingTimers());
-    act(() => vi.runOnlyPendingTimers());
+    click(".relational-continue");
     expect(current().encounter).toBeNull();
     expect(loadPrince()!.numRelationalEncounters).toBe(1);
   });
@@ -248,7 +249,10 @@ describe("chorus entry", () => {
     expect(current()).toMatchObject({ light: 144, encounter: { resolved: true } });
     expect(current().map.outcomes[nodeId]).toMatchObject({ lightDelta: 144, combusts: ["Moon"] });
     expect(isOver(current(), prince.chart, 0)).toBe(true);
-    act(() => vi.advanceTimersByTime(2800));
+    act(() => vi.advanceTimersByTime(TIMINGS.house.combust - 1));
+    expect(document.querySelector(".narrative-continue")).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    click(".narrative-continue");
     expect(current().encounter).toBeNull();
     expect(current().light).toBe(144);
     expect(loadPrince()!.numRelationalEncounters).toBe(0);

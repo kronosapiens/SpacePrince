@@ -106,9 +106,8 @@ describe("shared player chart", () => {
     expectStableChart();
 
     act(() => vi.runOnlyPendingTimers());
-    expect(element(".relational").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
-    click(".chart-layout-chart");
+    click(".relational-continue");
     expect(element(".map-content")).toBeDefined();
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(1);
     expectStableChart();
@@ -135,10 +134,10 @@ describe("shared player chart", () => {
     expect(afterNarrative.encounter?.resolved).toBe(true);
     expect(afterNarrative.state[target].tension).toBe(startingTension + 24);
     expect(afterNarrative.light).toBe(afterRelational.runs[0]!.light + 96);
-    expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
+    act(() => vi.advanceTimersByTime(TIMINGS.house.choice));
     expectStableChart();
 
-    click(".chart-layout-chart");
+    click(".narrative-continue");
     expect(element(".map-content")).toBeDefined();
     expect(container.querySelector(".narrative-column")).toBeNull();
     expectStableChart();

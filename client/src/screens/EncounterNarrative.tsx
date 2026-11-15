@@ -1,5 +1,5 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useEncounterAdvance } from "@/components/useEncounterAdvance";
+import { EncounterContinue } from "@/components/EncounterContinue";
 import type { ProjectionChips } from "@/components/Chart";
 import { usePlayerChart } from "@/components/PlayerChartLayout";
 import { NarrativeGuide } from "@/components/NarrativeGuide";
@@ -16,7 +16,6 @@ import { describeOptionParts, occupantLine } from "@/copy/narrative";
 import { newlyCombusted } from "@/game/combust";
 import { getEffectiveStatsFromPlacement } from "@/game/relational";
 import { runChart } from "@/game/chart";
-import { isOver } from "@/game/run";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
 import { HOUSES } from "@/data/houses";
 import { getScenario } from "@/data/narrative-scenarios";
@@ -207,13 +206,18 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
     ? { verb: planetDelta > 0 ? "Affliction" as const : "Testimony" as const, value: Math.abs(planetDelta) }
     : undefined;
 
-  // `over` is derived (STATE.md): the run ended if every fielded planet combust.
-  const runEnded = isOver(run, chart, prince.numRelationalEncounters);
-
-  const leave = timings().leave;
-  const advance = useEncounterAdvance(
-    resolved, onClearEncounter, runEnded ? leave.runEnded : flash?.combusting.size ? leave.houseCombust : leave.encounter,
-  );
+  // Continue waits for the choice to land on the chart: its bloom, or the
+  // combust ripple when it puts a planet out.
+  const [continueShown, setContinueShown] = useState(false);
+  const combusted = !!flash?.combusting.size;
+  useEffect(() => {
+    if (!resolved) return;
+    const wait = timings().house;
+    const timer = window.setTimeout(() => setContinueShown(true), combusted ? wait.combust : wait.choice);
+    return () => window.clearTimeout(timer);
+  }, [resolved, combusted]);
+  // An authored consequence, when the chosen option has one; the scene stays.
+  const resultText = resolved ? scenario.options.find((o) => o.id === selectedOptionId)?.result.text : undefined;
 
   const chartRef = usePlayerChart({
     props: {
@@ -249,23 +253,19 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
       combustingPlanets: flash?.combusting,
       animationEpoch: flash?.epoch,
     },
-    onBackgroundClick: resolved ? advance : resetChoice,
+    onBackgroundClick: resolved ? undefined : resetChoice,
     onMouseEnter: () => setChartHovered(true),
     onMouseLeave: () => setChartHovered(false),
-    className: resolved ? "is-resolved" : "",
   });
 
   return (
     <>
-      {/* A resolved scene carries itself onward within seconds — nothing left
-          to study, so the guide comes down with the choices. */}
-      {!resolved && (
-        <NarrativeGuide
-          open={guideOpen}
-          onOpen={openGuide}
-          onClose={() => setGuideOpen(false)}
-        />
-      )}
+      <NarrativeGuide
+        open={guideOpen}
+        resolved={resolved}
+        onOpen={openGuide}
+        onClose={() => setGuideOpen(false)}
+      />
       {!guideOpen && !resolved && (
         <Instruction text={targeting ? INSTRUCTION.narrative.target : INSTRUCTION.narrative.option} />
       )}
@@ -288,7 +288,8 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
               <span className="narrative-house-gloss">{house.gloss}</span>
             </div>
           </div>
-          <p>{resolved ? (encounter.resolutionText ?? "It is finished.") : scenario.text}</p>
+          <p>{scenario.text}</p>
+          {resultText && <p>{resultText}</p>}
           {occupants && <p className="narrative-occupants">{occupants}</p>}
         </div>
 
@@ -316,7 +317,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
                 <button
                   className={`option ${isSelected ? "is-selected" : ""} ${!resolved && previewOptionId === o.id ? "is-preview" : ""}`}
                   data-guide={`option-${i + 1}`}
-                  onClick={resolved ? advance : (e) => { e.stopPropagation(); commit(); }}
+                  onClick={resolved ? undefined : (e) => { e.stopPropagation(); commit(); }}
                   onPointerEnter={(event) => { playHoverSound(event); setHoveredOptionId(o.id); }}
                   onPointerLeave={() => setHoveredOptionId(null)}
                   onFocus={(event) => {
@@ -362,6 +363,7 @@ export function EncounterNarrativeScreen(props: NarrativeScreenProps) {
           >
             {Math.round(run.light)}
           </span>
+          {continueShown && <EncounterContinue className="narrative-continue" disabled={guideOpen} onContinue={onClearEncounter} />}
         </div>
       </div>
     </>

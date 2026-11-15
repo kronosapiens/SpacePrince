@@ -131,6 +131,10 @@
   text-decoration-thickness: 2px;
 }
 .begin-btn:disabled { opacity: 0.45; cursor: not-allowed; text-shadow: none; }
+/* An encounter's Continue sits in a line of chrome: the negative margin
+   cancels its block padding, so it keeps its touch area without growing the
+   line. */
+.encounter-continue { padding-block: 8px; margin-block: -8px; }
 
 /* ── Title ─────────────────────────────────────────────────────────────── */
 
@@ -556,7 +560,12 @@
   color: var(--bone);
   text-align: center;
 }
-.relational.is-resolved { cursor: pointer; }
+/* Continue takes the move line's place at the line's size, so the slot keeps
+   its height. */
+.relational-continue {
+  font-size: inherit;
+  line-height: inherit;
+}
 .relational-readouts {
   display: flex;
   align-items: baseline;
@@ -1002,6 +1011,12 @@
   letter-spacing: 0.02em;
   font-feature-settings: "tnum";
 }
+.narrative-continue { margin-left: auto; }
+/* On desktop the column scrolls, and the touch padding would hang below its
+   last row and lengthen the scroll; a pointer needs none. */
+@media (min-width: 900px) {
+  .narrative-continue { padding-block: 0; margin-block: 0; min-height: 0; }
+}
 .narrative-column {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1060,9 +1075,6 @@
   color: var(--mist);
   font-weight: 400;
 }
-/* Resolved: no Continue button — the screen auto-advances, and a tap anywhere
-   skips the wait (EncounterNarrative). */
-.narrative.is-resolved { cursor: pointer; }
 .narrative-options {
   display: flex;
   flex-direction: column;
@@ -1107,7 +1119,7 @@
 .option.is-selected .option-index { color: var(--vc); }
 /* Resolved: options stay in place (so the column doesn't shift). The chosen
    option holds a steady highlight; the roads not taken recede, pulse stilled. */
-.narrative-options.is-resolved .option { box-shadow: none; text-shadow: none; }
+.narrative-options.is-resolved .option { box-shadow: none; text-shadow: none; cursor: default; }
 .narrative-options.is-resolved .option.is-selected { box-shadow: inset 3px 0 0 0 var(--vc); }
 .narrative-options.is-resolved .option:not(.is-selected) { opacity: 0.4; }
 /* Other options stay available while the selected choice awaits a target. */

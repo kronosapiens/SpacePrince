@@ -138,10 +138,10 @@ The border, the overlap, and the height budget the wheel is sized from are decid
 - **Left half:** the player's chart, drawn per [STYLE.md §11](STYLE.md#11-the-charts-visual-treatment).
 - **Right half:** a column carrying the narrative encounter, top to bottom:
   - **Heading:** the house's coin in its fixed game ruler's colour, the house name, and its one-line gloss — the steady presence of the encounter.
-  - **Prompt:** the scene's text, replaced by its specific consequence after commitment.
+  - **Prompt:** the scene's text, which stays after commitment, with the chosen option's consequence beneath it where one is written.
   - **Occupants:** one line naming the planets in the house and how their dignity changes the terms, when any planet occupies it.
   - **Options:** the single decision's options, each with its aside of costs and effects after occupant terms, and a reason when it cannot be taken.
-  - **Light:** the run's total.
+  - **Light:** the run's total, with **Continue** beside it once the choice has landed; the scene leaves for the map when the player activates it.
 
 The heading stays put while the player selects targets and the decision resolves.
 The copy rules for each piece are in [ENCOUNTERS.md §9](../mechanics/ENCOUNTERS.md#9-prose-and-mechanical-copy).
@@ -369,8 +369,8 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
   Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
-  The final chart and Light total remain briefly after resolution finishes, then the screen advances to the map.
-  A tap skips that final pause.
+  The final chart and Light total remain after resolution finishes, and **Continue** appears where the Other's move was named.
+  The screen leaves for the map when the player activates it.
 
   Rejected: a row of pips, filled to the current turn.
   They separated three states where the fraction has two, and cost the strip a second visual language that could not share a baseline with the type beside it.

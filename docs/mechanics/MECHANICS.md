@@ -265,7 +265,7 @@ Per encounter:
   The VRF request for turn N+1 happens at turn N's resolution — the encounter arrival request covers the first — so the reveal rides a transaction already in flight (§7).
 - The opponent's action verb is drawn stat-weighted and precommitted at the same time (§5, §11.4).
 - If all fielded opponent planets combust before the final turn, the encounter ends early.
-- Once the outcome settles, the encounter advances to the map by itself after a short pause, longer when the run has ended; a tap skips the pause (`useEncounterAdvance`).
+- Once the outcome settles, the encounter stays on screen until the player continues to the map.
 
 The player's tension and combust state **persist across encounters and across maps within a run**.
 Each map opening applies uncombust rolls without adding tension (§11.3).

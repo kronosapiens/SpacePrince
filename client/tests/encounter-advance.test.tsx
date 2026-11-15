@@ -7,11 +7,10 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { beginRelationalEncounter, beginNarrativeEncounter } from "@/game/encounter";
 import { beginRun, enterNode, isOver } from "@/game/run";
 import { getEffectiveStatsFromPlacement } from "@/game/relational";
-import { PLANETS } from "@/game/data";
 import { eligibleNext } from "@/game/map-gen";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TIMINGS } from "@/svg/timings";
-import { playCombust, playUISound } from "@/audio/engine";
+import { playUISound } from "@/audio/engine";
 import { createStubPrince } from "./fixtures";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
@@ -95,6 +94,7 @@ const get = (selector: string) => {
   if (!el) throw new Error(`Missing ${selector}`);
   return el;
 };
+const noteLabels = () => [...document.querySelectorAll(".guide-note .guide-note-label")].map((el) => el.textContent);
 const click = (el: Element) => act(() => el.dispatchEvent(new MouseEvent("click", { bubbles: true })));
 const advanceTime = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 function commit(verb = "Afflict") {
@@ -104,12 +104,12 @@ function commit(verb = "Afflict") {
 }
 function settle() {
   let steps = 0;
-  while (!container.querySelector(".relational.is-resolved") && steps++ < 200) {
+  while (!container.querySelector(".relational-continue") && steps++ < 200) {
     expect(container.querySelector(".relational")).not.toBeNull();
     expect(container.querySelector("[data-screen]")).toBeNull();
     act(() => vi.advanceTimersToNextTimer());
   }
-  expect(container.querySelector(".relational.is-resolved")).not.toBeNull();
+  expect(container.querySelector(".relational-continue")).not.toBeNull();
 }
 
 describe("encounter advancement", () => {
@@ -119,7 +119,7 @@ describe("encounter advancement", () => {
     const committed = structuredClone(run);
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
     expect(get(".relational-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
-    expect(container.querySelector(".relational.is-resolved")).toBeNull();
+    expect(container.querySelector(".relational-continue")).toBeNull();
     expect(container.querySelector(".ps-action")).toBeNull();
     expect(container.querySelector('[data-guide="incoming"]')).toBeNull();
     click(get(".relational"));
@@ -132,16 +132,16 @@ describe("encounter advancement", () => {
     expect(container.querySelector('[data-guide="chart-self"] .necessity-opening')).toBeNull();
     click(get(".relational"));
     advanceTime((encounter.necessity!.length - 1) * perPlanet - 1);
-    expect(container.querySelector(".relational.is-resolved")).toBeNull();
+    expect(container.querySelector(".relational-continue")).toBeNull();
     expect(loadPrince()!.runs[0]).toEqual(committed);
     advanceTime(1);
     expect(container.querySelector(".necessity-opening")).toBeNull();
-    expect(container.querySelector(".relational.is-resolved")).not.toBeNull();
     expect(get(".relational-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
-    advanceTime(2799);
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
     expect(container.querySelector("[data-intro]")).toBeNull();
-    advanceTime(1);
+    advanceTime(TIMINGS.arrival.guide);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    click(get(".relational-continue"));
 
     const after = loadPrince()!;
     expect(after.numRelationalEncounters).toBe(32);
@@ -161,13 +161,12 @@ describe("encounter advancement", () => {
     const { prince, encounter } = entryWipe(64);
     mount(prince, false);
     expect(container.querySelector(".necessity-opening")).toBeNull();
-    expect(container.querySelector(".relational.is-resolved")).not.toBeNull();
     expect(get(".relational-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
     expect(container.querySelector(".ps-action")).toBeNull();
-    const surface = get(".relational");
+    const leave = get(".relational-continue");
     act(() => {
-      surface.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      surface.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      leave.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      leave.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     const after = loadPrince()!;
     expect(after.numRelationalEncounters).toBe(65);
@@ -212,7 +211,7 @@ describe("encounter advancement", () => {
     expect(vi.mocked(playUISound).mock.calls).toEqual([["select"], ["commit"]]);
   });
 
-  it("waits for the full propagation playback and final pause before returning to the map", () => {
+  it("waits after playback until Continue, ignoring the background and the charts, then leaves once", () => {
     const { prince } = relational();
     mount(prince);
     commit("Testify");
@@ -220,43 +219,43 @@ describe("encounter advancement", () => {
     const encounter = committed.runs[0]!.encounter!;
     expect(encounter.resolved).toBe(true);
     expect(encounter.kind === "relational" && encounter.log[0]!.propagation.length).toBeGreaterThan(0);
-    expect(container.querySelector(".relational.is-resolved")).toBeNull();
-    expect(container.querySelector('[aria-label="Study this encounter"]')).toBeNull();
     expect(container.querySelector(".relational-continue")).toBeNull();
     click(get(".relational"));
     click(get('[data-guide="planet-self-moon"]'));
-    expect(container.querySelector(".relational.is-resolved")).toBeNull();
+    expect(container.querySelector(".relational-continue")).toBeNull();
     settle();
-    expect(loadPrince()!.numRelationalEncounters).toBe(64);
-    vi.mocked(playUISound).mockClear();
-    advanceTime(1799);
+    expect(document.activeElement).toBe(get(".relational-continue"));
+    advanceTime(60_000);
+    click(get(".relational"));
+    click(get('[data-guide="planet-self-moon"]'));
+    click(get('[data-guide="chart-other"]'));
     expect(container.querySelector('[data-screen="map"]')).toBeNull();
-    advanceTime(1);
+    expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
+    vi.mocked(playUISound).mockClear();
+    const leave = get(".relational-continue");
+    act(() => {
+      leave.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      leave.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     expect(loadPrince()!.runs[0]!.light).toBe(committed.runs[0]!.light);
     expect(loadPrince()!.numRelationalEncounters).toBe(65);
-    expect(playUISound).not.toHaveBeenCalled();
   });
 
-  it("lets a tap on the final chart skip the pause and advances only once", () => {
-    const { prince } = relational(1, 0);
+  it("keeps the guide on a finished encounter with only what is still on the board, and holds Continue while it is open", () => {
+    const { prince } = relational();
     mount(prince);
     commit();
-    expect(container.querySelector("[data-intro]")).toBeNull();
     settle();
-    const planet = get('[data-guide="planet-self-moon"]');
-    vi.mocked(playUISound).mockClear();
-    act(() => {
-      planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      planet.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    });
-    expect(vi.mocked(playUISound).mock.calls).toEqual([["select"]]);
-    expect(container.querySelector(".necessity-opening")).toBeNull();
+    click(get('[aria-label="Study this encounter"]'));
+    expect(noteLabels()).toEqual(["Self", "Ruler and scoring"]);
+    click(get(".relational-continue"));
+    expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
+    click(document.querySelector(".guide-close")!);
+    click(get(".relational-continue"));
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
-    advanceTime(TIMINGS.arrival.card);
-    expect(get("[data-intro]").textContent).toBe("Mercury");
-    expect(loadPrince()!.numRelationalEncounters).toBe(1);
   });
 
   it("keeps an encounter open between turns", () => {
@@ -266,69 +265,65 @@ describe("encounter advancement", () => {
     act(() => vi.runAllTimers());
     expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(false);
     expect(container.querySelector(".relational")).not.toBeNull();
-    expect(container.querySelector(".relational.is-resolved")).toBeNull();
+    expect(container.querySelector(".relational-continue")).toBeNull();
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(container.querySelector(".necessity-arc")).toBeNull();
     expect(loadPrince()!.runs[0]!.encounter).toMatchObject({ turnIndex: 1 });
     expect(loadPrince()!.numRelationalEncounters).toBe(64);
   });
 
-  it("finishes run-ending combustion playback before returning to the map", () => {
-    const { prince, run, encounter } = relational();
-    for (const planet of PLANETS) run.state[planet].tension = getEffectiveStatsFromPlacement(prince.chart.planets[planet]).resolve;
-    run.state.Moon.tension -= 12;
-    encounter.opponentActions = ["Affliction"];
-    mount(prince);
-    commit("Testify");
-    settle();
-    expect(playCombust).toHaveBeenCalled();
-    advanceTime(2799);
-    expect(container.querySelector("[data-screen]")).toBeNull();
-    advanceTime(1);
-    expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
-    expect(loadPrince()!.numRelationalEncounters).toBe(65);
-  });
-
-  it("advances a restored resolved encounter without replaying or paying again", () => {
+  it("leaves a restored resolved encounter on Continue without replaying or paying again", () => {
     const { prince, run, encounter } = relational();
     encounter.resolved = true;
     encounter.turnIndex = 1;
     run.light = 96;
     mount(prince);
-    advanceTime(1800);
+    // The frame that settles focus after the chorus leaves Continue holding it.
+    advanceTime(100);
+    expect(document.activeElement).toBe(get(".relational-continue"));
+    click(get(".relational-continue"));
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     expect(loadPrince()!.runs[0]!.light).toBe(96);
     expect(loadPrince()!.numRelationalEncounters).toBe(65);
   });
 
-  it("cancels a pending exit when the screen unmounts", () => {
-    const { prince, encounter } = relational();
-    encounter.resolved = true;
-    mount(prince);
-    act(() => root!.unmount());
-    root = null;
-    advanceTime(5000);
-    expect(loadPrince()!.runs[0]!.encounter).not.toBeNull();
-    expect(loadPrince()!.numRelationalEncounters).toBe(64);
-  });
-
-  it("advances a narrative encounter without counting it or unlocking a planet", () => {
-    const prince = createStubPrince({ numRelationalEncounters: 31 });
+  it("keeps the house guide on a finished scene with only its house note", () => {
+    const prince = createStubPrince();
     const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
     run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: "home-libra-mara" });
     run.mapsCompleted = 1;
     prince.runs = [run];
     mount(prince);
     click(get('[data-guide="option-3"]'));
-    expect(container.querySelector(".narrative.is-resolved")).not.toBeNull();
-    advanceTime(1799);
-    expect(container.querySelector('[data-screen="map"]')).toBeNull();
+    click(get('[aria-label="Study this scene"]'));
+    expect(noteLabels()).toEqual(["The house"]);
+  });
+
+  it("keeps a house's scene after a choice and leaves on Continue once it has landed, without counting it", () => {
+    const prince = createStubPrince({ numRelationalEncounters: 31 });
+    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
+    run.encounter = beginNarrativeEncounter({ run, house: 4, scenarioId: "home-libra-mara" });
+    run.mapsCompleted = 1;
+    prince.runs = [run];
+    mount(prince);
+    const scene = get(".narrative-body p").textContent;
+    click(get('[data-guide="option-3"]'));
+    expect(loadPrince()!.runs[0]!.encounter?.resolved).toBe(true);
+    expect(get(".narrative-body p").textContent).toBe(scene);
+    expect(get('[data-guide="option-3"]').classList.contains("is-selected")).toBe(true);
+    advanceTime(TIMINGS.house.choice - 1);
+    expect(container.querySelector(".narrative-continue")).toBeNull();
     advanceTime(1);
+    expect(document.activeElement).toBe(get(".narrative-continue"));
+    advanceTime(60_000);
+    click(get('[data-guide="option-3"]'));
+    click(get(".narrative"));
+    expect(container.querySelector('[data-screen="map"]')).toBeNull();
+    click(get(".narrative-continue"));
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
+    expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     expect(loadPrince()!.runs[0]!.light).toBe(0);
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
     expect(container.querySelector("[data-intro]")).toBeNull();
-    advanceTime(5000);
-    expect(loadPrince()!.numRelationalEncounters).toBe(31);
   });
 });
