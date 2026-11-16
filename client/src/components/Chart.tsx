@@ -11,7 +11,7 @@ import {
   panelHeightFor,
   type PlanetStatsActions,
 } from "@/components/PlanetStatsPanel";
-import { NECESSITY_ANIMATION_TIMINGS, type NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
+import type { NecessityAnimationPresentation } from "@/components/useNecessityAnimation";
 import { PropagationLine } from "@/components/PropagationLine";
 import { useMobileLayout } from "@/components/useMobileLayout";
 import { SvgRotation } from "@/components/SvgRotation";
@@ -483,7 +483,7 @@ export function Chart(props: ChartProps) {
             invite={inviteInteraction && !opening && !selectedPlanet}
             ringVerb={ringVerb}
             actionPulse={isActionPulse}
-            necessityAccent={opening?.phase === "accent" && opening.entries.some((entry) => entry.planet === p.planet)}
+            necessityAccent={opening?.entries.some((entry) => entry.planet === p.planet)}
             combusting={isCombusting}
             effectPolarity={effectPolarity}
             animationEpoch={animationEpoch}
@@ -670,8 +670,7 @@ function PlanetGlyph({
         setFocused(false);
         if (interactive) onFocus?.(null);
       }}
-      style={{ cursor: interactive ? "pointer" : "default", color: c,
-        animationDuration: necessityAccent ? `${NECESSITY_ANIMATION_TIMINGS.map.accent}ms` : undefined }}
+      style={{ cursor: interactive ? "pointer" : "default", color: c }}
       className={outerClass}
     >
       {handleClick && hitRadius != null && (
@@ -820,13 +819,10 @@ function PlanetArc({
   // rather than a comparison of two lengths. The predicate is `wouldCombust`
   // itself, not a second reading of the same arithmetic.
   let diff: { from: number; to: number; color: string } | null = null;
-  if (necessity && openingPhase && openingPhase !== "revival" && openingPhase !== "accent") {
+  if (necessity) {
     // Before settlement the base arc still holds its pre-necessity state.
-    // The necessity phase shows the raw draw (old records lack it; their amount
-    // is all we can show); from the Fortune phase on, the amount added.
     const from = openingPhase === "settle" ? Math.max(0, spent - necessity.amount) : spent;
-    const amount = openingPhase === "necessity" ? necessity.draw ?? necessity.amount : necessity.amount;
-    const to = clamp(from + amount, from, resolve);
+    const to = clamp(from + necessity.amount, from, resolve);
     if (to > from) diff = { from, to, color: to >= resolve ? COMBUST_WARNING : VALENCE_COLOR.Affliction };
   } else if (projection) {
     const harm = projection.polarity !== "Testimony";

@@ -5,6 +5,7 @@ import { BeginButton } from "@/components/BeginButton";
 import { MapDiagram } from "@/components/MapDiagram";
 import { MapGuide, type MapGuidePhase } from "@/components/MapGuide";
 import { INSTRUCTION } from "@/copy/instruction";
+import { MAP_COPY } from "@/copy/map";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
 import { usePrince, useActiveRun } from "@/state/PrinceStore";
@@ -13,11 +14,13 @@ import { isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
 import { useEnterNode, useRolloverMap, useStartRun } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { HOUSES } from "@/data/houses";
 import { chartRuler } from "@/game/chart";
 import { nodeRuler } from "@/game/map-content";
+import { timings } from "@/svg/timings";
 import type { MapState, PlanetName } from "@/game/types";
 
 /** Roman numerals for the current map. */
@@ -31,8 +34,14 @@ export function MapScreen() {
   const startRun = useStartRun();
   const { setActive } = useActivePlanet();
   const { guideOpen, setGuideOpen, openingActive } = useOutletContext<GameLayoutContext>();
+  const { current: card, enqueueCard } = useInfoCards();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
+  const [crossing, setCrossing] = useState<"close" | "arrive" | null>(null);
   const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numRelationalEncounters);
+  const finished = !!prince && !!run && shouldRolloverMap(run, prince.chart, prince.numRelationalEncounters);
+  const lastMap = !!run && run.mapsCompleted >= MAPS_PER_RUN - 1;
+  // A finished map other than the seventh stays until the player crosses.
+  const waiting = finished && !lastMap;
   const openGuide = useCallback(() => {
     setGuidePhase("map");
     setGuideOpen(true);
@@ -70,12 +79,24 @@ export function MapScreen() {
     [run, prince, runOver, openingActive, enterNode],
   );
 
+  // The seventh map ends the run in place, and queues the card its star arrives on.
   useEffect(() => {
-    if (!run || !prince || !shouldRolloverMap(run, prince.chart, prince.numRelationalEncounters)) return;
-    // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
-    // uncombust rolls, seeded by the new map.
+    if (!run || !prince || !finished || !lastMap) return;
     rolloverMap(run, prince.chart, playerUnlocked);
-  }, [run, prince, playerUnlocked, rolloverMap]);
+    enqueueCard({ kind: "run-star", runId: run.id });
+  }, [run, prince, finished, lastMap, playerUnlocked, rolloverMap, enqueueCard]);
+
+  useEffect(() => {
+    if (crossing !== "close" || !run || !prince) return;
+    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : timings().crossing.close;
+    const timer = window.setTimeout(() => {
+      // The chart + fielded roster cross the map boundary (MECHANICS §11.3):
+      // uncombust rolls, seeded by the new map.
+      rolloverMap(run, prince.chart, playerUnlocked);
+      setCrossing("arrive");
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [crossing, run, prince, playerUnlocked, rolloverMap]);
 
   if (!prince || !run) return null;
 
@@ -84,6 +105,13 @@ export function MapScreen() {
     startRun();
     playUISound("commit");
   };
+  const cross = () => {
+    if (crossing) return;
+    setCrossing("close");
+    playUISound("commit");
+  };
+  const motion = crossing === "close" ? "anim-crossing-close"
+    : crossing === "arrive" ? "anim-crossing-arrive" : "anim-surface-in";
 
   return (
     <>
@@ -97,17 +125,21 @@ export function MapScreen() {
         onClose={() => setGuideOpen(false)}
         onPhaseChange={setGuidePhase}
       />
-      {!guideOpen && !openingActive && !runOver && (
+      {!guideOpen && !openingActive && !runOver && !waiting && (
         <Instruction text={INSTRUCTION.map.node} />
       )}
-      <div className="map-content anim-surface-in">
+      <div className={`map-content ${motion}`}>
         <div className="map-diagram-wrap">
           <MapDiagram map={run.map} unlockedPlanets={playerUnlocked} onSelectNode={runOver || openingActive ? undefined : guideOpen ? noop : handleNodeSelect} />
         </div>
         <div className="map-index">
           <span className="map-index-v">{ROMAN[mapIndex]}</span>
         </div>
-        {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>New Run</BeginButton>}
+        {waiting && <BeginButton onClick={cross} disabled={guideOpen || openingActive}>{MAP_COPY.continue}</BeginButton>}
+        {/* New Run waits until every queued card, the run's star among them, has closed. */}
+        {runOver && !card && (
+          <BeginButton className="anim-announce-in" onClick={beginNew} disabled={guideOpen}>{MAP_COPY.newRun}</BeginButton>
+        )}
       </div>
     </>
   );

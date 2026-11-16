@@ -114,12 +114,11 @@
   --stroke-medium: 2.5;
   --stroke-heavy: 4;
 
-  /* Motion (STYLE.md §7) */
+  /* Motion (STYLE.md §7). Pacing durations are not declared here: `applyTimings`
+     (svg/timings.ts) writes them onto :root. */
   --m-encounter-open: 1200ms;
-  --m-planet-active: 600ms;
   --m-trine: 1000ms;
   --m-square: 1400ms;
-  --m-combust: 1800ms;
   --m-tint-shift: 2000ms;
   --m-map-arrival: 400ms;
   --m-leave: 600ms;
@@ -207,10 +206,8 @@ svg text,
 @media (prefers-reduced-motion: reduce) {
   :root {
     --m-encounter-open: 1ms;
-    --m-planet-active: 1ms;
     --m-trine: 1ms;
     --m-square: 1ms;
-    --m-combust: 1ms;
     --m-tint-shift: 1ms;
     --m-map-arrival: 1ms;
     --m-leave: 1ms;

@@ -11,6 +11,7 @@ import { loadPrince, savePrince } from "@/state/prince";
 import { createStubPrince } from "./fixtures";
 import { GameTest } from "./game-layout";
 import { RESOLVE_ARC_R } from "@/svg/viewbox";
+import { TIMINGS } from "@/svg/timings";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
 vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(),
@@ -48,8 +49,10 @@ function element(selector: string) {
 function click(selector: string) {
   act(() => element(selector).dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
-/** A first encounter of each kind opens its guide by itself; close it to play. */
+/** A first encounter of each kind opens its guide by itself a moment after
+ *  arriving; close it to play. */
 function closeFirstGuide(label: string) {
+  act(() => vi.advanceTimersByTime(TIMINGS.arrival.guide));
   expect(document.querySelector('[role="dialog"]')?.getAttribute("aria-label")).toBe(label);
   act(() => document.querySelector(".guide-close")!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
   expect(document.querySelector('[role="dialog"]')).toBeNull();
@@ -103,9 +106,8 @@ describe("shared player chart", () => {
     expectStableChart();
 
     act(() => vi.runOnlyPendingTimers());
-    expect(element(".relational").classList.contains("is-resolved")).toBe(true);
     expectStableChart();
-    click(".chart-layout-chart");
+    click(".relational-continue");
     expect(element(".map-content")).toBeDefined();
     expect(container.querySelectorAll(".chart-svg")).toHaveLength(1);
     expectStableChart();
@@ -132,10 +134,10 @@ describe("shared player chart", () => {
     expect(afterNarrative.encounter?.resolved).toBe(true);
     expect(afterNarrative.state[target].tension).toBe(startingTension + 24);
     expect(afterNarrative.light).toBe(afterRelational.runs[0]!.light + 96);
-    expect(element(".narrative").classList.contains("is-resolved")).toBe(true);
+    act(() => vi.advanceTimersByTime(TIMINGS.house.choice));
     expectStableChart();
 
-    click(".chart-layout-chart");
+    click(".narrative-continue");
     expect(element(".map-content")).toBeDefined();
     expect(container.querySelector(".narrative-column")).toBeNull();
     expectStableChart();

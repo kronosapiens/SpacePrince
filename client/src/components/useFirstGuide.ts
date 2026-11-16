@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useActiveRun, usePrince } from "@/state/PrinceStore";
+import { timings } from "@/svg/timings";
 import type { Prince, Run } from "@/game/types";
 
 type GuideScreen = "map" | "relational" | "narrative";
@@ -16,15 +17,21 @@ function firstSight(prince: Prince, run: Run, screen: GuideScreen): boolean {
 }
 
 /** Opens a screen's guide by itself, once, the first time the Prince sees the
- *  screen — as soon as nothing else is playing (`ready`). */
+ *  screen — a moment after nothing else is playing (`ready`), so the screen is
+ *  seen bare first. Losing `ready` during that moment starts it over. */
 export function useFirstGuide(screen: GuideScreen, ready: boolean, open: () => void) {
   const prince = usePrince();
   const run = useActiveRun();
   const first = !!prince && !!run && firstSight(prince, run, screen);
   const opened = useRef(false);
+  const latestOpen = useRef(open);
+  latestOpen.current = open;
   useEffect(() => {
     if (!first || !ready || opened.current) return;
-    opened.current = true;
-    open();
-  }, [first, ready, open]);
+    const timer = window.setTimeout(() => {
+      opened.current = true;
+      latestOpen.current();
+    }, timings().arrival.guide);
+    return () => window.clearTimeout(timer);
+  }, [first, ready]);
 }

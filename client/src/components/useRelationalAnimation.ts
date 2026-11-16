@@ -4,6 +4,7 @@ import { playCombust, playStrike } from "@/audio/engine";
 import { encounterRuler } from "@/game/encounter";
 import { beatScore, type ScoreTurn, type ScoredBeat } from "@/game/score";
 import type { ProjectedEffect } from "@/game/projections";
+import { timings } from "@/svg/timings";
 import type {
   Chart,
   RelationalEncounter,
@@ -13,28 +14,6 @@ import type {
   SideState,
   TurnLogEntry,
 } from "@/game/types";
-
-// ── Timing constants ────────────────────────────────────────────────────
-// JS-side schedule cadence. These are independent of CSS keyframe durations
-// except where a beat must outlast its animation: `combustRippleDuration` must
-// be ≥ the CSS ripple (currently `combust-ripple 1000ms`), and
-// `propagationClearOffset` must be ≥ the CSS travel (`prop-travel 460ms`) so the
-// pulse reaches the target before its line is cleared.
-
-export const ANIMATION_TIMINGS = {
-  primaryDelay: 200,
-  primaryEffectClear: 360,
-  primaryGlowClear: 600,
-  propagationStart: 800,
-  propagationStep: 520,
-  propagationApplyOffset: 230,
-  propagationClearOffset: 500,
-  combustRippleDuration: 1000,
-  endOffset: 360,
-  /** Pause between the opponent's resolution phase and the player's, so the
-   *  two charts read sequentially rather than simultaneously. */
-  interPhasePause: 240,
-} as const;
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -222,6 +201,7 @@ function runScheduler(args: {
   const { entry, previousRun, previousEncounter, playerChart, projectedDeltas, setAnimation, timeoutIds } = args;
   timeoutIds.current.forEach((id) => window.clearTimeout(id));
   timeoutIds.current = [];
+  const timing = timings().turn;
 
   // Light ticks per beat under the encounter's ruler, so the running number
   // climbs by exactly what the turn awards and never snaps at the end. The
@@ -328,7 +308,7 @@ function runScheduler(args: {
         };
         return next;
       });
-    }, base + ANIMATION_TIMINGS.primaryDelay);
+    }, base + timing.primaryDelay);
 
     // Clear primary effect pulse before propagation begins.
     schedule(() => {
@@ -339,7 +319,7 @@ function runScheduler(args: {
           [side]: removeFromEffect(state.effectPlanets[side], actionPlanet),
         },
       }));
-    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryEffectClear);
+    }, base + timing.primaryDelay + timing.primaryEffectClear);
 
     // Clear action glow.
     schedule(() => {
@@ -349,13 +329,13 @@ function runScheduler(args: {
           ? { ...state.actionPulse, player: null }
           : { ...state.actionPulse, opponent: null },
       }));
-    }, base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear);
+    }, base + timing.primaryDelay + timing.primaryGlowClear);
 
     // Propagation steps for this side.
     let lastCombustClearLocal = 0;
     steps.forEach((step, stepIndex) => {
       const key = aspectKey(step.source, step.target);
-      const delay = base + ANIMATION_TIMINGS.propagationStart + stepIndex * ANIMATION_TIMINGS.propagationStep;
+      const delay = base + timing.propagationStart + stepIndex * timing.propagationStep;
       // A "Combusts" marker shares its source→target with the hit step that
       // caused it; the hit already lights the traveling line, so the marker only
       // fires the ripple — otherwise the same aspect pulses twice.
@@ -411,7 +391,7 @@ function runScheduler(args: {
           };
           return next;
         });
-      }, delay + ANIMATION_TIMINGS.propagationApplyOffset);
+      }, delay + timing.propagationApplyOffset);
 
       if (lightsLine) {
         schedule(() => {
@@ -426,11 +406,11 @@ function runScheduler(args: {
               [side]: removeFromEffect(state.effectPlanets[side], step.target),
             },
           }));
-        }, delay + ANIMATION_TIMINGS.propagationClearOffset);
+        }, delay + timing.propagationClearOffset);
       }
 
       if (step.note === "Combusts") {
-        const rippleClearAt = delay + ANIMATION_TIMINGS.propagationApplyOffset + ANIMATION_TIMINGS.combustRippleDuration;
+        const rippleClearAt = delay + timing.propagationApplyOffset + timing.combustRippleDuration;
         lastCombustClearLocal = Math.max(lastCombustClearLocal, rippleClearAt);
         schedule(() => {
           updateAnimation((state) => ({
@@ -446,8 +426,8 @@ function runScheduler(args: {
 
     // Final-phase action-planet combust (if any).
     const finalPropagationDelay = steps.length > 0
-      ? base + ANIMATION_TIMINGS.propagationStart + (steps.length - 1) * ANIMATION_TIMINGS.propagationStep + ANIMATION_TIMINGS.propagationApplyOffset
-      : base + ANIMATION_TIMINGS.primaryDelay;
+      ? base + timing.propagationStart + (steps.length - 1) * timing.propagationStep + timing.propagationApplyOffset
+      : base + timing.primaryDelay;
 
     if (actionCombust) {
       schedule(() => {
@@ -464,7 +444,7 @@ function runScheduler(args: {
         });
       }, finalPropagationDelay);
 
-      const actionRippleClearAt = finalPropagationDelay + ANIMATION_TIMINGS.combustRippleDuration;
+      const actionRippleClearAt = finalPropagationDelay + timing.combustRippleDuration;
       lastCombustClearLocal = Math.max(lastCombustClearLocal, actionRippleClearAt);
       schedule(() => {
         updateAnimation((state) => ({
@@ -478,8 +458,8 @@ function runScheduler(args: {
     }
 
     const propagationEnd = steps.length > 0
-      ? base + ANIMATION_TIMINGS.propagationStart + (steps.length - 1) * ANIMATION_TIMINGS.propagationStep + ANIMATION_TIMINGS.propagationClearOffset
-      : base + ANIMATION_TIMINGS.primaryDelay + ANIMATION_TIMINGS.primaryGlowClear;
+      ? base + timing.propagationStart + (steps.length - 1) * timing.propagationStep + timing.propagationClearOffset
+      : base + timing.primaryDelay + timing.primaryGlowClear;
     return Math.max(propagationEnd, lastCombustClearLocal);
   };
 
@@ -499,7 +479,7 @@ function runScheduler(args: {
     sign: otherSign,
     steps: opponentSteps,
   });
-  const selfBase = opponentPhaseEnd + ANIMATION_TIMINGS.interPhasePause;
+  const selfBase = opponentPhaseEnd + timing.interPhasePause;
   // Phase 2: the opponent's reply lands on your chart; the attacker is the
   // opponent's planet, on the other chart.
   const playerPhaseEnd = schedulePhase({
@@ -512,5 +492,5 @@ function runScheduler(args: {
     steps: playerSteps,
   });
 
-  schedule(() => setAnimation(null), playerPhaseEnd + ANIMATION_TIMINGS.endOffset);
+  schedule(() => setAnimation(null), playerPhaseEnd + timing.endOffset);
 }

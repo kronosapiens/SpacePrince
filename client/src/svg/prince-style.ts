@@ -46,6 +46,10 @@ export const STAR_STYLE = {
   minOpacity: 0.1,
   lightScale: 256,
   glow: { core: 0.5, mid: 0.14 },
+  /** Around the star of the run that just ended, on the card that opens then.
+   *  Stars sit at least 16 units inside the artwork's edge, so the radius
+   *  stays at or under 16. The stroke is in screen pixels. */
+  ring: { radius: 14, stroke: 1 },
 } as const;
 
 /** Prince artwork units (800 × 1000), separate from the chart's stroke scale. */

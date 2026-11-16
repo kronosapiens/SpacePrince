@@ -96,7 +96,7 @@ Listed roughly in the order a player encounters them.
 | Map             | Walk the Sephirot tree; one map per L1→L7 traversal                    | Built (§4)                              |
 | Encounter       | Relational (symmetric) or narrative (asymmetric column)                    | Built (§3)                              |
 | Inspection      | Planets inspected in place; the Prince artifact from the settings menu | Built (§7); earned layers open (#32)    |
-| End of run      | The run's Light becomes a star                                         | In design (§6, #34)                     |
+| End of run      | The run's Light becomes a star                                         | Built (§6)                              |
 
 Dev-only and auxiliary routes: `/__index` (navigation and reset during development), `/gallery` (the design gallery of components, palettes, and themes), `/token` (a random Prince artifact preview).
 None is part of the shipped game's navigation (§8).
@@ -138,10 +138,10 @@ The border, the overlap, and the height budget the wheel is sized from are decid
 - **Left half:** the player's chart, drawn per [STYLE.md §11](STYLE.md#11-the-charts-visual-treatment).
 - **Right half:** a column carrying the narrative encounter, top to bottom:
   - **Heading:** the house's coin in its fixed game ruler's colour, the house name, and its one-line gloss — the steady presence of the encounter.
-  - **Prompt:** the scene's text, replaced by its specific consequence after commitment.
+  - **Prompt:** the scene's text, which stays after commitment, with the chosen option's consequence beneath it where one is written.
   - **Occupants:** one line naming the planets in the house and how their dignity changes the terms, when any planet occupies it.
   - **Options:** the single decision's options, each with its aside of costs and effects after occupant terms, and a reason when it cannot be taken.
-  - **Light:** the run's total.
+  - **Light:** the run's total, with **Continue** beside it once the choice has landed; the scene leaves for the map when the player activates it.
 
 The heading stays put while the player selects targets and the decision resolves.
 The copy rules for each piece are in [ENCOUNTERS.md §9](../mechanics/ENCOUNTERS.md#9-prose-and-mechanical-copy).
@@ -185,8 +185,8 @@ The two charts resolve in sequence, the order the rules resolve them ([MECHANICS
 Activation propagates within each chart along that chart's own aspect lines; there is no line drawn between the two charts.
 The connection between them is conceptual (your planet faces theirs this turn), not visual.
 
-The total turn animation budget is roughly **3–4 seconds**, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
-The per-motion durations live in `client/src/style/motion.css`.
+A turn's playback runs a little over two seconds with no propagation and half a second more for each propagation step, intentionally long enough to mask a Starknet transaction confirmation while preserving visual energy.
+The per-motion durations live in `client/src/svg/timings.ts`.
 
 **Narrative.**
 During the **decision phase**, the player's chart is *gently active* — planets that gate a current option (per [ENCOUNTERS.md, Current predicates](../mechanics/ENCOUNTERS.md#43-current-predicates)) carry a soft Field-layer halo so the player can see *why* the option exists.
@@ -284,7 +284,7 @@ With study **off**, the panel shows only **operational numbers** — what matter
   It is the planet's base Resolve plus placement bonuses, shown directly.
 - **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings or blocking its entire necessity draw, and for the Other's planets the odds that each of three necessity rolls adds nothing.
   Necessity applies independently to both charts at each relational encounter opening: the player's planets draw 12, 24, or 36 before Fortune, and the Other's start from half their Resolve.
-  Each sweep shows the raw draw, then removes what Fortune relieves before settling the resulting state.
+  Each sweep gives every fielded planet one beat: the tension it takes appears on its arc, then settles into the resulting state.
   Wounded planets can combust at entry; fresh planets survive every draw.
   Both charts show their opening sweep before the first action becomes available.
   If the player's entire roster combusts during the opening, both sweeps finish before the encounter advances without an action.
@@ -333,13 +333,14 @@ A card opens in three contexts:
   Passage and dismissal state live only in the UI.
 
 The first queued card is the **planet introduction**: crossing a Macrobian threshold ([MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) queues the new planet's card — glyph, sign placement, dignity, role, stats, and the schedule line (the thresholds are deterministic, so the next unlock is shown — client honesty, §1.1).
+The card opens a moment after the map appears, and travel waits until it has.
 The Moon has no threshold to cross; its card presents at the end of the mint reveal instead (§5.2).
 The introduction celebrates the **position, not a person**: no voice line, because planets stay ambient ([intent.md](../intent.md), Audience).
 
 **Screen-help cards** — the corner "?" on each gameplay surface — run three beats: one sentence of purpose carrying the screen's stakes (the test: it survives with the title deleted); two-three sentences of goals and affordances in one breath; a slightly longer close holding only the concepts that change decisions.
 Previews teach the numbers (§1.1); the card holds the frame the numbers sit in.
 Copy lives in `client/src/copy/help.ts` and follows the §1.2 register and casing.
-Each screen's **guide** (`client/src/copy/guide.ts`) opens by itself the first time a Prince meets that screen and waits for its `?` after that; it points at the controls in turn and permits previews but no commitment.
+Each screen's **guide** (`client/src/copy/guide.ts`) opens by itself the first time a Prince meets that screen, a moment after the screen is seen bare, and waits for its `?` after that; it points at the controls in turn and permits previews but no commitment.
 
 ### 3.7 Chrome
 
@@ -368,8 +369,8 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
   Position in the encounter's turn sequence, as a fraction — *2 / 3*.
   Unlike Light this has a real denominator, the sequence length, so a fraction states it exactly rather than inventing a ceiling.
   While the encounter is live the numerator is the turn being answered; once settled it is the turns actually taken, so an encounter that ends early reads *2 / 3* rather than *3 / 3*.
-  The final chart and Light total remain briefly after resolution finishes, then the screen advances to the map.
-  A tap skips that final pause.
+  The final chart and Light total remain after resolution finishes, and **Continue** appears where the Other's move was named.
+  The screen leaves for the map when the player activates it.
 
   Rejected: a row of pips, filled to the current turn.
   They separated three states where the fraction has two, and cost the strip a second visual language that could not share a baseline with the type beside it.
@@ -407,7 +408,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
 
 Transitions between major surfaces fade through the Void canvas as the tint shifts to the next surface's planet ([STYLE.md §5](STYLE.md#5-color-rules)).
 Arriving is slower than leaving; a run's end is slower still, and on a combust-out it matches the combust motion's weight.
-The durations live in `client/src/style/motion.css`.
+The durations live in `client/src/svg/timings.ts`.
 
 ### 3.9 Open questions
 
@@ -430,8 +431,11 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 - **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, tension on the arc (§3.5.1).
   The "chart is always present" principle made literal on this surface.
   At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-relational-openings-and-revival-at-map-openings)).
+  After a crossing, the returning planets stay combusted until the new map has arrived, then play.
 - **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative relational encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
-- **New Run** appears in place of the next step once the run is over (§6).
+- **Continue** appears under the numeral once a map other than the seventh is finished.
+  The finished map stays until the player activates it; then the map fades out while the chart stays, and the next map fades in.
+- **New Run** appears in place of the next step once the run is over and its star's card has closed (§6).
 
 ### 4.2 Nodes
 
@@ -567,7 +571,7 @@ After confirmation, the chart is computed (onchain per [CHART.md](../mechanics/C
 
 > Moon → Mercury → Venus → Sun → Mars → Jupiter → Saturn
 
-Each planet appears at its computed sign placement, in its glyph and color, with a caption naming the placement and a row of glyph pips marking progress; the pacing lives in `client/src/screens/useCasting.ts`.
+Each planet appears at its computed sign placement, in its glyph and color, with a caption naming the placement and a row of glyph pips marking progress; the pacing lives in `client/src/svg/timings.ts`.
 The ceremony is intentionally long enough to mask an onchain confirmation and to give the act its weight.
 After all seven planets have appeared, the chart sits whole for a brief held moment.
 
@@ -608,8 +612,16 @@ There is no standing "preview" of the full chart in the artifact; a verification
 
 ## 6. End of Run
 
-End-of-run presentation is being developed as the run's closing beat, where the run's Light becomes a star ([#34](https://github.com/kronosapiens/SpacePrince/issues/34)).
-For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
+A run ends when its seventh map is finished or when every fielded planet has combusted, and both endings close the same way.
+The player leaves the final encounter with Continue, and the map returns with its final chart, further travel disabled.
+A moment after the map is ready, the info card (§3.6.2) opens by itself over it, showing the Prince artifact as **Inspect Prince** does, without the star of the run that just ended, and the run's Light below the artwork.
+If that encounter also unlocked a planet, the planet's introduction opens first.
+A second after the card opens, the run's star fades in at its place with a thin ring around it, and the star bell sounds.
+The star looks as every star does at rest; the ring is the only added mark, and it breathes until the player closes the card.
+The card carries no other words.
+Closing it early skips what has not yet played.
+Once the card is closed, **New Run** fades in on the map.
+Reloading a map whose run is already over shows **New Run** at once, with no card.
 Starting again preserves the Prince's identity, relational encounter count, unlocks, and run records.
 
 ---
@@ -734,7 +746,7 @@ This is *front-load intent, not information* made literal ([intent.md](../intent
 ## 10. Navigation
 
 The play loop alternates between Map and Encounter, generating a new map after each non-final L7 completion.
-When a run ends, the final chart and map remain visible with a New Run action (§6).
+When a run ends, the final chart and map remain visible; the run's star arrives in the artifact over them, and New Run follows (§6).
 On first arrival the framing (§9.6) precedes Mint.
 The codex and inspection are reachable from the settings menu on every surface.
 

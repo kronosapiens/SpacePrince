@@ -4,6 +4,8 @@ import { GuideOverlay, type GuideNote } from "@/components/GuideOverlay";
 
 interface NarrativeGuideProps {
   open: boolean;
+  /** The choice is made, so only the house is left to read. */
+  resolved: boolean;
   onOpen: () => void;
   onClose: () => void;
 }
@@ -26,15 +28,16 @@ const NOTES: GuideNote[] = [
     body: <TermText text={COPY.notes.commit.body} />,
   },
 ];
+const RESOLVED_NOTES = NOTES.filter((note) => note.key === "house");
 
-export function NarrativeGuide({ open, onOpen, onClose }: NarrativeGuideProps) {
+export function NarrativeGuide({ open, resolved, onOpen, onClose }: NarrativeGuideProps) {
   return (
     <GuideOverlay
       open={open}
       phase="scene"
       phases={["scene"]}
       phaseLabel={COPY.phases}
-      notes={NOTES}
+      notes={resolved ? RESOLVED_NOTES : NOTES}
       openLabel={COPY.open}
       closeLabel={COPY.close}
       onOpen={onOpen}

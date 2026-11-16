@@ -7,12 +7,17 @@ import { NEUTRAL } from "@/svg/palette";
 import { PRINCE_CHART_INSET } from "@/svg/viewbox";
 import { SPANDREL_PATH, STAR_RECTANGLES } from "@/svg/prince-style";
 
-/** `draft` shows every assigned achievement as earned until earning is implemented. */
-export function PrinceArtwork({ prince, draft = false }: { prince: Prince; draft?: boolean }) {
+/** `draft` shows every assigned achievement as earned until earning is implemented.
+ *  `arrivingRunId` names a run that just ended, whose star arrives (`RunStars`). */
+export function PrinceArtwork({ prince, draft = false, arrivingRunId }: {
+  prince: Prince;
+  draft?: boolean;
+  arrivingRunId?: string;
+}) {
   return (
     <svg className="prince-artwork" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" aria-label={`${prince.chart.name} Prince artwork`}>
       <rect width="800" height="1000" fill={NEUTRAL.void} />
-      <RunStars prince={prince} />
+      <RunStars prince={prince} arrivingRunId={arrivingRunId} />
       <svg
         x={PRINCE_CHART_INSET}
         y={100 + PRINCE_CHART_INSET}

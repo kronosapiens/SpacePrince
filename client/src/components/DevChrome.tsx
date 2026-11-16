@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { usePrince, usePrinceDispatch, useActiveRun } from "@/state/PrinceStore";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { isOver } from "@/game/run";
 import { spawn, type SpawnKind } from "@/state/dev-spawn";
 import { DevConsole } from "@/components/DevConsole";
@@ -41,6 +42,7 @@ export function DevChrome() {
   const dispatch = usePrinceDispatch();
   const prince = usePrince();
   const run = useActiveRun();
+  const { enqueueCard } = useInfoCards();
   const [pagesOpen, setPagesOpen] = useState(false);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [gridOn, setGridOn] = useState(false);
@@ -64,8 +66,15 @@ export function DevChrome() {
       ? surface
       : surface === "title" && prince ? "map" : null;
 
+  // A finished run's spawn queues the card its star arrives on, so the run's end replays.
+  const mintSpawn = (kind: SpawnKind) => {
+    const spawned = spawn(kind, { tier });
+    dispatch({ kind: "mint", prince: spawned });
+    if (kind === "end") enqueueCard({ kind: "run-star", runId: spawned.runs.at(-1)!.id });
+  };
+
   const launch = (kind: SpawnKind) => {
-    dispatch({ kind: "mint", prince: spawn(kind, { tier }) });
+    mintSpawn(kind);
     navigate(ROUTES.play);
   };
 
@@ -84,7 +93,7 @@ export function DevChrome() {
   const regenerate = () => {
     if (!regenKind) return;
     playUISound("commit");
-    dispatch({ kind: "mint", prince: spawn(regenKind, { tier }) });
+    mintSpawn(regenKind);
   };
 
   // The list and the console share the corner, so opening one shuts the other.

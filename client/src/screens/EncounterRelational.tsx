@@ -7,11 +7,10 @@ import { INSTRUCTION } from "@/copy/instruction";
 import { Instruction } from "@/components/Instruction";
 import { useFirstGuide } from "@/components/useFirstGuide";
 import { PlanetBands } from "@/components/PlanetBands";
-import { useEncounterAdvance } from "@/components/useEncounterAdvance";
+import { EncounterContinue } from "@/components/EncounterContinue";
 import { useNecessityAnimation } from "@/components/useNecessityAnimation";
 import { hashString, mulberry32 } from "@/game/rng";
 import { relationalTurnRng, resolveTurn, type TurnResult } from "@/game/turn";
-import { isOver } from "@/game/run";
 import { runChart } from "@/game/chart";
 import { PLANETS } from "@/game/data";
 import { playUISound, setTheme } from "@/audio/engine";
@@ -89,7 +88,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     state: run.state,
     necessity: encounter.selfNecessity,
     enabled: openingEnabled,
-    kind: "encounter",
   });
   const otherOpening = useNecessityAnimation({
     id: openingId,
@@ -97,7 +95,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     state: encounter.opponentState,
     necessity: encounter.necessity,
     enabled: openingEnabled,
-    kind: "encounter",
   });
 
   const openingActive = selfOpening.active || otherOpening.active;
@@ -105,9 +102,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
   useEffect(() => {
     setPreviewAction(null);
   }, [encounter.id, encounter.turnIndex]);
-
-  // `over` is derived (STATE.md): the run ended once every fielded planet combust.
-  const runEnded = isOver(run, playerChart, prince.numRelationalEncounters);
 
   const opponentTurn = encounter.sequence[encounter.turnIndex] ?? null;
   const displayOpponentTurn = animation?.opponentPlanet ?? opponentTurn;
@@ -127,7 +121,6 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
         )
       : null;
   const settled = encounter.resolved && !animation && !openingActive;
-  const advance = useEncounterAdvance(settled, onClearEncounter, runEnded ? 2800 : 1800);
   const displayedRunLight = animation?.runningLight ?? run.light;
   const lightFlashEpoch = animation?.lightFlashEpoch ?? 0;
   // Tint each Light flash with the color of the planet resolving on that
@@ -444,7 +437,7 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
     setGuidePhase("read");
     setGuideOpen(true);
   }, [animation, openingActive, selected, skipAnimation, study]);
-  useFirstGuide("relational", !openingActive, openGuide);
+  useFirstGuide("relational", !openingActive && !encounter.resolved, openGuide);
 
   const closeGuide = useCallback(() => {
     const snapshot = guideSnapshot.current;
@@ -503,10 +496,9 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
       inviteInteraction: !openingActive && !animation && !encounter.resolved,
       ringVerb: selected ? indicatedVerb : null,
     },
-    onBackgroundClick: settled ? advance : handleClearSelection,
+    onBackgroundClick: handleClearSelection,
     label: "SELF",
     guideId: "chart-self",
-    className: settled ? "is-resolved" : "",
   });
 
   return (
@@ -515,21 +507,21 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
           other down the right, matching the two charts. */}
       <PlanetBands className="relational-bands is-self" on={animation?.consumedProjections.self} current={struckSelf} />
       <PlanetBands className="relational-bands is-other" on={animation?.consumedProjections.other} current={struckOther} />
-      {!encounter.resolved && (
-        <RelationalGuide
-          open={guideOpen}
-          phase={guidePhase}
-          ruler={ruler}
-          rule={ENCOUNTER_RULES[ruler].rule}
-          opponentPlanet={displayOpponentTurn}
-          examplePlanet={guidePlanet}
-          previewAction={indicatedVerb}
-          projectedLight={projectedLight?.value ?? null}
-          onOpen={openGuide}
-          onClose={closeGuide}
-          onPhaseChange={changeGuidePhase}
-        />
-      )}
+      {/* A finished encounter keeps its guide, reduced to what is still on
+          the board: no move to answer, nothing to act with. */}
+      <RelationalGuide
+        open={guideOpen}
+        phase={guidePhase}
+        ruler={ruler}
+        rule={ENCOUNTER_RULES[ruler].rule}
+        opponentPlanet={encounter.resolved ? null : displayOpponentTurn}
+        examplePlanet={encounter.resolved ? null : guidePlanet}
+        previewAction={indicatedVerb}
+        projectedLight={projectedLight?.value ?? null}
+        onOpen={openGuide}
+        onClose={closeGuide}
+        onPhaseChange={changeGuidePhase}
+      />
       {!guideOpen && !openingActive && !animation && !encounter.resolved && (
         <Instruction text={selected ? INSTRUCTION.encounter.verb : INSTRUCTION.encounter.planet} />
       )}
@@ -608,14 +600,19 @@ export function EncounterRelationalScreen(props: RelationalScreenProps) {
           </div>
           {/* The sentence is the caption that teaches the marks — the ring's
               colour and the bites on the candidates say the same thing wordlessly,
-              and nothing else says which of them is Saturn. */}
+              and nothing else says which of them is Saturn. Once the encounter
+              settles the slot holds the way out instead. */}
           <div className="relational-announce">
             {openingActive ? (
               <p className="relational-announce-line">
                 <span style={{ color: NEUTRAL.gold }}>Necessity</span> settles
               </p>
-            ) : !settled && displayOpponentTurn && displayOpponentAction && (
-              <p className="relational-announce-line" data-guide="opponent-move">
+            ) : settled ? (
+              <EncounterContinue className="relational-continue" disabled={guideOpen} onContinue={onClearEncounter} />
+            ) : displayOpponentTurn && displayOpponentAction && (
+              // Keyed by turn, so each turn's move fades in rather than replacing
+              // the last in the frame its playback ends.
+              <p key={displayTurnIndex} className="relational-announce-line anim-announce-in" data-guide="opponent-move">
                 <span style={{ color: PLANET_PRIMARY[displayOpponentTurn] }}>
                   {displayOpponentTurn}
                 </span>{" "}
