@@ -7,8 +7,10 @@ import type { Prince } from "@/game/types";
 import { createStubPrince } from "./fixtures";
 import { SPANDREL, STAR_RECTANGLES } from "@/svg/prince-style";
 
-function stars(prince: Prince) {
-  const doc = new DOMParser().parseFromString(renderToStaticMarkup(<svg><RunStars prince={prince} /></svg>), "image/svg+xml");
+function stars(prince: Prince, arrivingRunId?: string) {
+  const doc = new DOMParser().parseFromString(
+    renderToStaticMarkup(<svg><RunStars prince={prince} arrivingRunId={arrivingRunId} /></svg>), "image/svg+xml",
+  );
   return [...doc.querySelectorAll('[aria-label="Past runs"] > g')];
 }
 
@@ -92,5 +94,19 @@ describe("run stars", () => {
 
     prince.runs.push({ ...beginRun(prince.chart, 3), light: 100000, mapsCompleted: MAPS_PER_RUN });
     expect(stars(prince).slice(0, 2).map((star) => star.outerHTML)).toEqual(original);
+  });
+
+  it("rings only the arriving run's star and draws every star as it is drawn without one arriving", () => {
+    const prince = createStubPrince();
+    prince.runs = [1, 2, 3].map((seed) => ({
+      ...beginRun(prince.chart, seed), light: 512, mapsCompleted: MAPS_PER_RUN,
+    }));
+    const plain = stars(prince).map((star) => star.outerHTML);
+    const [first, arriving, last] = stars(prince, prince.runs[1]!.id);
+    expect([first!.outerHTML, last!.outerHTML]).toEqual([plain[0], plain[2]]);
+    expect(arriving!.getAttribute("class")).toBe("run-star-arrive");
+    expect(arriving!.firstElementChild!.outerHTML).toBe(plain[1]);
+    expect(arriving!.querySelectorAll(".run-star-ring")).toHaveLength(1);
+    expect(plain.join("")).not.toContain("run-star");
   });
 });

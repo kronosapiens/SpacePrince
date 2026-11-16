@@ -1,4 +1,5 @@
 import { PlanetIntroCard } from "@/components/PlanetIntroCard";
+import { RunStarCard } from "@/components/RunStarCard";
 import { useInfoCards } from "@/state/InfoCardContext";
 import { usePrince } from "@/state/PrinceStore";
 
@@ -15,5 +16,7 @@ export function InfoCardHost() {
       return (
         <PlanetIntroCard key={current.planet} chart={prince.chart} planet={current.planet} onClose={dismissCard} />
       );
+    case "run-star":
+      return <RunStarCard key={current.runId} prince={prince} runId={current.runId} onClose={dismissCard} />;
   }
 }

@@ -19,7 +19,7 @@ vi.mock("@/screens/MapScreen", () => ({ MapScreen: () => <div data-screen="map" 
 vi.mock("@/components/InfoCardHost", () => ({
   InfoCardHost: () => {
     const { current } = useInfoCards();
-    return current ? <div data-intro>{current.planet}</div> : null;
+    return current ? <div data-card>{current.kind === "planet-intro" ? current.planet : current.runId}</div> : null;
   },
 }));
 
@@ -138,7 +138,7 @@ describe("encounter advancement", () => {
     expect(container.querySelector(".necessity-opening")).toBeNull();
     expect(get(".relational-turns-v").textContent).toBe(`0/${encounter.sequence.length}`);
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
-    expect(container.querySelector("[data-intro]")).toBeNull();
+    expect(container.querySelector("[data-card]")).toBeNull();
     advanceTime(TIMINGS.arrival.guide);
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     click(get(".relational-continue"));
@@ -151,12 +151,12 @@ describe("encounter advancement", () => {
     expect(isOver(after.runs[0]!, after.chart, after.numRelationalEncounters)).toBe(false);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
     advanceTime(TIMINGS.arrival.card);
-    expect(get("[data-intro]").textContent).toBe("Saturn");
+    expect(get("[data-card]").textContent).toBe("Saturn");
     advanceTime(5000);
     expect(loadPrince()!.numRelationalEncounters).toBe(32);
   });
 
-  it("settles a fatal entry wipe immediately with reduced motion and clears it only once", () => {
+  it("settles a fatal entry wipe immediately with reduced motion, clears it only once, and queues the run's star", () => {
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
     const { prince, encounter } = entryWipe(64);
     mount(prince, false);
@@ -174,7 +174,9 @@ describe("encounter advancement", () => {
     expect(after.runs[0]!.light).toBe(96);
     expect(isOver(after.runs[0]!, after.chart, after.numRelationalEncounters)).toBe(true);
     expect(container.querySelector('[data-screen="map"]')).not.toBeNull();
-    expect(container.querySelector("[data-intro]")).toBeNull();
+    expect(container.querySelector("[data-card]")).toBeNull();
+    advanceTime(TIMINGS.arrival.card);
+    expect(get("[data-card]").textContent).toBe(after.runs[0]!.id);
     advanceTime(5000);
     expect(loadPrince()!.numRelationalEncounters).toBe(65);
   });
@@ -324,6 +326,6 @@ describe("encounter advancement", () => {
     expect(loadPrince()!.runs[0]!.encounter).toBeNull();
     expect(loadPrince()!.runs[0]!.light).toBe(0);
     expect(loadPrince()!.numRelationalEncounters).toBe(31);
-    expect(container.querySelector("[data-intro]")).toBeNull();
+    expect(container.querySelector("[data-card]")).toBeNull();
   });
 });

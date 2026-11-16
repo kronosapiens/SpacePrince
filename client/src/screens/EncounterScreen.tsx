@@ -3,6 +3,7 @@ import { useInfoCards } from "@/state/InfoCardContext";
 import { useCommitTurn } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { thresholdCrossedBy } from "@/game/unlocks";
+import { isOver } from "@/game/run";
 import { EncounterRelationalScreen } from "./EncounterRelational";
 import { EncounterNarrativeScreen } from "./EncounterNarrative";
 
@@ -25,15 +26,21 @@ export function EncounterScreen() {
   // The lifetime layer
   // advances HERE, on leaving a resolved encounter — never mid-surface, so a
   // new planet can't pop in un-ghosted during the final turn's playback.
-  // Crossing a Macrobian threshold queues the planet introduction, which
-  // presents over the next stable surface (InfoCardHost).
+  // Crossing a Macrobian threshold queues the planet introduction, and ending
+  // the run queues the card its star arrives on, after any introduction; both
+  // present over the next stable surface (InfoCardHost).
   const clearEncounter = () => {
-    if (enc.resolved && enc.kind === "relational") {
-      const crossed = thresholdCrossedBy(prince.numRelationalEncounters, prince.numRelationalEncounters + 1);
+    const counted = enc.resolved && enc.kind === "relational";
+    const count = prince.numRelationalEncounters + (counted ? 1 : 0);
+    const cleared = { ...run, encounter: null };
+    if (counted) {
+      const crossed = thresholdCrossedBy(prince.numRelationalEncounters, count);
       if (crossed) enqueueCard({ kind: "planet-intro", planet: crossed });
       dispatch({ kind: "incrementRelationalEncounters" });
     }
-    dispatch({ kind: "commitRun", run: { ...run, encounter: null } });
+    // Judged at the new count: a planet unlocked here can keep the run going.
+    if (isOver(cleared, prince.chart, count)) enqueueCard({ kind: "run-star", runId: run.id });
+    dispatch({ kind: "commitRun", run: cleared });
   };
 
   if (enc.kind === "relational") {

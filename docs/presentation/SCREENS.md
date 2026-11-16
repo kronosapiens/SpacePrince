@@ -96,7 +96,7 @@ Listed roughly in the order a player encounters them.
 | Map             | Walk the Sephirot tree; one map per L1→L7 traversal                    | Built (§4)                              |
 | Encounter       | Relational (symmetric) or narrative (asymmetric column)                    | Built (§3)                              |
 | Inspection      | Planets inspected in place; the Prince artifact from the settings menu | Built (§7); earned layers open (#32)    |
-| End of run      | The run's Light becomes a star                                         | In design (§6, #34)                     |
+| End of run      | The run's Light becomes a star                                         | Built (§6)                              |
 
 Dev-only and auxiliary routes: `/__index` (navigation and reset during development), `/gallery` (the design gallery of components, palettes, and themes), `/token` (a random Prince artifact preview).
 None is part of the shipped game's navigation (§8).
@@ -435,7 +435,7 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 - **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative relational encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
 - **Continue** appears under the numeral once a map other than the seventh is finished.
   The finished map stays until the player activates it; then the map fades out while the chart stays, and the next map fades in.
-- **New Run** appears in place of the next step once the run is over (§6).
+- **New Run** appears in place of the next step once the run is over and its star's card has closed (§6).
 
 ### 4.2 Nodes
 
@@ -612,8 +612,16 @@ There is no standing "preview" of the full chart in the artifact; a verification
 
 ## 6. End of Run
 
-End-of-run presentation is being developed as the run's closing beat, where the run's Light becomes a star ([#34](https://github.com/kronosapiens/SpacePrince/issues/34)).
-For now, the final chart and map remain visible, with further travel disabled and a **New Run** action.
+A run ends when its seventh map is finished or when every fielded planet has combusted, and both endings close the same way.
+The player leaves the final encounter with Continue, and the map returns with its final chart, further travel disabled.
+A moment after the map is ready, the info card (§3.6.2) opens by itself over it, showing the Prince artifact as **Inspect Prince** does, without the star of the run that just ended, and the run's Light below the artwork.
+If that encounter also unlocked a planet, the planet's introduction opens first.
+A second after the card opens, the run's star fades in at its place with a thin ring around it, and the star bell sounds.
+The star looks as every star does at rest; the ring is the only added mark, and it breathes until the player closes the card.
+The card carries no other words.
+Closing it early skips what has not yet played.
+Once the card is closed, **New Run** fades in on the map.
+Reloading a map whose run is already over shows **New Run** at once, with no card.
 Starting again preserves the Prince's identity, relational encounter count, unlocks, and run records.
 
 ---
@@ -738,7 +746,7 @@ This is *front-load intent, not information* made literal ([intent.md](../intent
 ## 10. Navigation
 
 The play loop alternates between Map and Encounter, generating a new map after each non-final L7 completion.
-When a run ends, the final chart and map remain visible with a New Run action (§6).
+When a run ends, the final chart and map remain visible; the run's star arrives in the artifact over them, and New Run follows (§6).
 On first arrival the framing (§9.6) precedes Mint.
 The codex and inspection are reachable from the settings menu on every surface.
 

@@ -5,7 +5,9 @@ import type { Prince } from "@/game/types";
 import { NEUTRAL } from "@/svg/palette";
 import { STAR_RECTANGLES, STAR_STYLE as STYLE } from "@/svg/prince-style";
 
-export function RunStars({ prince }: { prince: Prince }) {
+/** `arrivingRunId` names the run that just ended: its star fades in after a
+ *  moment, with a ring around it. */
+export function RunStars({ prince, arrivingRunId }: { prince: Prince; arrivingRunId?: string }) {
   const glowId = useId();
   // Earlier runs are already finished, including combustions at a lower unlock tier.
   const completed = prince.runs.filter((run, index) =>
@@ -32,7 +34,7 @@ export function RunStars({ prince }: { prince: Prince }) {
         const coreOpacity = STYLE.minOpacity + brightness * (1 - STYLE.minOpacity);
         const haloOpacity = brightness * brightness;
         const radius = Math.max(STYLE.minRadius, Math.sqrt(run.light / STYLE.lightScale));
-        return (
+        const star = (
           <g key={run.id} opacity={coreOpacity}>
             <title>{`Run ${index + 1} · ${run.light} Light`}</title>
             <circle
@@ -44,6 +46,23 @@ export function RunStars({ prince }: { prince: Prince }) {
               fillOpacity={haloOpacity / coreOpacity}
             />
             <circle cx={x} cy={y} r={STYLE.coreRadius} />
+          </g>
+        );
+        if (run.id !== arrivingRunId) return star;
+        // The fade runs on a wrapper, since the star's own group carries its opacity.
+        return (
+          <g key={run.id} className="run-star-arrive">
+            {star}
+            <circle
+              className="run-star-ring"
+              cx={x}
+              cy={y}
+              r={STYLE.ring.radius}
+              fill="none"
+              stroke={NEUTRAL.bone}
+              strokeWidth={STYLE.ring.stroke}
+              vectorEffect="non-scaling-stroke"
+            />
           </g>
         );
       })}

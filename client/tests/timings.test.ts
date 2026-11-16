@@ -17,6 +17,7 @@ describe("timings", () => {
     );
     expect(rest).toEqual({
       turn: TIMINGS.turn, house: TIMINGS.house, mint: TIMINGS.mint, arrival: TIMINGS.arrival, crossing: TIMINGS.crossing,
+      runEnd: TIMINGS.runEnd,
     });
   });
 });

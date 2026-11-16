@@ -14,6 +14,7 @@ import { isOver, MAPS_PER_RUN, shouldRolloverMap } from "@/game/run";
 import { useEnterNode, useRolloverMap, useStartRun } from "@/state/store-actions";
 import { loadDevSettings } from "@/state/settings";
 import { useActivePlanet } from "@/state/ActivePlanetContext";
+import { useInfoCards } from "@/state/InfoCardContext";
 import { unlockedPlanets } from "@/game/unlocks";
 import { TERMINAL_NODE_ID } from "@/game/map-gen";
 import { HOUSES } from "@/data/houses";
@@ -33,6 +34,7 @@ export function MapScreen() {
   const startRun = useStartRun();
   const { setActive } = useActivePlanet();
   const { guideOpen, setGuideOpen, openingActive } = useOutletContext<GameLayoutContext>();
+  const { current: card, enqueueCard } = useInfoCards();
   const [guidePhase, setGuidePhase] = useState<MapGuidePhase>("map");
   const [crossing, setCrossing] = useState<"close" | "arrive" | null>(null);
   const runOver = !!prince && !!run && isOver(run, prince.chart, prince.numRelationalEncounters);
@@ -77,11 +79,12 @@ export function MapScreen() {
     [run, prince, runOver, openingActive, enterNode],
   );
 
-  // The seventh map ends the run in place.
+  // The seventh map ends the run in place, and queues the card its star arrives on.
   useEffect(() => {
     if (!run || !prince || !finished || !lastMap) return;
     rolloverMap(run, prince.chart, playerUnlocked);
-  }, [run, prince, finished, lastMap, playerUnlocked, rolloverMap]);
+    enqueueCard({ kind: "run-star", runId: run.id });
+  }, [run, prince, finished, lastMap, playerUnlocked, rolloverMap, enqueueCard]);
 
   useEffect(() => {
     if (crossing !== "close" || !run || !prince) return;
@@ -133,7 +136,10 @@ export function MapScreen() {
           <span className="map-index-v">{ROMAN[mapIndex]}</span>
         </div>
         {waiting && <BeginButton onClick={cross} disabled={guideOpen || openingActive}>{MAP_COPY.continue}</BeginButton>}
-        {runOver && <BeginButton onClick={beginNew} disabled={guideOpen}>{MAP_COPY.newRun}</BeginButton>}
+        {/* New Run waits until every queued card, the run's star among them, has closed. */}
+        {runOver && !card && (
+          <BeginButton className="anim-announce-in" onClick={beginNew} disabled={guideOpen}>{MAP_COPY.newRun}</BeginButton>
+        )}
       </div>
     </>
   );

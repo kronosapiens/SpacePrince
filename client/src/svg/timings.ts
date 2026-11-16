@@ -3,8 +3,8 @@ import { getTuning } from "@/svg/tuning";
 /**
  * Pacing: how long each beat holds, in milliseconds. A turn's playback, the
  * Necessity opening, the wait before a house's Continue, the mint and title
- * fades, the crossing to the next map, and the wait before a guide or card
- * covers a newly arrived screen.
+ * fades, the crossing to the next map, the run's star arriving when a run
+ * ends, and the wait before a guide or card covers a newly arrived screen.
  * JS schedules read `timings()`; the CSS animations that must keep step
  * with them read the custom properties `applyTimings` writes on :root.
  *
@@ -72,6 +72,13 @@ export const TIMINGS = {
     /** Returning planets wait for it before they play. */
     arrive: 1000,
   },
+  /** The card that opens when a run ends shows the artifact without that run's
+   *  star, then the star and its ring fade in as the star bell sounds. */
+  runEnd: {
+    /** How long the artifact is seen without the star. */
+    starDelay: 1000,
+    starFade: 1000,
+  },
 } as const;
 
 type Timings = { [G in keyof typeof TIMINGS]: Record<keyof (typeof TIMINGS)[G], number> };
@@ -93,12 +100,13 @@ export function timings(): Timings {
     mint: scaled(TIMINGS.mint, all),
     arrival: scaled(TIMINGS.arrival, all),
     crossing: scaled(TIMINGS.crossing, all * tuning.crossingDurationScale),
+    runEnd: scaled(TIMINGS.runEnd, all * tuning.runEndDurationScale),
   };
 }
 
 /** Write the durations CSS reads onto :root. */
 export function applyTimings(): void {
-  const { turn, necessity, mint, crossing } = timings();
+  const { turn, necessity, mint, crossing, runEnd } = timings();
   const durations = {
     "--m-prop-travel": turn.propagationTravel,
     "--m-effect-bloom": turn.effectBloom,
@@ -116,6 +124,8 @@ export function applyTimings(): void {
     "--m-title-fade": mint.titleFade,
     "--m-crossing-close": crossing.close,
     "--m-crossing-arrive": crossing.arrive,
+    "--m-run-end-star-delay": runEnd.starDelay,
+    "--m-run-end-star-fade": runEnd.starFade,
   };
   for (const [prop, ms] of Object.entries(durations)) {
     document.documentElement.style.setProperty(prop, `${ms}ms`);

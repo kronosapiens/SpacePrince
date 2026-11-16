@@ -17,7 +17,7 @@ import { playNecessityNote, setTheme } from "@/audio/engine";
 import type { Prince } from "@/game/types";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn(), playCombust: vi.fn(), playStrike: vi.fn(), playStar: vi.fn() }));
 vi.mock("@/game/rng", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/game/rng")>(), randomSeed: vi.fn(),
 }));
@@ -256,6 +256,9 @@ describe("chorus entry", () => {
     expect(current().encounter).toBeNull();
     expect(current().light).toBe(144);
     expect(loadPrince()!.numRelationalEncounters).toBe(0);
+    expect(document.querySelector(".begin-btn")).toBeNull();
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.card));
+    click(".prince-modal .info-card-close");
     expect(document.querySelector(".begin-btn")!.textContent).toBe("New Run");
     reload();
     expect(current().encounter).toBeNull();

@@ -1,5 +1,5 @@
 import { GameTest } from "./game-layout";
-import { act } from "react";
+import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadPrince, savePrince } from "@/state/prince";
@@ -12,11 +12,12 @@ import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
 import type { Prince } from "@/game/types";
 import { PRIMER_FRAMING } from "@/copy/primer";
-import { playUISound, setTheme } from "@/audio/engine";
+import { playStar, playUISound, setTheme } from "@/audio/engine";
 import { TIMINGS } from "@/svg/timings";
 
 vi.hoisted(() => { HTMLCanvasElement.prototype.getContext = () => null; });
-vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn() }));
+vi.mock("@/audio/engine", () => ({ playNecessityNote: vi.fn(), setTheme: vi.fn(), playUISound: vi.fn(), playStar: vi.fn() }));
+vi.mock("@/components/AudioControls", () => ({ AudioControls: () => null }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -337,26 +338,55 @@ describe("entry screens", () => {
     expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
   });
 
-  it("finishes the seventh map in place and keeps that completed map after reload", () => {
-    const prince = createStubPrince();
-    const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
-    run.mapsCompleted = MAPS_PER_RUN - 1;
-    run.map.currentNodeId = TERMINAL_NODE_ID;
-    run.map.visitedNodeIds.push(TERMINAL_NODE_ID);
-    prince.runs = [run];
+  it("finishes the seventh map in place, opens its star's card once, offers New Run when it closes, and at once after reload", () => {
+    const { prince, run } = finishedMap(MAPS_PER_RUN - 1);
     savePrince(prince);
-    act(() => root.render(<GameTest path="/play" />));
+    // Effects run twice here, as in development.
+    act(() => root.render(<StrictMode><GameTest path="/play" /></StrictMode>));
 
     const completed = loadPrince()!;
     expect(completed.runs[0]).toEqual({ ...run, mapsCompleted: MAPS_PER_RUN });
     expect(element(".map-index-v").textContent).toBe("VII");
+    expect(container.querySelector(".begin-btn")).toBeNull();
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.card - 1));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(document.querySelector('[role="dialog"]')!.classList).toContain("prince-modal");
+    expect(container.querySelector(".begin-btn")).toBeNull();
+    click(document.querySelector(".info-card-close")!);
     expect(element(".begin-btn").textContent).toBe("New Run");
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+
     act(() => root.unmount());
     root = createRoot(container);
     act(() => root.render(<GameTest path="/play" />));
     expect(loadPrince()).toEqual(completed);
     expect(element(".map-index-v").textContent).toBe("VII");
     expect(element(".begin-btn").textContent).toBe("New Run");
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it("brings the ended run's star in with its ring and bell above the run's Light, neither of which Inspect Prince shows", () => {
+    const { prince, run } = finishedMap(MAPS_PER_RUN - 1);
+    run.light = 96;
+    play(prince);
+    act(() => vi.advanceTimersByTime(TIMINGS.arrival.card));
+    const card = document.querySelector(".prince-modal")!;
+    expect(card.querySelectorAll(".run-star-arrive .run-star-ring")).toHaveLength(1);
+    expect(card.querySelector(".prince-light")!.textContent).toBe("Light96");
+    act(() => vi.advanceTimersByTime(TIMINGS.runEnd.starDelay - 1));
+    expect(playStar).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1));
+    expect(playStar).toHaveBeenCalledTimes(1);
+
+    click(document.querySelector(".info-card-close")!);
+    click(element('[aria-label="Open settings"]'));
+    click([...document.querySelectorAll(".settings-menu-button")].find((button) => button.textContent === "Inspect Prince")!);
+    const inspected = document.querySelector(".prince-modal")!;
+    expect(inspected.querySelectorAll('[aria-label="Past runs"] > g')).toHaveLength(1);
+    expect(inspected.querySelector(".run-star-arrive, .run-star-ring, .prince-light")).toBeNull();
   });
 
   it("keeps a finished map that is not the seventh, with its numeral and Continue, across a reload", () => {

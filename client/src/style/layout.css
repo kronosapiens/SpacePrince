@@ -676,7 +676,8 @@
    through a resolution wave. */
 .relational-turns-v,
 .relational-light-v,
-.relational-ruler-v {
+.relational-ruler-v,
+.prince-light-v {
   font-family: var(--serif);
   font-size: 30px;
   font-weight: 500;
@@ -988,7 +989,8 @@
   .relational-ruler { gap: 6px; }
   .relational-turns-v,
   .relational-light-v,
-  .relational-ruler-v { font-size: clamp(18px, 5vw, 22px); }
+  .relational-ruler-v,
+  .prince-light-v { font-size: clamp(18px, 5vw, 22px); }
   .relational-rule { font-size: 19px; }
   .relational-opening { font-size: 19px; }
 }
@@ -1441,6 +1443,18 @@
 .prince-modal .info-card-close {
   top: var(--prince-close-inset);
   right: var(--prince-close-inset);
+}
+/* The ended run's Light, centred in the stage's margin below the artwork, so
+   the artwork keeps the box Inspect Prince gives it. */
+.prince-light {
+  position: absolute;
+  inset: auto 0 0;
+  height: calc(var(--prince-artwork-inset) / var(--prince-aspect-ratio));
+  display: grid;
+  grid-auto-flow: column;
+  place-content: center;
+  align-items: baseline;
+  gap: 10px;
 }
 .screen-help {
   display: flex;

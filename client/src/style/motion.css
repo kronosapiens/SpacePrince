@@ -297,6 +297,13 @@
 @keyframes surface-fade-out { from { opacity: 1; } to { opacity: 0; } }
 .anim-crossing-close { animation: surface-fade-out var(--m-crossing-close) ease forwards; }
 .anim-crossing-arrive { animation: surface-fade-in var(--m-crossing-arrive) var(--ease-out) both; }
+/* The run that just ended: its star and ring are unseen for a moment after the
+   card opens, then fade in together. The ring then breathes on the shared clock,
+   in brightness only, since a ring that also breathes in size marks a choice. */
+.run-star-arrive {
+  animation: surface-fade-in var(--m-run-end-star-fade) var(--ease-out) var(--m-run-end-star-delay) both;
+}
+.run-star-ring { opacity: calc(0.6 + 0.4 * var(--breath)); }
 
 @media (prefers-reduced-motion: reduce) {
   .planet-intro-modal.anim-info-card-fade,
@@ -320,7 +327,8 @@
   .anim-surface-in,
   .anim-announce-in,
   .anim-crossing-close,
-  .anim-crossing-arrive { animation: none; }
+  .anim-crossing-arrive,
+  .run-star-arrive { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
      ~0.75). .anim-active-halo isn't listed above because it no longer runs an
