@@ -10,6 +10,7 @@ import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
 import { PLANET_GLYPH } from "@/svg/glyphs";
 import { PLANETS } from "@/game/data";
 import { createStubPrince } from "./fixtures";
+import type { Prince } from "@/game/types";
 import { PRIMER_FRAMING } from "@/copy/primer";
 import { playUISound, setTheme } from "@/audio/engine";
 import { TIMINGS } from "@/svg/timings";
@@ -71,6 +72,21 @@ function finishOpening() {
   expect(container.querySelector(".necessity-opening")).toBeNull();
 }
 
+function finishedMap(mapsCompleted: number) {
+  const prince = createStubPrince();
+  const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
+  run.mapsCompleted = mapsCompleted;
+  run.map.currentNodeId = TERMINAL_NODE_ID;
+  run.map.visitedNodeIds.push(TERMINAL_NODE_ID);
+  prince.runs = [run];
+  return { prince, run };
+}
+
+function play(prince: Prince) {
+  savePrince(prince);
+  act(() => root.render(<GameTest path="/play" />));
+}
+
 function planetPositions() {
   return [...container.querySelectorAll('.chart-svg text')]
     .filter((text) => Object.values(PLANET_GLYPH).includes(text.textContent ?? ""))
@@ -90,6 +106,7 @@ describe("entry screens", () => {
     const node = `[data-guide="node-${next}"]`;
 
     expect(container.querySelector(".map-boundary")).toBeNull();
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.arrive));
     expect(element(".chart-layout-chart .necessity-opening").textContent).toBe("");
     expect(container.querySelector(".necessity-revival")).not.toBeNull();
     expect(container.querySelector(".necessity-accent")).toBeNull();
@@ -340,5 +357,88 @@ describe("entry screens", () => {
     expect(loadPrince()).toEqual(completed);
     expect(element(".map-index-v").textContent).toBe("VII");
     expect(element(".begin-btn").textContent).toBe("New Run");
+  });
+
+  it("keeps a finished map that is not the seventh, with its numeral and Continue, across a reload", () => {
+    const { prince } = finishedMap(0);
+    play(prince);
+    const unchanged = () => {
+      expect(loadPrince()).toEqual(prince);
+      expect(element(".map-index-v").textContent).toBe("I");
+      expect(element(".begin-btn").textContent).toBe("Continue");
+      expect(document.activeElement).not.toBe(element(".begin-btn"));
+      expect(container.querySelector(".instruction")).toBeNull();
+    };
+    unchanged();
+    act(() => vi.advanceTimersByTime(60_000));
+    unchanged();
+    act(() => root.unmount());
+    root = createRoot(container);
+    act(() => root.render(<GameTest path="/play" />));
+    unchanged();
+  });
+
+  it("crosses once, after the finished map closes, and the next map arrives with its numeral", () => {
+    const { prince, run } = finishedMap(0);
+    play(prince);
+    vi.mocked(playUISound).mockClear();
+    click(element(".begin-btn"));
+    click(element(".begin-btn"));
+    expect(vi.mocked(playUISound).mock.calls).toEqual([["commit"]]);
+    expect(element(".map-content").classList).toContain("anim-crossing-close");
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.close - 1));
+    expect(loadPrince()).toEqual(prince);
+    expect(element(".map-index-v").textContent).toBe("I");
+
+    act(() => vi.advanceTimersByTime(1));
+    const crossed = loadPrince()!.runs[0]!;
+    expect(crossed.mapsCompleted).toBe(1);
+    expect(crossed.map.id).not.toBe(run.map.id);
+    expect(element(".map-index-v").textContent).toBe("II");
+    expect(element(".map-content").classList).toContain("anim-crossing-arrive");
+    expect(container.querySelector(".begin-btn")).toBeNull();
+    // No planet returns, so nothing is held.
+    expect(element('[data-guide="map"]').querySelector('[role="button"]')).not.toBeNull();
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(loadPrince()!.runs[0]).toEqual(crossed);
+  });
+
+  it("keeps a returning planet combusted until the next map has arrived, then returns it", () => {
+    const { prince, run } = finishedMap(1);
+    const resolve = getEffectiveStatsFromPlacement(prince.chart.planets.Moon).resolve;
+    run.state.Moon.tension = resolve;
+    // Fortune of 120 or more makes the Moon's return certain.
+    run.gains.Moon.luck = 120;
+    play(prince);
+    const moonCombusted = () => !!container.querySelector('.anim-combust > [data-guide="planet-self-moon"]');
+    const travel = () => element('[data-guide="map"]').querySelector('[role="button"]');
+    expect(moonCombusted()).toBe(true);
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.close));
+    expect(loadPrince()!.runs[0]!.state.Moon.tension).toBe(resolve / 2);
+
+    expect(element(".map-index-v").textContent).toBe("III");
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.arrive - 1));
+    expect(moonCombusted()).toBe(true);
+    expect(container.querySelector(".necessity-revival")).toBeNull();
+    expect(travel()).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(container.querySelector(".necessity-revival")).not.toBeNull();
+    act(() => vi.advanceTimersByTime(TIMINGS.necessity.revival));
+    expect(moonCombusted()).toBe(false);
+    expect(travel()).not.toBeNull();
+  });
+
+  it("holds Continue while the map's guide is open", () => {
+    const { prince } = finishedMap(1);
+    play(prince);
+    click(element('[aria-label="Study this map"]'));
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.close));
+    expect(loadPrince()).toEqual(prince);
+    click(document.querySelector(".guide-close")!);
+    click(element(".begin-btn"));
+    act(() => vi.advanceTimersByTime(TIMINGS.crossing.close));
+    expect(loadPrince()!.runs[0]!.mapsCompleted).toBe(2);
   });
 });

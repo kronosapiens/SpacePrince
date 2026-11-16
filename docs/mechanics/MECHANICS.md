@@ -247,7 +247,7 @@ The game's progression is layered:
 - **Map** — one Sephirot-tree (per [MAP.md](MAP.md)).
   The player walks a path from L1 to L7, one encounter per node entered: 1 to 11 per map, depending on the layout and route.
 - **Run** — **up to seven maps** (`MAPS_PER_RUN` in `client/src/game/run.ts`).
-  After completing a map, the next is generated and begun.
+  After completing a map, the player crosses into the next, which is generated at the crossing.
   The structure is similar to FTL's sectors.
 - **Run end** — a run ends on whichever comes first: **full combustion** (every planet the player fields combusts) or **completion** (the seventh map is finished).
   Combustion is early failure — dying before the final boss, in Slay the Spire / FTL terms; completion is the full passage.

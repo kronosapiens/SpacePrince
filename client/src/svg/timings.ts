@@ -3,7 +3,8 @@ import { getTuning } from "@/svg/tuning";
 /**
  * Pacing: how long each beat holds, in milliseconds. A turn's playback, the
  * Necessity opening, the wait before a house's Continue, the mint and title
- * fades, and the wait before a guide or card covers a newly arrived screen.
+ * fades, the crossing to the next map, and the wait before a guide or card
+ * covers a newly arrived screen.
  * JS schedules read `timings()`; the CSS animations that must keep step
  * with them read the custom properties `applyTimings` writes on :root.
  *
@@ -65,6 +66,12 @@ export const TIMINGS = {
     /** A queued card over the map, such as a planet's introduction. */
     card: 1000,
   },
+  /** Crossing to the next map: the finished map fades out, then the next fades in. */
+  crossing: {
+    close: 500,
+    /** Returning planets wait for it before they play. */
+    arrive: 1000,
+  },
 } as const;
 
 type Timings = { [G in keyof typeof TIMINGS]: Record<keyof (typeof TIMINGS)[G], number> };
@@ -85,12 +92,13 @@ export function timings(): Timings {
     house: scaled(TIMINGS.house, all),
     mint: scaled(TIMINGS.mint, all),
     arrival: scaled(TIMINGS.arrival, all),
+    crossing: scaled(TIMINGS.crossing, all * tuning.crossingDurationScale),
   };
 }
 
 /** Write the durations CSS reads onto :root. */
 export function applyTimings(): void {
-  const { turn, necessity, mint } = timings();
+  const { turn, necessity, mint, crossing } = timings();
   const durations = {
     "--m-prop-travel": turn.propagationTravel,
     "--m-effect-bloom": turn.effectBloom,
@@ -106,6 +114,8 @@ export function applyTimings(): void {
     "--m-necessity-settle": necessity.settle,
     "--m-framing-fade": mint.framingFade,
     "--m-title-fade": mint.titleFade,
+    "--m-crossing-close": crossing.close,
+    "--m-crossing-arrive": crossing.arrive,
   };
   for (const [prop, ms] of Object.entries(durations)) {
     document.documentElement.style.setProperty(prop, `${ms}ms`);

@@ -67,6 +67,8 @@ export function GameLayout() {
     necessity: run?.map.boundary?.necessity,
     uncombusts: run?.map.boundary?.uncombusts,
     enabled: isMap && run?.map.currentNodeId === ROOT_NODE_ID,
+    // The new map fades in first; its returning planets wait for it.
+    delay: timings().crossing.arrive,
   });
   // A card queued on the way here (a planet's introduction) opens a moment
   // after the map is ready, and stays queued until it does, so leaving the

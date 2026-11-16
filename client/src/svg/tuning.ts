@@ -18,7 +18,7 @@ import { useSyncExternalStore } from "react";
  * how you can tell at the call site that a number is decided. Put one back the
  * moment it is in question again; that costs a field, a default and a row.
  *
- * What is left is the breath period, which may still speed up, and three
+ * What is left is the breath period, which may still speed up, and four
  * multipliers on the pacing durations in `timings.ts`.
  *
  * CSS knobs use the stylesheet values as defaults and the console overrides
@@ -38,6 +38,8 @@ export interface ChartTuning {
   turnDurationScale: number;
   /** Multiplies the Necessity opening, on top of `durationScale`. */
   necessityDurationScale: number;
+  /** Multiplies the crossing to the next map, on top of `durationScale`. */
+  crossingDurationScale: number;
 }
 
 /** The keys the slider list can drive — every knob whose value is a number. */
@@ -51,6 +53,7 @@ export const TUNING_DEFAULTS: ChartTuning = {
   durationScale: 1,
   turnDurationScale: 1,
   necessityDurationScale: 1,
+  crossingDurationScale: 1,
 };
 
 /** Slider ranges for the console. Bounds are generous rather than safe — the
@@ -66,6 +69,7 @@ export const TUNING_KNOBS: ReadonlyArray<{
   { key: "durationScale", label: "All durations ×", min: 0.25, max: 3, step: 0.05 },
   { key: "turnDurationScale", label: "Turn durations ×", min: 0.25, max: 3, step: 0.05 },
   { key: "necessityDurationScale", label: "Necessity durations ×", min: 0.25, max: 3, step: 0.05 },
+  { key: "crossingDurationScale", label: "Crossing durations ×", min: 0.25, max: 3, step: 0.05 },
 ];
 
 /** The CSS custom properties the console can override. `suffix` is

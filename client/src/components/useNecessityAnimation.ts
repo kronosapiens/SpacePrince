@@ -19,12 +19,14 @@ interface NecessityAnimationInput {
   necessity?: NecessityEntry[];
   uncombusts?: MapBoundary["uncombusts"];
   enabled: boolean;
+  /** A hold before the first beat, showing the state the beats start from. */
+  delay?: number;
 }
 
 interface Playback {
   id: string;
   state: SideState;
-  opening: NecessityAnimationPresentation;
+  opening?: NecessityAnimationPresentation;
 }
 
 /** Presentation only: reconstruct the opening from committed results, never reroll it. */
@@ -57,7 +59,7 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
   }, []);
 
   useLayoutEffect(() => {
-    const { id, chart, state, necessity = [], uncombusts = [] } = latest.current;
+    const { id, chart, state, necessity = [], uncombusts = [], delay = 0 } = latest.current;
     const revived = PLANETS.filter((planet) => uncombusts.some((entry) => entry.planet === planet && entry.success));
     const ordered = PLANETS.flatMap((planet) => necessity.filter((entry) => entry.planet === planet));
     if (!input.enabled || reducedMotion || (!necessity.length && !revived.length)) {
@@ -68,7 +70,8 @@ export function useNecessityAnimation(input: NecessityAnimationInput): {
     for (const entry of necessity) beforeNecessity[entry.planet].tension -= entry.amount;
     const progress = cloneSideState(beforeNecessity);
     for (const planet of revived) progress[planet].tension = getEffectiveStatsFromPlacement(chart.planets[planet]).resolve;
-    let elapsed = 0;
+    let elapsed = delay;
+    if (delay) setPlayback({ id, state: cloneSideState(progress) });
     const timing = timings().necessity;
     const noteDuration = (timing.reveal + timing.settle) / 1000;
     const show = (opening: NecessityAnimationPresentation) => {

@@ -408,7 +408,7 @@ Below, between the SELF and OTHER labels: the encounter's ruler, the sentence th
 
 Transitions between major surfaces fade through the Void canvas as the tint shifts to the next surface's planet ([STYLE.md §5](STYLE.md#5-color-rules)).
 Arriving is slower than leaving; a run's end is slower still, and on a combust-out it matches the combust motion's weight.
-The durations live in `client/src/style/motion.css`.
+The durations live in `client/src/svg/timings.ts`.
 
 ### 3.9 Open questions
 
@@ -431,7 +431,10 @@ Renders the Sephirot-pattern node graph from [MAP.md](../mechanics/MAP.md) again
 - **The chart** is the same full-size, inspectable chart the layout keeps on every surface (§1), in its current state — combusts dimmed, tension on the arc (§3.5.1).
   The "chart is always present" principle made literal on this surface.
   At a map's first node the chart plays the opening's revival rolls before the map can be entered ([MECHANICS.md §11.3](../mechanics/MECHANICS.md#113-necessity-at-relational-openings-and-revival-at-map-openings)).
+  After a crossing, the returning planets stay combusted until the new map has arrived, then play.
 - **Unlock moments** land here as an interstitial: surfacing back from an encounter that crossed a Macrobian threshold (cumulative relational encounters 1, 2, 4, 8, 16, 32 — per [MECHANICS.md §11.1](../mechanics/MECHANICS.md#111-planet-unlock-schedule)) presents the new planet's introduction in the info card (§3.6.2); on dismissal the planet stands unghosted in its computed sign on the chart.
+- **Continue** appears under the numeral once a map other than the seventh is finished.
+  The finished map stays until the player activates it; then the map fades out while the chart stays, and the next map fades in.
 - **New Run** appears in place of the next step once the run is over (§6).
 
 ### 4.2 Nodes

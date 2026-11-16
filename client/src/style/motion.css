@@ -292,6 +292,11 @@
 /* The Other's move arrives rather than swapping in the frame its turn begins;
    an encounter's Continue arrives the same way. */
 .anim-announce-in { animation: surface-fade-in var(--m-announce-fade) var(--ease-out) both; }
+/* Crossing to the next map: the finished map fades out and holds there until
+   the next one replaces it and fades in. */
+@keyframes surface-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.anim-crossing-close { animation: surface-fade-out var(--m-crossing-close) ease forwards; }
+.anim-crossing-arrive { animation: surface-fade-in var(--m-crossing-arrive) var(--ease-out) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .planet-intro-modal.anim-info-card-fade,
@@ -313,7 +318,9 @@
   .wordmark-glow circle,
   .planet-corona,
   .anim-surface-in,
-  .anim-announce-in { animation: none; }
+  .anim-announce-in,
+  .anim-crossing-close,
+  .anim-crossing-arrive { animation: none; }
   /* Still the breath clock, holding it mid-inhale so everything deriving from it
      keeps a tuned still-state (invite glow ~0.36, invite ring ~0.84, active halo
      ~0.75). .anim-active-halo isn't listed above because it no longer runs an
