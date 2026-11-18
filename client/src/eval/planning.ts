@@ -3,7 +3,7 @@ import { isCombusted, remainingResolve } from "@/game/combust";
 import { encounterRuler } from "@/game/encounter";
 import { fortuneChance, getEffectiveStats } from "@/game/relational";
 import { eligibleNext, TERMINAL_NODE_ID } from "@/game/map-gen";
-import { NECESSITY_TENSION_TIERS } from "@/game/necessity";
+import { NECESSITY_ROLLS, necessityPerMiss } from "@/game/necessity";
 import { opponentMoveOdds } from "@/game/opponent-move";
 import { hashString, mulberry32, pickWeighted } from "@/game/rng";
 import { MAPS_PER_RUN } from "@/game/run";
@@ -69,7 +69,7 @@ export function preferred(candidates: Candidate[], allowance = 0): Candidate[] {
 
 /** Value a resolved relational as if another relational encounter arrived before recovery.
  * This heuristic omits intervening narratives, map revival and unlocks.
- * Independent Fortune rolls fully block the current Necessity tiers.
+ * Each Necessity roll misses independently, so the count of misses is binomial.
  * The chart is natal; both Resolve and Fortune include run gains here. */
 export function entryLeafValue(run: Run, chart: Chart): Value {
   const encounter = run.encounter as RelationalEncounter;
@@ -84,11 +84,12 @@ export function entryLeafValue(run: Run, chart: Chart): Value {
     const remaining = Math.max(0, remainingResolve(effective.planets[planet], run.state[planet]));
     if (remaining === 0) continue;
     const fortune = fortuneChance(getEffectiveStats(effective, planet).luck);
-    let survives = fortune;
-    capacity += fortune * remaining;
-    for (const draw of NECESSITY_TENSION_TIERS) {
-      const probability = (1 - fortune) / NECESSITY_TENSION_TIERS.length;
-      const after = Math.max(0, remaining - draw);
+    const perMiss = necessityPerMiss(effective, planet);
+    let survives = 0, orders = 1; // `orders` counts the ways the rolls can miss this many times.
+    for (let misses = 0; misses <= NECESSITY_ROLLS; misses++) {
+      const probability = orders * (1 - fortune) ** misses * fortune ** (NECESSITY_ROLLS - misses);
+      orders = orders * (NECESSITY_ROLLS - misses) / (misses + 1);
+      const after = Math.max(0, remaining - misses * perMiss);
       if (after > 0) survives += probability;
       capacity += probability * after;
     }

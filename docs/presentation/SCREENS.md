@@ -282,10 +282,10 @@ With study **off**, the panel shows only **operational numbers** — what matter
 - **Resolve** — the total tension a planet can take ([MECHANICS.md §10](../mechanics/MECHANICS.md#10-combustion)): how much tension the planet endures before it gives out.
   Now that combustion is deterministic, this is literally its HP.
   It is the planet's base Resolve plus placement bonuses, shown directly.
-- **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings or blocking its entire necessity draw, and for the Other's planets the odds that each of three necessity rolls adds nothing.
-  Necessity applies independently to both charts at each relational encounter opening: the player's planets draw 12, 24, or 36 before Fortune, and the Other's start from half their Resolve.
+- **Fortune %** — the fortune roll, `luck / 120` ([MECHANICS.md §7](../mechanics/MECHANICS.md#7-randomness)): the planet's odds of uncombusting at map openings, and the odds that each of its three necessity rolls adds nothing.
+  Necessity applies independently to both charts at each relational encounter opening: each missed roll adds a sixth of the planet's Resolve, to the player's carried tension and to the Other's fresh state.
   Each sweep gives every fielded planet one beat: the tension it takes appears on its arc, then settles into the resulting state.
-  Wounded planets can combust at entry; fresh planets survive every draw.
+  Wounded planets can combust at entry; fresh planets always survive it.
   Both charts show their opening sweep before the first action becomes available.
   If the player's entire roster combusts during the opening, both sweeps finish before the encounter advances without an action.
   Map openings show revival only; a new run begins with zero tension.

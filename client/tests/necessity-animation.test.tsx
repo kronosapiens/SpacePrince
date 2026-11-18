@@ -22,7 +22,7 @@ function advance(ms: number) { act(() => vi.advanceTimersByTime(ms)); }
 function input(): Input {
   const state = blankSideState();
   state.Moon.tension = 30;
-  return { id: "map-1", chart, state, necessity: [{ planet: "Moon", amount: 6, draw: 12 }], enabled: true };
+  return { id: "map-1", chart, state, necessity: [{ planet: "Moon", amount: 6 }], enabled: true };
 }
 beforeEach(() => {
   vi.useFakeTimers();
@@ -71,7 +71,7 @@ it("does not restart on ordinary rerenders", () => {
 });
 it("plays all seven planets in Macrobian order with progressive immutable state", () => {
   const props = input();
-  props.necessity = [...PLANETS].reverse().map((planet) => ({ planet, amount: 12, draw: 24 }));
+  props.necessity = [...PLANETS].reverse().map((planet) => ({ planet, amount: 12 }));
   for (const planet of PLANETS) props.state[planet].tension = 30;
   const original = structuredClone(props);
   render(props);

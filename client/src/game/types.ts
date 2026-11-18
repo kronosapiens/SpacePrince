@@ -174,12 +174,8 @@ export interface NodeOutcome {
 
 export interface NecessityEntry {
   planet: PlanetName;
+  /** Tension added; zero when every roll succeeds, still recorded for a lit planet. */
   amount: number;
-  /** Fortune blocked the draw; zero-amount entries still record lit planets. */
-  blocked?: boolean;
-  /** Tension arriving before Fortune: Self's tier before the combustion cap,
-   *  or half of the Other's Resolve; absent in old saves. */
-  draw?: number;
 }
 
 /** The player's uncombust rolls, seeded at map creation and shown on entry. */

@@ -63,7 +63,7 @@ function finishOpening() {
   expect(container.querySelector(".necessity-opening")).toBeNull();
 }
 
-function setup(settleOpening = true, openingCounts?: { self: number; other: number; combustSelf?: PlanetName; blocked?: boolean }, devAnimationControls = false) {
+function setup(settleOpening = true, openingCounts?: { self: number; other: number; combustSelf?: PlanetName; amount?: number }, devAnimationControls = false) {
   const prince = createStubPrince();
   const run = beginRun(prince.chart, 42, prince.numRelationalEncounters);
   const encounter = beginRelationalEncounter({ run, opponentSeed: 99, lifetimeRelationalEncounterCount: prince.numRelationalEncounters });
@@ -71,9 +71,7 @@ function setup(settleOpening = true, openingCounts?: { self: number; other: numb
   encounter.opponentActions = ["Affliction", "Testimony"];
   encounter.opponentState.Moon.tension = 12;
   if (openingCounts) {
-    const entries = (count: number): NecessityEntry[] => PLANETS.slice(0, count).map((planet) => openingCounts.blocked === undefined
-      ? { planet, amount: 12, draw: 24 }
-      : { planet, amount: openingCounts.blocked ? 0 : 12, draw: 12, blocked: openingCounts.blocked });
+    const entries = (count: number): NecessityEntry[] => PLANETS.slice(0, count).map((planet) => ({ planet, amount: openingCounts.amount ?? 12 }));
     encounter.selfNecessity = entries(openingCounts.self);
     encounter.necessity = entries(openingCounts.other);
     for (const entry of encounter.selfNecessity) run.state[entry.planet].tension = 30;
@@ -172,15 +170,15 @@ describe("encounter interactions", () => {
 
   it("shows both committed charts immediately with reduced motion", () => {
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
-    const { onCommitTurn } = setup(false, { self: 2, other: 2, blocked: true });
+    const { onCommitTurn } = setup(false, { self: 2, other: 2, amount: 0 });
     expect(container.querySelector(".necessity-opening")).toBeNull();
     click(moon);
     click(testimony);
     expect(onCommitTurn).toHaveBeenCalledOnce();
   });
 
-  it("accents blocked planets without drawing an arc while both openings finish before actions resume", () => {
-    const { run, encounter, render, onCommitTurn } = setup(false, { self: 7, other: 7, blocked: true });
+  it("accents planets that take no tension without drawing an arc while both openings finish before actions resume", () => {
+    const { run, encounter, render, onCommitTurn } = setup(false, { self: 7, other: 7, amount: 0 });
     const committed = structuredClone({ self: run.state, other: encounter.opponentState });
     expect(container.querySelectorAll(".necessity-opening")).toHaveLength(2);
     expect(container.querySelectorAll(".necessity-accent")).toHaveLength(2);
@@ -206,7 +204,7 @@ describe("encounter interactions", () => {
   });
 
   it("shows an entry death when its sweep settles and only allows surviving planets to act", () => {
-    const { run, prince, onCommitTurn } = setup(false, { self: 1, other: 2, combustSelf: "Moon", blocked: false });
+    const { run, prince, onCommitTurn } = setup(false, { self: 1, other: 2, combustSelf: "Moon" });
     expect(get(moon).closest(".anim-combust")).toBeNull();
     const arc = get('[data-guide="arc-self-moon"]');
     const trackEnd = arc.querySelector("path")!.getAttribute("d")!.split(" ").slice(-2);
