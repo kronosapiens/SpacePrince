@@ -13,19 +13,16 @@ import type { Chart, RelationalEncounter, PlanetName } from "@/game/types";
 const chart = seededChart(7);
 
 describe("necessity", () => {
-  it.each([0, 1, 2])("draws uniform tier %i and Fortune blocks at luck/120", (tier) => {
-    const chance = fortuneChance(getEffectiveStats(chart, "Sun").luck);
-    for (const fortunate of [false, true]) {
-      for (const edge of [0, 0.999]) {
-        const rng = vi.fn().mockReturnValueOnce((tier + edge) / 3)
-          .mockReturnValueOnce(fortunate ? chance - 0.001 : chance);
-        const result = applyNecessity(chart, blankSideState(), ["Sun"], rng);
-        const draw = [12, 24, 36][tier]!;
-        const amount = fortunate ? 0 : draw;
-        expect(result.state.Sun.tension).toBe(amount);
-        expect(result.necessity).toEqual([{ planet: "Sun", amount, blocked: fortunate, draw }]);
-        expect(rng).toHaveBeenCalledTimes(2);
-      }
+  it("rolls Fortune three times, adding a sixth of Resolve for each miss, and a roll equal to the chance misses", () => {
+    const { luck, resolve } = getEffectiveStats(chart, "Sun");
+    const chance = fortuneChance(luck);
+    for (const misses of [0, 1, 2, 3]) {
+      const rng = vi.fn();
+      for (let roll = 0; roll < 3; roll++) rng.mockReturnValueOnce(roll < misses ? chance : chance - 0.001);
+      const result = applyNecessity(chart, blankSideState(), ["Sun"], rng);
+      expect(result.state.Sun.tension).toBe(misses * resolve / 6);
+      expect(result.necessity).toEqual([{ planet: "Sun", amount: misses * resolve / 6 }]);
+      expect(rng).toHaveBeenCalledTimes(3);
     }
   });
 
@@ -35,44 +32,33 @@ describe("necessity", () => {
       const state = blankSideState();
       state.Moon.tension = initial;
       const result = applyNecessity(chart, state, ["Moon"], () => 0.999);
-      const expected = Math.min(initial + 36, resolve);
+      const expected = Math.min(initial + resolve / 2, resolve);
       expect(result.state.Moon.tension).toBe(expected);
+      expect(isCombusted(chart.planets.Moon, result.state.Moon)).toBe(expected === resolve);
       expect(state.Moon.tension).toBe(initial);
-      expect(result.necessity).toEqual([{ planet: "Moon", amount: expected - initial, blocked: false, draw: 36 }]);
+      expect(result.necessity).toEqual([{ planet: "Moon", amount: expected - initial }]);
     }
   });
 
-  it("blocks the complete draw on a wounded planet and retains its zero-amount record", () => {
-    const state = blankSideState();
-    state.Moon.tension = getEffectiveStatsFromPlacement(chart.planets.Moon).resolve - 2;
-    const rng = vi.fn().mockReturnValueOnce(0.999).mockReturnValueOnce(0);
-    const result = applyNecessity(chart, state, ["Moon"], rng);
-    expect(result.state.Moon).toEqual(state.Moon);
-    expect(isCombusted(chart.planets.Moon, result.state.Moon)).toBe(false);
-    expect(result.necessity).toEqual([{ planet: "Moon", amount: 0, blocked: true, draw: 36 }]);
-    expect(rng).toHaveBeenCalledTimes(2);
-  });
-
-  it("skips combusted and unfielded planets without consuming their rolls", () => {
+  it("skips combusted and unfielded planets without consuming their rolls, and records a lit planet's zero amount", () => {
     const state = blankSideState();
     state.Mars.tension = getEffectiveStatsFromPlacement(chart.planets.Mars).resolve;
     const rng = vi.fn(() => 0);
     const result = applyNecessity(chart, state, ["Mars", "Moon"], rng);
-    expect(rng).toHaveBeenCalledTimes(2);
-    expect(result.necessity).toEqual([{ planet: "Moon", amount: 0, blocked: true, draw: 12 }]);
+    expect(rng).toHaveBeenCalledTimes(3);
+    expect(result.necessity).toEqual([{ planet: "Moon", amount: 0 }]);
     for (const planet of PLANETS) {
       expect(result.state[planet].tension).toBe(state[planet].tension);
     }
   });
 
-  it("cannot combust a fresh planet in any sign or sect, even when Fortune fails on the maximum draw", () => {
+  it("cannot combust a fresh planet in any sign or sect, even when every roll misses", () => {
     for (const isDiurnal of [false, true]) for (const [index] of SIGNS.entries()) {
       const longitudes = Object.fromEntries(PLANETS.map((p) => [p, index * 30])) as Record<PlanetName, number>;
       const fresh: Chart = { id: "fresh", name: "fresh", isDiurnal, ...derivePlacements({ longitudes, ascendantLongitude: 0, isDiurnal }) };
       const result = applyNecessity(fresh, blankSideState(), PLANETS, () => 0.999);
       for (const planet of PLANETS) {
-        expect(getEffectiveStatsFromPlacement(fresh.planets[planet]).resolve).toBeGreaterThanOrEqual(48);
-        expect(result.state[planet].tension).toBe(36);
+        expect(result.state[planet].tension).toBe(getEffectiveStatsFromPlacement(fresh.planets[planet]).resolve / 2);
         expect(isCombusted(fresh.planets[planet], result.state[planet])).toBe(false);
       }
     }
@@ -131,7 +117,7 @@ describe("necessity", () => {
     expect(entered.state).toEqual(opening.state);
     expect(encounter.selfNecessity).toEqual(opening.necessity);
     expect(entered.state.Moon.tension).toBe(run.state.Moon.tension);
-    expect(encounter.selfNecessity!.find((entry) => entry.planet === "Moon")).toMatchObject({ amount: 0, blocked: true });
+    expect(encounter.selfNecessity!.find((entry) => entry.planet === "Moon")).toEqual({ planet: "Moon", amount: 0 });
     expect(entered.state.Sun).toEqual(run.state.Sun);
     for (const planet of PLANETS.filter((p) => !encounter.roster.includes(p))) expect(entered.state[planet]).toEqual(run.state[planet]);
     expect(run).toEqual(before);
@@ -151,7 +137,7 @@ describe("the Other's necessity", () => {
     const result = applyOtherNecessity(chart, roster, rng);
     expect(rng).toHaveBeenCalledTimes(3 * roster.length);
     expect(result.necessity).toEqual(roster.map((planet) =>
-      ({ planet, amount: sixths * resolve(planet) / 6, draw: resolve(planet) / 2 })));
+      ({ planet, amount: sixths * resolve(planet) / 6 })));
     for (const planet of PLANETS) {
       expect(result.state[planet].tension).toBe(roster.includes(planet) ? sixths * resolve(planet) / 6 : 0);
       expect(isCombusted(chart.planets[planet], result.state[planet])).toBe(false);

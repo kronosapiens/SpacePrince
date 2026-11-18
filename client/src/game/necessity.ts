@@ -1,16 +1,29 @@
 import { blankSideState, cloneSideState } from "./chart";
 import { fortuneChance, getEffectiveStats } from "./relational";
 import { isCombusted, remainingResolve } from "./combust";
-import { pickWeighted } from "./rng";
 import type { Chart, NecessityEntry, PlanetName, SideState } from "./types";
 
-export const NECESSITY_TENSION_TIERS = [12, 24, 36];
-/** The Other's Necessity: each fielded planet rolls its Fortune this many times, */
-export const OTHER_NECESSITY_ROLLS = 3;
+/** Necessity: each fielded planet rolls its Fortune this many times, */
+export const NECESSITY_ROLLS = 3;
 /** and each miss adds its Resolve over this divisor as tension. */
-export const OTHER_NECESSITY_RESOLVE_DIVISOR = 6;
+const NECESSITY_RESOLVE_DIVISOR = 6;
 
-/** Apply necessity to available fielded planets, preserving existing tension. */
+/** The tension one missed roll adds to the planet. */
+export function necessityPerMiss(chart: Chart, planet: PlanetName): number {
+  return getEffectiveStats(chart, planet).resolve / NECESSITY_RESOLVE_DIVISOR;
+}
+
+function rollNecessity(chart: Chart, planet: PlanetName, rng: () => number): number {
+  const chance = fortuneChance(getEffectiveStats(chart, planet).luck);
+  let misses = 0;
+  for (let roll = 0; roll < NECESSITY_ROLLS; roll++) {
+    if (rng() >= chance) misses++;
+  }
+  return misses * necessityPerMiss(chart, planet);
+}
+
+/** Apply the player's Necessity to available fielded planets, added to the
+ *  tension each already carries and capped at its Resolve. */
 export function applyNecessity(
   chart: Chart,
   state: SideState,
@@ -22,20 +35,14 @@ export function applyNecessity(
   for (const planet of roster) {
     const ps = next[planet];
     if (isCombusted(chart.planets[planet], ps)) continue;
-    const draw = pickWeighted(NECESSITY_TENSION_TIERS, rng);
-    const blocked = rng() < fortuneChance(getEffectiveStats(chart, planet).luck);
-    const amount = Math.max(0, Math.min(
-      blocked ? 0 : draw,
-      remainingResolve(chart.planets[planet], ps),
-    ));
+    const amount = Math.min(rollNecessity(chart, planet, rng), remainingResolve(chart.planets[planet], ps));
     ps.tension += amount;
-    necessity.push({ planet, amount, blocked, draw });
+    necessity.push({ planet, amount });
   }
   return { state: next, necessity };
 }
 
-/** Apply the Other's Necessity to a blank state: each fielded planet rolls its
- *  Fortune three times, and every miss adds a sixth of its Resolve as tension. */
+/** Apply the Other's Necessity to a blank state. */
 export function applyOtherNecessity(
   chart: Chart,
   roster: readonly PlanetName[],
@@ -44,15 +51,9 @@ export function applyOtherNecessity(
   const state = blankSideState();
   const necessity: NecessityEntry[] = [];
   for (const planet of roster) {
-    const { luck, resolve } = getEffectiveStats(chart, planet);
-    const chance = fortuneChance(luck);
-    const perMiss = resolve / OTHER_NECESSITY_RESOLVE_DIVISOR;
-    let amount = 0;
-    for (let roll = 0; roll < OTHER_NECESSITY_ROLLS; roll++) {
-      if (rng() >= chance) amount += perMiss;
-    }
+    const amount = rollNecessity(chart, planet, rng);
     state[planet].tension = amount;
-    necessity.push({ planet, amount, draw: OTHER_NECESSITY_ROLLS * perMiss });
+    necessity.push({ planet, amount });
   }
   return { state, necessity };
 }

@@ -111,7 +111,7 @@ Key modules:
 - `projections.ts`: preview deltas and projected Light, over the same beats the scorer reads
 - `score.ts`: Light by the encounter's ruler (`RULER_RULES`)
 - `combust.ts`: remaining Resolve, combustion, uncombust
-- `necessity.ts`: relational-entry Necessity with Fortune blocking
+- `necessity.ts`: relational-entry Necessity for both charts, from Fortune rolls
 - `encounter.ts`: `beginRelationalEncounter`, `beginNarrativeEncounter`, `encounterRuler`
 - `narrative.ts`: scene context, targets, occupant terms (`withOccupants`), preview and resolve
 - `run.ts`: `beginRun`, map rollover, boundary revival, `isOver`

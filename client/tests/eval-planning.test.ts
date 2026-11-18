@@ -133,8 +133,8 @@ describe("relational planning", () => {
     // its 12 Testimony on the Other counts double: 24 Light. The Other's
     // Testimony clears our 12. Next turn it equally afflicts 12 or testifies
     // to nothing: expected capacity is 114. Either way the best reply afflicts
-    // its cleared Moon for 12, doubled again: 48 Light. A later opening costs
-    // 24 on half the draws, giving 102 with entry anticipation.
+    // its cleared Moon for 12, doubled again: 48 Light. A later opening's three
+    // rolls each miss half the time for 20, costing 30 on average: 84 with entry anticipation.
     const immediate = evaluateRelational(play, run, actions, { anticipateEntry: true })[0]!;
     expect(immediate.value).toEqual({ alive: 1, lit: 1, capacity: 120, light: 24 });
     const defensive = evaluateRelational(play, run, actions, { horizon: 2 })[0]!;
@@ -142,16 +142,17 @@ describe("relational planning", () => {
     const entry = evaluateRelational(play, run, actions, { horizon: 2, anticipateEntry: true })[0]!;
     expect(entry.value.alive).toBeCloseTo(1);
     expect(entry.value.lit).toBeCloseTo(1);
-    expect(entry.value.capacity).toBeCloseTo(102);
+    expect(entry.value.capacity).toBeCloseTo(84);
     expect(entry.value.light).toBe(48);
   });
 });
 
 describe("next-entry expectation", () => {
+  // Resolve 120: each miss costs 20; at luck 60, 0 to 3 misses come 1/8, 3/8, 3/8, 1/8 of the time.
   it.each([
-    [6, 60, 0.5, 3], [12, 60, 0.5, 6], [24, 60, 2 / 3, 14],
-    [36, 60, 5 / 6, 24], [48, 60, 1, 36], [12, 0, 0, 0], [6, 120, 1, 6],
-  ])("values capacity %i with luck %i using complete Fortune blocking", (capacity, luck, survives, remaining) => {
+    [6, 60, 1 / 8, 0.75], [20, 60, 1 / 8, 2.5], [40, 60, 1 / 2, 12.5],
+    [60, 60, 7 / 8, 30], [72, 60, 1, 42], [12, 0, 0, 0], [6, 120, 1, 6],
+  ])("values capacity %i with luck %i over three independent Fortune rolls", (capacity, luck, survives, remaining) => {
     const { run, play } = leaf(capacity, luck);
     const value = entryLeafValue(run, play.prince.chart);
     expect(value.alive).toBeCloseTo(survives);
@@ -161,18 +162,19 @@ describe("next-entry expectation", () => {
   });
 
   it("includes gained Resolve and Fortune, combines independent survival, and ignores dead or unfielded planets", () => {
-    const { run, encounter, play } = leaf(0, 0);
+    const { run, encounter, play } = leaf(12, 0);
     encounter.roster = ["Moon", "Mercury", "Venus"];
     const chart = play.prince.chart;
     run.gains.Moon.resolve = 12;
     run.gains.Moon.luck = 60;
     chart.planets.Mercury.base = { affliction: 12, testimony: 12, resolve: 120, luck: 60 };
     chart.planets.Mercury.buffs = { affliction: 0, testimony: 0, resolve: 0, luck: 0 };
-    run.state.Mercury.tension = 108;
+    run.state.Mercury.tension = 96;
     run.state.Venus.tension = getEffectiveStatsFromPlacement(chart.planets.Venus).resolve;
     const before = structuredClone(run);
-    // Each of two lit planets survives with probability 1/2 and capacity 12.
-    expect(entryLeafValue(run, chart)).toEqual({ alive: 0.75, lit: 1, capacity: 12, light: 37 });
+    // Each of two lit planets keeps 24 and survives at most one miss: probability 1/2.
+    // A miss costs the Moon 22 of its gained 132 Resolve, leaving 2, and Mercury 20, leaving 4.
+    expect(entryLeafValue(run, chart)).toEqual({ alive: 0.75, lit: 1, capacity: 8.25, light: 37 });
     expect(run).toEqual(before);
   });
 

@@ -22,7 +22,7 @@ const DEFINITIONS: Record<Strategy, string> = {
   "capacity-12": "Immediate defense may spend up to 12 capacity for Light after preserving survival and lit planets; baseline survival routing and narratives.",
   "two-turn-survival": "Two-turn defensive actions; baseline survival routing and immediate defensive narratives.",
   "two-turn-capacity-12": "Two-turn defense may spend up to 12 expected capacity for Light after preserving survival and expected lit planets; baseline survival routing and narratives.",
-  "relational-two-turn-entry-aware": "Two-turn defense values the next Necessity draw at resolved encounter leaves; prefer relational nodes, then the shorter route to the exit; immediate defensive narratives.",
+  "relational-two-turn-entry-aware": "Two-turn defense values the next Necessity rolls at resolved encounter leaves; prefer relational nodes, then the shorter route to the exit; immediate defensive narratives.",
 };
 
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;

@@ -8,9 +8,8 @@ Narrative encounters are specified in [ENCOUNTERS.md](ENCOUNTERS.md) and their r
 Stat divisions in relational encounters produce whole numbers without rounding.
 Effective stats are multiples of `12` — the smallest number every aspect fraction (§9) divides — so halves, thirds, quarters, and sixths of any stat are integers.
 Resolve is the tension at which a planet combusts, also a multiple of `12` (§10).
-The player's Necessity draws `12`, `24`, or `36` tension; a successful Fortune roll blocks the draw entirely (§11.3).
-Its addition is limited to the planet's remaining Resolve, and a planet with none left combusts.
-The Other's Necessity adds a sixth of a planet's Resolve for each of three Fortune rolls it misses (§11.3).
+Necessity adds a sixth of a planet's Resolve for each of three Fortune rolls it misses (§11.3).
+On the player's chart its addition is limited to the planet's remaining Resolve, and a planet with none left combusts.
 Probabilities are stated in sixtieths (§7); percentages appear only as glosses.
 Lattice membership is an invariant: never introduce a buff, multiplier, or knob that steps off it.
 Exempt from the lattice: the planet-unlock schedule (`2^i` — temporal pacing, not an operand), the seven planets themselves, and economy numbers (Light totals, narrative prices) — sums and payments, never divided.
@@ -165,7 +164,7 @@ Narrative choices roll nothing: every option's effect is determined and previewe
 
 Luck is therefore not a stat used during relational turns.
 Affliction, testimony, and Resolve decide what a planet does inside an encounter; luck decides uncombust rolls and relief from necessity.
-The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the one luck-based probability: the chance a combusted planet uncombusts at a map opening, the chance an available planet's necessity draw is blocked, and the chance each of the Other's three necessity rolls adds nothing (§11.3).
+The **fortune roll**, `luck / 120` — in sixtieths, `(luck/2) / 60` — is the one luck-based probability: the chance a combusted planet uncombusts at a map opening, and the chance each of a planet's three necessity rolls adds nothing (§11.3).
 One roll, one name: the UI surfaces it as `Fortune`, and a planet's displayed Fortune is its odds wherever fate is asked.
 
 ## 8. Tension Value Model
@@ -219,7 +218,7 @@ At 2° per point, this fills one Resolve arc.
 Resolve reads directly as how much tension a planet absorbs before it goes out — durable planets soak many blows; fragile ones fold in a few.
 Tension **below** Resolve is recoverable: a planet never combusts from a hit that leaves it under the line, and easing tension back down restores its remaining Resolve in full.
 During an exchange, the player can read the exact combustion outcome before acting.
-Relational entry adds a Necessity draw (§11.3), so preparation must account for its possible amounts.
+Relational entry adds Necessity (§11.3), so preparation must account for its possible amounts.
 
 Tension is **capped at Resolve** — a combusted planet holds `tension = Resolve`, never more.
 Within encounters, combustion is terminal: a combusted planet is zero-output, takes no further tension, receives no testimony, and is skipped by propagation.
@@ -259,7 +258,7 @@ Per encounter:
   The Other is then a chart whose Ascendant that planet rules (`RULERSHIP` in `client/src/game/data.ts`, `chartRuler` in `chart.ts`).
   One planet drives three surfaces: the node's colour on the map, the relational theme ([MUSIC.md](../presentation/MUSIC.md)), and the encounter's scoring rule (§12).
   Narrative encounters use their house's [fixed game ruler](HOUSES.md#house) for presentation.
-- Both charts receive **Necessity at relational entry** (§11.3): the player adds a draw to carried tension, while the Other begins with fresh state and arrives carrying up to half its Resolve as tension.
+- Both charts receive **Necessity at relational entry** (§11.3), up to half of each fielded planet's Resolve as tension: the player adds it to carried tension, while the Other begins with fresh state.
   Fortune can leave a planet with no added tension, and every fielded planet on the Other's chart arrives lit.
 - Opponent planet is drawn randomly each turn from its non-combusted **fielded** planets (the roster mirrors the player's unlock tier, §11.1), at odds the ruler sets (§11.4).
   The VRF request for turn N+1 happens at turn N's resolution — the encounter arrival request covers the first — so the reveal rides a transaction already in flight (§7).
@@ -328,25 +327,22 @@ Candidates that depend on lasting narrative consequences stay provisional, since
 ### 11.3 Necessity at relational openings and revival at map openings
 
 Necessity is the tension a chart brings into a new situation; Fortune offers relief from it.
-It applies to both charts at every relational encounter opening, by a separate rule for each (`client/src/game/necessity.ts`).
-The player's state carries forward; each other chart begins with fresh state.
-
-**The player.** For each available fielded planet (`applyNecessity`):
-
-1. Draw uniformly from `12`, `24`, or `36` tension.
-2. Roll Fortune (`luck / 120`, §7); on success, block the draw entirely.
-3. Add the result to existing tension, capped at Resolve.
-   Reaching Resolve combusts the planet.
-
-**The Other.** Each fielded planet rolls Fortune three times, and each miss adds a sixth of its Resolve (`applyOtherNecessity`).
-A planet arrives with between none and half of its Resolve as tension, so it always arrives lit, and the higher its Fortune the less it carries.
+It applies to both charts at every relational encounter opening, by one rule (`client/src/game/necessity.ts`).
+Each fielded planet rolls Fortune (`luck / 120`, §7) three times, and each miss adds a sixth of its Resolve as tension.
+A planet takes between none and half of its Resolve, and the higher its Fortune the less it takes.
 Its average is half its Resolve times its chance of missing a roll.
 Resolve is a multiple of `12`, so every amount is a whole number.
+
+**The player.** The player's state carries forward (`applyNecessity`).
+Each available fielded planet adds its Necessity to the tension it already carries, capped at Resolve.
+Reaching Resolve combusts the planet.
+A planet carrying no tension always survives the opening: the most it can take is half its Resolve.
+
+**The Other.** Each other chart begins with fresh state (`applyOtherNecessity`), so every fielded planet arrives lit.
 The intent is that an Other arrives with between a half and two-thirds of its Resolve remaining; on base stats the chart averages 40% of its Resolve as tension.
 
 Combusted and unfielded planets receive nothing.
 There is no map-depth multiplier, and necessity does not propagate or award Light.
-A fresh planet always survives the player's draw: the maximum is 36, below the smallest Resolve of 48.
 If Necessity combusts the player's entire fielded roster, the encounter resolves with zero actions and zero Light.
 Clearing that encounter still advances the lifetime relational encounter count; a newly unlocked planet can keep the run alive.
 
@@ -358,7 +354,7 @@ Narrative entry applies no Necessity, and relational entry provides no resurrect
 The map seed determines revival in a separate stream from node content; results are applied and displayed before the first node is entered (§7).
 At relational arrival, both Necessity sweeps settle before the first action and are visible on their respective charts.
 Encounter length still increases with map number, while repeated necessity adds to the player's carried tension and revival provides a way back from combustion.
-The balancing study that arrived at the player's rules is summarised on [PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560).
+An earlier balancing study of the player's Necessity, made under a different rule, is summarised on [PR #18](https://github.com/kronosapiens/SpacePrince/pull/18#issuecomment-6457613560).
 
 ### 11.4 The Other's move
 

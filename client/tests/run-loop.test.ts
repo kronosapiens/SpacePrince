@@ -346,7 +346,7 @@ describe("Shared run transitions", () => {
     expect(wounded).toEqual(before);
   });
 
-  it("records entry and later losses once, including planets whose opening Fortune blocked the draw", () => {
+  it("records entry and later losses once, including planets whose opening Fortune rolls all succeeded", () => {
     const chart = structuredClone(prince.chart);
     chart.planets.Moon.sign = "Aries";
     chart.planets.Mercury.sign = "Taurus";
@@ -362,9 +362,9 @@ describe("Shared run transitions", () => {
     const nodeId = Object.keys(wounded.map.rolledNodes).find((id) => wounded.map.rolledNodes[id]!.kind === "relational")!;
     let current = enterNode({ run: wounded, chart, nodeId, lifetimeRelationalEncounterCount: 2 });
     const encounter = current.encounter as RelationalEncounter;
-    expect(encounter.selfNecessity!.filter(({ blocked }) => blocked)).toEqual([
-      { planet: "Mercury", amount: 0, blocked: true, draw: expect.any(Number) },
-      { planet: "Venus", amount: 0, blocked: true, draw: expect.any(Number) },
+    expect(encounter.selfNecessity!.filter(({ amount }) => amount === 0)).toEqual([
+      { planet: "Mercury", amount: 0 },
+      { planet: "Venus", amount: 0 },
     ]);
     expect(isCombusted(chart.planets.Moon, current.state.Moon)).toBe(true);
     expect(encounter.resolved).toBe(false);
