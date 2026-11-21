@@ -12,3 +12,4 @@ It is kept because the current design still refers to that lineage: the postures
 - [DESIGN.md](v1/DESIGN.md): the v1 game design.
 - [CONTRACTS.md](v1/CONTRACTS.md): the v1 onchain data model for charts and synastry.
 - [ONBOARD.md](v1/ONBOARD.md): the v1 first-ten-minutes arc.
+- [Space Prince Design Insights](v1/SPACE_PRINCE_DESIGN_INSIGHTS.md) preserves the original design conversation and its three artwork replies.
