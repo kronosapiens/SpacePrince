@@ -4,6 +4,7 @@ import { Codex } from "./Codex";
 import { InfoCard } from "./InfoCard";
 import { PrinceArtwork } from "./PrinceArtwork";
 import { usePrince } from "@/state/PrinceStore";
+import { ABOUT } from "@/copy/about";
 import { playUISound } from "@/audio/engine";
 import { playFocusSound, playHoverSound } from "@/audio/interaction";
 
@@ -12,10 +13,10 @@ export function SettingsMenu() {
   const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<"settings" | "prince" | "codex" | null>(null);
+  const [view, setView] = useState<"settings" | "prince" | "codex" | "about" | null>(null);
   const close = useCallback(() => setView(null), []);
   const inspecting = view === "prince" && !!prince;
-  const openView = (next: "prince" | "codex") => {
+  const openView = (next: "prince" | "codex" | "about") => {
     playUISound("select");
     triggerRef.current?.focus();
     setView(next);
@@ -88,6 +89,14 @@ export function SettingsMenu() {
           <Codex />
         </InfoCard>
       )}
+      {view === "about" && (
+        <InfoCard ariaLabel={ABOUT.title} className="about-modal" onClose={close}>
+          <article className="about">
+            <h2>{ABOUT.title}</h2>
+            {ABOUT.paragraphs.map((text, i) => <p key={i}>{text}</p>)}
+          </article>
+        </InfoCard>
+      )}
       {view === "settings" && (
         <div
           ref={panelRef}
@@ -127,6 +136,16 @@ export function SettingsMenu() {
               {arrow}
             </button>
             {!prince && <p>Create a Prince to inspect it here.</p>}
+            <button
+              type="button"
+              className="settings-menu-button"
+              onPointerEnter={playHoverSound}
+              onFocus={playFocusSound}
+              onClick={() => openView("about")}
+            >
+              <span>{ABOUT.title}</span>
+              {arrow}
+            </button>
           </div>
         </div>
       )}

@@ -1751,17 +1751,20 @@
   outline: 1px solid var(--gold);
   outline-offset: 2px;
 }
-.codex-entry {
+.codex-entry,
+.about {
   overflow-y: auto;
   padding: 44px clamp(24px, 5vw, 56px) 40px;
   color: var(--bone);
   font: 17px / 1.65 var(--sans);
 }
-.codex-entry h2 {
+.codex-entry h2,
+.about h2 {
   margin: 0 0 20px;
   font: 400 clamp(32px, 5vw, 44px) / 1.1 var(--serif);
 }
-.codex-entry p {
+.codex-entry p,
+.about p {
   max-width: 60ch;
   margin: 0 0 16px;
   text-wrap: pretty;
@@ -1793,6 +1796,20 @@
   }
   .codex-entry { padding: 28px 24px; }
 }
+
+/* About — one column of prose in the codex entry's type, a size down so
+   the whole text shows at 1280×720; the stage takes the text's height and
+   the text scrolls when the viewport is shorter. */
+.about-modal .info-card-stage {
+  flex-direction: column;
+  align-items: stretch;
+  width: min(640px, 100%);
+  max-height: calc(100svh - 48px);
+  aspect-ratio: auto;
+  padding: 0;
+}
+.about { min-height: 0; font-size: 15px; }
+.about p:last-child { margin-bottom: 0; }
 
 /* Planet introduction — a ceremonial plate around an illustrated reading. */
 .planet-intro-modal .info-card-stage {

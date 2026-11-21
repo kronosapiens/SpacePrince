@@ -317,13 +317,13 @@ They share a register and the same panel.
 
 ### 3.6.2 The info card
 
-One modal frame — full-viewport backdrop, bordered square stage, close button (`InfoCard`) — hosts standalone study content: the Prince artifact, the Astral Codex, planet introductions, and future tooltip or tutorial cards.
+One modal frame — full-viewport backdrop, bordered square stage, close button (`InfoCard`) — hosts standalone study content: the Prince artifact, the Astral Codex, the About text, planet introductions, and future tooltip or tutorial cards.
 Content differs; the frame, entrance, and dismissal grammar (backdrop tap, ✕, or ESC) never do.
 The primer keeps its own gated flow (§9.6) for now; whether it ever presents inside this frame is an open question.
 
 A card opens in three contexts:
 
-- **Summoned** — the player asks for it: **Inspect Prince** and the **Astral Codex** from the settings menu (§9.5).
+- **Summoned** — the player asks for it: **Inspect Prince**, the **Astral Codex**, and **About** from the settings menu (§9.5).
 - **Queued** — gameplay earns it (`InfoCardContext`): a queued card presents on returning to the map, one at a time, never over a running encounter.
 - **Encounter entry** — the planetary chorus presents after node entry is committed, before the encounter mounts.
   It reuses the planet introduction’s abstract composition with a complete curated passage, author, linked work/locator, and translator when present.
@@ -687,7 +687,7 @@ A combined lobby surface — the player's entry point, and in the intended game 
 - **Wordmark "SPACE PRINCE"** beside it.
   This is the only screen where the wordmark exists.
 - **One primary affordance:** **Begin** or **Continue** (see §9.2).
-- **The settings menu** (the corner gear, present on every surface) holds audio controls, the **Astral Codex** glossary (§9.6), and **Inspect Prince** (§7).
+- **The settings menu** (the corner gear, present on every surface) holds audio controls, the **Astral Codex** glossary (§9.6), **Inspect Prince** (§7), and **About**, a short account of the game (`client/src/copy/about.ts`).
   Always available, never demanded.
 
 ### 9.2 Begin — state-dependent
@@ -719,7 +719,7 @@ The archived [v1 onboarding](../archive/v1/ONBOARD.md) opened instead on a bare 
 ### 9.5 Settings, account, wallet
 
 Account, wallet, and configuration management are **not** intended as in-game surfaces: they would live in the **Cartridge Controller** web wallet's config modal once the game is onchain.
-The prototype's settings menu holds only what the local game needs — audio, the codex, and inspection.
+The prototype's settings menu holds only what the local game needs — audio, the codex, inspection, and the About text.
 
 ### 9.6 Primer — the framing and the codex
 
